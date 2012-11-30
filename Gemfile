@@ -43,6 +43,5 @@ gem 'debugger'
 
 # authentication/authorization
 gem 'devise'
-gem 'cancan'
 gem 'cantango'
 gem 'cantango_editor'

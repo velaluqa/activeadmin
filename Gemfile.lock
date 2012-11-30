@@ -165,7 +165,6 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt-ruby (~> 3.0.0)
-  cancan
   cantango
   cantango_editor
   coffee-rails (~> 3.2.1)
