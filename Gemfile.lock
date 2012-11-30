@@ -164,6 +164,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bcrypt-ruby (~> 3.0.0)
   cancan
   cantango
   cantango_editor

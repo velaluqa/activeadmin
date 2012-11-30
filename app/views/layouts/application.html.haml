@@ -1,0 +1,26 @@
+!!! 5
+%html
+  %head
+    %title StudyServer
+    = stylesheet_link_tag "application", :media => "all"
+    = javascript_include_tag "application"
+    = csrf_meta_tags
+
+  %body
+    - unless @dont_display_navbar
+      .navbar.navbar-fixed-top
+        .navbar-inner
+          .container
+            .brand= link_to("Study Server", dashboard_index_path)
+            .pull-right
+              - if user_signed_in?
+                %ul.nav
+                  %li
+                    %p.navbar-text= "Signed in as #{current_user.name}"
+                  %li
+                    = link_to("Log out", destroy_user_session_path, :method => 'delete')
+              - else
+                %p.navbar-text Please sign in!
+
+  .container-fluid
+    = yield
