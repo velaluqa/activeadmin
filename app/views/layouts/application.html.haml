@@ -19,8 +19,11 @@
                     %p.navbar-text= "Signed in as #{current_user.name}"
                   %li
                     = link_to("Log out", destroy_user_session_path, :method => 'delete')
-              - else
-                %p.navbar-text Please sign in!
 
   .container-fluid
+    - flash.each do |name, msg|
+      - if msg.is_a?(String)
+        %div{:class => "alert alert-#{name == :notice ? "success" : "error"}"}
+          %a.close{"data-dismiss" => "alert"} ×
+          = content_tag :div, msg, :id => "flash_#{name}"
     = yield
