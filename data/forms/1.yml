@@ -1,7 +1,7 @@
 - include: test_form_reader
 - id: tumor_size
   type: measurement
-  label: Tumor Size
+  label: Tumour Size
   validations:
     - required: true
       message: Without a measurement, this whole enterprise is rather pointless.
