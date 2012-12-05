@@ -1,0 +1,19 @@
+- id: reader_name
+  type: string
+  label: Reader Name
+  validations:
+    - required: true
+      message: Please enter your name!
+    - minlength: 2
+      message: Nobody has that short a name.
+- id: reader_age
+  type: number
+  label: Reader Age
+  validations:
+    - required: true
+      message: Bitte geben Sie ihr wahres Alter ein!
+    - min: 23
+      message: Aren\'t you a bit young to be a doctor?
+    - max: 67
+      message: Rente awaits.
+- include: test_form_soul

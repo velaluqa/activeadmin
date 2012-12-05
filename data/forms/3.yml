@@ -1,0 +1,6 @@
+- id: waver
+  type: bool
+  label: I sell my soul to you.
+  validations:
+    - required: true
+      message: No soul selling, no money!
