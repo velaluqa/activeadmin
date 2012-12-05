@@ -3,5 +3,5 @@ class Form < ActiveRecord::Base
 
   validates :name, :presence => true
   validates :name, :uniqueness => true
-  validates :name, :format => { :with => /^[a-zA-Z0-9_]$/, :message => 'Only letters A-Z, numbers and \'_\' allowed' }
+  validates :name, :format => { :with => /^[a-zA-Z0-9_]+$/, :message => 'Only letters A-Z, numbers and \'_\' allowed' }
 end
