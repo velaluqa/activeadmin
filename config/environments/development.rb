@@ -37,4 +37,8 @@ StudyServer::Application.configure do
 
   # default URL for devise
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
+
+  # custom app config
+  config.data_directory = 'data'
+  config.form_configs_directory = config.data_directory + '/forms'
 end

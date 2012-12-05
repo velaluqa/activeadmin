@@ -1,0 +1,19 @@
+!!! 5
+%html
+  %head
+    %title Data Entry Form
+    = stylesheet_link_tag "application", :media => "all"
+    = javascript_include_tag "application"
+    = csrf_meta_tags
+    - unless @form_config_components[:validators].nil?
+      :javascript
+        @form_config_components[:validators]
+    - unless @form_config_components[:stylesheet].nil?
+      :css
+        @form_config_components[:stylesheet]
+    :javascript
+      $(function () { $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(); } );
+
+  %body
+  .container
+    = yield

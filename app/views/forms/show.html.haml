@@ -1,0 +1,9 @@
+.offset1.span10
+  = form_tag('', :class => 'form-horizontal') do
+    - @form_config.each do |field|
+      - unless field['include'].nil?
+        %span Templates are not implemented yet
+      - else        
+        = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
+    .form-actions
+      %button.btn.btn-primary{:type => 'submit'} Submit Answers

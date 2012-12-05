@@ -1,5 +1,6 @@
 StudyServer::Application.routes.draw do
   resources :dashboard
+  resources :forms
 
   devise_for :users, :controllers => { :sessions => 'users/sessions' }
 
