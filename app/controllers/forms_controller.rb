@@ -1,4 +1,6 @@
 require 'yaml'
+require 'pp'
+
 
 class FormsController < ApplicationController
   before_filter :find_record
@@ -15,6 +17,8 @@ class FormsController < ApplicationController
     return if @form_components.nil?
 
     @form_config, @form_components = process_imports(@form_config, @form_components, [@form.id])
+    @form_components = stringify_form_components(@form_components)
+    pp @form_components
   end
 
 protected
@@ -59,9 +63,15 @@ protected
     return components
   end
 
+  def stringify_form_components(components)
+    components.each do |key, value|
+      components[key] = value.join("\n")
+    end
+  end
+
   def process_imports(config, components, already_included)
     full_config = []
-    full_components = Hash.new(components)
+    full_components = components
 
     config.each do |field|
       if field['include'].nil?
@@ -86,14 +96,10 @@ protected
 
         full_config += included_config
         full_components.each do |key, value|
-          full_components[k] = v + included_components[k]
+          full_components[key] = value + included_components[key]
         end
       end
     end
-
-    full_components.each do |key, value|
-      full_components[k] = value.join("\n")
-    end    
 
     return [full_config, full_components]
   end

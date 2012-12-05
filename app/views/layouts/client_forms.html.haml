@@ -7,13 +7,13 @@
     = csrf_meta_tags
     - unless @form_components[:validators].nil?
       :javascript
-        @form_components[:validators]
-    - unless @form_components[:stylesheet].nil?
+        #{@form_components[:validators]}
+    - unless @form_components[:stylesheets].nil?
       :css
-        @form_components[:stylesheet]
+        #{@form_components[:stylesheets]}
     :javascript
       $(function () { $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(); } );
 
   %body
-  .container
-    = yield
+    .container
+      = yield
