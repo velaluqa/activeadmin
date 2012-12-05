@@ -18,7 +18,6 @@ class FormsController < ApplicationController
 
     @form_config, @form_components = process_imports(@form_config, @form_components, [@form.id])
     @form_components = stringify_form_components(@form_components)
-    pp @form_components
   end
 
 protected
