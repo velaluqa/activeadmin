@@ -53,10 +53,10 @@ protected
     components = {:validators => [], :stylesheets => []}
 
     if(File.exists?(Rails.application.config.form_configs_directory + "/#{id}.js"))
-      components[:validators] << File.open(Rails.application.config.form_configs_directory + "/#{id}.js", 'o') {|f| f.read}
+      components[:validators] << File.open(Rails.application.config.form_configs_directory + "/#{id}.js", 'r') {|f| f.read}
     end
     if(File.exists?(Rails.application.config.form_configs_directory + "/#{id}.css"))
-      components[:stylesheet] << File.open(Rails.application.config.form_configs_directory + "/#{id}.css", 'o') {|f| f.read}
+      components[:stylesheet] << File.open(Rails.application.config.form_configs_directory + "/#{id}.css", 'r') {|f| f.read}
     end
 
     return components
