@@ -2,6 +2,9 @@
   .form-actions
     %button#refresh-rois-btn.btn.pull-right Refresh Measurements
   = form_tag('', :class => 'form-horizontal', :id => 'the_form') do
+    .control-group.error
+      .controls
+        %p#custom-validation-help-block.help-block
     - @form_config.each do |field|
       = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
     .form-actions
