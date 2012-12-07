@@ -1,7 +1,8 @@
 - include: test_form_reader
 - id: tumor_size
-  type: measurement
-  label: Tumour Size
+  type: roi
+  value: mensure_length
+  label: Tumour Diameter
   validations:
     - required: true
       message: Without a measurement, this whole enterprise is rather pointless.
