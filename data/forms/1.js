@@ -1,3 +1,8 @@
+function hasPharmTraceAPI()
+{
+	return (typeof PharmTraceAPI != 'undefined');
+}
+
 $(document).ready(function()
 {
 	if(typeof PharmTraceAPI != 'undefined')
@@ -15,6 +20,8 @@ $(function () {
 	   {
 		submitError: function($form, event, errors)
 		{
+			if(!hasPharmTraceAPI()) { alert("test"); return; }
+			
 			PharmTraceAPI.updateROIs();
 
 			rois = PharmTraceAPI.rois;
