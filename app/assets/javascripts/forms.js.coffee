@@ -25,7 +25,14 @@ populate_select_with_rois = (select, rois) ->
   if($('#'+select_id+' option').length == 0)
     select.append(new Option("No ROIs available", "", true, true))
 
+register_custom_validation_function = (func) ->
+  window.custom_validation_functions.push(func)
+
 $(document).ready ->
+  window.custom_validation_functions = []
+
+  $("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
+  
   $('#refresh-rois-btn').click ->
     PharmTraceAPI.updateROIs()
 

@@ -11,8 +11,6 @@
     - unless @form_components[:stylesheets].nil?
       :css
         #{@form_components[:stylesheets]}
-    :javascript
-      $(function () { $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(); } );
 
   %body
     .container
