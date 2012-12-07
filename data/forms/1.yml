@@ -6,4 +6,11 @@
   validations:
     - required: true
       message: Without a measurement, this whole enterprise is rather pointless.
+- id: tumor_area
+  type: roi
+  value: area
+  label: Tumour Area
+  validations:
+    - required: true
+      message: 1D is boring!
           
