@@ -43,6 +43,30 @@ set_custom_validation_messages = (messages) ->
 
   ul.append(lis.join('\n'))
 
+transform_answers_array = (array) ->
+  result = new Object
+
+  (result[answer['name']] = answer['value']) for answer in array
+
+  return result
+
+display_answers_preview = (answers) ->
+  preview_modal = $('#preview_modal')  
+  data_fields = preview_modal.find('.modal-body span')
+
+  fill_data_field($(field), answers) for field in data_fields
+
+  preview_modal.modal('show')  
+
+fill_data_field = (field, answers) ->
+  field_name = field.attr('name')
+  answer = answers[field_name]
+
+  if(field.attr('data-display-style') == 'bool')
+    answer = if answer > 0 then "Yes" else "No"
+
+  field.text(answer)
+
 $(document).ready ->
   $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(
     submitSuccess: ($form, event) ->
@@ -58,8 +82,9 @@ $(document).ready ->
 
       if(validation_messages.length > 0)
         set_custom_validation_messages(validation_messages)
-
-        event.preventDefault()
+      else
+        form_data = $('#the_form').serializeArray()
+        display_answers_preview(transform_answers_array(form_data))
   )
   
   $('#refresh-rois-btn').click ->
