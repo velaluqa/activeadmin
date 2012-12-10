@@ -43,10 +43,20 @@ set_custom_validation_messages = (messages) ->
 
   ul.append(lis.join('\n'))
 
+apply_type = (value, preview_field) ->
+  type = $(preview_field).attr('data-type')
+
+  if(type == 'number' || type == 'roi')
+    return parseFloat(value, 10)
+  else if(type == 'bool')
+    return value > 0
+  else
+    return value
+
 transform_answers_array = (array) ->
   result = new Object
 
-  (result[answer['name']] = answer['value']) for answer in array
+  (result[answer['name']] = apply_type(answer['value'], $("#preview_modal .modal-body span[name='#{answer['name']}']"))) for answer in array
 
   return result
 
@@ -62,8 +72,8 @@ fill_data_field = (field, answers) ->
   field_name = field.attr('name')
   answer = answers[field_name]
 
-  if(field.attr('data-display-style') == 'bool')
-    answer = if answer > 0 then "Yes" else "No"
+  if(field.attr('data-type') == 'bool')
+    answer = if answer == yes then "Yes" else "No"
 
   field.text(answer)
 
@@ -83,8 +93,9 @@ $(document).ready ->
       if(validation_messages.length > 0)
         set_custom_validation_messages(validation_messages)
       else
-        form_data = $('#the_form').serializeArray()
-        display_answers_preview(transform_answers_array(form_data))
+        form_data = transform_answers_array($('#the_form').serializeArray())
+        window.form_answers = form_data
+        display_answers_preview(form_data)
   )
   
   $('#refresh-rois-btn').click ->
@@ -94,6 +105,11 @@ $(document).ready ->
     populate_select_with_rois(select, rois) for select in $('[class*="select-roi-"]')
 
   $('#preview_submit_btn').click ->
+    $(this).button('loading')
+
+    PharmTraceAPI.submitAnswers(window.form_answers)
+
+    $(this).button('reset')
     $('#preview_modal').modal('hide')
-    alert("submitted your answers")
+    
     
