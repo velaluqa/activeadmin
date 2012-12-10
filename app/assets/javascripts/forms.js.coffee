@@ -109,6 +109,9 @@ $(document).ready ->
 
     PharmTraceAPI.submitAnswers(window.form_answers)
 
+  PharmTraceAPI.answersSubmitted.connect (success) ->
+    console.log("submitting answers: #{success}")
+    
     $(this).button('reset')
     $('#preview_modal').modal('hide')
     
