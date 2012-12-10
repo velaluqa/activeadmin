@@ -92,3 +92,8 @@ $(document).ready ->
 
     rois = PharmTraceAPI.rois
     populate_select_with_rois(select, rois) for select in $('[class*="select-roi-"]')
+
+  $('#preview_submit_btn').click ->
+    $('#preview_modal').modal('hide')
+    alert("submitted your answers")
+    

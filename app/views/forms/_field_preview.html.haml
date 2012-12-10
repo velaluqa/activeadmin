@@ -1,4 +1,4 @@
-.control-group
-  = label_tag(field['id'], field['label'], :class => 'control-label')
-  .controls
-    %span{:name => field['id'], :'data-display-style' => field['type']}
+.row-fluid
+  -#.span4.lead= label_tag(field['id'], field['label'])
+  %strong.span4= field['label']
+  %span.span8{:name => field['id'], :'data-display-style' => field['type']}
