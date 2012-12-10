@@ -9,3 +9,15 @@
       = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
     .form-actions
       %button.btn.btn-primary{:type => 'submit'} Submit Answers
+
+#previewModal.modal.hide.fade
+  .modal-header
+    %button.close{:type => 'button', :'data-dismiss' => 'modal', :'aria-hidden' => true} &times;
+    %h3 Please verify your answeres
+  .modal-body
+    .form-horizontal
+      - @form_config.each do |field|
+        = render "forms/field_preview", :field => field
+  .modal-footer
+    %button.btn{:'data-dismiss' => 'modal', :'aria-hidden' => true} Change Answeres
+    %button.btn.btn-primary Submit Answeres

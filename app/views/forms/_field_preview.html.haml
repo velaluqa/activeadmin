@@ -1,0 +1,4 @@
+.control-group
+  = label_tag(field['id'], field['label'], :class => 'control-label')
+  .controls
+    %p{:name => field['id'], :'data-display-style' => field['type']}
