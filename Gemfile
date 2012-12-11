@@ -49,3 +49,6 @@ gem 'debugger'
 gem 'devise'
 gem 'cantango'
 gem 'cantango_editor'
+
+# audit trail
+gem 'paper_trail', '~>2'
