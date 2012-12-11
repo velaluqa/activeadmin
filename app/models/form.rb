@@ -1,4 +1,6 @@
 class Form < ActiveRecord::Base
+  has_paper_trail
+
   attr_accessible :description, :name
 
   validates :name, :presence => true
