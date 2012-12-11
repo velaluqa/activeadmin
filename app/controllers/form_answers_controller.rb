@@ -2,9 +2,6 @@ class FormAnswersController < ApplicationController
   before_filter :authenticate_user!
 
   def create
-    # params: answers as json hash, rest from session?
-    pp params[:form_answer]
-
     answer = FormAnswer.new
     answer.answers = params[:form_answer]
     answer.reader = 23
