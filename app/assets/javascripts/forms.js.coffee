@@ -78,7 +78,7 @@ fill_data_field = (field, answers) ->
   field.text(answer)
 
 $(document).ready ->
-  $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(
+  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
     submitSuccess: ($form, event) ->
       event.preventDefault()
 
