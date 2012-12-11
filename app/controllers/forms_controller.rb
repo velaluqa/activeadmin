@@ -3,6 +3,8 @@ require 'pp'
 
 
 class FormsController < ApplicationController
+  before_filter :authenticate_user!
+
   before_filter :find_record
   layout 'client_forms'
 

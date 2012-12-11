@@ -1,6 +1,6 @@
-require 'pp'
-
 class FormAnswersController < ApplicationController
+  before_filter :authenticate_user!
+
   def create
     # params: answers as json hash, rest from session?
     pp params[:form_answer]
@@ -13,8 +13,7 @@ class FormAnswersController < ApplicationController
     answer.form_timestamp = Time.now
     answer.submitted_at = Time.now
 
-    pp answer
-    pp answer.save
+    answer.save
 
     render :json => {:success => true}
   end
