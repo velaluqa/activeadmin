@@ -8,5 +8,4 @@ class FormAnswer
   key :submitted_at, Time
   key :answers, Hash
   key :signature, Binary
-
 end
