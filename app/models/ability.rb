@@ -2,6 +2,8 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
+    return if user.nil? # guest users have no access whatsoever
+
     # Define abilities for the passed in user here. For example:
     #
     #   user ||= User.new # guest user (not logged in)
