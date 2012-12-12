@@ -3,4 +3,20 @@ class Role < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :object, :polymorphic => true  
+
+  ROLE_SYMS = [:manage, :read, :create, :update, :destroy]
+
+  def role
+    return ROLE_SYMS[read_attribute(:role)]
+  end
+  def role=(sym)
+    index = ROLE_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported role"
+      return
+    end
+
+    write_attribute(:role, index)
+  end
 end
