@@ -47,8 +47,7 @@ gem 'debugger'
 
 # authentication/authorization
 gem 'devise'
-gem 'cantango'
-gem 'cantango_editor'
+gem 'cancan'
 
 # audit trail
 gem 'paper_trail', '~>2'
