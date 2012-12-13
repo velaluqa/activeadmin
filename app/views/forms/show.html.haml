@@ -1,6 +1,6 @@
 .offset1.span10
   .form-actions
-    %button#refresh-rois-btn.btn.pull-right Refresh Measurements
+    %button#refresh-rois-btn.btn.pull-right{:'data-loading-text' => 'Refreshing...'} Refresh Measurements
   = form_tag('', :class => 'form-horizontal', :id => 'the_form') do
     .control-group.error
       .controls

@@ -99,10 +99,13 @@ $(document).ready ->
   )
   
   $('#refresh-rois-btn').click ->
+    $(this).button('loading')
     PharmTraceAPI.updateROIs()
 
+  PharmTraceAPI.roisUpdated.connect ->  
     rois = PharmTraceAPI.rois
     populate_select_with_rois(select, rois) for select in $('[class*="select-roi-"]')
+    $('#refresh-rois-btn').button('reset')
 
   $('#preview_submit_btn').click ->
     $(this).button('loading')

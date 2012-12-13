@@ -1,7 +1,7 @@
 - include: test_form_reader
 - id: tumor_size
   type: roi
-  value: mensure_length
+  value: length
   label: Tumour Diameter
   validations:
     - required: true
