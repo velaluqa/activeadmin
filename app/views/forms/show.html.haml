@@ -9,7 +9,7 @@
       .row.form-row-padding
         .control-group.span5
           = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
-        .help-block.span5= field['description']
+        .muted.span5= field['description']
     .form-actions
       %button.btn.btn-primary{:type => 'submit'} Submit Answers
 
