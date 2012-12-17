@@ -1,5 +1,4 @@
-.control-group
-  = label_tag(field['id'], field['label'], :class => 'control-label')
-  .controls
-    = text_field_tag(field['id'], nil, { :class => input_size }.merge(validators_hash(field)))
-    %p.help-block
+= label_tag(field['id'], field['label'], :class => 'control-label')
+.controls
+  = text_field_tag(field['id'], nil, { :class => input_size }.merge(validators_hash(field)))
+  %p.help-block
