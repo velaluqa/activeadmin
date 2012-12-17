@@ -6,3 +6,34 @@
 {
 	padding-bottom: 15px;
 }
+
+.signature-div
+{
+    width: 80%;
+}
+.signature-line
+{
+    margin-top: 150px !important;
+    height: 0px;
+    line-height: 0px;
+    font-size: 0px;
+    border: solid 1px black;
+    padding: 0;
+}
+
+@media print
+{
+    #form_area { display: none !important; }
+    #preview_modal { display: none !important; }
+    #print_version
+    {
+	display: block !important;
+	-webkit-print-color-adjust: exact !important;
+    }
+
+    .print-signature
+    {
+	padding-top: 50px;
+	padding-bottom: 50px;
+    }
+}

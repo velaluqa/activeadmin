@@ -68,6 +68,12 @@ display_answers_preview = (answers) ->
 
   preview_modal.modal('show')  
 
+fill_print_version = (answers) ->
+  print_version = $('#print_version')  
+  data_fields = print_version.find('.print-body span')
+
+  fill_data_field($(field), answers) for field in data_fields
+
 fill_data_field = (field, answers) ->
   field_name = field.attr('name')
   answer = answers[field_name]
@@ -95,6 +101,7 @@ $(document).ready ->
       else
         form_data = transform_answers_array($('#the_form').serializeArray())
         window.form_answers = form_data
+        fill_print_version(form_data)
         display_answers_preview(form_data)
   )
   
