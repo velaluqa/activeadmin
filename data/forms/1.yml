@@ -3,6 +3,7 @@
   type: roi
   value: length
   label: Tumour Diameter
+  description: Please take your time measuring. Another humans life may depend on you doing a good job here. But no pressure, no pressure at all!
   validations:
     - required: true
       message: Without a measurement, this whole enterprise is rather pointless.
@@ -10,6 +11,7 @@
   type: roi
   value: area
   label: Tumour Area
+  description: "I do not like to repeat myself, but let me just reiterate one point: DO NOT MUCK THIS UP!"
   validations:
     - required: true
       message: 1D is boring!

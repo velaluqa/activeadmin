@@ -1,6 +1,7 @@
 - id: reader_name
   type: string
   label: Reader Name
+  description: Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt. Franz jagt im komplett verwahrlosten Taxi quer durch Bayern. Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. Vogel
   validations:
     - required: true
       message: Please enter your name!
@@ -9,6 +10,7 @@
 - id: reader_age
   type: number
   label: Reader Age
+  description: Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt. Franz jagt im komplett verwahrlosten Taxi quer durch Bayern. Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. Vogel
   validations:
     - required: true
       message: Bitte geben Sie ihr wahres Alter ein!
