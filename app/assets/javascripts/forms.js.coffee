@@ -125,4 +125,9 @@ $(document).ready ->
     $('#preview_submit_btn').button('reset')
     $('#preview_modal').modal('hide')
     
+  PharmTraceAPI.answerSubmissionAborted.connect (success) ->
+    console.log("answers not submitted, aborted")
+    
+    $('#preview_submit_btn').button('reset')
+    
     
