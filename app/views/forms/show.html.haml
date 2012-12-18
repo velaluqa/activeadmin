@@ -2,6 +2,7 @@
   .form-actions
     %button#refresh-rois-btn.btn.pull-right{:'data-loading-text' => 'Refreshing...'} Refresh Measurements
   = form_tag('', :class => 'form-horizontal', :id => 'the_form') do
+    = hidden_field_tag('form_id', @form.id)
     .control-group.error
       .controls
         %p#custom-validation-help-block.help-block
