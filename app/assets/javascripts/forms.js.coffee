@@ -98,28 +98,61 @@ find_arrays = (answers) ->
   (answers[key] = convert_to_array(value)) for own key, value of answers
   answers
 
+set_index_in_name_and_id = (elements, index) ->
+  for element in elements
+    name = $(element).attr('name').replace(/\[\]/, "[#{index}]")
+    id = $(element).attr('id').replace(/__/, "_#{index}_")
+
+    $(element).attr('name', name)
+    $(element).attr('id', id)
+set_index_in_for = (elements, index) ->
+  for element in elements
+    name = $(element).attr('for').replace(/__/, "_#{index}_")
+
+    $(element).attr('for', name)
+
 $(document).ready ->
-  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
-    submitSuccess: ($form, event) ->
-      event.preventDefault()
+  jq_bootstrap_validation_settings = {
+      submitSuccess: ($form, event) ->
+        event.preventDefault()
 
-      clear_custom_validation_messages()
+        clear_custom_validation_messages()
 
-      if(!window.custom_validation_functions? || window.custom_validation_functions.length == 0)
-        return
+        if(!window.custom_validation_functions? || window.custom_validation_functions.length == 0)
+          return
 
-      validation_messages = (validator_func($form) for validator_func in window.custom_validation_functions)
-      validation_messages = validation_messages.reduce (acc,v) -> acc.concat(v)
+        validation_messages = (validator_func($form) for validator_func in window.custom_validation_functions)
+        validation_messages = validation_messages.reduce (acc,v) -> acc.concat(v)
 
-      if(validation_messages.length > 0)
-        set_custom_validation_messages(validation_messages)
-      else
-        #form_data = transform_answers_array($('#the_form').serializeArray())
-        form_data = find_arrays($('#the_form').formParams())
-        window.form_answers = form_data
-        fill_print_version(form_data)
-        display_answers_preview(form_data)
-  )
+        if(validation_messages.length > 0)
+          set_custom_validation_messages(validation_messages)
+        else
+          #form_data = transform_answers_array($('#the_form').serializeArray())
+          form_data = find_arrays($('#the_form').formParams())
+          window.form_answers = form_data
+          fill_print_version(form_data)
+          display_answers_preview(form_data)
+  }
+
+  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(jq_bootstrap_validation_settings)
+
+  $('.add-repeat-btn').click ->
+    repeatable_id = $(this).attr('data-id')
+    console.log("Adding #{repeatable_id}")
+
+    elements = find_arrays($('#the_form').formParams())[repeatable_id]
+    index = elements.length
+    console.log("Currently included #{elements.length} times")
+
+    group_end = $("#repeatable_group_end_#{repeatable_id}")
+    repeatable = $("#repeatable_#{repeatable_id}").clone()
+    set_index_in_name_and_id(repeatable.find('input,select,textarea'), index)
+    set_index_in_for(repeatable.find('label'), index)
+    console.log(group_end)
+    console.log(repeatable)
+
+    group_end.before(repeatable)
+    #$("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(jq_bootstrap_validation_settings)
   
   $('#refresh-rois-btn').click ->
     $(this).button('loading')

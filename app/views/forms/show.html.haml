@@ -13,6 +13,8 @@
           %a.btn.add-repeat-btn.pull-right{:'data-id' => field['id'], :href => '#'}= field['button-label']
       - elsif(field['type'] == 'divider')
         %hr
+      - elsif(field['type'] == 'group-end')
+        %div{:id => "repeatable_group_end_#{field['id']}"}
       - else
         .row.form-row-padding
           .control-group.span5
@@ -53,3 +55,15 @@
       %div.signature-div
         .signature-line
         %p.pull-right.muted (Please sign here)
+
+#repeatables.hide
+  - @repeatables.each do |r|
+    %div{:id => "repeatable_#{r[:id]}"}
+      - r[:config].each do |field|
+        - if(field['type'] == 'divider')
+          %hr
+        - else
+          .row.form-row-padding
+            .control-group.span5
+              = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
+            .muted.span5= field['description']

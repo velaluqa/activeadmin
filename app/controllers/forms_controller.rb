@@ -18,7 +18,7 @@ class FormsController < ApplicationController
     @form_components = form_components(@form)
     return if @form_components.nil?
 
-    @form_config, @form_components = process_imports(@form_config, @form_components, [@form.id])
+    @form_config, @form_components, @repeatables = process_imports(@form_config, @form_components, [], [@form.id])
     @form_components = stringify_form_components(@form_components)
 
     pp @form_config
@@ -79,7 +79,7 @@ protected
     end
   end
 
-  def process_imports(config, components, already_included)
+  def process_imports(config, components, repeatables, already_included)
     full_config = []
     full_components = components
 
@@ -102,11 +102,19 @@ protected
         included_config = parse_form_config(included_form)
         included_components = form_components(included_form)
         
-        included_config, included_components = process_imports(included_config, included_components, already_included)
+        included_config, included_components = process_imports(included_config, included_components, repeatables, already_included)
 
         if(field['repeat'].nil?)
           full_config += included_config
         else
+          repeatable = Marshal.load(Marshal.dump(included_config))
+          repeatable.each do |included_field|
+            included_field['id'] = "#{field['repeat']['prefix']}[][#{included_field['id']}]"
+          end
+          repeatable << {'type' => 'divider'}
+
+          repeatables << {:id => field['repeat']['prefix'], :max => field['repeat']['max'], :config => repeatable}
+
           full_config << {'type' => 'add_repeat', 'group-label' => "#{field['repeat']['label']}s", 'button-label' => "Add #{field['repeat']['label']}", 'id' => field['repeat']['prefix']}
 
           field['repeat']['min'].times do |i|
@@ -114,13 +122,14 @@ protected
             
             config_copy.each do |included_field|
               included_field['id'] = "#{field['repeat']['prefix']}[#{i}][#{included_field['id']}]"
-              pp included_field
             end
 
             config_copy << {'type' => 'divider'}
 
             full_config += config_copy
           end
+
+          full_config << {'type' => 'group-end', 'id' => field['repeat']['prefix']}
         end
 
         full_components.each do |key, value|
@@ -129,6 +138,6 @@ protected
       end
     end
     
-    return [full_config, full_components]
+    return [full_config, full_components, repeatables]
   end
 end
