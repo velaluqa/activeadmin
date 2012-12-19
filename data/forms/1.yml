@@ -1,4 +1,3 @@
-- include: test_form_reader
 - id: tumor_location
   type: select
   values:
