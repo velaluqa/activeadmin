@@ -15,4 +15,15 @@ module FormsHelper
 
     return attributes
   end
+
+  def options_from_values(field)
+    values = field['values']
+    options = ""
+
+    values.each do |value, label|
+      options += "<option value=\"#{value}\">#{label} (#{value})</option>"
+    end
+
+    return options
+  end
 end
