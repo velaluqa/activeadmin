@@ -20,6 +20,8 @@ class FormsController < ApplicationController
 
     @form_config, @form_components = process_imports(@form_config, @form_components, [@form.id])
     @form_components = stringify_form_components(@form_components)
+
+    pp @form_config
   end
 
 protected
@@ -102,13 +104,29 @@ protected
         
         included_config, included_components = process_imports(included_config, included_components, already_included)
 
-        full_config += included_config
+        if(field['repeat'].nil?)
+          full_config += included_config
+        else
+          full_config << {'type' => 'add_repeat', 'label' => "Add #{field['repeat']['label']}"}
+
+          field['repeat']['min'].times do |i|
+            config_copy = Marshal.load(Marshal.dump(included_config))
+            
+            config_copy.each do |included_field|
+              included_field['id'] = "#{field['repeat']['prefix']}[#{i}][#{included_field['id']}]"
+              pp included_field
+            end
+
+            full_config += config_copy
+          end
+        end
+
         full_components.each do |key, value|
           full_components[key] = value + included_components[key]
         end
       end
     end
-
+    
     return [full_config, full_components]
   end
 end

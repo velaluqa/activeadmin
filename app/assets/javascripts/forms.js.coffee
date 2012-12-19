@@ -43,23 +43,6 @@ set_custom_validation_messages = (messages) ->
 
   ul.append(lis.join('\n'))
 
-apply_type = (value, preview_field) ->
-  type = $(preview_field).attr('data-type')
-
-  if(type == 'number' || type == 'roi')
-    return parseFloat(value, 10)
-  else if(type == 'bool')
-    return value > 0
-  else
-    return value
-
-transform_answers_array = (array) ->
-  result = new Object
-
-  (result[answer['name']] = apply_type(answer['value'], $("#preview_modal .modal-body span[name='#{answer['name']}']"))) for answer in array
-
-  return result
-
 display_answers_preview = (answers) ->
   preview_modal = $('#preview_modal')  
   data_fields = preview_modal.find('.modal-body span')
@@ -83,6 +66,26 @@ fill_data_field = (field, answers) ->
 
   field.text(answer)
 
+is_array = (obj) ->
+  return false unless (typeof obj == 'object')
+  
+  numbers = ((/^[0-9]*/.test(key)) for own key, value of obj)
+
+  numbers.reduce (a,b) -> a and b
+
+convert_to_array = (value) ->
+  return value unless is_array(value)
+
+  array = []
+  for own key, v of value
+    array[parseInt(key, 10)] = v
+
+  array
+
+find_arrays = (answers) ->  
+  (answers[key] = convert_to_array(value)) for own key, value of answers
+  answers
+
 $(document).ready ->
   $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
     submitSuccess: ($form, event) ->
@@ -99,7 +102,8 @@ $(document).ready ->
       if(validation_messages.length > 0)
         set_custom_validation_messages(validation_messages)
       else
-        form_data = transform_answers_array($('#the_form').serializeArray())
+        #form_data = transform_answers_array($('#the_form').serializeArray())
+        form_data = find_arrays($('#the_form').formParams())
         window.form_answers = form_data
         fill_print_version(form_data)
         display_answers_preview(form_data)
@@ -111,6 +115,7 @@ $(document).ready ->
 
   PharmTraceAPI.roisUpdated.connect ->  
     rois = PharmTraceAPI.rois
+    console.log($('[class*="select-roi-"]'))
     populate_select_with_rois(select, rois) for select in $('[class*="select-roi-"]')
     $('#refresh-rois-btn').button('reset')
 
