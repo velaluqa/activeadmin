@@ -14,7 +14,7 @@
       - elsif(field['type'] == 'divider')
         %hr
       - elsif(field['type'] == 'group-end')
-        %div{:id => "repeatable_group_end_#{field['id']}"}
+        %div{:id => "repeatable_group_end_form_#{field['id']}"}
       - else
         .row.form-row-padding
           .control-group.span5
@@ -33,6 +33,8 @@
         %h3= field['group-label']
       - elsif(field['type'] == 'divider')
         %hr
+      - elsif(field['type'] == 'group-end')
+        %div{:id => "repeatable_group_end_preview_#{field['id']}"}
       - else
         = render "forms/field_preview", :field => field
   .modal-footer
@@ -49,6 +51,8 @@
             %h3= field['group-label']
           - elsif(field['type'] == 'divider')
             %hr
+          - elsif(field['type'] == 'group-end')
+            %div{:id => "repeatable_group_end_print_#{field['id']}"}
           - else
             = render "forms/field_preview", :field => field
       %strong.print-signature I hereby declare that these are indeed my very own answers:
@@ -58,7 +62,7 @@
 
 #repeatables.hide
   - @repeatables.each do |r|
-    %div{:id => "repeatable_#{r[:id]}"}
+    %div{:id => "repeatable_form_#{r[:id]}"}
       - r[:config].each do |field|
         - if(field['type'] == 'divider')
           %hr
@@ -67,3 +71,9 @@
             .control-group.span5
               = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
             .muted.span5= field['description']
+    %div{:id => "repeatable_preview_#{r[:id]}"}
+      - r[:config].each do |field|
+        - if(field['type'] == 'divider')
+          %hr
+        - else
+          = render "forms/field_preview", :field => field

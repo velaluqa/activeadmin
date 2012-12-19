@@ -98,6 +98,11 @@ find_arrays = (answers) ->
   (answers[key] = convert_to_array(value)) for own key, value of answers
   answers
 
+set_index_in_name = (elements, index) ->
+  for element in elements
+    name = $(element).attr('name').replace(/\[\]/, "[#{index}]")
+
+    $(element).attr('name', name)
 set_index_in_name_and_id = (elements, index) ->
   for element in elements
     name = $(element).attr('name').replace(/\[\]/, "[#{index}]")
@@ -144,14 +149,21 @@ $(document).ready ->
     index = elements.length
     console.log("Currently included #{elements.length} times")
 
-    group_end = $("#repeatable_group_end_#{repeatable_id}")
-    repeatable = $("#repeatable_#{repeatable_id}").clone()
-    set_index_in_name_and_id(repeatable.find('input,select,textarea'), index)
-    set_index_in_for(repeatable.find('label'), index)
-    console.log(group_end)
-    console.log(repeatable)
+    group_end_form = $("#repeatable_group_end_form_#{repeatable_id}")
+    repeatable_form = $("#repeatable_form_#{repeatable_id}").clone()
+    set_index_in_name_and_id(repeatable_form.find('input,select,textarea'), index)
+    set_index_in_for(repeatable_form.find('label'), index)
+    console.log(group_end_form)
+    console.log(repeatable_form)
 
-    group_end.before(repeatable)
+    group_end_form.before(repeatable_form)
+
+    repeatable_preview = $("#repeatable_preview_#{repeatable_id}").clone()
+    set_index_in_name(repeatable_preview.find('span'), index)
+
+    $("#repeatable_group_end_preview_#{repeatable_id}").before(repeatable_preview)
+    $("#repeatable_group_end_print_#{repeatable_id}").before(repeatable_preview.clone())
+    
     #$("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(jq_bootstrap_validation_settings)
   
   $('#refresh-rois-btn').click ->
