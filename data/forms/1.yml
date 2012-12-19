@@ -1,4 +1,15 @@
 - include: test_form_reader
+- id: tumor_location
+  type: select
+  values:
+    l: Liver
+    k: Kidney
+    c: Colon
+  label: Tumour Location
+  description: Locate the tumour and select the most appropriate location category.
+  validations:
+    - required: true
+      message: Tumour location is required for this study.
 - id: tumor_size
   type: roi
   value: length
