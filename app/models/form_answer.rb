@@ -1,3 +1,6 @@
+require 'openssl'
+require 'base64'
+
 class FormAnswer
   include MongoMapper::Document
 
@@ -8,10 +11,25 @@ class FormAnswer
   key :answers, Hash
   key :signature, String
 
+  def signature_is_valid?()
+    key = user_public_key_rsa
+    return false if key.nil?
+    data = canonical_answers
+    signature = Base64.decode64(read_attribute(:signature))
+    
+    return key.verify(OpenSSL::Digest::RIPEMD160.new, signature, data)
+  end
   
   private
+  def user_public_key_rsa
+    user = User.find(read_attribute(:reader))
+    return nil if user.nil?
+
+    return OpenSSL::PKey::RSA.new(user.public_key)
+  end
+
   def canonical_answers
-    FormAnswer::canonical_json(read_attribute[:answers])
+    FormAnswer::canonical_json(read_attribute(:answers))
   end
 
   def self.canonical_json(value)
@@ -19,8 +37,7 @@ class FormAnswer
            when NilClass   then "null"
            when TrueClass  then "true"
            when FalseClass then "false"
-           when Float      then canonical_json_float(value)
-           when Fixnum     then canonical_json_fixnum(value)
+           when Numeric    then canonical_json_numeric(value)
            when String     then canonical_json_string(value)
            when Array      then canonical_json_array(value)
            when Hash       then canonical_json_hash(value)
@@ -55,6 +72,14 @@ class FormAnswer
     result += '}'
 
     return result
+  end
+
+  def self.canonical_json_numeric(value)
+    if(value.to_i == value)
+      return canonical_json_fixnum(value.to_i)
+    else
+      return canonical_json_float(value)
+    end
   end
 
   def self.canonical_json_float(value)
