@@ -115,7 +115,7 @@ protected
 
           repeatables << {:id => field['repeat']['prefix'], :max => field['repeat']['max'], :config => repeatable}
 
-          full_config << {'type' => 'add_repeat', 'group-label' => "#{field['repeat']['label']}s", 'button-label' => "Add #{field['repeat']['label']}", 'id' => field['repeat']['prefix']}
+          full_config << {'type' => 'add_repeat', 'group-label' => "#{field['repeat']['label']}s", 'button-label' => "Add #{field['repeat']['label']}", 'id' => field['repeat']['prefix'], 'max' => field['repeat']['max']}
 
           field['repeat']['min'].times do |i|
             config_copy = Marshal.load(Marshal.dump(included_config))

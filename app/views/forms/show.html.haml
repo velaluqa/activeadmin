@@ -10,7 +10,7 @@
       - if(field['type'] == 'add_repeat')
         .form-actions
           %span= field['group-label']
-          %a.btn.add-repeat-btn.pull-right{:'data-id' => field['id'], :href => '#'}= field['button-label']
+          %a.btn.add-repeat-btn.pull-right{:'data-id' => field['id'], :'data-max-repeats' => field['max'], :href => '#'}= field['button-label']
       - elsif(field['type'] == 'divider')
         %hr
       - elsif(field['type'] == 'group-end')

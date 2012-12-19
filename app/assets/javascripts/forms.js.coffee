@@ -143,8 +143,15 @@ $(document).ready ->
     repeatable_id = $(this).attr('data-id')
     console.log("Adding #{repeatable_id}")
 
+    console.log($('#the_form'))
+    console.log($('#the_form').formParams())
     elements = find_arrays($('#the_form').formParams())[repeatable_id]
     index = elements.length
+
+    console.log(index)
+    console.log(parseInt($(this).attr('data-max-repeats'), 10))
+    return if (index == parseInt($(this).attr('data-max-repeats'), 10))
+    
     console.log("Currently included #{elements.length} times")
 
     group_end_form = $("#repeatable_group_end_form_#{repeatable_id}")
@@ -154,13 +161,13 @@ $(document).ready ->
     console.log(group_end_form)
     console.log(repeatable_form)
 
-    group_end_form.before(repeatable_form)
+    group_end_form.before(e) for e in repeatable_form.children()
 
     repeatable_preview = $("#repeatable_preview_#{repeatable_id}").clone()
     set_index_in_name(repeatable_preview.find('span'), index)
 
-    $("#repeatable_group_end_preview_#{repeatable_id}").before(repeatable_preview)
-    $("#repeatable_group_end_print_#{repeatable_id}").before(repeatable_preview.clone())
+    $("#repeatable_group_end_preview_#{repeatable_id}").before(e) for e in repeatable_preview.clone()
+    $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview
     
     repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
   
