@@ -22,8 +22,12 @@ class FormAnswer
   
   private
   def user_public_key_rsa
-    user = User.find(read_attribute(:reader))
-    return nil if user.nil?
+    begin
+      user = User.find(read_attribute(:reader))
+      return nil if user.nil?
+    rescue ActiveRecord::RecordNotFound
+      return nil
+    end
 
     return OpenSSL::PKey::RSA.new(user.public_key)
   end
