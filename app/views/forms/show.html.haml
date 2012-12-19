@@ -7,11 +7,17 @@
       .controls
         %p#custom-validation-help-block.help-block
     - @form_config.each do |field|
-      - next if(field['type'] == 'add_repeat')
-      .row.form-row-padding
-        .control-group.span5
-          = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
-        .muted.span5= field['description']
+      - if(field['type'] == 'add_repeat')
+        .form-actions
+          %span= field['group-label']
+          %a.btn.add-repeat-btn.pull-right{:'data-id' => field['id'], :href => '#'}= field['button-label']
+      - elsif(field['type'] == 'divider')
+        %hr
+      - else
+        .row.form-row-padding
+          .control-group.span5
+            = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
+          .muted.span5= field['description']
     .form-actions
       %button.btn.btn-primary{:type => 'submit'} Submit Answers
 
@@ -21,8 +27,12 @@
     %h3 Please verify your answers
   .modal-body
     - @form_config.each do |field|
-      - next if(field['type'] == 'add_repeat')
-      = render "forms/field_preview", :field => field
+      - if(field['type'] == 'add_repeat')
+        %h3= field['group-label']
+      - elsif(field['type'] == 'divider')
+        %hr
+      - else
+        = render "forms/field_preview", :field => field
   .modal-footer
     %button.btn{:'data-dismiss' => 'modal', :'aria-hidden' => true} Change Answers
     %button#preview_submit_btn.btn.btn-primary{:'data-loading-text' => 'Submitting...'} Submit Answers
@@ -33,8 +43,12 @@
       %h2.print-header Your answers
       %div.print-body
         - @form_config.each do |field|
-          - next if(field['type'] == 'add_repeat')
-          = render "forms/field_preview", :field => field
+          - if(field['type'] == 'add_repeat')
+            %h3= field['group-label']
+          - elsif(field['type'] == 'divider')
+            %hr
+          - else
+            = render "forms/field_preview", :field => field
       %strong.print-signature I hereby declare that these are indeed my very own answers:
       %div.signature-div
         .signature-line

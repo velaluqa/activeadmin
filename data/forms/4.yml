@@ -4,3 +4,4 @@
     min: 2
     max: 5
     prefix: tumours
+    label: Tumour

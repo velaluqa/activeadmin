@@ -107,7 +107,7 @@ protected
         if(field['repeat'].nil?)
           full_config += included_config
         else
-          full_config << {'type' => 'add_repeat', 'label' => "Add #{field['repeat']['label']}"}
+          full_config << {'type' => 'add_repeat', 'group-label' => "#{field['repeat']['label']}s", 'button-label' => "Add #{field['repeat']['label']}", 'id' => field['repeat']['prefix']}
 
           field['repeat']['min'].times do |i|
             config_copy = Marshal.load(Marshal.dump(included_config))
@@ -116,6 +116,8 @@ protected
               included_field['id'] = "#{field['repeat']['prefix']}[#{i}][#{included_field['id']}]"
               pp included_field
             end
+
+            config_copy << {'type' => 'divider'}
 
             full_config += config_copy
           end
