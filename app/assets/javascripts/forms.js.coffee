@@ -117,29 +117,27 @@ set_index_in_for = (elements, index) ->
     $(element).attr('for', name)
 
 $(document).ready ->
-  jq_bootstrap_validation_settings = {
-      submitSuccess: ($form, event) ->
-        event.preventDefault()
+  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
+        submitSuccess: ($form, event) ->
+          event.preventDefault()
 
-        clear_custom_validation_messages()
+          clear_custom_validation_messages()
 
-        if(!window.custom_validation_functions? || window.custom_validation_functions.length == 0)
-          return
+          if(!window.custom_validation_functions? || window.custom_validation_functions.length == 0)
+            return
 
-        validation_messages = (validator_func($form) for validator_func in window.custom_validation_functions)
-        validation_messages = validation_messages.reduce (acc,v) -> acc.concat(v)
+          validation_messages = (validator_func($form) for validator_func in window.custom_validation_functions)
+          validation_messages = validation_messages.reduce (acc,v) -> acc.concat(v)
 
-        if(validation_messages.length > 0)
-          set_custom_validation_messages(validation_messages)
-        else
-          #form_data = transform_answers_array($('#the_form').serializeArray())
-          form_data = find_arrays($('#the_form').formParams())
-          window.form_answers = form_data
-          fill_print_version(form_data)
-          display_answers_preview(form_data)
-  }
-
-  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(jq_bootstrap_validation_settings)
+          if(validation_messages.length > 0)
+            set_custom_validation_messages(validation_messages)
+          else
+            #form_data = transform_answers_array($('#the_form').serializeArray())
+            form_data = find_arrays($('#the_form').formParams())
+            window.form_answers = form_data
+            fill_print_version(form_data)
+            display_answers_preview(form_data)
+  )
 
   $('.add-repeat-btn').click ->
     repeatable_id = $(this).attr('data-id')
@@ -164,7 +162,7 @@ $(document).ready ->
     $("#repeatable_group_end_preview_#{repeatable_id}").before(repeatable_preview)
     $("#repeatable_group_end_print_#{repeatable_id}").before(repeatable_preview.clone())
     
-    #$("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(jq_bootstrap_validation_settings)
+    repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
   
   $('#refresh-rois-btn').click ->
     $(this).button('loading')
