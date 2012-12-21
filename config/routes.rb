@@ -1,4 +1,6 @@
 StudyServer::Application.routes.draw do
+  ActiveAdmin.routes(self)
+
   resources :dashboard
   resources :forms
   resources :form_answers

@@ -52,3 +52,6 @@ gem 'cancan'
 
 # audit trail
 gem 'paper_trail', '~>2'
+
+# ActiveAdmin
+gem 'activeadmin'
