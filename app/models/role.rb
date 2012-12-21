@@ -4,7 +4,7 @@ class Role < ActiveRecord::Base
   belongs_to :user
   belongs_to :object, :polymorphic => true  
 
-  ROLE_SYMS = [:manage, :read, :create, :update, :destroy]
+  ROLE_SYMS = [:manage, :validate, :read]
 
   def role
     return ROLE_SYMS[read_attribute(:role)]
