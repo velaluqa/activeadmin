@@ -3,11 +3,15 @@ class FormAnswersController < ApplicationController
 
   def create
     answer = FormAnswer.new
-    answer.signature = params[:form_answer].delete('signature')
+
     answer.form_id = params[:form_answer].delete('form_id')
+    answer.user_id = current_user.id
+    answer.session_id = 42 #HC
+    answer.patient_id = 23 #HC
+    answer.images = "baseline" #HC
+
+    answer.signature = params[:form_answer].delete('signature')
     answer.answers = params[:form_answer]
-    answer.reader = current_user.id
-    answer.read = 42
     answer.submitted_at = Time.now
 
     answer.save
