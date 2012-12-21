@@ -9,7 +9,7 @@ gem 'sqlite3'
 gem 'pg'
 
 # MongoDB
-gem 'mongo_mapper'
+gem 'mongoid', '~> 3.0.0'
 gem 'bson_ext'
 
 # Gems used only for assets and not required
@@ -55,3 +55,4 @@ gem 'paper_trail', '~>2'
 
 # ActiveAdmin
 gem 'activeadmin'
+gem 'activeadmin-mongoid', :git => 'https://github.com/elia/activeadmin-mongoid.git'
