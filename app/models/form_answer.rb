@@ -4,12 +4,19 @@ require 'base64'
 class FormAnswer
   include MongoMapper::Document
 
-  key :reader, Integer
-  key :read, Integer
+  key :user_id, Integer
+  key :session_id, Integer
   key :form_id, Integer
+  key :patient_id, Integer
   key :submitted_at, Time
   key :answers, Hash
   key :signature, String
+  key :images, String
+
+  belongs_to :session
+  belongs_to :user
+  belongs_to :form
+  belongs_to :patient
 
   def signature_is_valid?()
     key = user_public_key_rsa
@@ -23,7 +30,7 @@ class FormAnswer
   private
   def user_public_key_rsa
     begin
-      user = User.find(read_attribute(:reader))
+      user = User.find(read_attribute(:user_id))
       return nil if user.nil?
     rescue ActiveRecord::RecordNotFound
       return nil

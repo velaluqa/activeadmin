@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  subject_id: MyString
+  images_folder: MyString
+  session: 
+
+two:
+  subject_id: MyString
+  images_folder: MyString
+  session: 

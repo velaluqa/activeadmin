@@ -12,4 +12,6 @@ class User < ActiveRecord::Base
   attr_accessible :public_key, :private_key
 
   has_many :roles
+  has_many :form_answers
+  has_many :sessions
 end
