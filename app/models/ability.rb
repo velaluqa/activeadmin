@@ -4,10 +4,10 @@ class Ability
   def initialize(user)
     return if user.nil? # guest users have no access whatsoever
 
-    is_app_admin? = !(user.roles.first(:conditions => { :object_type => nil, :object_id => nil, :role => Role::role_sym_to_int(:manage) }).nil?)
+    is_app_admin = !(user.roles.first(:conditions => { :object_type => nil, :object_id => nil, :role => Role::role_sym_to_int(:manage) }).nil?)
 
     # App Admin
-    if is_app_admin?
+    if is_app_admin
       can :manage, User
       can :manage, Role
     end
