@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121218140638) do
+ActiveRecord::Schema.define(:version => 20121221140652) do
 
   create_table "forms", :force => true do |t|
     t.string   "name"
@@ -19,6 +19,15 @@ ActiveRecord::Schema.define(:version => 20121218140638) do
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
     t.integer  "version"
+    t.integer  "session_id"
+  end
+
+  create_table "patients", :force => true do |t|
+    t.string   "subject_id"
+    t.string   "images_folder"
+    t.integer  "session_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
   end
 
   create_table "roles", :force => true do |t|
@@ -30,11 +39,21 @@ ActiveRecord::Schema.define(:version => 20121218140638) do
     t.datetime "updated_at",  :null => false
   end
 
+  create_table "session_pauses", :force => true do |t|
+    t.datetime "start"
+    t.datetime "end"
+    t.string   "reason"
+    t.integer  "session_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "sessions", :force => true do |t|
     t.string   "name"
     t.integer  "study_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.integer  "user_id"
   end
 
   create_table "studies", :force => true do |t|
