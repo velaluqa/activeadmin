@@ -1,6 +1,6 @@
 #form_area.offset1.span10
   .form-actions
-    %button#refresh-rois-btn.btn.pull-right{:'data-loading-text' => 'Refreshing...'} Refresh Measurements
+    %button#refresh-rois-btn.btn.pull-right{:type => 'button', :'data-loading-text' => 'Refreshing...'} Refresh Measurements
   = form_tag('', :class => 'form-horizontal', :id => 'the_form') do
     = hidden_field_tag('form_id', @form.id)
     .control-group.error

@@ -13,4 +13,11 @@
 //= require jquery
 //= require jquery_ujs
 //= require twitter/bootstrap
-//= require_tree .
+//= require bootstrap
+//= require dashboard
+//= require form_answers
+//= require forms
+//= require jqBootstrapValidation
+//= require jquery.formparams.min
+//= require session
+//= require users
