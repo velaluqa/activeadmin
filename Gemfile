@@ -55,4 +55,4 @@ gem 'paper_trail', '~>2'
 
 # ActiveAdmin
 gem 'activeadmin'
-gem 'activeadmin-mongoid', :git => 'https://github.com/elia/activeadmin-mongoid.git'
+gem 'activeadmin-mongoid', :github => 'profmaad/activeadmin-mongoid', :branch => 'master'
