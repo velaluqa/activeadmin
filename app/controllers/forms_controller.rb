@@ -33,9 +33,9 @@ protected
     form = nil
     begin
       if version.nil?
-        form = Form.find_by_name(name, :order => "version DESC")
+        form = Form.find_by_name(name, :order => "form_version DESC")
       else
-        form = Form.find_by_name_and_version(name, version)
+        form = Form.find_by_name_and_form_version(name, version)
       end
       throw "Form does not exist" if form.nil?
     rescue
@@ -50,10 +50,10 @@ protected
     begin
       config = YAML.load_file(Rails.application.config.form_configs_directory + "/#{form.id}.yml")
     rescue Errno::ENOENT
-      flash[:error] = "Form configuration for form '#{form.id}' (name: #{form.name}, version: #{form.version} ' is missing"
+      flash[:error] = "Form configuration for form '#{form.id}' (name: #{form.name}, version: #{form.form_version} ' is missing"
       redirect_to :action => 'index'
     rescue
-      flash[:error] = "Form configuration for form '#{form.id}' (name: #{form.name}, version: #{form.version} ' is invalid"
+      flash[:error] = "Form configuration for form '#{form.id}' (name: #{form.name}, version: #{form.form_version} ' is invalid"
       redirect_to :action => 'index'
     end
 
