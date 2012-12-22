@@ -2,58 +2,21 @@ require 'openssl'
 require 'base64'
 
 class FormAnswer
-  include Mongoid::Document
+  include MongoMapper::Document
 
-  field :user_id, type: Integer
-  field :session_id, type: Integer
-  field :form_id, type:  Integer
-  field :patient_id, type:  Integer
-  field :submitted_at, type:  Time
-  field :answers, type:  Hash
-  field :signature, type:  String
-  field :images, type:  String
+  key :user_id, Integer
+  key :session_id, Integer
+  key :form_id, Integer
+  key :patient_id, Integer
+  key :submitted_at, Time
+  key :answers, Hash
+  key :signature, String
+  key :images, String
 
-  def session
-    begin
-      return Session.find(read_attribute(:session_id))
-    rescue ActiveRecord::RecordNotFound
-      return nil
-    end
-  end
-  def user
-    begin
-      User.find(read_attribute(:user_id))
-    rescue ActiveRecord::RecordNotFound
-      return nil
-    end
-  end
-  def form
-    begin
-      Form.find(read_attribute(:form_id))
-    rescue ActiveRecord::RecordNotFound
-      return nil
-    end
-  end
-  def patient
-    begin
-      Patient.find(read_attribute(:patient_id))
-    rescue ActiveRecord::RecordNotFound
-      return nil
-    end
-  end
-
-  def session=(session)
-    write_attribute(:session_id, session.id)
-  end
-  def user=(user)
-    write_attribute(:user_id, user.id)
-  end
-  def form=(form)
-    write_attribute(:form_id, form.id)
-  end
-  def patient=(patient)
-    write_attribute(:patient_id, patient.id)
-  end
+  belongs_to :session
+  belongs_to :user
+  belongs_to :form
+  belongs_to :patient
 
   def signature_is_valid?()
     key = user_public_key_rsa
