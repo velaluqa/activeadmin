@@ -166,8 +166,8 @@ $(document).ready ->
     repeatable_preview = $("#repeatable_preview_#{repeatable_id}").clone()
     set_index_in_name(repeatable_preview.find('span'), index)
 
-    $("#repeatable_group_end_preview_#{repeatable_id}").before(e) for e in repeatable_preview.clone()
-    $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview
+    $("#repeatable_group_end_preview_#{repeatable_id}").before(e) for e in repeatable_preview.clone().children()
+    $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview.children()
     
     repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
   
