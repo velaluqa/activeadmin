@@ -10,11 +10,9 @@
  *
  *= require_self
  *= require bootstrap_and_overrides
- *= require dashboard
  *= require form_answers
  *= require form-login
  *= require forms
  *= require navbar
- *= require session
  *= require users
  */

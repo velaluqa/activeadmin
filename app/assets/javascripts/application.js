@@ -14,10 +14,8 @@
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require bootstrap
-//= require dashboard
-//= require form_answers
-//= require forms
 //= require jqBootstrapValidation
 //= require jquery.formparams.min
-//= require session
+//= require form_answers
+//= require forms
 //= require users
