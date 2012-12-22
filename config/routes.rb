@@ -5,7 +5,6 @@ StudyServer::Application.routes.draw do
   resources :form_answers
 
   devise_for :users, :controllers => { :sessions => 'users/sessions' }
-  resources :users
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

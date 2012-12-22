@@ -18,4 +18,3 @@
 //= require jquery.formparams.min
 //= require form_answers
 //= require forms
-//= require users
