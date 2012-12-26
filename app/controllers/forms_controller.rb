@@ -15,13 +15,6 @@ class FormsController < ApplicationController
   def show
     @form_config, @form_components, @repeatables = @form.configuration
     
-    pp @form_config
-    puts "---------------------------------"
-    pp @form_components
-    puts "---------------------------------"
-    pp @repeatables
-    puts "---------------------------------"
-
     return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
   end
 
