@@ -37,6 +37,10 @@ class Form < ActiveRecord::Base
     return [form_config, form_components, repeatables]
   end
 
+  def self.config_field_has_special_type?(field)
+    ['add_repeat', 'group-label', 'divider', 'group-end'].include? field['type']
+  end
+
   protected
   
   def parse_config
