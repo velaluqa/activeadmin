@@ -1,6 +1,8 @@
 ActiveAdmin.register FormAnswer do
   before_filter { @skip_sidebar = true }
 
+  actions :index, :show
+
   index do
     selectable_column
     column :user
