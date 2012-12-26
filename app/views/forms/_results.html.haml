@@ -1,0 +1,9 @@
+- fields.each do |field|
+  - if(field['type'] == 'add_repeat')
+    %h3= field['group-label']
+  - elsif(field['type'] == 'divider')
+    %hr
+  - elsif(field['type'] == 'group-end')
+    %div{:id => "repeatable_group_end_#{display_type}_#{field['id']}"}
+  - else
+    = render "forms/field_preview", :field => field

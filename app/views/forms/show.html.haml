@@ -28,15 +28,7 @@
     %button.close{:type => 'button', :'data-dismiss' => 'modal', :'aria-hidden' => true} &times;
     %h3 Please verify your answers
   .modal-body
-    - @form_config.each do |field|
-      - if(field['type'] == 'add_repeat')
-        %h3= field['group-label']
-      - elsif(field['type'] == 'divider')
-        %hr
-      - elsif(field['type'] == 'group-end')
-        %div{:id => "repeatable_group_end_preview_#{field['id']}"}
-      - else
-        = render "forms/field_preview", :field => field
+    = render "forms/results", :fields => @form_config, :display_type => 'preview'
   .modal-footer
     %button.btn{:'data-dismiss' => 'modal', :'aria-hidden' => true} Change Answers
     %button#preview_submit_btn.btn.btn-primary{:'data-loading-text' => 'Submitting...'} Submit Answers
@@ -45,18 +37,10 @@
   .row-fluid
     .offset2.span10
       %h2.print-header Your answers
-      %div.print-body
-        - @form_config.each do |field|
-          - if(field['type'] == 'add_repeat')
-            %h3= field['group-label']
-          - elsif(field['type'] == 'divider')
-            %hr
-          - elsif(field['type'] == 'group-end')
-            %div{:id => "repeatable_group_end_print_#{field['id']}"}
-          - else
-            = render "forms/field_preview", :field => field
+      .print-body
+        = render "forms/results", :fields => @form_config, :display_type => 'print'
       %strong.print-signature I hereby declare that these are indeed my very own answers:
-      %div.signature-div
+      .signature-div
         .signature-line
         %p.pull-right.muted (Please sign here)
 
