@@ -18,5 +18,10 @@ ActiveAdmin.register FormAnswer do
     end
 
     default_actions
-  end  
+  end
+
+  show do
+    pp form_answer
+    pp form_answer.printable_answers
+  end
 end
