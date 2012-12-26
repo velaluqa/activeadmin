@@ -67,75 +67,66 @@ class FormAnswer
   def printable_answers
     form_config, form_components, repeatables = form.configuration
     return nil if (form_config.nil? or repeatables.nil?)
-    field_map = form_config_to_field_map(form_config, repeatables)
 
-    return join_answers_with_config([], answers, field_map)
+    repeatables_map = {}
+    repeatables.each do |r|
+      repeatables_map[r[:id]] = r[:config]
+    end
+
+    return form_config_and_answers_to_display_list(form_config, repeatables_map, answers)
   end
   
   private
-  def form_config_to_field_map(form_config, repeatables)
-    field_map = {}
+  def access_by_path(value, path)
+    if (path.nil? or value.nil?)
+      puts "Value: #{value}"
+      return value 
+    end
+    puts "Path: #{path}"
 
-    form_config.each do |field|
-      next if Form.config_field_has_special_type?(field)
-      next if (field['id'] && field['id'].include?('[') and field['id'].include?(']'))
+    path_components = path.gsub(/\]/,'').split('[', 2)
 
-      field_map[field['id']] = {:label => field['label'], :type => field['type']}
+    if(value.is_a? Array)
+      result = value[path_components[0].to_i]
+    else
+      result = value[path_components[0]]
     end
 
-    repeatables.each do |repeatable|
-      repeatable[:config].each do |field|
-        next if Form.config_field_has_special_type?(field)
-        
-        field_map[field['id']] = {:label => field['label'], :type => field['type']}
-      end
-    end
-
-    return field_map
+    return access_by_path(result, path_components[1])
   end
 
-  def stringify_answer_key(key, keep_array_indices = false)
-    result = key.first.to_s
+  def form_config_and_answers_to_display_list(form_config, repeatables, answers, indices = [])
+    display_list = []
 
-    key.each_with_index do |elem, i|
-      next if i == 0
-      
-      if (elem.class == Fixnum && !keep_array_indices)
-        result += '[]'
+    skip_group = false
+    while(field = form_config.shift)
+      next if (skip_group and field['type'] != 'group-end')
+
+      id = field['id']
+      indices_copy = indices.clone
+      id = id.gsub(/\[\]/) {|match| "[#{indices_copy.shift.to_s}]"} unless id.nil?
+
+      case field['type']
+      when 'add_repeat'
+        skip_group = true
+
+        repeatable = repeatables[field['id']]
+        repeatable_answer = access_by_path(answers, id)
+        next if repeatable_answer.nil?
+
+        repeatable_answer.each_with_index do |answer, i|
+          display_list += form_config_and_answers_to_display_list(Marshal.load(Marshal.dump(repeatable)), repeatables, answers, indices + [i])
+        end
+      when 'group-end'
+        skip_group = false
+      when 'divider'
+        display_list << field
       else
-        result += "[#{elem.to_s}]"
+        display_list << field.merge({'value' => access_by_path(answers, id), 'id' => id})
       end
     end
 
-    return result
-  end
-  def join_answer_with_config(key, value, field_map)
-    key_string = stringify_answer_key(key)
-
-    field_config = field_map[key_string]
-    if field_config.nil?
-      return {:label => stringify_answer_key(key, true), :answer => value, :type => 'unknown'}
-    else
-      return field_config.merge({:answer => value})
-    end
-  end
-  def join_answers_with_config(prefix, answers, field_map)
-    results = []
-
-    case answers
-    when Hash
-      answers.each do |key, value|
-        results += join_answers_with_config(prefix + [key], value, field_map)
-      end
-    when Array
-      answers.each_with_index do |value, i|
-        results += join_answers_with_config(prefix + [i], value, field_map)
-      end
-    else
-      results << join_answer_with_config(prefix, answers, field_map)
-    end
-
-    return results
+    return display_list
   end
 
   def user_public_key_rsa
