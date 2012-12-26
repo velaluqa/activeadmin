@@ -22,7 +22,7 @@ class Form < ActiveRecord::Base
     return form
   end
 
-  def configuration(already_included_forms = nil, stringify = false)
+  def configuration(already_included_forms = nil, stringify = true)
     form_config = parse_config
     return [nil,nil,nil] if form_config.nil?
     form_components = components
@@ -95,9 +95,7 @@ class Form < ActiveRecord::Base
           redirect_to :action => 'index'
         end
 
-#        already_included << included_form.id
-
-        included_config, included_components, included_repeatables = included_form.configuration(already_included)
+        included_config, included_components, included_repeatables = included_form.configuration(already_included, false)
         repeatables += included_repeatables
        
         if(field['repeat'].nil?)
