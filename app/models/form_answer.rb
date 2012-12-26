@@ -122,7 +122,7 @@ class FormAnswer
       when 'divider'
         display_list << field
       else
-        display_list << field.merge({'value' => access_by_path(answers, id), 'id' => id})
+        display_list << field.merge({'answer' => access_by_path(answers, id), 'id' => id})
       end
     end
 
