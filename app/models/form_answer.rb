@@ -63,8 +63,81 @@ class FormAnswer
     
     return key.verify(OpenSSL::Digest::RIPEMD160.new, signature, data)
   end
+
+  def printable_answers
+    form_config, form_components, repeatables = form.configuration
+    return nil if (form_config.nil? or repeatables.nil?)
+    field_map = form_config_to_field_map(form_config, repeatables)
+
+    return join_answers_with_config([], answers, field_map)
+  end
   
   private
+  def form_config_to_field_map(form_config, repeatables)
+    field_map = {}
+
+    form_config.each do |field|
+      next if Form.config_field_has_special_type?(field)
+      next if (field['id'] && field['id'].include?('[') and field['id'].include?(']'))
+
+      field_map[field['id']] = {:label => field['label'], :type => field['type']}
+    end
+
+    repeatables.each do |repeatable|
+      repeatable[:config].each do |field|
+        next if Form.config_field_has_special_type?(field)
+        
+        field_map[field['id']] = {:label => field['label'], :type => field['type']}
+      end
+    end
+
+    return field_map
+  end
+
+  def stringify_answer_key(key, keep_array_indices = false)
+    result = key.first.to_s
+
+    key.each_with_index do |elem, i|
+      next if i == 0
+      
+      if (elem.class == Fixnum && !keep_array_indices)
+        result += '[]'
+      else
+        result += "[#{elem.to_s}]"
+      end
+    end
+
+    return result
+  end
+  def join_answer_with_config(key, value, field_map)
+    key_string = stringify_answer_key(key)
+
+    field_config = field_map[key_string]
+    if field_config.nil?
+      return {:label => stringify_answer_key(key, true), :answer => value, :type => 'unknown'}
+    else
+      return field_config.merge({:answer => value})
+    end
+  end
+  def join_answers_with_config(prefix, answers, field_map)
+    results = []
+
+    case answers
+    when Hash
+      answers.each do |key, value|
+        results += join_answers_with_config(prefix + [key], value, field_map)
+      end
+    when Array
+      answers.each_with_index do |value, i|
+        results += join_answers_with_config(prefix + [i], value, field_map)
+      end
+    else
+      results << join_answer_with_config(prefix, answers, field_map)
+    end
+
+    return results
+  end
+
   def user_public_key_rsa
     begin
       user = User.find(read_attribute(:user_id))
