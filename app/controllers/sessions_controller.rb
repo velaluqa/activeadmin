@@ -12,10 +12,7 @@ class SessionsController < ApplicationController
     full_sequence = (params[:full_sequence] == 'true')
     view_sequence = @session.view_sequence(!full_sequence)
 
-    result = {:session => @session, :configuration => @session.configuration, :view_sequence => view_sequence}
-    if(full_sequence)
-      result.merge!({:current_sequence_row => @session.current_sequence_row})
-    end
+    result = {:session => @session, :configuration => @session.configuration, :view_sequence => view_sequence, :current_sequence_row => @session.current_sequence_row}
     
     respond_to do |format|
       format.json { render :json => result }
