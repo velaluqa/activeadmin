@@ -19,7 +19,7 @@ class Session < ActiveRecord::Base
     return config
   end
 
-  def view_sequence
+  def view_sequence(only_unread = true)
     csv_options = {
       :col_sep => ',',
       :row_sep => :auto,
@@ -32,7 +32,21 @@ class Session < ActiveRecord::Base
       csv.read
     end
 
-    return sequence
+    if only_unread
+      return sequence[current_sequence_row..-1]
+    else
+      return sequence
+    end
+  end
+
+  def most_recent_pause
+    return self.session_pauses.order("end DESC").first
+  end
+  def current_sequence_row
+    pause = most_recent_pause
+    return 0 if pause.nil?
+
+    return pause.sequence_row
   end
 
   private
