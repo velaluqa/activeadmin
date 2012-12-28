@@ -41,4 +41,5 @@ StudyServer::Application.configure do
   # custom app config
   config.data_directory = 'data'
   config.form_configs_directory = config.data_directory + '/forms'
+  config.session_configs_directory = config.data_directory + '/sessions'
 end
