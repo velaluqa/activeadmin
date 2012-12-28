@@ -1,10 +1,10 @@
 class Session < ActiveRecord::Base
-  attr_accessible :name, :study
+  attr_accessible :name, :study, :user, :study_id, :user_id
 
   belongs_to :study
+  belongs_to :user
 
   has_many :roles, :as => :object
-  has_one :user
   has_many :form_answers
   has_many :patients
   has_many :session_pauses
