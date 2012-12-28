@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
     end
     
     respond_to do |format|
-      format.json { render :json => {:session => @session} }
+      format.json { render :json => {:session => @session, :configuration => @session.configuration, :view_sequence => @session.view_sequence} }
     end      
   end
 
