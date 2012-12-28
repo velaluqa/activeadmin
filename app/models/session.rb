@@ -9,4 +9,6 @@ class Session < ActiveRecord::Base
   has_many :patients
   has_many :session_pauses
   has_many :forms
+
+  scope :blind_readable_by_user, lambda { |user| where(:user_id => user.id) }
 end

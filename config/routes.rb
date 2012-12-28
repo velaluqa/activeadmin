@@ -4,6 +4,12 @@ StudyServer::Application.routes.draw do
   resources :forms, :only => [:show]
   resources :form_answers, :only => [:create]
 
+  resources :sessions, :only => [:show] do
+    collection do
+      get 'blind_readable'
+    end
+  end
+
   devise_for :users, :controllers => { :sessions => 'users/sessions' }
 
   # The priority is based upon order of creation:
