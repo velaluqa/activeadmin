@@ -32,10 +32,14 @@ class Session < ActiveRecord::Base
       csv.read
     end
 
+    sequence_as_hashes = sequence.map do |row|
+      {:subject => row[0], :images => row[1], :type => row[2]}
+    end
+
     if only_unread
-      return sequence[current_sequence_row..-1]
+      return sequence_as_hashes[current_sequence_row..-1]
     else
-      return sequence
+      return sequence_as_hashes
     end
   end
 
