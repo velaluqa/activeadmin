@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121222161430) do
+ActiveRecord::Schema.define(:version => 20121228170557) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -59,8 +59,9 @@ ActiveRecord::Schema.define(:version => 20121222161430) do
     t.datetime "end"
     t.string   "reason"
     t.integer  "session_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+    t.integer  "sequence_row"
   end
 
   create_table "sessions", :force => true do |t|
