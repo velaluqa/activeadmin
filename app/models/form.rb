@@ -46,15 +46,7 @@ class Form < ActiveRecord::Base
   def parse_config
     id = read_attribute(:id)
 
-    begin
-      config = YAML.load_file(Rails.application.config.form_configs_directory + "/#{id}.yml")
-    rescue Errno::ENOENT
-      flash[:error] = "Form configuration for form '#{id}' (name: #{read_attribute(:name)}, version: #{read_attribute(:form_version)} ' is missing"
-      redirect_to :action => 'index'
-    rescue
-      flash[:error] = "Form configuration for form '#{id}' (name: #{read_attribute(:name)}, version: #{read_attribute(:form_version)} ' is invalid"
-      redirect_to :action => 'index'
-    end
+    config = YAML.load_file(Rails.application.config.form_configs_directory + "/#{id}.yml")
     
     return config
   end
@@ -91,12 +83,10 @@ class Form < ActiveRecord::Base
       else
         included_form = Form.find_with_name_and_version(field['include'], field['version'])
         if included_form.nil?
-          flash[:error] = "The form tried to include form '#{field['include']}', which doesn't exist"
-          redirect_to :action => 'index'
+          throw "The form tried to include form '#{field['include']}', which doesn't exist"
         end
         if already_included.include?(included_form.id)
-          flash[:error] = "The form has a circular include of form '#{included_form.name}'"
-          redirect_to :action => 'index'
+          throw "The form has a circular include of form '#{included_form.name}'"
         end
 
         included_config, included_components, included_repeatables = included_form.configuration(already_included, false)
