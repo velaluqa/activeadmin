@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
     end
     
     respond_to do |format|
-      format.json { render :json => @session }
+      format.json { render :json => {:session => @session} }
     end      
   end
 
@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
     @sessions = Session.blind_readable_by_user(current_user)
 
     respond_to do |format|
-      format.json { render :json => @sessions }
+      format.json { render :json => {:sessions => @sessions} }
     end
   end  
 end
