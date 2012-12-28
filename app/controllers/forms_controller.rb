@@ -8,10 +8,6 @@ class FormsController < ApplicationController
   before_filter :find_form_from_params, :except => :index
   layout 'client_forms', :only => :show
 
-  def index
-    @forms = Form.all
-  end
-
   def show
     @form_config, @form_components, @repeatables = @form.configuration
     
