@@ -1,8 +1,8 @@
 StudyServer::Application.routes.draw do
   ActiveAdmin.routes(self)
 
-  resources :forms
-  resources :form_answers
+  resources :forms, :only => [:show]
+  resources :form_answers, :only => [:create]
 
   devise_for :users, :controllers => { :sessions => 'users/sessions' }
 
