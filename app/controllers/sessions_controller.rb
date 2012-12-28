@@ -16,8 +16,6 @@ class SessionsController < ApplicationController
 
   def blind_readable
     @sessions = Session.blind_readable_by_user(current_user)
-    print "Sessions: "
-    pp @sessions
 
     respond_to do |format|
       format.json { render :json => @sessions }
