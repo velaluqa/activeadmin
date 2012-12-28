@@ -15,7 +15,7 @@ class SessionsController < ApplicationController
   end
 
   def blind_readable
-    @sessions = Session.blind_readable_by_user(current_user)
+    @sessions = Session.blind_readable_by_user(current_user).map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
 
     respond_to do |format|
       format.json { render :json => {:sessions => @sessions} }
