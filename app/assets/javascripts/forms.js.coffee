@@ -11,8 +11,11 @@ camelize = (input) ->
 has_pharmtrace_api = ->
   PharmTraceAPI?
 
+create_option = (text, value) ->
+  $('<option></option>').val(value).html(text)
+
 roi_to_options = (roi, type) ->
-  new Option("Name: "+roi['name']+", "+camelize(type)+": "+roi[type], roi[type], false, false)
+  create_option("Name: "+roi['name']+", "+camelize(type)+": "+roi[type], roi[type])
 
 populate_select_with_rois = (select, rois) ->
   type = /select-roi-(.*)/.exec(select.className)[1]
@@ -22,7 +25,7 @@ populate_select_with_rois = (select, rois) ->
   select.append(roi_to_options(roi, type)) for roi in rois when (type of roi)
 
   if($('#'+select_id+' option').length == 0)
-    select.append(new Option("No ROIs available", "", true, true))
+    select.append(create_option("No ROIs available", ""))
 
 register_custom_validation_function = (func) ->
   window.custom_validation_functions = [] unless window.custom_validation_functions?
