@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121228170557) do
+ActiveRecord::Schema.define(:version => 20121231133637) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -109,5 +109,20 @@ ActiveRecord::Schema.define(:version => 20121228170557) do
   end
 
   add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
+
+  create_table "views", :force => true do |t|
+    t.integer  "position"
+    t.integer  "session_id"
+    t.integer  "patient_id"
+    t.integer  "form_id"
+    t.string   "images"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "views", ["form_id"], :name => "index_views_on_form_id"
+  add_index "views", ["patient_id"], :name => "index_views_on_patient_id"
+  add_index "views", ["session_id", "position"], :name => "index_views_on_session_id_and_position", :unique => true
+  add_index "views", ["session_id"], :name => "index_views_on_session_id"
 
 end
