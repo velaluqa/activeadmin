@@ -1,8 +1,7 @@
 class Form < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :description
-  attr_readonly :name, :form_version
+  attr_accessible :description, :name, :form_version, :session_id, :session
 
   validates :name, :presence => true
   validates :name, :format => { :with => /^[a-zA-Z0-9_]+$/, :message => 'Only letters A-Z, numbers and \'_\' allowed' }
