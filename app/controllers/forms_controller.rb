@@ -1,6 +1,5 @@
 require 'yaml'
-require 'pp'
-
+require 'exceptions'
 
 class FormsController < ApplicationController
   before_filter :authenticate_user!
@@ -18,5 +17,7 @@ protected
 
   def find_form_from_params
     @form = Form.find_with_name_and_version(params[:id], params[:version])
+
+    raise Exceptions::FormNotFoundError.new(params[:id], params[:version]) if @form.nil?
   end
 end

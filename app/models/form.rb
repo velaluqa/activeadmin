@@ -16,9 +16,9 @@ class Form < ActiveRecord::Base
     if version.nil?
       form = Form.where(:name => name).order("form_version DESC").first
     else
-      form = Form.where(:name => name, :version => version).first
+      form = Form.where(:name => name, :form_version => version).first
     end
-    
+
     return form
   end
 
