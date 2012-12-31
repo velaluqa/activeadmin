@@ -5,7 +5,7 @@ ActiveAdmin.register View do
     column :position
     column :patient
     column :images
-    column :form
+    column :view_type
     
     default_actions
   end
@@ -16,7 +16,7 @@ ActiveAdmin.register View do
       f.input :position
       f.input :patient      
       f.input :images
-      f.input :form
+      f.input :view_type
     end
 
     f.buttons

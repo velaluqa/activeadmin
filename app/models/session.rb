@@ -11,6 +11,7 @@ class Session < ActiveRecord::Base
   has_many :patients
   has_many :session_pauses
   has_many :forms
+  has_many :views
 
   scope :blind_readable_by_user, lambda { |user| where(:user_id => user.id).includes(:study) }
 
@@ -20,41 +21,26 @@ class Session < ActiveRecord::Base
   end
 
   def view_sequence(only_unread = true)
-    csv_options = {
-      :col_sep => ',',
-      :row_sep => :auto,
-      :quote_char => '"',
-      :headers => false,
-    }
-
-    sequence = File.open(Rails.application.config.session_configs_directory + "/#{id}.csv", 'r') do |f|
-      csv = CSV.new(f, csv_options)
-      csv.read
-    end
-
-    sequence_as_hashes = sequence.map do |row|
-      {:subject => row[0], :images => row[1], :type => row[2]}
-    end
-
     if only_unread
-      return sequence_as_hashes[current_sequence_row..-1]
+      self.views.where('position >= :next_view_position', {:next_view_position => self.next_view_position})
     else
-      return sequence_as_hashes
+      self.views
     end
   end
 
   def most_recent_pause
     return self.session_pauses.order("end DESC").first
   end
-  def current_sequence_row
+  def current_view
     pause = most_recent_pause
-    return 0 if pause.nil?
+    return nil if pause.nil?
 
-    return pause.sequence_row
+    return pause.last_view
   end
 
-  def next_view_positon
-    self.views.all.last.position+1
+  def next_view_position
+    return 0 if current_view.nil?
+    return current_view.position+1
   end
 
   private
