@@ -53,6 +53,10 @@ class Session < ActiveRecord::Base
     return pause.sequence_row
   end
 
+  def next_view_positon
+    self.views.all.last.position+1
+  end
+
   private
 
   
