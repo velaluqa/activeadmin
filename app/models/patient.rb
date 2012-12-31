@@ -3,4 +3,9 @@ class Patient < ActiveRecord::Base
 
   belongs_to :session
   has_many :form_answers
+
+  # virtual attribute for pretty names
+  def name
+    "Session #{session.name}, Subject ID #{subject_id}"
+  end
 end
