@@ -12,16 +12,4 @@ ActiveAdmin.register View do
     
     default_actions
   end
-
-  form do |f|
-    f.inputs 'Details' do
-      f.input :session
-      f.input :position
-      f.input :patient      
-      f.input :images
-      f.input :view_type
-    end
-
-    f.buttons
-  end  
 end
