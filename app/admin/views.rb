@@ -1,4 +1,7 @@
 ActiveAdmin.register View do
+
+  actions :index, :show, :destroy
+
   index do
     selectable_column
     column :session
