@@ -1,5 +1,3 @@
-require 'csv'
-
 class Session < ActiveRecord::Base
   attr_accessible :name, :study, :user, :study_id, :user_id
 
