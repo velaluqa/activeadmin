@@ -1,6 +1,6 @@
 .row-fluid
   .offset4.span4
-    = form_for(resource, :as => resource_name, :url => session_path(resource_name), :html => { :class => 'form-login'}) do |f|
+    = form_for(resource, :as => resource_name, :url => user_session_path, :html => { :class => 'form-login'}) do |f|
       %h2.form-signin-heading
         PharmTrace Study Server
 
