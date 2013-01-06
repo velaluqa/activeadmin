@@ -28,7 +28,7 @@ types:
       columns: 2
     annotations_layout: fu
 
-images_root: 349999_read
+images_root: /Users/profmaad/Workspace/freelance/PharmTrace/images
 access_to_previous_images: false
 record_annotations: true
 show_previous_annotations: false
