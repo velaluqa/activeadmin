@@ -6,10 +6,15 @@ class FormAnswersController < ApplicationController
 
     answer.form_id = params['form_id']
     answer.user_id = current_user.id
-    answer.session_id = 42 #HC
-    answer.patient_id = 23 #HC
-    answer.images = "baseline" #HC
 
+    view = View.find(params['view_id'])
+    unless(view.nil?)
+      answer.session_id = view.session.id
+      answer.patient_id = view.patient.id
+      answer.images = view.images
+      # TODO: maybe just store the view?
+    end
+    
     answer.signature = params['signature']
     answer.answers = params['answers']
     answer.submitted_at = Time.now
