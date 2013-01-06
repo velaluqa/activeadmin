@@ -12,7 +12,18 @@ class SessionsController < ApplicationController
     full_sequence = (params[:full_sequence] == 'true')
     view_sequence = @session.view_sequence(!full_sequence)
 
-    result = {:session => @session, :configuration => @session.configuration, :view_sequence => view_sequence, :next_view_position => @session.next_view_position}
+    view_sequence_hashes = view_sequence.map do |view|
+      {
+        :images => view.images,
+        :images_folder => view.images_folder,
+        :position => view.position,
+        :id => view.id,
+        :view_type => view.view_type,
+        :patient_id => view.patient_id,
+      }
+    end
+
+    result = {:session => @session, :configuration => @session.configuration, :view_sequence => view_sequence_hashes, :next_view_position => @session.next_view_position}
     
     respond_to do |format|
       format.json { render :json => result }
