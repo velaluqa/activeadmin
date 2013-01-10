@@ -1,0 +1,36 @@
+- id: MLOCCD
+  type: select
+  values:
+    brain: Brain
+    lung: Lung
+    liver: Liver
+    spleen: Spleen
+    abdomen: Abdomen
+    pelvis: Pelvis
+    lymph: Lymph Node
+  label: Location
+  validations:
+    - required: true
+      message: Required  
+- id: MLOC
+  type: string
+  label: Further description of lesion site
+
+- id: LESDIAM
+  type: roi
+  value: length
+  label: Maximum lesion diameter
+  validations:
+    - required: true
+      message: Required  
+- id: HUUNITS
+  type: roi
+  value: density
+  label: Density in HU
+  description: Only if lesion is HCC
+
+- id: COMM
+  type: string
+  label: Comments
+  description: if any
+  
