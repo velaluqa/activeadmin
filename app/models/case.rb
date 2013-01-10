@@ -12,6 +12,11 @@ class Case < ActiveRecord::Base
   # so we always get results sorted by position, not by row id
   default_scope order('position ASC')
 
+  # virtual attribute for pretty names
+  def name
+    images_folder
+  end
+
   def images_folder
     "#{self.patient.subject_id}/#{read_attribute(:images)}"
   end
