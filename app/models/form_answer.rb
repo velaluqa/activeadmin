@@ -6,12 +6,11 @@ class FormAnswer
 
   field :user_id, type: Integer
   field :session_id, type: Integer
+  field :case_id, type: Integer
   field :form_id, type:  Integer
-  field :patient_id, type:  Integer
   field :submitted_at, type:  Time
   field :answers, type:  Hash
   field :signature, type:  String
-  field :images, type:  String
 
   def session
     begin
@@ -34,9 +33,9 @@ class FormAnswer
       return nil
     end
   end
-  def patient
+  def case
     begin
-      Patient.find(read_attribute(:patient_id))
+      Case.find(read_attribute(:case_id))
     rescue ActiveRecord::RecordNotFound
       return nil
     end
@@ -51,8 +50,8 @@ class FormAnswer
   def form=(form)
     write_attribute(:form_id, form.id)
   end
-  def patient=(patient)
-    write_attribute(:patient_id, patient.id)
+  def case=(new_case)
+    write_attribute(:case_id, new_case.id)
   end
 
   def signature_is_valid?()

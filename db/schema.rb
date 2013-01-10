@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121231154838) do
+ActiveRecord::Schema.define(:version => 20130110130106) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -27,6 +27,20 @@ ActiveRecord::Schema.define(:version => 20121231154838) do
   add_index "active_admin_comments", ["author_type", "author_id"], :name => "index_active_admin_comments_on_author_type_and_author_id"
   add_index "active_admin_comments", ["namespace"], :name => "index_active_admin_comments_on_namespace"
   add_index "active_admin_comments", ["resource_type", "resource_id"], :name => "index_admin_notes_on_resource_type_and_resource_id"
+
+  create_table "cases", :force => true do |t|
+    t.integer  "position"
+    t.integer  "session_id"
+    t.integer  "patient_id"
+    t.string   "images"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+    t.string   "case_type"
+  end
+
+  add_index "cases", ["patient_id"], :name => "index_views_on_patient_id"
+  add_index "cases", ["session_id", "position"], :name => "index_views_on_session_id_and_position", :unique => true
+  add_index "cases", ["session_id"], :name => "index_views_on_session_id"
 
   create_table "forms", :force => true do |t|
     t.string   "name"
@@ -109,19 +123,5 @@ ActiveRecord::Schema.define(:version => 20121231154838) do
   end
 
   add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
-
-  create_table "views", :force => true do |t|
-    t.integer  "position"
-    t.integer  "session_id"
-    t.integer  "patient_id"
-    t.string   "images"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-    t.string   "view_type"
-  end
-
-  add_index "views", ["patient_id"], :name => "index_views_on_patient_id"
-  add_index "views", ["session_id", "position"], :name => "index_views_on_session_id_and_position", :unique => true
-  add_index "views", ["session_id"], :name => "index_views_on_session_id"
 
 end

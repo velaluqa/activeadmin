@@ -9,7 +9,7 @@ ActiveAdmin.register Session do
     column :study
     column 'Reader', :user
     column 'Progress' do |session|
-      "#{session.next_view_position} / #{session.view_sequence(false).size}"
+      "#{session.next_case_position} / #{session.case_list(false).size}"
     end
     column 'Most Recent Pause' do |session|
       most_recent_pause = session.most_recent_pause
@@ -27,9 +27,9 @@ ActiveAdmin.register Session do
   member_action :import_csv, :method => :post do
     @session = Session.find(params[:id])
 
-    num_imported = View.batch_create_from_csv(params[:session][:file].tempfile, @session, @session.next_view_position)
+    num_imported = Case.batch_create_from_csv(params[:session][:file].tempfile, @session, @session.next_case_position)
 
-    redirect_to({:action => :show}, :notice => "Successfully imported #{num_imported} views from CSV")
+    redirect_to({:action => :show}, :notice => "Successfully imported #{num_imported} cases from CSV")
   end
   member_action :import_csv_form, :method => :get do
     @session = Session.find(params[:id])

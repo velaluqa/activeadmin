@@ -9,7 +9,7 @@ class Session < ActiveRecord::Base
   has_many :patients
   has_many :session_pauses
   has_many :forms
-  has_many :views
+  has_many :cases
 
   scope :blind_readable_by_user, lambda { |user| where(:user_id => user.id).includes(:study) }
 
@@ -18,27 +18,27 @@ class Session < ActiveRecord::Base
     return config
   end
 
-  def view_sequence(only_unread = true)
+  def case_list(only_unread = true)
     if only_unread
-      self.views.where('position >= :next_view_position', {:next_view_position => self.next_view_position})
+      self.cases.where('position >= :next_case_position', {:next_case_position => self.next_case_position})
     else
-      self.views
+      self.cases
     end
   end
 
   def most_recent_pause
     return self.session_pauses.order("end DESC").first
   end
-  def current_view
+  def current_case
     pause = most_recent_pause
     return nil if pause.nil?
 
-    return pause.last_view
+    return pause.last_case
   end
 
-  def next_view_position
-    return 0 if current_view.nil?
-    return current_view.position+1
+  def next_case_position
+    return 0 if current_case.nil?
+    return current_case.position+1
   end
 
   private

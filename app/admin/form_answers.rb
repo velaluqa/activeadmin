@@ -7,9 +7,8 @@ ActiveAdmin.register FormAnswer do
     selectable_column
     column :user
     column :session
+    column :case
     column :form
-    column :patient
-    column :images
     column 'Submission Date', :submitted_at
     column :signature do |form_answer|
       if(form_answer.signature_is_valid?)
@@ -26,9 +25,8 @@ ActiveAdmin.register FormAnswer do
     attributes_table do
       row :user
       row :session
+      row :case
       row :form
-      row :patient
-      row :images
       row :submitted_at
       row :signature do
         if(form_answer.signature_is_valid?)

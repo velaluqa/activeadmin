@@ -7,13 +7,12 @@ class FormAnswersController < ApplicationController
     answer.form_id = params['form_id']
     answer.user_id = current_user.id
 
-    view = View.find(params['view_id'])
-    unless(view.nil?)
-      answer.session_id = view.session.id
-      answer.patient_id = view.patient.id
-      answer.images = view.images
-      # TODO: maybe just store the view?
+    the_case = Case.find(params['case_id'])
+    unless(the_case.nil?)
+      answer.case_id = the_case.id
+      answer.session_id = the_case.session.id
     end
+    
     
     answer.signature = params['signature']
     answer.answers = params['answers']

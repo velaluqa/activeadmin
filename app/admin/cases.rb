@@ -1,4 +1,4 @@
-ActiveAdmin.register View do
+ActiveAdmin.register Case do
 
   actions :index, :show, :destroy
 
@@ -8,7 +8,7 @@ ActiveAdmin.register View do
     column :position
     column :patient
     column :images
-    column :view_type
+    column :case_type
     
     default_actions
   end
