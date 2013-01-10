@@ -4,7 +4,8 @@ types:
     form_version: 1
     screen_layout:
       rows: 1
-      series: [test]
+      active: [test]
+      passive: false
     annotations_layout: initial_testing
     features: []
     toolbar_layout: [roi]
@@ -14,7 +15,8 @@ types:
     form_version: 1
     screen_layout:
       rows: 1
-      series: [test]
+      active: [test]
+      passive: false
     annotations_layout: retesting
     features: []
     toolbar_layout: [roi]
@@ -24,7 +26,8 @@ types:
     form_version: 1
     screen_layout:
       rows: 2
-      series: [liver, abdomen, kidney, pelvis]
+      active: [liver, abdomen, kidney, pelvis]
+      passive: true
     annotations_layout: baseline
     features: []
     toolbar_layout: [roi]
@@ -34,7 +37,8 @@ types:
     form_version: 1
     screen_layout:
       rows: 3
-      series: [liver, abdomen, kidney, pelvis]
+      active: [liver, abdomen, kidney, pelvis]
+      passive: true
     annotations_layout: fu
     features: []
     toolbar_layout: [roi]
