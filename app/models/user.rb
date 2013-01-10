@@ -14,4 +14,8 @@ class User < ActiveRecord::Base
   has_many :roles
   has_many :form_answers
   has_many :sessions
+
+  def is_app_admin?
+    !(roles.first(:conditions => { :object_type => nil, :object_id => nil, :role => Role::role_sym_to_int(:manage) }).nil?)
+  end
 end

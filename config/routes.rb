@@ -10,7 +10,9 @@ StudyServer::Application.routes.draw do
     end
   end
 
-  devise_for :users, :controllers => { :sessions => 'users/sessions' }
+  devise_for :users, :controllers => { :sessions => 'users/sessions' } do
+    post 'users/authenticate', :to => 'users/sessions#authenticate_user'
+  end
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
