@@ -9,18 +9,6 @@ class Form < ActiveRecord::Base
   belongs_to :session
   has_many :form_answers
 
-  def self.find_with_name_and_version(name, version)
-    form = nil
-
-    if version.nil?
-      form = Form.where(:name => name).order("form_version DESC").first
-    else
-      form = Form.where(:name => name, :form_version => version).first
-    end
-
-    return form
-  end
-
   def configuration(already_included_forms = nil, stringify = true)
     form_config = parse_config
     return [nil,nil,nil] if form_config.nil?
@@ -30,7 +18,7 @@ class Form < ActiveRecord::Base
     already_included_forms = [] if already_included_forms.nil?
     already_included_forms << read_attribute(:id)
 
-    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms)
+    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms, read_attribute(:session_id))
     form_components = stringify_form_components(form_components) if stringify
 
     return [form_config, form_components, repeatables]
@@ -71,7 +59,7 @@ class Form < ActiveRecord::Base
     end
   end
 
-  def process_imports(config, components, already_included)
+  def process_imports(config, components, already_included, session_id)
     full_config = []
     full_components = components
     repeatables = []
@@ -80,7 +68,12 @@ class Form < ActiveRecord::Base
       if field['include'].nil?
         full_config << field
       else
-        included_form = Form.find_with_name_and_version(field['include'], field['version'])
+        if field['version'].nil?
+          included_form = Form.where(:name => field['include'], :session_id => session_id).order("form_version DESC").first
+        else
+          included_form = Form.where(:name => field['include'], :session_id => session_id, :form_version => field['version'])..first
+        end
+
         if included_form.nil?
           throw "The form tried to include form '#{field['include']}', which doesn't exist"
         end
@@ -88,7 +81,7 @@ class Form < ActiveRecord::Base
           throw "The form has a circular include of form '#{included_form.name}'"
         end
 
-        included_config, included_components, included_repeatables = included_form.configuration(already_included, false)
+        included_config, included_components, included_repeatables = included_form.configuration(already_included.dup, false)
         repeatables += included_repeatables
        
         if(field['repeat'].nil?)

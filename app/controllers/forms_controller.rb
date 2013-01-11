@@ -16,8 +16,17 @@ class FormsController < ApplicationController
 protected
 
   def find_form_from_params
-    @form = Form.find_with_name_and_version(params[:id], params[:version])
+    raise Exceptions::CaseNotFoundError.new(params[:case]) if params[:case].nil?
 
-    raise Exceptions::FormNotFoundError.new(params[:id], params[:version]) if @form.nil?
+    the_case = Case.find(params[:case])
+    raise Exceptions::CaseNotFoundError.new(params[:case]) if the_case.nil?
+
+    if params[:version].nil?
+      @form = Form.where(:name => params[:id], :session_id => the_case.session_id).order("form_version DESC").first
+    else
+      @form = Form.where(:name => params[:id], :session_id => the_case.session_id, :form_version => params[:version]).first
+    end
+
+    raise Exceptions::FormNotFoundError.new(params[:id], params[:version], params[:case]) if @form.nil?
   end
 end
