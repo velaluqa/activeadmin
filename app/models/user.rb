@@ -13,7 +13,9 @@ class User < ActiveRecord::Base
 
   has_many :roles
   has_many :form_answers
-  has_many :sessions
+
+  has_and_belongs_to_many :blind_readable_sessions, :class_name => 'Session', :join_table => 'readers_sessions'
+  has_and_belongs_to_many :validatable_sessions, :class_name => 'Session', :join_table => 'validators_sessions'
 
   def is_app_admin?
     !(roles.first(:conditions => { :object_type => nil, :object_id => nil, :role => Role::role_sym_to_int(:manage) }).nil?)

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130110130106) do
+ActiveRecord::Schema.define(:version => 20130111140010) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -59,6 +59,13 @@ ActiveRecord::Schema.define(:version => 20130110130106) do
     t.datetime "updated_at",    :null => false
   end
 
+  create_table "readers_sessions", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "session_id"
+  end
+
+  add_index "readers_sessions", ["user_id", "session_id"], :name => "index_readers_sessions_on_user_id_and_session_id"
+
   create_table "roles", :force => true do |t|
     t.integer  "object_id"
     t.string   "object_type"
@@ -83,7 +90,6 @@ ActiveRecord::Schema.define(:version => 20130110130106) do
     t.integer  "study_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
-    t.integer  "user_id"
   end
 
   create_table "studies", :force => true do |t|
@@ -112,6 +118,13 @@ ActiveRecord::Schema.define(:version => 20130110130106) do
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
+
+  create_table "validators_sessions", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "session_id"
+  end
+
+  add_index "validators_sessions", ["user_id", "session_id"], :name => "index_validators_sessions_on_user_id_and_session_id"
 
   create_table "versions", :force => true do |t|
     t.string   "item_type",  :null => false

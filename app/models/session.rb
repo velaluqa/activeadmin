@@ -1,8 +1,7 @@
 class Session < ActiveRecord::Base
-  attr_accessible :name, :study, :user, :study_id, :user_id
+  attr_accessible :name, :study, :study_id
 
   belongs_to :study
-  belongs_to :user
 
   has_many :roles, :as => :object
   has_many :form_answers
@@ -11,7 +10,10 @@ class Session < ActiveRecord::Base
   has_many :forms
   has_many :cases
 
-  scope :blind_readable_by_user, lambda { |user| where(:user_id => user.id).includes(:study) }
+  has_and_belongs_to_many :readers, :class_name => 'User', :join_table => 'readers_sessions'
+  has_and_belongs_to_many :validators, :class_name => 'User', :join_table => 'validators_sessions'
+
+  scope :blind_readable_by_user, lambda { |user| user.blind_readable_sessions.includes(:study) }
 
   def configuration
     begin
