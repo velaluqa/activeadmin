@@ -147,13 +147,13 @@ $(document).ready ->
     console.log($('#the_form'))
     console.log($('#the_form').formParams())
     elements = find_arrays($('#the_form').formParams())[repeatable_id]
-    index = elements.length
+    index = if elements? then elements.length else 0
 
     console.log(index)
     console.log(parseInt($(this).attr('data-max-repeats'), 10))
     return if (index == parseInt($(this).attr('data-max-repeats'), 10))
     
-    console.log("Currently included #{elements.length} times")
+    console.log("Currently included #{index} times")
 
     group_end_form = $("#repeatable_group_end_form_#{repeatable_id}")
     repeatable_form = $("#repeatable_form_#{repeatable_id}").clone()
