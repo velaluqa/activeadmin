@@ -7,12 +7,45 @@ ActiveAdmin.register Session do
       link_to session.name, admin_session_path(session)
     end
     column :study
-    column 'Reader', :user
+    column 'Readers' do |session|
+      session.readers.size
+    end
+    column 'Validators' do |session|
+      session.validators.size
+    end
     column 'Progress' do |session|
       "#{session.case_list(:read).size} / #{session.case_list(:all).size}"
     end
 
     default_actions
+  end
+
+  show do |session|
+    attributes_table do
+      row :name
+      row :study
+      row :readers do
+        if session.readers.empty?
+          nil
+        else
+          render 'admin/sessions/list', :items => session.readers.map {|r| link_to(r.name, admin_user_path(r)) }
+        end
+      end
+      row :validators do
+        if session.validators.empty?
+          nil
+        else
+          render 'admin/sessions/list', :items => session.validators.map {|v| link_to(v.name, admin_user_path(v)) }
+        end
+      end
+      row :cases do
+        if session.case_list(:all).empty?
+          nil
+        else
+          render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
+        end
+      end
+    end
   end
 
   member_action :import_csv, :method => :post do
