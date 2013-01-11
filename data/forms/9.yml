@@ -38,8 +38,8 @@
 - id: TMYNCD
   type: select
   values:
-    1: yes
-    2: no
+    1: 'yes'
+    2: 'no'
   label: Does this patient have any target lesion?
   validations:
     - required: true
@@ -49,13 +49,13 @@
     min: 0
     max: 5
     prefix: T
-    label: Target Lesions
+    label: Target Lesion
 
 - id: CTMYNCD
   type: select
   values:
-    1: yes
-    2: no
+    1: 'yes'
+    2: 'no'
   label: Does this patient have any additional lesions for CHOI measurements?
   validations:
     - required: true
@@ -65,13 +65,13 @@
     min: 0
     max: 5
     prefix: C
-    label: CHOI Lesions
+    label: CHOI Lesion
 
 - id: NTMYNCD
   type: select
   values:
-    1: yes
-    2: no
+    1: 'yes'
+    2: 'no'
   label: Does this patient have any additional non-target lesions?
   validations:
     - required: true
@@ -80,4 +80,4 @@
   repeat:
     min: 0
     prefix: N
-    label: Non-target lesions
+    label: Non-target lesion
