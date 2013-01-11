@@ -121,7 +121,14 @@ class FormAnswer
       when 'divider'
         display_list << field
       else
-        display_list << field.merge({'answer' => access_by_path(answers, id), 'id' => id})
+        answer = access_by_path(answers, id)
+        case field['type']
+        when 'bool'
+          answer = (answer.nil? ? false : answer)
+        when 'select_multiple'
+          answer = answer.join(',')
+        end
+        display_list << field.merge({'answer' => answer, 'id' => id})
       end
     end
 
