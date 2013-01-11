@@ -23,10 +23,13 @@ class Session < ActiveRecord::Base
     return config
   end
 
-  def case_list(only_unread = true)
-    if only_unread
-      self.cases.where('position >= :next_case_position', {:next_case_position => self.next_case_position})
-    else
+  def case_list(mode = :unread)
+    case mode
+    when :unread
+      self.cases.find_all {|c| c.form_answer.nil?}
+    when :read
+      self.cases.reject {|c| c.form_answer.nil?}        
+    when :all
       self.cases
     end
   end
@@ -34,16 +37,12 @@ class Session < ActiveRecord::Base
   def most_recent_pause
     return self.session_pauses.order("end DESC").first
   end
-  def current_case
-    pause = most_recent_pause
-    return nil if pause.nil?
 
-    return pause.last_case
+  def next_unread_case
+    case_list(:unread).first
   end
-
-  def next_case_position
-    return 0 if current_case.nil?
-    return current_case.position+1
+  def last_read_case
+    case_list(:read).last    
   end
 
   private

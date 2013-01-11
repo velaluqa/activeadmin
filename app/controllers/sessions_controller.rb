@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
     end
 
     full_sequence = (params[:full_sequence] == 'true')
-    case_list = @session.case_list(!full_sequence)
+    case_list = @session.case_list(full_sequence ? :all : :unread)
 
     case_list_hashes = case_list.map do |c|
       {
@@ -24,11 +24,12 @@ class SessionsController < ApplicationController
     end
 
     config = @session.configuration
+    next_case = @session.next_unread_case
     
     if config.nil?
       result = { :error_code => 1, :error => "Session is not configured"}
     else
-      result = {:session => @session, :configuration => @session.configuration, :case_list => case_list_hashes, :next_case_position => @session.next_case_position}
+      result = {:session => @session, :configuration => @session.configuration, :case_list => case_list_hashes, :next_case_position => (next_case.nil? ? 0 : next_case.position)}
     end
     
     respond_to do |format|

@@ -9,16 +9,7 @@ ActiveAdmin.register Session do
     column :study
     column 'Reader', :user
     column 'Progress' do |session|
-      "#{session.next_case_position} / #{session.case_list(false).size}"
-    end
-    column 'Most Recent Pause' do |session|
-      most_recent_pause = session.most_recent_pause
-      
-      if most_recent_pause.nil?
-        "None"
-      else
-        link_to most_recent_pause.end.to_s, admin_session_pause_path(most_recent_pause)
-      end      
+      "#{session.case_list(:read).size} / #{session.case_list(:all).size}"
     end
 
     default_actions
