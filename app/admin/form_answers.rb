@@ -1,7 +1,7 @@
 ActiveAdmin.register FormAnswer do
   before_filter { @skip_sidebar = true }
 
-  actions :index, :show, :destroy
+  actions :index, :show, :destroy #TEMP
 
   index do
     selectable_column
