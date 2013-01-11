@@ -3,6 +3,7 @@ require 'csv'
 class Case < ActiveRecord::Base
   belongs_to :session
   belongs_to :patient
+  has_one :form_answer
   attr_accessible :images, :position, :case_type
   attr_accessible :session_id, :patient_id
   attr_accessible :session, :patient
@@ -15,6 +16,10 @@ class Case < ActiveRecord::Base
   # virtual attribute for pretty names
   def name
     images_folder
+  end
+
+  def form_answer
+    FormAnswer.where(:case_id => read_attribute(:id)).first
   end
 
   def images_folder
