@@ -23,7 +23,13 @@ class SessionsController < ApplicationController
       }
     end
 
-    result = {:session => @session, :configuration => @session.configuration, :case_list => case_list_hashes, :next_case_position => @session.next_case_position}
+    config = @session.configuration
+    
+    if config.nil?
+      result = { :error_code => 1, :error => "Session is not configured"}
+    else
+      result = {:session => @session, :configuration => @session.configuration, :case_list => case_list_hashes, :next_case_position => @session.next_case_position}
+    end
     
     respond_to do |format|
       format.json { render :json => result }
