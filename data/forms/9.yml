@@ -36,14 +36,8 @@
   label: Assessability comment
 
 - id: TMYNCD
-  type: select
-  values:
-    1: 'yes'
-    2: 'no'
+  type: bool
   label: Does this patient have any target lesion?
-  validations:
-    - required: true
-      message: Required
 - include: baseline_target_lesion
   repeat:
     min: 0
@@ -52,14 +46,8 @@
     label: Target Lesion
 
 - id: CTMYNCD
-  type: select
-  values:
-    1: 'yes'
-    2: 'no'
+  type: bool
   label: Does this patient have any additional lesions for CHOI measurements?
-  validations:
-    - required: true
-      message: Required
 - include: baseline_target_lesion
   repeat:
     min: 0
@@ -68,14 +56,8 @@
     label: CHOI Lesion
 
 - id: NTMYNCD
-  type: select
-  values:
-    1: 'yes'
-    2: 'no'
+  type: bool
   label: Does this patient have any additional non-target lesions?
-  validations:
-    - required: true
-      message: Required
 - include: baseline_nontarget_lesion
   repeat:
     min: 0
