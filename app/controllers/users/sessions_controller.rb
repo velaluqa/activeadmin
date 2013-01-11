@@ -1,4 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
+  DeviseController.respond_to :json
+
   def new
     @dont_display_navbar = true
     super
