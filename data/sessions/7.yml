@@ -10,7 +10,7 @@ types:
     features: []
     toolbar_layout: [roi]
 
-images_root: /Users/profmaad/Workspace/freelance/PharmTrace/images
+images_root: /Users/profmaad/Workspace/freelance/PharmTrace/images_lazy_import_test
 access_to_previous_images: false
 record_annotations: true
 show_previous_annotations: false
