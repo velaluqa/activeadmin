@@ -19,7 +19,7 @@ class SessionsController < ApplicationController
         :position => c.position,
         :id => c.id,
         :case_type => c.case_type,
-        :patient_id => c.patient_id,
+        :patient => c.patient.subject_id,
       }
     end
 
