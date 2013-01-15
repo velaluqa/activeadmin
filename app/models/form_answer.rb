@@ -126,7 +126,18 @@ class FormAnswer
         when 'bool'
           answer = (answer.nil? ? false : answer)
         when 'select_multiple'
-          answer = answer.join(',')
+          if answer.nil?
+            answer = "None"
+          else
+            answer = answer.join(',')
+          end
+        when 'roi'
+          pp field
+          if answer.nil?
+            answer = "None given"
+          else
+            answer = (answer.respond_to?(:map) ? answer.map {|k,v| "#{k}: #{v}"}.join(", ") : answer)
+          end
         end
         display_list << field.merge({'answer' => answer, 'id' => id})
       end

@@ -7,6 +7,11 @@
       - when 'bool'
         = (field['answer'] ? "Yes" : "No")
       - when 'select'
-        = "#{field['values'][field['answer']]} (#{field['answer']})"
+        - if (field['answer'].nil? or (field['answer'].respond_to?(:'empty?') and field['answer'].empty?))
+          None given
+        - elsif (field['values'][field['answer']].nil? and field['answer'].is_a?(Float))
+          = "#{field['values'][field['answer'].to_i]} (#{field['answer']})"          
+        - else
+          = "#{field['values'][field['answer']]} (#{field['answer']})"
       - else
         = field['answer']

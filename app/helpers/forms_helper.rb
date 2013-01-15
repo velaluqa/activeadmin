@@ -18,7 +18,7 @@ module FormsHelper
 
   def options_from_values(field)
     values = field['values']
-    options = "<option>Please select</option>"
+    options = "<option value=\"\">Please select</option>"
 
     values.each do |value, label|
       options += "<option value=\"#{value}\">#{label} (#{value})</option>"

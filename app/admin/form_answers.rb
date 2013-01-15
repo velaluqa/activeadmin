@@ -38,6 +38,9 @@ ActiveAdmin.register FormAnswer do
       row :answers do
         render "forms/results", :fields => form_answer.printable_answers, :display_type => 'review'
       end
+      row :answers_raw do
+        form_answer.answers
+      end
     end
   end
 end
