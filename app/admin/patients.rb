@@ -13,6 +13,7 @@ ActiveAdmin.register Patient do
       row :session
       row :subject_id
       row :images_folder
+      row :patient_data
     end
   end
 
