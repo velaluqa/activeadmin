@@ -1,3 +1,24 @@
+- id: NAME
+  type: string
+  fixed_value: patient[name]
+  label: Patient name
+- id: AGE
+  type: number
+  fixed_value: patient[age]
+  label: Patient age
+- id: INSURED
+  type: bool
+  fixed_value: patient[insured]
+  label: Patient has insurance?
+- id: SEX
+  type: select
+  fixed_value: patient[sex]
+  values:
+    female: Female
+    male: Male
+    other: Other
+  label: Sex
+  
 - id: COHORT
   type: select
   values:

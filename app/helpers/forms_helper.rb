@@ -1,3 +1,5 @@
+require 'key_path_accessor'
+
 module FormsHelper
   def validators_hash(field)
     attributes = {}
@@ -16,23 +18,26 @@ module FormsHelper
     return attributes
   end
 
-  def options_from_values(field)
+  def options_from_values(field, selected_value)
     values = field['values']
     options = "<option value=\"\">Please select</option>"
 
     values.each do |value, label|
-      options += "<option value=\"#{value}\">#{label} (#{value})</option>"
+      selected = (value == selected_value ? " selected=\"selected\"" : "")
+      options += "<option value=\"#{value}\" #{selected}>#{label} (#{value})</option>"
     end
 
     return options
   end
 
-  def roi_values_data_fields(field)
-    values = field['values']
-    data_fields = {}
-    
-    values.each do |key,value|
-      data_fields[:"data-roi-value-#{key}"] = value
-    end
+  def fixed_value(field, data)
+    return [nil,{}] if (field['fixed_value'].nil? or
+                        !field['fixed_value'].is_a?(String) or
+                        field['fixed_value'].empty?)
+
+    key_path = field['fixed_value']
+    value = KeyPathAccessor::access_by_path(data, key_path)
+
+    return [value, {:disabled => true}]
   end
 end

@@ -1,7 +1,8 @@
 = label_tag(field['id'], field['label'], :class => 'control-label')
 .controls
   = label_tag(field['id'], :class => 'checkbox') do
-    = check_box_tag(field['id'], 'true', false, validators_hash(field))
+    - value, fixed_value_hash = fixed_value(field, data_hash)
+    = check_box_tag(field['id'], 'true', value, validators_hash(field).merge(fixed_value_hash))
     = "Yes"
     %p.help_block
     

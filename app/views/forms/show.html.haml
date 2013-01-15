@@ -18,7 +18,7 @@
       - else
         .row.form-row-padding
           .control-group.span5
-            = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
+            = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hash
           .muted.span5= field['description']
     .form-actions
       %button.btn.btn-primary{:type => 'submit'} Submit Answers
@@ -53,7 +53,7 @@
         - else
           .row.form-row-padding
             .control-group.span5
-              = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge'
+              = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hashx
             .muted.span5= field['description']
     %div{:id => "repeatable_preview_#{r[:id]}"}
       - r[:config].each do |field|
