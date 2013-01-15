@@ -13,8 +13,8 @@ ActiveAdmin.register Patient do
       row :session
       row :subject_id
       row :images_folder
-      row :patient_data do
-        patient.patient_data.to_yaml
+      row :patient_data_raw do
+        CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe
       end
     end
   end

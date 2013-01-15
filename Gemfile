@@ -56,3 +56,6 @@ gem 'paper_trail', '~>2'
 # ActiveAdmin
 gem 'activeadmin'
 gem 'activeadmin-mongoid', :github => 'profmaad/activeadmin-mongoid', :branch => 'master'
+
+# CodeRay for rendering yaml/json data
+gem 'coderay'

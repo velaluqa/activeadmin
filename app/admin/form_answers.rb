@@ -38,8 +38,8 @@ ActiveAdmin.register FormAnswer do
       row :answers do
         render "forms/results", :fields => form_answer.printable_answers, :display_type => 'review'
       end
-      row :answers_raw do
-        form_answer.answers
+      row :answers_raw do        
+        CodeRay.scan(JSON::pretty_generate(form_answer.answers), :json).div(:css => :class).html_safe
       end
     end
   end
