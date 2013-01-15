@@ -1,5 +1,5 @@
 - id: NAME
-  type: string
+  type: fixed
   fixed_value: patient[name]
   label: Patient name
 - id: AGE
