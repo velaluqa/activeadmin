@@ -13,7 +13,9 @@ ActiveAdmin.register Patient do
       row :session
       row :subject_id
       row :images_folder
-      row :patient_data
+      row :patient_data do
+        patient.patient_data.to_yaml
+      end
     end
   end
 
