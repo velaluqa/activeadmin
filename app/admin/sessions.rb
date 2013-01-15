@@ -48,20 +48,37 @@ ActiveAdmin.register Session do
     end
   end
 
-  member_action :import_csv, :method => :post do
+  member_action :import_case_list_csv, :method => :post do
     @session = Session.find(params[:id])
 
     num_imported = Case.batch_create_from_csv(params[:session][:file].tempfile, @session, (@session.last_read_case.nil? ? 0 : @session.last_read_case.position+1))
 
     redirect_to({:action => :show}, :notice => "Successfully imported #{num_imported} cases from CSV")
   end
-  member_action :import_csv_form, :method => :get do
+  member_action :import_case_list_csv_form, :method => :get do
     @session = Session.find(params[:id])
 
-    render 'admin/sessions/import_csv_form'
+    @page_title = "Import Case List from CSV"
+    render 'admin/sessions/import_csv_form', :locals => {:url => import_case_list_csv_admin_session_path}
   end
   action_item :only => :show do
-    link_to 'Import CSV', import_csv_form_admin_session_path(session)
+    link_to 'Import Case List from CSV', import_case_list_csv_form_admin_session_path(session)
   end
   
+  member_action :import_patient_data_csv, :method => :post do
+    @session = Session.find(params[:id])
+
+    num_imported = Patient.batch_create_from_csv(params[:session][:file].tempfile, @session)
+
+    redirect_to({:action => :show}, :notice => "Successfully imported/updated #{num_imported} patients from CSV")
+  end
+  member_action :import_patient_data_csv_form, :method => :get do
+    @session = Session.find(params[:id])
+
+    @page_title = "Import Patient Data from CSV"
+    render 'admin/sessions/import_csv_form', :locals => {:url => import_patient_data_csv_admin_session_path}
+  end
+  action_item :only => :show do
+    link_to 'Import Patient Data from CSV', import_patient_data_csv_form_admin_session_path(session)
+  end
 end

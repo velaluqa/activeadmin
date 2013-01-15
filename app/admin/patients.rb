@@ -14,7 +14,7 @@ ActiveAdmin.register Patient do
       row :subject_id
       row :images_folder
       row :patient_data_raw do
-        CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe
+        CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
       end
     end
   end
