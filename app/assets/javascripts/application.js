@@ -15,6 +15,6 @@
 //= require twitter/bootstrap
 //= require bootstrap
 //= require jqBootstrapValidation
-//= require jquery.formparams.min
+//= require jquery.formparams
 //= require form_answers
 //= require forms
