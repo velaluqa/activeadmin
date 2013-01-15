@@ -18,12 +18,21 @@ module FormsHelper
 
   def options_from_values(field)
     values = field['values']
-    options = ""
+    options = "<option>Please select</option>"
 
     values.each do |value, label|
       options += "<option value=\"#{value}\">#{label} (#{value})</option>"
     end
 
     return options
+  end
+
+  def roi_values_data_fields(field)
+    values = field['values']
+    data_fields = {}
+    
+    values.each do |key,value|
+      data_fields[:"data-roi-value-#{key}"] = value
+    end
   end
 end

@@ -18,14 +18,24 @@
 
 - id: LESDIAM
   type: roi
-  value: length
+  values:
+    DIAM: length
   label: Maximum lesion diameter
   validations:
     - required: true
       message: Required  
+- id: LESION
+  type: roi
+  values:
+    MIN: min
+    MAX: max
+    MEAN: mean
+  label: Main Lesion ROI
+  description: This will be used for min, max and mean calculation.
 - id: HUUNITS
   type: roi
-  value: density
+  values:
+    HUUNITS: mean
   label: Density in HU
   description: Only if lesion is HCC
 

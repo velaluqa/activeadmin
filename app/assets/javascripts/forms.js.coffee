@@ -14,18 +14,31 @@ has_pharmtrace_api = ->
 create_option = (text, value) ->
   $('<option></option>').val(value).html(text)
 
-roi_to_options = (roi, type) ->
-  create_option("Name: "+roi['name']+", "+camelize(type)+": "+roi[type], roi[type])
+roi_to_options = (roi, values) ->
+  label = "Name: "+roi['name']+", "
+  option_value = {}
+
+  for own key, value of values
+    label = label + camelize(value)+": "+roi[value]+", "
+    option_value[key] = roi[value]
+
+  label = label.slice(0, -2)
+    
+  create_option(label, JSON.stringify(option_value))
+
+roi_has_values = (roi, values) ->
+  (return false if !(value of roi)) for own _,value of values
+
+  return true
 
 populate_select_with_rois = (select, rois) ->
-  type = /select-roi-(.*)/.exec(select.className)[1]
-  select_id = select.id
-  select = $('#'+select_id)
-  select.empty()
-  select.append(roi_to_options(roi, type)) for roi in rois when (type of roi)
+  select = $(select)
 
-  if($('#'+select_id+' option').length == 0)
-    select.append(create_option("No ROIs available", ""))
+  values = jQuery.parseJSON(select.attr('data-roi-values'))
+  
+  select.empty()
+  select.append(create_option("Please select", ""))
+  select.append(roi_to_options(roi, values)) for roi in rois when roi_has_values(roi, values)
 
 register_custom_validation_function = (func) ->
   window.custom_validation_functions = [] unless window.custom_validation_functions?
@@ -67,8 +80,13 @@ fill_data_field = (field, answers) ->
 
   if(field.attr('data-type') == 'bool')
     answer = if answer == yes then "Yes" else "No"
+  else if(field.attr('data-type') == 'roi')
+    answer_html = (('<p>'+key+": "+value+'</p>') for own key,value of answer)
 
-  field.text(answer)
+  if(answer_html?)
+    field.html(answer_html)
+  else
+    field.text(answer)
 
 value_at_path = (obj, path) ->
   components = (component.replace(/\[/, "").replace(/\]/, "") for component in path.split("["))
@@ -135,6 +153,7 @@ $(document).ready ->
               return
               
           form_data = find_arrays($('#the_form').formParams())
+          console.log(form_data)
           window.form_answers = form_data
           fill_print_version(form_data)
           display_answers_preview(form_data)
@@ -178,8 +197,9 @@ $(document).ready ->
 
   PharmTraceAPI.roisUpdated.connect ->  
     rois = PharmTraceAPI.rois
-    console.log($('[class*="select-roi-"]'))
-    populate_select_with_rois(select, rois) for select in $('[class*="select-roi-"]')
+    selects = $('.select-roi')
+
+    populate_select_with_rois(select, rois) for select in selects
     $('#refresh-rois-btn').button('reset')
 
   $('#preview_submit_btn').click ->
