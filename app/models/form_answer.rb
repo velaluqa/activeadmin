@@ -1,5 +1,6 @@
 require 'openssl'
 require 'base64'
+require 'key_path_accessor'
 
 class FormAnswer
   include Mongoid::Document
@@ -76,23 +77,6 @@ class FormAnswer
   end
   
   private
-  def access_by_path(value, path)
-    if (path.nil? or value.nil?)
-      puts "Value: #{value}"
-      return value 
-    end
-    puts "Path: #{path}"
-
-    path_components = path.gsub(/\]/,'').split('[', 2)
-
-    if(value.is_a? Array)
-      result = value[path_components[0].to_i]
-    else
-      result = value[path_components[0]]
-    end
-
-    return access_by_path(result, path_components[1])
-  end
 
   def form_config_and_answers_to_display_list(form_config, repeatables, answers, indices = [])
     display_list = []
@@ -110,7 +94,7 @@ class FormAnswer
         skip_group = true
 
         repeatable = repeatables[field['id']]
-        repeatable_answer = access_by_path(answers, id)
+        repeatable_answer = KeyPathAccessor::access_by_path(answers, id)
         next if repeatable_answer.nil?
 
         repeatable_answer.each_with_index do |answer, i|
@@ -121,7 +105,7 @@ class FormAnswer
       when 'divider'
         display_list << field
       else
-        answer = access_by_path(answers, id)
+        answer = KeyPathAccessor::access_by_path(answers, id)
         case field['type']
         when 'bool'
           answer = (answer.nil? ? false : answer)
