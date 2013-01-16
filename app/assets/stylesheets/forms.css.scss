@@ -30,6 +30,7 @@
 
 @media print
 {
+    #previous_results { display: none !important; }
     #form_area { display: none !important; }
     #preview_modal { display: none !important; }
     #print_version
