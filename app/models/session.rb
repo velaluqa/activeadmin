@@ -47,6 +47,11 @@ class Session < ActiveRecord::Base
     case_list(:read).last    
   end
 
+  def next_position
+    return 0 if self.cases.empty?
+    return self.cases.last.position+1
+  end
+
   private
 
   

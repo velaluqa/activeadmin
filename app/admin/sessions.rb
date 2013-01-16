@@ -51,7 +51,7 @@ ActiveAdmin.register Session do
   member_action :import_case_list_csv, :method => :post do
     @session = Session.find(params[:id])
 
-    num_imported = Case.batch_create_from_csv(params[:session][:file].tempfile, @session, (@session.last_read_case.nil? ? 0 : @session.last_read_case.position+1))
+    num_imported = Case.batch_create_from_csv(params[:session][:file].tempfile, @session, @session.next_position)
 
     redirect_to({:action => :show}, :notice => "Successfully imported #{num_imported} cases from CSV")
   end
