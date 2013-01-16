@@ -4,6 +4,7 @@ class Case < ActiveRecord::Base
   belongs_to :session
   belongs_to :patient
   has_one :form_answer
+  has_one :case_data
   attr_accessible :images, :position, :case_type
   attr_accessible :session_id, :patient_id
   attr_accessible :session, :patient
@@ -22,6 +23,10 @@ class Case < ActiveRecord::Base
     FormAnswer.where(:case_id => read_attribute(:id)).first
   end
 
+  def case_data
+    CaseData.where(:case_id => read_attribute(:id)).first
+  end
+
   def images_folder
     "#{self.patient.subject_id}/#{read_attribute(:images)}"
   end
@@ -31,7 +36,7 @@ class Case < ActiveRecord::Base
       :col_sep => ',',
       :row_sep => :auto,
       :quote_char => '"',
-      :headers => false,
+      :headers => true,
     }
 
     csv = CSV.new(csv_file, csv_options)
@@ -39,10 +44,19 @@ class Case < ActiveRecord::Base
 
     position = start_position
     rows.each do |row|
-      patient = Patient.where(:subject_id => row[0], :session_id => session.id).first
-      patient = Patient.create(:subject_id => row[0], :session => session, :images_folder => row[0]) if patient.nil?
+      patient = Patient.where(:subject_id => row['patient'], :session_id => session.id).first
+      patient = Patient.create(:subject_id => row['patient'], :session => session, :images_folder => row['patient']) if patient.nil?
 
-      pp Case.create(:patient => patient, :session => session, :images => row[1], :case_type => row[2], :position => position)
+      new_case = Case.create(:patient => patient, :session => session, :images => row['images'], :case_type => row['type'], :position => position)
+      
+      case_data = {}
+      data_headers = row.headers.reject {|h| ['patient', 'images', 'type'].include?(h)}
+      data_headers.each do |field|
+        case_data[field] = row[field]
+      end
+
+      CaseData.create(:case => new_case, :data => case_data)
+      
       position += 1
     end
 
