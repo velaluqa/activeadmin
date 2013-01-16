@@ -1,0 +1,47 @@
+- printable_answers = cases.map {|c| c.form_answer.printable_answers}
+- current_group_index = nil
+- first_in_group = false
+%table.table.table-striped.table-bordered.table-condensed
+  %caption= caption
+  %colgroup
+    %col{:style => 'width: 2%'}
+    %col{:style => 'width: 23%'}
+    - cases.count.times do
+      %col{:style => "width: #{(75.0/cases.count).floor}%"}
+  - unless skip_header
+    %thead
+      %tr
+        %th{:colspan => 2} Field
+        - cases.each do |c|
+          %th= c.images_folder
+  %tbody
+    - printable_answers[0].each_with_index do |field_spec,i|
+      - case field_spec['type']
+      - when 'divider'
+        - current_group_index += 1
+        - first_in_group = true
+      - when 'group-end'
+        - current_group_index = nil
+        - first_in_group = false
+      - when 'add_repeat'
+        - current_group_index = 1
+        - first_in_group = true
+        %tr
+          %th{:colspan => 2+cases.count}= field_spec['group-label']
+      - else
+        %tr
+          - unless (current_group_index.nil?)
+            - if first_in_group
+              %th= current_group_index
+              - first_in_group = false
+            - else
+              %td
+            %td= field_spec['label']
+          - else
+            %td{:colspan => 2}= field_spec['label']
+          - printable_answers.each_with_index do |answers,case_index|
+            - answer = answers.find {|f| f['id'] == field_spec['id']}
+            - if answer.nil?
+              %td
+            - else                    
+              %td= (answer['type'] == 'fixed' ? fixed_value(answer, cases[case_index].data_hash)[0] : answer['answer'])

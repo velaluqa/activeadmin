@@ -9,7 +9,24 @@ class FormsController < ApplicationController
 
   def show
     @form_config, @form_components, @repeatables = @form.configuration
-    @data_hash = data_hash
+    @data_hash = @case.data_hash
+
+    if(@case and @case.session)
+      configuration = @case.session.configuration
+
+      unless (configuration.nil? or configuration['show_previous_results'].nil? or configuration['show_previous_results'] == false)
+        previous_cases_list = @case.patient.cases.where('position < ?', @case.position).reject {|c| c.form_answer.nil?}
+
+        @previous_cases = {}
+        previous_cases_list.each do |c|
+          if(@previous_cases[c.case_type].nil?)
+            @previous_cases[c.case_type] = []
+          end
+
+          @previous_cases[c.case_type] << c
+        end
+      end
+    end
     
     return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
   end

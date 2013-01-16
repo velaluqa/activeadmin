@@ -1,24 +1,3 @@
-- id: NAME
-  type: fixed
-  fixed_value: patient[name]
-  label: Patient name
-- id: AGE
-  type: number
-  fixed_value: patient[age]
-  label: Patient age
-- id: INSURED
-  type: bool
-  fixed_value: patient[insured]
-  label: Patient has insurance?
-- id: SEX
-  type: select
-  fixed_value: patient[sex]
-  values:
-    female: Female
-    male: Male
-    other: Other
-  label: Sex
-  
 - id: COHORT
   type: select
   values:
@@ -26,19 +5,23 @@
     H: HCC
     O: ovarian
     R: RCC
+  fixed_value: patient[cohort]
   label: Tumor type
   validations:
     - required: true
       message: Required
 
 - id: TMDX
-  type: string
+  type: fixed
+  fixed_value: case[visit_date]
   label: Visit Date
 - id: VISITNUM
-  type: number
+  type: fixed
+  fixed_value: case[visit_number]
   label: Visit number
 - id: PREVRAD
-  type: string
+  type: fixed
+  fixed_value: patient[prevrad]
   label: Sites that received radiation
 
 - id: IMASSESS
