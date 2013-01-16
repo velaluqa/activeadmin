@@ -24,25 +24,26 @@ class Patient < ActiveRecord::Base
       :row_sep => :auto,
       :quote_char => '"',
       :headers => true,
-      #:converters => nil,
-      #:header_converters => nil,
+      :converters => [:all, :date],
+      :unconverted_fields => true,
     }
 
     csv = CSV.new(csv_file, csv_options)
-    # csv.convert do |field|
-    #   if (field.downcase == 'true' or field.downcase == 'yes')
-    #     true
-    #   elsif (field.downcase == 'false' or field.downcase == 'no')
-    #     false
-    #   else
-    #     field
-    #   end
-    # end
+    csv.convert do |field|
+      if (field.downcase == 'true' or field.downcase == 'yes')
+        true
+      elsif (field.downcase == 'false' or field.downcase == 'no')
+        false
+      else
+        field
+      end
+    end
     rows = csv.read
 
     rows.each do |row|
-      patient = Patient.where(:subject_id => row['patient'], :session_id => session.id).first
-      patient = Patient.create(:subject_id => row['patient'], :session => session, :images_folder => row['patient']) if patient.nil?
+      subject_id = row.unconverted_fields[row.index('patient')]
+      patient = Patient.where(:subject_id => subject_id, :session_id => session.id).first
+      patient = Patient.create(:subject_id => subject_id, :session => session, :images_folder => subject_id) if patient.nil?
 
       new_patient_data = {}      
       row.headers.each do |field|

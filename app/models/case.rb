@@ -41,17 +41,35 @@ class Case < ActiveRecord::Base
       :row_sep => :auto,
       :quote_char => '"',
       :headers => true,
+      :converters => [:all, :date],
+      :unconverted_fields => true,
     }
 
     csv = CSV.new(csv_file, csv_options)
+    csv.convert do |field|
+      if (field.downcase == 'true' or field.downcase == 'yes')
+        true
+      elsif (field.downcase == 'false' or field.downcase == 'no')
+        false
+      else
+        field
+      end
+    end
     rows = csv.read
 
     position = start_position
     rows.each do |row|
-      patient = Patient.where(:subject_id => row['patient'], :session_id => session.id).first
-      patient = Patient.create(:subject_id => row['patient'], :session => session, :images_folder => row['patient']) if patient.nil?
+      puts "------------------------"
+      pp row
+      pp row['visit_date']
+      puts "------------------------"
+      subject_id = row.unconverted_fields[row.index('patient')]
+      images = row.unconverted_fields[row.index('images')]
+      case_type = row.unconverted_fields[row.index('type')]
+      patient = Patient.where(:subject_id => subject_id, :session_id => session.id).first
+      patient = Patient.create(:subject_id => subject_id, :session => session, :images_folder => subject_id) if patient.nil?
 
-      new_case = Case.create(:patient => patient, :session => session, :images => row['images'], :case_type => row['type'], :position => position)
+      new_case = Case.create(:patient => patient, :session => session, :images => images, :case_type => case_type, :position => position)
       
       case_data = {}
       data_headers = row.headers.reject {|h| ['patient', 'images', 'type'].include?(h)}
