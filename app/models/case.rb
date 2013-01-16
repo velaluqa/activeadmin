@@ -11,6 +11,10 @@ class Case < ActiveRecord::Base
 
   validates_uniqueness_of :position, :scope => :session_id
 
+  before_destroy do |c|
+    CaseData.destroy_all(:case_id => c.id)
+  end
+
   # so we always get results sorted by position, not by row id
   default_scope order('position ASC')
 
