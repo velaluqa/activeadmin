@@ -1,17 +1,4 @@
 .row-fluid
   -#.span4.lead= label_tag(field['id'], field['label'])
   %strong.span4= field['label']
-  %span.span8{:name => field['id'], :'data-type' => field['type']}
-    - unless field['answer'].nil?
-      - case field['type']
-      - when 'bool'
-        = (field['answer'] ? "Yes" : "No")
-      - when 'select'
-        - if (field['answer'].nil? or (field['answer'].respond_to?(:'empty?') and field['answer'].empty?))
-          None given
-        - elsif (field['values'][field['answer']].nil? and field['answer'].is_a?(Float))
-          = "#{field['values'][field['answer'].to_i]} (#{field['answer']})"          
-        - else
-          = "#{field['values'][field['answer']]} (#{field['answer']})"
-      - else
-        = field['answer']
+  %span.span8{:name => field['id'], :'data-type' => field['type']}= field['answer']
