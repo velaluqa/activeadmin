@@ -3,6 +3,7 @@ class Patient < ActiveRecord::Base
 
   belongs_to :session
   has_many :form_answers
+  has_many :cases
   has_one :patient_data
 
   before_destroy do |p|
