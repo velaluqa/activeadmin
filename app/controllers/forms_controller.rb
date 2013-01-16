@@ -17,7 +17,7 @@ class FormsController < ApplicationController
 protected
 
   def data_hash
-    {'patient' => @case.patient.patient_data.data}
+    {'patient' => (@case.patient.patient_data.nil? ? {} : @case.patient.patient_data.data), 'case' => (@case.case_data.nil? ? {} : @case.case_data.data)}
   end
 
   def find_form_from_params
