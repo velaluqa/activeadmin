@@ -78,6 +78,16 @@ class FormAnswer
   
   private
 
+  def pretty_print_select_answer(field, answer)
+    if (answer.respond_to?(:'empty?') and answer.empty?)
+      "None given"
+    elsif (field['values'][answer].nil? and answer.is_a?(Float))
+      "#{field['values'][answer.to_i]} (#{answer})"          
+    else
+      "#{field['values'][answer]} (#{answer})"
+    end          
+  end
+
   def form_config_and_answers_to_display_list(form_config, repeatables, answers, indices = [])
     display_list = []
 
@@ -91,6 +101,7 @@ class FormAnswer
 
       case field['type']
       when 'add_repeat'
+        display_list << field
         skip_group = true
 
         repeatable = repeatables[field['id']]
@@ -101,6 +112,7 @@ class FormAnswer
           display_list += form_config_and_answers_to_display_list(Marshal.load(Marshal.dump(repeatable)), repeatables, answers, indices + [i])
         end
       when 'group-end'
+        display_list << field
         skip_group = false
       when 'divider'
         display_list << field
@@ -108,15 +120,16 @@ class FormAnswer
         answer = KeyPathAccessor::access_by_path(answers, id)
         case field['type']
         when 'bool'
-          answer = (answer.nil? ? false : answer)
+          answer = (answer == true ? "Yes" : "No")
+        when 'select'
+          answer = pretty_print_select_answer(field, answer)
         when 'select_multiple'
           if answer.nil?
             answer = "None"
           else
-            answer = answer.join(',')
+            answer = answer.map {|a| pretty_print_select_answer(field, a)}.join(', ')
           end
         when 'roi'
-          pp field
           if answer.nil?
             answer = "None given"
           else
