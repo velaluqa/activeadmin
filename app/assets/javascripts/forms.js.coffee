@@ -178,6 +178,7 @@ $(document).ready ->
     repeatable_form = $("#repeatable_form_#{repeatable_id}").clone()
     set_index_in_name_and_id(repeatable_form.find('input,select,textarea'), index)
     set_index_in_for(repeatable_form.find('label'), index)
+    repeatable_form.find('.form-group-index').text(index+1)
     console.log(group_end_form)
     console.log(repeatable_form)
 

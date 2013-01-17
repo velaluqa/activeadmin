@@ -12,18 +12,29 @@
     .control-group.error
       .controls
         %p#custom-validation-help-block.help-block
-    - @form_config.each do |field|
+    - current_group_index = nil
+    - first_in_group = false
+    - @form_config.each do |field|      
       - if(field['type'] == 'add_repeat')
-        .form-actions
-          %span= field['group-label']
+        - current_group_index = 1
+        - first_in_group = true
+        .form-actions.form-group-header
+          %h3.pull-left.form-group-heading= field['group-label']
           %a.btn.add-repeat-btn.pull-right{:'data-id' => field['id'], :'data-max-repeats' => field['max'], :href => '#'}= field['button-label']
       - elsif(field['type'] == 'divider')
+        - current_group_index += 1
+        - first_in_group = true
         %hr
       - elsif(field['type'] == 'group-end')
+        - current_group_index = nil
+        - first_in_group = false
         %div{:id => "repeatable_group_end_form_#{field['id']}"}
       - else
         .row.form-row-padding
           .control-group.span5
+            - if (!current_group_index.nil? && first_in_group)
+              - first_in_group = false
+              %h3.form-group-index.pull-left= current_group_index
             = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hash
           .muted.span5= field['description']
     .form-actions
@@ -53,12 +64,16 @@
 #repeatables.hide
   - @repeatables.each do |r|
     %div{:id => "repeatable_form_#{r[:id]}"}
+      - first_field = true
       - r[:config].each do |field|
         - if(field['type'] == 'divider')
           %hr
         - else
           .row.form-row-padding
             .control-group.span5
+              - if(first_field)
+                - first_field = false
+                %h3.form-group-index.pull-left
               = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hashx
             .muted.span5= field['description']
     %div{:id => "repeatable_preview_#{r[:id]}"}
