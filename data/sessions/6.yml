@@ -47,7 +47,7 @@ types:
     toolbar_layout: [roi]
     context_menu: false
 
-images_root: /Users/profmaad/Workspace/freelance/PharmTrace/images
+images_root: prototype_session
 access_to_previous_images: false
 record_annotations: true
 show_previous_annotations: false
