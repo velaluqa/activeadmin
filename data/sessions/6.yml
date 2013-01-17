@@ -9,6 +9,7 @@ types:
     annotations_layout: initial_testing
     features: []
     toolbar_layout: [roi]
+    context_menu: false
     
   retesting:
     form: retesting
@@ -20,6 +21,7 @@ types:
     annotations_layout: retesting
     features: []
     toolbar_layout: [roi]
+    context_menu: false
 
   baseline:
     form: baseline
@@ -31,6 +33,7 @@ types:
     annotations_layout: baseline
     features: []
     toolbar_layout: [roi]
+    context_menu: false
 
   fu:
     form: fu
@@ -42,6 +45,7 @@ types:
     annotations_layout: fu
     features: []
     toolbar_layout: [roi]
+    context_menu: false
 
 images_root: /Users/profmaad/Workspace/freelance/PharmTrace/images
 access_to_previous_images: false
