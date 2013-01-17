@@ -189,7 +189,7 @@ $(document).ready ->
     repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
 
     delay 10, -> 
-      $(window).scrollTop(scroll_to_element.position().top);
+      $(window).scrollTop(scroll_to_element.position().top-20);
 
   $('#refresh-rois-btn').click ->
     $(this).button('loading')
