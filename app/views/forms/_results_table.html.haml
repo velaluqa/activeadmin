@@ -1,8 +1,16 @@
-- printable_answers = cases.map {|c| c.form_answer.printable_answers}
+- placeholders_only = false unless (defined? placeholders_only)
+- skip_header = false unless (defined? skip_header)
+- display_type = 'results' unless placeholders_only
+
+- if placeholders_only
+  - printable_answers = [form_config]
+- else
+  - printable_answers = cases.map {|c| c.form_answer.printable_answers}  
 - current_group_index = nil
 - first_in_group = false
 %table.table.table-striped.table-bordered.table-condensed
-  %caption= caption
+  - unless (caption.nil? or caption.empty?)
+    %caption= caption
   %colgroup
     %col{:style => 'width: 2%'}
     %col{:style => 'width: 23%'}
@@ -12,8 +20,11 @@
     %thead
       %tr
         %th{:colspan => 2} Field
-        - cases.each do |c|
-          %th= c.images_folder
+        - if placeholders_only
+          %th= Answer
+        - else
+          - cases.each do |c|
+            %th= c.images_folder
   %tbody
     - printable_answers[0].each_with_index do |field_spec,i|
       - case field_spec['type']
@@ -23,25 +34,14 @@
       - when 'group-end'
         - current_group_index = nil
         - first_in_group = false
+        - if placeholders_only
+          %tr{:id => "repeatable_group_end_#{display_type}_#{field_spec['id']}"}
       - when 'add_repeat'
         - current_group_index = 1
         - first_in_group = true
         %tr
           %th{:colspan => 2+cases.count}= field_spec['group-label']
       - else
-        %tr
-          - unless (current_group_index.nil?)
-            - if first_in_group
-              %th= current_group_index
-              - first_in_group = false
-            - else
-              %td
-            %td= field_spec['label']
-          - else
-            %td{:colspan => 2}= field_spec['label']
-          - printable_answers.each_with_index do |answers,case_index|
-            - answer = answers.find {|f| f['id'] == field_spec['id']}
-            - if answer.nil?
-              %td
-            - else                    
-              %td= (answer['type'] == 'fixed' ? fixed_value(answer, cases[case_index].data_hash)[0] : answer['answer'])
+        = render 'forms/results_table_row', :current_group_index => current_group_index, :first_in_group => first_in_group, :field_spec => field_spec, :printable_answers => printable_answers, :cases => cases, :placeholders_only => placeholders_only
+        - first_in_group = false
+        

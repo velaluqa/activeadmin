@@ -59,19 +59,10 @@ set_custom_validation_messages = (messages) ->
 
   ul.append(lis.join('\n'))
 
-display_answers_preview = (answers) ->
-  preview_modal = $('#preview_modal')  
-  data_fields = preview_modal.find('.modal-body span')
+fill_placeholder_cells = (root_elem, answers) ->
+  placeholder_cells = $(root_elem).find('td.results-table-placeholder-cell')
 
-  fill_data_field($(field), answers) for field in data_fields
-
-  preview_modal.modal('show')  
-
-fill_print_version = (answers) ->
-  print_version = $('#print_version')  
-  data_fields = print_version.find('.print-body span')
-
-  fill_data_field($(field), answers) for field in data_fields
+  fill_data_field($(cell), answers) for cell in placeholder_cells
 
 fill_data_field = (field, answers) ->
   field_name = field.attr('name')
@@ -155,8 +146,9 @@ $(document).ready ->
           form_data = find_arrays($('#the_form').formParams())
           console.log(form_data)
           window.form_answers = form_data
-          fill_print_version(form_data)
-          display_answers_preview(form_data)
+          fill_placeholder_cells($('#preview_modal'), form_data)
+          fill_placeholder_cells($('#print_version'), form_data)
+          $('#preview_modal').modal('show')  
   )
 
   $('.add-repeat-btn').click ->
@@ -184,8 +176,9 @@ $(document).ready ->
 
     group_end_form.before(e) for e in repeatable_form.children()
 
-    repeatable_preview = $("#repeatable_preview_#{repeatable_id}").clone()
-    set_index_in_name(repeatable_preview.find('span'), index)
+    repeatable_preview = $("#repeatable_table_#{repeatable_id} tbody").clone()
+    repeatable_preview.find('.form-group-index-cell').text(index+1)
+    set_index_in_name(repeatable_preview.find('td.results-table-placeholder-cell'), index)
 
     $("#repeatable_group_end_preview_#{repeatable_id}").before(e) for e in repeatable_preview.clone().children()
     $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview.children()

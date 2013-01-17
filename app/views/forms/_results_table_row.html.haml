@@ -1,0 +1,19 @@
+%tr
+  - unless (current_group_index.nil?)
+    - if(first_in_group)
+      %th.form-group-index-cell= (placeholders_only ? '' : current_group_index)
+    - else
+      %td
+    %td= field_spec['label']
+  - else
+    %td{:colspan => 2}= field_spec['label']
+  - printable_answers.each_with_index do |answers,case_index|
+    - answer = answers.find {|f| f['id'] == field_spec['id']}
+    - if (!answer.nil? and answer['type'] == 'fixed')
+      %td= fixed_value(answer, cases[case_index].data_hash)[0]
+    - elsif placeholders_only
+      %td.results-table-placeholder-cell{:name => field_spec['id'], :'data-type' => field_spec['type']}
+    - elsif answer.nil?
+      %td
+    - else
+      %td= answer['answer']

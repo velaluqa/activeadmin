@@ -45,7 +45,8 @@
     %button.close{:type => 'button', :'data-dismiss' => 'modal', :'aria-hidden' => true} &times;
     %h3 Please verify your answers
   .modal-body
-    = render "forms/results", :fields => @form_config, :display_type => 'preview'
+    = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'preview'
+    -# = render "forms/results", :fields => @form_config, :display_type => 'preview'
   .modal-footer
     %button.btn{:'data-dismiss' => 'modal', :'aria-hidden' => true} Change Answers
     %button#preview_submit_btn.btn.btn-primary{:'data-loading-text' => 'Submitting...'} Submit Answers
@@ -55,7 +56,8 @@
     .offset2.span10
       %h2.print-header Your answers
       .print-body
-        = render "forms/results", :fields => @form_config, :display_type => 'print'
+        = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'print'
+        -# = render "forms/results", :fields => @form_config, :display_type => 'print'
       %strong.print-signature I hereby declare that these are indeed my very own answers:
       .signature-div
         .signature-line
@@ -76,9 +78,11 @@
                 %h3.form-group-index.pull-left
               = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hashx
             .muted.span5= field['description']
-    %div{:id => "repeatable_preview_#{r[:id]}"}
+    %table{:id => "repeatable_table_#{r[:id]}"}
+      - first_in_group = true
       - r[:config].each do |field|
         - if(field['type'] == 'divider')
-          %hr
+          - first_in_group = true
         - else
-          = render "forms/field_preview", :field => field
+          = render 'forms/results_table_row', :current_group_index => 0, :first_in_group => first_in_group, :field_spec => field, :printable_answers => [r[:config]], :cases => [@case], :placeholders_only => true
+          - first_in_group = false
