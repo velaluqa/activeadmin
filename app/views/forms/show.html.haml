@@ -46,18 +46,18 @@
     %h3 Please verify your answers
   .modal-body
     = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'preview'
-    -# = render "forms/results", :fields => @form_config, :display_type => 'preview'
   .modal-footer
     %button.btn{:'data-dismiss' => 'modal', :'aria-hidden' => true} Change Answers
     %button#preview_submit_btn.btn.btn-primary{:'data-loading-text' => 'Submitting...'} Submit Answers
 
 #print_version.hide
   .row-fluid
-    .offset2.span10
+    .span12
       %h2.print-header Your answers
       .print-body
         = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'print'
-        -# = render "forms/results", :fields => @form_config, :display_type => 'print'
+  .row-fluid
+    .offset2.span10
       %strong.print-signature I hereby declare that these are indeed my very own answers:
       .signature-div
         .signature-line
