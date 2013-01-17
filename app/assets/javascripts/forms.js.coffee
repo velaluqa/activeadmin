@@ -128,6 +128,8 @@ set_index_in_for = (elements, index) ->
 
     $(element).attr('for', name)
 
+delay = (ms, func) -> window.setTimeout(func, ms)
+
 $(document).ready ->
   $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
         submitSuccess: ($form, event) ->
@@ -174,6 +176,7 @@ $(document).ready ->
     console.log(group_end_form)
     console.log(repeatable_form)
 
+    scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
     group_end_form.before(e) for e in repeatable_form.children()
 
     repeatable_preview = $("#repeatable_table_#{repeatable_id} tbody").clone()
@@ -184,7 +187,10 @@ $(document).ready ->
     $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview.children()
     
     repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
-  
+
+    delay 10, -> 
+      $(window).scrollTop(scroll_to_element.position().top);
+
   $('#refresh-rois-btn').click ->
     $(this).button('loading')
     PharmTraceAPI.updateROIs()
