@@ -14,8 +14,8 @@ ActiveAdmin.register FormAnswer do
     column :case
     column :form
     column 'Submission Date', :submitted_at
-    column :signature do |form_answer|
-      if(form_answer.signature_is_valid?)
+    column :signatures do |form_answer|
+      if(form_answer.answers_signature_is_valid? && form_answer.annotated_images_signature_is_valid?)
         status_tag('Valid', :ok)
       else
         status_tag('Invalid', :error)
@@ -32,8 +32,8 @@ ActiveAdmin.register FormAnswer do
       row :case
       row :form
       row :submitted_at
-      row :signature do
-        if(form_answer.signature_is_valid?)
+      row :signatures do
+        if(form_answer.answers_signature_is_valid? && form_answer.annotated_images_signature_is_valid?)
           status_tag('Valid', :ok)
         else
           status_tag('Invalid', :error)
@@ -44,7 +44,10 @@ ActiveAdmin.register FormAnswer do
         #render "forms/results", :fields => form_answer.printable_answers, :display_type => 'review'
       end
       row :answers_raw do        
-        CodeRay.scan(JSON::pretty_generate(form_answer.answers), :json).div(:css => :class).html_safe
+        CodeRay.scan(JSON::pretty_generate(form_answer.answers), :json).div(:css => :class).html_safe unless form_answer.answers.nil?
+      end
+      row :annotated_images_raw do       
+        CodeRay.scan(JSON::pretty_generate(form_answer.annotated_images), :json).div(:css => :class).html_safe unless form_answer.annotated_images.nil?
       end
     end
   end
