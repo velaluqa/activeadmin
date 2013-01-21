@@ -136,6 +136,7 @@ class FormAnswer
             answer = (answer.respond_to?(:map) ? answer.map {|k,v| "#{k}: #{v}"}.join(", ") : answer)
           end
         end
+
         display_list << field.merge({'answer' => answer, 'id' => id})
       end
     end

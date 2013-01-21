@@ -10,7 +10,7 @@
   - printable_answers.each_with_index do |answers,case_index|
     - answer = answers.find {|f| f['id'] == field_spec['id']}
     - if (!answer.nil? and answer['type'] == 'fixed')
-      %td= fixed_value(answer, cases[case_index].data_hash)[0]
+      %td= format_fixed_value(fixed_value(answer, cases[case_index].data_hash)[0])
     - elsif placeholders_only
       %td.results-table-placeholder-cell{:name => field_spec['id'], :'data-type' => field_spec['type']}
     - elsif answer.nil?

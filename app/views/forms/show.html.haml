@@ -76,7 +76,7 @@
               - if(first_field)
                 - first_field = false
                 %h3.form-group-index.pull-left
-              = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hashx
+              = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hash
             .muted.span5= field['description']
     %table{:id => "repeatable_table_#{r[:id]}"}
       - first_in_group = true

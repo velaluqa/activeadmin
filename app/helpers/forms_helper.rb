@@ -40,4 +40,19 @@ module FormsHelper
 
     return [value, {:disabled => true}]
   end
+
+  def format_fixed_value(value)
+    return '' if value.nil?
+
+    case value
+    when Date, DateTime, Time
+      value.strftime('%d.%m.%Y')
+    when TrueClass
+      'Yes'
+    when FalseClass
+      'No'
+    else
+      value.to_s
+    end
+  end
 end
