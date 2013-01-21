@@ -218,4 +218,15 @@ $(document).ready ->
     
     $('#preview_submit_btn').button('reset')
     
+  PharmTraceAPI.annotatedImagesAvailable.connect (annotated_images) ->
+    console.log("putting annotated images into paper trail")
+    console.log(annotated_images)
+    table_header_row = $('#print_annotated_images_table_header_row')
+    
+    for own series, images of annotated_images
+      console.log('Series: '+series)
+      for own image, checksum of images
+        console.log('Image: '+image+', checksum: '+checksum)
+        table_header_row.after($('<tr><td>'+image+'</td><td>'+checksum+'</td></tr>'))
+    
     

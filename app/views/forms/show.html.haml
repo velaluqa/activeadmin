@@ -57,6 +57,14 @@
       .print-body
         = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'print'
   .row-fluid
+    .span12
+      %h2.print-header Annotated images
+      %table#print_annotated_images_table.table
+        %tr#print_annotated_images_table_header_row
+          %th Image
+          %th Checksum
+          
+  .row-fluid
     .offset2.span10
       %strong.print-signature I hereby declare that these are indeed my very own answers:
       .signature-div
