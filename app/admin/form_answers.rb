@@ -3,6 +3,10 @@ ActiveAdmin.register FormAnswer do
 
   actions :index, :show, :destroy #TEMP
 
+  controller do
+    helper :forms
+  end
+
   index do
     selectable_column
     column :user

@@ -48,6 +48,7 @@ types:
     context_menu: false
 
 images_root: prototype_session
+annotated_images_root: prototype_session
 access_to_previous_images: false
 record_annotations: true
 show_previous_annotations: false
