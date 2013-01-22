@@ -1,4 +1,11 @@
 ActiveAdmin.register_page "Dashboard" do
+  controller.before_filter do
+    unless current_user.is_app_admin?
+      flash[:alert] = 'You are not authorized to log into the administrative component.'
+      sign_out current_user
+      redirect_to new_user_session_path
+    end
+  end  
 
   menu :priority => 1, :label => proc{ I18n.t("active_admin.dashboard") }
 
