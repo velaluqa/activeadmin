@@ -14,6 +14,10 @@ class Ability
       !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:blind_read)}).nil?)
     end
 
+    can :read, Session do |session|
+      can? :validate, session or can? :blind_read, session
+    end
+
     # this is just for the simplified prototype auth system, either you are an admin or you're not
     if user.is_app_admin?
       can :manage, :all
