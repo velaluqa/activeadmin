@@ -20,6 +20,28 @@ class Ability
       !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?)
     end
 
+    can :manage, Case do |c|
+      can? :manage, c.session
+    end
+    can :manage, CaseData do |cd|
+      can? :manage, cd.case
+    end
+    can :manage, FormAnswer do |form_answer|
+      can? :manage, form_answer.session
+    end
+    can :read, Form do |form|
+      form.session.nil?
+    end
+    can :manage, Form do |form|
+      user.is_app_admin? or (can? :manage, form.session)
+    end
+    can :manage, Patient do |patient|
+      can? :manage, patient.session
+    end
+    can :manage, PatientData do |pd|
+      can? :manage, pd.patient
+    end
+
     # Validator
     can :validate, Session do |session|
       !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:validate)}).nil?)
