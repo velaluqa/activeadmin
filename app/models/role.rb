@@ -6,12 +6,18 @@ class Role < ActiveRecord::Base
   belongs_to :subject, :polymorphic => true  
 
   ROLE_SYMS = [:manage, :validate, :blind_read]
+  ROLE_NAMES = ['Manager', 'Validator', 'Reader']
 
   def self.role_sym_to_int(sym)
     return Role::ROLE_SYMS.index(sym)
   end
 
+  def role_name
+    return Role::ROLE_NAMES[read_attribute(:role)]
+  end
+
   def role
+    return -1 if read_attribute(:role).nil?
     return Role::ROLE_SYMS[read_attribute(:role)]
   end
   def role=(sym)
