@@ -9,6 +9,8 @@ class SessionsController < ApplicationController
       return
     end
 
+    authorize! :read, @session
+
     full_sequence = (params[:full_sequence] == 'true')
     case_list = @session.case_list(full_sequence ? :all : :unread)
 
