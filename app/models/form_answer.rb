@@ -14,6 +14,7 @@ class FormAnswer
   field :answers_signature, type:  String
   field :annotated_images, type:  Hash
   field :annotated_images_signature, type:  String
+  field :is_test_data, type: Boolean
 
   def session
     begin

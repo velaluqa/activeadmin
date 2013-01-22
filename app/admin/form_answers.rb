@@ -21,6 +21,13 @@ ActiveAdmin.register FormAnswer do
         status_tag('Invalid', :error)
       end
     end
+    column 'Test Data?', :is_test_data do |form_answer|
+      if(form_answer.is_test_data)
+        status_tag('Yes', :error)
+      else
+        status_tag('No', :ok)
+      end
+    end
 
     default_actions
   end
