@@ -1,6 +1,8 @@
 class Users::SessionsController < Devise::SessionsController
   DeviseController.respond_to :json
 
+  skip_before_filter :verify_authenticity_token, :only => :authenticate_user
+
   def new
     @dont_display_navbar = true
     super
