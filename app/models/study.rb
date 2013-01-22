@@ -3,5 +3,5 @@ class Study < ActiveRecord::Base
 
   has_many :sessions
 
-  has_many :roles, :as => :object
+  has_many :roles, :as => :subject
 end
