@@ -3,7 +3,7 @@ class Session < ActiveRecord::Base
 
   belongs_to :study
 
-  has_many :roles, :as => :object
+  has_many :roles, :as => :subject
   has_many :form_answers
   has_many :patients
   has_many :session_pauses

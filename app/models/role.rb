@@ -1,8 +1,9 @@
 class Role < ActiveRecord::Base
-  attr_accessible :role, :user, :object
+  attr_accessible :role, :user, :subject
+  attr_accessible :role_id, :user_id, :subject_id
 
   belongs_to :user
-  belongs_to :object, :polymorphic => true  
+  belongs_to :subject, :polymorphic => true  
 
   ROLE_SYMS = [:manage, :validate, :blind_read]
 
