@@ -2,7 +2,7 @@
   .offset4.span4
     = form_for(resource, :as => resource_name, :url => user_session_path, :html => { :class => 'form-login'}) do |f|
       %h2.form-signin-heading
-        PharmTrace Study Server
+        pharmtrace Study Server
 
       = f.email_field(:email, :class => 'input-block-level', :placeholder => 'Email address')
       = f.password_field(:password, :class => 'input-block-level', :placeholder => 'Password')
