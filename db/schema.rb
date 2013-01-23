@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130111140010) do
+ActiveRecord::Schema.define(:version => 20130122172559) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -67,12 +67,12 @@ ActiveRecord::Schema.define(:version => 20130111140010) do
   add_index "readers_sessions", ["user_id", "session_id"], :name => "index_readers_sessions_on_user_id_and_session_id"
 
   create_table "roles", :force => true do |t|
-    t.integer  "object_id"
-    t.string   "object_type"
+    t.integer  "subject_id"
+    t.string   "subject_type"
     t.integer  "user_id"
     t.integer  "role"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
   end
 
   create_table "session_pauses", :force => true do |t|

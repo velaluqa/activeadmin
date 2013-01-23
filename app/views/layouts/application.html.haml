@@ -1,7 +1,7 @@
 !!! 5
 %html
   %head
-    %title PharmTrace StudyServer
+    %title pharmtrace StudyServer
     = stylesheet_link_tag "application", :media => "all"
     = javascript_include_tag "application"
     = csrf_meta_tags
@@ -11,7 +11,7 @@
       .navbar.navbar-fixed-top
         .navbar-inner
           .container
-            .brand= link_to("PharmTrace Study Server", admin_dashboard_index_path)
+            .brand= link_to("pharmtrace Study Server", admin_dashboard_index_path)
             .pull-right
               - if user_signed_in?
                 %ul.nav

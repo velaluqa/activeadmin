@@ -11,7 +11,10 @@ class FormAnswer
   field :form_id, type:  Integer
   field :submitted_at, type:  Time
   field :answers, type:  Hash
-  field :signature, type:  String
+  field :answers_signature, type:  String
+  field :annotated_images, type:  Hash
+  field :annotated_images_signature, type:  String
+  field :is_test_data, type: Boolean
 
   def session
     begin
@@ -55,13 +58,20 @@ class FormAnswer
     write_attribute(:case_id, new_case.id)
   end
 
-  def signature_is_valid?()
+  def answers_signature_is_valid?
+    return signature_is_valid?(read_attribute(:answers), read_attribute(:answers_signature))
+  end
+  def annotated_images_signature_is_valid?
+    return signature_is_valid?(read_attribute(:annotated_images), read_attribute(:annotated_images_signature))
+  end
+
+  def signature_is_valid?(data, signature)
     key = user_public_key_rsa
-    return false if key.nil?
-    data = canonical_answers
-    signature = Base64.decode64(read_attribute(:signature))
+    return false if (key.nil? or data.nil? or signature.nil?)
+    canonical_data = FormAnswer::canonical_json(data)
+    signature_raw = Base64.decode64(signature)
     
-    return key.verify(OpenSSL::Digest::RIPEMD160.new, signature, data)
+    return key.verify(OpenSSL::Digest::RIPEMD160.new, signature_raw, canonical_data)
   end
 
   def printable_answers
@@ -136,6 +146,7 @@ class FormAnswer
             answer = (answer.respond_to?(:map) ? answer.map {|k,v| "#{k}: #{v}"}.join(", ") : answer)
           end
         end
+
         display_list << field.merge({'answer' => answer, 'id' => id})
       end
     end
@@ -152,10 +163,6 @@ class FormAnswer
     end
 
     return OpenSSL::PKey::RSA.new(user.public_key)
-  end
-
-  def canonical_answers
-    FormAnswer::canonical_json(read_attribute(:answers))
   end
 
   def self.canonical_json(value)

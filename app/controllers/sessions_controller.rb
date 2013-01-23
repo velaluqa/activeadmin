@@ -9,18 +9,15 @@ class SessionsController < ApplicationController
       return
     end
 
+    authorize! :read, @session
+
     full_sequence = (params[:full_sequence] == 'true')
     case_list = @session.case_list(full_sequence ? :all : :unread)
 
+    passive_cases = passive_cases_for_case_list(case_list)
+
     case_list_hashes = case_list.map do |c|
-      {
-        :images => c.images,
-        :images_folder => c.images_folder,
-        :position => c.position,
-        :id => c.id,
-        :case_type => c.case_type,
-        :patient => c.patient.subject_id,
-      }
+      c.to_hash.merge({:passive_cases => passive_cases[c.id]})
     end
 
     config = @session.configuration
@@ -38,10 +35,31 @@ class SessionsController < ApplicationController
   end
 
   def blind_readable
-    @sessions = current_user.blind_readable_sessions.map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
+    @sessions = current_user.blind_readable_sessions.reject {|s| s.case_list(:unread).empty?}.map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
 
     respond_to do |format|
       format.json { render :json => {:sessions => @sessions} }
     end
   end  
+
+  def passive_cases_for_case_list(case_list)
+    imported = []
+    passive_cases = {}
+    
+    case_list.each do |c|
+      previous_cases = c.patient.cases.where('position < ?', c.position)
+
+      imported << c.id
+
+      passive_cases[c.id] = []
+      previous_cases.each do |pc|
+        next if imported.include?(pc.id)
+
+        imported << pc.id
+        passive_cases[c.id] << pc.to_hash
+      end
+    end
+    
+    return passive_cases
+  end
 end

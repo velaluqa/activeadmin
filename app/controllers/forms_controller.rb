@@ -8,6 +8,8 @@ class FormsController < ApplicationController
   layout 'client_forms', :only => :show
 
   def show
+    authorize! :read, @case.session
+
     @form_config, @form_components, @repeatables = @form.configuration
     @data_hash = @case.data_hash
 

@@ -39,6 +39,17 @@ class Case < ActiveRecord::Base
     "#{self.patient.subject_id}/#{read_attribute(:images)}"
   end
 
+  def to_hash
+    {
+      :images => self.images,
+      :images_folder => self.images_folder,
+      :position => self.position,
+      :id => self.id,
+      :case_type => self.case_type,
+      :patient => self.patient.subject_id,
+    }      
+  end
+
   def self.batch_create_from_csv(csv_file, session, start_position)
     csv_options = {
       :col_sep => ',',
