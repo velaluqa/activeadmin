@@ -22,7 +22,7 @@ class FormAnswersController < ApplicationController
     answer.annotated_images = params['annotated_images']
     answer.annotated_images_signature = params['annotated_images_signature']
     
-    answer.test_data = (can? :validate, @case.session)
+    answer.is_test_data = (can? :validate, @case.session)
 
     answer.submitted_at = Time.now
 
