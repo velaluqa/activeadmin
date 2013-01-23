@@ -75,7 +75,7 @@ class Form < ActiveRecord::Base
         end
 
         if included_form.nil?
-          throw "The form tried to include form '#{field['include']}', which doesn't exist"
+          raise Exceptions::FormNotFoundError.new(field['include'], field['version'], nil)
         end
         if already_included.include?(included_form.id)
           throw "The form has a circular include of form '#{included_form.name}'"

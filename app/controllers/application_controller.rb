@@ -5,7 +5,11 @@ class ApplicationController < ActionController::Base
   #check_authorization
 
   rescue_from Exceptions::FormNotFoundError do |exception|
-    messages = ["The requested form '#{exception.form_name}' at version #{exception.form_version} for case #{exception.case} could not be found.", "Please contact staff"]
+    main_message = "The requested form '#{exception.form_name}'"
+    main_message += " at version #{exception.form_version}" unless exception.form_version.nil?
+    main_message += " for case #{exception.case}" unless exception.case.nil?
+    main_message += " could not be found."
+    messages = [main_message, "Please contact staff"]
 
     render 'exceptions/not_found', :layout => 'client_errors', :locals => { :messages => messages, :exception_name => 'Form not found'}
   end
