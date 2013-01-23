@@ -27,8 +27,8 @@ types:
     form: baseline
     form_version: 1
     screen_layout:
-      rows: 1
-      active: [left, right]
+      rows: 2
+      active: [liver, abdomen, kidney, pelvis]
       passive: true
     annotations_layout: baseline
     features: []
@@ -49,7 +49,6 @@ types:
 
 images_root: prototype_session
 annotated_images_root: prototype_session
-access_to_previous_images: false
 record_annotations: true
 show_previous_annotations: false
 paper_trail: true
