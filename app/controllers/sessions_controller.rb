@@ -42,6 +42,8 @@ class SessionsController < ApplicationController
     end
   end  
 
+  protected
+
   def passive_cases_for_case_list(case_list)
     imported = []
     passive_cases = {}
