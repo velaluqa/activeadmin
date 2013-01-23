@@ -1,18 +1,12 @@
 class FormAnswersController < ApplicationController
   before_filter :authenticate_user!
 
-  def create
+  def create    
     @case = Case.find(params['case_id'])
     if @case.nil?
       render :json => {:success => false, :error => 'The supplied case does not exist', :error_code => 1}, :status => :bad_request
     end
-    # TODO: what if the user is both a validator and reader? is that even allowed?
-    test_data = false
-    if(can? :validate, @case.session)
-      test_data = true
-    else      
-      authorize! :blind_read, @case.session
-    end
+    authorize! :read, @case.session
 
     answer = FormAnswer.new
 
@@ -28,7 +22,7 @@ class FormAnswersController < ApplicationController
     answer.annotated_images = params['annotated_images']
     answer.annotated_images_signature = params['annotated_images_signature']
     
-    answer.test_data = test_data
+    answer.test_data = (can? :validate, @case.session)
 
     answer.submitted_at = Time.now
 
