@@ -7,9 +7,6 @@
     R: RCC
   fixed_value: patient[cohort]
   label: Tumor type
-  validations:
-    - required: true
-      message: Required
 
 - id: TMDX
   type: fixed

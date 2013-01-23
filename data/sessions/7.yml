@@ -8,9 +8,9 @@ types:
       passive: true
     annotations_layout: fu
     features: []
-    toolbar_layout: [roi]
+    toolbar_layout: [NSToolbarFlexibleSpaceItem, Tools, NSToolbarFlexibleSpaceItem]
 
-images_root: /Users/profmaad/Workspace/freelance/PharmTrace/images_lazy_import_test
+images_root: lazy_import_test
 access_to_previous_images: false
 record_annotations: true
 show_previous_annotations: false

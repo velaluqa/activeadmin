@@ -27,12 +27,12 @@ types:
     form: baseline
     form_version: 1
     screen_layout:
-      rows: 2
-      active: [liver, abdomen, kidney, pelvis]
+      rows: 1
+      active: [left, right]
       passive: true
     annotations_layout: baseline
     features: []
-    toolbar_layout: [roi]
+    toolbar_layout: [NSToolbarFlexibleSpaceItem, Tools, NSToolbarFlexibleSpaceItem]
     context_menu: false
 
   fu:
