@@ -5,8 +5,10 @@ class Role < ActiveRecord::Base
   belongs_to :user
   belongs_to :subject, :polymorphic => true  
 
-  ROLE_SYMS = [:manage, :validate, :blind_read]
-  ROLE_NAMES = ['Manager', 'Validator', 'Reader']
+  # ROLE_SYMS = [:manage, :validate, :blind_read]
+  # ROLE_NAMES = ['Manager', 'Validator', 'Reader']
+  ROLE_SYMS = [:manage]
+  ROLE_NAMES = ['Manager']
 
   def self.role_sym_to_int(sym)
     return Role::ROLE_SYMS.index(sym)

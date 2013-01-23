@@ -1,17 +1,19 @@
 class Ability
-  include CanCan::Ability
+  include CanCan::Ability  
 
   def initialize(user)
     return if user.nil? # guest users have no access whatsoever
 
+    alias_action :read, :create, :update, :destroy, :to => :administrate
+
     # Validator
     can :validate, Session do |session|
-      !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:validate)}).nil?)
+      session.validators.exists?(user.id)
     end
 
     # Reader
     can :blind_read, Session do |session|
-      !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:blind_read)}).nil?)
+      session.readers.exists?(user.id)
     end
 
     can :read, Session do |session|
@@ -20,7 +22,7 @@ class Ability
 
     # this is just for the simplified prototype auth system, either you are an admin or you're not
     if user.is_app_admin?
-      can :manage, :all
+      can :administrate, :all
     end
 
     return
@@ -28,51 +30,51 @@ class Ability
 
     # App Admin
     if user.is_app_admin?
-      can :manage, :all
-      can :manage, User
-      can :manage, Role
-      can :manage, Study
+      can :administrate, :all
+      can :administrate, User
+      can :administrate, Role
+      can :administrate, Study
     end
 
     # Study Admin
-    can :manage, Study do |study|
+    can :administrate, Study do |study|
       !(study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?)
     end
 
     # Session Admin
-    can :manage, Session do |session|
+    can :administrate, Session do |session|
       puts "CAN MANAGE SESSION?: #{session}"
       !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?) or
         !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?)
     end
 
-    can :manage, Case do |c|
+    can :administrate, Case do |c|
       puts "CAN MANAGE CASE?: #{c}"
-      can? :manage, c.session
+      can? :administrate, c.session
     end
-    can :manage, CaseData do |cd|
+    can :administrate, CaseData do |cd|
       puts "CAN MANAGE CASEDATA?: #{cd}"
-      can? :manage, cd.case
+      can? :administrate, cd.case
     end
-    can :manage, FormAnswer do |form_answer|
+    can :administrate, FormAnswer do |form_answer|
       puts "CAN MANAGE FORMANSWER?: #{form_answer}"
-      can? :manage, form_answer.session
+      can? :administrate, form_answer.session
     end
     can :read, Form do |form|
       puts "CAN READ FORM?: #{form}"
       form.session.nil?
     end
-    can :manage, Form do |form|
+    can :administrate, Form do |form|
       puts "CAN MANAGE FORM?: #{form}"
-      user.is_app_admin? or (can? :manage, form.session)
+      user.is_app_admin? or (can? :administrate, form.session)
     end
-    can :manage, Patient do |patient|
+    can :administrate, Patient do |patient|
       puts "CAN MANAGE PATIENT?: #{patient}"
-      can? :manage, patient.session
+      can? :administrate, patient.session
     end
-    can :manage, PatientData do |pd|
+    can :administrate, PatientData do |pd|
       puts "CAN MANAGE PATIENTDATA?: #{pd}"
-      can? :manage, pd.patient
+      can? :administrate, pd.patient
     end
 
   end

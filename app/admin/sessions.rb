@@ -24,6 +24,18 @@ ActiveAdmin.register Session do
     attributes_table do
       row :name
       row :study
+      # TODO: remove, is just for testing
+      row :rights do
+        if(can? :validate, session and can? :blind_read, session)
+          status_tag('Both', :error)
+        elsif(can? :validate, session)
+          status_tag('Validator', :ok)
+        elsif(can? :blind_read, session)
+          status_tag('Reader', :ok)
+        else
+          status_tag('None', :error)
+        end
+      end
       row :readers do
         if session.readers.empty?
           nil
