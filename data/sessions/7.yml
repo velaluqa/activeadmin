@@ -11,6 +11,7 @@ types:
     toolbar_layout: [NSToolbarFlexibleSpaceItem, Tools, NSToolbarFlexibleSpaceItem]
 
 images_root: lazy_import_test
+annotated_images_root: lazy_import_test
 access_to_previous_images: false
 record_annotations: true
 show_previous_annotations: false
