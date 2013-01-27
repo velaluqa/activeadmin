@@ -16,6 +16,13 @@ ActiveAdmin.register Session do
     column 'Progress' do |session|
       "#{session.case_list(:read).size} / #{session.case_list(:all).size}"
     end
+    column :configuration do |session|
+      if(session.configuration.nil?)
+        status_tag('Missing', :error)
+      else
+        status_tag('Available', :ok)
+      end
+    end
 
     default_actions
   end
@@ -55,6 +62,14 @@ ActiveAdmin.register Session do
           nil
         else
           render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
+        end
+      end
+      row :configuration do
+        config = session.configuration
+        if config.nil?
+          nil
+        else
+          CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
         end
       end
     end

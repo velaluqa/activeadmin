@@ -23,6 +23,9 @@ class Form < ActiveRecord::Base
 
     return [form_config, form_components, repeatables]
   end
+  def raw_configuration
+    parse_config
+  end
 
   def self.config_field_has_special_type?(field)
     ['add_repeat', 'group-label', 'divider', 'group-end'].include? field['type']
@@ -33,7 +36,11 @@ class Form < ActiveRecord::Base
   def parse_config
     id = read_attribute(:id)
 
-    config = YAML.load_file(Rails.application.config.form_configs_directory + "/#{id}.yml")
+    begin
+      config = YAML.load_file(Rails.application.config.form_configs_directory + "/#{id}.yml")
+    rescue Errno::ENOENT => e
+      return nil
+    end
     
     return config
   end
