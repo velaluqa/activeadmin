@@ -22,6 +22,9 @@ ActiveAdmin.register Form do
       row :form_version
       row :description
       row :session
+      row :download_configuration do
+        link_to 'Download Configuration', download_configuration_admin_form_path(form)
+      end
       row :configuration do
         config = form.raw_configuration
         if config.nil?
@@ -31,5 +34,11 @@ ActiveAdmin.register Form do
         end
       end
     end
+  end
+
+  member_action :download_configuration do
+    @form = Form.find(params[:id])
+
+    send_file @form.config_file_path
   end
 end

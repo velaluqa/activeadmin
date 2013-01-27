@@ -15,9 +15,13 @@ class Session < ActiveRecord::Base
 
   scope :blind_readable_by_user, lambda { |user| user.blind_readable_sessions.includes(:study) }
 
+  def config_file_path
+    Rails.application.config.session_configs_directory + "/#{id}.yml"
+  end
+
   def configuration
     begin
-      config = YAML.load_file(Rails.application.config.session_configs_directory + "/#{id}.yml")
+      config = YAML.load_file(config_file_path)
     rescue Errno::ENOENT => e
       return nil
     end

@@ -31,13 +31,17 @@ class Form < ActiveRecord::Base
     ['add_repeat', 'group-label', 'divider', 'group-end'].include? field['type']
   end
 
+  def config_file_path
+    Rails.application.config.form_configs_directory + "/#{id}.yml"
+  end
+
   protected
   
   def parse_config
     id = read_attribute(:id)
 
     begin
-      config = YAML.load_file(Rails.application.config.form_configs_directory + "/#{id}.yml")
+      config = YAML.load_file(config_file_path)
     rescue Errno::ENOENT => e
       return nil
     end

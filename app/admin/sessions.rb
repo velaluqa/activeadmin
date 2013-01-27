@@ -64,6 +64,9 @@ ActiveAdmin.register Session do
           render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
         end
       end
+      row :download_configuration do
+        link_to 'Download Configuration', download_configuration_admin_session_path(session)
+      end
       row :configuration do
         config = session.configuration
         if config.nil?
@@ -107,5 +110,11 @@ ActiveAdmin.register Session do
   end
   action_item :only => :show do
     link_to 'Import Patient Data from CSV', import_patient_data_csv_form_admin_session_path(session)
+  end
+
+  member_action :download_configuration do
+    @session = Session.find(params[:id])
+
+    send_file @session.config_file_path
   end
 end
