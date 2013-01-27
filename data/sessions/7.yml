@@ -16,7 +16,7 @@ access_to_previous_images: false
 record_annotations: true
 show_previous_annotations: false
 paper_trail: true
-preview_paper_trail: true
+preview_paper_trail: false
 enforce_paper_trail: true
 record_dicom_parameters:
   - '00180080'
