@@ -117,4 +117,26 @@ ActiveAdmin.register Session do
 
     send_file @session.config_file_path
   end
+  member_action :upload_config, :method => :post do
+    @session = Session.find(params[:id])
+
+    # TODO: copy old file somewhere (timestamp?)
+    if(params[:session].nil? or params[:session][:file].nil? or params[:session][:file].tempfile.nil?)
+      flash[:error] = "You must specify a configuration file to upload"
+      redirect_to({:action => :show})
+    else
+      FileUtils.copy(params[:session][:file].tempfile, @session.config_file_path)
+        
+      redirect_to({:action => :show}, :notice => "Configuration successfully uploaded")
+    end
+  end
+  member_action :upload_config_form, :method => :get do
+    @session = Session.find(params[:id])
+    
+    @page_title = "Upload new configuration"
+    render 'admin/sessions/upload_config', :locals => { :url => upload_config_admin_session_path}
+  end
+  action_item :only => :show do
+    link_to 'Upload configuration', upload_config_form_admin_session_path(session)
+  end
 end

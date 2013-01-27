@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ActiveAdmin.register Form do
   index do
     selectable_column
@@ -40,5 +41,28 @@ ActiveAdmin.register Form do
     @form = Form.find(params[:id])
 
     send_file @form.config_file_path
+  end
+  member_action :upload_config, :method => :post do
+    @form = Form.find(params[:id])
+
+    # TODO: copy old file somewhere (timestamp?)
+    if(params[:form].nil? or params[:form][:file].nil? or params[:form][:file].tempfile.nil?)
+      flash[:error] = "You must specify a configuration file to upload"
+      redirect_to({:action => :show})
+    else
+      FileUtils.copy(params[:form][:file].tempfile, @form.config_file_path)
+        
+      redirect_to({:action => :show}, :notice => "Configuration successfully uploaded")
+    end
+  end
+  member_action :upload_config_form, :method => :get do
+    @form = Form.find(params[:id])
+    
+    @page_title = "Upload new configuration"
+    render 'admin/forms/upload_config', :locals => { :url => upload_config_admin_form_path}
+  end
+  action_item :only => :show do
+    #link_to 'Upload configuration', upload_config_form_admin_form_path(form)
+    # see: https://github.com/gregbell/active_admin/issues/1886
   end
 end
