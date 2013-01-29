@@ -62,7 +62,6 @@ ActiveAdmin.register Form do
     render 'admin/forms/upload_config', :locals => { :url => upload_config_admin_form_path}
   end
   action_item :only => :show do
-    #link_to 'Upload configuration', upload_config_form_admin_form_path(form)
-    # see: https://github.com/gregbell/active_admin/issues/1886
+    link_to 'Upload configuration', upload_config_form_admin_form_path(resource)
   end
 end
