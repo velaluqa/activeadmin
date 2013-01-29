@@ -65,7 +65,11 @@ ActiveAdmin.register Session do
         end
       end
       row :download_configuration do
-        link_to 'Download Configuration', download_configuration_admin_session_path(session)
+        if session.configuration.nil?
+          status_tag('Missing', :error)
+        else
+          link_to 'Download Configuration', download_configuration_admin_session_path(session) 
+        end
       end
       row :configuration do
         config = session.configuration
@@ -115,12 +119,12 @@ ActiveAdmin.register Session do
   member_action :download_configuration do
     @session = Session.find(params[:id])
 
-    send_file @session.config_file_path
+    send_file @session.config_file_path unless @session.configuration.nil?
   end
   member_action :upload_config, :method => :post do
     @session = Session.find(params[:id])
 
-    # TODO: copy old file somewhere (timestamp?)
+    # TODO: create git commit
     if(params[:session].nil? or params[:session][:file].nil? or params[:session][:file].tempfile.nil?)
       flash[:error] = "You must specify a configuration file to upload"
       redirect_to({:action => :show})
