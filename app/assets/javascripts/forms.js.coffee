@@ -221,6 +221,10 @@ $(document).ready ->
   PharmTraceAPI.annotatedImagesAvailable.connect (annotated_images) ->
     console.log("putting annotated images into paper trail")
     console.log(annotated_images)
+
+    # clear already inserted images (in case this is not the first attempt to submit the form
+    $('#print_annotated_images_table_header_row ~ tr').remove()
+    
     table_header_row = $('#print_annotated_images_table_header_row')
     
     for own series, images of annotated_images
