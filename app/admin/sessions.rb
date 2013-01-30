@@ -44,18 +44,10 @@ ActiveAdmin.register Session do
         end
       end
       row :readers do
-        if session.readers.empty?
-          nil
-        else
-          render 'admin/sessions/list', :items => session.readers.map {|r| link_to(r.name, admin_user_path(r)) }
-        end
+        render 'admin/sessions/list', :items => session.readers.map {|r| link_to(r.name, admin_user_path(r)) + ' (' + link_to('-', remove_reader_admin_session_path(session, :reader_id => r.id)) +')' }, :action_link => link_to('Add Reader', add_reader_form_admin_session_path(session)).html_safe
       end
       row :validators do
-        if session.validators.empty?
-          nil
-        else
-          render 'admin/sessions/list', :items => session.validators.map {|v| link_to(v.name, admin_user_path(v)) }
-        end
+        render 'admin/sessions/list', :items => session.validators.map {|v| link_to(v.name, admin_user_path(v)) + ' (' + link_to('-', remove_validator_admin_session_path(session, :validator_id => v.id)) +')' }, :action_link => link_to('Add Validator', add_validator_form_admin_session_path(session)).html_safe
       end
       row :cases do
         if session.case_list(:all).empty?
@@ -80,6 +72,58 @@ ActiveAdmin.register Session do
         end
       end
     end
+  end
+
+  member_action :remove_reader, :method => :get do
+    @session = Session.find(params[:id])
+    @reader = User.find(params[:reader_id])
+
+    @session.readers.delete(@reader)
+    redirect_to :action => :show
+  end
+  member_action :remove_validator, :method => :get do
+    @session = Session.find(params[:id])
+    @validator = User.find(params[:validator_id])
+
+    @session.validators.delete(@validator)
+    redirect_to :action => :show
+  end
+
+  member_action :add_reader, :method => :post do
+    @session = Session.find(params[:id])
+    @reader = User.find(params[:user][:user])
+
+    if @reader.nil?
+      flash[:error] = 'The selected user does not exist'
+      redirect_to :action => :show
+    else
+      @session.readers << @reader unless @session.readers.exists? @reader
+      redirect_to({:action => :show}, :notice => "User #{@reader.email} was added as a Reader")
+    end
+  end
+  member_action :add_reader_form, :method => :get do
+    @session = Session.find(params[:id])
+    
+    @page_title = "Add Reader to Session"
+    render 'admin/sessions/select_user', :locals => { :url => add_reader_admin_session_path }
+  end
+  member_action :add_validator, :method => :post do
+    @session = Session.find(params[:id])
+    @validator = User.find(params[:user][:user])
+
+    if @validator.nil?
+      flash[:error] = 'The selected user does not exist'
+      redirect_to :action => :show
+    else
+      @session.validators << @validator unless @session.validators.exists? @validator
+      redirect_to({:action => :show}, :notice => "User #{@validator.email} was added as a Validator")
+    end
+  end
+  member_action :add_validator_form, :method => :get do
+    @session = Session.find(params[:id])
+    
+    @page_title = "Add Validator to Session"
+    render 'admin/sessions/select_user', :locals => { :url => add_validator_admin_session_path }
   end
 
   member_action :import_case_list_csv, :method => :post do
