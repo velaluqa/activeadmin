@@ -1,6 +1,6 @@
 class Role < ActiveRecord::Base
   attr_accessible :role, :user, :subject
-  attr_accessible :role_id, :user_id, :subject_id
+  attr_accessible :role_id, :user_id, :subject_id, :subject_type
 
   belongs_to :user
   belongs_to :subject, :polymorphic => true  
@@ -9,6 +9,18 @@ class Role < ActiveRecord::Base
   # ROLE_NAMES = ['Manager', 'Validator', 'Reader']
   ROLE_SYMS = [:manage]
   ROLE_NAMES = ['Manager']
+
+  before_save :fix_subject
+
+  def fix_subject
+    if self.subject_type =~ /study_([0-9]+)/
+      self.subject_id = $1
+      self.subject_type = 'Study'
+    elsif self.subject_type =~ /session_([0-9]+)/
+      self.subject_id = $1
+      self.subject_type = 'Session'
+    end
+  end
 
   def self.role_sym_to_int(sym)
     return Role::ROLE_SYMS.index(sym)
@@ -23,6 +35,7 @@ class Role < ActiveRecord::Base
     return Role::ROLE_SYMS[read_attribute(:role)]
   end
   def role=(sym)
+    sym = sym.to_sym if sym.is_a? String
     index = Role::ROLE_SYMS.index(sym)
 
     if index.nil?
