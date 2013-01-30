@@ -1,5 +1,5 @@
 class Patient < ActiveRecord::Base
-  attr_accessible :images_folder, :session, :subject_id, :session_id
+  attr_accessible :session, :subject_id, :session_id
 
   belongs_to :session
   has_many :form_answers
@@ -44,7 +44,7 @@ class Patient < ActiveRecord::Base
     rows.each do |row|
       subject_id = row.unconverted_fields[row.index('patient')]
       patient = Patient.where(:subject_id => subject_id, :session_id => session.id).first
-      patient = Patient.create(:subject_id => subject_id, :session => session, :images_folder => subject_id) if patient.nil?
+      patient = Patient.create(:subject_id => subject_id, :session => session) if patient.nil?
 
       new_patient_data = {}      
       row.headers.each do |field|

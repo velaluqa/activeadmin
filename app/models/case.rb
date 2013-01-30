@@ -82,7 +82,7 @@ class Case < ActiveRecord::Base
       images = row.unconverted_fields[row.index('images')]
       case_type = row.unconverted_fields[row.index('type')]
       patient = Patient.where(:subject_id => subject_id, :session_id => session.id).first
-      patient = Patient.create(:subject_id => subject_id, :session => session, :images_folder => subject_id) if patient.nil?
+      patient = Patient.create(:subject_id => subject_id, :session => session) if patient.nil?
 
       new_case = Case.create(:patient => patient, :session => session, :images => images, :case_type => case_type, :position => position)
       

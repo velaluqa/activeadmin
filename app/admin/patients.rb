@@ -3,7 +3,6 @@ ActiveAdmin.register Patient do
     selectable_column
     column :session
     column :subject_id
-    column :images_folder
     
     default_actions
   end
@@ -12,7 +11,6 @@ ActiveAdmin.register Patient do
     attributes_table do
       row :session
       row :subject_id
-      row :images_folder
       row :patient_data_raw do
         CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
       end
@@ -23,7 +21,6 @@ ActiveAdmin.register Patient do
     f.inputs 'Details' do
       f.input :session
       f.input :subject_id
-      f.input :images_folder
     end
 
     f.buttons
