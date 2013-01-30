@@ -21,13 +21,18 @@ class User < ActiveRecord::Base
     !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(:manage) }).nil?)
   end
 
-  before_create :generate_keys
+  before_create :generate_keypair_on_create
 
-  def generate_keys
-    private_key = OpenSSL::PKey::RSA.generate(4096) #HC
-    public_key = private_key.public_key
+  def generate_keypair_on_create
+    self.generate_keypair(self.password, false)
+  end
 
-    write_attribute(:private_key, private_key.to_pem(OpenSSL::Cipher.new('DES-EDE3-CBC'), self.password))
-    write_attribute(:public_key, public_key.to_pem)
+  def generate_keypair(private_key_password, save_to_db = true)
+    new_private_key = OpenSSL::PKey::RSA.generate(4096) #HC
+    new_public_key = new_private_key.public_key
+
+    self.private_key = new_private_key.to_pem(OpenSSL::Cipher.new('DES-EDE3-CBC'), private_key_password)
+    self.public_key = new_public_key.to_pem
+    self.save! if save_to_db
   end
 end
