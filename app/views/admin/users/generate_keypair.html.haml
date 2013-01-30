@@ -1,0 +1,7 @@
+= semantic_form_for @user, :url => generate_keypair_admin_user_path(@user), :method => :post do |f|
+  = f.inputs 'Generate new keypair' do
+    = f.input :password, :label => 'Password for private key'
+
+  = f.actions do
+    = f.action :submit, :as => :input
+    = f.action :cancel, :as => :link, :wrapper_html => {:class => 'cancel'}

@@ -75,4 +75,27 @@ ActiveAdmin.register User do
     
     send_data @user.private_key, :filename => "#{@user.email}.key" unless @user.private_key.nil?
   end
+
+  member_action :generate_keypair, :method => :post do
+    if (params[:user][:password].nil? or params[:user][:password].empty?)
+      flash[:error] = 'You must supply a password for the private key'
+      redirect_to :action => :show
+      return
+    end
+
+    @user = User.find(params[:id])
+    @user.generate_keypair(params[:user][:password])
+
+    redirect_to({:action => :show}, :notice => 'New keypair successfully generated')
+  end
+  member_action :generate_keypair_form, :method => :get do
+    @user = User.find(params[:id])
+
+    @page_title = 'Generate new keypair'
+    render 'admin/users/generate_keypair'
+  end
+
+  action_item :only => :show do
+    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource)
+  end
 end
