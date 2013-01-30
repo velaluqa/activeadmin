@@ -20,4 +20,14 @@ class User < ActiveRecord::Base
   def is_app_admin?
     !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(:manage) }).nil?)
   end
+
+  before_create :generate_keys
+
+  def generate_keys
+    private_key = OpenSSL::PKey::RSA.generate(4096) #HC
+    public_key = private_key.public_key
+
+    write_attribute(:private_key, private_key.to_pem(OpenSSL::Cipher.new('DES-EDE3-CBC'), self.password))
+    write_attribute(:public_key, public_key.to_pem)
+  end
 end
