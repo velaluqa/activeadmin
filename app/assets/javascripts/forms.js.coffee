@@ -35,10 +35,25 @@ populate_select_with_rois = (select, rois) ->
   select = $(select)
 
   values = jQuery.parseJSON(select.attr('data-roi-values'))
-  
+
+  # generate all options for this select
+  # check if currently selected option is still in list, if yes, remember it
+  # replace options
+  # select previous option
+
+  selected_option = null
+  if(select.find('option:selected').length > 0)
+    selected_option = select.find('option:selected').clone()
+    
   select.empty()
   select.append(create_option("Please select", ""))
   select.append(roi_to_options(roi, values)) for roi in rois when roi_has_values(roi, values)
+
+  if(selected_option?)
+    select.find('option').filter (index) ->
+      return $(this).text() == selected_option.text()
+    .attr('selected', 'selected')
+      
 
 register_custom_validation_function = (func) ->
   window.custom_validation_functions = [] unless window.custom_validation_functions?
