@@ -36,11 +36,6 @@ populate_select_with_rois = (select, rois) ->
 
   values = jQuery.parseJSON(select.attr('data-roi-values'))
 
-  # generate all options for this select
-  # check if currently selected option is still in list, if yes, remember it
-  # replace options
-  # select previous option
-
   selected_option = null
   if(select.find('option:selected').length > 0)
     selected_option = select.find('option:selected').clone()
