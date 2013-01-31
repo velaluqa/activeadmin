@@ -4,7 +4,7 @@ ActiveAdmin.register User do
     column :name do |user|
       link_to user.name, admin_user_path(user)
     end
-    column :email
+    column :username
     column :key_pair do |user|
       if(user.public_key.nil? or user.private_key.nil?)
         status_tag("Missing", :error)
@@ -18,7 +18,7 @@ ActiveAdmin.register User do
   show do |user|
     attributes_table do
       row :name
-      row :email
+      row :username
       row :sign_in_count
       row :currently_signed_in do
         if(user.current_sign_in_at.nil?)
@@ -53,7 +53,7 @@ ActiveAdmin.register User do
 
   form do |f|
     f.inputs 'User Information' do
-      f.input :email
+      f.input :username
       f.input :name
       unless f.object.persisted?
         f.input :password
@@ -68,12 +68,12 @@ ActiveAdmin.register User do
   member_action :download_public_key do
     @user = User.find(params[:id])
     
-    send_data @user.public_key, :filename => "#{@user.email}.pub" unless @user.public_key.nil?
+    send_data @user.public_key, :filename => "#{@user.username}.pub" unless @user.public_key.nil?
   end
   member_action :download_private_key do
     @user = User.find(params[:id])
     
-    send_data @user.private_key, :filename => "#{@user.email}.key" unless @user.private_key.nil?
+    send_data @user.private_key, :filename => "#{@user.username}.key" unless @user.private_key.nil?
   end
 
   member_action :generate_keypair, :method => :post do

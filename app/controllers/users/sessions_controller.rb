@@ -9,11 +9,11 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def authenticate_user
-    email = params[:user][:email]
+    username = params[:user][:username]
     password = params[:user][:password]
     session_id = params[:session_id]
 
-    user = User.find_for_authentication(:email => email)
+    user = User.find_for_authentication(:username => username)
     if user.nil? or !user.valid_password?(password)
       render :json => {:error => "Invalid credentials", :error_code => 1}
       return

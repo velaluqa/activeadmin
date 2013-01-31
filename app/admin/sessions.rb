@@ -98,7 +98,7 @@ ActiveAdmin.register Session do
       redirect_to :action => :show
     else
       @session.readers << @reader unless @session.readers.exists? @reader
-      redirect_to({:action => :show}, :notice => "User #{@reader.email} was added as a Reader")
+      redirect_to({:action => :show}, :notice => "User #{@reader.username} was added as a Reader")
     end
   end
   member_action :add_reader_form, :method => :get do
@@ -116,7 +116,7 @@ ActiveAdmin.register Session do
       redirect_to :action => :show
     else
       @session.validators << @validator unless @session.validators.exists? @validator
-      redirect_to({:action => :show}, :notice => "User #{@validator.email} was added as a Validator")
+      redirect_to({:action => :show}, :notice => "User #{@validator.username} was added as a Validator")
     end
   end
   member_action :add_validator_form, :method => :get do
