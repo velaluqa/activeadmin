@@ -19,6 +19,9 @@ class Role < ActiveRecord::Base
     elsif self.subject_type =~ /session_([0-9]+)/
       self.subject_id = $1
       self.subject_type = 'Session'
+    elsif self.subject_type.empty?
+      self.subject_type = nil
+      self.subject_id = nil
     end
   end
 
