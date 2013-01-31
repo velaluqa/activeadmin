@@ -18,3 +18,4 @@
 //= require jquery.formparams
 //= require form_answers
 //= require forms
+//= require moment.min

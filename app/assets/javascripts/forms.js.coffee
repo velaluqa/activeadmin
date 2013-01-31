@@ -228,6 +228,10 @@ $(document).ready ->
     
     $('#preview_submit_btn').button('reset')
     
+  PharmTraceAPI.aboutToPrintPaperTrail.connect ->
+    date_string = moment().format('DD.MM.YYYY HH:mm:ss')
+    $('#print_timestamp').text("Submission Date: "+date_string)
+
   PharmTraceAPI.annotatedImagesAvailable.connect (annotated_images) ->
     console.log("putting annotated images into paper trail")
     console.log(annotated_images)
@@ -243,4 +247,4 @@ $(document).ready ->
         console.log('Image: '+image+', checksum: '+checksum)
         table_header_row.after($('<tr><td>'+image+'</td><td>'+checksum+'</td></tr>'))
     
-    
+

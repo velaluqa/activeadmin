@@ -54,7 +54,8 @@
   .row-fluid
     .span12
       %h2.print-header Your answers
-      %h4= "Case #{@case.id}, Session #{@case.session.name}, Form #{@form.name}:#{@form.version}"
+      %h4= "Case #{@case.id}, Session #{@case.session.name}, Form #{@form.name}"
+      %h4#print_timestamp
       .print-body        
         = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'print'
   .row-fluid
