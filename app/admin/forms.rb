@@ -5,7 +5,6 @@ ActiveAdmin.register Form do
     column :name do |form|
       link_to form.name, admin_form_path(form)
     end
-    column 'Version', :form_version
     column :description
     column :session
     column :configuration do |form|
@@ -20,7 +19,6 @@ ActiveAdmin.register Form do
   show do |form|
     attributes_table do
       row :name
-      row :form_version
       row :description
       row :session
       row :download_configuration do

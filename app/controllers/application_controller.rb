@@ -6,7 +6,6 @@ class ApplicationController < ActionController::Base
 
   rescue_from Exceptions::FormNotFoundError do |exception|
     main_message = "The requested form '#{exception.form_name}'"
-    main_message += " at version #{exception.form_version}" unless exception.form_version.nil?
     main_message += " for case #{exception.case}" unless exception.case.nil?
     main_message += " could not be found."
     messages = [main_message, "Please contact staff"]
