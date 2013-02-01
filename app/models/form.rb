@@ -31,6 +31,9 @@ class Form < ActiveRecord::Base
     ['add_repeat', 'group-label', 'divider', 'group-end'].include? field['type']
   end
 
+  def relative_config_file_path
+    Rails.application.config.form_configs_subdirectory + "/#{id}.yml"
+  end
   def config_file_path
     Rails.application.config.form_configs_directory + "/#{id}.yml"
   end
