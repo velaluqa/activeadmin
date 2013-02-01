@@ -64,4 +64,9 @@ StudyServer::Application.configure do
   # Log the query plan for queries taking more than this (works
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
+
+  # custom app config
+  config.data_directory = 'data'
+  config.form_configs_directory = config.data_directory + '/forms'
+  config.session_configs_directory = config.data_directory + '/sessions'
 end
