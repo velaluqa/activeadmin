@@ -60,3 +60,6 @@ gem 'activeadmin-cancan'
 
 # CodeRay for rendering yaml/json data
 gem 'coderay'
+
+# Rugged for Git-based config versioning
+gem 'rugged', :github => 'libgit2/rugged', :branch => 'development', :submodules => true
