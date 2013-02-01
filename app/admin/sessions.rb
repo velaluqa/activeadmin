@@ -1,3 +1,5 @@
+require 'git_config_repository'
+
 ActiveAdmin.register Session do
 
   index do
@@ -168,12 +170,12 @@ ActiveAdmin.register Session do
   member_action :upload_config, :method => :post do
     @session = Session.find(params[:id])
 
-    # TODO: create git commit
     if(params[:session].nil? or params[:session][:file].nil? or params[:session][:file].tempfile.nil?)
       flash[:error] = "You must specify a configuration file to upload"
       redirect_to({:action => :show})
     else
-      FileUtils.copy(params[:session][:file].tempfile, @session.config_file_path)
+      repo = GitConfigRepository.new
+      repo.update_config_file(@session.relative_config_file_path, params[:session][:file].tempfile, current_user, "New configuration file for session #{@session.id}")
         
       redirect_to({:action => :show}, :notice => "Configuration successfully uploaded")
     end
