@@ -49,6 +49,15 @@ populate_select_with_rois = (select, rois) ->
       return $(this).text() == selected_option.text()
     .attr('selected', 'selected')
       
+disable_option = (select, option_text) ->
+  $(select).find('option').filter (index) ->
+    return $(this).text() == option_text
+  .attr('disabled', 'disabled')
+enable_option = (select, option_text) ->
+  console.log('Enabling option '+option_text)
+  $(select).find('option').filter (index) ->
+    return $(this).text() == option_text
+  .removeAttr('disabled')
 
 register_custom_validation_function = (func) ->
   window.custom_validation_functions = [] unless window.custom_validation_functions?
@@ -140,6 +149,23 @@ set_index_in_for = (elements, index) ->
 
 delay = (ms, func) -> window.setTimeout(func, ms)
 
+update_allowed_rois = (changed_select) ->
+  changed_select = $(changed_select)
+  option = changed_select.find('option:selected')
+  return if option.length == 0
+
+  selects = $('.select-roi').not(changed_select)
+
+  old_selection = changed_select.data('old_selection')
+
+  (enable_option(select, old_selection) for select in selects) if old_selection?
+  (disable_option(select, option.text()) for select in selects) unless option.val().length == 0
+
+  if(option.val().length == 0)
+    changed_select.removeData('old_selection')
+  else
+    changed_select.data('old_selection', option.text())
+
 $(document).ready ->
   $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
         submitSuccess: ($form, event) ->
@@ -185,6 +211,9 @@ $(document).ready ->
     repeatable_form.find('.form-group-index').text(index+1)
     console.log(group_end_form)
     console.log(repeatable_form)
+
+    repeatable_form.find('.select-roi').change ->
+      update_allowed_rois($(this))
 
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
     group_end_form.before(e) for e in repeatable_form.children()
@@ -247,4 +276,5 @@ $(document).ready ->
         console.log('Image: '+image+', checksum: '+checksum)
         table_header_row.after($('<tr><td>'+image+'</td><td>'+checksum+'</td></tr>'))
     
-
+  $('.select-roi').change ->
+    update_allowed_rois($(this))
