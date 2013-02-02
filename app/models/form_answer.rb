@@ -143,7 +143,7 @@ class FormAnswer
           if answer.nil?
             answer = "None given"
           else
-            answer = (answer.respond_to?(:map) ? answer.map {|k,v| "#{k}: #{v}"}.join(", ") : answer)
+            answer = (answer.respond_to?(:map) ? answer.map {|k,v| "#{k}: #{v}"}.join("\n") : answer)
           end
         end
 
