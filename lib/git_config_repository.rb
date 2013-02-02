@@ -28,4 +28,43 @@ class GitConfigRepository
 
     Rugged::Commit.create(@repo, options)
   end
+
+  def yaml_at_version(path, version)
+    file_blob = file_at_version(path, version)
+    return nil if file_blob.nil?
+
+    return YAML.load(file_blob.text)
+  end
+
+  protected
+
+  def file_at_version(path, version)
+    begin
+      return nil unless @repo.exists?(version)      
+    rescue Rugged::InvalidError => e
+      return nil
+    end
+
+    commit = @repo.lookup(version)
+    return nil unless commit.type == :commit
+
+    file_blob = access_tree_by_path(commit.tree, path)
+    return nil if (file_blob.nil? or file_blob.type != :blob)
+
+    return file_blob
+  end
+  
+  def access_tree_by_path(tree, path)
+    return tree if (path.nil? or tree.nil?)
+
+    path_components = path.split('/', 2)
+
+    target_oid = tree[path_components[0]][:oid]
+    return nil if target_oid.nil?
+    return nil unless @repo.exists?(target_oid)
+
+    target = @repo.lookup(target_oid)
+    
+    return access_tree_by_path(target, path_components[1])
+  end
 end
