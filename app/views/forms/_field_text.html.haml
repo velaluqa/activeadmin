@@ -1,0 +1,5 @@
+= label_tag(field['id'], field['label'], :class => 'control-label')
+.controls
+  - value, fixed_value_hash = fixed_value(field, data_hash)
+  = text_area_tag(field['id'], value, { :class => input_size }.merge(validators_hash(field)).merge(fixed_value_hash))
+  %p.help-block
