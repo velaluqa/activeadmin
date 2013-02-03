@@ -1,4 +1,12 @@
 GIT
+  remote: git://github.com/libgit2/rugged.git
+  revision: e138d860067df0c0570cd091b7a97a15e5c5e02e
+  branch: development
+  submodules: true
+  specs:
+    rugged (0.17.0.b8)
+
+GIT
   remote: git://github.com/profmaad/activeadmin-mongoid.git
   revision: a227aa991592432b779a3252a452fa863d8b3974
   branch: master
@@ -233,6 +241,7 @@ DEPENDENCIES
   paper_trail (~> 2)
   pg
   rails (= 3.2.11)
+  rugged!
   sass-rails (~> 3.2.3)
   sqlite3
   therubyracer

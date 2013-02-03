@@ -5,7 +5,6 @@ ActiveAdmin.register Form do
     column :name do |form|
       link_to form.name, admin_form_path(form)
     end
-    column 'Version', :form_version
     column :description
     column :session
     column :configuration do |form|
@@ -20,7 +19,6 @@ ActiveAdmin.register Form do
   show do |form|
     attributes_table do
       row :name
-      row :form_version
       row :description
       row :session
       row :download_configuration do
@@ -54,7 +52,8 @@ ActiveAdmin.register Form do
       flash[:error] = "You must specify a configuration file to upload"
       redirect_to({:action => :show})
     else
-      FileUtils.copy(params[:form][:file].tempfile, @form.config_file_path)
+      repo = GitConfigRepository.new
+      repo.update_config_file(@form.relative_config_file_path, params[:form][:file].tempfile, current_user, "New configuration file for form #{@form.id}")
         
       redirect_to({:action => :show}, :notice => "Configuration successfully uploaded")
     end

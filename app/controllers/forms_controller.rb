@@ -41,12 +41,8 @@ protected
     @case = Case.find(params[:case])
     raise Exceptions::CaseNotFoundError.new(params[:case]) if @case.nil?
 
-    if params[:version].nil?
-      @form = Form.where(:name => params[:id], :session_id => @case.session_id).order("form_version DESC").first
-    else
-      @form = Form.where(:name => params[:id], :session_id => @case.session_id, :form_version => params[:version]).first
-    end
+    @form = Form.where(:name => params[:id], :session_id => @case.session_id).first
 
-    raise Exceptions::FormNotFoundError.new(params[:id], params[:version], params[:case]) if @form.nil?
+    raise Exceptions::FormNotFoundError.new(params[:id], params[:case]) if @form.nil?
   end
 end

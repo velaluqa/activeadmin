@@ -18,6 +18,9 @@ class Session < ActiveRecord::Base
   def config_file_path
     Rails.application.config.session_configs_directory + "/#{id}.yml"
   end
+  def relative_config_file_path
+    Rails.application.config.session_configs_subdirectory + "/#{id}.yml"
+  end
 
   def configuration
     begin

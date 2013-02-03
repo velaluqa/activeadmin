@@ -1,7 +1,7 @@
 class Form < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :description, :name, :form_version, :session_id, :session
+  attr_accessible :description, :name, :session_id, :session
 
   validates :name, :presence => true
   validates :name, :format => { :with => /^[a-zA-Z0-9_]+$/, :message => 'Only letters A-Z, numbers and \'_\' allowed' }
@@ -31,6 +31,9 @@ class Form < ActiveRecord::Base
     ['add_repeat', 'group-label', 'divider', 'group-end'].include? field['type']
   end
 
+  def relative_config_file_path
+    Rails.application.config.form_configs_subdirectory + "/#{id}.yml"
+  end
   def config_file_path
     Rails.application.config.form_configs_directory + "/#{id}.yml"
   end
@@ -79,14 +82,10 @@ class Form < ActiveRecord::Base
       if field['include'].nil?
         full_config << field
       else
-        if field['version'].nil?
-          included_form = Form.where(:name => field['include'], :session_id => session_id).order("form_version DESC").first
-        else
-          included_form = Form.where(:name => field['include'], :session_id => session_id, :form_version => field['version'])..first
-        end
-
+        included_form = Form.where(:name => field['include'], :session_id => session_id).first
+        
         if included_form.nil?
-          raise Exceptions::FormNotFoundError.new(field['include'], field['version'], nil)
+          raise Exceptions::FormNotFoundError.new(field['include'], nil)
         end
         if already_included.include?(included_form.id)
           throw "The form has a circular include of form '#{included_form.name}'"
