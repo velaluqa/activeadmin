@@ -40,7 +40,7 @@
   description: Only if lesion is HCC
 
 - id: COMM
-  type: string
+  type: text
   label: Comments
   description: if any
   

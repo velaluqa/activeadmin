@@ -24,7 +24,7 @@ roi_to_options = (roi, values) ->
 
   label = label.slice(0, -2)
     
-  create_option(label, JSON.stringify(option_value)).attr('data-roi-id', roi['id'])
+  create_option(label, JSON.stringify(option_value)).attr('data-roi-name', roi['name'])
 
 roi_has_values = (roi, values) ->
   (return false if !(value of roi)) for own _,value of values
@@ -166,7 +166,26 @@ update_allowed_rois = (changed_select) ->
   else
     changed_select.data('old_selection', option.text())
 
+update_rois_table = (new_rois) ->
+  new_rois_by_id = {}
+  new_rois_by_name = {}
+  
+  for roi in new_rois
+    if new_rois_by_name[roi['name']]?
+      return false
+    
+    new_rois_by_id[roi['id']] = roi
+    new_rois_by_name[roi['name']] = roi
+
+  window.rois_by_id = new_rois_by_id
+  window.rois_by_name = new_rois_by_name
+
+  return true
+
 $(document).ready ->
+  window.rois_by_id = {}
+  window.rois_by_name = {}
+  
   $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
         submitSuccess: ($form, event) ->
           event.preventDefault()
@@ -235,6 +254,8 @@ $(document).ready ->
 
   PharmTraceAPI.roisUpdated.connect ->  
     rois = PharmTraceAPI.rois
+    update_rois_table(rois)
+        
     selects = $('.select-roi')
 
     populate_select_with_rois(select, rois) for select in selects
