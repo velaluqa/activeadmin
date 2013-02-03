@@ -214,6 +214,7 @@ $(document).ready ->
 
     repeatable_form.find('.select-roi').change ->
       update_allowed_rois($(this))
+    repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
 
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
     group_end_form.before(e) for e in repeatable_form.children()
@@ -224,8 +225,6 @@ $(document).ready ->
 
     $("#repeatable_group_end_preview_#{repeatable_id}").before(e) for e in repeatable_preview.clone().children()
     $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview.children()
-    
-    repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
 
     delay 10, -> 
       $(window).scrollTop(scroll_to_element.position().top-20);
