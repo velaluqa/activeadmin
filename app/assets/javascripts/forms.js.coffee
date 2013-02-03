@@ -24,7 +24,7 @@ roi_to_options = (roi, values) ->
 
   label = label.slice(0, -2)
     
-  create_option(label, JSON.stringify(option_value))
+  create_option(label, JSON.stringify(option_value)).attr('data-roi-id', roi['id'])
 
 roi_has_values = (roi, values) ->
   (return false if !(value of roi)) for own _,value of values
@@ -39,7 +39,7 @@ populate_select_with_rois = (select, rois) ->
   selected_option = null
   if(select.find('option:selected').length > 0)
     selected_option = select.find('option:selected').clone()
-    
+  
   select.empty()
   select.append(create_option("Please select", ""))
   select.append(roi_to_options(roi, values)) for roi in rois when roi_has_values(roi, values)
