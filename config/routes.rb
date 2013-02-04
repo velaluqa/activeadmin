@@ -1,7 +1,11 @@
 StudyServer::Application.routes.draw do
   ActiveAdmin.routes(self)
 
-  resources :forms, :only => [:show]
+  resources :forms, :only => [:show] do
+    member do
+      get 'previous_results'
+    end
+  end
   resources :form_answers, :only => [:create]
 
   resources :sessions, :only => [:show] do

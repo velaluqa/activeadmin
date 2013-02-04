@@ -2,10 +2,7 @@
 
 .container  
   - unless @previous_cases.nil?
-    #previous_results.offset1.span10
-      - @previous_cases.each do |case_type,cases|
-        - next if cases.empty?
-        = render 'forms/results_table', :cases => cases, :caption => "Previous #{case_type.camelize} Results for this Patient", :skip_header => false
+    = render 'forms/previous_cases_tables'
 
   #form_area.offset1.span10
     = form_tag('', :class => 'form-horizontal', :id => 'the_form') do

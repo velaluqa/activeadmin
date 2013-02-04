@@ -1,0 +1,4 @@
+#previous_results.offset1.span10
+  - @previous_cases.each do |case_type,cases|
+    - next if cases.empty?
+    = render 'forms/results_table', :cases => cases, :caption => "Previous #{case_type.camelize} Results for this Patient", :skip_header => false
