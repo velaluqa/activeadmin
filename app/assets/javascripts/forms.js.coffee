@@ -245,8 +245,9 @@ $(document).ready ->
     $("#repeatable_group_end_preview_#{repeatable_id}").before(e) for e in repeatable_preview.clone().children()
     $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview.children()
 
+    body_padding = $('body').css('padding-top').replace('px', '')
     delay 10, -> 
-      $(window).scrollTop(scroll_to_element.position().top-20);
+      $(window).scrollTop(scroll_to_element.position().top-body_padding);
 
   $('#refresh-rois-btn').click ->
     $(this).button('loading')
