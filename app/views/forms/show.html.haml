@@ -1,98 +1,102 @@
-- unless @previous_cases.nil?
-  #previous_results.offset1.span10
-    - @previous_cases.each do |case_type,cases|
-      - next if cases.empty?
-      = render 'forms/results_table', :cases => cases, :caption => "Previous #{case_type.camelize} Results for this Patient", :skip_header => false
-      
-#form_area.offset1.span10
-  .form-actions
+#form-navbar.navbar.navbar-fixed-top
+  .navbar-inner
+    %a.brand IAF
     %button#refresh-rois-btn.btn.pull-right{:type => 'button', :'data-loading-text' => 'Refreshing...'} Refresh Measurements
-  = form_tag('', :class => 'form-horizontal', :id => 'the_form') do
-    = hidden_field_tag('form_id', @form.id)
-    .control-group.error
-      .controls
-        %p#custom-validation-help-block.help-block
-    - current_group_index = nil
-    - first_in_group = false
-    - @form_config.each do |field|      
-      - if(field['type'] == 'add_repeat')
-        - current_group_index = 1
-        - first_in_group = true
-        .form-actions.form-group-header
-          %h3.pull-left.form-group-heading= field['group-label']
-          %a.btn.add-repeat-btn.pull-right{:'data-id' => field['id'], :'data-max-repeats' => field['max'], :href => '#'}= field['button-label']
-      - elsif(field['type'] == 'divider')
-        - current_group_index += 1
-        - first_in_group = true
-        %hr
-      - elsif(field['type'] == 'group-end')
-        - current_group_index = nil
-        - first_in_group = false
-        %div{:id => "repeatable_group_end_form_#{field['id']}"}
-      - else
-        .row.form-row-padding
-          .control-group.span5
-            - if (!current_group_index.nil? && first_in_group)
-              - first_in_group = false
-              %h3.form-group-index.pull-left= current_group_index
-            = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hash
-          .muted.span5= field['description']
-    .form-actions
-      %button.btn.btn-primary{:type => 'submit'} Submit Answers
 
-#preview_modal.modal.hide.fade
-  .modal-header
-    %button.close{:type => 'button', :'data-dismiss' => 'modal', :'aria-hidden' => true} &times;
-    %h3 Please verify your answers
-  .modal-body
-    = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'preview'
-  .modal-footer
-    %button.btn{:'data-dismiss' => 'modal', :'aria-hidden' => true} Change Answers
-    %button#preview_submit_btn.btn.btn-primary{:'data-loading-text' => 'Submitting...'} Submit Answers
+.container  
+  - unless @previous_cases.nil?
+    #previous_results.offset1.span10
+      - @previous_cases.each do |case_type,cases|
+        - next if cases.empty?
+        = render 'forms/results_table', :cases => cases, :caption => "Previous #{case_type.camelize} Results for this Patient", :skip_header => false
 
-#print_version.hide
-  .row-fluid
-    .span12
-      %h2.print-header Your answers
-      %h4= "Case #{@case.id}, Session #{@case.session.name}, Form #{@form.name}"
-      %h4#print_timestamp
-      .print-body        
-        = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'print'
-  .row-fluid
-    .span12
-      %h2.print-header Annotated images
-      %table#print_annotated_images_table.table
-        %tr#print_annotated_images_table_header_row
-          %th Image
-          %th Checksum
-          
-  .row-fluid
-    .offset2.span10
-      %strong.print-signature I hereby declare that these are indeed my very own answers:
-      .signature-div
-        .signature-line
-        %p.pull-right.muted (Please sign here)
-
-#repeatables.hide
-  - @repeatables.each do |r|
-    %div{:id => "repeatable_form_#{r[:id]}"}
-      - first_field = true
-      - r[:config].each do |field|
-        - if(field['type'] == 'divider')
+  #form_area.offset1.span10
+    = form_tag('', :class => 'form-horizontal', :id => 'the_form') do
+      = hidden_field_tag('form_id', @form.id)
+      .control-group.error
+        .controls
+          %p#custom-validation-help-block.help-block
+      - current_group_index = nil
+      - first_in_group = false
+      - @form_config.each do |field|      
+        - if(field['type'] == 'add_repeat')
+          - current_group_index = 1
+          - first_in_group = true
+          .form-actions.form-group-header
+            %h3.pull-left.form-group-heading= field['group-label']
+            %a.btn.add-repeat-btn.pull-right{:'data-id' => field['id'], :'data-max-repeats' => field['max'], :href => '#'}= field['button-label']
+        - elsif(field['type'] == 'divider')
+          - current_group_index += 1
+          - first_in_group = true
           %hr
+        - elsif(field['type'] == 'group-end')
+          - current_group_index = nil
+          - first_in_group = false
+          %div{:id => "repeatable_group_end_form_#{field['id']}"}
         - else
           .row.form-row-padding
             .control-group.span5
-              - if(first_field)
-                - first_field = false
-                %h3.form-group-index.pull-left
+              - if (!current_group_index.nil? && first_in_group)
+                - first_in_group = false
+                %h3.form-group-index.pull-left= current_group_index
               = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hash
             .muted.span5= field['description']
-    %table{:id => "repeatable_table_#{r[:id]}"}
-      - first_in_group = true
-      - r[:config].each do |field|
-        - if(field['type'] == 'divider')
-          - first_in_group = true
-        - else
-          = render 'forms/results_table_row', :current_group_index => 0, :first_in_group => first_in_group, :field_spec => field, :printable_answers => [r[:config]], :cases => [@case], :placeholders_only => true
-          - first_in_group = false
+      .form-actions
+        %button.btn.btn-primary{:type => 'submit'} Submit Answers
+
+  #preview_modal.modal.hide.fade
+    .modal-header
+      %button.close{:type => 'button', :'data-dismiss' => 'modal', :'aria-hidden' => true} &times;
+      %h3 Please verify your answers
+    .modal-body
+      = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'preview'
+    .modal-footer
+      %button.btn{:'data-dismiss' => 'modal', :'aria-hidden' => true} Change Answers
+      %button#preview_submit_btn.btn.btn-primary{:'data-loading-text' => 'Submitting...'} Submit Answers
+
+  #print_version.hide
+    .row-fluid
+      .span12
+        %h2.print-header Your answers
+        %h4= "Case #{@case.id}, Session #{@case.session.name}, Form #{@form.name}"
+        %h4#print_timestamp
+        .print-body        
+          = render 'forms/results_table', :placeholders_only => true, :cases => [@case], :form_config => @form_config, :caption => '', :skip_header => true, :display_type => 'print'
+    .row-fluid
+      .span12
+        %h2.print-header Annotated images
+        %table#print_annotated_images_table.table
+          %tr#print_annotated_images_table_header_row
+            %th Image
+            %th Checksum
+
+    .row-fluid
+      .offset2.span10
+        %strong.print-signature I hereby declare that these are indeed my very own answers:
+        .signature-div
+          .signature-line
+          %p.pull-right.muted (Please sign here)
+
+  #repeatables.hide
+    - @repeatables.each do |r|
+      %div{:id => "repeatable_form_#{r[:id]}"}
+        - first_field = true
+        - r[:config].each do |field|
+          - if(field['type'] == 'divider')
+            %hr
+          - else
+            .row.form-row-padding
+              .control-group.span5
+                - if(first_field)
+                  - first_field = false
+                  %h3.form-group-index.pull-left
+                = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hash
+              .muted.span5= field['description']
+      %table{:id => "repeatable_table_#{r[:id]}"}
+        - first_in_group = true
+        - r[:config].each do |field|
+          - if(field['type'] == 'divider')
+            - first_in_group = true
+          - else
+            = render 'forms/results_table_row', :current_group_index => 0, :first_in_group => first_in_group, :field_spec => field, :printable_answers => [r[:config]], :cases => [@case], :placeholders_only => true
+            - first_in_group = false
