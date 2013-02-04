@@ -16,7 +16,7 @@ class FormsController < ApplicationController
     if(@case and @case.session)
       configuration = @case.session.configuration
 
-      unless (configuration.nil? or configuration['show_previous_results'].nil? or configuration['show_previous_results'] == false or params[:previous_results].nil? or params[:previous_results] == false)
+      unless (configuration.nil? or configuration['show_previous_results'].nil? or configuration['show_previous_results'] == false or params[:previous_results].nil? or params[:previous_results] == 'false')
         @previous_cases = construct_previous_cases
       end
     end
