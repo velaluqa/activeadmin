@@ -14,7 +14,18 @@ has_pharmtrace_api = ->
 create_option = (text, value) ->
   $('<option></option>').val(value).html(text)
 
-roi_to_options = (roi, values) ->
+roi_to_option = (roi, values) ->
+  option = $('<option></option>').attr('data-roi-id', roi['roi_id'])
+  option = update_roi_option(option, values)
+
+  return option
+
+update_roi_option = (option, values) ->
+  option = $(option)
+  roi = window.rois[option.attr('data-roi-id')]
+  return null unless roi?
+  return null unless roi_has_values(roi, values)
+  
   label = "Name: "+roi['name']+", "
   option_value = {}
 
@@ -23,41 +34,51 @@ roi_to_options = (roi, values) ->
     option_value[key] = roi[value]
 
   label = label.slice(0, -2)
-    
-  create_option(label, JSON.stringify(option_value)).attr('data-roi-name', roi['name'])
 
+  option.html(label)
+  option.val(JSON.stringify(option_value))
+
+  return option
+  
 roi_has_values = (roi, values) ->
   (return false if !(value of roi)) for own _,value of values
 
   return true
 
-populate_select_with_rois = (select, rois) ->
+update_roi_select = (select) ->
   select = $(select)
 
   values = jQuery.parseJSON(select.attr('data-roi-values'))
 
-  selected_option = null
-  if(select.find('option:selected').length > 0)
-    selected_option = select.find('option:selected').clone()
-  
-  select.empty()
-  select.append(create_option("Please select", ""))
-  select.append(roi_to_options(roi, values)) for roi in rois when roi_has_values(roi, values)
+  options = select.find('option[value]').not('[value=""]')
+  existing_ids = []
+  for option in options
+    if update_roi_option(option, values)?      
+      existing_ids += $(option).attr('data-roi-id')
+    else
+      $(option).remove()
 
-  if(selected_option?)
-    select.find('option').filter (index) ->
-      return $(this).text() == selected_option.text()
-    .attr('selected', 'selected')
-      
-disable_option = (select, option_text) ->
-  $(select).find('option').filter (index) ->
-    return $(this).text() == option_text
-  .attr('disabled', 'disabled')
-enable_option = (select, option_text) ->
-  console.log('Enabling option '+option_text)
-  $(select).find('option').filter (index) ->
-    return $(this).text() == option_text
-  .removeAttr('disabled')
+  select.append(roi_to_option(roi, values)) for own roi_id, roi of window.rois when (!(roi_id in existing_ids) and roi_has_values(roi, values))
+
+  if(select.find('option') <= 1)
+    select.find('option').first().html('No ROIs available')
+  else
+    select.find('option').first().html('Please Select')
+    
+  if(select.find('option:selected').length == 0)
+    select.find('option:not([value])').attr('selected', 'selected')
+
+update_enabled_options = (select) ->
+  for option in $(select).find('option[value]')
+    option = $(option)
+    roi = window.rois[option.attr('data-roi-id')]
+    continue unless roi?
+    selected_by_select = roi['selected_by_select']
+  
+    if selected_by_select? and selected_by_select != $(select).attr('id')
+      option.attr('disabled', 'disabled')
+    else
+      option.removeAttr('disabled')
 
 register_custom_validation_function = (func) ->
   window.custom_validation_functions = [] unless window.custom_validation_functions?
@@ -151,40 +172,60 @@ delay = (ms, func) -> window.setTimeout(func, ms)
 
 update_allowed_rois = (changed_select) ->
   changed_select = $(changed_select)
-  option = changed_select.find('option:selected')
-  return if option.length == 0
 
-  selects = $('.select-roi').not(changed_select)
+  selected_option = changed_select.find('option:selected')
+  return if selected_option.length == 0
 
+  new_selection = changed_select.find('option:selected').attr('data-roi-id')
   old_selection = changed_select.data('old_selection')
 
-  (enable_option(select, old_selection) for select in selects) if old_selection?
-  (disable_option(select, option.text()) for select in selects) unless option.val().length == 0
+  window.rois[old_selection]['selected_by_select'] = null if old_selection?
+  window.rois[new_selection]['selected_by_select'] = changed_select.attr('id') if new_selection?
 
-  if(option.val().length == 0)
+  selects = $('.select-roi').not(changed_select)
+  update_enabled_options(select) for select in selects
+
+  if(selected_option.val().length == 0)
     changed_select.removeData('old_selection')
   else
-    changed_select.data('old_selection', option.text())
+    changed_select.data('old_selection', new_selection)
+
+find_roi_id_by_data = (roi) ->
+  for own roi_id,old_roi of window.rois
+    if(old_roi['length'] == roi['length'] and
+       old_roi['area'] == roi['area'] and
+       old_roi['min'] == roi['min'] and
+       old_roi['max'] == roi['max'] and
+       old_roi['mean'] == roi['mean'])
+      return roi_id
+
+  return null
 
 update_rois_table = (new_rois) ->
-  new_rois_by_id = {}
-  new_rois_by_name = {}
-  
   for roi in new_rois
-    if new_rois_by_name[roi['name']]?
-      return false
-    
-    new_rois_by_id[roi['id']] = roi
-    new_rois_by_name[roi['name']] = roi
+    roi_id = null
+    roi_name = roi['seriesUID']+'/'+roi['name']
+    if window.osirix_id_to_roi_id[roi['id']]?
+      roi_id = window.osirix_id_to_roi_id[roi['id']]
+    else if window.name_to_roi_id[roi_name]?
+      roi_id = window.name_to_roi_id[roi_name]
+    else
+      roi_id = find_roi_id_by_data(roi)
+      roi_id = window.next_roi_id++ unless roi_id?
 
-  window.rois_by_id = new_rois_by_id
-  window.rois_by_name = new_rois_by_name
+      window.osirix_id_to_roi_id[roi['id']] = roi_id
+      window.name_to_roi_id[roi_name] = roi_id
 
-  return true
+    roi['roi_id'] = roi_id
+    roi['selected_by_select'] = window.rois[roi_id]['selected_by_select'] if window.rois[roi_id]?
+
+    window.rois[roi_id] = roi
 
 $(document).ready ->
-  window.rois_by_id = {}
-  window.rois_by_name = {}
+  window.rois = {}
+  window.next_roi_id = 0
+  window.osirix_id_to_roi_id = {}
+  window.name_to_roi_id = {}
   
   $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
         submitSuccess: ($form, event) ->
@@ -212,13 +253,13 @@ $(document).ready ->
     repeatable_id = $(this).attr('data-id')
     console.log("Adding #{repeatable_id}")
 
-    console.log($('#the_form'))
-    console.log($('#the_form').formParams())
+    #console.log($('#the_form'))
+    #console.log($('#the_form').formParams())
     elements = find_arrays($('#the_form').formParams())[repeatable_id]
     index = if elements? then elements.length else 0
 
-    console.log(index)
-    console.log(parseInt($(this).attr('data-max-repeats'), 10))
+    #console.log(index)
+    #console.log(parseInt($(this).attr('data-max-repeats'), 10))
     return if (index == parseInt($(this).attr('data-max-repeats'), 10))
     
     console.log("Currently included #{index} times")
@@ -228,8 +269,8 @@ $(document).ready ->
     set_index_in_name_and_id(repeatable_form.find('input,select,textarea'), index)
     set_index_in_for(repeatable_form.find('label'), index)
     repeatable_form.find('.form-group-index').text(index+1)
-    console.log(group_end_form)
-    console.log(repeatable_form)
+    #console.log(group_end_form)
+    #console.log(repeatable_form)
 
     repeatable_form.find('.select-roi').change ->
       update_allowed_rois($(this))
@@ -253,13 +294,14 @@ $(document).ready ->
     $(this).button('loading')
     PharmTraceAPI.updateROIs()
 
-  PharmTraceAPI.roisUpdated.connect ->  
+  PharmTraceAPI.roisUpdated.connect ->
+    #rois = jQuery.parseJSON('[{"id":1,"length":23.42,"name":"Length","seriesModality":"CT","seriesName":"Test Series 1","seriesUID":"1.2.3.4.5","sliceLocation":1,"studyName":"Test Study"},{"area":42.23,"id":23,"max":5,"mean":4.23,"min":3,"name":"Area","seriesModality":"MRT","seriesName":"Test Series 2","seriesUID":"5.4.3.2.1","sliceLocation":7,"studyName":"Test Study"},{"area":65,"id":42,"length":7,"max":23,"mean":7.4223,"min":-1,"name":"MegaROI","seriesModality":"PET","seriesName":"Test Series 2","seriesUID":"5.4.3.2.1","sliceLocation":23,"studyName":"Test Study"}]')
     rois = PharmTraceAPI.rois
     update_rois_table(rois)
         
     selects = $('.select-roi')
 
-    populate_select_with_rois(select, rois) for select in selects
+    update_roi_select(select) for select in selects
     $('#refresh-rois-btn').button('reset')
 
   $('#preview_submit_btn').click ->
@@ -292,9 +334,7 @@ $(document).ready ->
     table_header_row = $('#print_annotated_images_table_header_row')
     
     for own series, images of annotated_images
-      console.log('Series: '+series)
       for own image, checksum of images
-        console.log('Image: '+image+', checksum: '+checksum)
         table_header_row.after($('<tr><td>'+image+'</td><td>'+checksum+'</td></tr>'))
     
   $('.select-roi').change ->
