@@ -1,5 +1,5 @@
 class Session < ActiveRecord::Base
-  attr_accessible :name, :study, :study_id
+  attr_accessible :name, :study, :study_id, :state, :locked_version
 
   belongs_to :study
 
@@ -15,6 +15,27 @@ class Session < ActiveRecord::Base
 
   scope :blind_readable_by_user, lambda { |user| user.blind_readable_sessions.includes(:study) }
 
+  STATE_SYMS = [:building, :testing, :production, :closed]
+
+  def self.state_sym_to_int(sym)
+    return Session::STATE_SYMS.index(sym)
+  end
+  def state
+    return -1 if read_attribute(:state).nil?
+    return Session::STATE_SYMS[read_attribute(:state)]
+  end
+  def state=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Session::STATE_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported state"
+      return
+    end
+
+    write_attribute(:state, index)
+  end
+  
   def config_file_path
     Rails.application.config.session_configs_directory + "/#{id}.yml"
   end

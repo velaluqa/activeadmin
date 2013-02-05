@@ -1,13 +1,34 @@
 class Form < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :description, :name, :session_id, :session
+  attr_accessible :description, :name, :session_id, :session, :state, :locked_version
 
   validates :name, :presence => true
   validates :name, :format => { :with => /^[a-zA-Z0-9_]+$/, :message => 'Only letters A-Z, numbers and \'_\' allowed' }
 
   belongs_to :session
   has_many :form_answers
+
+  STATE_SYMS = [:draft, :final]
+
+  def self.state_sym_to_int(sym)
+    return Form::STATE_SYMS.index(sym)
+  end
+  def state
+    return -1 if read_attribute(:state).nil?
+    return Form::STATE_SYMS[read_attribute(:state)]
+  end
+  def state=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Form::STATE_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported state"
+      return
+    end
+
+    write_attribute(:state, index)
+  end
 
   def configuration(already_included_forms = nil, stringify = true)
     form_config = parse_config
