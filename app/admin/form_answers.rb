@@ -23,7 +23,7 @@ ActiveAdmin.register FormAnswer do
     end
     column 'Test Data?', :is_test_data do |form_answer|
       if(form_answer.is_test_data)
-        status_tag('Yes', :error)
+        status_tag('Yes', :warning)
       else
         status_tag('No', :ok)
       end
@@ -44,6 +44,13 @@ ActiveAdmin.register FormAnswer do
           status_tag('Valid', :ok)
         else
           status_tag('Invalid', :error)
+        end
+      end
+      row 'Test Data?' do
+        if(form_answer.is_test_data)
+          status_tag('Yes', :warning)
+        else
+          status_tag('No', :ok)
         end
       end
       row :answers do
