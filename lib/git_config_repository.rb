@@ -33,7 +33,9 @@ class GitConfigRepository
     Rugged::Commit.create(@repo, options)
   end
 
-  def yaml_at_version(path, version)
+  def yaml_at_version(path, version = nil)
+    version = current_version if version.nil?
+
     file_blob = file_at_version(path, version)
     return nil if file_blob.nil?
 
