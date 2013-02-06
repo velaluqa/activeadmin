@@ -2,6 +2,12 @@ require 'git_config_repository'
 
 ActiveAdmin.register Session do
 
+  scope :all, :default => true
+  scope :building
+  scope :testing
+  scope :production
+  scope :closed
+
   index do
     selectable_column
 

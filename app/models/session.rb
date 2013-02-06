@@ -14,6 +14,10 @@ class Session < ActiveRecord::Base
   has_and_belongs_to_many :validators, :class_name => 'User', :join_table => 'validators_sessions'
 
   scope :blind_readable_by_user, lambda { |user| user.blind_readable_sessions.includes(:study) }
+  scope :building, where(:state => 0)
+  scope :testing, where(:state => 1)
+  scope :production, where(:state => 2)
+  scope :closed, where(:state => 3)
 
   STATE_SYMS = [:building, :testing, :production, :closed]
 
