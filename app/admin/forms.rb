@@ -113,10 +113,12 @@ ActiveAdmin.register Form do
   end
   
   action_item :only => :show do
+    next if resource.session.nil? # template forms can not be finalised
+
     if resource.state == :draft
       link_to 'Lock', lock_admin_form_path(resource)
     elsif resource.state == :final
-      link_to 'Unlock', unlock_admin_form_path(resource)      
+      link_to 'Unlock', unlock_admin_form_path(resource) if resource.session.state == :building
     end
   end
 end
