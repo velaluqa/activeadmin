@@ -34,11 +34,19 @@ class SessionsController < ApplicationController
     end      
   end
 
-  def blind_readable
-    @sessions = current_user.blind_readable_sessions.reject {|s| s.case_list(:unread).empty?}.map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
+  def list
+    blind_readable = current_user.blind_readable_sessions
+      .reject {|s| s.state != :production}
+      .reject {|s| s.case_list(:unread).empty?}
+      .map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
+
+    validatable = current_user.validatable_sessions
+      .reject {|s| s.state != :testing}
+      .reject {|s| s.case_list(:unread).empty?}
+      .map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
 
     respond_to do |format|
-      format.json { render :json => {:sessions => @sessions} }
+      format.json { render :json => {:blind_readable => blind_readable, :validatable => validatable} }
     end
   end  
 

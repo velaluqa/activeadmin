@@ -10,7 +10,7 @@ StudyServer::Application.routes.draw do
 
   resources :sessions, :only => [:show] do
     collection do
-      get 'blind_readable'
+      get 'list'
     end
   end
 
