@@ -7,6 +7,10 @@ class GitConfigRepository
     end    
   end
 
+  def current_version
+    @repo.head.resolve.target
+  end
+
   def update_config_file(path, new_file, author, commit_message)
     FileUtils.cp(new_file, @repo.workdir+'/'+path)
     

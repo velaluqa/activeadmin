@@ -30,6 +30,10 @@ class Form < ActiveRecord::Base
     write_attribute(:state, index)
   end
 
+  def is_template?
+    session_id == nil
+  end
+
   def configuration(already_included_forms = nil, stringify = true)
     form_config = parse_config
     return [nil,nil,nil] if form_config.nil?

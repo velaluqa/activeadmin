@@ -15,6 +15,9 @@ ActiveAdmin.register Session do
     column 'Validators' do |session|
       session.validators.size
     end
+    column :state do |session|
+      session.state.to_s.camelize
+    end
     column 'Progress' do |session|
       "#{session.case_list(:read).size} / #{session.case_list(:all).size}"
     end
@@ -50,6 +53,9 @@ ActiveAdmin.register Session do
       end
       row :validators do
         render 'admin/sessions/list', :items => session.validators.map {|v| link_to(v.name, admin_user_path(v)) + ' (' + link_to('-', remove_validator_admin_session_path(session, :validator_id => v.id)) +')' }, :action_link => link_to('Add Validator', add_validator_form_admin_session_path(session)).html_safe
+      end
+      row :state do
+        session.state.to_s.camelize + (session.locked_version.nil? ? '' : " (Version: #{session.locked_version})")
       end
       row :cases do
         if session.case_list(:all).empty?
@@ -188,5 +194,60 @@ ActiveAdmin.register Session do
   end
   action_item :only => :show do
     link_to 'Upload configuration', upload_config_form_admin_session_path(session)
+  end
+
+  controller do
+    def switch_session_state(session_id, new_state)
+      session = Session.find(session_id)
+      return if session.nil?
+
+      if(session.state == :closed and cannot? :manage, :system)
+        flash[:error] = 'Only an application administrator can reopen a session!'
+        redirect_to :action => :show
+        return
+      elsif(cannot? :manage, session)
+        flash[:error] = 'You are not authorized to change the state of this session!'
+        redirect_to :action => :show
+        return
+      end
+
+      session.state = new_state
+      case new_state
+      when :building
+        session.locked_version = nil
+      when :testing
+        session.locked_version = GitConfigRepository.new.current_version
+      end
+      pp session
+      session.save
+      pp Session.find(session_id)
+
+      redirect_to({:action => :show}, :notice => "State changed to #{new_state.to_s.camelize}")
+    end
+  end
+
+  member_action :switch_state, :method => :get do
+    switch_session_state(params[:id], params[:new_state].to_sym)
+  end
+
+  action_item :only => :show do
+    case resource.state
+    when :building
+      link_to 'Start Testing', switch_state_admin_session_path(resource, {:new_state => :testing})
+    when :testing
+      link_to 'Start Production', switch_state_admin_session_path(resource, {:new_state => :production})
+    when :production
+      link_to 'Close Session', switch_state_admin_session_path(resource, {:new_state => :closed})
+    end
+  end
+  action_item :only => :show do
+    case resource.state
+    when :testing
+      link_to 'Abort Testing', switch_state_admin_session_path(resource, {:new_state => :building})
+    when :production
+      link_to 'Abort Production', switch_state_admin_session_path(resource, {:new_state => :testing})
+    when :closed
+      link_to 'Reopen Session', switch_state_admin_session_path(resource, {:new_state => :production}) if can? :manage, :system
+    end
   end
 end

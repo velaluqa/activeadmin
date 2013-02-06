@@ -6,6 +6,9 @@ ActiveAdmin.register Form do
       link_to form.name, admin_form_path(form)
     end
     column :description
+    column :state do |form|
+      form.state.to_s.camelize
+    end
     column :session
     column :configuration do |form|
       if(form.raw_configuration.nil?)
@@ -20,6 +23,9 @@ ActiveAdmin.register Form do
     attributes_table do
       row :name
       row :description
+      row :state do
+        form.state.to_s.camelize + (form.locked_version.nil? ? '' : " (Version: #{form.locked_version})")
+      end
       row :session
       row :download_configuration do
         if form.raw_configuration.nil?
@@ -66,5 +72,46 @@ ActiveAdmin.register Form do
   end
   action_item :only => :show do
     link_to 'Upload configuration', upload_config_form_admin_form_path(resource)
+  end
+
+  member_action :lock do
+    @form = Form.find(params[:id])
+    return if @form.nil?
+
+    if(cannot? :manage, @form)
+      flash[:error] = 'You are not authorized to lock this form!'
+      redirect_to :action => :show
+      return
+    end
+
+    @form.state = :final
+    @form.locked_version = GitConfigRepository.new.current_version
+    @form.save
+
+    redirect_to({:action => :show}, :notice => 'Form locked')
+  end
+  member_action :unlock do
+    @form = Form.find(params[:id])
+    return if @form.nil?
+
+    if(cannot? :manage, @form)
+      flash[:error] = 'You are not authorized to unlock this form!'
+      redirect_to :action => :show
+      return
+    end
+
+    @form.state = :draft
+    @form.locked_version = nil
+    @form.save
+
+    redirect_to({:action => :show}, :notice => 'Form unlocked')
+  end
+  
+  action_item :only => :show do
+    if resource.state == :draft
+      link_to 'Lock', lock_admin_form_path(resource)
+    elsif resource.state == :final
+      link_to 'Unlock', unlock_admin_form_path(resource)      
+    end
   end
 end

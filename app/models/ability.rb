@@ -21,6 +21,7 @@ class Ability
     # this is just for the simplified prototype auth system, either you are an admin or you're not
     if user.is_app_admin?
       can :manage, :all
+      can :manage, :system
     end
 
     return
@@ -29,6 +30,7 @@ class Ability
     # App Admin
     if user.is_app_admin?
       can :manage, :all
+      can :manage, :system
       can :manage, User
       can :manage, Role
       can :manage, Study
@@ -64,7 +66,11 @@ class Ability
     end
     can :manage, Form do |form|
       puts "CAN MANAGE FORM?: #{form}"
-      user.is_app_admin? or (can? :manage, form.session)
+      if(form.is_template?)
+        user.is_app_admin?
+      else
+        can? :manage, form.session
+      end
     end
     can :manage, Patient do |patient|
       puts "CAN MANAGE PATIENT?: #{patient}"
