@@ -9,6 +9,9 @@ class Form < ActiveRecord::Base
   belongs_to :session
   has_many :form_answers
 
+  scope :draft, where(:state => 0)
+  scope :final, where(:state => 1)
+
   STATE_SYMS = [:draft, :final]
 
   def self.state_sym_to_int(sym)

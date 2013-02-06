@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 ActiveAdmin.register Form do
+
+  scope :all, :default => true
+  scope :draft
+  scope :final
+
   index do
     selectable_column
     column :name do |form|
