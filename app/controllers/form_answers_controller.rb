@@ -6,7 +6,18 @@ class FormAnswersController < ApplicationController
     if @case.nil?
       render :json => {:success => false, :error => 'The supplied case does not exist', :error_code => 1}, :status => :bad_request
     end
+
     authorize! :read, @case.session
+
+    is_test_data = true
+    if @case.session.validators.include?(current_user) and @case.session.state == :testing
+      is_test_data = true
+    elsif @case.session.readers.include?(current_user) and @case.session.state == :production
+      is_test_data = false
+    else
+      render :json => {:success => false, :error => 'You are not authorized to submit answers for this case', :error_code => 1}
+      return
+    end
 
     answer = FormAnswer.new
 
@@ -22,7 +33,7 @@ class FormAnswersController < ApplicationController
     answer.annotated_images = params['annotated_images']
     answer.annotated_images_signature = params['annotated_images_signature']
     
-    answer.is_test_data = (can? :validate, @case.session)
+    answer.is_test_data = is_test_data
 
     answer.submitted_at = Time.now
 
