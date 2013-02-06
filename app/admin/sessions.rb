@@ -239,7 +239,7 @@ ActiveAdmin.register Session do
   action_item :only => :show do
     case resource.state
     when :building
-      link_to 'Start Testing', switch_state_admin_session_path(resource, {:new_state => :testing})
+      link_to 'Start Testing', switch_state_admin_session_path(resource, {:new_state => :testing}) if resource.forms.map {|f| f.state == :final}.reduce(:and)
     when :testing
       link_to 'Start Production', switch_state_admin_session_path(resource, {:new_state => :production})
     when :production
