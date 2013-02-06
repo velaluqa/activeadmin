@@ -82,6 +82,7 @@ ActiveAdmin.register Form do
   member_action :lock do
     @form = Form.find(params[:id])
     return if @form.nil?
+    return if @form.session.nil?
 
     if(cannot? :manage, @form)
       flash[:error] = 'You are not authorized to lock this form!'
@@ -98,6 +99,7 @@ ActiveAdmin.register Form do
   member_action :unlock do
     @form = Form.find(params[:id])
     return if @form.nil?
+    return if @form.session.nil?
 
     if(cannot? :manage, @form)
       flash[:error] = 'You are not authorized to unlock this form!'
@@ -114,6 +116,7 @@ ActiveAdmin.register Form do
   
   action_item :only => :show do
     next if resource.session.nil? # template forms can not be finalised
+    next unless can? :manage, resource
 
     if resource.state == :draft
       link_to 'Lock', lock_admin_form_path(resource)
