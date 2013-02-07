@@ -50,6 +50,16 @@ ActiveAdmin.register Form do
     end
   end
 
+  form do |f|
+    f.inputs 'Details' do
+      f.input :session
+      f.input :name
+      f.input :description
+    end
+
+    f.buttons
+  end
+
   member_action :download_configuration do
     @form = Form.find(params[:id])
 
