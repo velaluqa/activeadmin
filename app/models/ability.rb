@@ -4,19 +4,19 @@ class Ability
   def initialize(user)
     return if user.nil? # guest users have no access whatsoever
 
-    # Validator
-    can :validate, Session do |session|
-      session.validators.exists?(user.id)
-    end
+    # # Validator
+    # can :validate, Session do |session|
+    #   session.validators.exists?(user.id)
+    # end
 
-    # Reader
-    can :blind_read, Session do |session|
-      session.readers.exists?(user.id)
-    end
+    # # Reader
+    # can :blind_read, Session do |session|
+    #   session.readers.exists?(user.id)
+    # end
 
-    can :read, Session do |session|
-      can? :validate, session or can? :blind_read, session
-    end
+    # can :read, Session do |session|
+    #   can? :validate, session or can? :blind_read, session
+    # end
 
     # App Admin
     if user.is_app_admin?
