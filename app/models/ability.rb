@@ -35,7 +35,7 @@ class Ability
     # Session Admin
     can :manage, Session, ['id IN '+SESSION_ROLES_SUBQUERY, user.id] do |session|
       !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?) or
-        !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?)
+        (session.study and !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?))
     end
 
     can :manage, Case, ['session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |c|
