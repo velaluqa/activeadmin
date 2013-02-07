@@ -41,11 +41,14 @@ class Ability
     can :manage, Case, ['session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |c|
       can? :manage, c.session
     end
+    # possible record query for mongoid: 
+    # CaseData.in(case_id: Case.where('session_id IN '+SESSION_ROLES_SUBQUERY, user.id).map{|c| c.id})
+    # we don't need that though, since there is no index for case/patient data anyway and we can define the actual rights via the block
     can :manage, CaseData do |cd|
-      can? :manage, cd.case
+      can? :manage, cd.case      
     end
 
-    can :manage, FormAnswer do |form_answer|
+    can :manage, FormAnswer, FormAnswer.in(session_id: Session.where('id IN '+SESSION_ROLES_SUBQUERY, user.id).map{|s| s.id}) do |form_answer|
       can? :manage, form_answer.session
     end
 
