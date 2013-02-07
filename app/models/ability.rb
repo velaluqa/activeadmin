@@ -18,6 +18,8 @@ class Ability
     #   can? :validate, session or can? :blind_read, session
     # end
 
+    return if user.roles.empty?
+
     # App Admin
     if user.is_app_admin?
       can :manage, :system
@@ -25,6 +27,9 @@ class Ability
       can :manage, Role
       can :manage, Study
       can [:create, :read], Session
+      can :manage, Form, ['session_id IS NULL'] do |form|
+        form.is_template?
+      end
     end    
 
     # Session Admin
@@ -33,26 +38,26 @@ class Ability
         !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?)
     end
 
-    can :manage, Case do |c|
+    can :manage, Case, ['session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |c|
       can? :manage, c.session
     end
     can :manage, CaseData do |cd|
       can? :manage, cd.case
     end
+
     can :manage, FormAnswer do |form_answer|
       can? :manage, form_answer.session
     end
-    can :read, Form do |form|
-      form.session.nil?
+
+    can :create, Form
+    can :read, Form, ['session_id IS NULL'] do |form|
+      form.is_template?
     end
-    can :manage, Form do |form|
-      if(form.is_template?)
-        user.is_app_admin?
-      else
-        can? :manage, form.session
-      end
+    can :manage, Form, ['session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |form|
+      can? :manage, form.session
     end
-    can :manage, Patient do |patient|
+
+    can :manage, Patient, ['session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |patient|
       can? :manage, patient.session
     end
     can :manage, PatientData do |pd|
@@ -61,5 +66,6 @@ class Ability
   end
 
   protected
+  APP_ADMIN_SUBQUERY = 'EXISTS(SELECT id FROM roles WHERE subject_type IS NULL and subject_id IS NULL AND role = 0 AND user_id = ?)'
   SESSION_ROLES_SUBQUERY = '(SELECT subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE "Session" AND role = 0 AND user_id = ?)'
 end

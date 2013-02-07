@@ -34,7 +34,7 @@ class Form < ActiveRecord::Base
   end
 
   def is_template?
-    session_id == nil
+    session_id.nil?
   end
 
   def configuration(already_included_forms = nil, stringify = true)
