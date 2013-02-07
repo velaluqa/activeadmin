@@ -8,8 +8,6 @@ class FormsController < ApplicationController
   layout 'client_forms', :only => [:show, :previous_results]
 
   def show
-    authorize! :read, @case.session
-
     @form_config, @form_components, @repeatables = @form.configuration
     @data_hash = @case.data_hash
 
@@ -25,8 +23,6 @@ class FormsController < ApplicationController
   end
 
   def previous_results
-    authorize! :read, @case.session
-
     if(@case and @case.session)
       configuration = @case.session.configuration
 
@@ -53,6 +49,11 @@ protected
     return previous_cases
   end
 
+  def authorize_user_for_case
+    raise CanCan::AccessDenied.new('You are not authorized to access this case!', :read, @case) unless (@case.session.readers.include?(current_user) or
+                                                                                                        @case.sesssion.validators.include?(current_user))
+  end
+
   def find_form_from_params
     raise Exceptions::CaseNotFoundError.new(params[:case]) if params[:case].nil?
 
@@ -62,5 +63,7 @@ protected
     @form = Form.where(:name => params[:id], :session_id => @case.session_id).first
 
     raise Exceptions::FormNotFoundError.new(params[:id], params[:case]) if @form.nil?
+
+    authorize_user_for_case
   end
 end
