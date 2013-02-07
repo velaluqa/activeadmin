@@ -25,10 +25,10 @@ class Ability
       can :manage, Role
       can :manage, Study
       can [:create, :read], Session
-    end
+    end    
 
     # Session Admin
-    can :manage, Session, ['id IN (SELECT subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE "Session" AND role = 0 AND user_id = ?)', user.id] do |session|
+    can :manage, Session, ['id IN '+SESSION_ROLES_SUBQUERY, user.id] do |session|
       !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?) or
         !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?)
     end
@@ -59,4 +59,7 @@ class Ability
       can? :manage, pd.patient
     end
   end
+
+  protected
+  SESSION_ROLES_SUBQUERY = '(SELECT subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE "Session" AND role = 0 AND user_id = ?)'
 end
