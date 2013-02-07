@@ -95,7 +95,7 @@ ActiveAdmin.register Session do
     end
   end
 
-  form do
+  form do |f|
     f.inputs 'Details' do
       f.input :study
       f.input :name
