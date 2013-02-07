@@ -7,8 +7,6 @@ class FormAnswersController < ApplicationController
       render :json => {:success => false, :error => 'The supplied case does not exist', :error_code => 1}, :status => :bad_request
     end
 
-    authorize! :read, @case.session
-
     is_test_data = true
     if @case.session.validators.include?(current_user) and @case.session.state == :testing
       is_test_data = true
