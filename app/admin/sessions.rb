@@ -95,6 +95,15 @@ ActiveAdmin.register Session do
     end
   end
 
+  form do
+    f.inputs 'Details' do
+      f.input :study
+      f.input :name
+    end
+    
+    f.buttons
+  end
+
   member_action :remove_reader, :method => :get do
     @session = Session.find(params[:id])
     @reader = User.find(params[:reader_id])
