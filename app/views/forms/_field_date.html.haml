@@ -1,0 +1,8 @@
+= label_tag(field['id'], field['label'], :class => 'control-label')
+.controls
+  - value, fixed_value_hash = fixed_value(field, data_hash)
+  .input-append.date.datepicker-field{:'data-date-format' => 'dd-mm-yyyy'}
+    = text_field_tag(field['id'], value, { :class => input_size, :readonly => true }.merge(validators_hash(field)).merge(fixed_value_hash))
+    %span.add-on
+      %i.icon-th
+  %p.help-block

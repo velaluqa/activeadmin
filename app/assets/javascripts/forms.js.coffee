@@ -226,7 +226,9 @@ $(document).ready ->
   window.next_roi_id = 0
   window.osirix_id_to_roi_id = {}
   window.name_to_roi_id = {}
-  
+
+  $(".datepicker-field").datepicker()
+      
   $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
         submitSuccess: ($form, event) ->
           event.preventDefault()

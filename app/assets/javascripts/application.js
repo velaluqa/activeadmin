@@ -19,3 +19,4 @@
 //= require form_answers
 //= require forms
 //= require moment.min
+//= require bootstrap-datepicker
