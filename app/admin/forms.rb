@@ -7,6 +7,7 @@ ActiveAdmin.register Form do
 
   controller do
     load_and_authorize_resource :except => :index
+    skip_load_and_authorize_resource :only => :download_configuration
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
@@ -59,13 +60,13 @@ ActiveAdmin.register Form do
 
   member_action :download_configuration do
     @form = Form.find(params[:id])
+    authorize! :read, @form
 
     send_file @form.config_file_path unless @form.raw_configuration.nil?
   end
   member_action :upload_config, :method => :post do
     @form = Form.find(params[:id])
 
-    # TODO: create git commit
     if(params[:form].nil? or params[:form][:file].nil? or params[:form][:file].tempfile.nil?)
       flash[:error] = "You must specify a configuration file to upload"
       redirect_to({:action => :show})
@@ -88,8 +89,11 @@ ActiveAdmin.register Form do
 
   member_action :lock do
     @form = Form.find(params[:id])
-    return if @form.nil?
-    return if @form.session.nil?
+    if @form.nil? or @form.session.nil?
+      flash[:error] = 'Template forms can not be locked/unlocked!'      
+      redirect_to :action => :show
+      return
+    end
 
     if(cannot? :manage, @form)
       flash[:error] = 'You are not authorized to lock this form!'
@@ -105,8 +109,11 @@ ActiveAdmin.register Form do
   end
   member_action :unlock do
     @form = Form.find(params[:id])
-    return if @form.nil?
-    return if @form.session.nil?
+    if @form.nil? or @form.session.nil?
+      flash[:error] = 'Template forms can not be locked/unlocked!'      
+      redirect_to :action => :show
+      return
+    end
 
     if(cannot? :manage, @form)
       flash[:error] = 'You are not authorized to unlock this form!'
