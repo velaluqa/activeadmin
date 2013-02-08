@@ -10,6 +10,7 @@ ActiveAdmin.register Session do
 
   controller do
     load_and_authorize_resource :except => :index
+    skip_load_and_authorize_resource :only => [:download_configuration, :switch_state]
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
@@ -62,10 +63,18 @@ ActiveAdmin.register Session do
         end
       end
       row :readers do
-        render 'admin/sessions/list', :items => session.readers.map {|r| link_to(r.name, admin_user_path(r)) + ' (' + link_to('-', remove_reader_admin_session_path(session, :reader_id => r.id)) +')' }, :action_link => link_to('Add Reader', add_reader_form_admin_session_path(session)).html_safe
+        if can? :manage, session
+          render 'admin/sessions/list', :items => session.readers.map {|r| link_to(r.name, admin_user_path(r)) + ' (' + link_to('-', remove_reader_admin_session_path(session, :reader_id => r.id)) +')' }, :action_link => link_to('Add Reader', add_reader_form_admin_session_path(session)).html_safe
+        else
+          render 'admin/sessions/list', :items => session.readers.map {|r| link_to(r.name, admin_user_path(r))}
+        end
       end
       row :validators do
-        render 'admin/sessions/list', :items => session.validators.map {|v| link_to(v.name, admin_user_path(v)) + ' (' + link_to('-', remove_validator_admin_session_path(session, :validator_id => v.id)) +')' }, :action_link => link_to('Add Validator', add_validator_form_admin_session_path(session)).html_safe
+        if can? :manage, session
+          render 'admin/sessions/list', :items => session.validators.map {|v| link_to(v.name, admin_user_path(v)) + ' (' + link_to('-', remove_validator_admin_session_path(session, :validator_id => v.id)) +')' }, :action_link => link_to('Add Validator', add_validator_form_admin_session_path(session)).html_safe
+        else
+          render 'admin/sessions/list', :items => session.validators.map {|v| link_to(v.name, admin_user_path(v))}
+        end
       end
       row :state do
         session.state.to_s.camelize + (session.locked_version.nil? ? '' : " (Version: #{session.locked_version})")
@@ -170,7 +179,7 @@ ActiveAdmin.register Session do
     render 'admin/sessions/import_csv_form', :locals => {:url => import_case_list_csv_admin_session_path}
   end
   action_item :only => :show do
-    link_to 'Import Case List from CSV', import_case_list_csv_form_admin_session_path(session)
+    link_to 'Import Case List from CSV', import_case_list_csv_form_admin_session_path(session) if can? :manage, session
   end
   
   member_action :import_patient_data_csv, :method => :post do
@@ -187,7 +196,7 @@ ActiveAdmin.register Session do
     render 'admin/sessions/import_csv_form', :locals => {:url => import_patient_data_csv_admin_session_path}
   end
   action_item :only => :show do
-    link_to 'Import Patient Data from CSV', import_patient_data_csv_form_admin_session_path(session)
+    link_to 'Import Patient Data from CSV', import_patient_data_csv_form_admin_session_path(session) if can? :manage, session
   end
 
   member_action :download_configuration do
@@ -215,7 +224,7 @@ ActiveAdmin.register Session do
     render 'admin/sessions/upload_config', :locals => { :url => upload_config_admin_session_path}
   end
   action_item :only => :show do
-    link_to 'Upload configuration', upload_config_form_admin_session_path(session)
+    link_to 'Upload configuration', upload_config_form_admin_session_path(session) if can? :manage, session
   end
 
   controller do
@@ -223,14 +232,10 @@ ActiveAdmin.register Session do
       session = Session.find(session_id)
       return if session.nil?
 
-      if(session.state == :closed and cannot? :manage, :system)
-        flash[:error] = 'Only an application administrator can reopen a session!'
-        redirect_to :action => :show
-        return
+      if(session.state == :closed)
+        authorize! :manage, :system
       elsif(cannot? :manage, session)
-        flash[:error] = 'You are not authorized to change the state of this session!'
-        redirect_to :action => :show
-        return
+        authorize! :manage, session
       end
 
       session.state = new_state
@@ -253,21 +258,22 @@ ActiveAdmin.register Session do
   end
 
   action_item :only => :show do
+    next unless can? :manage, resource
     case resource.state
     when :building
-      link_to 'Start Testing', switch_state_admin_session_path(resource, {:new_state => :testing}) if resource.forms.map {|f| f.state == :final}.reduce {|a,b| a and b}
+      link_to 'Start Testing', switch_state_admin_session_path(resource, {:new_state => :testing}) if (resource.forms.map {|f| f.state == :final}.reduce {|a,b| a and b} and can? :manage, resource)
     when :testing
-      link_to 'Start Production', switch_state_admin_session_path(resource, {:new_state => :production})
+      link_to 'Start Production', switch_state_admin_session_path(resource, {:new_state => :production}) if can? :manage, resource
     when :production
-      link_to 'Close Session', switch_state_admin_session_path(resource, {:new_state => :closed})
+      link_to 'Close Session', switch_state_admin_session_path(resource, {:new_state => :closed}) if can? :manage, resource
     end
   end
   action_item :only => :show do
     case resource.state
     when :testing
-      link_to 'Abort Testing', switch_state_admin_session_path(resource, {:new_state => :building})
+      link_to 'Abort Testing', switch_state_admin_session_path(resource, {:new_state => :building}) if can? :manage, resource
     when :production
-      link_to 'Abort Production', switch_state_admin_session_path(resource, {:new_state => :testing})
+      link_to 'Abort Production', switch_state_admin_session_path(resource, {:new_state => :testing}) if can? :manage, resource
     when :closed
       link_to 'Reopen Session', switch_state_admin_session_path(resource, {:new_state => :production}) if can? :manage, :system
     end
