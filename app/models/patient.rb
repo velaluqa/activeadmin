@@ -7,6 +7,11 @@ class Patient < ActiveRecord::Base
   has_one :patient_data
 
   before_destroy do |p|
+    unless cases.empty?
+      errors.add :base, 'You cannot delete a patient which has cases associated.' 
+      return false
+    end
+
     PatientData.destroy_all(:patient_id => p.id)
   end
 
