@@ -1,6 +1,9 @@
 require 'git_config_repository'
+require 'aa_customizable_default_actions'
 
 ActiveAdmin.register Session do
+
+  config.clear_action_items! # get rid of the default action items, since we have to handle 'edit' and 'delete' on a case-by-case basis
 
   scope :all, :default => true
   scope :building
@@ -43,7 +46,13 @@ ActiveAdmin.register Session do
       end
     end
 
-    default_actions
+    customizable_default_actions do |session|
+      except = []
+      except << :destroy unless can? :destroy, session
+      except << :edit unless can? :edit, session
+      
+      except
+    end
   end
 
   show do |session|
@@ -112,6 +121,25 @@ ActiveAdmin.register Session do
     
     f.buttons
   end
+
+    # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
+  action_item :except => [:new, :show] do
+    if controller.action_methods.include?('new')
+      link_to(I18n.t('active_admin.new_model', :model => active_admin_config.resource_label), new_resource_path)
+    end
+  end
+  action_item :only => :show do
+    if controller.action_methods.include?('edit') and can? :edit, resource
+      link_to(I18n.t('active_admin.edit_model', :model => active_admin_config.resource_label), edit_resource_path(resource))
+    end
+  end
+  action_item :only => :show do
+    if controller.action_methods.include?('destroy') and can? :destroy, resource
+      link_to(I18n.t('active_admin.delete_model', :model => active_admin_config.resource_label),
+              resource_path(resource),
+              :method => :delete, :data => {:confirm => I18n.t('active_admin.delete_confirmation')})
+    end
+  end 
 
   member_action :remove_reader, :method => :get do
     @session = Session.find(params[:id])
