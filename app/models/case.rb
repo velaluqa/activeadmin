@@ -31,12 +31,16 @@ class Case < ActiveRecord::Base
     CaseData.where(:case_id => read_attribute(:id)).first
   end
   def data_hash
-    {'patient' => (self.patient.patient_data.nil? ? {} : self.patient.patient_data.data),
+    {'patient' => ((self.patient.nil? or self.patient.patient_data.nil?) ? {} : self.patient.patient_data.data),
       'case' => (self.case_data.nil? ? {} : self.case_data.data)}
   end
 
   def images_folder
-    "#{self.patient.subject_id}/#{read_attribute(:images)}"
+    if patient.nil?
+      read_attribute(:images)
+    else
+      "#{self.patient.subject_id}/#{read_attribute(:images)}"
+    end
   end
 
   def to_hash
@@ -46,7 +50,7 @@ class Case < ActiveRecord::Base
       :position => self.position,
       :id => self.id,
       :case_type => self.case_type,
-      :patient => self.patient.subject_id,
+      :patient => self.patient.nil? ? '' : self.patient.subject_id,
     }      
   end
 
