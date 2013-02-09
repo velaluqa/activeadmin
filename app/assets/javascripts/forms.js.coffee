@@ -135,6 +135,7 @@ is_array = (obj) ->
   
   numbers = ((/^[0-9]*/.test(key)) for own key, value of obj)
 
+  return true if numbers.length == 0
   numbers.reduce (a,b) -> a and b
 
 convert_to_array = (value) ->
