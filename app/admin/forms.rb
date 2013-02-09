@@ -40,10 +40,14 @@ ActiveAdmin.register Form do
         end
       end
       row :configuration do
-        if form.has_configuration?
-          CodeRay.scan(JSON::pretty_generate(form.raw_configuration), :json).div(:css => :class).html_safe
+        config = form.raw_configuration if form.has_configuration?
+
+        if not form.has_configuration?
+          status_tag('Missing', :error)       
+        elsif config.nil?
+          status_tag('Invalid', :warning)
         else
-          nil
+          CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
         end
       end
     end

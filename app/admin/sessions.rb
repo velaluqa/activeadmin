@@ -78,10 +78,14 @@ ActiveAdmin.register Session do
         end
       end
       row :configuration do
-        if session.has_configuration?
-          CodeRay.scan(JSON::pretty_generate(session.configuration), :json).div(:css => :class).html_safe
-        else
-          nil
+        config = session.configuration if session.has_configuration?
+
+        if not session.has_configuration?
+          status_tag('Missing', :error)       
+        elsif config.nil?
+          status_tag('Invalid', :warning)
+        else          
+          CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
         end
       end
     end

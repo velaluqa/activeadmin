@@ -78,6 +78,8 @@ class Form < ActiveRecord::Base
       config = YAML.load_file(config_file_path)
     rescue Errno::ENOENT => e
       return nil
+    rescue SyntaxError => e
+      return nil
     end
     
     return config
