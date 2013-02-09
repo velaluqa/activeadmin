@@ -16,4 +16,4 @@
     - elsif answer.nil?
       %td
     - else
-      %td= simple_format(answer['answer'])
+      %td= answer['answer'].respond_to?(:to_s) ? simple_format(answer['answer'].to_s) : answer['answer']
