@@ -19,6 +19,15 @@ class Session < ActiveRecord::Base
   scope :production, where(:state => 2)
   scope :closed, where(:state => 3)
 
+  before_destroy do
+    unless form_answers.empty? and patients.empty? and forms.empty? and cases.empty?
+      errors.add :base, 'You cannot delete a session unless all associated data was deleted first.'
+      return false
+    end
+
+    self.roles.destroy_all
+  end
+
   STATE_SYMS = [:building, :testing, :production, :closed]
 
   def self.state_sym_to_int(sym)

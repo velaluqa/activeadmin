@@ -12,6 +12,13 @@ class Form < ActiveRecord::Base
   scope :draft, where(:state => 0)
   scope :final, where(:state => 1)
 
+  before_destroy do
+    unless self.form_answers.empty?
+      errors.add :base, 'You cannot delete a form that has form answers associated with it'
+      return false
+    end
+  end
+
   STATE_SYMS = [:draft, :final]
 
   def self.state_sym_to_int(sym)
