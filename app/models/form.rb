@@ -54,6 +54,9 @@ class Form < ActiveRecord::Base
   def raw_configuration
     parse_config
   end
+  def has_configuration?
+    File.exists?(self.config_file_path)
+  end
 
   def self.config_field_has_special_type?(field)
     ['add_repeat', 'group-label', 'divider', 'group-end'].include? field['type']

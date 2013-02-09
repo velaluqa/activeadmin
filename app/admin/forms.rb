@@ -16,10 +16,10 @@ ActiveAdmin.register Form do
     end
     column :session
     column :configuration do |form|
-      if(form.raw_configuration.nil?)
-        status_tag('Missing', :error)
-      else
+      if(form.has_configuration?)
         status_tag('Available', :ok)
+      else
+        status_tag('Missing', :error)
       end
     end
   end
@@ -33,18 +33,17 @@ ActiveAdmin.register Form do
       end
       row :session
       row :download_configuration do
-        if form.raw_configuration.nil?
-          status_tag('Missing', :error)
-        else
+        if form.has_configuration?
           link_to 'Download Configuration', download_configuration_admin_form_path(form)
+        else
+          status_tag('Missing', :error)
         end
       end
       row :configuration do
-        config = form.raw_configuration
-        if config.nil?
-          nil
+        if form.has_configuration?
+          CodeRay.scan(JSON::pretty_generate(form.raw_configuration), :json).div(:css => :class).html_safe
         else
-          CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
+          nil
         end
       end
     end
@@ -63,7 +62,7 @@ ActiveAdmin.register Form do
   member_action :download_configuration do
     @form = Form.find(params[:id])
 
-    send_file @form.config_file_path unless @form.raw_configuration.nil?
+    send_file @form.config_file_path if @form.has_configuration?
   end
   member_action :upload_config, :method => :post do
     @form = Form.find(params[:id])

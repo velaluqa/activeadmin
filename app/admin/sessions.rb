@@ -28,10 +28,10 @@ ActiveAdmin.register Session do
       "#{session.case_list(:read).size} / #{session.case_list(:all).size}"
     end
     column :configuration do |session|
-      if(session.configuration.nil?)
-        status_tag('Missing', :error)
-      else
+      if(session.has_configuration?)
         status_tag('Available', :ok)
+      else
+        status_tag('Missing', :error)
       end
     end
 
@@ -71,18 +71,17 @@ ActiveAdmin.register Session do
         end
       end
       row :download_configuration do
-        if session.configuration.nil?
-          status_tag('Missing', :error)
-        else
+        if session.has_configuration?
           link_to 'Download Configuration', download_configuration_admin_session_path(session) 
+        else
+          status_tag('Missing', :error)
         end
       end
       row :configuration do
-        config = session.configuration
-        if config.nil?
-          nil
+        if session.has_configuration?
+          CodeRay.scan(JSON::pretty_generate(session.configuration), :json).div(:css => :class).html_safe
         else
-          CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
+          nil
         end
       end
     end
@@ -186,7 +185,7 @@ ActiveAdmin.register Session do
   member_action :download_configuration do
     @session = Session.find(params[:id])
 
-    send_file @session.config_file_path unless @session.configuration.nil?
+    send_file @session.config_file_path if @session.has_configuration?
   end
   member_action :upload_config, :method => :post do
     @session = Session.find(params[:id])

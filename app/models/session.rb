@@ -56,6 +56,9 @@ class Session < ActiveRecord::Base
       
     return config
   end
+  def has_configuration?
+    File.exists?(self.config_file_path)
+  end
 
   def case_list(mode = :unread)
     case mode
