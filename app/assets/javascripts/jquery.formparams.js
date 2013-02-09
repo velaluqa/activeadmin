@@ -74,6 +74,8 @@
 						value = parseFloat(value);
 					} else if ( value === 'true' || value === 'false' ) {
 						value = Boolean(value);
+					} else if ( type == 'select-multiple' && value == null) {
+					        value = []
 					} else {
 					        try {
 						    var parsed_object = jQuery.parseJSON(value);
