@@ -63,3 +63,6 @@ gem 'coderay'
 
 # Rugged for Git-based config versioning
 gem 'rugged', :github => 'libgit2/rugged', :branch => 'development', :submodules => true
+
+# Airbrake Exception notifier
+gem 'airbrake'
