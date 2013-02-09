@@ -14,7 +14,8 @@ StudyServer::Application.routes.draw do
     end
   end
 
-  devise_for :users, :controllers => { :sessions => 'users/sessions' } do
+  devise_for :users, :controllers => { :sessions => 'users/sessions' }
+  devise_scope :user do
     post 'users/authenticate', :to => 'users/sessions#authenticate_user'
   end
 
