@@ -40,6 +40,10 @@ class Form < ActiveRecord::Base
     write_attribute(:state, index)
   end
 
+  def form_answers
+    return FormAnswer.where(:form_id => self.id)
+  end
+
   def is_template?
     session_id.nil?
   end

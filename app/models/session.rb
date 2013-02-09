@@ -48,6 +48,10 @@ class Session < ActiveRecord::Base
 
     write_attribute(:state, index)
   end
+
+  def form_answers
+    return FormAnswer.where(:session_id => self.id)
+  end
   
   def config_file_path
     Rails.application.config.session_configs_directory + "/#{id}.yml"

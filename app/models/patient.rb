@@ -15,6 +15,10 @@ class Patient < ActiveRecord::Base
     PatientData.destroy_all(:patient_id => p.id)
   end
 
+  def form_answers
+    return FormAnswer.where(:patient_id => self.id)
+  end
+
   # virtual attribute for pretty names
   def name
     "Session #{session.name}, Subject ID #{subject_id}"
