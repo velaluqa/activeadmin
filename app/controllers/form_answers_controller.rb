@@ -1,6 +1,9 @@
 class FormAnswersController < ApplicationController
   before_filter :authenticate_user!
 
+  # TEMP workaround, just to make doubly sure that #319 doesn't come round to bite us
+  skip_before_filter :verify_authenticity_token, :only => :create
+
   def create    
     @case = Case.find(params['case_id'])
     if @case.nil?
