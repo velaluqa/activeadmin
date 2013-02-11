@@ -1,6 +1,7 @@
 type: seq
 sequence:
   - type: map
+    name: field
     mapping:
       "id":
         type: str
@@ -23,6 +24,7 @@ sequence:
         type: seq
         sequence:
           - type: map
+            name: validation
             mapping:
               "message":
                 type: str
@@ -31,16 +33,28 @@ sequence:
                 type: bool
               "min":
                 type: int
+                range:
+                  min: 0
               "max":
                 type: int
+                range:
+                  min: 1
               "minlength":
                 type: int
+                range:
+                  min: 0
               "maxlength":
                 type: int
+                range:
+                  min: 0
               "minchecked":
                 type: int
+                range:
+                  min: 0
               "maxchecked":
                 type: int
+                range:
+                  min: 0
               "pattern":
                 type: str
       "include":
