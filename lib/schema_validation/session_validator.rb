@@ -16,7 +16,7 @@ module SchemaValidation
         limit_previous_results = value['limit_previous_results']
         types = value['types']
         if(not limit_previous_results.nil? and limit_previous_results.is_a?(Array) and types.is_a?(Hash))
-          limit_previous_results.reject {|case_type| tyepes.include?(case_type)}.each do |unknown_case_type|
+          limit_previous_results.reject {|case_type| types.include?(case_type)}.each do |unknown_case_type|
             errors << Kwalify::ValidationError.new("Case type #{unknown_case_type} is referenced in 'limit_previous_results', but not defined", path)
           end
         end
