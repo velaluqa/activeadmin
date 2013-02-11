@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+require 'schema_validation'
+
 ActiveAdmin.register Form do
 
   scope :all, :default => true
@@ -49,6 +52,17 @@ ActiveAdmin.register Form do
         else
           CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
         end
+      end
+      row :configuration_validation do
+        next nil unless form.has_configuration?
+
+        validator = SchemaValidation::FormValidator.new
+        config = form.raw_configuration
+        next nil if config.nil?
+
+        validation_errors = validator.validate(config)
+        
+        render 'admin/shared/schema_validation_results', :errors => validation_errors
       end
     end
   end
