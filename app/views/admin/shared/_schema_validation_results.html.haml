@@ -1,0 +1,7 @@
+- if errors.empty?
+  %p No Errors
+- else  
+  %ul
+    - errors.each do |error|
+      %li= "[#{error.path}]: #{error.message}"
+      

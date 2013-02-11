@@ -1,4 +1,5 @@
 require 'git_config_repository'
+require 'schema_validation'
 
 ActiveAdmin.register Session do
 
@@ -87,6 +88,17 @@ ActiveAdmin.register Session do
         else          
           CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
         end
+      end
+      row :configuration_validation do
+        return nil unless session.has_configuration?
+
+        validator = SchemaValidation::SessionValidator.new
+        config = session.configuration
+        return nil if config.nil?
+
+        validation_errors = validator.validate(config)
+        
+        render 'admin/shared/schema_validation_results', :errors => validation_errors
       end
     end
   end
