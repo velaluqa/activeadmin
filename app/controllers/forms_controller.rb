@@ -17,7 +17,7 @@ class FormsController < ApplicationController
       configuration = @case.session.configuration
 
       unless (configuration.nil? or configuration['show_previous_results'].nil? or configuration['show_previous_results'] == false or params[:previous_results].nil? or params[:previous_results] == 'false')
-        @previous_cases = construct_previous_cases
+        @previous_cases = construct_previous_cases(configuration['limit_previous_results'])
       end
     end
     
@@ -31,18 +31,19 @@ class FormsController < ApplicationController
       configuration = @case.session.configuration
 
       unless (configuration.nil? or configuration['show_previous_results'].nil? or configuration['show_previous_results'] == false)
-        @previous_cases = construct_previous_cases
+        @previous_cases = construct_previous_cases(configuration['limit_previous_results'])
       end
     end
   end
 
 protected
 
-  def construct_previous_cases
+  def construct_previous_cases(enabled_case_types = nil)
     previous_cases_list = @case.patient.cases.where('position < ?', @case.position).reject {|c| c.form_answer.nil?}
     
     previous_cases = {}
     previous_cases_list.each do |c|
+      next unless (enabled_case_types.nil? or enabled_case_types.include?(c.case_type))
       if(previous_cases[c.case_type].nil?)
         previous_cases[c.case_type] = []
       end
