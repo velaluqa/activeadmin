@@ -3,6 +3,8 @@ class Users::SessionsController < Devise::SessionsController
 
   skip_before_filter :verify_authenticity_token, :only => :authenticate_user
 
+  after_filter :generate_csrf_token, :only => :create # force generation of a CSRF token on login
+
   def new
     @dont_display_navbar = true
     super
@@ -25,4 +27,11 @@ class Users::SessionsController < Devise::SessionsController
 
     render :json => {:error_code => 0, :success => true, :is_session_admin => is_session_admin}
   end
+
+  protected
+
+  def generate_csrf_token
+    form_authenticity_token 
+  end
+
 end
