@@ -90,11 +90,11 @@ ActiveAdmin.register Session do
         end
       end
       row :configuration_validation do
-        return nil unless session.has_configuration?
+        next nil unless session.has_configuration?
 
         validator = SchemaValidation::SessionValidator.new
         config = session.configuration
-        return nil if config.nil?
+        next nil if config.nil?
 
         validation_errors = validator.validate(config)
         
