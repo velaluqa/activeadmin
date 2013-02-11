@@ -4,7 +4,7 @@ require 'yaml'
 module SchemaValidation
   class SessionValidator < Kwalify::Validator
     ## load schema definition
-    @@schema = YAML.load_file('session.schema.yml') #HC
+    @@schema = YAML.load_file('lib/schema_validation/session.schema.yml') #HC
 
     def initialize
       super(@@schema)
