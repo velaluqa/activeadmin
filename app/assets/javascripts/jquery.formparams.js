@@ -70,7 +70,7 @@
 					lastPart;
 
 				if ( convert ) {
-					if ( isNumber(value) ) {
+					if ( isNumber(value) && (type != 'text' || type == 'number') ) {
 						value = parseFloat(value);
 					} else if ( value === 'true' || value === 'false' ) {
 						value = Boolean(value);
@@ -79,7 +79,7 @@
 					} else {
 					        try {
 						    var parsed_object = jQuery.parseJSON(value);
-						    if(parsed_object != null) {
+						    if(parsed_object != null && typeof parsed_object == 'object') {
 						    	     value = parsed_object;
 						    }
 						} catch (e) {
