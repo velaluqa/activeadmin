@@ -1,4 +1,5 @@
 type: map
+name: root
 mapping:
   "images_root":
     type: str
