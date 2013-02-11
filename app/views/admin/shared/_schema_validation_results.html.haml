@@ -3,5 +3,8 @@
 - else  
   %ul
     - errors.each do |error|
-      %li= "[#{error.path}]: #{error.message}"
+      - if error.is_a?(Kwalify::ValidationError)
+        %li= "[#{error.path}]: #{error.message}"
+      - else
+        %li= error
       
