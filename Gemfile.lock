@@ -130,6 +130,7 @@ GEM
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
     kgio (2.7.4)
+    kwalify (0.7.2)
     less (2.2.2)
       commonjs (~> 0.2.6)
     less-rails (2.2.6)
@@ -243,6 +244,7 @@ DEPENDENCIES
   devise
   haml-rails
   jquery-rails
+  kwalify
   less-rails
   libv8 (~> 3.11.8)
   mongoid (~> 3.0.0)
