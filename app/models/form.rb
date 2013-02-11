@@ -125,6 +125,9 @@ class Form < ActiveRecord::Base
         end
 
         included_config, included_components, included_repeatables = included_form.configuration(already_included.dup, false)
+        if included_config.nil? or included_components.nil? or included_repeatables.nil?
+          raise Exceptions::FormNotFoundError.new(field['include'], nil)
+        end
         repeatables += included_repeatables
        
         if(field['repeat'].nil?)
