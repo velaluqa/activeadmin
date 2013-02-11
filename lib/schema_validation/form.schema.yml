@@ -1,0 +1,65 @@
+type: seq
+sequence:
+  - type: map
+    mapping:
+      "id":
+        type: str
+        unique: yes
+      "type":
+        type: str
+        enum: ['select', 'select_multiple', 'string', 'text', 'number', 'fixed', 'date', 'bool', 'roi']
+      "label":
+        type: str
+      "description":
+        type: str
+      "fixed_value":
+        type: str
+      "values":
+        type: map
+        mapping:
+          =:
+            type: str
+      "validations":
+        type: seq
+        sequence:
+          - type: map
+            mapping:
+              "message":
+                type: str
+                required: yes
+              "required":
+                type: bool
+              "min":
+                type: int
+              "max":
+                type: int
+              "minlength":
+                type: int
+              "maxlength":
+                type: int
+              "minchecked":
+                type: int
+              "maxchecked":
+                type: int
+              "pattern":
+                type: str
+      "include":
+        type: str
+      "repeat":
+        type: map
+        mapping:
+          "min":
+            type: int
+            range:
+              min: 0
+          "max":
+            type: int
+            range:
+              min: 1
+          "prefix":
+            type: str
+            required: yes
+          "label":
+            type: str
+            required: yes
+            
