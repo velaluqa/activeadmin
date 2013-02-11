@@ -229,13 +229,13 @@ ActiveAdmin.register Session do
         return
       end
 
-      session.state = new_state
       case new_state
       when :building
         session.locked_version = nil
       when :testing
-        session.locked_version = GitConfigRepository.new.current_version
+        session.locked_version = GitConfigRepository.new.current_version if session.state == :building
       end
+      session.state = new_state
       pp session
       session.save
       pp Session.find(session_id)
