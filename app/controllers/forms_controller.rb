@@ -10,7 +10,7 @@ class FormsController < ApplicationController
   def show
     authorize! :read, @case.session
 
-    @form_config, @form_components, @repeatables = @form.locked_full_configuration
+    @form_config, @form_components, @repeatables = @form.full_locked_configuration
     @data_hash = @case.data_hash
 
     if(@case and @case.session)
