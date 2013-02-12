@@ -70,15 +70,15 @@ ActiveAdmin.register Session do
           render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
         end
       end
-      row :download_configuration do
+      row :download_current_configuration do
         if session.has_configuration?
-          link_to 'Download Configuration', download_configuration_admin_session_path(session) 
+          link_to 'Download Current Configuration', download_current_configuration_admin_session_path(session) 
         else
           status_tag('Missing', :error)
         end
       end
-      row :configuration do
-        config = session.configuration if session.has_configuration?
+      row :current_configuration do
+        config = session.current_configuration if session.has_configuration?
 
         if not session.has_configuration?
           status_tag('Missing', :error)       
@@ -86,6 +86,20 @@ ActiveAdmin.register Session do
           status_tag('Invalid', :warning)
         else          
           CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
+        end
+      end
+      unless session.locked_version.nil?
+        row :download_locked_configuration do
+          link_to 'Download Locked Configuration', download_locked_configuration_admin_session_path(session)
+        end
+        row :locked_configuration do
+          config = session.locked_configuration
+
+          if config.nil?
+            status_tag('Invalid', :warning)
+          else
+            CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
+          end
         end
       end
     end
@@ -186,10 +200,17 @@ ActiveAdmin.register Session do
     link_to 'Import Patient Data from CSV', import_patient_data_csv_form_admin_session_path(session)
   end
 
-  member_action :download_configuration do
+  member_action :download_current_configuration do
     @session = Session.find(params[:id])
 
-    send_file @session.config_file_path if @session.has_configuration?
+    data = GitConfigRepository.new.data_at_version(@session.relative_config_file_path, nil)
+    send_data data, :filename => "session_#{@session.id}_current.yml" unless data.nil?
+  end
+  member_action :download_locked_configuration do
+    @session = Session.find(params[:id])
+
+    data = GitConfigRepository.new.data_at_version(@session.relative_config_file_path, @session.locked_version)
+    send_data data, :filename => "session_#{@session.id}_#{@session.locked_version}.yml" unless data.nil?
   end
   member_action :upload_config, :method => :post do
     @session = Session.find(params[:id])

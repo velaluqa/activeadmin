@@ -32,15 +32,15 @@ ActiveAdmin.register Form do
         form.state.to_s.camelize + (form.locked_version.nil? ? '' : " (Version: #{form.locked_version})")
       end
       row :session
-      row :download_configuration do
+      row :download_current_configuration do
         if form.has_configuration?
-          link_to 'Download Configuration', download_configuration_admin_form_path(form)
+          link_to 'Download Current Configuration', download_current_configuration_admin_form_path(form)
         else
           status_tag('Missing', :error)
         end
       end
-      row :configuration do
-        config = form.raw_configuration if form.has_configuration?
+      row :current_configuration do
+        config = form.current_configuration if form.has_configuration?
 
         if not form.has_configuration?
           status_tag('Missing', :error)       
@@ -48,6 +48,20 @@ ActiveAdmin.register Form do
           status_tag('Invalid', :warning)
         else
           CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
+        end
+      end
+      unless form.locked_version.nil?
+        row :download_locked_configuration do
+          link_to 'Download Locked Configuration', download_locked_configuration_admin_form_path(form)
+        end
+        row :locked_configuration do
+          config = form.locked_configuration
+
+          if config.nil?
+            status_tag('Invalid', :warning)
+          else
+            CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
+          end
         end
       end
     end
@@ -63,10 +77,17 @@ ActiveAdmin.register Form do
     f.buttons
   end
 
-  member_action :download_configuration do
+  member_action :download_current_configuration do
     @form = Form.find(params[:id])
 
-    send_file @form.config_file_path if @form.has_configuration?
+    data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, nil)
+    send_data data, :filename => "form_#{@form.id}_current.yml" unless data.nil?
+  end
+  member_action :download_locked_configuration do
+    @form = Form.find(params[:id])
+
+    data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, @form.locked_version)
+    send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.yml" unless data.nil?
   end
   member_action :upload_config, :method => :post do
     @form = Form.find(params[:id])
