@@ -92,7 +92,7 @@ class Session < ActiveRecord::Base
     return nil unless has_configuration?
 
     validator = SchemaValidation::SessionValidator.new
-    config = configuration
+    config = current_configuration
     return nil if config.nil?
 
     validation_errors = validator.validate(config)
@@ -105,7 +105,7 @@ class Session < ActiveRecord::Base
   end
 
   def included_forms
-    config = configuration
+    config = current_configuration
     return [] if config.nil?
 
     return config['types'].reject{|name,t| t['form'].nil?}.map{|name,t| t['form'].to_s}

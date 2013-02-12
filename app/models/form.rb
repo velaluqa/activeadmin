@@ -85,7 +85,7 @@ class Form < ActiveRecord::Base
   end
 
   def included_forms
-    config = raw_configuration
+    config = current_configuration
     return [] if config.nil?
 
     return config.reject{|f| f['include'].nil?}.map{|f| f['include'].to_s}
@@ -98,7 +98,7 @@ class Form < ActiveRecord::Base
     return nil unless has_configuration?
 
     validator = SchemaValidation::FormValidator.new
-    config = raw_configuration
+    config = current_configuration
     return nil if config.nil?
 
     validation_errors = validator.validate(config)
