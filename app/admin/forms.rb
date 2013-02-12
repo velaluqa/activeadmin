@@ -1,9 +1,21 @@
 # -*- coding: utf-8 -*-
+require 'aa_customizable_default_actions'
+
 ActiveAdmin.register Form do
+
+  config.clear_action_items! # get rid of the default action items, since we have to handle 'edit' and 'delete' on a case-by-case basis
 
   scope :all, :default => true
   scope :draft
   scope :final
+
+  controller do
+    load_and_authorize_resource :except => :index
+    skip_load_and_authorize_resource :only => :download_configuration
+    def scoped_collection
+      end_of_association_chain.accessible_by(current_ability)
+    end
+  end
 
   index do
     selectable_column
@@ -21,6 +33,14 @@ ActiveAdmin.register Form do
       else
         status_tag('Missing', :error)
       end
+    end
+
+    customizable_default_actions do |form|
+      except = []
+      except << :destroy unless can? :destroy, form
+      except << :edit unless can? :edit, form
+      
+      except
     end
   end
 
@@ -77,6 +97,25 @@ ActiveAdmin.register Form do
     f.buttons
   end
 
+  # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
+  action_item :except => [:new, :show] do
+    if controller.action_methods.include?('new')
+      link_to(I18n.t('active_admin.new_model', :model => active_admin_config.resource_label), new_resource_path)
+    end
+  end
+  action_item :only => :show do
+    if controller.action_methods.include?('edit') and can? :edit, resource
+      link_to(I18n.t('active_admin.edit_model', :model => active_admin_config.resource_label), edit_resource_path(resource))
+    end
+  end
+  action_item :only => :show do
+    if controller.action_methods.include?('destroy') and can? :destroy, resource
+      link_to(I18n.t('active_admin.delete_model', :model => active_admin_config.resource_label),
+              resource_path(resource),
+              :method => :delete, :data => {:confirm => I18n.t('active_admin.delete_confirmation')})
+    end
+  end 
+
   member_action :download_current_configuration do
     @form = Form.find(params[:id])
 
@@ -85,14 +124,15 @@ ActiveAdmin.register Form do
   end
   member_action :download_locked_configuration do
     @form = Form.find(params[:id])
+    authorize! :read, @form
 
     data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, @form.locked_version)
     send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.yml" unless data.nil?
   end
+
   member_action :upload_config, :method => :post do
     @form = Form.find(params[:id])
 
-    # TODO: create git commit
     if(params[:form].nil? or params[:form][:file].nil? or params[:form][:file].tempfile.nil?)
       flash[:error] = "You must specify a configuration file to upload"
       redirect_to({:action => :show})
@@ -115,8 +155,11 @@ ActiveAdmin.register Form do
 
   member_action :lock do
     @form = Form.find(params[:id])
-    return if @form.nil?
-    return if @form.session.nil?
+    if @form.nil? or @form.session.nil?
+      flash[:error] = 'Template forms can not be locked/unlocked!'      
+      redirect_to :action => :show
+      return
+    end
 
     if(cannot? :manage, @form)
       flash[:error] = 'You are not authorized to lock this form!'
@@ -132,8 +175,11 @@ ActiveAdmin.register Form do
   end
   member_action :unlock do
     @form = Form.find(params[:id])
-    return if @form.nil?
-    return if @form.session.nil?
+    if @form.nil? or @form.session.nil?
+      flash[:error] = 'Template forms can not be locked/unlocked!'      
+      redirect_to :action => :show
+      return
+    end
 
     if(cannot? :manage, @form)
       flash[:error] = 'You are not authorized to unlock this form!'
@@ -158,4 +204,5 @@ ActiveAdmin.register Form do
       link_to 'Unlock', unlock_admin_form_path(resource) if resource.session.state == :building
     end
   end
+  
 end

@@ -6,8 +6,17 @@ class Patient < ActiveRecord::Base
   has_many :cases
   has_one :patient_data
 
-  before_destroy do |p|
+  before_destroy do
+    unless cases.empty? and form_answers.empty?
+      errors.add :base, 'You cannot delete a patient which has cases or form answers associated.' 
+      return false
+    end
+
     PatientData.destroy_all(:patient_id => p.id)
+  end
+
+  def form_answers
+    return FormAnswer.where(:patient_id => self.id)
   end
 
   # virtual attribute for pretty names
