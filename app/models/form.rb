@@ -69,6 +69,13 @@ class Form < ActiveRecord::Base
     Rails.application.config.form_configs_directory + "/#{id}.yml"
   end
 
+  def included_forms
+    config = raw_configuration
+    return [] if config.nil?
+
+    return config.reject{|f| f['include'].nil?}.map{|f| f['include'].to_s}
+  end
+
   protected
   
   def parse_config

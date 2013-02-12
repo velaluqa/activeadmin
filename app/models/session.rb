@@ -62,6 +62,13 @@ class Session < ActiveRecord::Base
     File.exists?(self.config_file_path)
   end
 
+  def included_forms
+    config = configuration
+    return [] if config.nil?
+
+    return config['types'].reject{|name,t| t['form'].nil?}.map{|name,t| t['form'].to_s}
+  end
+
   def case_list(mode = :unread)
     case mode
     when :unread

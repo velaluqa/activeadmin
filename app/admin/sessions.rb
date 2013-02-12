@@ -97,6 +97,10 @@ ActiveAdmin.register Session do
         next nil if config.nil?
 
         validation_errors = validator.validate(config)
+
+        session.included_forms.each do |included_form|
+          validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => session.id).empty?
+        end
         
         render 'admin/shared/schema_validation_results', :errors => validation_errors
       end
