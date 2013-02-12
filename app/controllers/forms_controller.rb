@@ -10,11 +10,11 @@ class FormsController < ApplicationController
   def show
     authorize! :read, @case.session
 
-    @form_config, @form_components, @repeatables = @form.configuration
+    @form_config, @form_components, @repeatables = @form.locked_full_configuration
     @data_hash = @case.data_hash
 
     if(@case and @case.session)
-      configuration = @case.session.configuration
+      configuration = @case.session.locked_configuration
 
       unless (configuration.nil? or configuration['show_previous_results'].nil? or configuration['show_previous_results'] == false or params[:previous_results].nil? or params[:previous_results] == 'false')
         @previous_cases = construct_previous_cases(configuration['limit_previous_results'])
@@ -28,7 +28,7 @@ class FormsController < ApplicationController
     authorize! :read, @case.session
 
     if(@case and @case.session)
-      configuration = @case.session.configuration
+      configuration = @case.session.locked_configuration
 
       unless (configuration.nil? or configuration['show_previous_results'].nil? or configuration['show_previous_results'] == false)
         @previous_cases = construct_previous_cases(configuration['limit_previous_results'])

@@ -20,13 +20,13 @@ class SessionsController < ApplicationController
       c.to_hash.merge({:passive_cases => passive_cases[c.id]})
     end
 
-    config = @session.configuration
+    config = @session.locked_configuration
     next_case = @session.next_unread_case
     
     if config.nil?
       result = { :error_code => 1, :error => "Session is not configured"}
     else
-      result = {:session => @session, :configuration => @session.configuration, :case_list => case_list_hashes, :next_case_position => (next_case.nil? ? 0 : next_case.position)}
+      result = {:session => @session, :configuration => config, :case_list => case_list_hashes, :next_case_position => (next_case.nil? ? 0 : next_case.position)}
     end
     
     respond_to do |format|
