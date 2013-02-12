@@ -16,6 +16,31 @@ ActiveAdmin.register Form do
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
+
+    def update
+      if params[:form][:session_id].nil? or params[:form][:session_id].empty?
+        unless Ability.can_manage_template_forms?(current_user)
+          flash[:error] = 'You are not authorized to manage form templates!'
+          redirect_to :action => :show
+          return
+        end
+      else
+        authorize! :manage, Session.find(params[:form][:session_id])
+      end
+      update!
+    end
+    def create
+      if params[:form][:session_id].nil? or params[:form][:session_id].empty?
+        unless Ability.can_manage_template_forms?(current_user)
+          flash[:error] = 'You are not authorized to manage form templates!'
+          redirect_to :action => :show
+          return
+        end
+      else
+        authorize! :manage, Session.find(params[:form][:session_id])
+      end
+      create!
+    end
   end
 
   index do
@@ -95,7 +120,7 @@ ActiveAdmin.register Form do
 
   form do |f|
     f.inputs 'Details' do
-      f.input :session
+      f.input :session, :collection => current_user.sessions, :include_blank => Ability.can_manage_template_forms?(current_user)
       f.input :name
       f.input :description
     end
