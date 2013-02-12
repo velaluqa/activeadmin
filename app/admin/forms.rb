@@ -12,7 +12,7 @@ ActiveAdmin.register Form do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => :download_configuration
+    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration]
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
@@ -122,6 +122,7 @@ ActiveAdmin.register Form do
 
   member_action :download_current_configuration do
     @form = Form.find(params[:id])
+    authorize! :read, @form
 
     data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, nil)
     send_data data, :filename => "form_#{@form.id}_current.yml" unless data.nil?

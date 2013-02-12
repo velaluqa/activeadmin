@@ -13,7 +13,7 @@ ActiveAdmin.register Session do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:download_configuration, :switch_state]
+    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :switch_state]
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
@@ -258,12 +258,14 @@ ActiveAdmin.register Session do
 
   member_action :download_current_configuration do
     @session = Session.find(params[:id])
+    authorize! :read, @session
 
     data = GitConfigRepository.new.data_at_version(@session.relative_config_file_path, nil)
     send_data data, :filename => "session_#{@session.id}_current.yml" unless data.nil?
   end
   member_action :download_locked_configuration do
     @session = Session.find(params[:id])
+    authorize! :read, @session
 
     data = GitConfigRepository.new.data_at_version(@session.relative_config_file_path, @session.locked_version)
     send_data data, :filename => "session_#{@session.id}_#{@session.locked_version}.yml" unless data.nil?
