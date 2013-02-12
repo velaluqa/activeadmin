@@ -26,7 +26,7 @@ class Ability
       can :manage, User
       can :manage, Role
       can :manage, Study
-      can [:create, :read], Session
+      can [:create, :read, :edit, :destroy], Session
       can :manage, Form, ['session_id IS NULL'] do |form|
         form.is_template?
       end
