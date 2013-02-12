@@ -38,6 +38,7 @@ ActiveAdmin.register FormAnswer do
       row :session
       row :case
       row :form
+      row :form_version
       row :submitted_at
       row :signatures do
         if(form_answer.answers_signature_is_valid? && form_answer.annotated_images_signature_is_valid?)
