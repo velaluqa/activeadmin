@@ -1,3 +1,5 @@
+require 'git_config_repository'
+
 class Session < ActiveRecord::Base
   attr_accessible :name, :study, :study_id, :state, :locked_version
 
@@ -47,11 +49,18 @@ class Session < ActiveRecord::Base
     Rails.application.config.session_configs_subdirectory + "/#{id}.yml"
   end
 
-  def configuration
+  def current_configuration
     begin
-      config = YAML.load_file(config_file_path)
-    rescue Errno::ENOENT => e
+      config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, nil)
+    rescue SyntaxError => e
       return nil
+    end
+      
+    return config
+  end
+  def locked_configuration
+    begin
+      config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, self.locked_version)
     rescue SyntaxError => e
       return nil
     end

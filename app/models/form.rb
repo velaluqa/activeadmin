@@ -1,3 +1,5 @@
+require 'git_config_repository'
+
 class Form < ActiveRecord::Base
   has_paper_trail
 
@@ -37,22 +39,23 @@ class Form < ActiveRecord::Base
     session_id == nil
   end
 
-  def configuration(already_included_forms = nil, stringify = true)
-    form_config = parse_config
-    return [nil,nil,nil] if form_config.nil?
-    form_components = components
-    return [nil,nil,nil] if form_components.nil?
-
-    already_included_forms = [] if already_included_forms.nil?
-    already_included_forms << read_attribute(:id)
-
-    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms, read_attribute(:session_id))
-    form_components = stringify_form_components(form_components) if stringify
-
-    return [form_config, form_components, repeatables]
+  def full_current_configuration
+    full_configuration(nil)
   end
-  def raw_configuration
-    parse_config
+  def full_locked_configuration
+    full_configuration(self.locked_version)
+  end
+  def full_configuration_at_version(version)
+    full_configuration(version)
+  end
+  def current_configuration
+    parse_config(nil)
+  end
+  def locked_configuration
+    parse_config(self.locked_version)
+  end
+  def configuration_at_version(versioN)
+    parse_config(version)
   end
   def has_configuration?
     File.exists?(self.config_file_path)
@@ -71,13 +74,9 @@ class Form < ActiveRecord::Base
 
   protected
   
-  def parse_config
-    id = read_attribute(:id)
-
+  def parse_config(version)
     begin
-      config = YAML.load_file(config_file_path)
-    rescue Errno::ENOENT => e
-      return nil
+      config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, version)
     rescue SyntaxError => e
       return nil
     end
@@ -85,7 +84,8 @@ class Form < ActiveRecord::Base
     return config
   end
   
-  def components
+  # TODO: version is not yet used, since components are not yet versioned
+  def components(version)
     id = read_attribute(:id)
 
     form_components = {:validators => [], :stylesheets => []}
@@ -106,7 +106,21 @@ class Form < ActiveRecord::Base
     end
   end
 
-  def process_imports(config, components, already_included, session_id)
+  def full_configuration(version, already_included_forms = nil, stringify = true)
+    form_config = parse_config(version)
+    return [nil,nil,nil] if form_config.nil?
+    form_components = components(version)
+    return [nil,nil,nil] if form_components.nil?
+
+    already_included_forms = [] if already_included_forms.nil?
+    already_included_forms << read_attribute(:id)
+
+    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms, read_attribute(:session_id), version)
+    form_components = stringify_form_components(form_components) if stringify
+
+    return [form_config, form_components, repeatables]
+  end
+  def process_imports(config, components, already_included, session_id, version)
     full_config = []
     full_components = components
     repeatables = []
@@ -124,7 +138,7 @@ class Form < ActiveRecord::Base
           throw "The form has a circular include of form '#{included_form.name}'"
         end
 
-        included_config, included_components, included_repeatables = included_form.configuration(already_included.dup, false)
+        included_config, included_components, included_repeatables = included_form.full_configuration(version, already_included.dup, false)
         if included_config.nil? or included_components.nil? or included_repeatables.nil?
           raise Exceptions::FormNotFoundError.new(field['include'], nil)
         end
