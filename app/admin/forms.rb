@@ -12,7 +12,7 @@ ActiveAdmin.register Form do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration]
+    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :copy, :copy_form]
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
@@ -229,6 +229,37 @@ ActiveAdmin.register Form do
     @form.save
 
     redirect_to({:action => :show}, :notice => 'Form unlocked')
+  end
+
+  member_action :copy, :method => :post do
+    @form = Form.find(params[:id])
+    authorize! :read, @form
+    @session = Session.find(params[:form][:session_id])
+    authorize! :manage, @session
+
+    unless @form.session.nil?      
+      flash[:error] = 'Only template forms can be copied!'
+      redirect_to :action => :show
+      return
+    end
+
+    copied_form = @form.dup
+    copied_form.session = @session
+    copied_form.save
+
+    GitConfigRepository.new.update_config_file(copied_form.relative_config_file_path, @form.config_file_path, current_user, "Copied form #{@form.id} into session #{@session.id}")
+
+    redirect_to(admin_form_path(copied_form), :notice => 'Form copied')
+  end
+  member_action :copy_form do
+    @form = Form.find(params[:id])
+    authorize! :read, @form
+    
+    @page_title = "Copy Form to Session"
+    render 'admin/forms/select_session', :locals => { :url => copy_admin_form_path}
+  end
+  action_item :only => :show do
+    link_to 'Copy', copy_form_admin_form_path(resource) if resource.is_template?
   end
   
   action_item :only => :show do
