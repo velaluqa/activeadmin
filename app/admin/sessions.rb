@@ -127,6 +127,9 @@ ActiveAdmin.register Session do
           end
         end
       end
+      row :configuration_validation do        
+        render 'admin/shared/schema_validation_results', :errors => session.validate
+      end
     end
   end
 
@@ -297,6 +300,16 @@ ActiveAdmin.register Session do
         authorize! :manage, :system
       elsif(cannot? :manage, session)
         authorize! :manage, session
+      end
+      if(session.state == :building and new_state == :testing and not session.semantically_valid?)
+        flash[:error] = 'The session still has validation errors. These need to be fixed before the session can be moved into testing.'
+        redirect_to :action => :show
+        return
+      end
+      unless resource.forms.map {|f| f.state == :final}.reduce {|a,b| a and b}
+        flash[:error] = 'Not all forms belonging to this session are locked. Please lock all associated forms before moving the session into testing.'
+        redirect_to :action => :show
+        return
       end
 
       case new_state

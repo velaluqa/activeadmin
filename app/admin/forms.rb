@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'aa_customizable_default_actions'
+require 'git_config_repository'
 
 ActiveAdmin.register Form do
 
@@ -76,13 +77,16 @@ ActiveAdmin.register Form do
         end
         row :locked_configuration do
           config = form.locked_configuration
-
+          
           if config.nil?
             status_tag('Invalid', :warning)
           else
             CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
           end
         end
+      end
+      row :configuration_validation do        
+        render 'admin/shared/schema_validation_results', :errors => form.validate
       end
     end
   end
@@ -163,6 +167,11 @@ ActiveAdmin.register Form do
 
     if(cannot? :manage, @form)
       flash[:error] = 'You are not authorized to lock this form!'
+      redirect_to :action => :show
+      return
+    end
+    unless(@form.semantically_valid?)
+      flash[:error] = 'The form still has validation errors. These need to be fixed before the form can be locked.'
       redirect_to :action => :show
       return
     end

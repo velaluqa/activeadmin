@@ -1,0 +1,68 @@
+type: map
+name: root
+mapping:
+  "images_root":
+    type: str
+    required: yes
+  "annotated_images_root":
+    type: str
+    required: yes
+  "paper_trail":
+    type: bool
+  "preview_paper_trail":
+    type: bool
+  "enforce_paper_trail":
+    type: bool
+  "show_previous_results":
+    type: bool
+  "limit_previous_results":
+    type: seq
+    sequence:
+      - type: str
+  "case_import_limit":
+    type: int
+    range:
+      min: 1
+  "types":
+    type: map
+    required: yes
+    mapping:
+      =:
+        type: map
+        mapping:
+          "form":
+            type: str
+            required: yes
+          "features":
+            type: seq
+            sequence:
+              - type: str
+                unique: yes
+          "toolbar_layout":
+            type: seq
+            sequence:
+              - type: str
+          "annotations_layout":
+            type: str
+          "context_menu":
+            type: bool
+          "screen_layout":
+            type: map
+            required: yes
+            mapping:
+              "rows":
+                type: int
+                required: yes
+                range:
+                  min: 1
+              "active":
+                type: seq
+                required: yes
+                sequence:
+                  - type: str
+                    unique: yes
+              "passive":
+                type: bool
+              "placeholders":
+                type: bool
+                
