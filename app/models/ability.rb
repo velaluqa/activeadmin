@@ -68,7 +68,12 @@ class Ability
     end
   end
 
+  # this is somewhat of a hack so we can check whether a user can create/edit a template form without actually having a template form object
+  def self.can_manage_template_forms?(user)
+    user.is_app_admin?
+  end
+
   protected
   APP_ADMIN_SUBQUERY = 'EXISTS(SELECT id FROM roles WHERE subject_type IS NULL and subject_id IS NULL AND role = 0 AND user_id = ?)'
-  SESSION_ROLES_SUBQUERY = '(SELECT subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE "Session" AND role = 0 AND user_id = ?)'
+  SESSION_ROLES_SUBQUERY = '(SELECT subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE "Session" AND role = 0 AND user_id = ?)'  
 end
