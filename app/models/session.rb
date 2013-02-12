@@ -1,3 +1,5 @@
+require 'schema_validation'
+
 class Session < ActiveRecord::Base
   attr_accessible :name, :study, :study_id, :state, :locked_version
 
@@ -60,6 +62,25 @@ class Session < ActiveRecord::Base
   end
   def has_configuration?
     File.exists?(self.config_file_path)
+  end
+
+  def semantically_valid?
+    return self.validate == []
+  end
+  def validate
+    return nil unless has_configuration?
+
+    validator = SchemaValidation::SessionValidator.new
+    config = configuration
+    return nil if config.nil?
+
+    validation_errors = validator.validate(config)
+
+    included_forms.each do |included_form|
+      validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => self.id).empty?
+    end
+
+    return validation_errors
   end
 
   def included_forms

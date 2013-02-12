@@ -1,6 +1,4 @@
 require 'git_config_repository'
-require 'schema_validation'
-
 ActiveAdmin.register Session do
 
   scope :all, :default => true
@@ -89,20 +87,8 @@ ActiveAdmin.register Session do
           CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
         end
       end
-      row :configuration_validation do
-        next nil unless session.has_configuration?
-
-        validator = SchemaValidation::SessionValidator.new
-        config = session.configuration
-        next nil if config.nil?
-
-        validation_errors = validator.validate(config)
-
-        session.included_forms.each do |included_form|
-          validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => session.id).empty?
-        end
-        
-        render 'admin/shared/schema_validation_results', :errors => validation_errors
+      row :configuration_validation do        
+        render 'admin/shared/schema_validation_results', :errors => session.validate
       end
     end
   end
@@ -241,6 +227,16 @@ ActiveAdmin.register Session do
         return
       elsif(cannot? :manage, session)
         flash[:error] = 'You are not authorized to change the state of this session!'
+        redirect_to :action => :show
+        return
+      end
+      if(session.state == :building and new_state == :testing and not session.semantically_valid?)
+        flash[:error] = 'The session still has validation errors. These need to be fixed before the session can be moved into testing.'
+        redirect_to :action => :show
+        return
+      end
+      unless resource.forms.map {|f| f.state == :final}.reduce {|a,b| a and b}
+        flash[:error] = 'Not all forms belonging to this session are locked. Please lock all associated forms before moving the session into testing.'
         redirect_to :action => :show
         return
       end

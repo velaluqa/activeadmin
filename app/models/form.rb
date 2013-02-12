@@ -1,3 +1,5 @@
+require 'schema_validation'
+
 class Form < ActiveRecord::Base
   has_paper_trail
 
@@ -74,6 +76,25 @@ class Form < ActiveRecord::Base
     return [] if config.nil?
 
     return config.reject{|f| f['include'].nil?}.map{|f| f['include'].to_s}
+  end
+
+  def semantically_valid?
+    return self.validate == []
+  end
+  def validate
+    return nil unless has_configuration?
+
+    validator = SchemaValidation::FormValidator.new
+    config = raw_configuration
+    return nil if config.nil?
+
+    validation_errors = validator.validate(config)
+
+    included_forms.each do |included_form|
+      validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => self.session_id).empty?
+    end
+
+    return validation_errors
   end
 
   protected

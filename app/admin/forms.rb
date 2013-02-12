@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-require 'schema_validation'
-
 ActiveAdmin.register Form do
 
   scope :all, :default => true
@@ -53,20 +51,8 @@ ActiveAdmin.register Form do
           CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
         end
       end
-      row :configuration_validation do
-        next nil unless form.has_configuration?
-
-        validator = SchemaValidation::FormValidator.new
-        config = form.raw_configuration
-        next nil if config.nil?
-
-        validation_errors = validator.validate(config)
-
-        form.included_forms.each do |included_form|
-          validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => form.session_id).empty?
-        end
-        
-        render 'admin/shared/schema_validation_results', :errors => validation_errors
+      row :configuration_validation do        
+        render 'admin/shared/schema_validation_results', :errors => form.validate
       end
     end
   end
@@ -117,6 +103,11 @@ ActiveAdmin.register Form do
 
     if(cannot? :manage, @form)
       flash[:error] = 'You are not authorized to lock this form!'
+      redirect_to :action => :show
+      return
+    end
+    unless(@form.semantically_valid?)
+      flash[:error] = 'The form still has validation errors. These need to be fixed before the form can be locked.'
       redirect_to :action => :show
       return
     end
