@@ -41,6 +41,14 @@ class GitConfigRepository
 
     return YAML.load(file_blob.text)
   end
+  def data_at_version(path, version = nil)
+    version = current_version if version.nil?
+
+    file_blob = file_at_version(path, version)
+    return nil if file_blob.nil?
+
+    return file_blob.content
+  end
 
   protected
 
