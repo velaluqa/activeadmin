@@ -85,8 +85,10 @@ ActiveAdmin.register Form do
           end
         end
       end
-      row :configuration_validation do        
-        render 'admin/shared/schema_validation_results', :errors => form.validate
+      if form.has_configuration?
+        row :configuration_validation do        
+          render 'admin/shared/schema_validation_results', :errors => form.validate
+        end
       end
     end
   end

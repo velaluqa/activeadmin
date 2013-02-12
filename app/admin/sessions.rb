@@ -127,8 +127,10 @@ ActiveAdmin.register Session do
           end
         end
       end
-      row :configuration_validation do        
-        render 'admin/shared/schema_validation_results', :errors => session.validate
+      if session.has_configuration?
+        row :configuration_validation do        
+          render 'admin/shared/schema_validation_results', :errors => session.validate
+        end
       end
     end
   end
