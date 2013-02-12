@@ -17,6 +17,16 @@ ActiveAdmin.register Session do
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
+
+    def update
+      if params[:session][:study_id] != Session.find(params[:id]).study_id
+        flash[:error] = 'A session can no be moved to a new study!'
+        redirect_to :action => :show
+        return
+      end
+
+      update!
+    end
   end
 
   index do
@@ -137,16 +147,9 @@ ActiveAdmin.register Session do
 
   form do |f|
     f.inputs 'Details' do
-      f.input :study
-      f.input :name
-    end
-    
-    f.buttons
-  end
-
-  form do |f|
-    f.inputs 'Details' do
-      f.input :study
+      unless f.object.persisted?
+        f.input :study
+      end
       f.input :name
     end
     
