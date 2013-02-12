@@ -9,6 +9,7 @@ class FormAnswer
   field :session_id, type: Integer
   field :case_id, type: Integer
   field :form_id, type:  Integer
+  field :form_version, type:  String
   field :submitted_at, type:  Time
   field :answers, type:  Hash
   field :answers_signature, type:  String
@@ -75,7 +76,7 @@ class FormAnswer
   end
 
   def printable_answers
-    form_config, form_components, repeatables = form.configuration
+    form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
     return nil if (form_config.nil? or repeatables.nil?)
 
     repeatables_map = {}

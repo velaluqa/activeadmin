@@ -25,6 +25,12 @@ class FormAnswersController < ApplicationController
     answer = FormAnswer.new
 
     answer.form_id = params['form_id']
+    begin
+      answer.form_version = @case.session.forms.find(params['form_id']).locked_version
+    rescue ActiveRecord::RecordNotFound => e
+      render :json => {:success => fase, :error => 'The form associated with this form answer does not exist.', :error_code => 2}
+      return
+    end
     answer.user_id = current_user.id
 
     answer.case_id = @case.id
