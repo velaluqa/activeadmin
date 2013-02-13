@@ -39,7 +39,7 @@ class SessionsController < ApplicationController
       .map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
 
     respond_to do |format|
-      format.json { render :json => {:blind_readable => blind_readable, :validatable => validatable} }
+      format.json { render :json => {'Blinded Read' => blind_readable, 'Validation' => validatable} }
     end
   end  
 
