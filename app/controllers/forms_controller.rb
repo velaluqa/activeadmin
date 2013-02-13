@@ -4,8 +4,8 @@ require 'exceptions'
 class FormsController < ApplicationController
   before_filter :authenticate_user!
 
-  before_filter :find_form_from_params, :except => :index
-  layout 'client_forms', :only => [:show, :previous_results]
+  before_filter :find_form_from_params, :except => [:index, :preview]
+  layout 'client_forms', :only => [:show, :previous_results, :preview]
 
   def show
     @form_config, @form_components, @repeatables = @form.full_locked_configuration
@@ -30,6 +30,27 @@ class FormsController < ApplicationController
         @previous_cases = construct_previous_cases(configuration['limit_previous_results'])
       end
     end
+  end
+
+  def preview
+    @form = Form.find(params[:id])
+    authorize! :read, @form
+
+    @form_config, @form_components, @repeatables = @form.full_locked_configuration   
+    return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
+
+    patient = Patient.new
+    patient.session = @form.session
+    patient.subject_id = 'preview'
+
+    @case = Case.new
+    @case.images = 'preview'
+    @case.position = 0
+    @case.case_type = 'preview'
+    @case.session = @form.session
+    @case.patient = patient
+
+    render :show
   end
 
 protected

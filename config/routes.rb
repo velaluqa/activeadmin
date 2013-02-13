@@ -4,6 +4,7 @@ StudyServer::Application.routes.draw do
   resources :forms, :only => [:show] do
     member do
       get 'previous_results'
+      get 'preview'
     end
   end
   resources :form_answers, :only => [:create]
