@@ -36,7 +36,7 @@ class FormsController < ApplicationController
     @form = Form.find(params[:id])
     authorize! :read, @form
 
-    @form_config, @form_components, @repeatables = @form.full_locked_configuration   
+    @form_config, @form_components, @repeatables = @form.full_current_configuration
     return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
 
     patient = Patient.new
