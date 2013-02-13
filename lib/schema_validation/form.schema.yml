@@ -17,8 +17,11 @@ sequence:
         type: str
       "number_step":
         type: number
+      "selected_option":
+        type: any
       "values":
         type: map
+        name: field_values
         mapping:
           =:
             type: str
