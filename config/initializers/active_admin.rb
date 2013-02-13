@@ -1,3 +1,5 @@
+require 'aa_footer'
+
 ActiveAdmin.setup do |config|
 
   # == Site Title
@@ -5,7 +7,7 @@ ActiveAdmin.setup do |config|
   # Set the title that is displayed on the main layout
   # for each of the active admin pages.
   #
-  config.site_title = "pharmtrace Study Server"
+  config.site_title = "pharmtrace ERICA"
 
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.
@@ -149,4 +151,8 @@ ActiveAdmin.setup do |config|
   #
   # Set the CSV builder options (default is {})
   # config.csv_options = {}
+
+  # customize the footer
+  config.view_factory.footer = PharmTraceERICAFooter
 end
+
