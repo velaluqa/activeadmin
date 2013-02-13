@@ -47,7 +47,7 @@ class SessionsController < ApplicationController
 
   def authorize_user_for_session
     raise CanCan::AccessDenied.new('You are not authorized to access this session!', :read, @session) unless (@session.readers.include?(current_user) or
-                                                                                                        @sesssion.validators.include?(current_user))
+                                                                                                        @session.validators.include?(current_user))
   end
   def find_session
     begin
