@@ -17,7 +17,7 @@ class Case < ActiveRecord::Base
       return false
     end
 
-    CaseData.destroy_all(:case_id => c.id)
+    CaseData.destroy_all(:case_id => self.id)
   end
 
   # so we always get results sorted by position, not by row id
