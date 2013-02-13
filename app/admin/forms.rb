@@ -272,5 +272,9 @@ ActiveAdmin.register Form do
       link_to 'Unlock', unlock_admin_form_path(resource) if resource.session.state == :building
     end
   end
+
+  action_item :only => :show do
+    link_to 'Preview', preview_form_path(resource), :target => '_blank' if resource.has_configuration? and can? :read, resource
+  end
   
 end
