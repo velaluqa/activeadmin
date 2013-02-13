@@ -18,6 +18,7 @@ module SchemaValidation
           errors << Kwalify::ValidationError.new('Missing \'label\'', path) if value['label'].nil?
           errors << Kwalify::ValidationError.new('Missing \'fixed_value\'', path) if(value['type'] == 'fixed' and value['fixed_value'].nil?)
           errors << Kwalify::ValidationError.new('Missing \'values\'', path) if(['select', 'select_multiple', 'roi'].include?(value['type']) and value['values'].nil?)
+          errors << Kwalify::ValidationError.new('Only \'number\' fields can have a \'number_step\'', path) unless(value['number_step'].nil? or value['type'] == 'number')
         elsif not value['include'].nil?
           # no custom checks for includes yet, 'repeat' is not required
         else
