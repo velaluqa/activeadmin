@@ -19,6 +19,7 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from CanCan::AccessDenied do |exception|
+    Rails.logger.debug "Access denied for user #{current_user.username} on #{exception.action} #{exception.subject.inspect}"
     respond_to do |format|
       format.html { redirect_to admin_dashboard_path, :alert => exception.message }
       format.json { render :json => {:error_code => -1, :error => exception.message} }

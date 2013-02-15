@@ -70,7 +70,7 @@
 					lastPart;
 
 				if ( convert ) {
-					if ( isNumber(value) && (type != 'text' || type == 'number') ) {
+					if ( isNumber(value) && type == 'number' ) {
 						value = parseFloat(value);
 					} else if ( value === 'true' || value === 'false' ) {
 						value = Boolean(value);

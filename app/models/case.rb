@@ -9,10 +9,15 @@ class Case < ActiveRecord::Base
   attr_accessible :session_id, :patient_id
   attr_accessible :session, :patient
 
-  validates_uniqueness_of :position, :scope => :session_id
+  validates_uniqueness_of :position, :scope => :session_id  
 
-  before_destroy do |c|
-    CaseData.destroy_all(:case_id => c.id)
+  before_destroy do
+    unless form_answer.nil?
+      errors.add :base, 'You cannot delete a case that was answered' 
+      return false
+    end
+
+    CaseData.destroy_all(:case_id => self.id)
   end
 
   # so we always get results sorted by position, not by row id

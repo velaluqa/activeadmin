@@ -1,5 +1,9 @@
 = label_tag(field['id'], field['label'], :class => 'control-label')
 .controls
   - value, fixed_value_hash = fixed_value(field, data_hash)
-  = select_tag(field['id'], options_from_values(field, value, true).html_safe, { :multiple => true, :class => "#{input_size}" }.merge(validators_hash(field)).merge(fixed_value_hash))
+  - if value.nil?
+    - value = field['selected_option']
+  - else
+    - value = value.split(':')
+  = select_tag(field['id'], options_from_values(field, value, true).html_safe, { :multiple => true, :size => field['values'].size, :class => "#{input_size}" }.merge(validators_hash(field)).merge(fixed_value_hash))
   %p.help-block

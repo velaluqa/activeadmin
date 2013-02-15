@@ -18,7 +18,7 @@ module FormsHelper
     return attributes
   end
 
-  def options_from_values(field, selected_value, no_default = false)
+  def options_from_values(field, selected_values, no_default = false)
     values = field['values']
     if no_default
       options = ''
@@ -27,7 +27,7 @@ module FormsHelper
     end
 
     values.each do |value, label|
-      selected = (value == selected_value ? " selected=\"selected\"" : "")
+      selected = (selected_values.include?(value) ? " selected=\"selected\"" : "")
       options += "<option value=\"#{value}\" #{selected}>#{label} (#{value})</option>"
     end
 

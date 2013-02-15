@@ -1,6 +1,6 @@
 ActiveAdmin.register_page "Dashboard" do
   controller.before_filter do
-    unless current_user.is_app_admin?
+    if current_user.roles.empty?
       flash[:alert] = 'You are not authorized to log into the administrative component.'
       sign_out current_user
       redirect_to new_user_session_path

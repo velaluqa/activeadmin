@@ -14,8 +14,14 @@ class User < ActiveRecord::Base
   has_many :roles
   has_many :form_answers
 
+  has_many :sessions, :through => :roles, :source => :subject, :source_type => 'Session'
+
   has_and_belongs_to_many :blind_readable_sessions, :class_name => 'Session', :join_table => 'readers_sessions'
   has_and_belongs_to_many :validatable_sessions, :class_name => 'Session', :join_table => 'validators_sessions'
+
+  before_destroy do
+    self.roles.destroy_all
+  end
 
   def email_required?
     false

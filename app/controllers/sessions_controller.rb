@@ -1,16 +1,9 @@
 class SessionsController < ApplicationController
   before_filter :authenticate_user!
 
+  before_filter :find_session, :except => :list
+
   def show
-    begin
-      @session = Session.find(params[:id])
-    rescue ActiveRecord::RecordNotFound => e
-      render :json => {:error => 'Session not found'}
-      return
-    end
-
-    authorize! :read, @session
-
     full_sequence = (params[:full_sequence] == 'true')
     case_list = @session.case_list(full_sequence ? :all : :unread)
 
@@ -46,11 +39,26 @@ class SessionsController < ApplicationController
       .map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
 
     respond_to do |format|
-      format.json { render :json => {:blind_readable => blind_readable, :validatable => validatable} }
+      format.json { render :json => {'Blinded Read' => blind_readable, 'Validation' => validatable} }
     end
   end  
 
   protected
+
+  def authorize_user_for_session
+    raise CanCan::AccessDenied.new('You are not authorized to access this session!', :read, @session) unless (@session.readers.include?(current_user) or
+                                                                                                        @session.validators.include?(current_user))
+  end
+  def find_session
+    begin
+      @session = Session.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => e
+      render :json => {:error => 'Session not found', :error_code => 1}
+      return false
+    end
+
+    authorize_user_for_session
+  end
 
   def passive_cases_for_case_list(case_list)
     imported = []

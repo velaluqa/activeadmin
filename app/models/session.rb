@@ -1,4 +1,5 @@
 require 'git_config_repository'
+require 'schema_validation'
 
 class Session < ActiveRecord::Base
   attr_accessible :name, :study, :study_id, :state, :locked_version
@@ -21,6 +22,15 @@ class Session < ActiveRecord::Base
   scope :production, where(:state => 2)
   scope :closed, where(:state => 3)
 
+  before_destroy do
+    unless form_answers.empty? and patients.empty? and forms.empty? and cases.empty?
+      errors.add :base, 'You cannot delete a session unless all associated data was deleted first.'
+      return false
+    end
+
+    self.roles.destroy_all
+  end
+
   STATE_SYMS = [:building, :testing, :production, :closed]
 
   def self.state_sym_to_int(sym)
@@ -40,6 +50,10 @@ class Session < ActiveRecord::Base
     end
 
     write_attribute(:state, index)
+  end
+
+  def form_answers
+    return FormAnswer.where(:session_id => self.id)
   end
   
   def config_file_path
@@ -69,6 +83,32 @@ class Session < ActiveRecord::Base
   end
   def has_configuration?
     File.exists?(self.config_file_path)
+  end
+
+  def semantically_valid?
+    return self.validate == []
+  end
+  def validate
+    return nil unless has_configuration?
+
+    validator = SchemaValidation::SessionValidator.new
+    config = current_configuration
+    return nil if config.nil?
+
+    validation_errors = validator.validate(config)
+
+    included_forms.each do |included_form|
+      validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => self.id).empty?
+    end
+
+    return validation_errors
+  end
+
+  def included_forms
+    config = current_configuration
+    return [] if config.nil?
+
+    return config['types'].reject{|name,t| t['form'].nil?}.map{|name,t| t['form'].to_s}
   end
 
   def case_list(mode = :unread)

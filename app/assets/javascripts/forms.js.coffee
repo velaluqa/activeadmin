@@ -113,6 +113,13 @@ fill_data_field = (field, answers) ->
     answer = if answer == yes then "Yes" else "No"
   else if(field.attr('data-type') == 'roi')
     answer_html = (('<p>'+key+": "+value+'</p>') for own key,value of answer)
+  else if(field.attr('data-type') == 'select')
+    answer_option = $('#'+field_name).find('option[value="'+answer+'"]').text()
+    answer = if answer_option? and answer_option.length > 0 then answer_option else answer
+  else if(field.attr('data-type') == 'select_multiple')
+    answer_html = for value in answer
+      option = $('#'+field_name).find('option[value="'+value+'"]').text()
+      '<p>'+(if option? and option.length > 0 then option else value)+'</p>'
 
   if(answer_html?)
     field.html(answer_html)

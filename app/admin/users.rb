@@ -96,6 +96,6 @@ ActiveAdmin.register User do
   end
 
   action_item :only => :show do
-    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource)
+    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will invalidate all past signatures by this user. Are you sure you want to do this?'
   end
 end

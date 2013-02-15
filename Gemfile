@@ -67,3 +67,6 @@ gem 'rugged', :github => 'libgit2/rugged', :branch => 'development', :submodules
 
 # Airbrake Exception notifier
 gem 'airbrake'
+
+# Kwalify schema validator
+gem 'kwalify'
