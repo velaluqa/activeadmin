@@ -29,6 +29,10 @@ update_roi_option = (option, values) ->
   label = "Name: "+roi['name']+", "
   option_value = {}
 
+  option_value['location'] = {}
+  option_value['location']['seriesUID'] = roi['seriesUID']
+  option_value['location']['imageIndex'] = roi['instanceNumber']
+
   for own key, value of values
     label = label + camelize(value)+": "+roi[value]+", "
     option_value[key] = roi[value]
@@ -112,7 +116,8 @@ fill_data_field = (field, answers) ->
   if(field.attr('data-type') == 'bool')
     answer = if answer == yes then "Yes" else "No"
   else if(field.attr('data-type') == 'roi')
-    answer_html = (('<p>'+key+": "+value+'</p>') for own key,value of answer)
+    location_html = '<p>Location: '+answer['location']['seriesUID']+' #'+answer['location']['imageIndex'].toString()+'</p>'
+    answer_html = location_html+(('<p>'+key+": "+value+'</p>') for own key,value of answer when key != 'location').join("\n")
   else if(field.attr('data-type') == 'select')
     answer_option = $('#'+field_name).find('option[value="'+answer+'"]').text()
     answer = if answer_option? and answer_option.length > 0 then answer_option else answer

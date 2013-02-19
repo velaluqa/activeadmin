@@ -141,11 +141,7 @@ class FormAnswer
             answer = answer.map {|a| pretty_print_select_answer(field, a)}.join(', ')
           end
         when 'roi'
-          if answer.nil?
-            answer = "None given"
-          else
-            answer = (answer.respond_to?(:map) ? answer.map {|k,v| "#{k}: #{v}"}.join("\n") : answer)
-          end
+          answer = printable_roi_answer(answer)
         end
 
         display_list << field.merge({'answer' => answer, 'id' => id})
@@ -153,6 +149,20 @@ class FormAnswer
     end
 
     return display_list
+  end
+  def printable_roi_answer(roi_answer)
+    return 'None given' if roi_answer.nil?
+    return roi_answer unless roi_answer.respond_to?(:map)
+
+    mapped_answer = roi_answer.map do |key, value|
+      if key == 'location'
+        "Location: #{value['seriesUID']} ##{value['imageIndex'].to_i}"
+      else
+        "#{key}: #{value}"
+      end
+    end
+   
+    mapped_answer.join("\n")
   end
 
   def user_public_key_rsa
