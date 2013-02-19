@@ -14,21 +14,23 @@
       - first_in_group = false
       %a.offset-anchor#form-top
       - @form_config.each do |field|      
-        - if(field['type'] == 'add_repeat')
+        - if(field['type'] == 'include_start')
           - current_group_index = 1
           - first_in_group = true
-          .form-actions.form-group-header
-            %a.offset-anchor{:id => 'group-heading-'+field['id']}
-            %h3.pull-left.form-group-heading= field['group-label']
-            %a.btn.add-repeat-btn.pull-right{:'data-id' => field['id'], :'data-max-repeats' => field['max'], :href => '#'}=  field['button-label']
-        - elsif(field['type'] == 'divider')
+        - elsif(field['type'] == 'include_divider')
           - current_group_index += 1
           - first_in_group = true
           %hr
-        - elsif(field['type'] == 'group-end')
+        - elsif(field['type'] == 'section')
+          %hr
+        - elsif(field['type'] == 'include_end')
           - current_group_index = nil
           - first_in_group = false
           %div{:id => "repeatable_group_end_form_#{field['id']}"}
+        - elsif(field['type'] == 'group')
+          .form-actions.form-group-header
+            %a.offset-anchor{:id => 'group-heading-'+field['id']}
+            %h3.pull-left.form-group-heading= field['label']
         - else
           .row.form-row-padding
             .control-group.span5
@@ -78,7 +80,7 @@
       %div{:id => "repeatable_form_#{r[:id]}"}
         - first_field = true
         - r[:config].each do |field|
-          - if(field['type'] == 'divider')
+          - if(field['type'] == 'include_divider') or (field['type'] == 'section')
             %hr
           - else
             .row.form-row-padding
@@ -91,7 +93,7 @@
       %table{:id => "repeatable_table_#{r[:id]}"}
         - first_in_group = true
         - r[:config].each do |field|
-          - if(field['type'] == 'divider')
+          - if(field['type'] == 'include_divider')
             - first_in_group = true
           - else
             = render 'forms/results_table_row', :current_group_index => 0, :first_in_group => first_in_group, :field_spec => field, :printable_answers => [r[:config]], :cases => [@case], :placeholders_only => true

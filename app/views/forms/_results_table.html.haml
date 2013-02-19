@@ -32,16 +32,17 @@
       - when 'divider'
         - current_group_index += 1
         - first_in_group = true
-      - when 'group-end'
+      - when 'include_end'
         - current_group_index = nil
         - first_in_group = false
         - if placeholders_only
           %tr{:id => "repeatable_group_end_#{display_type}_#{field_spec['id']}"}
-      - when 'add_repeat'
+      - when 'include_start'
         - current_group_index = 1
         - first_in_group = true
+      - when 'group'
         %tr
-          %th{:colspan => 2+cases.count}= field_spec['group-label']
+          %th{:colspan => 2+cases.count}= field_spec['label']
       - else
         = render 'forms/results_table_row', :current_group_index => current_group_index, :first_in_group => first_in_group, :field_spec => field_spec, :printable_answers => printable_answers, :cases => cases, :placeholders_only => placeholders_only, :roi_links => roi_links
         - first_in_group = false

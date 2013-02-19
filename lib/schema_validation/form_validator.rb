@@ -15,7 +15,7 @@ module SchemaValidation
       when 'field'
         if not value['id'].nil?
           errors << Kwalify::ValidationError.new('Missing \'type\'', path) if value['type'].nil?
-          errors << Kwalify::ValidationError.new('Missing \'label\'', path) if value['label'].nil?
+          errors << Kwalify::ValidationError.new('Missing \'label\'', path) if (value['label'].nil? and not value['type'] == 'section')
 
           errors << Kwalify::ValidationError.new('Missing \'fixed_value\'', path) if(value['type'] == 'fixed' and value['fixed_value'].nil?)
 
@@ -36,6 +36,8 @@ module SchemaValidation
           end              
         elsif not value['include'].nil?
           # no custom checks for includes yet, 'repeat' is not required
+        elsif value['type'] == 'section'
+          # no custom checks for sections, we just need this so sections can exist without an id
         else
           errors << Kwalify::ValidationError.new('This is neither a field (missing \'id\') nor an include (missing \'include\')', path)
         end

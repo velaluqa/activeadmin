@@ -104,14 +104,14 @@ class FormAnswer
 
     skip_group = false
     while(field = form_config.shift)
-      next if (skip_group and field['type'] != 'group-end')
+      next if (skip_group and field['type'] != 'include_end')
 
       id = field['id']
       indices_copy = indices.clone
       id = id.gsub(/\[\]/) {|match| "[#{indices_copy.shift.to_s}]"} unless id.nil?
 
       case field['type']
-      when 'add_repeat'
+      when 'include_start'
         display_list << field
         skip_group = true
 
@@ -122,10 +122,10 @@ class FormAnswer
         repeatable_answer.each_with_index do |answer, i|
           display_list += form_config_and_answers_to_display_list(Marshal.load(Marshal.dump(repeatable)), repeatables, answers, indices + [i])
         end
-      when 'group-end'
+      when 'include_end'
         display_list << field
         skip_group = false
-      when 'divider'
+      when 'include_divider', 'group', 'section'
         display_list << field
       else
         answer = KeyPathAccessor::access_by_path(answers, id)

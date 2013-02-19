@@ -74,7 +74,7 @@ class Form < ActiveRecord::Base
   end
 
   def self.config_field_has_special_type?(field)
-    ['add_repeat', 'group-label', 'divider', 'group-end'].include? field['type']
+    ['include_start', 'include_divider', 'include_end', 'section', 'group'].include? field['type']
   end
 
   def relative_config_file_path
@@ -203,11 +203,11 @@ class Form < ActiveRecord::Base
           repeatable.each do |included_field|
             included_field['id'] = "#{field['repeat']['prefix']}[][#{included_field['id']}]"
           end
-          repeatable << {'type' => 'divider'}
+          repeatable << {'type' => 'include_divider'}
 
           repeatables << {:id => field['repeat']['prefix'], :max => field['repeat']['max'], :config => repeatable}
 
-          full_config << {'type' => 'add_repeat', 'group-label' => "#{field['repeat']['label']}s", 'button-label' => "Add #{field['repeat']['label']}", 'id' => field['repeat']['prefix'], 'max' => field['repeat']['max']}
+          full_config << {'type' => 'include_start', 'label' => field['repeat']['label'], 'id' => field['repeat']['prefix'], 'max' => field['repeat']['max']}
 
           field['repeat']['min'].times do |i|
             config_copy = Marshal.load(Marshal.dump(included_config))
@@ -216,12 +216,12 @@ class Form < ActiveRecord::Base
               included_field['id'] = "#{field['repeat']['prefix']}[#{i}][#{included_field['id']}]"
             end
 
-            config_copy << {'type' => 'divider'}
+            config_copy << {'type' => 'include_divider'}
 
             full_config += config_copy
           end
 
-          full_config << {'type' => 'group-end', 'id' => field['repeat']['prefix']}
+          full_config << {'type' => 'include_end', 'id' => field['repeat']['prefix']}
         end
 
         full_components.each do |key, value|

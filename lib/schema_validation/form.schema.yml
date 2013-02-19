@@ -8,7 +8,7 @@ sequence:
         unique: yes
       "type":
         type: str
-        enum: ['select', 'select_multiple', 'string', 'text', 'number', 'fixed', 'date', 'bool', 'roi']
+        enum: ['select', 'select_multiple', 'string', 'text', 'number', 'fixed', 'date', 'bool', 'roi', 'group', 'section']
       "label":
         type: str
       "description":
