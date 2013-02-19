@@ -52,19 +52,19 @@ class Form < ActiveRecord::Base
   end
 
   def full_current_configuration
-    full_configuration(nil)
+    full_configuration(:current)
   end
   def full_locked_configuration
-    full_configuration(self.locked_version)
+    full_configuration(:locked)
   end
   def full_configuration_at_version(version)
     full_configuration(version)
   end
   def current_configuration
-    parse_config(nil)
+    parse_config(:current)
   end
   def locked_configuration
-    parse_config(self.locked_version)
+    parse_config(:locked)
   end
   def configuration_at_version(versioN)
     parse_config(version)
@@ -111,8 +111,20 @@ class Form < ActiveRecord::Base
   end
 
   protected
+
+  def parse_version_sym(version)
+    case version
+    when :current
+      nil
+    when :locked
+      self.locked_version
+    else
+      version
+    end
+  end
   
   def parse_config(version)
+    version = parse_version_sym(version)
     begin
       config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, version)
     rescue SyntaxError => e
@@ -124,6 +136,7 @@ class Form < ActiveRecord::Base
   
   # TODO: version is not yet used, since components are not yet versioned
   def components(version)
+    version = parse_version_sym(version)
     id = read_attribute(:id)
 
     form_components = {:validators => [], :stylesheets => []}
@@ -145,9 +158,10 @@ class Form < ActiveRecord::Base
   end
 
   def full_configuration(version, already_included_forms = nil, stringify = true)
-    form_config = parse_config(version)
+    parsed_version = parse_version_sym(version)
+    form_config = parse_config(parsed_version)
     return [nil,nil,nil] if form_config.nil?
-    form_components = components(version)
+    form_components = components(parsed_version)
     return [nil,nil,nil] if form_components.nil?
 
     already_included_forms = [] if already_included_forms.nil?
