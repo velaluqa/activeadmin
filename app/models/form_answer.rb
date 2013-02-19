@@ -141,6 +141,7 @@ class FormAnswer
             answer = answer.map {|a| pretty_print_select_answer(field, a)}.join(', ')
           end
         when 'roi'
+          field.merge!({'seriesUID' => answer['location']['seriesUID'], 'imageIndex' => answer['location']['imageIndex'].to_i}) unless answer['location'].nil?
           answer = printable_roi_answer(answer)
         end
 

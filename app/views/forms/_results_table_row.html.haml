@@ -16,4 +16,7 @@
     - elsif answer.nil?
       %td
     - else
-      %td= answer['answer'].respond_to?(:to_s) ? simple_format(answer['answer'].to_s) : answer['answer']
+      %td
+        = answer['answer'].respond_to?(:to_s) ? simple_format(answer['answer'].to_s) : answer['answer']
+        - if(field_spec['type'] == 'roi' and roi_links and not (answer['seriesUID'].nil? or answer['imageIndex'].nil?))
+          %a.roi_link{:href => '#', :onclick => "PharmTraceAPI.jumpToImage('#{answer['seriesUID']}', #{answer['imageIndex']}); return false;"} Jump to ROI
