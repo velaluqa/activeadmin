@@ -119,12 +119,15 @@ fill_data_field = (field, answers) ->
     location_html = '<p>Location: '+answer['location']['seriesUID']+' #'+answer['location']['imageIndex'].toString()+'</p>'
     answer_html = location_html+(('<p>'+key+": "+value+'</p>') for own key,value of answer when key != 'location').join("\n")
   else if(field.attr('data-type') == 'select')
-    answer_option = $('#'+field_name).find('option[value="'+answer+'"]').text()
+    select_input = $('select[name="'+field_name+'"]')
+    answer_option = select_input.find('option[value="'+answer+'"]').text()
     answer = if answer_option? and answer_option.length > 0 then answer_option else answer
   else if(field.attr('data-type') == 'select_multiple')
+    select_input = $('select[name="'+field_name+'"]')
     answer_html = for value in answer
-      option = $('#'+field_name).find('option[value="'+value+'"]').text()
+      option = select_input.find('option[value="'+value+'"]').text()
       '<p>'+(if option? and option.length > 0 then option else value)+'</p>'
+    answer_html = answer_html.join("\n")
 
   if(answer_html?)
     field.html(answer_html)
