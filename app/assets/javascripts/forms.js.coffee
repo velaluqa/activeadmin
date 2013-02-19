@@ -244,11 +244,23 @@ update_rois = ->
   selects = $('.select-roi')
   update_roi_select(select) for select in selects
 
+update_nav_button_state = ->
+  if $('#form_nav_select option').first().attr('selected') == 'selected'
+    $('#form_nav_previous_btn').attr('disabled', 'disabled')
+    $('#form_nav_next_btn').removeAttr('disabled')
+  else if $('#form_nav_select option').last().attr('selected') == 'selected'
+    $('#form_nav_previous_btn').removeAttr('disabled')
+    $('#form_nav_next_btn').attr('disabled', 'disabled')
+  else
+    $('#form_nav_previous_btn').removeAttr('disabled')
+    $('#form_nav_next_btn').removeAttr('disabled')  
+
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
   window.osirix_id_to_roi_id = {}
   window.name_to_roi_id = {}
+  window.body_padding = $('body').css('padding-top').replace('px', '')
 
   $(".datepicker-field").datepicker()
       
@@ -273,6 +285,39 @@ $(document).ready ->
           fill_placeholder_cells($('#print_version'), form_data)
           $('#preview_modal').modal('show')  
   )
+
+  $('#form_nav_select').change ->
+    target = $('#'+$(this).val())
+    console.log(target)
+    $(window).scrollTop(target.position().top);
+    update_nav_button_state()
+
+  $('#form_nav_previous_btn').click ->  
+    return false if $(this).attr('disabled') == 'disabled'
+    
+    nav_select = $('#form_nav_select')
+    current_value =  nav_select.find('option:selected').val()
+    previous_value = nav_select.find('option:selected').prev().val()
+
+    unless previous_value == current_value
+      nav_select.val(previous_value)
+      nav_select.change()
+      update_nav_button_state()
+
+    return false
+  $('#form_nav_next_btn').click ->
+    return false if $(this).attr('disabled') == 'disabled'
+
+    nav_select = $('#form_nav_select')
+    current_value =  nav_select.find('option:selected').val()
+    next_value = nav_select.find('option:selected').next().val()
+
+    unless next_value == current_value
+      nav_select.val(next_value)
+      nav_select.change()
+      update_nav_button_state()
+
+    return false
 
   $('.add-repeat-btn').click ->
     repeatable_id = $(this).attr('data-id')
@@ -314,9 +359,8 @@ $(document).ready ->
     $("#repeatable_group_end_preview_#{repeatable_id}").before(e) for e in repeatable_preview.clone().children()
     $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview.children()
 
-    body_padding = $('body').css('padding-top').replace('px', '')
     delay 10, -> 
-      $(window).scrollTop(scroll_to_element.position().top-body_padding);
+      $(window).scrollTop(scroll_to_element.position().top-window.body_padding);
 
   $('.select-roi').mousedown ->
     PharmTraceAPI.updateROIsSynchronously()
