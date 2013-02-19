@@ -237,6 +237,13 @@ update_rois_table = (new_rois) ->
 
     window.rois[roi_id] = roi
 
+update_rois = ->
+  rois = PharmTraceAPI.rois
+  update_rois_table(rois)
+
+  selects = $('.select-roi')
+  update_roi_select(select) for select in selects
+
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -314,12 +321,7 @@ $(document).ready ->
 
   PharmTraceAPI.roisUpdated.connect ->
     #rois = jQuery.parseJSON('[{"id":1,"length":23.42,"name":"Length","seriesModality":"CT","seriesName":"Test Series 1","seriesUID":"1.2.3.4.5","sliceLocation":1,"studyName":"Test Study"},{"area":42.23,"id":23,"max":5,"mean":4.23,"min":3,"name":"Area","seriesModality":"MRT","seriesName":"Test Series 2","seriesUID":"5.4.3.2.1","sliceLocation":7,"studyName":"Test Study"},{"area":65,"id":42,"length":7,"max":23,"mean":7.4223,"min":-1,"name":"MegaROI","seriesModality":"PET","seriesName":"Test Series 2","seriesUID":"5.4.3.2.1","sliceLocation":23,"studyName":"Test Study"}]')
-    rois = PharmTraceAPI.rois
-    update_rois_table(rois)
-        
-    selects = $('.select-roi')
-
-    update_roi_select(select) for select in selects
+    update_rois()
     $('#refresh-rois-btn').button('reset')
 
   $('#preview_submit_btn').click ->
