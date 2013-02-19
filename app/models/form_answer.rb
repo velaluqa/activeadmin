@@ -142,7 +142,7 @@ class FormAnswer
           end
         when 'roi'
           field.merge!({'seriesUID' => answer['location']['seriesUID'], 'imageIndex' => answer['location']['imageIndex'].to_i}) unless answer['location'].nil?
-          answer = printable_roi_answer(answer)
+          answer = printable_roi_answer(field, answer)
         end
 
         display_list << field.merge({'answer' => answer, 'id' => id})
@@ -151,9 +151,9 @@ class FormAnswer
 
     return display_list
   end
-  def printable_roi_answer(roi_answer)
+  def printable_roi_answer(field, roi_answer)
     return 'None given' if roi_answer.nil?
-    return roi_answer unless roi_answer.respond_to?(:map)
+    return pretty_print_select_answer(field, roi_answer) unless roi_answer.respond_to?(:map)
 
     mapped_answer = roi_answer.map do |key, value|
       if key == 'location'

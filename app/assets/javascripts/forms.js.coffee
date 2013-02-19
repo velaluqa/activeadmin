@@ -54,7 +54,7 @@ update_roi_select = (select) ->
 
   values = jQuery.parseJSON(select.attr('data-roi-values'))
 
-  options = select.find('option[value]').not('[value=""]')
+  options = select.find('option[value]').not('[value=""]').not('[data-permanent-select-option="true"]')
   existing_ids = []
   for option in options
     if update_roi_option(option, values)?      
@@ -115,10 +115,10 @@ fill_data_field = (field, answers) ->
 
   if(field.attr('data-type') == 'bool')
     answer = if answer == yes then "Yes" else "No"
-  else if(field.attr('data-type') == 'roi')
+  else if(field.attr('data-type') == 'roi') and (typeof answer == 'object')
     location_html = '<p>Location: '+answer['location']['seriesUID']+' #'+answer['location']['imageIndex'].toString()+'</p>'
-    answer_html = location_html+(('<p>'+key+": "+value+'</p>') for own key,value of answer when key != 'location').join("\n")
-  else if(field.attr('data-type') == 'select')
+    answer_html = location_html+(('<p>'+key+": "+value+'</p>') for own key,value of answer when key != 'location').join("\n")      
+  else if(field.attr('data-type') == 'select') or ((field.attr('data-type') == 'roi') and (typeof answer == 'string'))
     select_input = $('select[name="'+field_name+'"]')
     answer_option = select_input.find('option[value="'+answer+'"]').text()
     answer = if answer_option? and answer_option.length > 0 then answer_option else answer

@@ -1,4 +1,6 @@
 = label_tag(field['id'], field['label'], :class => 'control-label')
 .controls
-  = select_tag(field['id'], '<option value="">No ROIs available</option>'.html_safe, { :class => "#{input_size} select-roi", :'data-roi-values' => (field['values'].nil? ? '{}' : field['values'].to_json)}.merge(validators_hash(field)))
+  - value, fixed_value_hash = fixed_value(field, data_hash)
+  - value = field['selected_option'] if value.nil?
+  = select_tag(field['id'], options_from_values(field, [value]).html_safe, { :class => "#{input_size} select-roi", :'data-roi-values' => (field['roi_values'].nil? ? '{}' : field['roi_values'].to_json)}.merge(validators_hash(field)))
   %p.help-block

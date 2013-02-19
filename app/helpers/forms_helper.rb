@@ -20,6 +20,7 @@ module FormsHelper
 
   def options_from_values(field, selected_values, no_default = false)
     values = field['values']
+    values = {} if values.nil?
     if no_default
       options = ''
     else
@@ -28,7 +29,7 @@ module FormsHelper
 
     values.each do |value, label|
       selected = (selected_values.include?(value) ? " selected=\"selected\"" : "")
-      options += "<option value=\"#{value}\" #{selected}>#{label} (#{value})</option>"
+      options += "<option data-permanent-select-option=\"true\" value=\"#{value}\" #{selected}>#{label} (#{value})</option>"
     end
 
     return options
