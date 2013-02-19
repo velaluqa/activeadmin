@@ -299,6 +299,9 @@ $(document).ready ->
 
     repeatable_form.find('.select-roi').change ->
       update_allowed_rois($(this))
+    repeatable_form.find('.select-roi').mousedown ->
+      PharmTraceAPI.updateROIsSynchronously()
+      update_rois()
     repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
 
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
@@ -314,6 +317,10 @@ $(document).ready ->
     body_padding = $('body').css('padding-top').replace('px', '')
     delay 10, -> 
       $(window).scrollTop(scroll_to_element.position().top-body_padding);
+
+  $('.select-roi').mousedown ->
+    PharmTraceAPI.updateROIsSynchronously()
+    update_rois()
 
   $('#refresh-rois-btn').click ->
     $(this).button('loading')
