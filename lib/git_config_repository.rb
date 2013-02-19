@@ -73,7 +73,9 @@ class GitConfigRepository
 
     path_components = path.split('/', 2)
 
-    target_oid = tree[path_components[0]][:oid]
+    target_node = tree[path_components[0]]
+    return nil if target_node.nil?
+    target_oid = target_node[:oid]
     return nil if target_oid.nil?
     return nil unless @repo.exists?(target_oid)
 
