@@ -106,60 +106,32 @@ ActiveAdmin.register Session do
         end
       end
       row :configuration do
-        table do
-          thead do
-            tr do
-              th do
-                "Current"                
-              end
-              unless session.locked_version.nil?
-                th do
-                  "Locked"
-                end
-              end
-            end
+        current = {}
+        if session.has_configuration?
+          current_config = session.current_configuration 
+          if current_config.nil?
+            current[:configuration] = :invalid
+          else
+            current[:configuration] = CodeRay.scan(JSON::pretty_generate(current_config), :json).div(:css => :class).html_safe
           end
-          tbody do
-            tr do
-              td do 
-                if session.has_configuration?
-                  link_to 'Download Current Configuration', download_current_configuration_admin_session_path(session)
-                else
-                  status_tag('Missing', :error)
-                end
-              end
-              unless session.locked_version.nil?
-                td do
-                  link_to 'Download Locked Configuration', download_locked_configuration_admin_session_path(session)                  
-                end
-              end
-            end
-            tr do
-              td do
-                config = session.current_configuration if session.has_configuration?
-
-                if not session.has_configuration?
-                  status_tag('Missing', :error)       
-                elsif config.nil?
-                  status_tag('Invalid', :warning)
-                else
-                  CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
-                end
-              end
-              unless session.locked_version.nil?
-                td do
-                  config = session.locked_configuration
-                  
-                  if config.nil?
-                    status_tag('Invalid', :warning)
-                  else
-                    CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
-                  end
-                end
-              end
-            end
-          end
+          
+          current[:download_link] = download_current_configuration_admin_session_path(session)
         end
+        locked = nil
+        unless session.locked_version.nil?
+          locked = {}
+    
+          locked_config = session.locked_configuration
+          if locked_config.nil?
+            locked[:configuration] = :invalid
+          else
+            locked[:configuration] = CodeRay.scan(JSON::pretty_generate(locked_config), :json).div(:css => :class).html_safe
+          end
+          
+          locked[:download_link] = download_locked_configuration_admin_session_path(session)
+        end
+
+        render 'admin/shared/config_table', :current => current, :locked => locked
       end
       if session.has_configuration?
         row :configuration_validation do        
