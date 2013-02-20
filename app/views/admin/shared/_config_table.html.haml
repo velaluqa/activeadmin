@@ -1,14 +1,14 @@
 %table
   %thead
     %tr
-      %th Current
+      %th Current    
       - unless locked.nil?
         %th Locked
   %tbody
     %tr
-      %td
+      %td        
         - if current[:configuration].nil?
-          = status_tag('Missing', :error)
+          %span.status_tag.Missing.error Missing
         - else
           = link_to 'Download', current[:download_link]
       - unless locked.nil?
@@ -16,16 +16,16 @@
     %tr
       %td
         - if current[:configuration].nil?
-          = status_tag('Missing', :error)
+          %span.status_tag.Missing.error Missing
         - elsif current[:configuration] == :invalid
-          = status_tag('Invalid', :warning)
+          %span.status_tag.Invalid.warning Invalid
         - else
           = current[:configuration]
       - unless locked.nil?
         %td
           - if locked[:configuration].nil?
-            = status_tag('Missing', :error)
+            %span.status_tag.Missing.error Missing
           - elsif locked[:configuration] == :invalid
-            = status_tag('Invalid', :warning)
+            %span.status_tag.Invalid.warning Invalid
           - else
             = locked[:configuration]
