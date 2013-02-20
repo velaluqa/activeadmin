@@ -73,6 +73,13 @@ class Form < ActiveRecord::Base
     File.exists?(self.config_file_path)
   end
 
+  def current_components
+    components(:current)
+  end
+  def locked_components
+    components(:locked)
+  end
+
   def self.config_field_has_special_type?(field)
     ['include_start', 'include_divider', 'include_end', 'section', 'group'].include? field['type']
   end
@@ -141,12 +148,11 @@ class Form < ActiveRecord::Base
 
     form_components = {:validators => [], :stylesheets => []}
 
-    if(File.exists?(Rails.application.config.form_configs_directory + "/#{id}.js"))
-      form_components[:validators] << File.open(Rails.application.config.form_configs_directory + "/#{id}.js", 'r') {|f| f.read}
-    end
-    if(File.exists?(Rails.application.config.form_configs_directory + "/#{id}.css"))
-      form_components[:stylesheet] << File.open(Rails.application.config.form_configs_directory + "/#{id}.css", 'r') {|f| f.read}
-    end
+    validator = GitConfigRepository.new.text_at_version(Rails.application.config.form_configs_subdirectory + "/#{id}.js", version)
+    form_components[:validators] << validator unless validator.nil?
+
+    stylesheet = GitConfigRepository.new.text_at_version(Rails.application.config.form_configs_subdirectory + "/#{id}.css", version)
+    form_components[:stylesheet] << stylesheet unless stylesheet.nil?
 
     return form_components
   end
@@ -161,7 +167,7 @@ class Form < ActiveRecord::Base
     parsed_version = parse_version_sym(version)
     form_config = parse_config(parsed_version)
     return [nil,nil,nil] if form_config.nil?
-    form_components = components(parsed_version)
+    form_components = components(version)
     return [nil,nil,nil] if form_components.nil?
 
     already_included_forms = [] if already_included_forms.nil?
