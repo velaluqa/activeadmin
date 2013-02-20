@@ -49,6 +49,14 @@ class GitConfigRepository
 
     return file_blob.content
   end
+  def text_at_version(path, version = nil)
+    version = current_version if version.nil?
+
+    file_blob = file_at_version(path, version)
+    return nil if file_blob.nil?
+
+    return file_blob.text
+  end
 
   protected
 
