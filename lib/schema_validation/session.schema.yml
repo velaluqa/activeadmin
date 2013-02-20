@@ -23,6 +23,7 @@ mapping:
     mapping:
       =:
         type: map
+        name: case_type
         mapping:
           "form":
             type: str
@@ -40,9 +41,10 @@ mapping:
             type: str
           "context_menu":
             type: bool
+          "dont_use_viewer":
+            type: bool
           "screen_layout":
             type: map
-            required: yes
             mapping:
               "rows":
                 type: int

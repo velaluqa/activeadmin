@@ -24,6 +24,8 @@ module SchemaValidation
         end
       when 'previous_results_table_repeatable_row'
         errors << Kwalify::ValidationError.new("'row' must have either 'value' or 'values'", path) unless (value['value'].nil? ^ value['values'].nil?)
+      when 'case_type'
+        errors << Kwalify::ValidationError.new("Must have either 'screen_layout' or 'dont_use_viewer: true'", path) unless ((not value['screen_layout'].nil?) ^ value['dont_use_viewer'])
       end
     end
   end
