@@ -90,6 +90,18 @@ class Form < ActiveRecord::Base
   def config_file_path
     Rails.application.config.form_configs_directory + "/#{id}.yml"
   end
+  def relative_validator_file_path
+    Rails.application.config.form_configs_subdirectory + "/#{id}.js"
+  end
+  def validator_file_path
+    Rails.application.config.form_configs_directory + "/#{id}.js"
+  end
+  def relative_stylesheet_file_path
+    Rails.application.config.form_configs_subdirectory + "/#{id}.css"
+  end
+  def stylesheet_file_path
+    Rails.application.config.form_configs_directory + "/#{id}.css"
+  end
 
   def included_forms
     config = current_configuration
@@ -148,10 +160,10 @@ class Form < ActiveRecord::Base
 
     form_components = {:validators => [], :stylesheets => []}
 
-    validator = GitConfigRepository.new.text_at_version(Rails.application.config.form_configs_subdirectory + "/#{id}.js", version)
+    validator = GitConfigRepository.new.text_at_version(relative_validator_file_path, version)
     form_components[:validators] << validator unless validator.nil?
 
-    stylesheet = GitConfigRepository.new.text_at_version(Rails.application.config.form_configs_subdirectory + "/#{id}.css", version)
+    stylesheet = GitConfigRepository.new.text_at_version(relative_stylesheet_file_path, version)
     form_components[:stylesheet] << stylesheet unless stylesheet.nil?
 
     return form_components

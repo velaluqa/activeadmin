@@ -12,7 +12,7 @@ ActiveAdmin.register Form do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :copy, :copy_form]
+    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :download_current_custom_validators, :download_locked_custom_validators, :copy, :copy_form]
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
@@ -111,6 +111,29 @@ ActiveAdmin.register Form do
           render 'admin/shared/schema_validation_results', :errors => form.validate
         end
       end
+      row :custom_validators do
+        current_components = form.current_components
+        locked_components = form.locked_components
+
+        current = {}
+        if not (current_components.nil? or current_components[:validators].nil? or current_components[:validators].empty?)
+          current[:configuration] = CodeRay.scan(current_components[:validators][0], :javascript).div(:css => :class).html_safe
+          current[:download_link] = download_current_custom_validators_admin_form_path(form)
+        end          
+
+        locked = nil
+        unless form.locked_version.nil?
+          locked = {}
+    
+          if not (locked_components.nil? or locked_components[:validators].nil? or locked_components[:validators].empty?)
+            locked[:configuration] = CodeRay.scan(locked_components[:validators][0], :javascript).div(:css => :class).html_safe
+          end
+          
+          locked[:download_link] = download_locked_custom_validators_admin_form_path(form)
+        end
+
+        render 'admin/shared/config_table', :current => current, :locked => locked
+      end
     end
   end
 
@@ -157,19 +180,34 @@ ActiveAdmin.register Form do
     data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, @form.locked_version)
     send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.yml" unless data.nil?
   end
+  member_action :download_current_custom_validators do
+    @form = Form.find(params[:id])
+    authorize! :read, @form
+
+    data = GitConfigRepository.new.data_at_version(@form.relative_validator_file_path, nil)
+    send_data data, :filename => "form_#{@form.id}_current.js" unless data.nil?
+  end
+  member_action :download_locked_custom_validators do
+    @form = Form.find(params[:id])
+    authorize! :read, @form
+
+    data = GitConfigRepository.new.data_at_version(@form.relative_validator_file_path, @form.locked_version)
+    send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.js" unless data.nil?
+  end
 
   member_action :upload_config, :method => :post do
     @form = Form.find(params[:id])
 
-    if(params[:form].nil? or params[:form][:file].nil? or params[:form][:file].tempfile.nil?)
-      flash[:error] = "You must specify a configuration file to upload"
-      redirect_to({:action => :show})
-    else
-      repo = GitConfigRepository.new
+    repo = GitConfigRepository.new
+
+    unless(params[:form].nil? or (params[:form][:file].nil? or params[:form][:file].tempfile.nil?))
       repo.update_config_file(@form.relative_config_file_path, params[:form][:file].tempfile, current_user, "New configuration file for form #{@form.id}")
-        
-      redirect_to({:action => :show}, :notice => "Configuration successfully uploaded")
     end
+    unless(params[:form].nil? or (params[:form][:validators].nil? or params[:form][:validators].tempfile.nil?))
+      repo.update_config_file(@form.relative_validator_file_path, params[:form][:validators].tempfile, current_user, "New custom validations for form #{@form.id}")
+    end
+        
+    redirect_to({:action => :show}, :notice => "Configuration successfully uploaded")
   end
   member_action :upload_config_form, :method => :get do
     @form = Form.find(params[:id])

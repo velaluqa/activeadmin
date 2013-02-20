@@ -12,7 +12,11 @@
         - else
           = link_to 'Download', current[:download_link]
       - unless locked.nil?
-        %td= link_to 'Download', locked[:download_link]
+        %td
+          - if locked[:configuration].nil?
+            %span.status_tag.Missing.error Missing
+          - else        
+            = link_to 'Download', locked[:download_link]
     %tr
       %td
         - if current[:configuration].nil?
