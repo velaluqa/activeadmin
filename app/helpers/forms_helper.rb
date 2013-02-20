@@ -60,4 +60,64 @@ module FormsHelper
       value.to_s
     end
   end
+
+  def results_table_columns(cases, merge = false)
+    return [] if cases.empty?
+
+    columns = [[cases.shift]]
+
+    cases.each do |c|
+      if merge and columns.last.last.patient_id == c.patient_id and columns.last.last.images == c.images
+        columns.last << c
+      else
+       columns << [c]        
+      end
+    end
+
+    return columns
+  end
+
+  def results_table_answer_for_column(column, row_spec, repeatable)
+    answer = nil
+    the_case = nil
+    the_value = nil
+    column.each do |c|      
+      value = (row_spec['value'].nil? ? row_spec['values'][c.case_type] : row_spec['value'])
+
+      unless repeatable.nil?
+        prefix = repeatable[:prefixes][c.case_type]
+        full_value = "#{prefix}[#{repeatable[:index]}][" + value + ']'
+      else
+        full_value = value
+      end
+
+      answer = results_table_find_answer(c, full_value)
+
+      unless answer.nil?
+        the_case = c
+        the_value = value
+        break
+      end
+    end
+
+    return [answer, the_case, the_value]
+  end
+  def results_table_find_answer(the_case, value)
+    answer = nil
+    if value.start_with?('patient[') or value.start_with?('case[')
+      answer = KeyPathAccessor::access_by_path(the_case.data_hash, value)
+    else
+      answer = KeyPathAccessor::access_by_path(the_case.form_answer.answers, value)      
+    end
+
+    return answer
+  end
+
+  def results_table_format_answer(answer, answer_spec)
+    if answer_spec.nil?
+      format_fixed_value(answer)
+    else
+      simple_format(FormAnswer.pretty_print_answer(answer_spec, answer))
+    end
+  end
 end

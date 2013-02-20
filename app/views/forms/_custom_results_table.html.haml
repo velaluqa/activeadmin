@@ -1,0 +1,44 @@
+- placeholders_only = false unless (defined? placeholders_only)
+- skip_header = false unless (defined? skip_header)
+- display_type = 'results' unless placeholders_only
+- roi_links = false unless (defined? roi_links)
+- merge_cases = false unless (defined? merge_cases)
+
+- current_group_index = nil
+- first_in_group = false
+- form_answer_field_maps = {}
+- cases.each do |c|
+  - form_answer_field_maps[c.id] = c.form_answer.form_fields_hash
+- columns = results_table_columns(cases, merge_cases)
+%table.table.table-striped.table-bordered.table-condensed
+  - unless (caption.nil? or caption.empty?)
+    %caption= caption
+  %colgroup
+    %col{:style => 'width: 2%'}
+    %col{:style => 'width: 23%'}    
+    - columns.count.times do
+      %col{:style => "width: #{(75.0/columns.count).floor}%"}
+  - unless skip_header
+    %thead
+      %tr
+        %th{:colspan => 2} Field
+        - if placeholders_only
+          %th= Answer
+        - else
+          - columns.each do |c|
+            %th= c.first.images_folder
+  %tbody
+    - table_config.each_with_index do |row_spec,i|
+      - if row_spec['group']
+        %tr
+          %th{:colspan => 2+columns.count}= row_spec['group']
+      - elsif row_spec['row']
+        = render 'forms/custom_results_table_row', :row_spec => row_spec, :columns => columns, :placeholders_only => placeholders_only, :roi_links => roi_links, :form_answer_field_maps => form_answer_field_maps
+      - elsif row_spec['repeatable']
+        - prefixes = row_spec['repeatable']['prefixes']
+        - rows = row_spec['repeatable']['rows']
+        - max_case = cases.max{|c| c.form_answer.answers[prefixes[c.case_type]].nil? ? 0 : c.form_answer.answers[prefixes[c.case_type]].size}
+        - repeatable_size = max_case.form_answer.answers[prefixes[max_case.case_type]].nil? ? 0 : max_case.form_answer.answers[prefixes[max_case.case_type]].size
+        - repeatable_size.times do |repeatable_index|
+          - row_spec['repeatable']['rows'].each_with_index do |repeatable_row_spec, repeatable_row_index|
+            = render 'forms/custom_results_table_row', :row_spec => repeatable_row_spec, :columns => columns, :placeholders_only => placeholders_only, :roi_links => roi_links, :repeatable => {:index => repeatable_index, :first_row => (repeatable_row_index == 0), :prefixes => prefixes}, :form_answer_field_maps => form_answer_field_maps

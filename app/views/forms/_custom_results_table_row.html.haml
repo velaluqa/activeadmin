@@ -1,0 +1,27 @@
+- repeatable = nil unless (defined? repeatable)
+
+%tr
+  - unless (repeatable.nil?)
+    - if(repeatable[:first_row])
+      %th.form-group-index-cell= (placeholders_only ? '' : (repeatable[:index]+1).to_s)
+    - else
+      %td
+    %td= row_spec['row']
+  - else
+    %td{:colspan => 2}= row_spec['row']
+  - columns.each_with_index do |column,case_index|
+    - answer, answer_case, answer_key = results_table_answer_for_column(column, row_spec, repeatable)
+    - if placeholders_only
+      -# %td.results-table-placeholder-cell{:name => answer_key, :'data-type' => field_spec['type']}
+    - elsif answer.nil?
+      %td
+    - else
+      - answer_spec = nil
+      - if repeatable.nil?
+        - answer_spec = form_answer_field_maps[answer_case.id][0][answer_key]
+      - else
+        - answer_spec = form_answer_field_maps[answer_case.id][1][repeatable[:prefixes][answer_case.case_type]][answer_key]
+      %td        
+        = results_table_format_answer(answer, answer_spec)
+        - if(answer_spec and answer_spec['type'] == 'roi' and roi_links and not (answer['location'].nil? or answer['location']['seriesUID'].nil? or answer['location']['imageIndex'].nil?))
+          %a.roi_link{:href => '#', :onclick => "PharmTraceAPI.jumpToImage('#{answer['location']['seriesUID']}', #{answer['location']['imageIndex']}); return false;"} Jump to ROI

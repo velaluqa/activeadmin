@@ -13,12 +13,6 @@ mapping:
     type: bool
   "enforce_paper_trail":
     type: bool
-  "show_previous_results":
-    type: bool
-  "limit_previous_results":
-    type: seq
-    sequence:
-      - type: str
   "case_import_limit":
     type: int
     range:
@@ -65,4 +59,54 @@ mapping:
                 type: bool
               "placeholders":
                 type: bool
-                
+          "previous_results":
+            type: map
+            name: previous_results
+            mapping:
+              "merge_columns":
+                type: bool
+              "default_table":
+                type: bool
+              "table":
+                type: seq
+                sequence:
+                  - type: map
+                    name: previous_results_table_row
+                    mapping:
+                      "group":
+                        type: str
+                      "row":
+                        type: str
+                      "value":
+                        type: str
+                      "values":
+                        type: map
+                        mapping:
+                          =:
+                            type: str
+                      "repeatable":
+                        type: map
+                        mapping:
+                          "prefixes":
+                            type: map
+                            required: yes
+                            mapping:
+                              =:
+                                type: str
+                          "rows":
+                            type: seq
+                            required: yes
+                            sequence:
+                              - type: map
+                                name: previous_results_table_repeatable_row
+                                mapping:
+                                  "row":
+                                    type: str
+                                    required: yes
+                                  "value":
+                                    type: str
+                                  "values":
+                                    type: map
+                                    mapping:
+                                      =:
+                                        type: str

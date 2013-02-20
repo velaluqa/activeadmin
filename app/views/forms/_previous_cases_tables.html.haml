@@ -1,4 +1,8 @@
 #previous_results.offset1.span10
-  - @previous_cases.each do |case_type,cases|
-    - next if cases.empty?
-    = render 'forms/results_table', :cases => cases, :caption => "Previous #{case_type.camelize} Results for this Patient", :skip_header => false, :roi_links => true
+  - case @table_type
+  - when :default
+    - @previous_cases.each do |case_type,cases|
+      - next if cases.empty?
+      = render 'forms/results_table', :cases => cases, :caption => "Previous #{case_type.camelize} Results for this Patient", :skip_header => false, :roi_links => true
+  - when :custom
+    = render 'forms/custom_results_table', :caption => 'Previous Results for this Patient', :merge_cases => @merge_table_columns, :cases => @previous_cases, :table_config => @table_config, :roi_links => true
