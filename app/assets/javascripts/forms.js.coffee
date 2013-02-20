@@ -270,16 +270,20 @@ $(document).ready ->
 
           clear_custom_validation_messages()
 
+          form_data = find_arrays($('#the_form').formParams())
+          console.log(form_data)
+
+          # create a clone so even if custom validators change the values, we don't use the changes
+          form_data_clone = jQuery.extend(true, {}, form_data)
+
           if(window.custom_validation_functions? && window.custom_validation_functions.length > 0)
-            validation_messages = (validator_func($form) for validator_func in window.custom_validation_functions)
+            validation_messages = (validator_func(form_data_clone) for validator_func in window.custom_validation_functions)
             validation_messages = validation_messages.reduce (acc,v) -> acc.concat(v)
 
             if(validation_messages.length > 0)
               set_custom_validation_messages(validation_messages)
               return
               
-          form_data = find_arrays($('#the_form').formParams())
-          console.log(form_data)
           window.form_answers = form_data
           fill_placeholder_cells($('#preview_modal'), form_data)
           fill_placeholder_cells($('#print_version'), form_data)
