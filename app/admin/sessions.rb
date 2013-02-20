@@ -105,35 +105,59 @@ ActiveAdmin.register Session do
           render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
         end
       end
-      row :download_current_configuration do
-        if session.has_configuration?
-          link_to 'Download Current Configuration', download_current_configuration_admin_session_path(session) 
-        else
-          status_tag('Missing', :error)
-        end
-      end
-      row :current_configuration do
-        config = session.current_configuration if session.has_configuration?
+      row :configuration do
+        table do
+          thead do
+            tr do
+              th do
+                "Current"                
+              end
+              unless session.locked_version.nil?
+                th do
+                  "Locked"
+                end
+              end
+            end
+          end
+          tbody do
+            tr do
+              td do 
+                if session.has_configuration?
+                  link_to 'Download Current Configuration', download_current_configuration_admin_session_path(session)
+                else
+                  status_tag('Missing', :error)
+                end
+              end
+              unless session.locked_version.nil?
+                td do
+                  link_to 'Download Locked Configuration', download_locked_configuration_admin_session_path(session)                  
+                end
+              end
+            end
+            tr do
+              td do
+                config = session.current_configuration if session.has_configuration?
 
-        if not session.has_configuration?
-          status_tag('Missing', :error)       
-        elsif config.nil?
-          status_tag('Invalid', :warning)
-        else          
-          CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
-        end
-      end
-      unless session.locked_version.nil?
-        row :download_locked_configuration do
-          link_to 'Download Locked Configuration', download_locked_configuration_admin_session_path(session)
-        end
-        row :locked_configuration do
-          config = session.locked_configuration
-
-          if config.nil?
-            status_tag('Invalid', :warning)
-          else
-            CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
+                if not session.has_configuration?
+                  status_tag('Missing', :error)       
+                elsif config.nil?
+                  status_tag('Invalid', :warning)
+                else
+                  CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
+                end
+              end
+              unless session.locked_version.nil?
+                td do
+                  config = session.locked_configuration
+                  
+                  if config.nil?
+                    status_tag('Invalid', :warning)
+                  else
+                    CodeRay.scan(JSON::pretty_generate(config), :json).div(:css => :class).html_safe
+                  end
+                end
+              end
+            end
           end
         end
       end
