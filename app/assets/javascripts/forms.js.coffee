@@ -32,6 +32,7 @@ update_roi_option = (option, values) ->
   option_value['location'] = {}
   option_value['location']['seriesUID'] = roi['seriesUID']
   option_value['location']['imageIndex'] = roi['instanceNumber']
+  option_value['location']['sopInstanceUID'] = roi['sopInstanceUID']
 
   for own key, value of values
     label = label + camelize(value)+": "+roi[value]+", "
