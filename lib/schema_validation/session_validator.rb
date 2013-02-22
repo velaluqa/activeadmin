@@ -26,6 +26,8 @@ module SchemaValidation
         errors << Kwalify::ValidationError.new("'row' must have either 'value' or 'values'", path) unless (value['value'].nil? ^ value['values'].nil?)
       when 'case_type'
         errors << Kwalify::ValidationError.new("Must have either 'screen_layout' or 'dont_use_viewer: true'", path) unless ((not value['screen_layout'].nil?) ^ value['dont_use_viewer'])
+      when 'case_type_screen_layout'
+        errors << Kwalify::ValidationError.new("When 'strict' is set, 'passive' can't be true.", path) if (value['strict'] and value['passive'])
       end
     end
   end

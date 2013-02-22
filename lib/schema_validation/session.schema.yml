@@ -45,6 +45,7 @@ mapping:
             type: bool
           "screen_layout":
             type: map
+            name: case_type_screen_layout
             mapping:
               "rows":
                 type: int
@@ -60,6 +61,8 @@ mapping:
               "passive":
                 type: bool
               "placeholders":
+                type: bool
+              "strict":
                 type: bool
           "previous_results":
             type: map
