@@ -28,6 +28,7 @@ module SchemaValidation
         errors << Kwalify::ValidationError.new("Must have either 'screen_layout' or 'dont_use_viewer: true'", path) unless ((not value['screen_layout'].nil?) ^ value['dont_use_viewer'])
       when 'case_type_screen_layout'
         errors << Kwalify::ValidationError.new("When 'strict' is set, 'passive' can't be true.", path) if (value['strict'] and value['passive'])
+        errors << Kwalify::ValidationError.new("'passive_annotations' requires 'passive' to be 'true'.", path) if (value['passive_annotations'] and not value['passive'])
       end
     end
   end
