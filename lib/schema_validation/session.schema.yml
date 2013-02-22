@@ -43,6 +43,8 @@ mapping:
             type: bool
           "dont_use_viewer":
             type: bool
+          "include_3d_viewer_rois":
+            type: bool
           "screen_layout":
             type: map
             name: case_type_screen_layout
