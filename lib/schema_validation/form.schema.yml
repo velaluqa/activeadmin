@@ -8,7 +8,7 @@ sequence:
         unique: yes
       "type":
         type: str
-        enum: ['select', 'select_multiple', 'string', 'text', 'number', 'fixed', 'date', 'bool', 'roi']
+        enum: ['select', 'select_multiple', 'string', 'text', 'number', 'fixed', 'date', 'bool', 'roi', 'group', 'section']
       "label":
         type: str
       "description":
@@ -19,6 +19,12 @@ sequence:
         type: number
       "selected_option":
         type: any
+      "roi_values":
+        type: map
+        name: field_values
+        mapping:
+          =:
+            type: str
       "values":
         type: map
         name: field_values

@@ -49,6 +49,14 @@ class GitConfigRepository
 
     return file_blob.content
   end
+  def text_at_version(path, version = nil)
+    version = current_version if version.nil?
+
+    file_blob = file_at_version(path, version)
+    return nil if file_blob.nil?
+
+    return file_blob.text
+  end
 
   protected
 
@@ -73,7 +81,9 @@ class GitConfigRepository
 
     path_components = path.split('/', 2)
 
-    target_oid = tree[path_components[0]][:oid]
+    target_node = tree[path_components[0]]
+    return nil if target_node.nil?
+    target_oid = target_node[:oid]
     return nil if target_oid.nil?
     return nil unless @repo.exists?(target_oid)
 

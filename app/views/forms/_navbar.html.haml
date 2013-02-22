@@ -3,11 +3,15 @@
     %a.brand= @case.name
     %ul.nav
       %li
-        %a{:href => '#form-top'} Top
-      - @form_config.each do |field|
-        - if(field['type'] == 'add_repeat')
-          %li
-            %a{:href => '#group-heading-'+field['id']}= field['group-label']
+        %form.navbar-form
+          .input-prepend.input-append
+            %a.btn#form_nav_previous_btn{:href => '#', :disabled => true} <
+            %select#form_nav_select
+              %option{:value => 'form-top'} Start
+              - @form_config.each do |field|
+                - if(field['type'] == 'group')
+                  %option{:value => 'group-heading-'+field['id']}= field['label']
+            %a.btn#form_nav_next_btn{:href  => '#'} >
       %li.divider
       %li.dropdown
         %a.dropdown-toggle{:'data-toggle' => 'dropdown', :href => '#'}
@@ -15,7 +19,7 @@
           %span.caret
         %ul.dropdown-menu
           - @form_config.each do |field|
-            - if(field['type'] == 'add_repeat')
+            - if(field['type'] == 'include_start')
               %li
-                %a.add-repeat-btn{:'data-id' => field['id'], :'data-max-repeats' => field['max'], :href => '#'}= field['group-label']
+                %a.add-repeat-btn{:'data-id' => field['id'], :'data-max-repeats' => field['max'], :href => '#'}= field['label']
     %button#refresh-rois-btn.btn.pull-right{:type => 'button', :'data-loading-text' => 'Refreshing...'} Refresh Measurements

@@ -86,17 +86,58 @@ class FormAnswer
 
     return form_config_and_answers_to_display_list(form_config, repeatables_map, answers)
   end
+
+  def form_fields_hash
+    @form_fields_hash ||= generate_form_fields_hash
+
+    return @form_fields_hash
+  end
+  def form_fields_hash!
+    @form_fields_hash = generate_form_fields_hash
+
+    return @form_fields_hash
+  end
+
+  def self.pretty_print_answer(field, answer)
+   case field['type']
+   when 'bool'
+     return (answer == true ? 'Yes' : 'No')
+   when 'select'
+     return FormAnswer.pretty_print_select_answer(field, answer)
+   when 'select_multiple'
+     return 'None' if answer.nil?
+     return answer.map {|a| FormAnswer.pretty_print_select_answer(field, a)}.join(', ')
+   when 'roi'
+     return FormAnswer.printable_roi_answer(field, answer)
+   end
+
+    return nil
+  end
   
   private
 
-  def pretty_print_select_answer(field, answer)
-    if (answer.respond_to?(:'empty?') and answer.empty?)
-      "None given"
-    elsif (field['values'][answer].nil? and answer.is_a?(Float))
-      "#{field['values'][answer.to_i]} (#{answer})"          
-    else
-      "#{field['values'][answer]} (#{answer})"
-    end          
+  def generate_form_fields_hash
+    form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+    return [nil, nil] if (form_config.nil? or repeatables.nil?)
+
+    repeatables_map = {}
+    repeatables.each do |r|
+      r_map = {}
+      r[:config].each do |field|
+        next if field['id'].nil?
+        id = field['id'].slice(4..-2)
+
+        r_map[id] = field
+      end
+      repeatables_map[r[:id]] = r_map
+    end
+
+    form_fields_map = {}
+    form_config.each do |field|
+      form_fields_map[field['id']] = field unless field['id'].nil?
+    end
+
+    return  [form_fields_map, repeatables_map]
   end
 
   def form_config_and_answers_to_display_list(form_config, repeatables, answers, indices = [])
@@ -104,14 +145,14 @@ class FormAnswer
 
     skip_group = false
     while(field = form_config.shift)
-      next if (skip_group and field['type'] != 'group-end')
+      next if (skip_group and field['type'] != 'include_end')
 
       id = field['id']
       indices_copy = indices.clone
       id = id.gsub(/\[\]/) {|match| "[#{indices_copy.shift.to_s}]"} unless id.nil?
 
       case field['type']
-      when 'add_repeat'
+      when 'include_start'
         display_list << field
         skip_group = true
 
@@ -122,30 +163,17 @@ class FormAnswer
         repeatable_answer.each_with_index do |answer, i|
           display_list += form_config_and_answers_to_display_list(Marshal.load(Marshal.dump(repeatable)), repeatables, answers, indices + [i])
         end
-      when 'group-end'
+      when 'include_end'
         display_list << field
         skip_group = false
-      when 'divider'
+      when 'include_divider', 'group', 'section'
         display_list << field
       else
         answer = KeyPathAccessor::access_by_path(answers, id)
-        case field['type']
-        when 'bool'
-          answer = (answer == true ? "Yes" : "No")
-        when 'select'
-          answer = pretty_print_select_answer(field, answer)
-        when 'select_multiple'
-          if answer.nil?
-            answer = "None"
-          else
-            answer = answer.map {|a| pretty_print_select_answer(field, a)}.join(', ')
-          end
-        when 'roi'
-          if answer.nil?
-            answer = "None given"
-          else
-            answer = (answer.respond_to?(:map) ? answer.map {|k,v| "#{k}: #{v}"}.join("\n") : answer)
-          end
+        answer = FormAnswer.pretty_print_answer(field, answer)
+
+        if field['type'] == 'roi'
+          field.merge!({'seriesUID' => answer['location']['seriesUID'], 'imageIndex' => answer['location']['imageIndex'].to_i}) unless answer['location'].nil?
         end
 
         display_list << field.merge({'answer' => answer, 'id' => id})
@@ -153,6 +181,31 @@ class FormAnswer
     end
 
     return display_list
+  end
+
+  def self.printable_roi_answer(field, roi_answer)
+    return 'None given' if roi_answer.nil?
+    return pretty_print_select_answer(field, roi_answer) unless roi_answer.respond_to?(:map)
+
+    mapped_answer = roi_answer.map do |key, value|
+      if key == 'location'
+        "Location: #{value['seriesUID']} ##{value['imageIndex'].to_i}"
+      else
+        "#{key}: #{value}"
+      end
+    end
+   
+    mapped_answer.join("\n")
+  end
+
+  def self.pretty_print_select_answer(field, answer)
+    if (answer.respond_to?(:'empty?') and answer.empty?)
+      "None given"
+    elsif (field['values'][answer].nil? and answer.is_a?(Float))
+      "#{field['values'][answer.to_i.to_s]} (#{answer})"          
+    else
+      "#{field['values'][answer]} (#{answer})"
+    end          
   end
 
   def user_public_key_rsa

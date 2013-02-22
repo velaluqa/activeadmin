@@ -61,7 +61,6 @@ ActiveAdmin.register FormAnswer do
       end
       row :answers do
         render "forms/results_table", :caption => '', :cases => [form_answer.case], :skip_header => true
-        #render "forms/results", :fields => form_answer.printable_answers, :display_type => 'review'
       end
       row :answers_raw do        
         CodeRay.scan(JSON::pretty_generate(form_answer.answers), :json).div(:css => :class).html_safe unless form_answer.answers.nil?

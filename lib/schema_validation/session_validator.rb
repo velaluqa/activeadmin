@@ -12,14 +12,23 @@ module SchemaValidation
 
     def validate_hook(value, rule, path, errors)
       case rule.name
-      when 'root'
-        limit_previous_results = value['limit_previous_results']
-        types = value['types']
-        if(not limit_previous_results.nil? and limit_previous_results.is_a?(Array) and types.is_a?(Hash))
-          limit_previous_results.reject {|case_type| types.include?(case_type)}.each do |unknown_case_type|
-            errors << Kwalify::ValidationError.new("Case type #{unknown_case_type} is referenced in 'limit_previous_results', but not defined", path)
-          end
+      when 'previous_results'
+        errors << Kwalify::ValidationError.new("Must contain either 'default_table' or 'table'", path) unless ((not value['default_table'].nil?) ^ (not value['table'].nil?))
+        errors << Kwalify::ValidationError.new("'merge_columns' can only be used with 'table', not 'default_table'", path) unless (value['default_table'].nil? or value['merge_columns'].nil?)
+      when 'previous_results_table_row'
+        unless ((not value['group'].nil?) ^ (not value['row'].nil?) ^ (not value['repeatable'].nil?))
+          errors << Kwalify::ValidationError.new("Must contain exactly one of 'group', 'row' or 'repeatable'", path)
+        else
+          errors << Kwalify::ValidationError.new("Only 'row' rows can not contain 'value' or 'values'", path) unless ((value['value'].nil? and value['values'].nil?) or not value['row'].nil?)
+          errors << Kwalify::ValidationError.new("'row' must have either 'value' or 'values'", path) unless (value['row'].nil? or (value['value'].nil? ^ value['values'].nil?))
         end
+      when 'previous_results_table_repeatable_row'
+        errors << Kwalify::ValidationError.new("'row' must have either 'value' or 'values'", path) unless (value['value'].nil? ^ value['values'].nil?)
+      when 'case_type'
+        errors << Kwalify::ValidationError.new("Must have either 'screen_layout' or 'dont_use_viewer: true'", path) unless ((not value['screen_layout'].nil?) ^ value['dont_use_viewer'])
+      when 'case_type_screen_layout'
+        errors << Kwalify::ValidationError.new("When 'strict' is set, 'passive' can't be true.", path) if (value['strict'] and value['passive'])
+        errors << Kwalify::ValidationError.new("'passive_annotations' requires 'passive' to be 'true'.", path) if (value['passive_annotations'] and not value['passive'])
       end
     end
   end

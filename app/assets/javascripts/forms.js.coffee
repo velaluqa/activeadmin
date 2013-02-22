@@ -29,6 +29,11 @@ update_roi_option = (option, values) ->
   label = "Name: "+roi['name']+", "
   option_value = {}
 
+  option_value['location'] = {}
+  option_value['location']['seriesUID'] = roi['seriesUID']
+  option_value['location']['imageIndex'] = roi['instanceNumber']
+  option_value['location']['sopInstanceUID'] = roi['sopInstanceUID']
+
   for own key, value of values
     label = label + camelize(value)+": "+roi[value]+", "
     option_value[key] = roi[value]
@@ -50,7 +55,7 @@ update_roi_select = (select) ->
 
   values = jQuery.parseJSON(select.attr('data-roi-values'))
 
-  options = select.find('option[value]').not('[value=""]')
+  options = select.find('option[value]').not('[value=""]').not('[data-permanent-select-option="true"]')
   existing_ids = []
   for option in options
     if update_roi_option(option, values)?      
@@ -111,15 +116,19 @@ fill_data_field = (field, answers) ->
 
   if(field.attr('data-type') == 'bool')
     answer = if answer == yes then "Yes" else "No"
-  else if(field.attr('data-type') == 'roi')
-    answer_html = (('<p>'+key+": "+value+'</p>') for own key,value of answer)
-  else if(field.attr('data-type') == 'select')
-    answer_option = $('#'+field_name).find('option[value="'+answer+'"]').text()
+  else if(field.attr('data-type') == 'roi') and (typeof answer == 'object')
+    location_html = '<p>Location: '+answer['location']['seriesUID']+' #'+answer['location']['imageIndex'].toString()+'</p>'
+    answer_html = location_html+(('<p>'+key+": "+value+'</p>') for own key,value of answer when key != 'location').join("\n")      
+  else if(field.attr('data-type') == 'select') or ((field.attr('data-type') == 'roi') and (typeof answer == 'string'))
+    select_input = $('select[name="'+field_name+'"]')
+    answer_option = select_input.find('option[value="'+answer+'"]').text()
     answer = if answer_option? and answer_option.length > 0 then answer_option else answer
   else if(field.attr('data-type') == 'select_multiple')
+    select_input = $('select[name="'+field_name+'"]')
     answer_html = for value in answer
-      option = $('#'+field_name).find('option[value="'+value+'"]').text()
+      option = select_input.find('option[value="'+value+'"]').text()
       '<p>'+(if option? and option.length > 0 then option else value)+'</p>'
+    answer_html = answer_html.join("\n")
 
   if(answer_html?)
     field.html(answer_html)
@@ -229,11 +238,30 @@ update_rois_table = (new_rois) ->
 
     window.rois[roi_id] = roi
 
+update_rois = ->
+  rois = PharmTraceAPI.rois
+  update_rois_table(rois)
+
+  selects = $('.select-roi')
+  update_roi_select(select) for select in selects
+
+update_nav_button_state = ->
+  if $('#form_nav_select option').first().attr('selected') == 'selected'
+    $('#form_nav_previous_btn').attr('disabled', 'disabled')
+    $('#form_nav_next_btn').removeAttr('disabled')
+  else if $('#form_nav_select option').last().attr('selected') == 'selected'
+    $('#form_nav_previous_btn').removeAttr('disabled')
+    $('#form_nav_next_btn').attr('disabled', 'disabled')
+  else
+    $('#form_nav_previous_btn').removeAttr('disabled')
+    $('#form_nav_next_btn').removeAttr('disabled')  
+
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
   window.osirix_id_to_roi_id = {}
   window.name_to_roi_id = {}
+  window.body_padding = $('body').css('padding-top').replace('px', '')
 
   $(".datepicker-field").datepicker()
       
@@ -243,21 +271,58 @@ $(document).ready ->
 
           clear_custom_validation_messages()
 
+          form_data = find_arrays($('#the_form').formParams())
+          console.log(form_data)
+
+          # create a clone so even if custom validators change the values, we don't use the changes
+          form_data_clone = jQuery.extend(true, {}, form_data)
+
           if(window.custom_validation_functions? && window.custom_validation_functions.length > 0)
-            validation_messages = (validator_func($form) for validator_func in window.custom_validation_functions)
+            validation_messages = (validator_func(form_data_clone) for validator_func in window.custom_validation_functions)
             validation_messages = validation_messages.reduce (acc,v) -> acc.concat(v)
 
             if(validation_messages.length > 0)
               set_custom_validation_messages(validation_messages)
               return
               
-          form_data = find_arrays($('#the_form').formParams())
-          console.log(form_data)
           window.form_answers = form_data
           fill_placeholder_cells($('#preview_modal'), form_data)
           fill_placeholder_cells($('#print_version'), form_data)
           $('#preview_modal').modal('show')  
   )
+
+  $('#form_nav_select').change ->
+    target = $('#'+$(this).val())
+    console.log(target)
+    $(window).scrollTop(target.position().top);
+    update_nav_button_state()
+
+  $('#form_nav_previous_btn').click ->  
+    return false if $(this).attr('disabled') == 'disabled'
+    
+    nav_select = $('#form_nav_select')
+    current_value =  nav_select.find('option:selected').val()
+    previous_value = nav_select.find('option:selected').prev().val()
+
+    unless previous_value == current_value
+      nav_select.val(previous_value)
+      nav_select.change()
+      update_nav_button_state()
+
+    return false
+  $('#form_nav_next_btn').click ->
+    return false if $(this).attr('disabled') == 'disabled'
+
+    nav_select = $('#form_nav_select')
+    current_value =  nav_select.find('option:selected').val()
+    next_value = nav_select.find('option:selected').next().val()
+
+    unless next_value == current_value
+      nav_select.val(next_value)
+      nav_select.change()
+      update_nav_button_state()
+
+    return false
 
   $('.add-repeat-btn').click ->
     repeatable_id = $(this).attr('data-id')
@@ -284,6 +349,9 @@ $(document).ready ->
 
     repeatable_form.find('.select-roi').change ->
       update_allowed_rois($(this))
+    repeatable_form.find('.select-roi').mousedown ->
+      PharmTraceAPI.updateROIsSynchronously()
+      update_rois()
     repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
 
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
@@ -296,9 +364,12 @@ $(document).ready ->
     $("#repeatable_group_end_preview_#{repeatable_id}").before(e) for e in repeatable_preview.clone().children()
     $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview.children()
 
-    body_padding = $('body').css('padding-top').replace('px', '')
     delay 10, -> 
-      $(window).scrollTop(scroll_to_element.position().top-body_padding);
+      $(window).scrollTop(scroll_to_element.position().top-window.body_padding);
+
+  $('.select-roi').mousedown ->
+    PharmTraceAPI.updateROIsSynchronously()
+    update_rois()
 
   $('#refresh-rois-btn').click ->
     $(this).button('loading')
@@ -306,12 +377,7 @@ $(document).ready ->
 
   PharmTraceAPI.roisUpdated.connect ->
     #rois = jQuery.parseJSON('[{"id":1,"length":23.42,"name":"Length","seriesModality":"CT","seriesName":"Test Series 1","seriesUID":"1.2.3.4.5","sliceLocation":1,"studyName":"Test Study"},{"area":42.23,"id":23,"max":5,"mean":4.23,"min":3,"name":"Area","seriesModality":"MRT","seriesName":"Test Series 2","seriesUID":"5.4.3.2.1","sliceLocation":7,"studyName":"Test Study"},{"area":65,"id":42,"length":7,"max":23,"mean":7.4223,"min":-1,"name":"MegaROI","seriesModality":"PET","seriesName":"Test Series 2","seriesUID":"5.4.3.2.1","sliceLocation":23,"studyName":"Test Study"}]')
-    rois = PharmTraceAPI.rois
-    update_rois_table(rois)
-        
-    selects = $('.select-roi')
-
-    update_roi_select(select) for select in selects
+    update_rois()
     $('#refresh-rois-btn').button('reset')
 
   $('#preview_submit_btn').click ->

@@ -11,25 +11,13 @@ class FormsController < ApplicationController
     @form_config, @form_components, @repeatables = @form.full_locked_configuration
     @data_hash = @case.data_hash
 
-    if(@case and @case.session)
-      configuration = @case.session.locked_configuration
-
-      unless (configuration.nil? or configuration['show_previous_results'].nil? or configuration['show_previous_results'] == false or params[:previous_results].nil? or params[:previous_results] == 'false')
-        @previous_cases = construct_previous_cases(configuration['limit_previous_results'])
-      end
-    end
+    setup_previous_cases_config
     
     return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
   end
 
   def previous_results
-    if(@case and @case.session)
-      configuration = @case.session.locked_configuration
-
-      unless (configuration.nil? or configuration['show_previous_results'].nil? or configuration['show_previous_results'] == false)
-        @previous_cases = construct_previous_cases(configuration['limit_previous_results'])
-      end
-    end
+    setup_previous_cases_config
   end
 
   def preview
@@ -55,6 +43,25 @@ class FormsController < ApplicationController
 
 protected
 
+  def setup_previous_cases_config
+    if(@case and @case.session)
+      configuration = @case.session.locked_configuration
+
+      unless (configuration.nil? or configuration['types'].nil? or configuration['types'][@case.case_type].nil? or configuration['types'][@case.case_type]['previous_results'].nil?)
+        previous_results_config = configuration['types'][@case.case_type]['previous_results']
+
+        if(previous_results_config['default_table'] == true)
+          @table_type = :default
+          @previous_cases = construct_previous_cases
+        elsif(previous_results_config['table'])
+          @table_type = :custom
+          @table_config = previous_results_config['table']
+          @merge_table_columns = previous_results_config['merge_columns']
+          @previous_cases = @case.patient.cases.where('position < ?', @case.position).reject {|c| c.form_answer.nil?}
+        end
+      end
+    end
+  end
   def construct_previous_cases(enabled_case_types = nil)
     previous_cases_list = @case.patient.cases.where('position < ?', @case.position).reject {|c| c.form_answer.nil?}
     

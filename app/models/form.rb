@@ -52,19 +52,19 @@ class Form < ActiveRecord::Base
   end
 
   def full_current_configuration
-    full_configuration(nil)
+    full_configuration(:current)
   end
   def full_locked_configuration
-    full_configuration(self.locked_version)
+    full_configuration(:locked)
   end
   def full_configuration_at_version(version)
     full_configuration(version)
   end
   def current_configuration
-    parse_config(nil)
+    parse_config(:current)
   end
   def locked_configuration
-    parse_config(self.locked_version)
+    parse_config(:locked)
   end
   def configuration_at_version(versioN)
     parse_config(version)
@@ -73,8 +73,15 @@ class Form < ActiveRecord::Base
     File.exists?(self.config_file_path)
   end
 
+  def current_components
+    components(:current)
+  end
+  def locked_components
+    components(:locked)
+  end
+
   def self.config_field_has_special_type?(field)
-    ['add_repeat', 'group-label', 'divider', 'group-end'].include? field['type']
+    ['include_start', 'include_divider', 'include_end', 'section', 'group'].include? field['type']
   end
 
   def relative_config_file_path
@@ -82,6 +89,18 @@ class Form < ActiveRecord::Base
   end
   def config_file_path
     Rails.application.config.form_configs_directory + "/#{id}.yml"
+  end
+  def relative_validator_file_path
+    Rails.application.config.form_configs_subdirectory + "/#{id}.js"
+  end
+  def validator_file_path
+    Rails.application.config.form_configs_directory + "/#{id}.js"
+  end
+  def relative_stylesheet_file_path
+    Rails.application.config.form_configs_subdirectory + "/#{id}.css"
+  end
+  def stylesheet_file_path
+    Rails.application.config.form_configs_directory + "/#{id}.css"
   end
 
   def included_forms
@@ -111,8 +130,20 @@ class Form < ActiveRecord::Base
   end
 
   protected
+
+  def parse_version_sym(version)
+    case version
+    when :current
+      nil
+    when :locked
+      self.locked_version
+    else
+      version
+    end
+  end
   
   def parse_config(version)
+    version = parse_version_sym(version)
     begin
       config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, version)
     rescue SyntaxError => e
@@ -124,16 +155,16 @@ class Form < ActiveRecord::Base
   
   # TODO: version is not yet used, since components are not yet versioned
   def components(version)
+    version = parse_version_sym(version)
     id = read_attribute(:id)
 
     form_components = {:validators => [], :stylesheets => []}
 
-    if(File.exists?(Rails.application.config.form_configs_directory + "/#{id}.js"))
-      form_components[:validators] << File.open(Rails.application.config.form_configs_directory + "/#{id}.js", 'r') {|f| f.read}
-    end
-    if(File.exists?(Rails.application.config.form_configs_directory + "/#{id}.css"))
-      form_components[:stylesheet] << File.open(Rails.application.config.form_configs_directory + "/#{id}.css", 'r') {|f| f.read}
-    end
+    validator = GitConfigRepository.new.text_at_version(relative_validator_file_path, version)
+    form_components[:validators] << validator unless validator.nil?
+
+    stylesheet = GitConfigRepository.new.text_at_version(relative_stylesheet_file_path, version)
+    form_components[:stylesheet] << stylesheet unless stylesheet.nil?
 
     return form_components
   end
@@ -145,7 +176,8 @@ class Form < ActiveRecord::Base
   end
 
   def full_configuration(version, already_included_forms = nil, stringify = true)
-    form_config = parse_config(version)
+    parsed_version = parse_version_sym(version)
+    form_config = parse_config(parsed_version)
     return [nil,nil,nil] if form_config.nil?
     form_components = components(version)
     return [nil,nil,nil] if form_components.nil?
@@ -189,11 +221,11 @@ class Form < ActiveRecord::Base
           repeatable.each do |included_field|
             included_field['id'] = "#{field['repeat']['prefix']}[][#{included_field['id']}]"
           end
-          repeatable << {'type' => 'divider'}
+          repeatable << {'type' => 'include_divider'}
 
           repeatables << {:id => field['repeat']['prefix'], :max => field['repeat']['max'], :config => repeatable}
 
-          full_config << {'type' => 'add_repeat', 'group-label' => "#{field['repeat']['label']}s", 'button-label' => "Add #{field['repeat']['label']}", 'id' => field['repeat']['prefix'], 'max' => field['repeat']['max']}
+          full_config << {'type' => 'include_start', 'label' => field['repeat']['label'], 'id' => field['repeat']['prefix'], 'max' => field['repeat']['max']}
 
           field['repeat']['min'].times do |i|
             config_copy = Marshal.load(Marshal.dump(included_config))
@@ -202,12 +234,12 @@ class Form < ActiveRecord::Base
               included_field['id'] = "#{field['repeat']['prefix']}[#{i}][#{included_field['id']}]"
             end
 
-            config_copy << {'type' => 'divider'}
+            config_copy << {'type' => 'include_divider'}
 
             full_config += config_copy
           end
 
-          full_config << {'type' => 'group-end', 'id' => field['repeat']['prefix']}
+          full_config << {'type' => 'include_end', 'id' => field['repeat']['prefix']}
         end
 
         full_components.each do |key, value|
