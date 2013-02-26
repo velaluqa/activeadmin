@@ -39,6 +39,8 @@ class FormsController < ApplicationController
     @case.session = @form.session
     @case.patient = patient
 
+    @previous_results = [{:images => 'preview'}]
+
     render :show
   end
 
