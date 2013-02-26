@@ -394,6 +394,11 @@ $(document).ready ->
     PharmTraceAPI.updateROIsSynchronously()
     update_rois()
 
+  $('#recalc-btn').click ->
+    $(this).button('loading')
+    update_calculated_fields()
+    $(this).button('reset')
+
   $('#refresh-rois-btn').click ->
     $(this).button('loading')
     PharmTraceAPI.updateROIs()
