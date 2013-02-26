@@ -91,8 +91,8 @@ protected
   end
 
   def authorize_user_for_case
-    raise CanCan::AccessDenied.new('You are not authorized to access this case!', :read, @case) unless (@case.session.readers.include?(current_user) or
-                                                                                                        @case.session.validators.include?(current_user))
+    raise CanCan::AccessDenied.new('You are not authorized to access this case!', :read, @case) unless ((@case.session.state == :production and @case.session.readers.include?(current_user)) or
+                                                                                                        (@case.session.state == :testing and @case.session.validators.include?(current_user)))
   end
 
   def find_form_from_params
