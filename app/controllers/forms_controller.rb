@@ -12,6 +12,7 @@ class FormsController < ApplicationController
     @data_hash = @case.data_hash
 
     setup_previous_cases_config
+    @previous_results = construct_previous_results_list
     
     return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
   end
@@ -76,6 +77,17 @@ protected
     end
     
     return previous_cases
+  end
+  def construct_previous_results_list
+    previous_cases = @case.patient.cases.where('position < ?', @case.position).reject {|c| c.form_answer.nil?}
+
+    previous_results = []
+    previous_cases.each do |c|
+      previous_results << {'answers' => c.form_answer.answers, 'images' => c.images}
+    end
+    previous_results << {'images' => @case.images}
+
+    return previous_results
   end
 
   def authorize_user_for_case
