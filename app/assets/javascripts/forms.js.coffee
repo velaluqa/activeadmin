@@ -319,6 +319,7 @@ $(document).ready ->
     console.log(target)
     $(window).scrollTop(target.position().top);
     update_nav_button_state()
+    update_calculated_fields()
 
   $('#form_nav_previous_btn').click ->  
     return false if $(this).attr('disabled') == 'disabled'
@@ -326,6 +327,8 @@ $(document).ready ->
     nav_select = $('#form_nav_select')
     current_value =  nav_select.find('option:selected').val()
     previous_value = nav_select.find('option:selected').prev().val()
+
+    update_calculated_fields()
 
     unless previous_value == current_value
       nav_select.val(previous_value)
@@ -339,6 +342,8 @@ $(document).ready ->
     nav_select = $('#form_nav_select')
     current_value =  nav_select.find('option:selected').val()
     next_value = nav_select.find('option:selected').next().val()
+
+    update_calculated_fields()
 
     unless next_value == current_value
       nav_select.val(next_value)
