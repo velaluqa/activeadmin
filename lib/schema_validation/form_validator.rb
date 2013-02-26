@@ -23,7 +23,9 @@ module SchemaValidation
           errors << Kwalify::ValidationError.new('Missing \'values\'', path) if(['select', 'select_multiple'].include?(value['type']) and value['values'].nil?)
           errors << Kwalify::ValidationError.new('Only types \'select\',\'select_multiple\' and \'roi\' can have \'values\'', path) unless (['select', 'select_multiple', 'roi'].include?(value['type']) or value['values'].nil?)
           errors << Kwalify::ValidationError.new('Only \'number\' fields can have a \'number_step\'', path) unless(value['number_step'].nil? or value['type'] == 'number')
-
+          errors << Kwalify::ValidationError.new('Only \'calculated\' fields can have a \'calculation_function\'', path) unless(value['calculation_function'].nil? or value['type'] == 'calculated')
+          errors << Kwalify::ValidationError.new('Only \'calculated\' fields can specify \'store_calculated_value\'', path) unless(value['store_calculated_value'].nil? or value['type'] == 'calculated')
+          errors << Kwalify::ValidationError.new('Fields of type \'calculated\' must specify a \'calculation_function\'', path) if(value['type'] == 'calculated' and value['calculation_function'].nil?)
           unless value['selected_option'].nil?
             case value['type']
             when 'select', 'roi'
