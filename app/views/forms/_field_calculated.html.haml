@@ -1,0 +1,6 @@
+= label_tag(field['id'], field['label'], :class => 'control-label')
+.controls
+  - if field['store_calculated_value']
+    = hidden_field_tag(field['id'])
+  %span.form-fixed-text.calculated-field{:'data-calculation-function' => field['calculation_function'], :name => field['id']}
+  %p.help-block
