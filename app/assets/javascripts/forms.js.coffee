@@ -256,6 +256,27 @@ update_nav_button_state = ->
     $('#form_nav_previous_btn').removeAttr('disabled')
     $('#form_nav_next_btn').removeAttr('disabled')  
 
+update_calculated_field = (field) ->
+  field = $(field)
+  hidden_field = $('.calculated-hidden-field[id="'+field.attr('name')+'"]')
+
+  calculation_function = field.attr('data-calculation-function')
+  unless calculation_function? and @[calculation_function]?
+    console.error('Calculated field "'+field.attr('name')+'" specifies an invalid calculation function "'+calculation_function+'"')
+    return
+
+  [display_value, value] = @[calculation_function](window.results_list)
+  field.html(display_value)
+  hidden_field.val(value) if hidden_field?
+
+update_calculated_fields = ->
+  update_results_list()
+  update_calculated_field(field) for field in $('.calculated-field')
+
+update_results_list = ->
+  current_result = window.results_list[window.results_list.length-1]
+  current_result.answers = find_arrays($('#the_form').formParams())
+
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -264,6 +285,8 @@ $(document).ready ->
   window.body_padding = $('body').css('padding-top').replace('px', '')
 
   $(".datepicker-field").datepicker()
+
+  update_calculated_fields()
       
   $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
         submitSuccess: ($form, event) ->
