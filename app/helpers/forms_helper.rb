@@ -28,7 +28,7 @@ module FormsHelper
     end
 
     values.each do |value, label|
-      selected = (selected_values.include?(value) ? " selected=\"selected\"" : "")
+      selected = ((selected_values and selected_values.include?(value)) ? " selected=\"selected\"" : "")
       options += "<option data-permanent-select-option=\"true\" value=\"#{value}\" #{selected}>#{label} (#{value})</option>"
     end
 
