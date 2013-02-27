@@ -17,6 +17,12 @@ class FormAnswer
   field :annotated_images_signature, type:  String
   field :is_test_data, type: Boolean
 
+  before_destroy do
+    c = self.case
+    c.state = :unread
+    c.save
+  end
+
   def session
     begin
       return Session.find(read_attribute(:session_id))
