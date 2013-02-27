@@ -9,6 +9,9 @@ class FormAnswersController < ApplicationController
     if @case.nil?
       render :json => {:success => false, :error => 'The supplied case does not exist', :error_code => 1}, :status => :bad_request
     end
+    unless @case.form_answer.nil?
+      render :json => {:success => false, :error => 'The supplied case was already answered', :error_code => 2}
+    end
 
     is_test_data = true
     if @case.session.validators.include?(current_user) and @case.session.state == :testing
@@ -45,6 +48,9 @@ class FormAnswersController < ApplicationController
     answer.submitted_at = Time.now
 
     answer.save
+
+    @case.state = :read
+    @case.save
 
     render :json => {:success => true}
   end

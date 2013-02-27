@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130205152103) do
+ActiveRecord::Schema.define(:version => 20130227121120) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -33,9 +33,10 @@ ActiveRecord::Schema.define(:version => 20130205152103) do
     t.integer  "session_id"
     t.integer  "patient_id"
     t.string   "images"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
     t.string   "case_type"
+    t.integer  "state",      :default => 0
   end
 
   add_index "cases", ["patient_id"], :name => "index_views_on_patient_id"

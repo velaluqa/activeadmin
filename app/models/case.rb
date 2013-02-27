@@ -5,7 +5,7 @@ class Case < ActiveRecord::Base
   belongs_to :patient
   has_one :form_answer
   has_one :case_data
-  attr_accessible :images, :position, :case_type
+  attr_accessible :images, :position, :case_type, :state
   attr_accessible :session_id, :patient_id
   attr_accessible :session, :patient
 
@@ -22,6 +22,27 @@ class Case < ActiveRecord::Base
 
   # so we always get results sorted by position, not by row id
   default_scope order('position ASC')
+
+  STATE_SYMS = [:unread, :in_progress, :read]
+
+  def self.state_sym_to_int(sym)
+    return Case::STATE_SYMS.index(sym)
+  end
+  def state
+    return -1 if read_attribute(:state).nil?
+    return Case::STATE_SYMS[read_attribute(:state)]
+  end
+  def state=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Case::STATE_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported state"
+      return
+    end
+
+    write_attribute(:state, index)
+  end
 
   # virtual attribute for pretty names
   def name

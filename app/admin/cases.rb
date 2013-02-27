@@ -19,11 +19,14 @@ ActiveAdmin.register Case do
     column :patient
     column :images
     column :case_type
-    column :form_answer do |c|
-      if(c.form_answer.nil?)
-        status_tag('None', :error)
-      else
-        status_tag('available', :ok, :label => link_to('Available', admin_form_answer_path(c.form_answer)).html_safe)
+    column :state do |c|
+      case c.state
+      when :unread
+        status_tag('Unread', :error)
+      when :in_progress
+        status_tag('In Progress', :warning)
+      when :read
+        status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe)
       end
     end
    
@@ -39,11 +42,14 @@ ActiveAdmin.register Case do
       row :patient
       row :images
       row :case_type
-      row :form_answers do
-        if(c.form_answer.nil?)
-          status_tag('None', :error)
-        else
-          status_tag('available', :ok, :label => link_to('Available', admin_form_answer_path(c.form_answer)).html_safe)
+      row :state do
+        case c.state
+        when :unread
+          status_tag('Unread', :error)
+        when :in_progress
+          status_tag('In Progress', :warning)
+        when :read
+          status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe)
         end
       end
       row :case_data_raw do
