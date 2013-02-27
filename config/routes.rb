@@ -12,6 +12,8 @@ StudyServer::Application.routes.draw do
   resources :sessions, :only => [:show] do
     collection do
       get 'list'
+    end
+    member do
       get 'reserve_cases'
     end
   end
