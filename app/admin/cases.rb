@@ -48,7 +48,7 @@ ActiveAdmin.register Case do
       when :in_progress
         status_tag('In Progress', :warning)
       when :read
-        status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe)
+        status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       end
     end
    
@@ -81,7 +81,7 @@ ActiveAdmin.register Case do
         when :in_progress
           status_tag('In Progress', :warning)
         when :read
-          status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe)
+          status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
         end
       end
       row :case_data_raw do
