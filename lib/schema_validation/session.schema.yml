@@ -17,6 +17,26 @@ mapping:
     type: int
     range:
       min: 1
+  "reader_testing":
+    type: map
+    mapping:
+      "interval":
+        type: int
+        required: yes
+        range:
+          min: 0
+      "case_type":
+        type: str
+        required: yes
+      "patient":
+        type: str
+        required: yes
+      "images":
+        type: str
+        required: yes
+      "judgement_function":
+        type: str
+        required: yes
   "types":
     type: map
     required: yes
