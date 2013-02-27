@@ -68,6 +68,15 @@ ActiveAdmin.register FormAnswer do
       row :annotated_images_raw do       
         CodeRay.scan(JSON::pretty_generate(form_answer.annotated_images), :json).div(:css => :class).html_safe unless form_answer.annotated_images.nil?
       end
+      if(form_answer.case.flag == :reader_testing)
+        row 'Reader Testing Judgement' do
+          if(FormAnswersController.new.run_form_judgement_function(form_answer) == true)
+            status_tag('Passed', :ok)
+          else
+            status_tag('Failed', :error)
+          end
+        end
+      end
     end
   end
 end

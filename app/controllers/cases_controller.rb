@@ -8,6 +8,11 @@ class CasesController < ApplicationController
       @case.state = :unread
       @case.save
 
+      if(@case.flag == :reader_testing)
+        @case.form_answer.destroy
+        @case.destroy
+      end
+
       respond_to do |format|
         format.json { render :json => {:success => true} }
       end  
