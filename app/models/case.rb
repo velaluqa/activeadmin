@@ -5,7 +5,7 @@ class Case < ActiveRecord::Base
   belongs_to :patient
   has_one :form_answer
   has_one :case_data
-  attr_accessible :images, :position, :case_type, :state
+  attr_accessible :images, :position, :case_type, :state, :flag
   attr_accessible :session_id, :patient_id
   attr_accessible :session, :patient
 
@@ -42,6 +42,27 @@ class Case < ActiveRecord::Base
     end
 
     write_attribute(:state, index)
+  end
+
+  FLAG_SYMS = [:regular, :validation, :reader_testing]
+
+  def self.flag_sym_to_int(sym)
+    return Case::FLAG_SYMS.index(sym)
+  end
+  def flag
+    return -1 if read_attribute(:flag).nil?
+    return Case::FLAG_SYMS[read_attribute(:flag)]
+  end
+  def flag=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Case::FLAG_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported flag"
+      return
+    end
+
+    write_attribute(:flag, index)
   end
 
   # virtual attribute for pretty names
