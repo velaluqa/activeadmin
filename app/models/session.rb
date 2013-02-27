@@ -100,6 +100,10 @@ class Session < ActiveRecord::Base
     included_forms.each do |included_form|
       validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => self.id).empty?
     end
+    if(config['reader_testing'])
+      validation_errors << "Reader testing case type '#{config['reader_testing']['case_type']}' does not exist" if config['types'][config['reader_testing']['case_type']].nil?
+      validation_errors << "Reader testing patient '#{config['reader_testing']['patient']}' does not exist" if Patient.where(:subject_id => config['reader_testing']['patient'], :session_id => self.id).empty?
+    end
 
     return validation_errors
   end
