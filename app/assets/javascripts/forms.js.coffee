@@ -149,7 +149,7 @@ value_at_path = (obj, path) ->
 is_array = (obj) ->
   return false unless (typeof obj == 'object')
   
-  numbers = ((/^[0-9]*/.test(key)) for own key, value of obj)
+  numbers = ((/^[0-9]*$/.test(key)) for own key, value of obj)
 
   return true if numbers.length == 0
   numbers.reduce (a,b) -> a and b
