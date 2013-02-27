@@ -8,6 +8,7 @@ class Form < ActiveRecord::Base
 
   validates :name, :presence => true
   validates :name, :format => { :with => /^[a-zA-Z0-9_]+$/, :message => 'Only letters A-Z, numbers and \'_\' allowed' }
+  validates_uniqueness_of :name, :scope => :session_id  
 
   belongs_to :session
   has_many :form_answers

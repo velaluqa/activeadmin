@@ -6,6 +6,8 @@ class Patient < ActiveRecord::Base
   has_many :cases
   has_one :patient_data
 
+  validates_uniqueness_of :subject_id, :scope => :session_id  
+  
   before_destroy do
     unless cases.empty? and form_answers.empty?
       errors.add :base, 'You cannot delete a patient which has cases or form answers associated.' 
