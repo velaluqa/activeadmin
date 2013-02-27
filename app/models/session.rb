@@ -114,9 +114,11 @@ class Session < ActiveRecord::Base
   def case_list(mode = :unread)
     case mode
     when :unread
-      self.cases.find_all {|c| c.form_answer.nil?}
+      self.cases.find_all {|c| c.state == :unread and c.form_answer.nil? }
+    when :in_progress
+      self.cases.where(:state => :in_progress)
     when :read
-      self.cases.reject {|c| c.form_answer.nil?}        
+      self.cases.find_all {|c| c.state == :read and not c.form_answer.nil?}
     when :all
       self.cases
     end
@@ -126,6 +128,13 @@ class Session < ActiveRecord::Base
     return self.session_pauses.order("end DESC").first
   end
 
+  def reserve_next_case
+    c = case_list(:unread).first
+    c.state = :in_progress
+    c.save
+
+    return c
+  end
   def next_unread_case
     case_list(:unread).first
   end

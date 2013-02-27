@@ -12,6 +12,13 @@ StudyServer::Application.routes.draw do
   resources :sessions, :only => [:show] do
     collection do
       get 'list'
+      get 'reserve_cases'
+    end
+  end
+  
+  resources :cases, :only => [] do
+    member do
+      get 'cancel_read'
     end
   end
 
