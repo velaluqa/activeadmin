@@ -258,6 +258,12 @@ ActiveAdmin.register Form do
       return
     end
 
+    if(@form.session.state != :building)
+      flash[:error] = 'The forms session is locked, can\'t unlock form!'
+      redirect_to :action => :show
+      return
+    end
+
     @form.state = :draft
     @form.locked_version = nil
     @form.save
