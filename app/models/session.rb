@@ -81,6 +81,15 @@ class Session < ActiveRecord::Base
       
     return config
   end
+  def configuration_at_version(version)
+    begin
+      config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, version)
+    rescue SyntaxError => e
+      return nil
+    end
+      
+    return config
+  end
   def has_configuration?
     File.exists?(self.config_file_path)
   end

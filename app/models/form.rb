@@ -67,7 +67,7 @@ class Form < ActiveRecord::Base
   def locked_configuration
     parse_config(:locked)
   end
-  def configuration_at_version(versioN)
+  def configuration_at_version(version)
     parse_config(version)
   end
   def has_configuration?
@@ -79,6 +79,9 @@ class Form < ActiveRecord::Base
   end
   def locked_components
     components(:locked)
+  end
+  def components_at_version(version)
+    components(version)
   end
 
   def self.config_field_has_special_type?(field)
