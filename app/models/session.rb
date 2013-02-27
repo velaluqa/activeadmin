@@ -112,15 +112,16 @@ class Session < ActiveRecord::Base
   end
 
   def case_list(mode = :unread)
+    flag = (self.state == :testing ? :validation : :regular)
     case mode
     when :unread
-      self.cases.find_all {|c| c.state == :unread and c.form_answer.nil? }
+      self.cases.where(:state => Case::state_sym_to_int(:unread), :flag => Case::flag_sym_to_int(flag)).reject {|c| not c.form_answer.nil? }
     when :in_progress
-      self.cases.where(:state => :in_progress)
+      self.cases.where(:state => Case::state_sym_to_int(:in_progress), :flag => Case::flag_sym_to_int(flag))
     when :read
-      self.cases.find_all {|c| c.state == :read and not c.form_answer.nil?}
+      self.cases.where(:state => Case::state_sym_to_int(:read), :flag => Case::flag_sym_to_int(flag)).reject {|c| c.form_answer.nil? }
     when :all
-      self.cases
+      self.cases.where(:flag => Case::flag_sym_to_int(flag))
     end
   end
 
