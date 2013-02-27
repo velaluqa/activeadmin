@@ -107,10 +107,36 @@ ActiveAdmin.register Case do
     if controller.action_methods.include?('edit') and resource.state == :unread and resource.form_answer.nil?
       link_to(I18n.t('active_admin.edit_model', :model => active_admin_config.resource_label), edit_resource_path(resource))
     end
+  end
+  action_item :only => :show do
+    # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
     if controller.action_methods.include?('destroy') and resource.state == :unread and resource.form_answer.nil?
       link_to(I18n.t('active_admin.delete_model', :model => active_admin_config.resource_label),
               resource_path(resource),
               :method => :delete, :data => {:confirm => I18n.t('active_admin.delete_confirmation')})
     end
   end 
+
+  batch_action :mark_as_regular do |selection|
+    Case.find(selection).each do |c|
+      authorize! :manage, c
+      next unless (c.state == :unread and c.form_answer.nil?)
+
+      c.flag = :regular
+      c.save
+    end
+
+    redirect_to :action => :index
+  end
+  batch_action :mark_as_validation do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+      next unless (c.state == :unread and c.form_answer.nil?)
+
+      c.flag = :validation
+      c.save
+    end
+
+    redirect_to :action => :index
+  end
 end
