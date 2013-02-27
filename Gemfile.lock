@@ -242,6 +242,7 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   debugger
   devise
+  execjs
   haml-rails
   jquery-rails
   kwalify

@@ -23,12 +23,15 @@ group :assets do
   gem 'twitter-bootstrap-rails'
   gem 'bootstrap-datepicker-rails'
 
-  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  gem 'libv8', '~> 3.11.8'
-  gem 'therubyracer', :platforms => :ruby
 
   gem 'uglifier', '>= 1.0.3'
 end
+
+# we need these even in production, for server-side judgement functions
+# See https://github.com/sstephenson/execjs#readme for more supported runtimes
+gem 'libv8', '~> 3.11.8'
+gem 'therubyracer', :platforms => :ruby
+gem 'execjs'
 
 gem 'jquery-rails'
 
