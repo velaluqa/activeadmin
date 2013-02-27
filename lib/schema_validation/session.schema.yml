@@ -28,6 +28,22 @@ mapping:
           "form":
             type: str
             required: yes
+          "validation":
+            type: map
+            mapping:
+              "features":
+                type: seq
+                sequence:
+                  - type: str
+                    unique: yes
+              "toolbar_layout":
+                type: seq
+                sequence:
+                  - type: str
+              "annotations_layout":
+                type: str
+              "context_menu":
+                type: bool
           "features":
             type: seq
             sequence:
