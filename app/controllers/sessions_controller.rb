@@ -34,7 +34,7 @@ class SessionsController < ApplicationController
   end
 
   def reserve_cases
-    count = (params[:count].nil? : 1 : params[:count].to_i)
+    count = (params[:count].nil? ? 1 : params[:count].to_i)
 
     cases = []
     count.times do
