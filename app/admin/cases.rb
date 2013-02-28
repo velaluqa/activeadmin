@@ -49,6 +49,8 @@ ActiveAdmin.register Case do
         status_tag('In Progress', :warning)
       when :read
         status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
+      when :reopened
+        status_tag('Reopened', :warning, :label => link_to('Reopened', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       end
     end
    
@@ -82,6 +84,8 @@ ActiveAdmin.register Case do
           status_tag('In Progress', :warning)
         when :read
           status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
+        when :reopened
+          status_tag('Reopened', :warning, :label => link_to('Reopened', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
         end
       end
       row :case_data_raw do
@@ -100,6 +104,24 @@ ActiveAdmin.register Case do
     end
     
     f.buttons
+  end
+
+  member_action :reopen, :only => :show do
+    @case = Case.find(params[:id])
+
+    if(@case.state != :read or @case.form_answer.nil?)
+      flash[:error] = 'Only read cases can be reopened.'
+      redirect_to :action => :show
+      return
+    end
+
+    @case.state = :reopened
+    @case.save
+
+    redirect_to({:action => :show}, :notice => 'Case is reopened and the answers can now be ammended via the Reader Client.')
+  end
+  action_item :only => :show do
+    link_to('Reopen', reopen_admin_case_path(resource)) if (resource.state == :read and resource.form_answer)
   end
 
   action_item :only => :show do
