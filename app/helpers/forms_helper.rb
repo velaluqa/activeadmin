@@ -120,4 +120,9 @@ module FormsHelper
       simple_format(FormAnswer.pretty_print_answer(answer_spec, answer))
     end
   end
+
+  def value_for_reopened_case(field, reopened_case)
+    return nil if (reopened_case.form_answer.nil? or reopened_case.form_answer.answers.nil?)
+    KeyPathAccessor::access_by_path(reopened_case.form_answer.answers, field['id'])
+  end
 end

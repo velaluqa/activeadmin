@@ -44,16 +44,25 @@ class SessionsController < ApplicationController
 
     cases = []
 
-    last_reader_testing_result = current_user.test_results_for_session(@session).last
-    if(config['reader_testing'] and (last_reader_testing_result.nil? or last_reader_testing_result.submitted_at < Time.now - config['reader_testing']['interval']))
-      cases << create_reader_test_case(config)
-      count -= 1
-    end
+    if(@reopened_cases.empty?)
+      last_reader_testing_result = current_user.test_results_for_session(@session).last
+      if(config['reader_testing'] and (last_reader_testing_result.nil? or last_reader_testing_result.submitted_at < Time.now - config['reader_testing']['interval']))
+        cases << create_reader_test_case(config)
+        count -= 1
+      end
 
-    count.times do
-      c = @session.reserve_next_case
-      break if c.nil?
-      cases << c
+      count.times do
+        c = @session.reserve_next_case
+        break if c.nil?
+        cases << c
+      end
+    else
+      @reopened_cases.each do |c|
+        c.state = :reopened_in_progress
+        c.save
+
+        cases << c
+      end
     end
 
     passive_cases = passive_cases_for_case_list(cases)
@@ -93,7 +102,13 @@ class SessionsController < ApplicationController
       return false
     end
 
-    authorize_user_for_session
+    authorize_user_for_session    
+    check_for_reopened_cases
+  end
+  def check_for_reopened_cases
+    @reopened_cases = @session.cases.where(:state => Case::state_sym_to_int(:reopened))
+      .reject {|c| c.form_answer.nil? }
+      .reject {|c| c.form_answer.user != current_user }
   end
 
   def passive_cases_for_case_list(case_list)

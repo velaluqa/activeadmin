@@ -1,7 +1,9 @@
 = label_tag(field['id'], field['label'], :class => 'control-label')
 .controls
   - value, fixed_value_hash = fixed_value(field, data_hash)
-  - if value.nil?
+  - if(@case.state == :reopened_in_progress)
+    - value = value_for_reopened_case(field, @case)  
+  - elsif value.nil?
     - value = field['selected_option']
   - else
     - value = value.split(':')

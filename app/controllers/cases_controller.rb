@@ -4,11 +4,11 @@ class CasesController < ApplicationController
   before_filter :find_case
 
   def cancel_read
-    if(@case.state == :in_progress)
-      @case.state = :unread
+    if(@case.state == :in_progress || @case.state == :reopened_in_progress)
+      @case.state = (@case.state == :reopened_in_progress ? :reopened : :unread)
       @case.save
 
-      if(@case.flag == :reader_testing)
+      if(@case.state == :unread and @case.flag == :reader_testing)
         @case.form_answer.destroy
         @case.destroy
       end
