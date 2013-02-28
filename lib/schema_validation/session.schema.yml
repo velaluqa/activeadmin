@@ -73,8 +73,9 @@ mapping:
             type: seq
             sequence:
               - type: str
-          "annotations_layout":
+          "annotations_layout":          
             type: str
+            required: yes
           "context_menu":
             type: bool
           "dont_use_viewer":
