@@ -13,7 +13,9 @@ class GitConfigRepository
 
   def update_config_file(path, new_file, author, commit_message)
     FileUtils.cp(new_file, @repo.workdir+'/'+path)
-    
+    update_path(path, author, commit_message)
+  end
+  def update_path(path, author, commit_message)
     index = @repo.index
     index.add(path)
     index.write
@@ -59,7 +61,7 @@ class GitConfigRepository
   end
 
   protected
-
+  
   def file_at_version(path, version)
     begin
       return nil unless @repo.exists?(version)      

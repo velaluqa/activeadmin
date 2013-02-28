@@ -161,6 +161,16 @@ class Session < ActiveRecord::Base
     return self.cases.last.position+1
   end
 
+  # fake attributes for formtastic
+  # this is both disgusting and stupid, but still seems the most practical way :(
+  def case_type
+    nil
+  end
+  def annotations_layout_mode
+    :regular
+  end
+
+
   private
 
   
