@@ -78,6 +78,11 @@ ActiveAdmin.register Form do
         form.state.to_s.camelize + (form.locked_version.nil? ? '' : " (Version: #{form.locked_version})")
       end
       row :session
+      if form.has_configuration?
+        row :configuration_validation do        
+          render 'admin/shared/schema_validation_results', :errors => form.validate
+        end
+      end
       row :configuration do
         current = {}
         if form.has_configuration?
@@ -105,11 +110,6 @@ ActiveAdmin.register Form do
         end
 
         render 'admin/shared/config_table', :current => current, :locked => locked
-      end
-      if form.has_configuration?
-        row :configuration_validation do        
-          render 'admin/shared/schema_validation_results', :errors => form.validate
-        end
       end
       row :custom_validators do
         current_components = form.current_components
