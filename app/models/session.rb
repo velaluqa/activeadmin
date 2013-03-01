@@ -144,6 +144,7 @@ class Session < ActiveRecord::Base
 
   def reserve_next_case
     c = case_list(:unread).first
+    return nil if c.nil?
     c.state = :in_progress
     c.save
 
