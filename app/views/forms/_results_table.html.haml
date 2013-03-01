@@ -50,6 +50,7 @@
       - when 'group'
         %tr
           %th{:colspan => 2+cases.count}= field_spec['label']
+      - when 'section'
       - else
         = render 'forms/results_table_row', :current_group_index => current_group_index, :first_in_group => first_in_group, :field_spec => field_spec, :printable_answers => printable_answers, :cases => cases, :placeholders_only => placeholders_only, :roi_links => roi_links
         - first_in_group = false
