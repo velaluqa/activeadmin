@@ -8,9 +8,11 @@ class FormAnswersController < ApplicationController
     @case = Case.find(params['case_id'])
     if @case.nil?
       render :json => {:success => false, :error => 'The supplied case does not exist', :error_code => 1}, :status => :bad_request
+      return
     end
     unless (@case.form_answer.nil? or @case.flag == :reader_testing)
       render :json => {:success => false, :error => 'The supplied case was already answered', :error_code => 2}
+      return
     end
 
     is_test_data = true
@@ -28,19 +30,27 @@ class FormAnswersController < ApplicationController
       is_test_data = true
     end
 
-    answer = FormAnswer.new
+    unless(@case.state = :reopened_in_progress and @case.form_answer)
+      answer = FormAnswer.new
 
-    answer.form_id = params['form_id']
-    begin
-      answer.form_version = @case.session.forms.find(params['form_id']).locked_version
-    rescue ActiveRecord::RecordNotFound => e
-      render :json => {:success => fase, :error => 'The form associated with this form answer does not exist.', :error_code => 2}
-      return
+      answer.form_id = params['form_id']
+      begin
+        answer.form_version = @case.session.forms.find(params['form_id']).locked_version
+      rescue ActiveRecord::RecordNotFound => e
+        render :json => {:success => fase, :error => 'The form associated with this form answer does not exist.', :error_code => 2}
+        return
+      end
+      answer.user_id = current_user.id
+
+      answer.case_id = @case.id
+      answer.session_id = @case.session.id
+
+      answer.is_test_data = is_test_data
+    else
+      @case.form_answer.version_current_answers
+
+      answer = @case.form_answer
     end
-    answer.user_id = current_user.id
-
-    answer.case_id = @case.id
-    answer.session_id = @case.session.id
         
     answer.answers = params['answers']
     answer.answers_signature = params['answers_signature']
@@ -48,15 +58,13 @@ class FormAnswersController < ApplicationController
     answer.annotated_images = params['annotated_images']
     answer.annotated_images_signature = params['annotated_images_signature']
     
-    answer.is_test_data = is_test_data
-
     answer.submitted_at = Time.now
 
     answer.save
 
     @case.state = :read
     @case.save
-
+    
     if(@case.flag == :reader_testing)
       if(run_form_judgement_function(answer) == true)
         render :json => {:success => true}
