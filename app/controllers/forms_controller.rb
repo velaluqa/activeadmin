@@ -8,7 +8,11 @@ class FormsController < ApplicationController
   layout 'client_forms', :only => [:show, :previous_results, :preview]
 
   def show
-    @form_config, @form_components, @repeatables = @form.full_locked_configuration
+    if(@case.state == :reopened_in_progress and @case.form_answer)
+      @form_config, @form_components, @repeatables = @form.full_configuration_at_version_for_case(@case.form_answer.form_version, @case)
+    else
+      @form_config, @form_components, @repeatables = @form.full_locked_configuration
+    end
     @data_hash = @case.data_hash
 
     setup_previous_cases_config
