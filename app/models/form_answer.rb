@@ -141,6 +141,8 @@ class FormAnswer
      return answer.map {|a| FormAnswer.pretty_print_select_answer(field, a)}.join(', ')
    when 'roi'
      return FormAnswer.printable_roi_answer(field, answer)
+   else
+     return answer
    end
 
     return nil
