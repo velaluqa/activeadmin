@@ -8,10 +8,10 @@
     - unless roi_value.nil?
       - if roi_value.is_a?(String)
         - selected_value = [roi_value]
-        - old_roi_option = ''
+        - old_roi_options = []
       - else
         - selected_value = []
-        - old_roi_option = "<option data-permanent-select-option=\"true\" value=\"#{JSON::generate(roi_value)}\" selected=\"selected\">Keep old ROI</option>"
-  - old_roi_option = '' if old_roi_option.nil?
-  = select_tag(field['id'], (old_roi_option+options_from_values(field, selected_value)).html_safe, { :class => "#{input_size} select-roi", :'data-roi-values' => (field['roi_values'].nil? ? '{}' : field['roi_values'].to_json)}.merge(validators_hash(field)))
+        - old_roi_options = ["<option data-permanent-select-option=\"true\" value=\"#{ERB::Util.html_escape(JSON::generate(roi_value))}\" selected=\"selected\">Keep old ROI</option>"]
+  - old_roi_options = [] if old_roi_options.nil?
+  = select_tag(field['id'], options_from_values(field, selected_value, false, old_roi_options).html_safe, { :class => "#{input_size} select-roi", :'data-roi-values' => (field['roi_values'].nil? ? '{}' : field['roi_values'].to_json)}.merge(validators_hash(field)))
   %p.help-block
