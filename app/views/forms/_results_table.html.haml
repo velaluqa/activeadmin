@@ -2,11 +2,18 @@
 - skip_header = false unless (defined? skip_header)
 - display_type = 'results' unless placeholders_only
 - roi_links = false unless (defined? roi_links)
+- versions = nil unless (defined? versions and not versions.nil? and versions.size == cases.size)
 
 - if placeholders_only
   - printable_answers = [form_config]
 - else
-  - printable_answers = cases.map {|c| c.form_answer.printable_answers}
+  - if versions.nil?
+    - printable_answers = cases.map {|c| c.form_answer.printable_answers}
+  - else
+    - printable_answers = []
+    - cases.each_with_index do |c,i|
+      - versions[i].each do |version_index|
+        - printable_answers << c.form_answer.printable_answers_for_version(version_index)
 - current_group_index = nil
 - first_in_group = false
 %table.table.table-striped.table-bordered.table-condensed
@@ -43,6 +50,7 @@
       - when 'group'
         %tr
           %th{:colspan => 2+cases.count}= field_spec['label']
+      - when 'section'
       - else
         = render 'forms/results_table_row', :current_group_index => current_group_index, :first_in_group => first_in_group, :field_spec => field_spec, :printable_answers => printable_answers, :cases => cases, :placeholders_only => placeholders_only, :roi_links => roi_links
         - first_in_group = false
