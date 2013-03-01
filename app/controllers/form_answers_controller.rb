@@ -4,14 +4,14 @@ class FormAnswersController < ApplicationController
   # TEMP workaround, just to make doubly sure that #319 doesn't come round to bite us
   skip_before_filter :verify_authenticity_token, :only => :create
 
-  def create    
+  def create   
     @case = Case.find(params['case_id'])
     if @case.nil?
       render :json => {:success => false, :error => 'The supplied case does not exist', :error_code => 1}, :status => :bad_request
       return
     end
-    unless (@case.form_answer.nil? or @case.flag == :reader_testing)
-      render :json => {:success => false, :error => 'The supplied case was already answered', :error_code => 2}
+    unless (@case.form_answer.nil? or @case.flag == :reader_testing or @case.state == :reopened_in_progress)
+      render :json => {:success => false, :error => 'The supplied case was already answered', :error_code => 2}, :status => :bad_request
       return
     end
 
@@ -21,7 +21,7 @@ class FormAnswersController < ApplicationController
     elsif @case.session.readers.include?(current_user) and @case.session.state == :production
       is_test_data = false
     else
-      render :json => {:success => false, :error => 'You are not authorized to submit answers for this case', :error_code => 1}
+      render :json => {:success => false, :error => 'You are not authorized to submit answers for this case', :error_code => 1}, :status => :forbidden
       return
     end
 
@@ -37,7 +37,7 @@ class FormAnswersController < ApplicationController
       begin
         answer.form_version = @case.session.forms.find(params['form_id']).locked_version
       rescue ActiveRecord::RecordNotFound => e
-        render :json => {:success => fase, :error => 'The form associated with this form answer does not exist.', :error_code => 2}
+        render :json => {:success => fase, :error => 'The form associated with this form answer does not exist.', :error_code => 2}, :status => :bad_request
         return
       end
       answer.user_id = current_user.id
