@@ -35,8 +35,19 @@ class ApplicationController < ActionController::Base
        not
        (
         params[:controller] == 'users' and
-        params[:action] == 'change_password' or
-        params[:action] == 'update_password'
+        (params[:action] == 'change_password' or
+        params[:action] == 'update_password')
+        ) and
+       not
+       (
+        params[:controller] == 'forms' and
+        (params[:action] == 'show' or
+         params[:action] == 'previous_results')
+        ) and
+       not
+       (
+        request.format == 'json' and not
+        (params[:controller] == 'users/sessions' and params[:action] == 'create')
         )
        )
       respond_to do |format|
