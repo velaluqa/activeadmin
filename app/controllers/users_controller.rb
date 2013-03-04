@@ -11,6 +11,15 @@ class UsersController < ActionController::Base
   end
 
   def update_password
+    if(params[:user][:current_password] == params[:user][:password])
+      flash[:error] = 'You cannot choose the same password again.'
+      respond_to do |format|
+        format.html { redirect_to users_change_password_path }
+        format.json { render :json => {:success => false, :error_code => 1, :error => 'You cannot choose the same password again.'}, :status => :bad_request }
+      end
+      return
+    end
+
     if @user.update_with_password({:current_password => params[:user][:current_password], :password => params[:user][:password], :password_confirmation => params[:user][:password_confirmation], :password_changed_at => Time.now})
       sign_in @user, :bypass => true
       
