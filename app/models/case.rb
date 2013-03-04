@@ -98,6 +98,8 @@ class Case < ActiveRecord::Base
       :id => self.id,
       :case_type => self.case_type,
       :patient => self.patient.nil? ? '' : self.patient.subject_id,
+      :flag => self.flag,
+      :state => self.state,
     }      
   end
 
