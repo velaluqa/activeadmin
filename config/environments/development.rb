@@ -47,5 +47,5 @@ StudyServer::Application.configure do
   config.form_configs_directory = config.data_directory + '/' + config.form_configs_subdirectory
   config.session_configs_directory = config.data_directory + '/' + config.session_configs_subdirectory
 
-  config.max_allowed_password_age = 10.minutes
+  config.max_allowed_password_age = 1.week
 end
