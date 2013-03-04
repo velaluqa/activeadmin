@@ -34,7 +34,7 @@ class User < ActiveRecord::Base
 
   def test_results_for_session(session)
     test_results = []
-    session.form_answers.where(:user_id => self.id).sort(:submitted_at => -1).each do |form_answer|
+    session.form_answers.where(:user_id => self.id).sort(:submitted_at => 1).each do |form_answer|
       test_results << form_answer if(form_answer.case and form_answer.case.flag == :reader_testing)
     end
 
