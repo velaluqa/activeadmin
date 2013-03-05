@@ -1,4 +1,6 @@
 class Study < ActiveRecord::Base
+  has_paper_trail
+
   attr_accessible :name
 
   has_many :sessions

@@ -1,6 +1,8 @@
 require 'csv'
 
 class Case < ActiveRecord::Base
+  has_paper_trail
+
   belongs_to :session
   belongs_to :patient
   has_one :form_answer

@@ -2,6 +2,8 @@ require 'git_config_repository'
 require 'schema_validation'
 
 class Session < ActiveRecord::Base
+  has_paper_trail
+
   attr_accessible :name, :study, :study_id, :state, :locked_version
 
   belongs_to :study

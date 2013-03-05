@@ -1,4 +1,6 @@
 class Patient < ActiveRecord::Base
+  has_paper_trail
+
   attr_accessible :session, :subject_id, :session_id
 
   belongs_to :session
