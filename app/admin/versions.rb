@@ -1,4 +1,6 @@
 ActiveAdmin.register Version do
+  menu :label => 'Audit Trail', :priority => 99
+
   actions :index, :show
 
   controller do
