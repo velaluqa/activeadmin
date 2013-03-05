@@ -3,6 +3,10 @@ ActiveAdmin.register Version do
 
   actions :index, :show
 
+  filter :created_at
+  filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Patient', 'Role', 'Session', 'Study' , 'User']
+  filter :whodunnit, :label => 'User', :as => :select, :collection => proc { User.all }
+
   controller do
     def self.classify_event(version)
       return version.event if version.changeset.nil?
