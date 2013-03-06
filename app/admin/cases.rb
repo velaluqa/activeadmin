@@ -55,6 +55,7 @@ ActiveAdmin.register Case do
         status_tag('Reopened In Progress', :warning, :label => link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       end
     end
+    column 'Last Export', :exported_at
    
     customizable_default_actions do |resource|
       (resource.state == :unread and resource.form_answer.nil?) ? [] : [:edit, :destroy]
@@ -92,6 +93,7 @@ ActiveAdmin.register Case do
           status_tag('Reopened In Progress', :warning, :label => link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
         end
       end
+      row :exported_at
       row :case_data_raw do
         CodeRay.scan(JSON::pretty_generate(c.case_data.data), :json).div(:css => :class).html_safe unless c.case_data.nil?
       end
