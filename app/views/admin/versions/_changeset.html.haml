@@ -1,0 +1,12 @@
+%table
+  %thead
+    %tr
+      %th Field
+      %th Previous Value
+      %th New Value
+  %tbody
+    - changeset.each do |field, values|
+      %tr
+        %td= item.class.human_attribute_name(field)
+        %td= values[0]
+        %td= values[1]

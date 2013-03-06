@@ -18,7 +18,7 @@ module FormsHelper
     return attributes
   end
 
-  def options_from_values(field, selected_values, no_default = false)
+  def options_from_values(field, selected_values, no_default = false, additional_options = [])
     values = field['values']
     values = {} if values.nil?
     if no_default
@@ -27,8 +27,10 @@ module FormsHelper
       options = '<option value="">Please select</option>'
     end
 
+    options += additional_options.join('')
+
     values.each do |value, label|
-      selected = (selected_values.include?(value) ? " selected=\"selected\"" : "")
+      selected = ((selected_values and selected_values.include?(value)) ? " selected=\"selected\"" : "")
       options += "<option data-permanent-select-option=\"true\" value=\"#{value}\" #{selected}>#{label} (#{value})</option>"
     end
 
@@ -119,5 +121,10 @@ module FormsHelper
     else
       simple_format(FormAnswer.pretty_print_answer(answer_spec, answer))
     end
+  end
+
+  def value_for_reopened_case(field, reopened_case)
+    return nil if (reopened_case.form_answer.nil? or reopened_case.form_answer.answers.nil?)
+    KeyPathAccessor::access_by_path(reopened_case.form_answer.answers, field['id'])
   end
 end

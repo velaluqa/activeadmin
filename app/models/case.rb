@@ -1,13 +1,16 @@
 require 'csv'
 
 class Case < ActiveRecord::Base
+  has_paper_trail
+
   belongs_to :session
   belongs_to :patient
   has_one :form_answer
   has_one :case_data
-  attr_accessible :images, :position, :case_type
+  attr_accessible :images, :position, :case_type, :state, :flag
   attr_accessible :session_id, :patient_id
   attr_accessible :session, :patient
+  attr_accessible :exported_at
 
   validates_uniqueness_of :position, :scope => :session_id  
 
@@ -22,6 +25,48 @@ class Case < ActiveRecord::Base
 
   # so we always get results sorted by position, not by row id
   default_scope order('position ASC')
+
+  STATE_SYMS = [:unread, :in_progress, :read, :reopened, :reopened_in_progress]
+
+  def self.state_sym_to_int(sym)
+    return Case::STATE_SYMS.index(sym)
+  end
+  def state
+    return -1 if read_attribute(:state).nil?
+    return Case::STATE_SYMS[read_attribute(:state)]
+  end
+  def state=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Case::STATE_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported state"
+      return
+    end
+
+    write_attribute(:state, index)
+  end
+
+  FLAG_SYMS = [:regular, :validation, :reader_testing]
+
+  def self.flag_sym_to_int(sym)
+    return Case::FLAG_SYMS.index(sym)
+  end
+  def flag
+    return -1 if read_attribute(:flag).nil?
+    return Case::FLAG_SYMS[read_attribute(:flag)]
+  end
+  def flag=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Case::FLAG_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported flag"
+      return
+    end
+
+    write_attribute(:flag, index)
+  end
 
   # virtual attribute for pretty names
   def name
@@ -56,6 +101,8 @@ class Case < ActiveRecord::Base
       :id => self.id,
       :case_type => self.case_type,
       :patient => self.patient.nil? ? '' : self.patient.subject_id,
+      :flag => self.flag,
+      :state => self.state,
     }      
   end
 

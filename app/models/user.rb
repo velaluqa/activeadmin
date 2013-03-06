@@ -10,6 +10,7 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :username, :name, :password, :password_confirmation, :remember_me
   attr_accessible :public_key, :private_key
+  attr_accessible :password_changed_at
 
   has_many :roles
   has_many :form_answers
@@ -29,6 +30,15 @@ class User < ActiveRecord::Base
 
   def is_app_admin?
     !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(:manage) }).nil?)
+  end
+
+  def test_results_for_session(session)
+    test_results = []
+    session.form_answers.where(:user_id => self.id).sort(:submitted_at => 1).each do |form_answer|
+      test_results << form_answer if(form_answer.case and form_answer.case.flag == :reader_testing)
+    end
+
+    return test_results
   end
 
   before_create :generate_keypair_on_create

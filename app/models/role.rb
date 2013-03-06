@@ -1,4 +1,6 @@
 class Role < ActiveRecord::Base
+  has_paper_trail
+
   attr_accessible :role, :user, :subject
   attr_accessible :role_id, :user_id, :subject_id, :subject_type
 

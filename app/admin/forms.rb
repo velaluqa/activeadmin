@@ -78,6 +78,11 @@ ActiveAdmin.register Form do
         form.state.to_s.camelize + (form.locked_version.nil? ? '' : " (Version: #{form.locked_version})")
       end
       row :session
+      if form.has_configuration?
+        row :configuration_validation do        
+          render 'admin/shared/schema_validation_results', :errors => form.validate
+        end
+      end
       row :configuration do
         current = {}
         if form.has_configuration?
@@ -105,11 +110,6 @@ ActiveAdmin.register Form do
         end
 
         render 'admin/shared/config_table', :current => current, :locked => locked
-      end
-      if form.has_configuration?
-        row :configuration_validation do        
-          render 'admin/shared/schema_validation_results', :errors => form.validate
-        end
       end
       row :custom_validators do
         current_components = form.current_components
@@ -254,6 +254,12 @@ ActiveAdmin.register Form do
 
     if(cannot? :manage, @form)
       flash[:error] = 'You are not authorized to unlock this form!'
+      redirect_to :action => :show
+      return
+    end
+
+    if(@form.session.state != :building)
+      flash[:error] = 'The forms session is locked, can\'t unlock form!'
       redirect_to :action => :show
       return
     end

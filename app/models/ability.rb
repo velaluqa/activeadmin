@@ -23,6 +23,7 @@ class Ability
     # App Admin
     if user.is_app_admin?
       can :manage, :system
+      can :manage, Version
       can :manage, User
       can :manage, Role
       can :manage, Study

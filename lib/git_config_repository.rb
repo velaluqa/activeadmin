@@ -1,3 +1,22 @@
+class GitConfigCommit
+  extend ActiveModel::Naming
+
+  attr_reader :commit, :oid, :message, :author_id, :author_name, :time
+
+  def initialize(commit)
+    @commit = commit
+    @oid = commit.oid
+    @message = commit.message
+    @author_id = commit.author[:email].to_i
+    @author_name = commit.author[:name]
+    @time = commit.time
+  end
+
+  def to_key
+    nil
+  end
+end
+
 class GitConfigRepository
   def initialize
     begin
@@ -11,9 +30,23 @@ class GitConfigRepository
     @repo.head.resolve.target
   end
 
+  def walker_for_version(version)
+    walker = Rugged::Walker.new(@repo)
+
+    walker.sorting(Rugged::SORT_DATE)
+    walker.push(version)
+    
+    return walker
+  end
+  def lookup(oid)
+    @repo.lookup(oid)
+  end
+  
   def update_config_file(path, new_file, author, commit_message)
     FileUtils.cp(new_file, @repo.workdir+'/'+path)
-    
+    update_path(path, author, commit_message)
+  end
+  def update_path(path, author, commit_message)
     index = @repo.index
     index.add(path)
     index.write
@@ -59,7 +92,7 @@ class GitConfigRepository
   end
 
   protected
-
+  
   def file_at_version(path, version)
     begin
       return nil unless @repo.exists?(version)      

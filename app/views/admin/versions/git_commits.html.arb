@@ -1,0 +1,34 @@
+table_for commits, :sortable => true, :class => 'index_table index' do
+  column :time
+  column :author do |commit|
+    author = User.find_by_id(commit.author_id)
+
+    unless author.nil?
+      link_to(author.name, admin_user_path(author))
+    end
+  end
+  column :message do |commit|
+    if commit.message =~ /session ([0-9]*)$/
+      id = $1
+      session = Session.find_by_id($1)
+      if session.nil?
+        commit.message
+      else
+        commit.message.gsub(/session [0-9]*$/, link_to("session #{id}", admin_session_path(session))).html_safe
+      end
+    elsif commit.message =~ /form ([0-9]*)$/
+      id = $1
+      form = Form.find_by_id($1)
+      if form.nil?
+        commit.message
+      else
+        commit.message.gsub(/form [0-9]*$/, link_to("form #{id}", admin_form_path(form))).html_safe
+      end
+    else
+      commit.message
+    end
+  end
+  column do |commit|
+    link_to('View', show_git_commit_admin_versions_path(:oid => commit.oid))
+  end
+end

@@ -26,6 +26,41 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  before_filter do
+    if(current_user and
+       (
+        current_user.password_changed_at.nil? or
+        current_user.password_changed_at < Rails.application.config.max_allowed_password_age.ago
+        ) and
+       not
+       (
+        params[:controller] == 'users' and
+        (params[:action] == 'change_password' or
+        params[:action] == 'update_password')
+        ) and
+       not
+       (
+        params[:controller] == 'forms' and
+        (params[:action] == 'show' or
+         params[:action] == 'previous_results')
+        ) and
+       not
+       (
+        request.format == 'json' and not
+        (params[:controller] == 'users/sessions' and params[:action] == 'create')
+        )
+       )
+      respond_to do |format|
+        format.html { redirect_to users_change_password_path }
+        format.json { render :json => {:success => false, :error => 'Password expired', :error_code => 23}, :status => :unauthorized }
+      end
+      
+      false
+    else
+      true
+    end
+  end
+
   def current_ability
     @current_ability ||= Ability.new(current_user)
   end

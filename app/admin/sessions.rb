@@ -1,5 +1,6 @@
 require 'git_config_repository'
 require 'aa_customizable_default_actions'
+require 'config_display_filters'
 
 ActiveAdmin.register Session do
 
@@ -105,6 +106,14 @@ ActiveAdmin.register Session do
           render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
         end
       end
+      row :annotations_layouts do
+        link_to 'Upload Annotations Layouts', upload_annotations_layouts_form_admin_session_path(session)
+      end
+      if session.has_configuration?
+        row :configuration_validation do        
+          render 'admin/shared/schema_validation_results', :errors => session.validate
+        end
+      end
       row :configuration do
         current = {}
         if session.has_configuration?
@@ -112,7 +121,7 @@ ActiveAdmin.register Session do
           if current_config.nil?
             current[:configuration] = :invalid
           else
-            current[:configuration] = CodeRay.scan(JSON::pretty_generate(current_config), :json).div(:css => :class).html_safe
+            current[:configuration] = CodeRay.scan(JSON::pretty_generate(ConfigDisplayFilters::filter_session_config(current_config)), :json).div(:css => :class).html_safe
           end
           
           current[:download_link] = download_current_configuration_admin_session_path(session)
@@ -125,18 +134,13 @@ ActiveAdmin.register Session do
           if locked_config.nil?
             locked[:configuration] = :invalid
           else
-            locked[:configuration] = CodeRay.scan(JSON::pretty_generate(locked_config), :json).div(:css => :class).html_safe
+            locked[:configuration] = CodeRay.scan(JSON::pretty_generate(ConfigDisplayFilters::filter_session_config(locked_config)), :json).div(:css => :class).html_safe
           end
           
           locked[:download_link] = download_locked_configuration_admin_session_path(session)
         end
 
         render 'admin/shared/config_table', :current => current, :locked => locked
-      end
-      if session.has_configuration?
-        row :configuration_validation do        
-          render 'admin/shared/schema_validation_results', :errors => session.validate
-        end
       end
     end
   end
@@ -292,6 +296,58 @@ ActiveAdmin.register Session do
   end
   action_item :only => :show do
     link_to 'Upload configuration', upload_config_form_admin_session_path(session) if can? :manage, session
+  end
+
+  member_action :upload_annotations_layouts, :method => :post do
+    @session = Session.find(params[:id])    
+
+    if(params[:session].nil? or params[:session][:case_type].blank? or params[:session][:annotations_layout_mode].blank? or params[:session][:file].blank?)
+      flash[:error] = "You must specifiy all the required parameters."
+      redirect_to({:action => :show})
+      return
+    end
+    
+    config = @session.current_configuration
+    case_type = config['types'][params[:session][:case_type]]
+    if(case_type.nil?)
+      flash[:error] = "You specified an invalid case type '#{params[:session][:case_type]}'."
+      redirect_to({:action => :show})
+      return
+    end
+
+    base64_layout = Base64.encode64(params[:session][:file].tempfile.read)
+    if(params[:session][:annotations_layout_mode] == 'validation')
+      case_type['validation'] = {} if case_type['validation'].nil?
+      case_type['validation']['annotations_layout'] = base64_layout
+    else
+      case_type['annotations_layout'] = base64_layout
+    end
+
+    begin
+      File.open(@session.config_file_path, 'w+') do |f|
+        f.write(config.to_yaml)
+      end
+      repo = GitConfigRepository.new
+      repo.update_path(@session.relative_config_file_path, current_user, "New annotations layout for session #{@session.id}")
+    rescue Exception => e
+      flash[:error] = "Updating the configuration with the new annotations layout failed: #{e.message}"
+      redirect_to({:action => :show})
+      return
+    end
+      
+    redirect_to({:action => :show}, :notice => "Annotations Layout successfully uploaded")
+  end
+  member_action :upload_annotations_layouts_form, :method => :get do
+    @session = Session.find(params[:id])
+    config = @session.current_configuration
+    if config.nil?
+      redirect_to :action => :show
+      return
+    end
+    @case_types = config['types'].map {|k,v| k}
+    
+    @page_title = "Upload Annotations Layouts"
+    render 'admin/sessions/upload_annotations_layouts', :locals => { :url => upload_annotations_layouts_admin_session_path}
   end
 
   controller do

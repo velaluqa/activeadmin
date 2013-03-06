@@ -2,6 +2,8 @@ require 'git_config_repository'
 require 'schema_validation'
 
 class Session < ActiveRecord::Base
+  has_paper_trail
+
   attr_accessible :name, :study, :study_id, :state, :locked_version
 
   belongs_to :study
@@ -81,6 +83,15 @@ class Session < ActiveRecord::Base
       
     return config
   end
+  def configuration_at_version(version)
+    begin
+      config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, version)
+    rescue SyntaxError => e
+      return nil
+    end
+      
+    return config
+  end
   def has_configuration?
     File.exists?(self.config_file_path)
   end
@@ -100,6 +111,10 @@ class Session < ActiveRecord::Base
     included_forms.each do |included_form|
       validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => self.id).empty?
     end
+    if(config['reader_testing'])
+      validation_errors << "Reader testing case type '#{config['reader_testing']['case_type']}' does not exist" if config['types'][config['reader_testing']['case_type']].nil?
+      validation_errors << "Reader testing patient '#{config['reader_testing']['patient']}' does not exist" if Patient.where(:subject_id => config['reader_testing']['patient'], :session_id => self.id).empty?
+    end
 
     return validation_errors
   end
@@ -112,13 +127,16 @@ class Session < ActiveRecord::Base
   end
 
   def case_list(mode = :unread)
+    flag = (self.state == :testing ? :validation : :regular)
     case mode
     when :unread
-      self.cases.find_all {|c| c.form_answer.nil?}
+      self.cases.where(:state => Case::state_sym_to_int(:unread), :flag => Case::flag_sym_to_int(flag)).reject {|c| not c.form_answer.nil? }
+    when :in_progress
+      self.cases.where(:state => Case::state_sym_to_int(:in_progress), :flag => Case::flag_sym_to_int(flag))
     when :read
-      self.cases.reject {|c| c.form_answer.nil?}        
+      self.cases.where(:state => Case::state_sym_to_int(:read), :flag => Case::flag_sym_to_int(flag)).reject {|c| c.form_answer.nil? }
     when :all
-      self.cases
+      self.cases.where(:flag => Case::flag_sym_to_int(flag))
     end
   end
 
@@ -126,6 +144,14 @@ class Session < ActiveRecord::Base
     return self.session_pauses.order("end DESC").first
   end
 
+  def reserve_next_case
+    c = case_list(:unread).first
+    return nil if c.nil?
+    c.state = :in_progress
+    c.save
+
+    return c
+  end
   def next_unread_case
     case_list(:unread).first
   end
@@ -137,6 +163,16 @@ class Session < ActiveRecord::Base
     return 0 if self.cases.empty?
     return self.cases.last.position+1
   end
+
+  # fake attributes for formtastic
+  # this is both disgusting and stupid, but still seems the most practical way :(
+  def case_type
+    nil
+  end
+  def annotations_layout_mode
+    :regular
+  end
+
 
   private
 

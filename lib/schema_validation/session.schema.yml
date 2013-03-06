@@ -17,6 +17,26 @@ mapping:
     type: int
     range:
       min: 1
+  "reader_testing":
+    type: map
+    mapping:
+      "interval":
+        type: int
+        required: yes
+        range:
+          min: 0
+      "case_type":
+        type: str
+        required: yes
+      "patient":
+        type: str
+        required: yes
+      "images":
+        type: str
+        required: yes
+      "judgement_function":
+        type: str
+        required: yes
   "types":
     type: map
     required: yes
@@ -28,6 +48,22 @@ mapping:
           "form":
             type: str
             required: yes
+          "validation":
+            type: map
+            mapping:
+              "features":
+                type: seq
+                sequence:
+                  - type: str
+                    unique: yes
+              "toolbar_layout":
+                type: seq
+                sequence:
+                  - type: str
+              "annotations_layout":
+                type: str
+              "context_menu":
+                type: bool
           "features":
             type: seq
             sequence:
@@ -37,8 +73,9 @@ mapping:
             type: seq
             sequence:
               - type: str
-          "annotations_layout":
+          "annotations_layout":          
             type: str
+            required: yes
           "context_menu":
             type: bool
           "dont_use_viewer":

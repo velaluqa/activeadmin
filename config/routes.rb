@@ -13,11 +13,22 @@ StudyServer::Application.routes.draw do
     collection do
       get 'list'
     end
+    member do
+      get 'reserve_cases'
+    end
+  end
+  
+  resources :cases, :only => [] do
+    member do
+      get 'cancel_read'
+    end
   end
 
   devise_for :users, :controllers => { :sessions => 'users/sessions' }
   devise_scope :user do
     post 'users/authenticate', :to => 'users/sessions#authenticate_user'
+    get 'users/change_password', :to => 'users#change_password'
+    put 'users/update_password', :to => 'users#update_password'
   end
 
   # The priority is based upon order of creation:

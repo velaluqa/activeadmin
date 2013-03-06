@@ -16,6 +16,13 @@ class FormAnswer
   field :annotated_images, type:  Hash
   field :annotated_images_signature, type:  String
   field :is_test_data, type: Boolean
+  field :versions, type: Array
+
+  before_destroy do
+    c = self.case
+    c.state = :unread
+    c.save
+  end
 
   def session
     begin
@@ -59,6 +66,19 @@ class FormAnswer
     write_attribute(:case_id, new_case.id)
   end
 
+  def version_current_answers
+    new_version = {}
+    new_version[:answers] = self.answers
+    new_version[:answers_signature] = self.answers_signature
+    new_version[:annotated_images] = self.annotated_images
+    new_version[:annotated_images_signature] = self.annotated_images_signature
+    new_version[:submitted_at] = self.submitted_at
+
+    self.versions = [] if self.versions.nil?
+    self.versions << new_version
+    self.save
+  end
+
   def answers_signature_is_valid?
     return signature_is_valid?(read_attribute(:answers), read_attribute(:answers_signature))
   end
@@ -86,6 +106,18 @@ class FormAnswer
 
     return form_config_and_answers_to_display_list(form_config, repeatables_map, answers)
   end
+  def printable_answers_for_version(i)
+    return nil if i >= self.versions.size
+    form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+    return nil if (form_config.nil? or repeatables.nil?)
+
+    repeatables_map = {}
+    repeatables.each do |r|
+      repeatables_map[r[:id]] = r[:config]
+    end
+
+    return form_config_and_answers_to_display_list(form_config, repeatables_map, self.versions[i]['answers'])
+  end
 
   def form_fields_hash
     @form_fields_hash ||= generate_form_fields_hash
@@ -109,6 +141,8 @@ class FormAnswer
      return answer.map {|a| FormAnswer.pretty_print_select_answer(field, a)}.join(', ')
    when 'roi'
      return FormAnswer.printable_roi_answer(field, answer)
+   else
+     return answer
    end
 
     return nil

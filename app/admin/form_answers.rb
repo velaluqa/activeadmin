@@ -65,8 +65,22 @@ ActiveAdmin.register FormAnswer do
       row :answers_raw do        
         CodeRay.scan(JSON::pretty_generate(form_answer.answers), :json).div(:css => :class).html_safe unless form_answer.answers.nil?
       end
+      unless(form_answer.versions.nil? or form_answer.versions.empty?)
+        row :previous_versions do
+          render "admin/form_answers/previous_versions", :form_answer => form_answer
+        end
+      end
       row :annotated_images_raw do       
         CodeRay.scan(JSON::pretty_generate(form_answer.annotated_images), :json).div(:css => :class).html_safe unless form_answer.annotated_images.nil?
+      end
+      if(form_answer.case.flag == :reader_testing)
+        row 'Reader Testing Judgement' do
+          if(FormAnswersController.new.run_form_judgement_function(form_answer) == true)
+            status_tag('Passed', :ok)
+          else
+            status_tag('Failed', :error)
+          end
+        end
       end
     end
   end

@@ -8,6 +8,7 @@ class Form < ActiveRecord::Base
 
   validates :name, :presence => true
   validates :name, :format => { :with => /^[a-zA-Z0-9_]+$/, :message => 'Only letters A-Z, numbers and \'_\' allowed' }
+  validates_uniqueness_of :name, :scope => :session_id  
 
   belongs_to :session
   has_many :form_answers
@@ -60,13 +61,16 @@ class Form < ActiveRecord::Base
   def full_configuration_at_version(version)
     full_configuration(version)
   end
+  def full_configuration_at_version_for_case(version, the_case)
+    full_configuration(version, nil, true, the_case)
+  end
   def current_configuration
     parse_config(:current)
   end
   def locked_configuration
     parse_config(:locked)
   end
-  def configuration_at_version(versioN)
+  def configuration_at_version(version)
     parse_config(version)
   end
   def has_configuration?
@@ -78,6 +82,9 @@ class Form < ActiveRecord::Base
   end
   def locked_components
     components(:locked)
+  end
+  def components_at_version(version)
+    components(version)
   end
 
   def self.config_field_has_special_type?(field)
@@ -175,7 +182,7 @@ class Form < ActiveRecord::Base
     end
   end
 
-  def full_configuration(version, already_included_forms = nil, stringify = true)
+  def full_configuration(version, already_included_forms = nil, stringify = true, the_case = nil)
     parsed_version = parse_version_sym(version)
     form_config = parse_config(parsed_version)
     return [nil,nil,nil] if form_config.nil?
@@ -185,12 +192,15 @@ class Form < ActiveRecord::Base
     already_included_forms = [] if already_included_forms.nil?
     already_included_forms << read_attribute(:id)
 
-    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms, read_attribute(:session_id), version)
+    unless(the_case.nil? or the_case.form_answer.nil?)
+      previous_answers = the_case.form_answer.answers
+    end
+    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms, read_attribute(:session_id), version, previous_answers)
     form_components = stringify_form_components(form_components) if stringify
 
     return [form_config, form_components, repeatables]
   end
-  def process_imports(config, components, already_included, session_id, version)
+  def process_imports(config, components, already_included, session_id, version, previous_answers = nil)
     full_config = []
     full_components = components
     repeatables = []
@@ -227,7 +237,11 @@ class Form < ActiveRecord::Base
 
           full_config << {'type' => 'include_start', 'label' => field['repeat']['label'], 'id' => field['repeat']['prefix'], 'max' => field['repeat']['max']}
 
-          field['repeat']['min'].times do |i|
+          min_repeat = field['repeat']['min']
+          if(previous_answers and previous_answers[field['repeat']['prefix']] and previous_answers[field['repeat']['prefix']].respond_to?(:size))
+            min_repeat = previous_answers[field['repeat']['prefix']].size if previous_answers[field['repeat']['prefix']].size > min_repeat
+          end
+          min_repeat.times do |i|
             config_copy = Marshal.load(Marshal.dump(included_config))
             
             config_copy.each do |included_field|

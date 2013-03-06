@@ -8,10 +8,15 @@ class FormsController < ApplicationController
   layout 'client_forms', :only => [:show, :previous_results, :preview]
 
   def show
-    @form_config, @form_components, @repeatables = @form.full_locked_configuration
+    if(@case.state == :reopened_in_progress and @case.form_answer)
+      @form_config, @form_components, @repeatables = @form.full_configuration_at_version_for_case(@case.form_answer.form_version, @case)
+    else
+      @form_config, @form_components, @repeatables = @form.full_locked_configuration
+    end
     @data_hash = @case.data_hash
 
     setup_previous_cases_config
+    @previous_results = construct_previous_results_list
     
     return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
   end
@@ -37,6 +42,8 @@ class FormsController < ApplicationController
     @case.case_type = 'preview'
     @case.session = @form.session
     @case.patient = patient
+
+    @previous_results = [{:images => 'preview'}]
 
     render :show
   end
@@ -77,10 +84,21 @@ protected
     
     return previous_cases
   end
+  def construct_previous_results_list
+    previous_cases = @case.patient.cases.where('position < ?', @case.position).reject {|c| c.form_answer.nil?}
+
+    previous_results = []
+    previous_cases.each do |c|
+      previous_results << {'answers' => c.form_answer.answers, 'images' => c.images}
+    end
+    previous_results << {'images' => @case.images}
+
+    return previous_results
+  end
 
   def authorize_user_for_case
-    raise CanCan::AccessDenied.new('You are not authorized to access this case!', :read, @case) unless (@case.session.readers.include?(current_user) or
-                                                                                                        @case.session.validators.include?(current_user))
+    raise CanCan::AccessDenied.new('You are not authorized to access this case!', :read, @case) unless ((@case.session.state == :production and @case.session.readers.include?(current_user)) or
+                                                                                                        (@case.session.state == :testing and @case.session.validators.include?(current_user)))
   end
 
   def find_form_from_params

@@ -4,22 +4,12 @@ class SessionsController < ApplicationController
   before_filter :find_session, :except => :list
 
   def show
-    full_sequence = (params[:full_sequence] == 'true')
-    case_list = @session.case_list(full_sequence ? :all : :unread)
-
-    passive_cases = passive_cases_for_case_list(case_list)
-
-    case_list_hashes = case_list.map do |c|
-      c.to_hash.merge({:passive_cases => passive_cases[c.id]})
-    end
-
     config = @session.locked_configuration
-    next_case = @session.next_unread_case
     
     if config.nil?
       result = { :error_code => 1, :error => "Session is not configured"}
     else
-      result = {:session => @session, :configuration => config, :case_list => case_list_hashes, :next_case_position => (next_case.nil? ? 0 : next_case.position)}
+      result = {:session => @session, :configuration => config}
     end
     
     respond_to do |format|
@@ -41,13 +31,68 @@ class SessionsController < ApplicationController
     respond_to do |format|
       format.json { render :json => {'Blinded Read' => blind_readable, 'Validation' => validatable} }
     end
-  end  
+  end
+
+  def reserve_cases
+    count = (params[:count].nil? ? 1 : params[:count].to_i)
+
+    config = @session.locked_configuration
+    if config.nil?
+      render :json => { :error_code => 1, :error => "Session is not configured"}, :status => :bad_request
+      return
+    end
+
+    cases = []
+
+    if(@reopened_cases.empty?)
+      last_reader_testing_result = current_user.test_results_for_session(@session).last
+      if(config['reader_testing'] and (last_reader_testing_result.nil? or last_reader_testing_result.submitted_at < Time.now - config['reader_testing']['interval']))
+        cases << create_reader_test_case(config)
+        count -= 1
+      end
+
+      count.times do
+        c = @session.reserve_next_case
+        break if c.nil?
+        cases << c
+      end
+    else
+      @reopened_cases.each do |c|
+        c.state = :reopened_in_progress
+        c.save
+
+        cases << c
+      end
+    end
+
+    passive_cases = passive_cases_for_case_list(cases)
+
+    case_hashes = cases.map do |c|
+      c.to_hash.merge({:passive_cases => passive_cases[c.id]})
+    end
+
+    respond_to do |format|
+      format.json { render :json => {:cases => case_hashes} }
+    end    
+  end
 
   protected
 
+  def create_reader_test_case(config)
+    patient = Patient.where(:subject_id => config['reader_testing']['patient'], :session_id => @session.id).first
+    return nil if patient.nil?
+
+    test_case = Case.create(:session_id => @session.id, :patient_id => patient.id, :position => @session.next_position, :images => config['reader_testing']['images'], :case_type => config['reader_testing']['case_type'], :state => :in_progress, :flag => :reader_testing)
+    return nil unless test_case.persisted?
+
+    test_case_answer = FormAnswer.create(:user_id => current_user.id, :session_id => @session.id, :case_id => test_case.id, :submitted_at => Time.now)
+
+    return test_case
+  end
+
   def authorize_user_for_session
-    raise CanCan::AccessDenied.new('You are not authorized to access this session!', :read, @session) unless (@session.readers.include?(current_user) or
-                                                                                                        @session.validators.include?(current_user))
+    raise CanCan::AccessDenied.new('You are not authorized to access this session!', :read, @session) unless ((@session.state == :production and @session.readers.include?(current_user)) or
+                                                                                                              (@session.state == :testing and @session.validators.include?(current_user)))
   end
   def find_session
     begin
@@ -57,7 +102,13 @@ class SessionsController < ApplicationController
       return false
     end
 
-    authorize_user_for_session
+    authorize_user_for_session    
+    check_for_reopened_cases
+  end
+  def check_for_reopened_cases
+    @reopened_cases = @session.cases.where(:state => Case::state_sym_to_int(:reopened))
+      .reject {|c| c.form_answer.nil? }
+      .reject {|c| c.form_answer.user != current_user }
   end
 
   def passive_cases_for_case_list(case_list)

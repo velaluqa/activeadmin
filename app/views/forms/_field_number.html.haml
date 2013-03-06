@@ -1,5 +1,6 @@
 = label_tag(field['id'], field['label'], :class => 'control-label')
 .controls
   - value, fixed_value_hash = fixed_value(field, data_hash)
+  - value = value_for_reopened_case(field, @case) if(@case.state == :reopened_in_progress and value.nil?)
   = number_field_tag(field['id'], value, { :class => input_size, :step => (field['number_step'].nil? ? 0.01 : field['number_step']) }.merge(validators_hash(field)).merge(fixed_value_hash))
   %p.help-block

@@ -1,0 +1,72 @@
+require 'config_display_filters'
+
+panel 'Commit Details' do
+  author = User.find_by_id(commit.author_id)
+  if commit.message =~ /session ([0-9]*)$/
+    session = Session.find_by_id($1)
+  elsif commit.message =~ /form ([0-9]*)$/
+    form = Form.find_by_id($1)
+  end
+
+  attributes_table_for commit do
+    row :time
+    row :author do      
+      unless author.nil?
+        link_to(author.name, admin_user_path(author))
+      end
+    end
+    row :message do
+      if session
+        commit.message.gsub(/session [0-9]*$/, link_to("session #{session.id}", admin_session_path(session))).html_safe
+      elsif form
+        commit.message.gsub(/form [0-9]*$/, link_to("form #{form.id}", admin_form_path(form))).html_safe
+      else
+        commit.message
+      end
+    end
+    row :changes do
+      next if commit.commit.parents.empty?
+      
+      parent = commit.commit.parents[0]
+
+      if session
+        config_path = session.relative_config_file_path
+      elsif form
+        config_path = form.relative_config_file_path
+      end
+
+      changes = {}
+
+      begin
+        old_config = repo.yaml_at_version(config_path, parent.oid)
+        new_config = repo.yaml_at_version(config_path, commit.oid)
+        changes['Configuration'] = [YAML.dump(old_config), YAML.dump(new_config)]
+      rescue SyntaxError => e
+      end
+
+      if(form)
+        old_js = repo.text_at_version(form.relative_validator_file_path, parent.oid)
+        new_js = repo.text_at_version(form.relative_validator_file_path, commit.oid)
+        changes['Validators'] = [old_js, new_js]
+      end
+
+      table do
+        changes.each do |name, versions|
+          tr do
+            th { name }
+          end
+          tr do
+            td do
+              diff = Diffy::Diff.new(versions[0], versions[1], :allow_empty_diff => true)
+              if(diff.to_s(:text).empty?)
+                status_tag('No changes', :ok)
+              else
+                diff.to_s(:html).html_safe
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+end
