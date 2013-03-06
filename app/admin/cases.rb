@@ -167,4 +167,13 @@ ActiveAdmin.register Case do
 
     redirect_to :action => :index
   end
+
+  collection_action :batch_export, :method => :post do
+    pp params
+  end
+
+  # batch_action :export do |selection|
+  #   @page_title = 'Export'
+  #   render 'admin/cases/export_settings', :locals => {:selection => selection}
+  # end
 end
