@@ -1,0 +1,73 @@
+require 'config_display_filters'
+
+panel 'Commit Details' do
+  author = User.find_by_id(commit.author_id)
+  if commit.message =~ /session ([0-9]*)$/
+    session = Session.find_by_id($1)
+  elsif commit.message =~ /form ([0-9]*)$/
+    form = Form.find_by_id($1)
+  end
+
+  attributes_table_for commit do
+    row :time
+    row :author do      
+      unless author.nil?
+        link_to(author.name, admin_user_path(author))
+      end
+    end
+    row :message do
+      if session
+        commit.message.gsub(/session [0-9]*$/, link_to("session #{session.id}", admin_session_path(session))).html_safe
+      elsif form
+        commit.message.gsub(/form [0-9]*$/, link_to("form #{form.id}", admin_form_path(form))).html_safe
+      else
+        commit.message
+      end
+    end
+    row :changes do
+      next if commit.commit.parents.empty?
+      
+      parent = commit.commit.parents[0]
+
+      if session
+        config_path = session.relative_config_file_path
+      elsif form
+        config_path = form.relative_config_file_path
+      end
+
+      begin
+        old_config = repo.yaml_at_version(config_path, parent.oid)
+        new_config = repo.yaml_at_version(config_path, commit.oid)
+      rescue SyntaxError => e
+      end
+
+      if(session)
+        old_config = ConfigDisplayFilters::filter_session_config(old_config)
+        new_config = ConfigDisplayFilters::filter_session_config(new_config)
+      end
+
+      table do
+        thead do
+          tr do
+            unless old_config.nil?
+              th { 'Old' }
+            end
+            unless new_config.nil?
+              th { 'New' }
+            end
+          end
+        end
+        tbody do
+          tr do
+            unless old_config.nil?
+              td {CodeRay.scan(JSON::pretty_generate(old_config), :json).div(:css => :class).html_safe}
+            end
+            unless new_config.nil?
+              td {CodeRay.scan(JSON::pretty_generate(new_config), :json).div(:css => :class).html_safe}
+            end            
+          end
+        end
+      end
+    end
+  end
+end

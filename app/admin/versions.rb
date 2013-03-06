@@ -1,5 +1,7 @@
+require 'git_config_repository'
+
 ActiveAdmin.register Version do
-  menu :label => 'Audit Trail', :priority => 99
+  menu :label => 'Audit Trail', :priority => 99, :if => proc{ can?(:manage, Version) }
 
   actions :index, :show
 
@@ -116,5 +118,56 @@ ActiveAdmin.register Version do
         end
       end
     end
+  end
+
+  collection_action :git_commits, :method => :get do
+    repo = GitConfigRepository.new
+    walker = repo.walker_for_version(repo.current_version)
+
+    if(params[:order] == 'time_asc')
+      walker.sorting(Rugged::SORT_DATE | Rugged::SORT_REVERSE)
+    end
+
+    commits = walker.map do |commit|
+      # {
+      #   :oid => commit.oid,
+      #   :message => commit.message,
+      #   :author_id => commit.author[:email].to_i,
+      #   :author_name => commit.author[:name],
+      #   :time => commit.time,
+      #   :tree_count => commit.tree.count
+      # }
+      GitConfigCommit.new(commit)
+    end
+
+    @page_title = 'Configuration Changes'
+    render 'admin/versions/git_commits', :locals => {:commits => commits}
+  end
+
+  collection_action :show_git_commit, :method => :get do
+    oid = params[:oid]
+    
+    repo = GitConfigRepository.new
+    begin
+      commit = repo.lookup(oid)
+    rescue Rugged::Error => e
+      commit = nil
+    end
+
+    if(commit.nil? or commit.type != :commit)
+      flash[:error] = 'No such commit exists'
+      redirect_to git_commits_admin_versions_path
+      return
+    end
+
+    @page_title = "Commit #{commit.oid}"
+    render 'admin/versions/show_git_commit', :locals => {:commit => GitConfigCommit.new(commit), :repo => repo}
+  end
+
+  action_item :only => :index do
+    link_to 'Configuration Changes', git_commits_admin_versions_path
+  end
+  action_item :only => :git_commits do
+    link_to 'Versions', admin_versions_path
   end
 end
