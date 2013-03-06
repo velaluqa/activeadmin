@@ -73,3 +73,6 @@ gem 'airbrake'
 
 # Kwalify schema validator
 gem 'kwalify'
+
+# diff library for config changes display
+gem 'diffy'

@@ -170,4 +170,7 @@ ActiveAdmin.register Version do
   action_item :only => :git_commits do
     link_to 'Versions', admin_versions_path
   end
+  action_item :only => :show_git_commit do
+    link_to 'Back', git_commits_admin_versions_path
+  end
 end
