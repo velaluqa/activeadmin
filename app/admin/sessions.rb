@@ -106,6 +106,16 @@ ActiveAdmin.register Session do
           render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
         end
       end
+      row :export do
+        ul do
+          li { link_to('All Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :all)) }
+          li { link_to('All Regular Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :regular)) }
+          li { link_to('All Validation Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :validation)) }
+          li { link_to('Unexported Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :all)) }
+          li { link_to('Unexported Regular Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :regular)) }
+          li { link_to('Unexported Validation Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :validation)) }
+        end
+      end
       row :annotations_layouts do
         link_to 'Upload Annotations Layouts', upload_annotations_layouts_form_admin_session_path(session)
       end
@@ -348,6 +358,30 @@ ActiveAdmin.register Session do
     
     @page_title = "Upload Annotations Layouts"
     render 'admin/sessions/upload_annotations_layouts', :locals => { :url => upload_annotations_layouts_admin_session_path}
+  end
+
+  member_action :export_cases, :method => :get do
+    @session = Session.find(params[:id])
+    
+    case params[:export_state]
+    when 'all'
+      if(params[:export_kind] == 'all')
+        cases = @session.cases
+      else
+        cases = @session.cases.where(:flag => Case::flag_sym_to_int(params[:export_kind].to_sym))
+      end
+    when 'unexported'
+      if(params[:export_kind] == 'all')
+        cases = @session.cases.where(:exported_at => nil)
+      else
+        cases = @session.cases.where(:exported_at => nil, :flag => Case::flag_sym_to_int(params[:export_kind].to_sym))
+      end
+    else
+      cases = []
+    end
+    case_ids = cases.reject {|c| c.form_answer.nil?}.map {|c| c.id}
+
+    render 'admin/cases/export_settings', :locals => {:selection => case_ids}
   end
 
   controller do
