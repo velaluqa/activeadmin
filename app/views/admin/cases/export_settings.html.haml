@@ -1,8 +1,13 @@
+- pp selection
+
 = form_tag(batch_export_admin_cases_path, :method => :post, :multipart => true, :class => 'formtastic form') do
   = hidden_field_tag('cases', selection)
 
   = field_set_tag('<span>Export Settings</span>'.html_safe, :class => 'inputs') do
     %ol
+      %li.input.select
+        = label_tag('export_format', 'Format')
+        = select_tag('export_format', options_for_select([['CSV', 'csv']]), :include_blank => false)
       %li.input.file
         = label_tag('export_specification', 'Export Specification')
         = file_field_tag('export_specification')

@@ -106,6 +106,16 @@ ActiveAdmin.register Session do
           render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
         end
       end
+      row :export do
+        ul do
+          li { link_to('All Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :all)) }
+          li { link_to('All Regular Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :regular)) }
+          li { link_to('All Validation Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :validation)) }
+          li { link_to('Unexported Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :all)) }
+          li { link_to('Unexported Regular Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :regular)) }
+          li { link_to('Unexported Validation Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :validation)) }
+        end
+      end
       row :annotations_layouts do
         link_to 'Upload Annotations Layouts', upload_annotations_layouts_form_admin_session_path(session)
       end
@@ -158,7 +168,7 @@ ActiveAdmin.register Session do
 
     # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
   action_item :except => [:new, :show] do
-    if controller.action_methods.include?('new')
+    if controller.action_methods.include?('new') and can? :manage, Session
       link_to(I18n.t('active_admin.new_model', :model => active_admin_config.resource_label), new_resource_path)
     end
   end
@@ -350,6 +360,30 @@ ActiveAdmin.register Session do
     render 'admin/sessions/upload_annotations_layouts', :locals => { :url => upload_annotations_layouts_admin_session_path}
   end
 
+  member_action :export_cases, :method => :get do
+    @session = Session.find(params[:id])
+    
+    case params[:export_state]
+    when 'all'
+      if(params[:export_kind] == 'all')
+        cases = @session.cases
+      else
+        cases = @session.cases.where(:flag => Case::flag_sym_to_int(params[:export_kind].to_sym))
+      end
+    when 'unexported'
+      if(params[:export_kind] == 'all')
+        cases = @session.cases.where(:exported_at => nil)
+      else
+        cases = @session.cases.where(:exported_at => nil, :flag => Case::flag_sym_to_int(params[:export_kind].to_sym))
+      end
+    else
+      cases = []
+    end
+    case_ids = cases.reject {|c| c.form_answer.nil?}.map {|c| c.id}
+
+    render 'admin/cases/export_settings', :locals => {:selection => case_ids}
+  end
+
   controller do
     def switch_session_state(session_id, new_state)
       session = Session.find(session_id)
@@ -410,5 +444,63 @@ ActiveAdmin.register Session do
     when :closed
       link_to 'Reopen Session', switch_state_admin_session_path(resource, {:new_state => :production}) if can? :manage, :system
     end
+  end
+
+  controller do
+    def cases_counts(sessions)
+      cases_counts = {}
+
+      sessions.each do |session|
+        counts = {}
+
+        Case::STATE_SYMS.each do |state|
+          counts[state] = {}
+
+          Case::FLAG_SYMS.each do |flag|
+            counts[state][flag] = session.cases.where(:flag => Case::flag_sym_to_int(flag), :state => Case::state_sym_to_int(state)).size
+          end
+        end
+
+        cases_counts[session.id] = counts
+      end
+
+      return cases_counts
+    end
+
+    def reader_cases(sessions)
+      reader_cases = {}
+
+      sessions.each do |session|
+        cases = []
+
+        session.readers.each do |reader|
+          readers_cases = session.cases.reject { |c| c.form_answer.nil? or c.form_answer.user.id != reader.id }
+          cases << {:reader => reader, :cases => readers_cases}
+        end
+
+        reader_cases[session.id] = cases
+      end
+
+      return reader_cases
+    end
+  end
+
+  member_action :session_summary_report, :method => :get do
+    @sessions = [Session.find(params[:id])]
+    @cases_counts = cases_counts(@sessions)
+    @reader_cases = reader_cases(@sessions)
+
+    render 'admin/sessions/summary_report'
+  end
+  collection_action :summary_report, :method => :get do
+    @sessions = scoped_collection
+    @cases_counts = cases_counts(@sessions)
+    @reader_cases = reader_cases(@sessions)
+  end
+  action_item :only => :index do
+    link_to 'Summary', summary_report_admin_sessions_path
+  end
+  action_item :only => :show do
+    link_to 'Summary', session_summary_report_admin_session_path(session)
   end
 end

@@ -1,0 +1,18 @@
+type: map
+mapping:
+  =:
+    type: seq
+    sequence:
+      - type: map
+        mapping:
+          "values":
+            type: map
+            required: yes
+            mapping:
+              =:
+                type: str
+          "repeat":
+            type: str
+          "include_id":
+            type: bool
+                

@@ -1,4 +1,8 @@
 require 'aa_customizable_default_actions'
+require 'schema_validation'
+require 'key_path_accessor'
+require 'csv'
+require 'set'
 
 ActiveAdmin.register Case do
 
@@ -169,11 +173,134 @@ ActiveAdmin.register Case do
   end
 
   collection_action :batch_export, :method => :post do
-    pp params
+    if(params[:export_specification].nil? or params[:export_specification].tempfile.nil?)
+      flash[:error] = 'You need to supply an export specification.'
+      redirect_to :action => :index
+      return
+    end
+
+    @errors = []
+    @results = {}
+
+    begin
+      export_specification = YAML.load_file(params[:export_specification].tempfile)
+
+      validator = SchemaValidation::ExportValidator.new
+      @errors += validator.validate(export_specification)
+    rescue SyntaxError => e
+      @errors << e.message
+    end
+
+    return unless @errors.empty?
+
+    case_ids = params[:cases].split(' ')      
+    begin
+      cases = Case.find(case_ids)
+    rescue ActiveRecord::RecordNotFound => e
+      @errors << e.message
+    end
+    return unless @errors.empty?
+
+    cases.each do |c|
+      unless(can? :manage, c)
+        @results[c.id] = :unauthorized
+        next
+      end
+
+      spec = export_specification[c.case_type]
+      if(spec.nil?)
+        @results[c.id] = :no_specification
+        next
+      end
+
+      answers = (c.form_answer.nil? ? nil : c.form_answer.answers)
+      if(answers.nil?)
+        @results[c.id] = :no_answers
+        next
+      end
+
+      c.exported_at = Time.now
+      c.save
+
+      @results[c.id] = []
+      spec.each do |row_spec|
+        if(row_spec['repeat'].nil?)
+          repeat_array = nil
+        else
+          repeat_array = KeyPathAccessor::access_by_path(answers, row_spec['repeat'])
+        end
+        if(repeat_array.is_a?(Array))
+          repeat_count = repeat_array.size
+        else
+          repeat_array = nil
+          repeat_count = 1
+        end
+
+        repeat_count.times do |r|
+          row = {}
+          answers['_REPEAT'] = repeat_array[r] unless repeat_array.nil?
+
+          row['ID'] = c.id if(row_spec['include_id'] == true)
+          
+          row_spec['values'].each do |name, path|
+            value = KeyPathAccessor::access_by_path(answers, path)
+            row[name] = value
+          end
+
+          @results[c.id] << row
+        end
+      end
+    end
+
+    case params[:export_format]
+    when 'csv'
+      @export_data = create_csv(@results)
+      @export_suffix = 'csv'
+    else
+      @export_data = nil
+      @errors << "Unknown export format '#{params[:export_format]}'"
+    end
+
+    send_data @export_data, :filename => "export.#{@export_suffix}" unless @export_data.nil?
+    flash[:error] = 'Export failed'
   end
 
-  # batch_action :export do |selection|
-  #   @page_title = 'Export'
-  #   render 'admin/cases/export_settings', :locals => {:selection => selection}
-  # end
+  controller do
+    def create_csv(results)
+      column_names = Set.new
+
+      results.each do |case_id, rows|
+        next unless rows.is_a?(Array)
+
+        rows.each do |row|
+          row.each do |name, value|
+            column_names << name
+          end
+        end
+      end
+
+      column_names = column_names.to_a
+      csv_table = CSV::Table.new([CSV::Row.new(column_names, column_names, true)])
+
+      results.each do |case_id, rows|
+        next unless rows.is_a?(Array)
+
+        rows.each do |row|
+          row_data = Array.new(column_names.size) do |i|
+            row[column_names[i]]
+          end
+          
+          csv_table << CSV::Row.new(column_names, row_data, false)
+        end
+      end
+
+      return csv_table.to_csv
+    end
+  end
+
+
+  batch_action :export do |selection|
+    @page_title = 'Export'
+    render 'admin/cases/export_settings', :locals => {:selection => selection}
+  end
 end
