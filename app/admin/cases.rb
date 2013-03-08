@@ -219,6 +219,9 @@ ActiveAdmin.register Case do
         next
       end
 
+      c.exported_at = Time.now
+      c.save
+
       @results[c.id] = []
       spec.each do |row_spec|
         if(row_spec['repeat'].nil?)
