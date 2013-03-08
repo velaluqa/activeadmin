@@ -168,7 +168,7 @@ ActiveAdmin.register Session do
 
     # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
   action_item :except => [:new, :show] do
-    if controller.action_methods.include?('new')
+    if controller.action_methods.include?('new') and can? :manage, Session
       link_to(I18n.t('active_admin.new_model', :model => active_admin_config.resource_label), new_resource_path)
     end
   end
@@ -444,5 +444,64 @@ ActiveAdmin.register Session do
     when :closed
       link_to 'Reopen Session', switch_state_admin_session_path(resource, {:new_state => :production}) if can? :manage, :system
     end
+  end
+
+  controller do
+    def cases_counts(sessions)
+      cases_counts = {}
+
+      sessions.each do |session|
+        counts = {}
+
+        Case::STATE_SYMS.each do |state|
+          counts[state] = {}
+
+          Case::FLAG_SYMS.each do |flag|
+            counts[state][flag] = session.cases.where(:flag => Case::flag_sym_to_int(flag), :state => Case::state_sym_to_int(state)).size
+          end
+        end
+
+        cases_counts[session.id] = counts
+      end
+
+      return cases_counts
+    end
+
+    def reader_cases(sessions)
+      reader_cases = {}
+
+      sessions.each do |session|
+        cases = []
+
+        session.readers.each do |reader|
+          readers_cases = session.cases.reject { |c| c.form_answer.nil? or c.form_answer.user.id != reader.id }
+          cases << {:reader => reader, :cases => readers_cases}
+        end
+
+        reader_cases[session.id] = cases
+      end
+
+      return reader_cases
+    end
+  end
+  # http://localhost:3000/admin/cases?utf8=%E2%9C%93&q%5Bsession_id_eq%5D=5&q%5Bpatient_id_eq%5D=&q%5Bposition_eq%5D=&q%5Bimages_contains%5D=&q%5Bcreated_at_gte%5D=&q%5Bcreated_at_lte%5D=&q%5Bupdated_at_gte%5D=&q%5Bupdated_at_lte%5D=&q%5Bcase_type_contains%5D=&q%5Bstate_eq%5D=0&q%5Bflag_eq%5D=1&q%5Bexported_at_gte%5D=&q%5Bexported_at_lte%5D=&commit=Filter&order=id_desc
+
+  member_action :session_summary_report, :method => :get do
+    @sessions = [Session.find(params[:id])]
+    @cases_counts = cases_counts(@sessions)
+    @reader_cases = reader_cases(@sessions)
+
+    render 'admin/sessions/summary_report'
+  end
+  collection_action :summary_report, :method => :get do
+    @sessions = scoped_collection
+    @cases_counts = cases_counts(@sessions)
+    @reader_cases = reader_cases(@sessions)
+  end
+  action_item :only => :index do
+    link_to 'Summary', summary_report_admin_sessions_path
+  end
+  action_item :only => :show do
+    link_to 'Summary', session_summary_report_admin_session_path(session)
   end
 end
