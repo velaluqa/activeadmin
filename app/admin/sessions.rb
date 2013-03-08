@@ -484,7 +484,6 @@ ActiveAdmin.register Session do
       return reader_cases
     end
   end
-  # http://localhost:3000/admin/cases?utf8=%E2%9C%93&q%5Bsession_id_eq%5D=5&q%5Bpatient_id_eq%5D=&q%5Bposition_eq%5D=&q%5Bimages_contains%5D=&q%5Bcreated_at_gte%5D=&q%5Bcreated_at_lte%5D=&q%5Bupdated_at_gte%5D=&q%5Bupdated_at_lte%5D=&q%5Bcase_type_contains%5D=&q%5Bstate_eq%5D=0&q%5Bflag_eq%5D=1&q%5Bexported_at_gte%5D=&q%5Bexported_at_lte%5D=&commit=Filter&order=id_desc
 
   member_action :session_summary_report, :method => :get do
     @sessions = [Session.find(params[:id])]
