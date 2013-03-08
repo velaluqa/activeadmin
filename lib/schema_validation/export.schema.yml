@@ -13,4 +13,6 @@ mapping:
                 type: str
           "repeat":
             type: str
+          "include_id":
+            type: bool
                 
