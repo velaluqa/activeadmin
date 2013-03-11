@@ -121,7 +121,7 @@ class Session < ActiveRecord::Base
 
   def included_forms
     config = current_configuration
-    return [] if config.nil?
+    return [] unless self.semantically_valid?
 
     return config['types'].reject{|name,t| t['form'].nil?}.map{|name,t| t['form'].to_s}
   end
