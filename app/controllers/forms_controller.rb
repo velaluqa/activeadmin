@@ -30,7 +30,11 @@ class FormsController < ApplicationController
     authorize! :read, @form
 
     @form_config, @form_components, @repeatables = @form.full_current_configuration
-    return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
+    if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
+      flash[:error] = 'This form does not have a (valid) configuration.'
+      redirect_to :controller => 'admin/forms', :action => :show, :id => params[:id]
+      return
+    end
 
     patient = Patient.new
     patient.session = @form.session
