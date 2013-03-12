@@ -16,42 +16,44 @@
         - printable_answers << c.form_answer.printable_answers_for_version(version_index)
 - current_group_index = nil
 - first_in_group = false
-%table.table.table-striped.table-bordered.table-condensed
-  - unless (caption.nil? or caption.empty?)
-    %caption= caption
-  %colgroup
-    %col{:style => 'width: 2%'}
-    %col{:style => 'width: 23%'}
-    - cases.count.times do
-      %col{:style => "width: #{(75.0/cases.count).floor}%"}
-  - unless skip_header
-    %thead
-      %tr
-        %th{:colspan => 2} Field
-        - if placeholders_only
-          %th= Answer
-        - else
-          - cases.each do |c|
-            %th= c.images_folder
-  %tbody
-    - printable_answers[0].each_with_index do |field_spec,i|
-      - case field_spec['type']
-      - when 'divider'
-        - current_group_index += 1
-        - first_in_group = true
-      - when 'include_end'
-        - current_group_index = nil
-        - first_in_group = false
-        - if placeholders_only
-          %tr{:id => "repeatable_group_end_#{display_type}_#{field_spec['id']}"}
-      - when 'include_start'
-        - current_group_index = 1
-        - first_in_group = true
-      - when 'group'
+- unless printable_answers[0].nil?
+  %table.table.table-striped.table-bordered.table-condensed
+    - unless (caption.nil? or caption.empty?)
+      %caption= caption
+    %colgroup
+      %col{:style => 'width: 2%'}
+      %col{:style => 'width: 23%'}
+      - cases.count.times do
+        %col{:style => "width: #{(75.0/cases.count).floor}%"}
+    - unless skip_header
+      %thead
         %tr
-          %th{:colspan => 2+cases.count}= field_spec['label']
-      - when 'section'
-      - else
-        = render 'forms/results_table_row', :current_group_index => current_group_index, :first_in_group => first_in_group, :field_spec => field_spec, :printable_answers => printable_answers, :cases => cases, :placeholders_only => placeholders_only, :roi_links => roi_links
-        - first_in_group = false
-        
+          %th{:colspan => 2} Field
+          - if placeholders_only
+            %th= Answer
+          - else
+            - cases.each do |c|
+              %th= c.images_folder
+    %tbody
+      - printable_answers[0].each_with_index do |field_spec,i|
+        - case field_spec['type']
+        - when 'divider'
+          - current_group_index += 1
+          - first_in_group = true
+        - when 'include_end'
+          - current_group_index = nil
+          - first_in_group = false
+          - if placeholders_only
+            %tr{:id => "repeatable_group_end_#{display_type}_#{field_spec['id']}"}
+        - when 'include_start'
+          - current_group_index = 1
+          - first_in_group = true
+        - when 'group'
+          %tr
+            %th{:colspan => 2+cases.count}= field_spec['label']
+        - when 'section'
+        - else
+          = render 'forms/results_table_row', :current_group_index => current_group_index, :first_in_group => first_in_group, :field_spec => field_spec, :printable_answers => printable_answers, :cases => cases, :placeholders_only => placeholders_only, :roi_links => roi_links
+          - first_in_group = false
+- else
+  = "Failed to render form answers"
