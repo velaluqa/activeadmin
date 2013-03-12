@@ -12,6 +12,8 @@ class User < ActiveRecord::Base
   attr_accessible :public_key, :private_key
   attr_accessible :password_changed_at
 
+  validates :username, :uniqueness => true
+
   has_many :roles
   has_many :form_answers
 
