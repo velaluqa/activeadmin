@@ -101,12 +101,10 @@ class Session < ActiveRecord::Base
   end
   def validate
     return nil unless has_configuration?
-
-    validator = SchemaValidation::SessionValidator.new
     config = current_configuration
-    return nil if config.nil?
+    return if config.nil?
 
-    validation_errors = validator.validate(config)
+    validation_errors = run_schema_validation
 
     included_forms.each do |included_form|
       validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => self.id).empty?
@@ -121,7 +119,7 @@ class Session < ActiveRecord::Base
 
   def included_forms
     config = current_configuration
-    return [] unless self.semantically_valid?
+    return [] unless self.run_schema_validation == []
 
     return config['types'].reject{|name,t| t['form'].nil?}.map{|name,t| t['form'].to_s}
   end
@@ -174,7 +172,14 @@ class Session < ActiveRecord::Base
   end
 
 
-  private
+  protected
 
+  def run_schema_validation
+    validator = SchemaValidation::SessionValidator.new
+    config = current_configuration
+    return nil if config.nil?
+
+    validator.validate(config)
+  end
   
 end
