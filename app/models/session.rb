@@ -133,6 +133,10 @@ class Session < ActiveRecord::Base
       self.cases.where(:state => Case::state_sym_to_int(:in_progress), :flag => Case::flag_sym_to_int(flag))
     when :read
       self.cases.where(:state => Case::state_sym_to_int(:read), :flag => Case::flag_sym_to_int(flag)).reject {|c| c.form_answer.nil? }
+    when :reopened
+      self.cases.where(:state => Case::state_sym_to_int(:reopened), :flag => Case::flag_sym_to_int(flag)).reject {|c| c.form_answer.nil? }
+    when :reopened_in_progress
+      self.cases.where(:state => Case::state_sym_to_int(:reopened_in_progress), :flag => Case::flag_sym_to_int(flag)).reject {|c| c.form_answer.nil? }
     when :all
       self.cases.where(:flag => Case::flag_sym_to_int(flag))
     end

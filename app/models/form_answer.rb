@@ -1,6 +1,7 @@
 require 'openssl'
 require 'base64'
 require 'key_path_accessor'
+require 'exceptions'
 
 class FormAnswer
   include Mongoid::Document
@@ -96,7 +97,11 @@ class FormAnswer
   end
 
   def printable_answers
-    form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+    begin
+      form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+    rescue Exceptions::FormNotFoundError => e
+      return nil
+    end
     return nil if (form_config.nil? or repeatables.nil?)
 
     repeatables_map = {}
@@ -108,7 +113,11 @@ class FormAnswer
   end
   def printable_answers_for_version(i)
     return nil if i >= self.versions.size
-    form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+    begin
+      form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+    rescue Exceptions::FormNotFoundError => e
+      return nil
+    end
     return nil if (form_config.nil? or repeatables.nil?)
 
     repeatables_map = {}
@@ -151,7 +160,11 @@ class FormAnswer
   private
 
   def generate_form_fields_hash
-    form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+    begin
+      form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+    rescue Exceptions::FormNotFoundError => e
+      return [nil, nil]
+    end
     return [nil, nil] if (form_config.nil? or repeatables.nil?)
 
     repeatables_map = {}

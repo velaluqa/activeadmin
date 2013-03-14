@@ -213,30 +213,44 @@ find_roi_id_by_data = (roi) ->
        old_roi['area'] == roi['area'] and
        old_roi['min'] == roi['min'] and
        old_roi['max'] == roi['max'] and
-       old_roi['mean'] == roi['mean'])
+       old_roi['mean'] == roi['mean'] and
+	   old_roi['seriesUID'] == roi['seriesUID'] and
+	   old_roi['instanceNumber'] == roi['instanceNumber'])
       return roi_id
 
   return null
 
 update_rois_table = (new_rois) ->
+  console.log("UPDATING ROI TABLE---------------")
   for roi in new_rois
+    console.log("Updating ROI: ")
+    console.log(roi)
     roi_id = null
     roi_name = roi['seriesUID']+'/'+roi['name']
+    console.log("ROI name: "+roi_name)
     if window.osirix_id_to_roi_id[roi['id']]?
       roi_id = window.osirix_id_to_roi_id[roi['id']]
+      console.log("found ROI ID via OsiriX ID: "+roi_id)
     else if window.name_to_roi_id[roi_name]?
       roi_id = window.name_to_roi_id[roi_name]
+      console.log("found ROI ID via name: "+roi_id)
     else
       roi_id = find_roi_id_by_data(roi)
+      console.log("found ROI ID via data: "+roi_id) if roi_id?
+      console.log("assigning new ROI ID: "+window.next_roi_id) unless roi_id?
       roi_id = window.next_roi_id++ unless roi_id?
 
-      window.osirix_id_to_roi_id[roi['id']] = roi_id
-      window.name_to_roi_id[roi_name] = roi_id
+    window.osirix_id_to_roi_id[roi['id']] = roi_id
+    console.log("updated osirix_id_to_roi_id: "+window.osirix_id_to_roi_id[roi['id']])
+    window.name_to_roi_id[roi_name] = roi_id
+    console.log("updated name_id_to_roi_id: "+window.name_to_roi_id[roi_name])
 
     roi['roi_id'] = roi_id
     roi['selected_by_select'] = window.rois[roi_id]['selected_by_select'] if window.rois[roi_id]?
 
     window.rois[roi_id] = roi
+    console.log("updated ROI table:")
+    console.log(window.rois[roi_id])
 
 update_rois = ->
   rois = PharmTraceAPI.rois

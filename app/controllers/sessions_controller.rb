@@ -20,12 +20,12 @@ class SessionsController < ApplicationController
   def list
     blind_readable = current_user.blind_readable_sessions
       .reject {|s| s.state != :production}
-      .reject {|s| s.case_list(:unread).empty?}
+      .reject {|s| s.case_list(:unread).empty? and s.case_list(:reopened).reject {|c| c.form_answer.nil? or c.form_answer.user != current_user }.empty?}
       .map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
 
     validatable = current_user.validatable_sessions
       .reject {|s| s.state != :testing}
-      .reject {|s| s.case_list(:unread).empty?}
+      .reject {|s| s.case_list(:unread).empty? and s.case_list(:reopened).reject {|c| c.form_answer.nil? or c.form_answer.user != current_user }.empty?}
       .map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
 
     respond_to do |format|
