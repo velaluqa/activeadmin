@@ -213,7 +213,9 @@ find_roi_id_by_data = (roi) ->
        old_roi['area'] == roi['area'] and
        old_roi['min'] == roi['min'] and
        old_roi['max'] == roi['max'] and
-       old_roi['mean'] == roi['mean'])
+       old_roi['mean'] == roi['mean'] and
+	   old_roi['seriesUID'] == roi['seriesUID'] and
+	   old_roi['instanceNumber'] == roi['instanceNumber'])
       return roi_id
 
   return null
