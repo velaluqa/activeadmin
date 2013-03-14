@@ -219,6 +219,7 @@ find_roi_id_by_data = (roi) ->
   return null
 
 update_rois_table = (new_rois) ->
+  console.log("UPDATING ROI TABLE---------------")
   for roi in new_rois
     console.log("Updating ROI: ")
     console.log(roi)
@@ -237,14 +238,13 @@ update_rois_table = (new_rois) ->
       console.log("assigning new ROI ID: "+window.next_roi_id) unless roi_id?
       roi_id = window.next_roi_id++ unless roi_id?
 
-      window.osirix_id_to_roi_id[roi['id']] = roi_id
-      console.log("updated osirix_id_to_roi_id: "+window.osirix_id_to_roi_id[roi['id']])
-      window.name_to_roi_id[roi_name] = roi_id
-      console.log("updated name_id_to_roi_id: "+window.name_to_roi_id[roi_name])
+    window.osirix_id_to_roi_id[roi['id']] = roi_id
+    console.log("updated osirix_id_to_roi_id: "+window.osirix_id_to_roi_id[roi['id']])
+    window.name_to_roi_id[roi_name] = roi_id
+    console.log("updated name_id_to_roi_id: "+window.name_to_roi_id[roi_name])
 
     roi['roi_id'] = roi_id
     roi['selected_by_select'] = window.rois[roi_id]['selected_by_select'] if window.rois[roi_id]?
-    console.log("added metadata to ROI: "+roi)
 
     window.rois[roi_id] = roi
     console.log("updated ROI table:")
