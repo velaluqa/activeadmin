@@ -48,6 +48,18 @@ class Form < ActiveRecord::Base
     return FormAnswer.where(:form_id => self.id)
   end
 
+  def copy_to_session(session, current_user)
+    copied_form = self.dup
+    copied_form.session = session
+    copied_form.locked_version = nil
+    copied_form.state = :draft
+    copied_form.save
+
+    GitConfigRepository.new.update_config_file(copied_form.relative_config_file_path, self.config_file_path, current_user, "Copied form #{self.id} into session #{session.id}")
+
+    copied_form
+  end
+
   def is_template?
     session_id.nil?
   end

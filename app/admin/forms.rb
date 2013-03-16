@@ -279,18 +279,10 @@ ActiveAdmin.register Form do
 
   controller do
     def copy_to_session(form, session)
-      authorize! :read, form      
+      authorize! :read, form
       authorize! :manage, session
 
-      copied_form = form.dup
-      copied_form.session = session
-      copied_form.locked_version = nil
-      copied_form.state = :draft
-      copied_form.save
-
-      GitConfigRepository.new.update_config_file(copied_form.relative_config_file_path, form.config_file_path, current_user, "Copied form #{form.id} into session #{session.id}")
-
-      copied_form
+      form.copy_to_session(session, current_user)
     end
   end
 
