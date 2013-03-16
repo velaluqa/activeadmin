@@ -166,6 +166,11 @@ ActiveAdmin.register Session do
     f.buttons
   end
 
+  # filters
+  filter :study
+  filter :name
+  filter :state, :as => :check_boxes, :collection => Session::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
+
     # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
   action_item :except => [:new, :show] do
     if controller.action_methods.include?('new') and can? :manage, Session
