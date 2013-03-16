@@ -105,6 +105,7 @@ class Session < ActiveRecord::Base
     return if config.nil?
 
     validation_errors = run_schema_validation
+    return validation_errors unless validation_errors == []
 
     included_forms.each do |included_form|
       validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => self.id).empty?
