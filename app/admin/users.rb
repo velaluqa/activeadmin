@@ -90,6 +90,10 @@ ActiveAdmin.register User do
     f.buttons
   end
 
+  # filters
+  filter :username
+  filter :name
+
   member_action :download_public_key do
     @user = User.find(params[:id])
     
