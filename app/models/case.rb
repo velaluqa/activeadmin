@@ -130,10 +130,6 @@ class Case < ActiveRecord::Base
 
     position = start_position
     rows.each do |row|
-      puts "------------------------"
-      pp row
-      pp row['visit_date']
-      puts "------------------------"
       subject_id = row.unconverted_fields[row.index('patient')]
       images = row.unconverted_fields[row.index('images')]
       case_type = row.unconverted_fields[row.index('type')]
