@@ -128,6 +128,16 @@ ActiveAdmin.register Case do
     column :exported_at    
   end
 
+  # filters
+  filter :session
+  filter :patient
+  filter :position
+  filter :images
+  filter :case_type
+  filter :flag, :as => :check_boxes, :collection => Case::FLAG_SYMS.each_with_index.map {|flag, i| [flag, i]}
+  filter :state, :as => :check_boxes, :collection => Case::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
+  filter :exported_at, :label => 'Last Export'
+
   member_action :reopen, :only => :show do
     @case = Case.find(params[:id])
 
