@@ -11,7 +11,6 @@ class Session < ActiveRecord::Base
   has_many :roles, :as => :subject
   has_many :form_answers
   has_many :patients
-  has_many :session_pauses
   has_many :forms
   has_many :cases
 
@@ -141,10 +140,6 @@ class Session < ActiveRecord::Base
     when :all
       self.cases.where(:flag => Case::flag_sym_to_int(flag))
     end
-  end
-
-  def most_recent_pause
-    return self.session_pauses.order("end DESC").first
   end
 
   def reserve_next_case
