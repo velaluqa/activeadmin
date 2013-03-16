@@ -316,21 +316,23 @@ ActiveAdmin.register Session do
       redirect_to({:action => :show})
       return
     end
-    
-    config = @session.current_configuration
-    case_type = config['types'][params[:session][:case_type]]
-    if(case_type.nil?)
-      flash[:error] = "You specified an invalid case type '#{params[:session][:case_type]}'."
-      redirect_to({:action => :show})
-      return
-    end
 
-    base64_layout = Base64.encode64(params[:session][:file].tempfile.read)
-    if(params[:session][:annotations_layout_mode] == 'validation')
-      case_type['validation'] = {} if case_type['validation'].nil?
-      case_type['validation']['annotations_layout'] = base64_layout
-    else
-      case_type['annotations_layout'] = base64_layout
+    config = @session.current_configuration
+    params[:session][:case_type].reject {|ct| ct.blank?}.each do |case_type_name|
+      case_type = config['types'][case_type_name]
+      if(case_type.nil?)
+        flash[:error] = "You specified an invalid case type '#{params[:session][:case_type]}'."
+        redirect_to({:action => :show})
+        return
+      end
+
+      base64_layout = Base64.encode64(params[:session][:file].tempfile.read)
+      if(params[:session][:annotations_layout_mode] == 'validation')
+        case_type['validation'] = {} if case_type['validation'].nil?
+        case_type['validation']['annotations_layout'] = base64_layout
+      else
+        case_type['annotations_layout'] = base64_layout
+      end
     end
 
     begin
