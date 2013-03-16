@@ -41,6 +41,10 @@ ActiveAdmin.register Patient do
     f.buttons
   end
 
+  # filters
+  filter :session
+  filter :subject_id, :label => 'Subject ID'
+
   action_item :only => :show do
     # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
     if controller.action_methods.include?('destroy') and resource.cases.empty?
