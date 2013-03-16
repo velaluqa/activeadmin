@@ -303,4 +303,21 @@ ActiveAdmin.register Case do
     @page_title = 'Export'
     render 'admin/cases/export_settings', :locals => {:selection => selection}
   end
+
+  batch_action :cancel, :confirmation => 'Canceling these Cases will set them as "unread" again. Make sure that no Reader is currently working on this session!' do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+
+      case c.state
+      when :in_progress
+        c.state = :unread
+      when :reopened_in_progress
+        c.state = :reopened
+      end
+
+      c.save
+    end
+
+    redirect_to(:back, :notice => 'Selected cases have been canceled.')
+  end
 end
