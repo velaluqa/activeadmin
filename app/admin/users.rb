@@ -1,4 +1,27 @@
 ActiveAdmin.register User do
+
+  controller do
+    def create
+      private_key_password = params[:user][:signature_password]
+      if(private_key_password != params[:user][:signature_password_confirmation])
+        flash[:error] = 'Signature password doesn\'t match confirmation'
+        redirect_to :back
+        return
+      elsif(private_key_password == params[:user][:password])
+        flash[:error] = 'Signature password must be different from login password'
+        redirect_to :back
+        return
+      elsif(private_key_password.length < 6)
+        flash[:error] = 'Signature password must be at least 6 characters'
+        redirect_to :back
+        return
+      end
+
+      create!
+      @user.generate_keypair(private_key_password, true)
+    end
+  end
+
   index do
     selectable_column
     column :name do |user|
@@ -58,6 +81,8 @@ ActiveAdmin.register User do
       unless f.object.persisted?
         f.input :password
         f.input :password_confirmation, :required => true
+        f.input :signature_password, :required => true
+        f.input :signature_password_confirmation, :required => true
       end
       f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end

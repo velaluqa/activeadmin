@@ -43,12 +43,6 @@ class User < ActiveRecord::Base
     return test_results
   end
 
-  before_create :generate_keypair_on_create
-
-  def generate_keypair_on_create
-    self.generate_keypair(self.password, false)
-  end
-
   def generate_keypair(private_key_password, save_to_db = true)
     new_private_key = OpenSSL::PKey::RSA.generate(4096) #HC
     new_public_key = new_private_key.public_key
@@ -56,5 +50,18 @@ class User < ActiveRecord::Base
     self.private_key = new_private_key.to_pem(OpenSSL::Cipher.new('DES-EDE3-CBC'), private_key_password)
     self.public_key = new_public_key.to_pem
     self.save! if save_to_db
+  end
+
+  # fake attributes to enable us to use them in the create user form
+  attr_accessible :signature_password, :signature_password_confirmation
+  def signature_password
+    nil
+  end
+  def signature_password=(p)
+  end
+  def signature_password_confirmation
+    nil
+  end
+  def signature_password_confirmation=(p)
   end
 end
