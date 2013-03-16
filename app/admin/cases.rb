@@ -116,6 +116,18 @@ ActiveAdmin.register Case do
     f.buttons
   end
 
+  csv do
+    column :id
+    column :session_id
+    column :position
+    column('Subject ID') {|c| c.patient.nil? ? '' : c.patient.subject_id}
+    column :images
+    column :case_type
+    column :flag
+    column :state
+    column :exported_at    
+  end
+
   member_action :reopen, :only => :show do
     @case = Case.find(params[:id])
 
