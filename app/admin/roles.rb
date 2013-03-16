@@ -44,4 +44,9 @@ ActiveAdmin.register Role do
     
     f.buttons
   end
+
+  # filters
+  filter :user
+  filter :role, :as => :check_boxes, :collection => Role::ROLE_SYMS.each_with_index.map {|role, i| [role, i]}
+
 end
