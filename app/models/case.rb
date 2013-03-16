@@ -106,7 +106,7 @@ class Case < ActiveRecord::Base
     }      
   end
 
-  def self.batch_create_from_csv(csv_file, session, start_position)
+  def self.batch_create_from_csv(csv_file, case_flag, session, start_position)
     csv_options = {
       :col_sep => ',',
       :row_sep => :auto,
@@ -140,7 +140,7 @@ class Case < ActiveRecord::Base
       patient = Patient.where(:subject_id => subject_id, :session_id => session.id).first
       patient = Patient.create(:subject_id => subject_id, :session => session) if patient.nil?
 
-      new_case = Case.create(:patient => patient, :session => session, :images => images, :case_type => case_type, :position => position)
+      new_case = Case.create(:patient => patient, :session => session, :images => images, :case_type => case_type, :position => position, :flag => case_flag)
       
       case_data = {}
       data_headers = row.headers.reject {|h| ['patient', 'images', 'type'].include?(h)}
