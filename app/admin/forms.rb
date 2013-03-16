@@ -147,6 +147,12 @@ ActiveAdmin.register Form do
     f.buttons
   end
 
+  # filters
+  filter :session
+  filter :name
+  filter :description
+  filter :state, :as => :check_boxes, :collection => Form::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
+
   # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
   action_item :except => [:new, :show] do
     if controller.action_methods.include?('new')
