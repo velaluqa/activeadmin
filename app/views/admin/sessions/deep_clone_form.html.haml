@@ -1,0 +1,8 @@
+= semantic_form_for @session, :url => deep_clone_admin_session_path(@session), :method => :post do |f|
+  = f.inputs 'New Session Details' do
+    = f.input :name
+    = f.input :study
+
+  = f.actions do
+    = f.action :submit, :as => :input, :label => 'Clone Session'
+    = f.action :cancel, :as => :link, :label => 'Cancel', :wrapper_html => {:class => 'cancel'}

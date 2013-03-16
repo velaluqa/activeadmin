@@ -14,7 +14,7 @@ ActiveAdmin.register Session do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :switch_state]
+    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :switch_state, :deep_clone_form, :deep_clone]
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
@@ -513,5 +513,28 @@ ActiveAdmin.register Session do
   end
   action_item :only => :show do
     link_to 'Summary', session_summary_report_admin_session_path(session)
+  end
+
+  member_action :deep_clone, :method => :post do
+    @session = Session.find(params[:id])
+    authorize! :read, @session
+
+    new_study = Study.find(params[:session][:study_id])
+    authorize! :manage, new_study
+
+    new_session_name = params[:session][:name]
+
+    new_session = @session.deep_clone(new_session_name, new_study, current_user)
+
+    redirect_to(admin_session_path(new_session), :notice => 'Session successfully cloned')
+  end
+  member_action :deep_clone_form, :method => :get do
+    @session = Session.find(params[:id])
+    authorize! :read, @session
+
+    @page_title = 'Clone Session'
+  end
+  action_item :only => :show do
+    link_to('Clone', deep_clone_form_admin_session_path(resource)) if can? :read, resource
   end
 end
