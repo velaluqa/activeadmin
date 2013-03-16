@@ -8,6 +8,7 @@ ActiveAdmin.register Version do
   filter :created_at
   filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Patient', 'Role', 'Session', 'Study' , 'User']
   filter :whodunnit, :label => 'User', :as => :select, :collection => proc { User.all }
+  filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
   controller do
     def self.classify_event(version)
