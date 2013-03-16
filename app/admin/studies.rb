@@ -22,4 +22,7 @@ ActiveAdmin.register Study do
 
     f.buttons
   end
+
+  # filters
+  filter :name
 end
