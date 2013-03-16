@@ -265,4 +265,8 @@ class Form < ActiveRecord::Base
     
     return [full_config, full_components, repeatables]
   end
+
+  def include_subforms
+    nil
+  end
 end
