@@ -53,4 +53,8 @@ ActiveAdmin.register Patient do
               :method => :delete, :data => {:confirm => I18n.t('active_admin.delete_confirmation')})
     end
   end 
+
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id))
+  end
 end

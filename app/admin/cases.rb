@@ -342,4 +342,8 @@ ActiveAdmin.register Case do
 
     redirect_to(:back, :notice => 'Selected cases have been canceled.')
   end
+
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'case', :audit_trail_view_id => resource.id))
+  end
 end

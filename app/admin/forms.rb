@@ -332,4 +332,7 @@ ActiveAdmin.register Form do
     link_to 'Preview', preview_form_path(resource), :target => '_blank' if resource.has_configuration? and can? :read, resource
   end
   
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'form', :audit_trail_view_id => resource.id))
+  end
 end

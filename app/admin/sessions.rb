@@ -537,4 +537,8 @@ ActiveAdmin.register Session do
   action_item :only => :show do
     link_to('Clone', deep_clone_form_admin_session_path(resource)) if can? :read, resource
   end
+
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'session', :audit_trail_view_id => resource.id))
+  end
 end
