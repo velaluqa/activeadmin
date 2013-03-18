@@ -1,3 +1,5 @@
+require 'exceptions'
+
 class FormAnswersController < ApplicationController
   before_filter :authenticate_user!
 
@@ -35,9 +37,26 @@ class FormAnswersController < ApplicationController
 
       answer.form_id = params['form_id']
       begin
-        answer.form_version = @case.session.forms.find(params['form_id']).locked_version
+        @form = @case.session.forms.find(params['form_id'])
+
+        form_versions = {}
+        form_versions[@form.id] = @form.locked_version
+
+        form_versions['session'] = @case.session.locked_version
+
+        @form.included_forms.each do |included_form_name|
+          included_form = @case.session.forms.where(:name => included_form_name).first
+          raise Exceptions::FormNotFoundError(included_form_name, @case) if included_form.nil?
+
+          form_versions[included_form.id] = included_form.locked_version
+        end
+
+        answer.form_versions = form_versions
       rescue ActiveRecord::RecordNotFound => e
-        render :json => {:success => fase, :error => 'The form associated with this form answer does not exist.', :error_code => 2}, :status => :bad_request
+        render :json => {:success => false, :error => 'A form associated with this form answer does not exist: '+e.message, :error_code => 2}, :status => :bad_request
+        return
+      rescue Exceptions::FormNotFoundError => e
+        render :json => {:success => false, :error => 'A form associated with this form answer does not exist: '+e.form_name, :error_code => 2}, :status => :bad_request
         return
       end
       answer.user_id = current_user.id
@@ -77,10 +96,10 @@ class FormAnswersController < ApplicationController
   end
 
   def run_form_judgement_function(form_answer)
-    source = form_answer.form.components_at_version(form_answer.form_version)[:validators].first
+    source = form_answer.form.components_at_version(form_answer.form_versions[form_answer.form.id])[:validators].first
     return false if source.nil?
 
-    session_config = form_answer.session.configuration_at_version(form_answer.form_version)
+    session_config = form_answer.session.configuration_at_version(form_answer.form_versions['session'])
     return false if (session_config.nil? or session_config['reader_testing'].nil?)
 
     js_context = ExecJS.compile(source)

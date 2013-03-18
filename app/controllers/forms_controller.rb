@@ -9,7 +9,7 @@ class FormsController < ApplicationController
 
   def show
     if(@case.state == :reopened_in_progress and @case.form_answer)
-      @form_config, @form_components, @repeatables = @form.full_configuration_at_version_for_case(@case.form_answer.form_version, @case)
+      @form_config, @form_components, @repeatables = @form.full_configuration_at_versions_for_case(@case.form_answer.form_versions, @case)
     else
       @form_config, @form_components, @repeatables = @form.full_locked_configuration
     end

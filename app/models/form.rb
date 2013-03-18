@@ -70,11 +70,11 @@ class Form < ActiveRecord::Base
   def full_locked_configuration
     full_configuration(:locked)
   end
-  def full_configuration_at_version(version)
-    full_configuration(version)
+  def full_configuration_at_versions(versions)
+    full_configuration(versions)
   end
-  def full_configuration_at_version_for_case(version, the_case)
-    full_configuration(version, nil, true, the_case)
+  def full_configuration_at_versions_for_case(versions, the_case)
+    full_configuration(versions, nil, true, the_case)
   end
   def current_configuration
     parse_config(:current)
@@ -151,12 +151,18 @@ class Form < ActiveRecord::Base
 
   protected
 
-  def parse_version_sym(version)
+  def parse_version_sym(version, resolve_hash = true)
     case version
     when :current
       nil
     when :locked
       self.locked_version
+    when Hash
+      if(resolve_hash)
+        version[self.id]
+      else
+        version
+      end
     else
       version
     end
@@ -173,7 +179,6 @@ class Form < ActiveRecord::Base
     return config
   end
   
-  # TODO: version is not yet used, since components are not yet versioned
   def components(version)
     version = parse_version_sym(version)
     id = read_attribute(:id)
@@ -195,11 +200,11 @@ class Form < ActiveRecord::Base
     end
   end
 
-  def full_configuration(version, already_included_forms = nil, stringify = true, the_case = nil)
-    parsed_version = parse_version_sym(version)
+  def full_configuration(versions, already_included_forms = nil, stringify = true, the_case = nil)
+    parsed_version = parse_version_sym(versions)
     form_config = parse_config(parsed_version)
     return [nil,nil,nil] if form_config.nil?
-    form_components = components(version)
+    form_components = components(parsed_version)
     return [nil,nil,nil] if form_components.nil?
 
     already_included_forms = [] if already_included_forms.nil?
@@ -208,12 +213,12 @@ class Form < ActiveRecord::Base
     unless(the_case.nil? or the_case.form_answer.nil?)
       previous_answers = the_case.form_answer.answers
     end
-    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms, read_attribute(:session_id), version, previous_answers)
+    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms, read_attribute(:session_id), versions, previous_answers)
     form_components = stringify_form_components(form_components) if stringify
 
     return [form_config, form_components, repeatables]
   end
-  def process_imports(config, components, already_included, session_id, version, previous_answers = nil)
+  def process_imports(config, components, already_included, session_id, versions, previous_answers = nil)
     full_config = []
     full_components = components
     repeatables = []
@@ -231,7 +236,7 @@ class Form < ActiveRecord::Base
           throw "The form has a circular include of form '#{included_form.name}'"
         end
 
-        included_config, included_components, included_repeatables = included_form.full_configuration(version, already_included.dup, false)
+        included_config, included_components, included_repeatables = included_form.full_configuration(versions, already_included.dup, false)
         if included_config.nil? or included_components.nil? or included_repeatables.nil?
           raise Exceptions::FormNotFoundError.new(field['include'], nil)
         end
