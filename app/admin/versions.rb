@@ -19,6 +19,12 @@ ActiveAdmin.register Version do
         end_of_association_chain.where('item_type LIKE "Case" and item_id = ?', params[:audit_trail_view_id].to_i)
       when 'patient'
         end_of_association_chain.where('item_type LIKE "Patient" and item_id = ?', params[:audit_trail_view_id].to_i)
+      when 'session'
+        end_of_association_chain.where('(item_type LIKE "Session" and item_id = :session_id) or (item_type LIKE "Case" and item_id IN (SELECT id FROM cases WHERE cases.session_id = :session_id)) or (item_type LIKE "Patient" and item_id IN (SELECT id FROM patients WHERE patients.session_id = :session_id)) or (item_type LIKE "Form" and item_id IN (SELECT id FROM forms WHERE forms.session_id = :session_id))',
+                                       {:session_id => params[:audit_trail_view_id].to_i})
+      when 'study'
+        end_of_association_chain.where('(item_type LIKE "Study" and item_id = :study_id) or (item_type LIKE "Session" and item_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id)) or (item_type LIKE "Case" and item_id IN (SELECT id FROM cases WHERE cases.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or (item_type LIKE "Patient" and item_id IN (SELECT id FROM patients WHERE patients.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or (item_type LIKE "Form" and item_id IN (SELECT id FROM forms WHERE forms.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id)))',
+                                       {:study_id => params[:audit_trail_view_id].to_i})
       else
         end_of_association_chain
       end
