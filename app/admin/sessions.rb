@@ -14,14 +14,14 @@ ActiveAdmin.register Session do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :switch_state]
+    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :switch_state, :deep_clone_form, :deep_clone]
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
 
     def update
       if params[:session][:study_id] != Session.find(params[:id]).study_id
-        flash[:error] = 'A session can no be moved to a new study!'
+        flash[:error] = 'A session cannot be moved to a new study!'
         redirect_to :action => :show
         return
       end
@@ -166,6 +166,11 @@ ActiveAdmin.register Session do
     f.buttons
   end
 
+  # filters
+  filter :study
+  filter :name
+  filter :state, :as => :check_boxes, :collection => Session::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
+
     # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
   action_item :except => [:new, :show] do
     if controller.action_methods.include?('new') and can? :manage, Session
@@ -240,7 +245,13 @@ ActiveAdmin.register Session do
   member_action :import_case_list_csv, :method => :post do
     @session = Session.find(params[:id])
 
-    num_imported = Case.batch_create_from_csv(params[:session][:file].tempfile, @session, @session.next_position)
+    if(params[:session].nil? or params[:session][:annotations_layout_mode].blank? or params[:session][:file].blank?)
+      flash[:error] = "You must specifiy all the required parameters."
+      redirect_to({:action => :show})
+      return
+    end
+
+    num_imported = Case.batch_create_from_csv(params[:session][:file].tempfile, params[:session][:annotations_layout_mode].to_sym, @session, @session.next_position)
 
     redirect_to({:action => :show}, :notice => "Successfully imported #{num_imported} cases from CSV")
   end
@@ -248,7 +259,6 @@ ActiveAdmin.register Session do
     @session = Session.find(params[:id])
 
     @page_title = "Import Case List from CSV"
-    render 'admin/sessions/import_csv_form', :locals => {:url => import_case_list_csv_admin_session_path}
   end
   action_item :only => :show do
     link_to 'Import Case List from CSV', import_case_list_csv_form_admin_session_path(session) if can? :manage, session
@@ -265,7 +275,6 @@ ActiveAdmin.register Session do
     @session = Session.find(params[:id])
 
     @page_title = "Import Patient Data from CSV"
-    render 'admin/sessions/import_csv_form', :locals => {:url => import_patient_data_csv_admin_session_path}
   end
   action_item :only => :show do
     link_to 'Import Patient Data from CSV', import_patient_data_csv_form_admin_session_path(session) if can? :manage, session
@@ -316,21 +325,23 @@ ActiveAdmin.register Session do
       redirect_to({:action => :show})
       return
     end
-    
-    config = @session.current_configuration
-    case_type = config['types'][params[:session][:case_type]]
-    if(case_type.nil?)
-      flash[:error] = "You specified an invalid case type '#{params[:session][:case_type]}'."
-      redirect_to({:action => :show})
-      return
-    end
 
-    base64_layout = Base64.encode64(params[:session][:file].tempfile.read)
-    if(params[:session][:annotations_layout_mode] == 'validation')
-      case_type['validation'] = {} if case_type['validation'].nil?
-      case_type['validation']['annotations_layout'] = base64_layout
-    else
-      case_type['annotations_layout'] = base64_layout
+    config = @session.current_configuration
+    params[:session][:case_type].reject {|ct| ct.blank?}.each do |case_type_name|
+      case_type = config['types'][case_type_name]
+      if(case_type.nil?)
+        flash[:error] = "You specified an invalid case type '#{params[:session][:case_type]}'."
+        redirect_to({:action => :show})
+        return
+      end
+
+      base64_layout = Base64.encode64(params[:session][:file].tempfile.read)
+      if(params[:session][:annotations_layout_mode] == 'validation')
+        case_type['validation'] = {} if case_type['validation'].nil?
+        case_type['validation']['annotations_layout'] = base64_layout
+      else
+        case_type['annotations_layout'] = base64_layout
+      end
     end
 
     begin
@@ -502,5 +513,32 @@ ActiveAdmin.register Session do
   end
   action_item :only => :show do
     link_to 'Summary', session_summary_report_admin_session_path(session)
+  end
+
+  member_action :deep_clone, :method => :post do
+    @session = Session.find(params[:id])
+    authorize! :read, @session
+
+    new_study = Study.find(params[:session][:study_id])
+    authorize! :manage, new_study
+
+    new_session_name = params[:session][:name]
+
+    new_session = @session.deep_clone(new_session_name, new_study, current_user)
+
+    redirect_to(admin_session_path(new_session), :notice => 'Session successfully cloned')
+  end
+  member_action :deep_clone_form, :method => :get do
+    @session = Session.find(params[:id])
+    authorize! :read, @session
+
+    @page_title = 'Clone Session'
+  end
+  action_item :only => :show do
+    link_to('Clone', deep_clone_form_admin_session_path(resource)) if can? :read, resource
+  end
+
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'session', :audit_trail_view_id => resource.id))
   end
 end

@@ -147,6 +147,12 @@ ActiveAdmin.register Form do
     f.buttons
   end
 
+  # filters
+  filter :session
+  filter :name
+  filter :description
+  filter :state, :as => :check_boxes, :collection => Form::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
+
   # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
   action_item :except => [:new, :show] do
     if controller.action_methods.include?('new')
@@ -271,35 +277,44 @@ ActiveAdmin.register Form do
     redirect_to({:action => :show}, :notice => 'Form unlocked')
   end
 
+  controller do
+    def copy_to_session(form, session)
+      authorize! :read, form
+      authorize! :manage, session
+
+      form.copy_to_session(session, current_user)
+    end
+  end
+
   member_action :copy, :method => :post do
     @form = Form.find(params[:id])
-    authorize! :read, @form
     @session = Session.find(params[:form][:session_id])
-    authorize! :manage, @session
 
-    unless @form.session.nil?      
-      flash[:error] = 'Only template forms can be copied!'
-      redirect_to :action => :show
-      return
+    copied_form = copy_to_session(@form, @session)
+
+    subform_copy_count = 0
+    if(params[:form][:include_subforms] == '1')
+      @form.included_forms.each do |included_form_name|
+        puts included_form_name
+        included_form = Form.where(:name => included_form_name, :session_id => @form.session_id).first
+        puts included_form
+        next if included_form.nil?
+        
+        copy_to_session(included_form, @session)
+        subform_copy_count += 1
+      end
     end
-
-    copied_form = @form.dup
-    copied_form.session = @session
-    copied_form.save
-
-    GitConfigRepository.new.update_config_file(copied_form.relative_config_file_path, @form.config_file_path, current_user, "Copied form #{@form.id} into session #{@session.id}")
-
-    redirect_to(admin_form_path(copied_form), :notice => 'Form copied')
+    
+    redirect_to(admin_form_path(copied_form), :notice => (subform_copy_count > 0 ? "Form and #{subform_copy_count} included forms copied" : 'Form copied'))
   end
   member_action :copy_form do
     @form = Form.find(params[:id])
     authorize! :read, @form
     
     @page_title = "Copy Form to Session"
-    render 'admin/forms/select_session', :locals => { :url => copy_admin_form_path}
   end
   action_item :only => :show do
-    link_to 'Copy', copy_form_admin_form_path(resource) if resource.is_template?
+    link_to 'Copy', copy_form_admin_form_path(resource)
   end
   
   action_item :only => :show do
@@ -317,4 +332,7 @@ ActiveAdmin.register Form do
     link_to 'Preview', preview_form_path(resource), :target => '_blank' if resource.has_configuration? and can? :read, resource
   end
   
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'form', :audit_trail_view_id => resource.id))
+  end
 end

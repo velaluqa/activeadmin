@@ -44,4 +44,12 @@ ActiveAdmin.register Role do
     
     f.buttons
   end
+
+  # filters
+  filter :user
+  filter :role, :as => :check_boxes, :collection => Role::ROLE_SYMS.each_with_index.map {|role, i| [role, i]}
+
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'role', :audit_trail_view_id => resource.id))
+  end
 end

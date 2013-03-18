@@ -10,7 +10,8 @@ class FormAnswer
   field :session_id, type: Integer
   field :case_id, type: Integer
   field :form_id, type:  Integer
-  field :form_version, type:  String
+  field :form_version, type:  String # OBSOLETE
+  field :form_versions, type:  Hash
   field :submitted_at, type:  Time
   field :answers, type:  Hash
   field :answers_signature, type:  String
@@ -67,6 +68,14 @@ class FormAnswer
     write_attribute(:case_id, new_case.id)
   end
 
+  def form_versions
+    if(read_attribute(:form_versions).nil?)
+       {self.form_id => self.form_version}
+     else
+       read_attribute(:form_versions)
+     end
+  end
+
   def version_current_answers
     new_version = {}
     new_version[:answers] = self.answers
@@ -98,7 +107,7 @@ class FormAnswer
 
   def printable_answers
     begin
-      form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+      form_config, form_components, repeatables = form.full_configuration_at_versions(self.form_versions)
     rescue Exceptions::FormNotFoundError => e
       return nil
     end
@@ -114,7 +123,7 @@ class FormAnswer
   def printable_answers_for_version(i)
     return nil if i >= self.versions.size
     begin
-      form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+      form_config, form_components, repeatables = form.full_configuration_at_versions(self.form_versions)
     rescue Exceptions::FormNotFoundError => e
       return nil
     end
@@ -161,7 +170,7 @@ class FormAnswer
 
   def generate_form_fields_hash
     begin
-      form_config, form_components, repeatables = form.full_configuration_at_version(self.form_version)
+      form_config, form_components, repeatables = form.full_configuration_at_versions(self.form_versions)
     rescue Exceptions::FormNotFoundError => e
       return [nil, nil]
     end

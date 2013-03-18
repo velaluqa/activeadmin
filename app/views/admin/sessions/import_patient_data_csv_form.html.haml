@@ -1,5 +1,4 @@
-= semantic_form_for @session, :url => url, :method => :post do |f|
-  - puts "Form: #{f}"
+= semantic_form_for @session, :url => import_patient_data_csv_admin_session_path(@session), :method => :post do |f|
   = f.inputs 'Import' do
     = f.input :file, :label => 'CSV File', :as => :file
 

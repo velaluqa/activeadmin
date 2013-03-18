@@ -43,7 +43,23 @@ ActiveAdmin.register FormAnswer do
       row :session
       row :case
       row :form
-      row :form_version
+      row 'Configuration Versions' do
+        ul do
+          li {"Session: #{form_answer.form_versions['session']}"} unless form_answer.form_versions['session'].nil?
+          form_answer.form_versions.each do |form_id, form_version|
+            next if form_id == 'session'
+            form_name = nil
+            begin
+              form = Form.find(form_id)
+              form_name = form.name
+            rescue ActiveRecord::RecordNotFound => e
+              form_name = form_id.to_s
+            end
+
+            li {"Form #{form_name}: #{form_version}"}
+          end
+        end
+      end
       row :submitted_at
       row :signatures do
         if(form_answer.answers_signature_is_valid? && form_answer.annotated_images_signature_is_valid?)

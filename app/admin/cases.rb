@@ -116,6 +116,28 @@ ActiveAdmin.register Case do
     f.buttons
   end
 
+  csv do
+    column :id
+    column :session_id
+    column :position
+    column('Subject ID') {|c| c.patient.nil? ? '' : c.patient.subject_id}
+    column :images
+    column :case_type
+    column :flag
+    column :state
+    column :exported_at    
+  end
+
+  # filters
+  filter :session
+  filter :patient
+  filter :position
+  filter :images
+  filter :case_type
+  filter :flag, :as => :check_boxes, :collection => Case::FLAG_SYMS.each_with_index.map {|flag, i| [flag, i]}
+  filter :state, :as => :check_boxes, :collection => Case::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
+  filter :exported_at, :label => 'Last Export'
+
   member_action :reopen, :only => :show do
     @case = Case.find(params[:id])
 
@@ -302,5 +324,26 @@ ActiveAdmin.register Case do
   batch_action :export do |selection|
     @page_title = 'Export'
     render 'admin/cases/export_settings', :locals => {:selection => selection}
+  end
+
+  batch_action :cancel, :confirmation => 'Canceling these Cases will set them as "unread" again. Make sure that no Reader is currently working on this session!' do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+
+      case c.state
+      when :in_progress
+        c.state = :unread
+      when :reopened_in_progress
+        c.state = :reopened
+      end
+
+      c.save
+    end
+
+    redirect_to(:back, :notice => 'Selected cases have been canceled.')
+  end
+
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'case', :audit_trail_view_id => resource.id))
   end
 end

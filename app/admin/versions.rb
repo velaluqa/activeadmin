@@ -8,8 +8,35 @@ ActiveAdmin.register Version do
   filter :created_at
   filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Patient', 'Role', 'Session', 'Study' , 'User']
   filter :whodunnit, :label => 'User', :as => :select, :collection => proc { User.all }
+  filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
   controller do
+    def scoped_collection
+      return end_of_association_chain if(params[:audit_trail_view_type].nil? or params[:audit_trail_view_id].nil?)
+
+      case params[:audit_trail_view_type]
+      when 'case'
+        end_of_association_chain.where('item_type LIKE "Case" and item_id = ?', params[:audit_trail_view_id].to_i)
+      when 'patient'
+        end_of_association_chain.where('item_type LIKE "Patient" and item_id = ?', params[:audit_trail_view_id].to_i)
+      when 'form'
+        end_of_association_chain.where('item_type LIKE "Form" and item_id = ?', params[:audit_trail_view_id].to_i)
+      when 'role'
+        end_of_association_chain.where('item_type LIKE "Role" and item_id = ?', params[:audit_trail_view_id].to_i)
+      when 'user'
+        end_of_association_chain.where('(item_type LIKE "User" and item_id = :user_id) or (item_type LIKE "Role" and item_id IN (SELECT id FROM roles WHERE roles.user_id = :user_id))',
+                                       {:user_id => params[:audit_trail_view_id].to_i})
+      when 'session'
+        end_of_association_chain.where('(item_type LIKE "Session" and item_id = :session_id) or (item_type LIKE "Case" and item_id IN (SELECT id FROM cases WHERE cases.session_id = :session_id)) or (item_type LIKE "Patient" and item_id IN (SELECT id FROM patients WHERE patients.session_id = :session_id)) or (item_type LIKE "Form" and item_id IN (SELECT id FROM forms WHERE forms.session_id = :session_id))',
+                                       {:session_id => params[:audit_trail_view_id].to_i})
+      when 'study'
+        end_of_association_chain.where('(item_type LIKE "Study" and item_id = :study_id) or (item_type LIKE "Session" and item_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id)) or (item_type LIKE "Case" and item_id IN (SELECT id FROM cases WHERE cases.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or (item_type LIKE "Patient" and item_id IN (SELECT id FROM patients WHERE patients.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or (item_type LIKE "Form" and item_id IN (SELECT id FROM forms WHERE forms.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id)))',
+                                       {:study_id => params[:audit_trail_view_id].to_i})
+      else
+        end_of_association_chain
+      end
+    end
+
     def self.classify_event(version)
       return version.event if version.changeset.nil?
 
@@ -19,9 +46,11 @@ ActiveAdmin.register Version do
            version.changeset['sign_in_count'][1] == version.changeset['sign_in_count'][0]+1
            )
           return 'sign_in'
+        elsif(version.changeset.include?('encrypted_password') and
+              version.changeset.include?('password_changed_at'))
+          return 'password_change'
         end
       when 'Case'
-        pp version.changeset
         if(version.changeset.include?('state'))
           case version.changeset['state']
           when [Case::state_sym_to_int(:unread), :in_progress], [Case::state_sym_to_int(:reopened), :reopened_in_progress]
@@ -57,6 +86,8 @@ ActiveAdmin.register Version do
         status_tag('Destroy', :error)
       when 'sign_in'
         status_tag('Sign-In', :ok)
+      when 'password_change'
+        status_tag('Password Change', :warning)
       when 'case_reservation'
         status_tag('Case Reservation', :warning)
       when 'case_cancelation'
@@ -95,6 +126,8 @@ ActiveAdmin.register Version do
           status_tag('Destroy', :error)
         when 'sign_in'
           status_tag('Sign-In', :ok)
+        when 'password_change'
+          status_tag('Password Change', :warning)
         when 'case_reservation'
           status_tag('Case Reservation', :warning)
         when 'case_cancelation'
