@@ -46,6 +46,9 @@ ActiveAdmin.register Version do
            version.changeset['sign_in_count'][1] == version.changeset['sign_in_count'][0]+1
            )
           return 'sign_in'
+        elsif(version.changeset.include?('encrypted_password') and
+              version.changeset.include?('password_changed_at'))
+          return 'password_change'
         end
       when 'Case'
         if(version.changeset.include?('state'))
@@ -83,6 +86,8 @@ ActiveAdmin.register Version do
         status_tag('Destroy', :error)
       when 'sign_in'
         status_tag('Sign-In', :ok)
+      when 'password_change'
+        status_tag('Password Change', :warning)
       when 'case_reservation'
         status_tag('Case Reservation', :warning)
       when 'case_cancelation'
@@ -121,6 +126,8 @@ ActiveAdmin.register Version do
           status_tag('Destroy', :error)
         when 'sign_in'
           status_tag('Sign-In', :ok)
+        when 'password_change'
+          status_tag('Password Change', :warning)
         when 'case_reservation'
           status_tag('Case Reservation', :warning)
         when 'case_cancelation'
