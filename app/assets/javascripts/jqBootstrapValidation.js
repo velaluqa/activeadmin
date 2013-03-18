@@ -860,6 +860,9 @@
 		if (type == "radio") {
 			value = ($('input[name="' + $this.attr("name") + '"]:checked').length > 0 ? value : "");
 		}
+		if ($this.prop("type") == "select-multiple" && value == null) {
+			value = []
+		}
 		return value;
 	}
   
