@@ -11,6 +11,19 @@ ActiveAdmin.register Version do
   filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
   controller do
+    def scoped_collection
+      return end_of_association_chain if(params[:audit_trail_view_type].nil? or params[:audit_trail_view_id].nil?)
+
+      case params[:audit_trail_view_type]
+      when 'case'
+        end_of_association_chain.where('item_type LIKE "Case" and item_id = ?', params[:audit_trail_view_id].to_i)
+      when 'patient'
+        end_of_association_chain.where('item_type LIKE "Patient" and item_id = ?', params[:audit_trail_view_id].to_i)
+      else
+        end_of_association_chain
+      end
+    end
+
     def self.classify_event(version)
       return version.event if version.changeset.nil?
 
@@ -22,7 +35,6 @@ ActiveAdmin.register Version do
           return 'sign_in'
         end
       when 'Case'
-        pp version.changeset
         if(version.changeset.include?('state'))
           case version.changeset['state']
           when [Case::state_sym_to_int(:unread), :in_progress], [Case::state_sym_to_int(:reopened), :reopened_in_progress]
