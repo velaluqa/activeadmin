@@ -99,13 +99,6 @@ ActiveAdmin.register Session do
       row :state do
         session.state.to_s.camelize + (session.locked_version.nil? ? '' : " (Version: #{session.locked_version})")
       end
-      row :cases do
-        if session.case_list(:all).empty?
-          nil
-        else
-          render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
-        end
-      end
       row :export do
         ul do
           li { link_to('All Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :all)) }
@@ -114,6 +107,13 @@ ActiveAdmin.register Session do
           li { link_to('Unexported Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :all)) }
           li { link_to('Unexported Regular Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :regular)) }
           li { link_to('Unexported Validation Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :validation)) }
+        end
+      end
+      row :cases do
+        if session.case_list(:all).empty?
+          nil
+        else
+          render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
         end
       end
       row :annotations_layouts do

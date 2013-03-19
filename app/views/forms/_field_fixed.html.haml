@@ -1,4 +1,4 @@
-= label_tag(field['id'], field['label'], :class => 'control-label')
+= label_tag(field['id'], field['label'].html_safe, :class => 'control-label')
 .controls
   - value, fixed_value_hash = fixed_value(field, data_hash)
   %span.form-fixed-text= value

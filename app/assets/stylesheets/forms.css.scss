@@ -93,6 +93,16 @@
     padding: 0;
 }
 
+.dark-muted
+{
+    color: #777777;
+}
+
+#preview_modal .modal-body
+{
+    max-height: 580px;
+}
+
 @media print
 {
     #previous_results { display: none !important; }

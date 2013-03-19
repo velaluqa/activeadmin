@@ -124,7 +124,8 @@ fill_data_field = (field, answers) ->
     answer_option = select_input.find('option[value="'+answer+'"]').text()
     answer = if answer_option? and answer_option.length > 0 then answer_option else answer
   else if(field.attr('data-type') == 'select_multiple')
-    select_input = $('select[name="'+field_name+'"]')
+    select_input = $('select[name="'+field_name+'"]')    
+    select_input = $('select[name="'+field_name+'[]"]') if select_input.length == 0
     answer_html = for value in answer
       option = select_input.find('option[value="'+value+'"]').text()
       '<p>'+(if option? and option.length > 0 then option else value)+'</p>'
@@ -291,6 +292,44 @@ update_results_list = ->
   current_result = window.results_list[window.results_list.length-1]
   current_result.answers = find_arrays($('#the_form').formParams())
 
+calculate_decimals_for_step = (step) ->
+  decimals = 0
+  while(step < 1)
+    decimals += 1
+    step *= 10
+
+  return decimals
+
+validate_number_inputs = ->
+  success = true
+  
+  for number_input in $('input[type=number]')
+    $number_input = $(number_input)
+
+    step = parseFloat($number_input.prop('step'))
+    value = parseFloat($number_input.val())
+    power = Math.pow(10, calculate_decimals_for_step(step))
+
+    help_block = $number_input.siblings('.help-block')
+    control_group = $number_input.closest('.control-group')
+
+    help_block.html('')
+    control_group.removeClass('error')
+
+    unless(Math.abs(Math.round(value*power) - value*power) < 0.00001) # epsilon calculation, since floating point math in JS is rediculously bad
+
+      help_block.html("<ul role=\"alert\"><li>Invalid number, must be a mulitple of #{step}</li></ul>")
+      control_group.addClass('error')
+      success = false
+
+  return success
+  
+display_validation_success = (success) ->
+  if(success)
+    $('#the_form .submit-errors').text('')
+  else
+    $('#the_form .submit-errors').text('Validation Errors present')
+  
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -302,9 +341,13 @@ $(document).ready ->
 
   update_calculated_fields()
       
-  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
+  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(  
         submitSuccess: ($form, event) ->
           event.preventDefault()
+
+          unless validate_number_inputs()
+            display_validation_success(false)
+            return            
 
           clear_custom_validation_messages()
 
@@ -320,12 +363,17 @@ $(document).ready ->
 
             if(validation_messages.length > 0)
               set_custom_validation_messages(validation_messages)
+              display_validation_success(false)
               return
+
+          display_validation_success(true)
               
           window.form_answers = form_data
           fill_placeholder_cells($('#preview_modal'), form_data)
           fill_placeholder_cells($('#print_version'), form_data)
-          $('#preview_modal').modal('show')  
+          $('#preview_modal').modal('show')
+        submitError: ($form, event, errors) ->
+          display_validation_success(false)
   )
 
   $('#form_nav_select').change ->
