@@ -326,6 +326,8 @@ ActiveAdmin.register Session do
       return
     end
 
+    base64_layout = Base64.encode64(params[:session][:file].tempfile.read)
+
     config = @session.current_configuration
     params[:session][:case_type].reject {|ct| ct.blank?}.each do |case_type_name|
       case_type = config['types'][case_type_name]
@@ -335,7 +337,6 @@ ActiveAdmin.register Session do
         return
       end
 
-      base64_layout = Base64.encode64(params[:session][:file].tempfile.read)
       if(params[:session][:annotations_layout_mode] == 'validation')
         case_type['validation'] = {} if case_type['validation'].nil?
         case_type['validation']['annotations_layout'] = base64_layout
