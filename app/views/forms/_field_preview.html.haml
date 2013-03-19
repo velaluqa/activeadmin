@@ -1,4 +1,4 @@
 .row-fluid
-  -#.span4.lead= label_tag(field['id'], field['label'])
-  %strong.span4= field['label']
+  -#.span4.lead= label_tag(field['id'], field['label'].html_safe)
+  %strong.span4= field['label'].html_safe
   %span.span8{:name => field['id'], :'data-type' => field['type']}= field['answer']
