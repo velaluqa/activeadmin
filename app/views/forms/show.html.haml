@@ -43,6 +43,7 @@
             .dark-muted.span5= (field['description'].nil? ? '' : field['description'].html_safe)
       .form-actions
         %button.btn.btn-primary{:type => 'submit'} Submit Answers
+        %p.submit-errors.text-error
 
   #preview_modal.modal.hide.fade
     .modal-header

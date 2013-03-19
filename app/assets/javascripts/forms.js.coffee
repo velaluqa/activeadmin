@@ -323,6 +323,12 @@ validate_number_inputs = ->
 
   return success
   
+display_validation_success = (success) ->
+  if(success)
+    $('#the_form .submit-errors').text('')
+  else
+    $('#the_form .submit-errors').text('Validation Errors present')
+  
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -334,11 +340,13 @@ $(document).ready ->
 
   update_calculated_fields()
       
-  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
+  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(  
         submitSuccess: ($form, event) ->
           event.preventDefault()
 
-          return unless validate_number_inputs()
+          unless validate_number_inputs()
+            display_validation_success(false)
+            return            
 
           clear_custom_validation_messages()
 
@@ -354,12 +362,17 @@ $(document).ready ->
 
             if(validation_messages.length > 0)
               set_custom_validation_messages(validation_messages)
+              display_validation_success(false)
               return
+
+          display_validation_success(true)
               
           window.form_answers = form_data
           fill_placeholder_cells($('#preview_modal'), form_data)
           fill_placeholder_cells($('#print_version'), form_data)
-          $('#preview_modal').modal('show')  
+          $('#preview_modal').modal('show')
+        submitError: ($form, event, errors) ->
+          display_validation_success(false)
   )
 
   $('#form_nav_select').change ->
