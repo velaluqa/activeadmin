@@ -291,6 +291,38 @@ update_results_list = ->
   current_result = window.results_list[window.results_list.length-1]
   current_result.answers = find_arrays($('#the_form').formParams())
 
+calculate_decimals_for_step = (step) ->
+  decimals = 0
+  while(step < 1)
+    decimals += 1
+    step *= 10
+
+  return decimals
+
+validate_number_inputs = ->
+  success = true
+  
+  for number_input in $('input[type=number]')
+    $number_input = $(number_input)
+
+    step = parseFloat($number_input.prop('step'))
+    value = parseFloat($number_input.val())
+    power = Math.pow(10, calculate_decimals_for_step(step))
+
+    help_block = $number_input.siblings('.help-block')
+    control_group = $number_input.closest('.control-group')
+
+    help_block.html('')
+    control_group.removeClass('error')
+
+    unless(Math.abs(Math.round(value*power) - value*power) < 0.00001) # epsilon calculation, since floating point math in JS is rediculously bad
+
+      help_block.html("<ul role=\"alert\"><li>Invalid number, must be a mulitple of #{step}</li></ul>")
+      control_group.addClass('error')
+      success = false
+
+  return success
+  
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -305,6 +337,8 @@ $(document).ready ->
   $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(
         submitSuccess: ($form, event) ->
           event.preventDefault()
+
+          return unless validate_number_inputs()
 
           clear_custom_validation_messages()
 
