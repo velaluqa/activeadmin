@@ -124,7 +124,8 @@ fill_data_field = (field, answers) ->
     answer_option = select_input.find('option[value="'+answer+'"]').text()
     answer = if answer_option? and answer_option.length > 0 then answer_option else answer
   else if(field.attr('data-type') == 'select_multiple')
-    select_input = $('select[name="'+field_name+'"]')
+    select_input = $('select[name="'+field_name+'"]')    
+    select_input = $('select[name="'+field_name+'[]"]') if select_input.length == 0
     answer_html = for value in answer
       option = select_input.find('option[value="'+value+'"]').text()
       '<p>'+(if option? and option.length > 0 then option else value)+'</p>'
