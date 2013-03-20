@@ -15,6 +15,10 @@ module FormsHelper
       attributes["data-validation-#{type}-#{type}"] = value
     end
 
+    if(field[:is_repeatable])
+      attributes["data-no-validation"] = true
+    end
+
     return attributes
   end
 
