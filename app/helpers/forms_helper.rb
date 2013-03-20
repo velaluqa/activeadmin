@@ -90,14 +90,18 @@ module FormsHelper
     column.each do |c|      
       value = (row_spec['value'].nil? ? row_spec['values'][c.case_type] : row_spec['value'])
 
-      unless repeatable.nil?
-        prefix = repeatable[:prefixes][c.case_type]
-        full_value = "#{prefix}[#{repeatable[:index]}][" + value + ']'
-      else
-        full_value = value
-      end
+      unless value.nil?
+        unless repeatable.nil?
+          prefix = repeatable[:prefixes][c.case_type]
+          full_value = "#{prefix}[#{repeatable[:index]}][" + value + ']'
+        else
+          full_value = value
+        end
 
-      answer = results_table_find_answer(c, full_value)
+        answer = results_table_find_answer(c, full_value)
+      else
+        answer = nil
+      end
 
       unless answer.nil?
         the_case = c
