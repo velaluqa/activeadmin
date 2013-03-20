@@ -55,16 +55,13 @@ update_roi_select = (select) ->
   console.log("Select: "+select.attr('name'))
 
   values = jQuery.parseJSON(select.attr('data-roi-values'))
-  console.log(values)
 
   options = select.find('option[value]').not('[value=""]').not('[data-permanent-select-option="true"]')
   existing_ids = []
   for option in options
-    console.log("Updating option:")
-    console.log(option)
     if update_roi_option(option, values)?
       console.log("update successful, adding id: "+$(option).attr('data-roi-id'))
-      existing_ids += $(option).attr('data-roi-id')
+      existing_ids.push($(option).attr('data-roi-id'))
     else
       console.log("update failed, removing option")
       $(option).remove()
@@ -229,6 +226,7 @@ find_roi_id_by_data = (roi) ->
 
 update_rois_table = (new_rois) ->
   console.log("UPDATING ROI TABLE---------------")
+  new_rois_table = {}
   for roi in new_rois
     console.log("Updating ROI: ")
     console.log(roi)
@@ -255,9 +253,11 @@ update_rois_table = (new_rois) ->
     roi['roi_id'] = roi_id
     roi['selected_by_select'] = window.rois[roi_id]['selected_by_select'] if window.rois[roi_id]?
 
-    window.rois[roi_id] = roi
+    new_rois_table[roi_id] = roi
     console.log("updated ROI table:")
-    console.log(window.rois[roi_id])
+    console.log(new_rois_table[roi_id])
+
+  window.rois = new_rois_table
 
 update_rois = ->
   rois = PharmTraceAPI.rois
