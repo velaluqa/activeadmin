@@ -229,6 +229,7 @@ find_roi_id_by_data = (roi) ->
 
 update_rois_table = (new_rois) ->
   console.log("UPDATING ROI TABLE---------------")
+  new_rois_table = {}
   for roi in new_rois
     console.log("Updating ROI: ")
     console.log(roi)
@@ -255,9 +256,11 @@ update_rois_table = (new_rois) ->
     roi['roi_id'] = roi_id
     roi['selected_by_select'] = window.rois[roi_id]['selected_by_select'] if window.rois[roi_id]?
 
-    window.rois[roi_id] = roi
+    new_rois_table[roi_id] = roi
     console.log("updated ROI table:")
-    console.log(window.rois[roi_id])
+    console.log(new_rois_table[roi_id])
+
+  window.rois = new_rois_table
 
 update_rois = ->
   rois = PharmTraceAPI.rois
