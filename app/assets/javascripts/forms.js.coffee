@@ -52,15 +52,21 @@ roi_has_values = (roi, values) ->
 
 update_roi_select = (select) ->
   select = $(select)
+  console.log("Select: "+select.attr('name'))
 
   values = jQuery.parseJSON(select.attr('data-roi-values'))
+  console.log(values)
 
   options = select.find('option[value]').not('[value=""]').not('[data-permanent-select-option="true"]')
   existing_ids = []
   for option in options
-    if update_roi_option(option, values)?      
+    console.log("Updating option:")
+    console.log(option)
+    if update_roi_option(option, values)?
+      console.log("update successful, adding id: "+$(option).attr('data-roi-id'))
       existing_ids += $(option).attr('data-roi-id')
     else
+      console.log("update failed, removing option")
       $(option).remove()
 
   select.append(roi_to_option(roi, values)) for own roi_id, roi of window.rois when (!(roi_id in existing_ids) and roi_has_values(roi, values))
@@ -373,6 +379,11 @@ $(document).ready ->
           fill_placeholder_cells($('#print_version'), form_data)
           $('#preview_modal').modal('show')
         submitError: ($form, event, errors) ->
+          console.log("SUBMIT ERROR:")
+          for own field, field_errors of errors
+            console.log("Field: "+field)
+            for error in field_errors
+              console.log("Error: "+error)
           display_validation_success(false)
   )
 
