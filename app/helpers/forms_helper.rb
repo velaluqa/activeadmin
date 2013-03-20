@@ -109,6 +109,8 @@ module FormsHelper
     return [answer, the_case, the_value]
   end
   def results_table_find_answer(the_case, value)
+    return nil if value.nil?
+
     answer = nil
     if value.start_with?('patient[') or value.start_with?('case[')
       answer = KeyPathAccessor::access_by_path(the_case.data_hash, value)
