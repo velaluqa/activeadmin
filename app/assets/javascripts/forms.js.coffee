@@ -189,6 +189,10 @@ set_index_in_for = (elements, index) ->
 
     $(element).attr('for', name)
 
+remove_no_validation = (elements) ->
+  for element in elements
+    $(element).removeAttr('data-no-validation')
+
 delay = (ms, func) -> window.setTimeout(func, ms)
 
 update_allowed_rois = (changed_select) ->
@@ -353,7 +357,7 @@ $(document).ready ->
 
   update_calculated_fields()
       
-  $("#the_form input,select,textarea").not("[type=submit]").jqBootstrapValidation(  
+  $("#the_form input,select,textarea").not("[type=submit]").not("[data-no-validation]").jqBootstrapValidation(  
         submitSuccess: ($form, event) ->
           event.preventDefault()
 
@@ -453,6 +457,7 @@ $(document).ready ->
     repeatable_form = $("#repeatable_form_#{repeatable_id}").clone()
     set_index_in_name_and_id(repeatable_form.find('input,select,textarea'), index)
     set_index_in_for(repeatable_form.find('label'), index)
+    remove_no_validation(repeatable_form.find('[data-no-validation]'))
     repeatable_form.find('.form-group-index').text(index+1)
     #console.log(group_end_form)
     #console.log(repeatable_form)
@@ -462,7 +467,7 @@ $(document).ready ->
     repeatable_form.find('.select-roi').mousedown ->
       PharmTraceAPI.updateROIsSynchronously()
       update_rois()
-    repeatable_form.find("input,select,textarea").not("[type=submit]").jqBootstrapValidation()
+    repeatable_form.find("input,select,textarea").not("[type=submit]").not("[data-no-validation]").jqBootstrapValidation()
 
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
     group_end_form.before(e) for e in repeatable_form.children()
