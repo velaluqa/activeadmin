@@ -313,12 +313,14 @@ calculate_decimals_for_step = (step) ->
 validate_number_inputs = ->
   success = true
   
-  for number_input in $('input[type=number]')
+  for number_input in $('input[type=number]').not("[data-no-validation]")
     $number_input = $(number_input)
 
     step = parseFloat($number_input.prop('step'))
     value = parseFloat($number_input.val())
     power = Math.pow(10, calculate_decimals_for_step(step))
+
+    continue if isNan(value)
 
     console.log('validating number input: '+$number_input.attr('name'))
     console.log('step: '+step)
