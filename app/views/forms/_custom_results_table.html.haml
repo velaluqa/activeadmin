@@ -38,7 +38,10 @@
         - prefixes = row_spec['repeatable']['prefixes']
         - rows = row_spec['repeatable']['rows']
         - max_case = cases.max{|c| c.form_answer.answers[prefixes[c.case_type]].nil? ? 0 : c.form_answer.answers[prefixes[c.case_type]].size}
-        - repeatable_size = max_case.form_answer.answers[prefixes[max_case.case_type]].nil? ? 0 : max_case.form_answer.answers[prefixes[max_case.case_type]].size
+        - if max_case.nil?
+          - repeatable_size = 0
+        - else
+          - repeatable_size = max_case.form_answer.answers[prefixes[max_case.case_type]].nil? ? 0 : max_case.form_answer.answers[prefixes[max_case.case_type]].size
         - repeatable_size.times do |repeatable_index|
           - row_spec['repeatable']['rows'].each_with_index do |repeatable_row_spec, repeatable_row_index|
             = render 'forms/custom_results_table_row', :row_spec => repeatable_row_spec, :columns => columns, :placeholders_only => placeholders_only, :roi_links => roi_links, :repeatable => {:index => repeatable_index, :first_row => (repeatable_row_index == 0), :prefixes => prefixes}, :form_answer_field_maps => form_answer_field_maps
