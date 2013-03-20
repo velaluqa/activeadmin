@@ -373,6 +373,11 @@ $(document).ready ->
           fill_placeholder_cells($('#print_version'), form_data)
           $('#preview_modal').modal('show')
         submitError: ($form, event, errors) ->
+          console.log("SUBMIT ERROR:")
+          for own field, field_errors of errors
+            console.log("Field: "+field)
+            for error in field_errors
+              console.log("Error: "+error)
           display_validation_success(false)
   )
 
