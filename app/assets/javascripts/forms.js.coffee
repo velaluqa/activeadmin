@@ -316,6 +316,12 @@ validate_number_inputs = ->
     value = parseFloat($number_input.val())
     power = Math.pow(10, calculate_decimals_for_step(step))
 
+    console.log('validating number input: '+$number_input.attr('name'))
+    console.log('step: '+step)
+    console.log('value: '+value)
+    console.log('power: '+power)
+    console.log('Calc: '+Math.abs(Math.round(value*power) - value*power))
+
     help_block = $number_input.siblings('.help-block')
     control_group = $number_input.closest('.control-group')
 
@@ -323,7 +329,7 @@ validate_number_inputs = ->
     control_group.removeClass('error')
 
     unless(Math.abs(Math.round(value*power) - value*power) < 0.00001) # epsilon calculation, since floating point math in JS is rediculously bad
-
+      console.log('number input '+$number_input.attr('name')+' failed number step validation')
       help_block.html("<ul role=\"alert\"><li>Invalid number, must be a mulitple of #{step}</li></ul>")
       control_group.addClass('error')
       success = false
@@ -352,6 +358,7 @@ $(document).ready ->
           event.preventDefault()
 
           unless validate_number_inputs()
+            console.log('NUMBER VALIDATION FAILED')
             display_validation_success(false)
             return            
 
@@ -368,6 +375,8 @@ $(document).ready ->
             validation_messages = validation_messages.reduce (acc,v) -> acc.concat(v)
 
             if(validation_messages.length > 0)
+              for message in validation_messages
+                console.log('Custom validation error: '+validation_messages)
               set_custom_validation_messages(validation_messages)
               display_validation_success(false)
               return
