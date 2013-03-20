@@ -1,7 +1,7 @@
 = render 'navbar'
 
 .container  
-  - unless @previous_cases.nil?
+  - if(@show_previous_results and not @previous_cases.nil?)
     = render 'forms/previous_cases_tables'
 
   #form_area.offset1.span10
