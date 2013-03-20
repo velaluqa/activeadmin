@@ -17,6 +17,9 @@ class FormsController < ApplicationController
 
     setup_previous_cases_config
     @previous_results = construct_previous_results_list
+
+    @show_previous_results = false
+    @show_previous_results = true if params[:previous_results] == 'true'
     
     return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
   end
