@@ -181,7 +181,8 @@ class FormAnswer
       r_map = {}
       r[:config].each do |field|
         next if field['id'].nil?
-        id = field['id'].slice(4..-2)
+        id = field['id'].slice((r[:id].length+3)..-2)
+        next if id.nil?
 
         r_map[id] = field
       end
