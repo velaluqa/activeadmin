@@ -324,7 +324,7 @@ validate_number_inputs = ->
     value = parseFloat($number_input.val())
     power = Math.pow(10, calculate_decimals_for_step(step))
 
-    continue if isNan(value)
+    continue if isNaN(value)
 
     console.log('validating number input: '+$number_input.attr('name'))
     console.log('step: '+step)
@@ -367,7 +367,7 @@ $(document).ready ->
         submitSuccess: ($form, event) ->
           event.preventDefault()
 
-          update_calculcated_fields()
+          update_calculated_fields()
 
           unless validate_number_inputs()
             console.log('NUMBER VALIDATION FAILED')
