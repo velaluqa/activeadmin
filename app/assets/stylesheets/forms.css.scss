@@ -21,6 +21,7 @@
 {
 	margin: 0;
 	line-height: 30px;
+	position: absolute; // we need this so the label to its right is not indented
 }
 
 .form-fixed-text
@@ -35,6 +36,12 @@
 	position: relative;	
 	left: 20px;
 	overflow-x: auto;
+}
+
+.remove-repeat-btn
+{
+	font-size: 20px;
+	font-weight: bold;
 }
 
 .offset-anchor
