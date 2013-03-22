@@ -86,15 +86,18 @@
           - if(field['type'] == 'include_divider') or (field['type'] == 'section')
             %hr
           - else
-            .row.form-row-padding
-              .control-group.span5
+            .row-fluid.form-row-padding
+              .control-group.pull-left
                 - if(first_field)
-                  - first_field = false
+                  -# first_field = false
                   %h3.form-group-index.pull-left
                 - repeatable_field = field.clone
                 - repeatable_field[:is_repeatable] = true
                 = render "forms/field_#{field['type']}", :field => repeatable_field, :input_size => 'input-xlarge', :data_hash => @data_hash
-              .muted.span5= field['description']
+              .dark-muted.form-field-description= (field['description'].nil? ? '' : field['description'].html_safe)
+              - if(first_field)
+                - first_field = false
+                %a.remove-repeat-btn.pull-right{:href => '#', :'data-id' => r[:id], :'data-min-repeats' => r[:min]} &times;
       %table{:id => "repeatable_table_#{r[:id]}"}
         - first_in_group = true
         - r[:config].each do |field|
