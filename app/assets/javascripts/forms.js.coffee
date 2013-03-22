@@ -367,6 +367,8 @@ $(document).ready ->
         submitSuccess: ($form, event) ->
           event.preventDefault()
 
+          update_calculcated_fields()
+
           unless validate_number_inputs()
             console.log('NUMBER VALIDATION FAILED')
             display_validation_success(false)
@@ -473,6 +475,7 @@ $(document).ready ->
     repeatable_form.find('.select-roi').mousedown ->
       PharmTraceAPI.updateROIsSynchronously()
       update_rois()
+      update_calculated_fields()
     repeatable_form.find("input,select,textarea").not("[type=submit]").not("[data-no-validation]").jqBootstrapValidation()
 
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
@@ -491,6 +494,7 @@ $(document).ready ->
   $('.select-roi').mousedown ->
     PharmTraceAPI.updateROIsSynchronously()
     update_rois()
+    update_calculated_fields()
 
   $('#recalc-btn').click ->
     $(this).button('loading')
