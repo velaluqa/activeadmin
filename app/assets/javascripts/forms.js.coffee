@@ -290,6 +290,10 @@ update_calculated_field = (field) ->
     console.error('Calculated field "'+field.attr('name')+'" specifies an invalid calculation function "'+calculation_function+'"')
     return
 
+  # elements are returned by jquery in document order
+  # by updating the form answers between every calculated fields, later fields can depend on the results of earlier fields
+  update_results_list()
+
   [display_value, value] = @[calculation_function](window.results_list)
   field.html(display_value)
   hidden_field.val(value) if hidden_field?
