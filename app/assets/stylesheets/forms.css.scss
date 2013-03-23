@@ -119,6 +119,7 @@
 
 @media print
 {
+    #form-navbar { display: none !important; }
     #previous_results { display: none !important; }
     #form_area { display: none !important; }
     #preview_modal { display: none !important; }
