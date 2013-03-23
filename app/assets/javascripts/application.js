@@ -17,6 +17,7 @@
 //= require jqBootstrapValidation
 //= require jquery.formparams
 //= require underscore
+//= require value_at_path
 //= require form_answers
 //= require forms
 //= require moment.min

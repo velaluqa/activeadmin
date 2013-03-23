@@ -115,7 +115,7 @@ fill_placeholder_cells = (root_elem, answers) ->
 fill_data_field = (field, answers) ->
   field_name = field.attr('name')
   return unless field_name?
-  answer = value_at_path(answers, field_name)
+  answer = @value_at_path(answers, field_name)
 
   if(field.attr('data-type') == 'bool')
     answer = if answer == yes then "Yes" else "No"
@@ -138,17 +138,6 @@ fill_data_field = (field, answers) ->
     field.html(answer_html)
   else
     field.text(answer)
-
-value_at_path = (obj, path) ->
-  components = (component.replace(/\[/, "").replace(/\]/, "") for component in path.split("["))
-
-  current_obj = obj
-  for component in components
-    component = parseInt(component, 10) if (/^[0-9]*$/.test(component))
-    
-    current_obj = current_obj[component]
-
-  current_obj
 
 is_array = (obj) ->
   return false unless (typeof obj == 'object')
