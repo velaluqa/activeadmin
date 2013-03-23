@@ -83,7 +83,6 @@
 						    	     value = parsed_object;
 						    }
 						} catch (e) {
-						  	console.log(e);
 						}						
 					}					
 

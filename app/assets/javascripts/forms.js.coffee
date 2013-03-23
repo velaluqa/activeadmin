@@ -290,6 +290,10 @@ update_calculated_field = (field) ->
     console.error('Calculated field "'+field.attr('name')+'" specifies an invalid calculation function "'+calculation_function+'"')
     return
 
+  # elements are returned by jquery in document order
+  # by updating the form answers between every calculated fields, later fields can depend on the results of earlier fields
+  update_results_list()
+
   [display_value, value] = @[calculation_function](window.results_list)
   field.html(display_value)
   hidden_field.val(value) if hidden_field?
@@ -320,7 +324,7 @@ validate_number_inputs = ->
     value = parseFloat($number_input.val())
     power = Math.pow(10, calculate_decimals_for_step(step))
 
-    continue if isNan(value)
+    continue if isNaN(value)
 
     console.log('validating number input: '+$number_input.attr('name'))
     console.log('step: '+step)
@@ -347,7 +351,58 @@ display_validation_success = (success) ->
     $('#the_form .submit-errors').text('')
   else
     $('#the_form .submit-errors').text('Validation Errors present')
+
+remove_last_repeatable = (remove_button) ->
+  return unless confirm('Are you sure you want to delete this section? All your choices will be lost.')
   
+  repeatable_id = $(remove_button).attr('data-id')
+  return unless repeatable_id?
+  console.log("Removing last of #{repeatable_id}")
+
+  elements = find_arrays($('#the_form').formParams())[repeatable_id]
+  index = if elements? then elements.length else 0
+
+  return if (index <= parseInt($(remove_button).attr('data-min-repeats'), 10))
+
+  start_element = $(remove_button).parents('.row-fluid.form-row-padding').first()
+  return unless start_element?
+  group_end_element = $("#repeatable_group_end_form_#{repeatable_id}")
+  return unless group_end_element?
+
+  elements_to_delete = start_element.nextUntil(group_end_element).add(start_element)
+
+  for select in elements_to_delete.find('.select-roi')
+    $(select).val('')
+    update_allowed_rois(select)
+
+  elements_to_delete.remove()
+
+  preview_group_end_element = $("#repeatable_group_end_preview_#{repeatable_id}")
+  preview_start_element = preview_group_end_element.prevAll('tr:has(th.form-group-index-cell)').first()
+  preview_start_element.nextUntil(preview_group_end_element).add(preview_start_element).remove()
+
+  print_group_end_element = $("#repeatable_group_end_print_#{repeatable_id}")
+  print_start_element = print_group_end_element.prevAll('tr:has(th.form-group-index-cell)').first()
+  print_start_element.nextUntil(print_group_end_element).add(print_start_element).remove()
+
+  update_remove_buttons_visibility()
+
+update_remove_buttons_visibility = ->
+  previous_button = null
+  previous_id = null
+
+  for button in $('#the_form .remove-repeat-btn')
+    id = $(button).attr('data-id')
+
+    if(previous_button? and previous_id? and previous_id != id)
+      previous_button.show()
+
+    $(button).hide()
+    previous_button = $(button)
+    previous_id = id
+
+  previous_button.show() if previous_button?
+                                                      
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -358,10 +413,13 @@ $(document).ready ->
   $(".datepicker-field").datepicker()
 
   update_calculated_fields()
+  update_remove_buttons_visibility()
       
   $("#the_form input,select,textarea").not("[type=submit]").not("[data-no-validation]").jqBootstrapValidation(  
         submitSuccess: ($form, event) ->
           event.preventDefault()
+
+          update_calculated_fields()
 
           unless validate_number_inputs()
             console.log('NUMBER VALIDATION FAILED')
@@ -469,7 +527,11 @@ $(document).ready ->
     repeatable_form.find('.select-roi').mousedown ->
       PharmTraceAPI.updateROIsSynchronously()
       update_rois()
+      update_calculated_fields()
     repeatable_form.find("input,select,textarea").not("[type=submit]").not("[data-no-validation]").jqBootstrapValidation()
+    repeatable_form.find('.remove-repeat-btn').click ->
+      remove_last_repeatable($(this))
+      return false
 
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
     group_end_form.before(e) for e in repeatable_form.children()
@@ -481,12 +543,19 @@ $(document).ready ->
     $("#repeatable_group_end_preview_#{repeatable_id}").before(e) for e in repeatable_preview.clone().children()
     $("#repeatable_group_end_print_#{repeatable_id}").before(e) for e in repeatable_preview.children()
 
+    update_remove_buttons_visibility()
+
     delay 10, -> 
       $(window).scrollTop(scroll_to_element.position().top-window.body_padding);
+
+  $('.remove-repeat-btn').click ->
+    remove_last_repeatable($(this))
+    return false
 
   $('.select-roi').mousedown ->
     PharmTraceAPI.updateROIsSynchronously()
     update_rois()
+    update_calculated_fields()
 
   $('#recalc-btn').click ->
     $(this).button('loading')

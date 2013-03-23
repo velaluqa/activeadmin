@@ -1,6 +1,6 @@
 = render 'navbar'
 
-.container  
+.container.row-fluid
   - if(@show_previous_results and not @previous_cases.nil?)
     = render 'forms/previous_cases_tables'
 
@@ -34,13 +34,13 @@
             %a.offset-anchor{:id => 'group-heading-'+field['id']}
             %h3.pull-left.form-group-heading= field['label']
         - else
-          .row.form-row-padding
-            .control-group.span5
+          .row-fluid.form-row-padding
+            .control-group.pull-left
               - if (!current_group_index.nil? && first_in_group)
                 - first_in_group = false
                 %h3.form-group-index.pull-left= current_group_index
               = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hash
-            .dark-muted.span5= (field['description'].nil? ? '' : field['description'].html_safe)
+            .dark-muted.form-field-description= (field['description'].nil? ? '' : field['description'].html_safe)
       .form-actions
         %button.btn.btn-primary{:type => 'submit'} Submit Answers
         %p.submit-errors.text-error
@@ -86,15 +86,18 @@
           - if(field['type'] == 'include_divider') or (field['type'] == 'section')
             %hr
           - else
-            .row.form-row-padding
-              .control-group.span5
+            .row-fluid.form-row-padding
+              .control-group.pull-left
                 - if(first_field)
-                  - first_field = false
+                  -# first_field = false
                   %h3.form-group-index.pull-left
                 - repeatable_field = field.clone
                 - repeatable_field[:is_repeatable] = true
                 = render "forms/field_#{field['type']}", :field => repeatable_field, :input_size => 'input-xlarge', :data_hash => @data_hash
-              .muted.span5= field['description']
+              .dark-muted.form-field-description= (field['description'].nil? ? '' : field['description'].html_safe)
+              - if(first_field)
+                - first_field = false
+                %a.remove-repeat-btn.pull-right{:href => '#', :'data-id' => r[:id], :'data-min-repeats' => r[:min]} &times;
       %table{:id => "repeatable_table_#{r[:id]}"}
         - first_in_group = true
         - r[:config].each do |field|
