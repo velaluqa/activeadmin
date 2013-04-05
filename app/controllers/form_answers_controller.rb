@@ -102,7 +102,11 @@ class FormAnswersController < ApplicationController
     session_config = form_answer.session.configuration_at_version(form_answer.form_versions['session'])
     return false if (session_config.nil? or session_config['reader_testing'].nil?)
 
-    js_context = ExecJS.compile(source)
+    # load utility libraries for usage in judgement functions via the sprockets environment
+    underscore_source = Rails.application.assets.find_asset('underscore.js').source
+    value_at_path_source = Rails.application.assets.find_asset('value_at_path.js').source
+
+    js_context = ExecJS.compile(underscore_source+value_at_path_source+source)
 
     results_list = construct_results_list(form_answer.case)
     pp results_list
