@@ -115,7 +115,7 @@ fill_placeholder_cells = (root_elem, answers) ->
 fill_data_field = (field, answers) ->
   field_name = field.attr('name')
   return unless field_name?
-  answer = value_at_path(answers, field_name)
+  answer = @value_at_path(answers, field_name)
 
   if(field.attr('data-type') == 'bool')
     answer = if answer == yes then "Yes" else "No"
@@ -138,17 +138,6 @@ fill_data_field = (field, answers) ->
     field.html(answer_html)
   else
     field.text(answer)
-
-value_at_path = (obj, path) ->
-  components = (component.replace(/\[/, "").replace(/\]/, "") for component in path.split("["))
-
-  current_obj = obj
-  for component in components
-    component = parseInt(component, 10) if (/^[0-9]*$/.test(component))
-    
-    current_obj = current_obj[component]
-
-  current_obj
 
 is_array = (obj) ->
   return false unless (typeof obj == 'object')
@@ -284,6 +273,7 @@ update_nav_button_state = ->
 update_calculated_field = (field) ->
   field = $(field)
   hidden_field = $('.calculated-hidden-field[id="'+field.attr('name')+'"]')
+  console.log("Updating calculated field #{field.attr('name')}")
 
   calculation_function = field.attr('data-calculation-function')
   unless calculation_function? and @[calculation_function]?
@@ -293,8 +283,10 @@ update_calculated_field = (field) ->
   # elements are returned by jquery in document order
   # by updating the form answers between every calculated fields, later fields can depend on the results of earlier fields
   update_results_list()
+  console.log("Results list:")
 
   [display_value, value] = @[calculation_function](window.results_list)
+  console.log("Calculation result: #{display_value} / #{value}")
   field.html(display_value)
   hidden_field.val(value) if hidden_field?
 
@@ -386,6 +378,7 @@ remove_last_repeatable = (remove_button) ->
   print_start_element.nextUntil(print_group_end_element).add(print_start_element).remove()
 
   update_remove_buttons_visibility()
+  update_calculated_fields()
 
 update_remove_buttons_visibility = ->
   previous_button = null
@@ -527,6 +520,7 @@ $(document).ready ->
     repeatable_form.find('.select-roi').mousedown ->
       PharmTraceAPI.updateROIsSynchronously()
       update_rois()
+    repeatable_form.find('.select-roi').change ->
       update_calculated_fields()
     repeatable_form.find("input,select,textarea").not("[type=submit]").not("[data-no-validation]").jqBootstrapValidation()
     repeatable_form.find('.remove-repeat-btn').click ->
@@ -555,6 +549,7 @@ $(document).ready ->
   $('.select-roi').mousedown ->
     PharmTraceAPI.updateROIsSynchronously()
     update_rois()
+  $('.select-roi').change ->
     update_calculated_fields()
 
   $('#recalc-btn').click ->
