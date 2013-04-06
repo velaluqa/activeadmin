@@ -81,8 +81,19 @@ class Case < ActiveRecord::Base
     CaseData.where(:case_id => read_attribute(:id)).first
   end
   def data_hash
-    {'patient' => ((self.patient.nil? or self.patient.patient_data.nil?) ? {} : self.patient.patient_data.data),
+    result = {'patient' => ((self.patient.nil? or self.patient.patient_data.nil?) ? {} : self.patient.patient_data.data),
       'case' => (self.case_data.nil? ? {} : self.case_data.data)}
+
+    result['patient']['id'] = (self.patient.nil? ? 'Unknown' : self.patient.subject_id)
+    result['case']['id'] = self.id
+    result['case']['images'] = self.images
+    result['case']['images_folder'] = self.images_folder
+    result['case']['position'] = self.position
+    result['case']['case_type'] = self.case_type
+    result['case']['flag'] = self.flag
+    result['case']['state'] = self.state
+
+    return result
   end
 
   def images_folder
