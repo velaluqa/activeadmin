@@ -70,6 +70,8 @@ module FormsHelper
   def results_table_columns(cases, merge = false)
     return [] if cases.empty?
 
+    cases = Array.new(cases) # make a copy so we can empty it locally
+
     columns = [[cases.shift]]
 
     cases.each do |c|
