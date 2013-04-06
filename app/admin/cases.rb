@@ -258,14 +258,19 @@ ActiveAdmin.register Case do
           repeat_count = 1
         end
 
+        answers = answers.merge(c.data_hash)
+
         repeat_count.times do |r|
           row = {}
-          answers['_REPEAT'] = repeat_array[r] unless repeat_array.nil?
+          answers['_REPEAT'] = repeat_array[r].merge({'_ID' => r}) unless repeat_array.nil?
 
           row['ID'] = c.id if(row_spec['include_id'] == true)
           
           row_spec['values'].each do |name, path|
             value = KeyPathAccessor::access_by_path(answers, path)
+
+            value = value.join(',') if value.is_a?(Array)
+            
             row[name] = value
           end
 
