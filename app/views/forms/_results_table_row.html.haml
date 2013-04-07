@@ -4,7 +4,7 @@
       %th.form-group-index-cell= (placeholders_only ? '' : current_group_index)
     - else
       %td
-    %td= field_spec['label'].html_safe
+    %td= (field_spec['label'].nil? ? '' : field_spec['label'].html_safe)
   - else
     %td{:colspan => 2}= field_spec['label'].html_safe
   - printable_answers.each_with_index do |answers,case_index|
