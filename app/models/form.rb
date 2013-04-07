@@ -259,6 +259,7 @@ class Form < ActiveRecord::Base
           if(previous_answers and previous_answers[field['repeat']['prefix']] and previous_answers[field['repeat']['prefix']].respond_to?(:size))
             min_repeat = previous_answers[field['repeat']['prefix']].size if previous_answers[field['repeat']['prefix']].size > min_repeat
           end
+          min_repeat = 0 if min_repeat.nil?
           min_repeat.times do |i|
             config_copy = Marshal.load(Marshal.dump(included_config))
             
