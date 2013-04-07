@@ -28,7 +28,11 @@ class Patient < ActiveRecord::Base
 
   # virtual attribute for pretty names
   def name
-    "Center #{center.name}, Subject ID #{subject_id}"
+    if(center.nil?)
+      "Subject ID #{subject_id}"
+    else
+      "Center #{center.name}, Subject ID #{subject_id}"
+    end
   end
 
   def patient_data
