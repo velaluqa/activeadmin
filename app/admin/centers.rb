@@ -40,15 +40,6 @@ ActiveAdmin.register Center do
   filter :name
 
   action_item :only => :show do
-    # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
-    if controller.action_methods.include?('destroy') and resource.patients.empty?
-      link_to(I18n.t('active_admin.delete_model', :model => active_admin_config.resource_label),
-              resource_path(resource),
-              :method => :delete, :data => {:confirm => I18n.t('active_admin.delete_confirmation')})
-    end
-  end 
-
-  action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id))
   end
 end

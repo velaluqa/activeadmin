@@ -2,9 +2,6 @@ require 'aa_customizable_default_actions'
 
 ActiveAdmin.register Patient do
 
-  actions :index, :show, :destroy
-  config.clear_action_items! # get rid of the default action items, since we have to handle 'delete' on a case-by-case basis
-
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
@@ -18,7 +15,7 @@ ActiveAdmin.register Patient do
     column :subject_id
     
     customizable_default_actions do |resource|
-      resource.cases.empty? ? [] : [:destroy]
+      (resource.cases.empty? and resource.form_answers.empty?) ? [] : [:destroy]
     end
   end
 
@@ -44,15 +41,6 @@ ActiveAdmin.register Patient do
   # filters
   filter :center
   filter :subject_id, :label => 'Subject ID'
-
-  action_item :only => :show do
-    # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
-    if controller.action_methods.include?('destroy') and resource.cases.empty?
-      link_to(I18n.t('active_admin.delete_model', :model => active_admin_config.resource_label),
-              resource_path(resource),
-              :method => :delete, :data => {:confirm => I18n.t('active_admin.delete_confirmation')})
-    end
-  end 
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id))
