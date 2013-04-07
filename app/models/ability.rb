@@ -4,20 +4,6 @@ class Ability
   def initialize(user)
     return if user.nil? # guest users have no access whatsoever
 
-    # # Validator
-    # can :validate, Session do |session|
-    #   session.validators.exists?(user.id)
-    # end
-
-    # # Reader
-    # can :blind_read, Session do |session|
-    #   session.readers.exists?(user.id)
-    # end
-
-    # can :read, Session do |session|
-    #   can? :validate, session or can? :blind_read, session
-    # end
-
     return if user.roles.empty?
 
     # App Admin
@@ -31,7 +17,23 @@ class Ability
       can :manage, Form, ['session_id IS NULL'] do |form|
         form.is_template?
       end
-    end    
+    end
+
+    if(user.has_system_role?(:image_import))
+      can [:create, :read], Center
+      can [:create, :read], Patient
+      # can [:create, :read], Visit
+      # can [:create, :read], Series
+      # can [:create, :read], Image
+    end
+    if(user.has_system_role?(:image_manage))
+      can :manage, Study
+      can :manage, Center
+      can :manage, Patient
+      # can :manage, Visit
+      # can :manage, Series
+      # can :manage, Image
+    end
 
     # Session Admin
     can :manage, Session, ['id IN '+SESSION_ROLES_SUBQUERY, user.id] do |session|
@@ -61,9 +63,6 @@ class Ability
       can? :manage, form.session
     end
 
-    can :manage, Patient, ['session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |patient|
-      can? :manage, patient.session
-    end
     can :manage, PatientData do |pd|
       can? :manage, pd.patient
     end

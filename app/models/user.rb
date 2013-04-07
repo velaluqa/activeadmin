@@ -31,7 +31,10 @@ class User < ActiveRecord::Base
   end
 
   def is_app_admin?
-    !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(:manage) }).nil?)
+    has_system_role?(:manage)
+  end
+  def has_system_role?(role_sym)
+    !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(role_sym) }).nil?)
   end
 
   def test_results_for_session(session)
