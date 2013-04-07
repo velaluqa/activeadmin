@@ -14,7 +14,7 @@ ActiveAdmin.register Patient do
 
   index do
     selectable_column
-    column :session
+    column :center
     column :subject_id
     
     customizable_default_actions do |resource|
@@ -24,7 +24,7 @@ ActiveAdmin.register Patient do
 
   show do |patient|
     attributes_table do
-      row :session
+      row :center
       row :subject_id
       row :patient_data_raw do
         CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
@@ -34,7 +34,7 @@ ActiveAdmin.register Patient do
 
   form do |f|
     f.inputs 'Details' do
-      f.input :session
+      f.input :center
       f.input :subject_id
     end
 
@@ -42,7 +42,7 @@ ActiveAdmin.register Patient do
   end
 
   # filters
-  filter :session
+  filter :center
   filter :subject_id, :label => 'Subject ID'
 
   action_item :only => :show do
