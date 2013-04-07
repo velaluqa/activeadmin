@@ -34,12 +34,16 @@ ActiveAdmin.register Role do
 
   form do |f|
     subjects = [["System", nil]] + Session.all.map{|s| ["Session: #{s.name}", "session_#{s.id}"]}
+    roles = {}
+    Role::ROLE_SYMS.each_with_index do |role_sym, index|
+      roles[Role::ROLE_NAMES[index]] = role_sym
+    end
 
     f.inputs 'Role details' do
       f.input :user, :required => true
       # HACK: we transform the malformed subject type in the Role model via a before_save filter and expand it into the proper subject_type and subject_id
       f.input :subject_type, :label => 'Subject', :collection => subjects
-      f.input :role, :collection => {"Manager" => :manage}, :as => :select, :include_blank => false
+      f.input :role, :collection => roles, :as => :select, :include_blank => false
     end
     
     f.buttons
