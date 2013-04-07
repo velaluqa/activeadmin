@@ -16,7 +16,7 @@ class Patient < ActiveRecord::Base
       return false
     end
 
-    PatientData.destroy_all(:patient_id => p.id)
+    PatientData.destroy_all(:patient_id => self.id)
   end
 
   def form_answers
