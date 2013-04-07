@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130316162423) do
+ActiveRecord::Schema.define(:version => 20130407122911) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -45,6 +45,13 @@ ActiveRecord::Schema.define(:version => 20130316162423) do
   add_index "cases", ["session_id", "position"], :name => "index_views_on_session_id_and_position", :unique => true
   add_index "cases", ["session_id"], :name => "index_views_on_session_id"
 
+  create_table "centers", :force => true do |t|
+    t.string   "name"
+    t.integer  "study_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "forms", :force => true do |t|
     t.string   "name"
     t.text     "description"
@@ -58,9 +65,9 @@ ActiveRecord::Schema.define(:version => 20130316162423) do
   create_table "patients", :force => true do |t|
     t.string   "subject_id"
     t.string   "images_folder"
-    t.integer  "session_id"
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
+    t.integer  "center_id"
   end
 
   create_table "readers_sessions", :id => false, :force => true do |t|
