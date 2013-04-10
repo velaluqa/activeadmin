@@ -22,16 +22,16 @@ class Ability
     if(user.has_system_role?(:image_import))
       can [:create, :read], Center
       can [:create, :read], Patient
-      # can [:create, :read], Visit
-      # can [:create, :read], Series
+      can [:create, :read], Visit
+      # can [:create, :read], ImageSeries
       # can [:create, :read], Image
     end
     if(user.has_system_role?(:image_manage))
       can :manage, Study
       can :manage, Center
       can :manage, Patient
-      # can :manage, Visit
-      # can :manage, Series
+      can :manage, Visit
+      # can :manage, ImageSeries
       # can :manage, Image
     end
 
