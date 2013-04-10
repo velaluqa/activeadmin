@@ -7,9 +7,13 @@ class Study < ActiveRecord::Base
 
   has_many :roles, :as => :subject
 
+  has_many :centers
+
+  validates_presence_of :name
+
   before_destroy do
-    unless sessions.empty?
-      errors.add :base, 'You cannot delete a study that still has sessions associated with it.'
+    unless(sessions.empty? and centers.empty?)
+      errors.add :base, 'You cannot delete a study that still has sessions or centers associated with it.'
       return false
     end
   end
