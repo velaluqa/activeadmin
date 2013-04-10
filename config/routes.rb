@@ -31,6 +31,14 @@ StudyServer::Application.routes.draw do
     put 'users/update_password', :to => 'users#update_password'
   end
 
+  resources :studies, :only => [:index] do
+    resources :centers, :only => [:index]
+  end
+
+  resources :centers, :only => [:index] do
+    resources :patients, :only => [:index]
+  end
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
