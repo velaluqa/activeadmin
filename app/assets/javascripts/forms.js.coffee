@@ -193,8 +193,8 @@ update_allowed_rois = (changed_select) ->
   new_selection = changed_select.find('option:selected').attr('data-roi-id')
   old_selection = changed_select.data('old_selection')
 
-  window.rois[old_selection]['selected_by_select'] = null if old_selection?
-  window.rois[new_selection]['selected_by_select'] = changed_select.attr('id') if new_selection?
+  window.rois[old_selection]['selected_by_select'] = null if(old_selection? and window.rois[old_selection]?)
+  window.rois[new_selection]['selected_by_select'] = changed_select.attr('id') if (new_selection? and window.rois[new_selection]?)
 
   selects = $('.select-roi').not(changed_select)
   update_enabled_options(select) for select in selects
