@@ -233,8 +233,9 @@ update_rois_table = (new_rois) ->
       roi_id = window.name_to_roi_id[roi_name]
       console.log("found ROI ID via name: "+roi_id)
     else
-      roi_id = find_roi_id_by_data(roi)
-      console.log("found ROI ID via data: "+roi_id) if roi_id?
+      # this is disabled because it causes more problems than it solves
+      # roi_id = find_roi_id_by_data(roi)
+      # console.log("found ROI ID via data: "+roi_id) if roi_id?
       console.log("assigning new ROI ID: "+window.next_roi_id) unless roi_id?
       roi_id = window.next_roi_id++ unless roi_id?
 
