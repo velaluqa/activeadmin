@@ -20,6 +20,7 @@ class Ability
     end
 
     if(user.has_system_role?(:image_import))
+      can :read, Study
       can [:create, :read], Center
       can [:create, :read], Patient
       can [:create, :read], Visit

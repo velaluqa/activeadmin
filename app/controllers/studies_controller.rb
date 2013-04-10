@@ -11,7 +11,7 @@ class StudiesController < ApplicationController
   protected
   
   def load_studies
-    authorize! :manage, Study
+    authorize! :read, Study
     @studies = Study.accessible_by(current_ability)    
   end
 end
