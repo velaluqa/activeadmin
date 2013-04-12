@@ -31,7 +31,7 @@ update_roi_option = (option, values) ->
 
   option_value['location'] = {}
   option_value['location']['seriesUID'] = roi['seriesUID']
-  option_value['location']['imageIndex'] = roi['instanceNumber']
+  option_value['location']['imageIndex'] = roi['imageIndex']
   option_value['location']['sopInstanceUID'] = roi['sopInstanceUID']
 
   for own key, value of values
@@ -211,8 +211,9 @@ find_roi_id_by_data = (roi) ->
        old_roi['min'] == roi['min'] and
        old_roi['max'] == roi['max'] and
        old_roi['mean'] == roi['mean'] and
-	   old_roi['seriesUID'] == roi['seriesUID'] and
-	   old_roi['instanceNumber'] == roi['instanceNumber'])
+       old_roi['seriesUID'] == roi['seriesUID'] and
+       old_roi['instanceNumber'] == roi['instanceNumber'] and
+       old_roi['imageIndex'] == roi['imageIndex'])
       return roi_id
 
   return null
