@@ -5,7 +5,7 @@ class Visit < ActiveRecord::Base
   attr_accessible :patient
   
   belongs_to :patient
-  #has_many :image_series, :dependent => :destroy
+  has_many :image_series, :dependent => :destroy
 
   validates_uniqueness_of :visit_number, :scopy => :patient_id
   validates_presence_of :visit_number, :visit_type, :patient_id
@@ -14,7 +14,7 @@ class Visit < ActiveRecord::Base
     if(patient.nil?)
       "Visit No. #{visit_number}"
     else
-      "#{patient. name}, Visit No. #{visit_number}"
+      "#{patient.name}, Visit No. #{visit_number}"
     end
   end
 end
