@@ -19,6 +19,6 @@ class Study < ActiveRecord::Base
   end
 
   def image_storage_path
-    Rails.application.config.image_storage_root + '/' + self.id.to_s
+    self.id.to_s
   end
 end
