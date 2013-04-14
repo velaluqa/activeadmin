@@ -35,8 +35,19 @@ StudyServer::Application.routes.draw do
     resources :centers, :only => [:index]
   end
 
-  resources :centers, :only => [:index] do
+  resources :centers, :only => [:create] do
     resources :patients, :only => [:index]
+  end
+
+  resources :patients, :only => [:create] do
+    resources :image_series, :only => [:index]
+  end
+
+  resources :image_series, :only => [:create]
+  resources :images, :only => [:create] do
+    collection do
+      post 'batch_create'
+    end
   end
 
   # The priority is based upon order of creation:

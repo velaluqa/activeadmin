@@ -8,6 +8,7 @@ class Patient < ActiveRecord::Base
   has_many :form_answers
   has_many :cases
   has_many :visits, :dependent => :destroy
+  has_many :image_series, :dependent => :destroy
   has_one :patient_data
 
   validates_uniqueness_of :subject_id, :scope => :center_id

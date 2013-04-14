@@ -5,10 +5,17 @@ class Visit < ActiveRecord::Base
   attr_accessible :patient
   
   belongs_to :patient
-  has_many :image_series, :dependent => :destroy
+  has_many :image_series
 
   validates_uniqueness_of :visit_number, :scopy => :patient_id
   validates_presence_of :visit_number, :visit_type, :patient_id
+
+  before_destroy do
+    self.image_series.each do |is|
+      is.visit = nil
+      is.save
+    end
+  end
 
   def name
     if(patient.nil?)
