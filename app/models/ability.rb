@@ -25,7 +25,7 @@ class Ability
       can [:create, :read], Patient
       can [:create, :read], Visit
       can [:create, :read], ImageSeries
-      # can [:create, :read], Image
+      can [:create, :read], Image
     end
     if(user.has_system_role?(:image_manage))
       can :manage, Study
@@ -33,7 +33,7 @@ class Ability
       can :manage, Patient
       can :manage, Visit
       can :manage, ImageSeries
-      # can :manage, Image
+      can :manage, Image
     end
 
     # Session Admin

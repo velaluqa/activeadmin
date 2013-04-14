@@ -12,6 +12,7 @@ ActiveAdmin.register ImageSeries do
 
   index do
     selectable_column
+    column :patient
     column :visit
     column :name
     
@@ -20,6 +21,7 @@ ActiveAdmin.register ImageSeries do
 
   show do |center|
     attributes_table do
+      row :patient
       row :visit
       row :name
     end
@@ -27,6 +29,7 @@ ActiveAdmin.register ImageSeries do
 
   form do |f|
     f.inputs 'Details' do
+      f.input :patient
       f.input :visit
       f.input :name
     end
@@ -35,6 +38,7 @@ ActiveAdmin.register ImageSeries do
   end
 
   # filters
+  filter :patient
   filter :visit
   filter :name
 end
