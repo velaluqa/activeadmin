@@ -23,6 +23,7 @@ ActiveAdmin.register Center do
     attributes_table do
       row :study
       row :name
+      row :image_storage_path
     end
   end
 

@@ -16,12 +16,13 @@ ActiveAdmin.register Visit do
     default_actions
   end
 
-  show do |center|
+  show do |visit|
     attributes_table do
       row :patient
       row :visit_number
       row :visit_type
-    end
+      row :image_storage_path
+   end
   end
 
   form do |f|

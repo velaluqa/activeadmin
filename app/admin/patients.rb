@@ -23,6 +23,7 @@ ActiveAdmin.register Patient do
     attributes_table do
       row :center
       row :subject_id
+      row :image_storage_path
       row :patient_data_raw do
         CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
       end

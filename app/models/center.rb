@@ -18,4 +18,8 @@ class Center < ActiveRecord::Base
 
     return true
   end
+
+  def image_storage_path
+    self.study.image_storage_path + '/' + self.id.to_s
+  end
 end

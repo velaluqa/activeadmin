@@ -17,4 +17,8 @@ class Study < ActiveRecord::Base
       return false
     end
   end
+
+  def image_storage_path
+    Rails.application.config.image_storage_root + '/' + self.id.to_s
+  end
 end

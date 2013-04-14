@@ -38,4 +38,8 @@ class Patient < ActiveRecord::Base
   def patient_data
     PatientData.where(:patient_id => read_attribute(:id)).first
   end
+
+  def image_storage_path
+    self.center.image_storage_path + '/' + self.id.to_s
+  end
 end

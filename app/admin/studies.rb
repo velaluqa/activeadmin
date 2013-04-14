@@ -12,6 +12,7 @@ ActiveAdmin.register Study do
   show do |study|
     attributes_table do
       row :name
+      row :image_storage_path
     end
   end
   

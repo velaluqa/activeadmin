@@ -17,4 +17,8 @@ class Visit < ActiveRecord::Base
       "#{patient.name}, Visit No. #{visit_number}"
     end
   end
+
+  def image_storage_path
+    self.patient.image_storage_path + '/' + self.id.to_s
+  end
 end

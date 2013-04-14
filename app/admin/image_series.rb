@@ -19,11 +19,12 @@ ActiveAdmin.register ImageSeries do
     default_actions
   end
 
-  show do |center|
+  show do |image_series|
     attributes_table do
       row :patient
       row :visit
       row :name
+      row :image_storage_path
     end
   end
 
