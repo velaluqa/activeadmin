@@ -2,6 +2,8 @@ class ImageSeriesController < ApplicationController
   before_filter :load_patient
   before_filter :load_image_series, :only => :index
 
+  skip_before_filter :verify_authenticity_token, :only => [:create]
+
   def index
     respond_to do |format|
       format.json { render :json => @image_series}

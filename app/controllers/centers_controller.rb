@@ -2,6 +2,8 @@ class CentersController < ApplicationController
   before_filter :load_study
   before_filter :load_centers, :only => :index
 
+  skip_before_filter :verify_authenticity_token, :only => [:create]
+
   def index
     respond_to do |format|
       format.json { render :json => @centers}

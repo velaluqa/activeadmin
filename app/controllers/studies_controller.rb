@@ -2,7 +2,6 @@ class StudiesController < ApplicationController
   before_filter :load_studies
 
   def index
-
     respond_to do |format|
       format.json { render :json => @studies}
     end
