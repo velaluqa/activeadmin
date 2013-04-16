@@ -76,7 +76,7 @@ class ImageStorageObserver < ActiveRecord::Observer
 
     if(model.is_a?(Patient))
       begin
-        FileUtils.rmdir(previous_image_storage_path + '/__unassigned')
+        FileUtils.rm_r(previous_image_storage_path + '/__unassigned')
       rescue SystemCallError => e
         Rails.logger.error "Failed to remove image storage for #{model} at #{previous_image_storage_path + '/__unassigned'}: #{e}"
         return false
@@ -84,7 +84,16 @@ class ImageStorageObserver < ActiveRecord::Observer
     end
     
     begin
-      FileUtils.rmdir(previous_image_storage_path)
+      # because we delete dependent records for patient and everything below it, the after_commit callbacks get called in the wrong order
+      # since its all happening inside the same transaction
+      # so the image will be deleted after the image_series
+      # therefore, when we attempt to rmdir the image series folder here, it will fail because there are still images inside
+      # hence: rm -r
+      if(model.is_a?(Patient) || model.is_a?(Visit) || model.is_a?(ImageSeries))
+        FileUtils.rm_r(previous_image_storage_path)
+      else
+        FileUtils.rmdir(previous_image_storage_path)
+      end
     rescue SystemCallError => e
       Rails.logger.error "Failed to remove image storage for #{model} at #{previous_image_storage_path}: #{e}"
       return false
