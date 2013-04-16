@@ -40,6 +40,15 @@ class Patient < ActiveRecord::Base
     PatientData.where(:patient_id => read_attribute(:id)).first
   end
 
+  def previous_image_storage_path
+    if(self.previous_changes.include?(:center_id))
+      previous_center = Center.find(self.previous_changes[:center_id][0])
+      
+      previous_center.image_storage_path + '/' + self.id.to_s
+    else
+      image_storage_path
+    end
+  end
   def image_storage_path
     self.center.image_storage_path + '/' + self.id.to_s
   end

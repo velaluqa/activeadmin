@@ -18,6 +18,9 @@ class Study < ActiveRecord::Base
     end
   end
 
+  def previous_image_storage_path
+    image_storage_path
+  end
   def image_storage_path
     self.id.to_s
   end

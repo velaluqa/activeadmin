@@ -25,6 +25,15 @@ class Visit < ActiveRecord::Base
     end
   end
 
+  def previous_image_storage_path
+    if(self.previous_changes.include?(:patient_id))
+      previous_patient = Patient.find(self.previous_changes[:patient_id][0])
+      
+      previous_patient.image_storage_path + '/' + self.id.to_s
+    else
+      image_storage_path
+    end
+  end
   def image_storage_path
     self.patient.image_storage_path + '/' + self.id.to_s
   end
