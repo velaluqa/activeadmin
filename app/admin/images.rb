@@ -13,6 +13,13 @@ ActiveAdmin.register Image do
     selectable_column
     column :image_series
     column :id
+    column 'File' do |image|
+      if(image.file_is_present?)
+        status_tag('Present', :ok)
+      else
+        status_tag('Missing', :error)
+      end      
+    end
     
     default_actions
   end
