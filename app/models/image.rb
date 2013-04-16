@@ -13,6 +13,6 @@ class Image < ActiveRecord::Base
   end
 
   def file_is_present?
-    File.readable?(image_storage_path)
+    File.readable?(Rails.application.config.image_storage_root + '/' + image_storage_path)
   end
 end
