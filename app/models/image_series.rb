@@ -8,7 +8,7 @@ class ImageSeries < ActiveRecord::Base
   belongs_to :patient
   has_many :images, :dependent => :destroy
   
-  validates_uniqueness_of :name, :scopy => :visit_id
+  validates_uniqueness_of :name, :scope => :visit_id
   validates_presence_of :name, :patient_id
 
   scope :not_assigned, where(:visit_id => nil)

@@ -7,7 +7,7 @@ class Visit < ActiveRecord::Base
   belongs_to :patient
   has_many :image_series
 
-  validates_uniqueness_of :visit_number, :scopy => :patient_id
+  validates_uniqueness_of :visit_number, :scope => :patient_id
   validates_presence_of :visit_number, :visit_type, :patient_id
 
   before_destroy do

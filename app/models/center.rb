@@ -7,7 +7,7 @@ class Center < ActiveRecord::Base
   belongs_to :study
   has_many :patients
 
-  validates_uniqueness_of :name, :scopy => :study_id
+  validates_uniqueness_of :name, :scope => :study_id
   validates_presence_of :name, :study_id
 
   before_destroy do
