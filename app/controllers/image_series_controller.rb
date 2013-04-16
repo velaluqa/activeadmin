@@ -29,6 +29,6 @@ class ImageSeriesController < ApplicationController
 
   def load_image_series
     authorize! :read, ImageSeries
-    @image_series = @patient.image_series.aaccessible_by(current_ability)
+    @image_series = @patient.image_series.accessible_by(current_ability)
   end
 end
