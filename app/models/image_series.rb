@@ -26,7 +26,6 @@ class ImageSeries < ActiveRecord::Base
 
   def previous_image_storage_path
     if(self.previous_changes.include?(:patient_id) || self.previous_changes.include?(:visit_id))
-      pp self.previous_changes
       previous_patient = (self.previous_changes[:patient_id].nil? ? self.patient : Patient.find(self.previous_changes[:patient_id][0]))
       previous_visit = if self.previous_changes[:visit_id].nil?
                          self.visit
@@ -35,14 +34,11 @@ class ImageSeries < ActiveRecord::Base
                        else
                          Visit.find(self.previous_changes[:visit_id][0])
                        end
-      pp previous_patient
-      pp previous_visit
+
       
       if(previous_visit.nil?)      
-        puts "UNASSIGNED??"
         previous_patient.image_storage_path + '/__unassigned/' + self.id.to_s
       else
-        puts "ASSIGNED!!"
         previous_visit.image_storage_path + '/' + self.id.to_s
       end
     else
