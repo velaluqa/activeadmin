@@ -9,7 +9,7 @@
               %td
                 = "#{element[:name]} "
                 %span.dicom_tag_key= "(#{element[:tag]})"
-              %td= element[:value]
+              %td= pretty_print_dicom_tag(element[:value], element[:vr])
 
 .panel
   %h3 DICOM Metadata
@@ -22,4 +22,4 @@
               %td
                 = "#{element[:name]} "
                 %span.dicom_tag_key= "(#{element[:tag]})"
-              %td= element[:value]
+              %td= pretty_print_dicom_tag(element[:value], element[:vr])
