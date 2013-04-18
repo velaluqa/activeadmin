@@ -162,7 +162,7 @@ class Session < ActiveRecord::Base
     return self.cases.last.position+1
   end
 
-  def deep_clone(new_name, new_study, current_user)
+  def deep_clone(new_name, new_study, current_user, components)
     new_session = self.dup
 
     new_session.name = new_name
@@ -173,50 +173,57 @@ class Session < ActiveRecord::Base
     new_session.save
 
     # forms
-    self.forms.each do |form|
-      form.copy_to_session(new_session, current_user)
+    if(components.include?(:forms))
+      self.forms.each do |form|
+        form.copy_to_session(new_session, current_user)
+      end
     end
     
     # patients
     patient_mapping = {}
-    self.patients.each do |patient|
-      new_patient = patient.dup
-      new_patient.session = new_session
-      new_patient.save
+    if(components.include?(:patients) || components.include?(:cases))
+      self.patients.each do |patient|
+        new_patient = patient.dup
+        new_patient.session = new_session
+        new_patient.save
 
-      unless(patient.patient_data.nil?)
-        new_patient_data = patient.patient_data.clone
-        new_patient_data.patient = new_patient
-        new_patient_data.save
+        unless(patient.patient_data.nil?)
+          new_patient_data = patient.patient_data.clone
+          new_patient_data.patient = new_patient
+          new_patient_data.save
+        end
+
+        patient_mapping[patient.id] = new_patient.id
       end
-
-      patient_mapping[patient.id] = new_patient.id
     end
 
     # cases
-    self.cases.each do |c|
-      next if c.flag == :reader_testing
+    if(components.include?(:cases))
+      self.cases.each do |c|
+        next if c.flag == :reader_testing
 
-      new_case = c.dup
-      new_case.session = new_session
-      new_case.patient_id = patient_mapping[c.patient_id]
+        new_case = c.dup
+        new_case.session = new_session
+        new_case.patient_id = patient_mapping[c.patient_id]
 
-      new_case.exported_at = nil
-      new_case.state = :unread
+        new_case.exported_at = nil
+        new_case.state = :unread
 
-      new_case.save
+        new_case.save
 
-      unless(c.case_data.nil?)
-        new_case_data = c.case_data.clone
-        new_case_data.case = new_case
-        new_case_data.save
+        unless(c.case_data.nil?)
+          new_case_data = c.case_data.clone
+          new_case_data.case = new_case
+          new_case_data.save
+        end
       end
     end
 
     # readers
-    new_session.readers = self.readers
+    new_session.readers = self.readers if(components.include?(:readers))
+
     # validators
-    new_session.validators = self.validators
+    new_session.validators = self.validators if(components.include?(:validators))
 
 
     GitConfigRepository.new.update_config_file(new_session.relative_config_file_path, self.config_file_path, current_user, "Cloned session #{self.id}")

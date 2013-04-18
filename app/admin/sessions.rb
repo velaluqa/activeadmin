@@ -525,7 +525,14 @@ ActiveAdmin.register Session do
 
     new_session_name = params[:session][:name]
 
-    new_session = @session.deep_clone(new_session_name, new_study, current_user)
+    components = []
+    components << :forms if params[:session]['Components to clone'].include?('Forms')
+    components << :cases if params[:session]['Components to clone'].include?('Cases')
+    components << :patients if (params[:session]['Components to clone'].include?('Patients') || params[:session]['Components to clone'].include?('Cases'))
+    components << :readers if params[:session]['Components to clone'].include?('Readers')
+    components << :validators if params[:session]['Components to clone'].include?('Validators')
+
+    new_session = @session.deep_clone(new_session_name, new_study, current_user, components)
 
     redirect_to(admin_session_path(new_session), :notice => 'Session successfully cloned')
   end
