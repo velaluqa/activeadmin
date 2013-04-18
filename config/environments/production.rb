@@ -77,4 +77,6 @@ StudyServer::Application.configure do
   config.max_allowed_password_age = 1.month
 
   config.image_storage_root = config.data_directory + '/images'
+
+  config.dcm2xml = '/usr/bin/dcm2xml'
 end

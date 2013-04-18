@@ -1,0 +1,25 @@
+.panel
+  %h3 DICOM Meta Header
+  .panel_contents
+    .attributes_table
+      %table
+        %tbody
+          - @dicom_meta_header.each do |element|
+            %tr
+              %td
+                = "#{element[:name]} "
+                %span.dicom_tag_key= "(#{element[:tag]})"
+              %td= element[:value]
+
+.panel
+  %h3 DICOM Metadata
+  .panel_contents
+    .attributes_table
+      %table
+        %tbody
+          - @dicom_metadata.each do |element|
+            %tr
+              %td
+                = "#{element[:name]} "
+                %span.dicom_tag_key= "(#{element[:tag]})"
+              %td= element[:value]
