@@ -109,6 +109,9 @@ ActiveAdmin.register Session do
           li { link_to('Unexported Validation Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :validation)) }
         end
       end
+      row :reorder_cases do
+        link_to('Reorder Case List', reorder_case_list_form_admin_session_path(session))
+      end
       row :cases do
         if session.case_list(:all).empty?
           nil
@@ -525,7 +528,14 @@ ActiveAdmin.register Session do
 
     new_session_name = params[:session][:name]
 
-    new_session = @session.deep_clone(new_session_name, new_study, current_user)
+    components = []
+    components << :forms if params[:session]['Components to clone'].include?('Forms')
+    components << :cases if params[:session]['Components to clone'].include?('Cases')
+    components << :patients if (params[:session]['Components to clone'].include?('Patients') || params[:session]['Components to clone'].include?('Cases'))
+    components << :readers if params[:session]['Components to clone'].include?('Readers')
+    components << :validators if params[:session]['Components to clone'].include?('Validators')
+
+    new_session = @session.deep_clone(new_session_name, new_study, current_user, components)
 
     redirect_to(admin_session_path(new_session), :notice => 'Session successfully cloned')
   end
@@ -541,5 +551,38 @@ ActiveAdmin.register Session do
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'session', :audit_trail_view_id => resource.id))
+  end
+
+  member_action :reorder_case_list, :method => :post do
+    @session = Session.find(params[:id])
+
+    new_case_list = params[:case_list].split(',')
+    
+    cases = new_case_list.map {|c| Case.find(c.to_i)}
+
+    available_positions = cases.map {|c| c.position}.sort
+    next_free_position = @session.next_position
+
+    Case.transaction do
+      # first we set the position to some unused position, so it won't clash with existing positions when setting the correct one next
+      cases.each do |c|
+        c.position = next_free_position
+        c.save
+        next_free_position += 1
+      end
+ 
+      cases.each do |c|
+        c.position = available_positions.shift
+        c.save
+      end
+    end
+
+    redirect_to({:action => :show}, :notice => "The case list was successfully reordered")
+  end
+  member_action :reorder_case_list_form, :method => :get do
+    @session = Session.find(params[:id])
+
+    @page_title = 'Reorder Case List'
+    @cases = @session.cases.where(:state => Case::state_sym_to_int(:unread))
   end
 end
