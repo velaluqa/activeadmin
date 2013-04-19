@@ -76,6 +76,16 @@ update_roi_select = (select) ->
   if(select.find('option:selected').length == 0)
     select.find('option:not([value])').attr('selected', 'selected')
 
+# copied from: http://stackoverflow.com/questions/9234830/how-to-hide-a-option-in-a-select-menu-with-css
+hide_select_option = (option, show) ->
+  $(option).toggle(show)
+
+  if(show)
+    if($(option).parent('span.toggleOption').length)
+      $(option).unwrap()
+  else
+    $(option).wrap('<span class="toggleOption" style="display: none;" />')
+
 update_enabled_options = (select) ->
   for option in $(select).find('option[value]')
     option = $(option)
@@ -84,9 +94,9 @@ update_enabled_options = (select) ->
     selected_by_select = roi['selected_by_select']
   
     if selected_by_select? and selected_by_select != $(select).attr('id')
-      option.attr('disabled', 'disabled')
+      hide_select_option(option, false)
     else
-      option.removeAttr('disabled')
+      hide_select_option(option, true)
 
 register_custom_validation_function = (func) ->
   window.custom_validation_functions = [] unless window.custom_validation_functions?
