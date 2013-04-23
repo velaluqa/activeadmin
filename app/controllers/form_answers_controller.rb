@@ -32,7 +32,7 @@ class FormAnswersController < ApplicationController
       is_test_data = true
     end
 
-    unless(@case.state = :reopened_in_progress and @case.form_answer)
+    unless(@case.state == :reopened_in_progress and @case.form_answer)
       answer = FormAnswer.new
 
       answer.form_id = params['form_id']
