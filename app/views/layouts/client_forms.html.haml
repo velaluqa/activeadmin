@@ -9,6 +9,8 @@
     - unless @previous_results.nil?
       :javascript
         window.results_list = #{JSON::generate(@previous_results)}
+        window.full_form_config = #{JSON::generate(@form_config)}
+        window.form_config_repeatables = #{JSON::generate(@repeatables_map)}
     - unless @form_components.nil?
       - unless @form_components[:validators].nil?
         :javascript

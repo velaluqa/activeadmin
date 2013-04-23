@@ -117,6 +117,65 @@ set_custom_validation_messages = (messages) ->
 
   ul.append(lis.join('\n'))
 
+generate_pretty_repeatable_answers = (answers, repeatable_config) ->
+  pretty_answers = []
+
+  for field in repeatable_config
+    if(field['type'] != 'section' and field['type'] != 'include_divider')
+      stripped_id = field['id'].replace(/^.*?\[\]\[/, '').replace(/\]$/, '')
+      value = value_at_path(answers, stripped_id)
+
+      pretty_answers.push({'type': field['type'], 'label': field['label'], 'value': pretty_print_value(value, field)})
+
+  return pretty_answers
+
+generate_pretty_answers = (answers, form_config, repeatables) ->
+  pretty_answers = []
+
+  ignore_fields = false
+  for field in form_config
+    switch field['type']
+      when 'include_start'
+        ignore_fields = true
+      when 'include_divider' then
+      when 'include_end'
+        ignore_fields = false
+        repeatable_answers = value_at_path(answers, field['id'])
+        repeatable_config = repeatables[field['id']]['config']
+
+        if repeatable_answers?
+          pretty_repeatable_answers = (generate_pretty_repeatable_answers(repeatable_answer, repeatable_config) for repeatable_answer in repeatable_answers)
+        else
+          pretty_repeatable_answers = []
+        
+        pretty_answers.push({'type': 'repeat', 'id': field['id'], 'answers': pretty_repeatable_answers})
+      when 'section' then
+      when 'group'
+        pretty_answers.push({'type': 'group', 'label': field['label']})
+      when 'fixed'
+        pretty_answers.push({'type': field['type'], 'label': field['label'], 'value': $("\##{field['id']}").text()}) unless ignore_fields
+      else
+        pretty_answers.push({'type': field['type'], 'label': field['label'], 'value': pretty_print_value(value_at_path(answers, field['id']), field)}) unless ignore_fields
+
+  return pretty_answers
+
+pretty_print_value = (value, field) ->
+  if(field['type'] == 'bool')
+    value = if value == yes then "Yes" else "No"
+  else if(field['type'] == 'roi') and (typeof value == 'object')
+    location = 'Location: '+value['location']['seriesUID']+' #'+value['location']['imageIndex'].toString()+"\n"
+    value = location+((k+": "+v) for own k,v of value when k != 'location').join("\n")
+  else if(field['type'] == 'select') or ((field['type'] == 'roi') and (typeof value == 'string'))
+    answer_option = field['values'][value]
+    value = if answer_option? and answer_option.length > 0 then answer_option + ' (' + value + ')' else value
+  else if(field['type'] == 'select_multiple')
+    value = for v in value
+      option = field['values'][v]
+      (if option? and option.length > 0 then option + ' (' + v + ')' else v)
+    value = value.join("\n")
+
+  return value
+
 fill_placeholder_cells = (root_elem, answers) ->
   placeholder_cells = $(root_elem).find('td.results-table-placeholder-cell')
 
@@ -451,10 +510,10 @@ $(document).ready ->
               return
 
           display_validation_success(true)
-              
+
           window.form_answers = form_data
           fill_placeholder_cells($('#preview_modal'), form_data)
-          fill_placeholder_cells($('#print_version'), form_data)
+          fill_placeholder_cells($('#print_version'), form_data)            
           $('#preview_modal').modal('show')
         submitError: ($form, event, errors) ->
           console.log("SUBMIT ERROR:")
@@ -581,7 +640,7 @@ $(document).ready ->
   $('#preview_submit_btn').click ->
     $(this).button('loading')
 
-    PharmTraceAPI.submitAnswers(window.form_answers)
+    PharmTraceAPI.submitAnswers(window.form_answers, generate_pretty_answers(window.form_answers, window.full_form_config, window.form_config_repeatables))
 
   PharmTraceAPI.answersSubmitted.connect (success) ->
     console.log("submitting answers: #{success}")
