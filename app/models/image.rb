@@ -20,6 +20,9 @@ class Image < ActiveRecord::Base
   def image_storage_path
     self.image_series.image_storage_path + '/' + self.id.to_s
   end
+  def absolute_image_storage_path
+    Rails.application.config.image_storage_root + '/' + self.image_storage_path
+  end
 
   def file_is_present?
     File.readable?(Rails.application.config.image_storage_root + '/' + image_storage_path)
