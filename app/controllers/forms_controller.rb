@@ -13,6 +13,10 @@ class FormsController < ApplicationController
     else
       @form_config, @form_components, @repeatables = @form.full_locked_configuration
     end
+    @repeatables_map = {}
+    @repeatables.each do |r|
+      @repeatables_map[r[:id]] = r
+    end
     @data_hash = @case.data_hash
 
     setup_previous_cases_config
@@ -37,6 +41,10 @@ class FormsController < ApplicationController
       flash[:error] = 'This form does not have a (valid) configuration.'
       redirect_to :controller => 'admin/forms', :action => :show, :id => params[:id]
       return
+    end
+    @repeatables_map = {}
+    @repeatables.each do |r|
+      @repeatables_map[r[:id]] = r
     end
 
     patient = Patient.new
