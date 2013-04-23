@@ -129,8 +129,8 @@ ActiveAdmin.register Case do
   end
 
   # filters
-  filter :session
-  filter :patient
+  filter :session, :collection => Proc.new { Session.accessible_by(current_ability) }
+  filter :patient, :collection => Proc.new { Patient.accessible_by(current_ability) }
   filter :position
   filter :images
   filter :case_type

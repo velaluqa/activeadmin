@@ -148,7 +148,7 @@ ActiveAdmin.register Form do
   end
 
   # filters
-  filter :session
+  filter :session, :collection => Proc.new { Session.accessible_by(current_ability) }
   filter :name
   filter :description
   filter :state, :as => :check_boxes, :collection => Form::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
