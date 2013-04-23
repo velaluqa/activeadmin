@@ -170,7 +170,7 @@ ActiveAdmin.register Session do
   end
 
   # filters
-  filter :study
+  filter :study, :collection => Proc.new { Study.accessible_by(current_ability) }
   filter :name
   filter :state, :as => :check_boxes, :collection => Session::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
 
