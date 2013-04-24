@@ -27,4 +27,55 @@ class Image < ActiveRecord::Base
   def file_is_present?
     File.readable?(Rails.application.config.image_storage_root + '/' + image_storage_path)
   end
+
+  def dicom_metadata
+    dicom_metadata_doc = self.dicom_metadata_xml
+
+    dicom_meta_header = {}
+    unless(dicom_metadata_doc.root.elements['meta-header'].nil?)
+      dicom_metadata_doc.root.elements['meta-header'].each_element('element') do |e|
+        dicom_meta_header[e.attributes['tag']] = {:tag => e.attributes['tag'], :name => e.attributes['name'], :vr => e.attributes['vr'], :value => e.text} unless e.text.blank?
+      end
+    end
+
+    dicom_metadata = {}
+    unless(dicom_metadata_doc.root.elements['data-set'].nil?)
+      dicom_metadata_doc.root.elements['data-set'].each_element('element') do |e|
+        dicom_metadata[e.attributes['tag']] = {:tag => e.attributes['tag'], :name => e.attributes['name'], :vr => e.attributes['vr'], :value => e.text} unless e.text.blank?
+      end    
+    end
+
+    return [dicom_meta_header, dicom_metadata]
+    
+  end
+
+  def dicom_metadata_as_arrays
+    dicom_metadata_doc = self.dicom_metadata_xml
+
+    dicom_meta_header = []
+    unless(dicom_metadata_doc.root.elements['meta-header'].nil?)
+      dicom_metadata_doc.root.elements['meta-header'].each_element('element') do |e|
+        dicom_meta_header << {:tag => e.attributes['tag'], :name => e.attributes['name'], :vr => e.attributes['vr'], :value => e.text} unless e.text.blank?
+      end
+    end
+
+    dicom_metadata = []
+    unless(dicom_metadata_doc.root.elements['data-set'].nil?)
+      dicom_metadata_doc.root.elements['data-set'].each_element('element') do |e|
+        dicom_metadata << {:tag => e.attributes['tag'], :name => e.attributes['name'], :vr => e.attributes['vr'], :value => e.text} unless e.text.blank?
+      end    
+    end
+
+    return [dicom_meta_header, dicom_metadata]
+  end
+  
+  protected
+  
+  def dicom_metadata_xml
+    file_path = self.absolute_image_storage_path
+    dicom_xml = `#{Rails.application.config.dcm2xml} --quiet '#{file_path}'`
+    dicom_metadata_doc = REXML::Document.new(dicom_xml)
+
+    return dicom_metadata_doc
+  end
 end
