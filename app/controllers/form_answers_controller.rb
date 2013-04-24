@@ -69,7 +69,10 @@ class FormAnswersController < ApplicationController
       @case.form_answer.version_current_answers
 
       answer = @case.form_answer
+      pp answer
     end
+
+    pp params
         
     answer.answers = params['answers']
     answer.answers_signature = params['answers_signature']
@@ -80,6 +83,8 @@ class FormAnswersController < ApplicationController
     answer.submitted_at = Time.now
 
     answer.save
+
+    pp answer
 
     @case.state = :read
     @case.save
