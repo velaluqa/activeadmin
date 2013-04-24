@@ -43,7 +43,11 @@ StudyServer::Application.routes.draw do
     resources :image_series, :only => [:index]
   end
 
-  resources :image_series, :only => [:create]
+  resources :image_series, :only => [:create] do
+    member do
+      get 'wado_query'
+    end
+  end
   resources :images, :only => [:create] do
     collection do
       post 'batch_create'

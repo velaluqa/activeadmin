@@ -24,6 +24,10 @@ class Image < ActiveRecord::Base
     Rails.application.config.image_storage_root + '/' + self.image_storage_path
   end
 
+  def wado_uid
+    Rails.application.config.wado_dicom_prefix + self.id.to_s
+  end
+
   def file_is_present?
     File.readable?(Rails.application.config.image_storage_root + '/' + image_storage_path)
   end

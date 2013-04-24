@@ -1,6 +1,7 @@
 class ImageSeriesController < ApplicationController
-  before_filter :load_patient
+  before_filter :load_patient, :only => [:index, :create]
   before_filter :load_image_series, :only => :index
+  before_filter :load_the_image_series, :only => [:wado_query]
 
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
@@ -20,6 +21,14 @@ class ImageSeriesController < ApplicationController
     end
   end
 
+  def wado_query
+    @images = @image_series.images.order('id ASC')
+
+    respond_to do |format|
+      format.xml
+    end
+  end
+
   protected
 
   def load_patient
@@ -30,5 +39,9 @@ class ImageSeriesController < ApplicationController
   def load_image_series
     authorize! :read, ImageSeries
     @image_series = @patient.image_series.accessible_by(current_ability)
+  end
+  def load_the_image_series
+    @image_series = ImageSeries.find(params[:id])
+    #authorize! :manage, @image_series
   end
 end
