@@ -30,9 +30,12 @@ ActiveAdmin.register Case do
 
   index do
     selectable_column
-    column :session
+    column :id
+    column :session, :sortable => :session_id
     column :position
-    column :patient
+    column :patient do |c|
+      link_to(c.patient.subject_id, admin_patient_path(c.patient)) unless c.patient.nil?
+    end
     column :images
     column :case_type
     column :flag do |c|
@@ -59,6 +62,12 @@ ActiveAdmin.register Case do
         status_tag('Reopened In Progress', :warning, :label => link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       end
     end
+    column :reader do |c|
+      link_to(c.form_answer.user.name, admin_user_path(c.form_answer.user)) unless c.form_answer.nil?
+    end
+    column 'Submission Date' do |c|
+      pretty_format(c.form_answer.submitted_at) unless c.form_answer.nil?
+    end
     column 'Last Export', :exported_at
    
     customizable_default_actions do |resource|
@@ -68,6 +77,7 @@ ActiveAdmin.register Case do
 
   show do |c|
     attributes_table do
+      row :id
       row :session
       row :position
       row :patient
@@ -129,6 +139,7 @@ ActiveAdmin.register Case do
   end
 
   # filters
+  filter :id
   filter :session, :collection => Proc.new { Session.accessible_by(current_ability).order('id ASC') }
   filter :patient, :collection => Proc.new { Patient.accessible_by(current_ability).order('id ASC') }
   filter :position
