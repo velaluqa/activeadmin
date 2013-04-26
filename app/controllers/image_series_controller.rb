@@ -24,6 +24,7 @@ class ImageSeriesController < ApplicationController
   def wado_query
     @images = @image_series.images.order('id ASC')
 
+    @authentication_token = current_user.authentication_token
     respond_to do |format|
       format.xml
     end

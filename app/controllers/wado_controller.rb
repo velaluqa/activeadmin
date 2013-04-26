@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 class WadoController < ApplicationController
-  #before_filter :authenticate_user!
-  #before_filter :authorize_user!
+  before_filter :authenticate_user!
+  before_filter :authorize_user!
+  before_filter :skip_trackable # do not track requests to the WADO API as logins/logouts, because every single request would be counted as one login
   
   before_filter :check_request_type
 
@@ -40,6 +41,10 @@ class WadoController < ApplicationController
 
   def authorize_user!
     authorize! :read, Image
+  end
+  
+  def skip_trackable
+    request.env['devise.skip_trackable'] = true
   end
 
   def check_request_type

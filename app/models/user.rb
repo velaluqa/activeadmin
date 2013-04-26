@@ -5,7 +5,8 @@ class User < ActiveRecord::Base
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, 
-         :recoverable, :rememberable, :trackable, :validatable
+         :recoverable, :rememberable, :trackable, :validatable,
+         :token_authenticatable, :token_authentication_key => 'authentication_token'
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :username, :name, :password, :password_confirmation, :remember_me
@@ -22,8 +23,15 @@ class User < ActiveRecord::Base
   has_and_belongs_to_many :blind_readable_sessions, :class_name => 'Session', :join_table => 'readers_sessions'
   has_and_belongs_to_many :validatable_sessions, :class_name => 'Session', :join_table => 'validators_sessions'
 
+  before_save :ensure_authentication_token
+  before_save :reset_authentication_token_on_password_change
+
   before_destroy do
     self.roles.destroy_all
+  end
+
+  def reset_authentication_token_on_password_change
+    self.reset_authentication_token if self.encrypted_password_changed?
   end
 
   def email_required?
