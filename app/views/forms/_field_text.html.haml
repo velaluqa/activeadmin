@@ -1,6 +1,6 @@
 = label_tag(field['id'], field['label'].html_safe, :class => 'control-label')
 .controls
   - value, fixed_value_hash = fixed_value(field, data_hash)
-  - value = value_for_reopened_case(field, @case) if(@case.state == :reopened_in_progress and value.nil?)
+  - value = value_for_reopened_case(field, @case) if(@case.state == :reopened_in_progress and value.nil?) unless (defined?(placeholder) and placeholder)
   = text_area_tag(field['id'], value, { :class => input_size }.merge(validators_hash(field)).merge(fixed_value_hash))
   %p.help-block
