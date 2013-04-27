@@ -93,7 +93,7 @@
                   %h3.form-group-index.pull-left
                 - repeatable_field = field.clone
                 - repeatable_field[:is_repeatable] = true
-                = render "forms/field_#{field['type']}", :field => repeatable_field, :input_size => 'input-xlarge', :data_hash => @data_hash
+                = render "forms/field_#{field['type']}", :field => repeatable_field, :input_size => 'input-xlarge', :data_hash => @data_hash, :placeholder => true
               .dark-muted.form-field-description= (field['description'].nil? ? '' : field['description'].html_safe)
               - if(first_field)
                 - first_field = false
