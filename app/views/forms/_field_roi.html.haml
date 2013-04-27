@@ -7,7 +7,7 @@
     - if (defined?(placeholder) and placeholder)
       - roi_value = nil
     - else
-      - roi_value = value_for_reopened_case(field, @case) unless 
+      - roi_value = value_for_reopened_case(field, @case)
     - unless roi_value.nil?
       - if roi_value.is_a?(String)
         - selected_value = [roi_value]
