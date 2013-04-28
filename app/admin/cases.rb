@@ -15,6 +15,37 @@ ActiveAdmin.register Case do
       end_of_association_chain.accessible_by(current_ability).includes(:patient)
     end
 
+    def generate_patients_options
+      Study.all.map do |study|
+        sessions = study.sessions.accessible_by(current_ability)
+        
+        sessions_optgroups = sessions.map do |session|
+          patients = session.patients.accessible_by(current_ability)
+          next if patients.empty?
+          
+          patient_options = patients.map do |patient|
+            {:id => patient.id, :text => patient.subject_id}
+          end
+
+          {:text => session.name, :children => patient_options}
+        end
+
+        {:text => study.name, :children => sessions_optgroups}
+      end
+    end
+    def generate_patients_options_map(patients_options)
+      patients_options_map = {}
+      patients_options.each do |study|
+        study[:children].each do |session|
+          session[:children].each do |patient|
+            patients_options_map[patient[:id]] = patient[:text]
+          end
+        end
+      end
+
+      patients_options_map
+    end
+
     def index
       if(params[:q] and
          params[:q][:patient_id_in].respond_to?(:length) and
@@ -40,6 +71,14 @@ ActiveAdmin.register Case do
     end
   end
 
+  # this is a "fake" sidebar entry, which is only here to ensure that our data array for the advanced patient filter is rendered to the index page, even if it is empty
+  # the resulting sidebar is hidden by the advanced filters javascript
+  sidebar :advanced_filter_data, :only => :index do
+    patients_select2_data = controller.generate_patients_options
+    patients_options_map = controller.generate_patients_options_map(patients_select2_data)
+    render :partial => 'admin/cases/advanced_filter_data', :locals => {:patients_select2_data => patients_select2_data, :patients_options_map => patients_options_map, :selected_patients => (params[:q].nil? ? [] : params[:q][:patient_id_in])}
+  end
+  
   index do
     selectable_column
     column :id
@@ -154,8 +193,7 @@ ActiveAdmin.register Case do
 
   # filters
   filter :id
-  filter :session, :collection => Proc.new { Session.accessible_by(current_ability).order('id ASC') }
-  filter :patient, :collection => Proc.new { Patient.accessible_by(current_ability).order('id ASC') }
+  filter :patient, :collection => []
   filter :position
   filter :images
   filter :case_type
@@ -398,26 +436,5 @@ ActiveAdmin.register Case do
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'case', :audit_trail_view_id => resource.id))
-  end
-
-  sidebar :advanced_filters, :only => :index do
-    patients_select2_data = Study.all.map do |study|
-      sessions = study.sessions.accessible_by(current_ability)
-      
-      sessions_optgroups = sessions.map do |session|
-        patients = session.patients.accessible_by(current_ability)
-        next if patients.empty?
-        
-        patient_options = patients.map do |patient|
-          {:id => patient.id, :text => patient.subject_id}
-        end
-
-        {:text => session.name, :children => patient_options}
-      end
-
-      {:text => study.name, :children => sessions_optgroups}
-    end
-
-    render :partial => 'admin/cases/advanced_filters_sidebar', :locals => {:patients_select2_data => patients_select2_data}
   end
 end

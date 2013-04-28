@@ -1,7 +1,23 @@
+hide_fake_sidebar_entry = ->
+  $('#advanced_filter_data_sidebar_section').hide()
+
+replace_stock_patient_filter = ->
+  $('#q_patient_id').replaceWith('<input id="q_patient_id" type="hidden" name="q[patient_id_in][]" style="width: 100%"/>')
+
 $(document).ready ->
-  $('#aq_patient_id').select2({
+  hide_fake_sidebar_entry()
+  replace_stock_patient_filter()
+  
+  $('#q_patient_id').select2({
     multiple: true
     placeholder: 'Please select patients'
     allowClear: true
-    data: { results: patients_select2_data }
+    data: patients_select2_data
+    initSelection: (element, callback) ->
+      values = element.val().split(',')
+      selection = ({id: value, text: patients_options_map[value]} for value in values when patients_options_map[value]?)
+
+      callback(selection)
     })
+
+  $('#q_patient_id').select2('val', selected_patients)
