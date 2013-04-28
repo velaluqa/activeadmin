@@ -139,7 +139,7 @@ ActiveAdmin.register Form do
 
   form do |f|
     f.inputs 'Details' do
-      f.input :session, :collection => current_user.sessions, :include_blank => Ability.can_manage_template_forms?(current_user)
+      f.input :session, :collection => Session.accessible_by(current_ability).order('id ASC'), :include_blank => Ability.can_manage_template_forms?(current_user)
       f.input :name
       f.input :description
     end

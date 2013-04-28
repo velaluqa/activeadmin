@@ -33,11 +33,15 @@ ActiveAdmin.register Role do
   end
 
   form do |f|
+<<<<<<< HEAD
     subjects = [["System", nil]] + Session.all.map{|s| ["Session: #{s.name}", "session_#{s.id}"]}
     roles = {}
     Role::ROLE_SYMS.each_with_index do |role_sym, index|
       roles[Role::ROLE_NAMES[index]] = role_sym
     end
+=======
+    subjects = [["System", nil]] + Session.all.map{|s| ["Session: #{s.name}", "session_#{s.id}"]} + Study.all.map{|s| ["Study: #{s.name}", "study_#{s.id}"]}
+>>>>>>> 0b9bf63... Add the ability to assign the manager role at study level, which means the user is automatically a manager for all session in that study (closes #465)
 
     f.inputs 'Role details' do
       f.input :user, :required => true
