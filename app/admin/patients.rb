@@ -11,7 +11,7 @@ ActiveAdmin.register Patient do
 
   index do
     selectable_column
-    column :center
+    column :center, :sortabel => :center_id
     column :subject_id
     
     customizable_default_actions do |resource|
