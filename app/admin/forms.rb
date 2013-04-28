@@ -45,14 +45,14 @@ ActiveAdmin.register Form do
 
   index do
     selectable_column
-    column :name do |form|
+    column :name, :sortable => :name do |form|
       link_to form.name, admin_form_path(form)
     end
     column :description
-    column :state do |form|
+    column :state, :sortable => :state do |form|
       form.state.to_s.camelize
     end
-    column :session
+    column :session, :sortable => :session_id
     column :configuration do |form|
       if(form.has_configuration?)
         status_tag('Available', :ok)
