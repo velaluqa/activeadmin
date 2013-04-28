@@ -12,7 +12,7 @@ ActiveAdmin.register Case do
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
+      end_of_association_chain.accessible_by(current_ability).includes(:patient)
     end
 
     def update
@@ -31,14 +31,14 @@ ActiveAdmin.register Case do
   index do
     selectable_column
     column :id
-    column :session, :sortable => :session_id
+    column :session, :sortable => 'cases.session_id'
     column :position
-    column :patient do |c|
+    column :patient, :sortable => 'patients.subject_id' do |c|
       link_to(c.patient.subject_id, admin_patient_path(c.patient)) unless c.patient.nil?
     end
     column :images
     column :case_type
-    column :flag do |c|
+    column :flag, :sortable => :flag do |c|
       case c.flag
       when :regular
         status_tag('Regular', :ok)
@@ -48,7 +48,7 @@ ActiveAdmin.register Case do
         status_tag('Reader Testing', :warning)
       end
     end
-    column :state do |c|
+    column :state, :sortable => :state do |c|
       case c.state
       when :unread
         status_tag('Unread', :error)
