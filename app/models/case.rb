@@ -26,7 +26,7 @@ class Case < ActiveRecord::Base
   # so we always get results sorted by position, not by row id
   default_scope order('position ASC')
 
-  STATE_SYMS = [:unread, :in_progress, :read, :reopened, :reopened_in_progress]
+  STATE_SYMS = [:unread, :in_progress, :read, :reopened, :reopened_in_progress, :postponed]
 
   def self.state_sym_to_int(sym)
     return Case::STATE_SYMS.index(sym)
