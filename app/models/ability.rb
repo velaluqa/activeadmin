@@ -14,7 +14,7 @@ class Ability
       can :manage, Role
       can :manage, Study
       can [:create, :read, :edit, :destroy], Session
-      can :manage, Form, ['session_id IS NULL'] do |form|
+      can :manage, Form, ['forms.session_id IS NULL'] do |form|
         form.is_template?
       end
     end
@@ -37,12 +37,12 @@ class Ability
     end
 
     # Session Admin
-    can :manage, Session, ['id IN '+SESSION_ROLES_SUBQUERY, user.id] do |session|
+    can :manage, Session, ['sessions.id IN '+SESSION_ROLES_SUBQUERY, user.id] do |session|
       !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?) or
         (session.study and !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?))
     end
 
-    can :manage, Case, ['session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |c|
+    can :manage, Case, ['cases.session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |c|
       can? :manage, c.session
     end
     # possible record query for mongoid: 
@@ -57,10 +57,10 @@ class Ability
     end
 
     can :create, Form
-    can :read, Form, ['session_id IS NULL'] do |form|
+    can :read, Form, ['forms.session_id IS NULL'] do |form|
       form.is_template?
     end
-    can :manage, Form, ['session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |form|
+    can :manage, Form, ['forms.session_id IN '+SESSION_ROLES_SUBQUERY, user.id] do |form|
       can? :manage, form.session
     end
 
@@ -76,5 +76,5 @@ class Ability
 
   protected
   APP_ADMIN_SUBQUERY = 'EXISTS(SELECT id FROM roles WHERE subject_type IS NULL and subject_id IS NULL AND role = 0 AND user_id = ?)'
-  SESSION_ROLES_SUBQUERY = '(SELECT subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE \'Session\' AND role = 0 AND user_id = ?)'
+  SESSION_ROLES_SUBQUERY = '(SELECT roles.subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE \'Session\' AND roles.role = 0 AND roles.user_id = ?)'
 end
