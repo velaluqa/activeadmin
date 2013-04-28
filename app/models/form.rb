@@ -55,7 +55,7 @@ class Form < ActiveRecord::Base
     copied_form.state = :draft
     copied_form.save
 
-    GitConfigRepository.new.update_config_file(copied_form.relative_config_file_path, self.config_file_path, current_user, "Copied form #{self.id} into session #{session.id}")
+    GitConfigRepository.new.update_config_file(copied_form.relative_config_file_path, self.config_file_path, current_user, "Copied form #{self.id} into session #{session.id}") if self.has_configuration?
 
     copied_form
   end
