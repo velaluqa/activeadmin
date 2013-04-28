@@ -60,6 +60,8 @@ ActiveAdmin.register Case do
         status_tag('Reopened', :warning, :label => link_to('Reopened', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       when :reopened_in_progress
         status_tag('Reopened In Progress', :warning, :label => link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
+      when :postponed
+        status_tag('Postponed', :warning)
       end
     end
     column :reader do |c|
@@ -357,6 +359,29 @@ ActiveAdmin.register Case do
     end
 
     redirect_to(:back, :notice => 'Selected cases have been canceled.')
+  end
+
+  batch_action :postpone do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+      next unless c.state == :unread
+
+      c.state = :postponed
+      c.save
+    end
+
+    redirect_to(:back, :notice => 'Selected cases have been postponed.')
+  end
+  batch_action :unpostpone do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+      next unless c.state == :postponed
+
+      c.state = :unread
+      c.save
+    end
+
+    redirect_to(:back, :notice => 'Selected cases have been "unpostponed".')
   end
 
   action_item :only => :show do
