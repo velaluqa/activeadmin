@@ -20,7 +20,7 @@ ActiveAdmin.register Session do
     end
 
     def update
-      if params[:session][:study_id] != Session.find(params[:id]).study_id
+      if(params[:session][:study_id] and params[:session][:study_id] != Session.find(params[:id]).study_id)
         flash[:error] = 'A session cannot be moved to a new study!'
         redirect_to :action => :show
         return
@@ -33,17 +33,17 @@ ActiveAdmin.register Session do
   index do
     selectable_column
 
-    column :name do |session|
+    column :name, :sortable => :name do |session|
       link_to session.name, admin_session_path(session)
     end
-    column :study
+    column :study, :sortable => :study_id
     column 'Readers' do |session|
       session.readers.size
     end
     column 'Validators' do |session|
       session.validators.size
     end
-    column :state do |session|
+    column :state, :sortable => :state do |session|
       session.state.to_s.camelize
     end
     column 'Progress' do |session|

@@ -2,7 +2,7 @@ ActiveAdmin.register Study do
 
   index do
     selectable_column
-    column :name do |study|
+    column :name, :sortable => :name do |study|
       link_to study.name, admin_study_path(study)
     end
     

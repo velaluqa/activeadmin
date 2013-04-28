@@ -3,3 +3,5 @@
 //= require jquery.sortable
 //= require reorder_case_list
 
+//= require select2
+//= require cases_advanced_filters

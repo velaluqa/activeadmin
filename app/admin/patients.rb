@@ -14,7 +14,7 @@ ActiveAdmin.register Patient do
 
   index do
     selectable_column
-    column :session
+    column :session, :sortable => :session_id
     column :subject_id
     
     customizable_default_actions do |resource|

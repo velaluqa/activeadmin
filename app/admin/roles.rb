@@ -1,15 +1,15 @@
 ActiveAdmin.register Role do
   index do
     selectable_column
-    column :user
-    column :subject do |role|
+    column :user, :sortable => :user_id
+    column :subject, :sortable => :subject_id do |role|
       if role.subject.nil?
         'System'
       else
         auto_link(role.subject)
       end
     end
-    column :role do |role|
+    column :role, :sortable => :role do |role|
       role.role_name
     end
 
@@ -33,7 +33,7 @@ ActiveAdmin.register Role do
   end
 
   form do |f|
-    subjects = [["System", nil]] + Session.all.map{|s| ["Session: #{s.name}", "session_#{s.id}"]}
+    subjects = [["System", nil]] + Session.all.map{|s| ["Session: #{s.name}", "session_#{s.id}"]} + Study.all.map{|s| ["Study: #{s.name}", "study_#{s.id}"]}
 
     f.inputs 'Role details' do
       f.input :user, :required => true

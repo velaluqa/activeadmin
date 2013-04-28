@@ -98,7 +98,7 @@ ActiveAdmin.register Version do
         status_tag('Case Reopened', :error)
       end
     end
-    column :user do |version|
+    column :user, :sortable => :whodunnit do |version|
       if version.whodunnit.blank?
         'System'
       else

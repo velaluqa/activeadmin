@@ -12,7 +12,50 @@ ActiveAdmin.register Case do
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
+      end_of_association_chain.accessible_by(current_ability).includes(:patient)
+    end
+
+    def generate_patients_options
+      Study.all.map do |study|
+        sessions = study.sessions.accessible_by(current_ability)
+        
+        sessions_optgroups = sessions.map do |session|
+          patients = session.patients.accessible_by(current_ability)
+          next if patients.empty?
+          
+          patient_options = patients.map do |patient|
+            {:id => patient.id, :text => patient.subject_id}
+          end
+
+          {:text => session.name, :children => patient_options}
+        end
+
+        {:text => study.name, :children => sessions_optgroups}
+      end
+    end
+    def generate_patients_options_map(patients_options)
+      patients_options_map = {}
+      patients_options.each do |study|
+        study[:children].each do |session|
+          session[:children].each do |patient|
+            patients_options_map[patient[:id]] = patient[:text]
+          end
+        end
+      end
+
+      patients_options_map
+    end
+
+    def index
+      if(params[:q] and
+         params[:q][:patient_id_in].respond_to?(:length) and
+         params[:q][:patient_id_in].length == 1 and
+         params[:q][:patient_id_in][0].include?(','))
+        params[:q][:patient_id_in] = params[:q][:patient_id_in][0].split(',')
+      end
+
+      pp params
+      index!
     end
 
     def update
@@ -28,17 +71,25 @@ ActiveAdmin.register Case do
     end
   end
 
+  # this is a "fake" sidebar entry, which is only here to ensure that our data array for the advanced patient filter is rendered to the index page, even if it is empty
+  # the resulting sidebar is hidden by the advanced filters javascript
+  sidebar :advanced_filter_data, :only => :index do
+    patients_select2_data = controller.generate_patients_options
+    patients_options_map = controller.generate_patients_options_map(patients_select2_data)
+    render :partial => 'admin/cases/advanced_filter_data', :locals => {:patients_select2_data => patients_select2_data, :patients_options_map => patients_options_map, :selected_patients => (params[:q].nil? ? [] : params[:q][:patient_id_in])}
+  end
+  
   index do
     selectable_column
     column :id
-    column :session, :sortable => :session_id
+    column :session, :sortable => 'cases.session_id'
     column :position
-    column :patient do |c|
+    column :patient, :sortable => 'patients.subject_id' do |c|
       link_to(c.patient.subject_id, admin_patient_path(c.patient)) unless c.patient.nil?
     end
     column :images
     column :case_type
-    column :flag do |c|
+    column :flag, :sortable => :flag do |c|
       case c.flag
       when :regular
         status_tag('Regular', :ok)
@@ -48,7 +99,7 @@ ActiveAdmin.register Case do
         status_tag('Reader Testing', :warning)
       end
     end
-    column :state do |c|
+    column :state, :sortable => :state do |c|
       case c.state
       when :unread
         status_tag('Unread', :error)
@@ -60,6 +111,8 @@ ActiveAdmin.register Case do
         status_tag('Reopened', :warning, :label => link_to('Reopened', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       when :reopened_in_progress
         status_tag('Reopened In Progress', :warning, :label => link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
+      when :postponed
+        status_tag('Postponed', :warning)
       end
     end
     column :reader do |c|
@@ -140,8 +193,7 @@ ActiveAdmin.register Case do
 
   # filters
   filter :id
-  filter :session, :collection => Proc.new { Session.accessible_by(current_ability).order('id ASC') }
-  filter :patient, :collection => Proc.new { Patient.accessible_by(current_ability).order('id ASC') }
+  filter :patient, :collection => []
   filter :position
   filter :images
   filter :case_type
@@ -357,6 +409,29 @@ ActiveAdmin.register Case do
     end
 
     redirect_to(:back, :notice => 'Selected cases have been canceled.')
+  end
+
+  batch_action :postpone do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+      next unless c.state == :unread
+
+      c.state = :postponed
+      c.save
+    end
+
+    redirect_to(:back, :notice => 'Selected cases have been postponed.')
+  end
+  batch_action :unpostpone do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+      next unless c.state == :postponed
+
+      c.state = :unread
+      c.save
+    end
+
+    redirect_to(:back, :notice => 'Selected cases have been "unpostponed".')
   end
 
   action_item :only => :show do

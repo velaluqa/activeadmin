@@ -45,14 +45,14 @@ ActiveAdmin.register Form do
 
   index do
     selectable_column
-    column :name do |form|
+    column :name, :sortable => :name do |form|
       link_to form.name, admin_form_path(form)
     end
     column :description
-    column :state do |form|
+    column :state, :sortable => :state do |form|
       form.state.to_s.camelize
     end
-    column :session
+    column :session, :sortable => :session_id
     column :configuration do |form|
       if(form.has_configuration?)
         status_tag('Available', :ok)
@@ -139,7 +139,7 @@ ActiveAdmin.register Form do
 
   form do |f|
     f.inputs 'Details' do
-      f.input :session, :collection => current_user.sessions, :include_blank => Ability.can_manage_template_forms?(current_user)
+      f.input :session, :collection => Session.accessible_by(current_ability).order('id ASC'), :include_blank => Ability.can_manage_template_forms?(current_user)
       f.input :name
       f.input :description
     end
