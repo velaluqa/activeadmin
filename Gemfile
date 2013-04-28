@@ -76,3 +76,6 @@ gem 'kwalify'
 
 # diff library for config changes display
 gem 'diffy'
+
+# select2 gem for integration with asset pipeline
+gem 'select2-rails'

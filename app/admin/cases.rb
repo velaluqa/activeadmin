@@ -15,6 +15,18 @@ ActiveAdmin.register Case do
       end_of_association_chain.accessible_by(current_ability).includes(:patient)
     end
 
+    def index
+      if(params[:q] and
+         params[:q][:patient_id_in].respond_to?(:length) and
+         params[:q][:patient_id_in].length == 1 and
+         params[:q][:patient_id_in][0].include?(','))
+        params[:q][:patient_id_in] = params[:q][:patient_id_in][0].split(',')
+      end
+
+      pp params
+      index!
+    end
+
     def update
       c = Case.find(params[:id])
       unless c.state == :unread and c.form_answer.nil?
@@ -386,5 +398,26 @@ ActiveAdmin.register Case do
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'case', :audit_trail_view_id => resource.id))
+  end
+
+  sidebar :advanced_filters, :only => :index do
+    patients_select2_data = Study.all.map do |study|
+      sessions = study.sessions.accessible_by(current_ability)
+      
+      sessions_optgroups = sessions.map do |session|
+        patients = session.patients.accessible_by(current_ability)
+        next if patients.empty?
+        
+        patient_options = patients.map do |patient|
+          {:id => patient.id, :text => patient.subject_id}
+        end
+
+        {:text => session.name, :children => patient_options}
+      end
+
+      {:text => study.name, :children => sessions_optgroups}
+    end
+
+    render :partial => 'admin/cases/advanced_filters_sidebar', :locals => {:patients_select2_data => patients_select2_data}
   end
 end

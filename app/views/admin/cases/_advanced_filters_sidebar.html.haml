@@ -1,0 +1,11 @@
+:javascript
+  patients_select2_data = #{patients_select2_data.to_json}
+
+%form.filter_form
+  .filter_form_field_filter_select
+    %label.label{:for => 'aq_patient_id'} Patients
+    %input#aq_patient_id{:name => 'q[patient_id_in][]', :style => 'width: 100%;', :type => 'hidden'}
+
+  .buttons
+    %input{:name => 'commit', :type => 'submit', :value => 'Filter'}
+    %a.clear_filters_btn{:href => '#'} Clear Filters
