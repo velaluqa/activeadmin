@@ -21,8 +21,7 @@ ActiveAdmin.register Case do
         
         sessions_optgroups = sessions.map do |session|
           patients = session.patients.accessible_by(current_ability)
-          next if patients.empty?
-          
+
           patient_options = patients.map do |patient|
             {:id => patient.id, :text => patient.subject_id}
           end
