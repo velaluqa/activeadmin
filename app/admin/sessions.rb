@@ -131,7 +131,7 @@ ActiveAdmin.register Session do
         current = {}
         if session.has_configuration?
           current_config = session.current_configuration 
-          if current_config.nil?
+          if(current_config.nil? or not current_config.is_a?(Hash))
             current[:configuration] = :invalid
           else
             current[:configuration] = CodeRay.scan(JSON::pretty_generate(ConfigDisplayFilters::filter_session_config(current_config)), :json).div(:css => :class).html_safe
