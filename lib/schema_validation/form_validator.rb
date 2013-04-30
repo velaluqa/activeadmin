@@ -26,6 +26,7 @@ module SchemaValidation
           errors << Kwalify::ValidationError.new('Only \'calculated\' fields can have a \'calculation_function\'', path) unless(value['calculation_function'].nil? or value['type'] == 'calculated')
           errors << Kwalify::ValidationError.new('Only \'calculated\' fields can specify \'store_calculated_value\'', path) unless(value['store_calculated_value'].nil? or value['type'] == 'calculated')
           errors << Kwalify::ValidationError.new('Fields of type \'calculated\' must specify a \'calculation_function\'', path) if(value['type'] == 'calculated' and value['calculation_function'].nil?)
+          errors << Kwalify::ValidationError.new('Only \'group\' fields can specify \'belongs_to_repeatable\'', path) if(value['type'] != 'group' and value['belongs_to_repeatable'])
           unless value['selected_option'].nil?
             case value['type']
             when 'select', 'roi'

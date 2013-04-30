@@ -251,7 +251,7 @@ class Form < ActiveRecord::Base
           end
           repeatable << {'type' => 'include_divider'}
 
-          repeatables << {:id => field['repeat']['prefix'], :min => (field['repeat']['min'].nil? ? 0 : field['repeat']['min']), :max => field['repeat']['max'], :config => repeatable}
+          repeatables << {:id => field['repeat']['prefix'], :label => field['repeat']['label'], :min => (field['repeat']['min'].nil? ? 0 : field['repeat']['min']), :max => field['repeat']['max'], :config => repeatable}
 
           full_config << {'type' => 'include_start', 'label' => field['repeat']['label'], 'id' => field['repeat']['prefix'], 'max' => field['repeat']['max']}
 

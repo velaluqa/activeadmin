@@ -33,6 +33,10 @@
           .form-actions.form-group-header
             %a.offset-anchor{:id => 'group-heading-'+field['id']}
             %h3.pull-left.form-group-heading= field['label']
+            - unless(field['belongs_to_repeatable'].nil?)
+              - repeatable = @repeatables_map[field['belongs_to_repeatable']]
+              - next if repeatable.nil?
+              %a.btn.add-repeat-btn.pull-right{:'data-id' => repeatable[:id], :'data-max-repeats' => repeatable[:max], :href => '#'}= "Add #{repeatable[:label]}"
         - else
           .row-fluid.form-row-padding
             .control-group.pull-left
