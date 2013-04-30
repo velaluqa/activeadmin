@@ -35,6 +35,13 @@ ActiveAdmin.register User do
         status_tag("Present", :ok)
       end
     end
+    column :locked do |user|
+      if(user.access_locked?)
+        status_tag('Locked', :error)
+      else
+        status_tag('Unlocked', :ok)
+      end
+    end
     default_actions
   end
 
@@ -55,6 +62,14 @@ ActiveAdmin.register User do
           "Never"
         else
           "#{pretty_format(user.last_sign_in_at)} from #{user.last_sign_in_ip}"
+        end
+      end
+      row :failed_attempts
+      row :locked do
+        if(user.access_locked?)
+          status_tag("Locked at #{pretty_format(user.locked_at)}", :error)
+        else
+          status_tag('Unlocked', :ok)
         end
       end
       row :public_key do
@@ -126,6 +141,17 @@ ActiveAdmin.register User do
 
   action_item :only => :show do
     link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will invalidate all past signatures by this user. Are you sure you want to do this?'
+  end
+
+  member_action :unlock, :method => :get do
+    authorize! :manage, :system
+
+    resource.unlock_access! if resource.access_locked?
+    redirect_to({:action => :show}, :notice => 'User unlocked!')
+  end
+
+  action_item :only => :show do
+    link_to 'Unlock', unlock_admin_user_path(resource) if(can? :manage, :system and resource.access_locked?)
   end
 
   action_item :only => :show do
