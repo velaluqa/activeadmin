@@ -46,14 +46,15 @@ ActiveAdmin.register Case do
     end
 
     def index
-      if(params[:q] and
+      if(params[:q] and params[:q][:patient_id_in] == [""])
+        params[:q].delete(:patient_id_in)
+      elsif(params[:q] and
          params[:q][:patient_id_in].respond_to?(:length) and
          params[:q][:patient_id_in].length == 1 and
          params[:q][:patient_id_in][0].include?(','))
         params[:q][:patient_id_in] = params[:q][:patient_id_in][0].split(',')
       end
 
-      pp params
       index!
     end
 
