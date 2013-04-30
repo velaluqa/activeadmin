@@ -667,8 +667,8 @@ $(document).ready ->
     table_header_row = $('#print_annotated_images_table_header_row')
     
     for own series, images of annotated_images
-      for own image, checksum of images
-        table_header_row.after($('<tr><td>'+image+'</td><td>'+checksum+'</td></tr>'))
+      for image in images
+        table_header_row.after($('<tr><td>'+image['path']+'</td><td>'+image['checksum']+'</td></tr>'))
     
   $('.select-roi').change ->
     update_allowed_rois($(this))
