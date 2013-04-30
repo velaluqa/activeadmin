@@ -21,5 +21,21 @@
           - @repeatables.each do |repeatable|
             %li
               %a.add-repeat-btn{:'data-id' => repeatable[:id], :'data-max-repeats' => repeatable[:max], :href => '#'}= repeatable[:label]
+      - unless @passive_series_list.empty?
+        %li.divider
+        %li.dropdown
+          %a.dropdown-toggle{:'data-toggle' => 'dropdown', :href => '#'}
+            Passive Series..
+            %span.caret
+          %ul.dropdown-menu
+            - @passive_series_list.each do |passive_case|
+              - next if (passive_case[:series].nil? or passive_case[:series].empty?)
+              %li.dropdown-submenu
+                %a{:tabindex => -1, :href => '#'}= passive_case[:case_name]
+                %ul.dropdown-menu
+                  - passive_case[:series].each do |series|
+                    %li
+                      - series_uid = "#{passive_case[:case_name]}/#{series}"
+                      %a.roi_link{:href => '#', :onclick => "PharmTraceAPI.jumpToImage('#{series_uid}', 0); return false;"}= series
     %button#refresh-rois-btn.btn.pull-right{:type => 'button', :'data-loading-text' => 'Refreshing...'} Refresh Measurements
     %button#recalc-btn.btn.pull-right{:type => 'button', :'data-loading-text' => 'Recalculating...'} Recalculate
