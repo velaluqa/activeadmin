@@ -18,9 +18,8 @@
           Add..
           %span.caret
         %ul.dropdown-menu
-          - @form_config.each do |field|
-            - if(field['type'] == 'include_start')
-              %li
-                %a.add-repeat-btn{:'data-id' => field['id'], :'data-max-repeats' => field['max'], :href => '#'}= field['label']
+          - @repeatables.each do |repeatable|
+            %li
+              %a.add-repeat-btn{:'data-id' => repeatable[:id], :'data-max-repeats' => repeatable[:max], :href => '#'}= repeatable[:label]
     %button#refresh-rois-btn.btn.pull-right{:type => 'button', :'data-loading-text' => 'Refreshing...'} Refresh Measurements
     %button#recalc-btn.btn.pull-right{:type => 'button', :'data-loading-text' => 'Recalculating...'} Recalculate

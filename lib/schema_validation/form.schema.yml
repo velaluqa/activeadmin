@@ -23,6 +23,8 @@ sequence:
         type: str
       "store_calculated_value":
         type: bool
+      "belongs_to_repeatable":
+        type: str
       "roi_values":
         type: map
         name: field_values
