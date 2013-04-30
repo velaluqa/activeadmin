@@ -46,6 +46,15 @@ ActiveAdmin.register Case do
 
       patients_options_map
     end
+    def generate_selected_patients
+      selected_patients = []
+      selected_patients += params[:q][:patient_id_in] unless(params[:q].nil? or params[:q][:patient_id_in].nil?)
+
+      selected_patients += params[:q][:session_id_in].map {|s_id| "session_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:session_id_in].nil?)
+      selected_patients += params[:q][:session_study_id_in].map {|s_id| "study_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:session_study_id_in].nil?)
+
+      return selected_patients
+    end
 
     def index
       if(params[:q] and params[:q][:patient_id_in] == [""])
@@ -96,7 +105,7 @@ ActiveAdmin.register Case do
   sidebar :advanced_filter_data, :only => :index do
     patients_select2_data = controller.generate_patients_options
     patients_options_map = controller.generate_patients_options_map(patients_select2_data)
-    render :partial => 'admin/cases/advanced_filter_data', :locals => {:patients_select2_data => patients_select2_data, :patients_options_map => patients_options_map, :selected_patients => (params[:q].nil? ? [] : params[:q][:patient_id_in])}
+    render :partial => 'admin/cases/advanced_filter_data', :locals => {:patients_select2_data => patients_select2_data, :patients_options_map => patients_options_map, :selected_patients => controller.generate_selected_patients}
   end
   
   index do
