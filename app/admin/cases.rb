@@ -12,7 +12,7 @@ ActiveAdmin.register Case do
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability).includes(:patient)
+      end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:session)
     end
 
     def generate_patients_options
@@ -26,16 +26,18 @@ ActiveAdmin.register Case do
             {:id => patient.id, :text => patient.subject_id}
           end
 
-          {:text => session.name, :children => patient_options}
+          {:id => "session_#{session.id.to_s}", :text => session.name, :children => patient_options}
         end
 
-        {:text => study.name, :children => sessions_optgroups}
+        {:id => "study_#{study.id.to_s}", :text => study.name, :children => sessions_optgroups}
       end
     end
     def generate_patients_options_map(patients_options)
       patients_options_map = {}
       patients_options.each do |study|
+        patients_options_map[study[:id]] = study[:text]
         study[:children].each do |session|
+          patients_options_map[session[:id]] = session[:text]
           session[:children].each do |patient|
             patients_options_map[patient[:id]] = patient[:text]
           end
@@ -53,6 +55,24 @@ ActiveAdmin.register Case do
          params[:q][:patient_id_in].length == 1 and
          params[:q][:patient_id_in][0].include?(','))
         params[:q][:patient_id_in] = params[:q][:patient_id_in][0].split(',')
+      end
+
+      if(params[:q] and params[:q][:patient_id_in].respond_to?(:each)) 
+        patient_id_in = []
+
+        params[:q][:patient_id_in].each do |id|         
+          if(id =~ /^session_([0-9]*)/)
+            params[:q][:session_id_in] ||= []
+            params[:q][:session_id_in] << $1
+          elsif(id =~ /^study_([0-9]*)/)
+            params[:q][:session_study_id_in] ||= []
+            params[:q][:session_study_id_in] << $1
+          else
+            patient_id_in << id
+          end
+        end
+
+        params[:q][:patient_id_in] = patient_id_in
       end
 
       index!
