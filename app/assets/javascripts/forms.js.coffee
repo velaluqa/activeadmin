@@ -167,11 +167,11 @@ pretty_print_value = (value, field) ->
     value = location+((k+": "+v) for own k,v of value when k != 'location').join("\n")
   else if(field['type'] == 'select') or ((field['type'] == 'roi') and (typeof value == 'string'))
     answer_option = field['values'][value]
-    value = if answer_option? and answer_option.length > 0 then answer_option + ' (' + value + ')' else value
+    value = if answer_option? and answer_option.length > 0 then answer_option else value
   else if(field['type'] == 'select_multiple')
     value = for v in value
       option = field['values'][v]
-      (if option? and option.length > 0 then option + ' (' + v + ')' else v)
+      (if option? and option.length > 0 then option else v)
     value = value.join("\n")
 
   return value
@@ -667,8 +667,8 @@ $(document).ready ->
     table_header_row = $('#print_annotated_images_table_header_row')
     
     for own series, images of annotated_images
-      for own image, checksum of images
-        table_header_row.after($('<tr><td>'+image+'</td><td>'+checksum+'</td></tr>'))
+      for image in images
+        table_header_row.after($('<tr><td>'+image['path']+'</td><td>'+image['checksum']+'</td></tr>'))
     
   $('.select-roi').change ->
     update_allowed_rois($(this))

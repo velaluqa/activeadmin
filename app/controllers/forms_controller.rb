@@ -24,6 +24,8 @@ class FormsController < ApplicationController
 
     @show_previous_results = false
     @show_previous_results = true if params[:previous_results] == 'true'
+
+    @passive_series_list = construct_passive_series_list
     
     return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
   end
@@ -59,6 +61,7 @@ class FormsController < ApplicationController
     @case.patient = patient
 
     @previous_results = [{:images => 'preview'}]
+    @passive_series_list = []
 
     render :show
   end
@@ -109,6 +112,26 @@ protected
     previous_results << {'images' => @case.images}
 
     return previous_results
+  end
+
+  def construct_passive_series_list
+    passive_series_list = []
+
+    if(@case and @case.session)
+      configuration = @case.session.locked_configuration
+
+      previous_cases = @case.patient.cases.where('position < ?', @case.position)
+      previous_cases.each do |c|
+        next if configuration['types'][c.case_type].nil?
+
+        case_series_map = {:case_name => c.name, :series => configuration['types'][c.case_type]['screen_layout']['active']}
+        case_series_map[:series] ||= []
+        passive_series_list << case_series_map
+      end
+    end
+    pp passive_series_list
+
+    return passive_series_list
   end
 
   def authorize_user_for_case

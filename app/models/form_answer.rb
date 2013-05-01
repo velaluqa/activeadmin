@@ -259,9 +259,9 @@ class FormAnswer
     if (answer.respond_to?(:'empty?') and answer.empty?)
       "None given"
     elsif (field['values'][answer].nil? and answer.is_a?(Float))
-      "#{field['values'][answer.to_i.to_s]} (#{answer})"          
+      "#{field['values'][answer.to_i.to_s]}"
     else
-      "#{field['values'][answer]} (#{answer})"
+      "#{field['values'][answer]}"
     end          
   end
 
