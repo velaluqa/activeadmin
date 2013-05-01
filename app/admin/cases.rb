@@ -12,33 +12,33 @@ ActiveAdmin.register Case do
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:session)
+      end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:center)
     end
 
     def generate_patients_options
       Study.all.map do |study|
-        sessions = study.sessions.accessible_by(current_ability)
+        centers = study.centers.accessible_by(current_ability)
         
-        sessions_optgroups = sessions.map do |session|
-          patients = session.patients.accessible_by(current_ability)
+        centers_optgroups = centers.map do |center|
+          patients = center.patients.accessible_by(current_ability)
 
           patient_options = patients.map do |patient|
             {:id => patient.id, :text => patient.subject_id}
           end
 
-          {:id => "session_#{session.id.to_s}", :text => session.name, :children => patient_options}
+          {:id => "center_#{center.id.to_s}", :text => center.name, :children => patient_options}
         end
 
-        {:id => "study_#{study.id.to_s}", :text => study.name, :children => sessions_optgroups}
+        {:id => "study_#{study.id.to_s}", :text => study.name, :children => centers_optgroups}
       end
     end
     def generate_patients_options_map(patients_options)
       patients_options_map = {}
       patients_options.each do |study|
         patients_options_map[study[:id]] = study[:text]
-        study[:children].each do |session|
-          patients_options_map[session[:id]] = session[:text]
-          session[:children].each do |patient|
+        study[:children].each do |center|
+          patients_options_map[center[:id]] = center[:text]
+          center[:children].each do |patient|
             patients_options_map[patient[:id]] = patient[:text]
           end
         end
@@ -50,8 +50,8 @@ ActiveAdmin.register Case do
       selected_patients = []
       selected_patients += params[:q][:patient_id_in] unless(params[:q].nil? or params[:q][:patient_id_in].nil?)
 
-      selected_patients += params[:q][:session_id_in].map {|s_id| "session_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:session_id_in].nil?)
-      selected_patients += params[:q][:session_study_id_in].map {|s_id| "study_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:session_study_id_in].nil?)
+      selected_patients += params[:q][:center_id_in].map {|s_id| "center_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:center_id_in].nil?)
+      selected_patients += params[:q][:center_study_id_in].map {|s_id| "study_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:center_study_id_in].nil?)
 
       return selected_patients
     end
@@ -70,12 +70,12 @@ ActiveAdmin.register Case do
         patient_id_in = []
 
         params[:q][:patient_id_in].each do |id|         
-          if(id =~ /^session_([0-9]*)/)
-            params[:q][:session_id_in] ||= []
-            params[:q][:session_id_in] << $1
+          if(id =~ /^center_([0-9]*)/)
+            params[:q][:center_id_in] ||= []
+            params[:q][:center_id_in] << $1
           elsif(id =~ /^study_([0-9]*)/)
-            params[:q][:session_study_id_in] ||= []
-            params[:q][:session_study_id_in] << $1
+            params[:q][:center_study_id_in] ||= []
+            params[:q][:center_study_id_in] << $1
           else
             patient_id_in << id
           end
@@ -198,7 +198,7 @@ ActiveAdmin.register Case do
 
   form do |f|
     f.inputs 'Details' do
-      f.input :patient, :collection => f.object.session.patients
+      f.input :patient, :collection => f.object.session.study.all_patients
       f.input :images
       f.input :position
       f.input :case_type

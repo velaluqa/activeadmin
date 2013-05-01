@@ -24,4 +24,8 @@ class Study < ActiveRecord::Base
   def image_storage_path
     self.id.to_s
   end
+
+  def all_patients
+    Patient.where('center_id IN ?', self.centers.map {|c| c.id})
+  end
 end
