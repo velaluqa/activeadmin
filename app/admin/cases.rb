@@ -12,7 +12,7 @@ ActiveAdmin.register Case do
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:center)
+      end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)
     end
 
     def generate_patients_options
@@ -50,8 +50,8 @@ ActiveAdmin.register Case do
       selected_patients = []
       selected_patients += params[:q][:patient_id_in] unless(params[:q].nil? or params[:q][:patient_id_in].nil?)
 
-      selected_patients += params[:q][:center_id_in].map {|s_id| "center_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:center_id_in].nil?)
-      selected_patients += params[:q][:center_study_id_in].map {|s_id| "study_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:center_study_id_in].nil?)
+      selected_patients += params[:q][:patient_center_id_in].map {|s_id| "center_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:patient_center_id_in].nil?)
+      selected_patients += params[:q][:patient_center_study_id_in].map {|s_id| "study_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:patient_center_study_id_in].nil?)
 
       return selected_patients
     end
@@ -71,11 +71,11 @@ ActiveAdmin.register Case do
 
         params[:q][:patient_id_in].each do |id|         
           if(id =~ /^center_([0-9]*)/)
-            params[:q][:center_id_in] ||= []
-            params[:q][:center_id_in] << $1
+            params[:q][:patient_center_id_in] ||= []
+            params[:q][:patient_center_id_in] << $1
           elsif(id =~ /^study_([0-9]*)/)
-            params[:q][:center_study_id_in] ||= []
-            params[:q][:center_study_id_in] << $1
+            params[:q][:patient_center_study_id_in] ||= []
+            params[:q][:patient_center_study_id_in] << $1
           else
             patient_id_in << id
           end
@@ -83,6 +83,7 @@ ActiveAdmin.register Case do
 
         params[:q][:patient_id_in] = patient_id_in
       end
+      pp params
 
       index!
     end

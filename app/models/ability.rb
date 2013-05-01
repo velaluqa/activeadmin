@@ -13,6 +13,11 @@ class Ability
       can :manage, User
       can :manage, Role
       can :manage, Study
+      can :read, Center
+      can :read, Patient
+      can :read, Visit
+      can :read, ImageSeries
+      can :read, Image
       can [:create, :read, :edit, :destroy], Session
       can :manage, Form, ['forms.session_id IS NULL'] do |form|
         form.is_template?

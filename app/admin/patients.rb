@@ -40,7 +40,7 @@ ActiveAdmin.register Patient do
   end
 
   # filters
-  filter :center, :collection => Proc.new { Center.acessibly_by(current_ability).order('id ASC') }
+  filter :center, :collection => Proc.new { Center.accessible_by(current_ability).order('id ASC') }
   filter :subject_id, :label => 'Subject ID'
 
   action_item :only => :show do
