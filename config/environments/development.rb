@@ -49,7 +49,7 @@ StudyServer::Application.configure do
   config.session_configs_directory = config.data_directory + '/' + config.session_configs_subdirectory
   config.study_configs_directory = config.data_directory + '/' + config.study_configs_subdirectory
 
-  config.max_allowed_password_age = 1.week
+  config.max_allowed_password_age = 1.month
 
   config.image_storage_root = config.data_directory + '/images'
   
