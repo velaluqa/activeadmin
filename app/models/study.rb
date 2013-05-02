@@ -69,4 +69,27 @@ class Study < ActiveRecord::Base
     File.exists?(self.config_file_path)
   end
 
+  def semantically_valid?
+    return self.validate == []
+  end
+  def validate
+    return nil unless has_configuration?
+    config = current_configuration
+    return if config.nil?
+
+    validation_errors = run_schema_validation(config)
+    return validation_errors unless validation_errors == []
+
+    return validation_errors
+  end
+
+  protected
+
+  def run_schema_validation(config)
+    validator = SchemaValidation::StudyValidator.new
+    return nil if config.nil?
+
+    validator.validate(config)
+  end
+
 end
