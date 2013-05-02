@@ -4,7 +4,7 @@ require 'schema_validation'
 class Study < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :name
+  attr_accessible :name, :locked_version
 
   has_many :sessions
 
@@ -41,6 +41,15 @@ class Study < ActiveRecord::Base
   def current_configuration
     begin
       config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, nil)
+    rescue SyntaxError => e
+      return nil
+    end
+
+    return config
+  end
+  def locked_configuration
+    begin
+      config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, self.locked_version)
     rescue SyntaxError => e
       return nil
     end
