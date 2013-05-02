@@ -12,6 +12,7 @@ ActiveAdmin.register Visit do
     column :patient
     column :visit_number
     column :visit_type
+    column :visit_date
     
     default_actions
   end
@@ -21,6 +22,7 @@ ActiveAdmin.register Visit do
       row :patient
       row :visit_number
       row :visit_type
+      row :visit_date
       row :image_storage_path
    end
   end

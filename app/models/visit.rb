@@ -24,6 +24,9 @@ class Visit < ActiveRecord::Base
       "#{patient.name}, Visit No. #{visit_number}"
     end
   end
+  def visit_date
+    self.image_series.map {|is| is.imaging_date}.reject {|date| date.nil? }.min
+  end
 
   def previous_image_storage_path
     if(self.previous_changes.include?(:patient_id))
@@ -37,4 +40,5 @@ class Visit < ActiveRecord::Base
   def image_storage_path
     self.patient.image_storage_path + '/' + self.id.to_s
   end
+
 end

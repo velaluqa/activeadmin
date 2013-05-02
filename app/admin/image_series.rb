@@ -15,6 +15,7 @@ ActiveAdmin.register ImageSeries do
     column :patient
     column :visit
     column :name
+    column :imaging_date
     
     default_actions
   end
@@ -25,6 +26,7 @@ ActiveAdmin.register ImageSeries do
       row :visit
       row :name
       row :image_storage_path
+      row :imaging_date
       row 'Viewer' do
         link_to('View in Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'))
       end
@@ -36,6 +38,7 @@ ActiveAdmin.register ImageSeries do
       f.input :patient
       f.input :visit
       f.input :name
+      f.input :imaging_date, :as => :datepicker
     end
 
     f.buttons
@@ -45,6 +48,7 @@ ActiveAdmin.register ImageSeries do
   filter :patient
   filter :visit
   filter :name
+  filter :imaging_date
 
   member_action :viewer, :method => :get do
     @image_series = ImageSeries.find(params[:id])
