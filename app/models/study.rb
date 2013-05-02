@@ -11,6 +11,9 @@ class Study < ActiveRecord::Base
   has_many :roles, :as => :subject
 
   has_many :centers
+  has_many :patients, :through => :centers
+  has_many :visits, :through => :patients
+  has_many :image_series, :through => :patients
 
   validates_presence_of :name
 
