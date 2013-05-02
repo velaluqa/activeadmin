@@ -7,6 +7,7 @@ class ImageSeries < ActiveRecord::Base
   belongs_to :visit
   belongs_to :patient
   has_many :images, :dependent => :destroy
+  has_one :image_series_data
   
   validates_uniqueness_of :name, :scope => :visit_id
   validates_presence_of :name, :patient_id, :imaging_date
@@ -14,6 +15,18 @@ class ImageSeries < ActiveRecord::Base
   scope :not_assigned, where(:visit_id => nil)
 
   before_save :ensure_visit_is_for_patient
+
+  after_create do
+    ImageSeriesData.create(:image_series_id => self.id)
+  end
+
+  before_destroy do
+    ImageSeriesData.destroy_all(:image_series_id => self.id)
+  end
+
+  def image_series_data
+    ImageSeriesData.where(:image_series_id => read_attribute(:id)).first
+  end
 
   def ensure_visit_is_for_patient
     if(self.visit && self.visit.patient != self.patient)
