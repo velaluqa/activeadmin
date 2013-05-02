@@ -1,0 +1,13 @@
+type: map
+name: root
+mapping:
+  "visit_types":
+    type: map
+    required: yes
+    mapping:
+      =:
+        type: map
+        mapping:
+          "description":
+            type: str
+          
