@@ -5,6 +5,7 @@ replace_stock_patient_filter = ->
   $('#q_patient_id').replaceWith('<input id="q_patient_id" type="hidden" name="q[patient_id_in][]" style="width: 100%"/>')
 
 $(document).ready ->
+  return unless $('body').hasClass('admin_cases')
   hide_fake_sidebar_entry()
   replace_stock_patient_filter()
   
