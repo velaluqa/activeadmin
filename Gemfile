@@ -58,7 +58,7 @@ gem 'cancan'
 gem 'paper_trail', '~>2'
 
 # ActiveAdmin
-gem 'activeadmin'
+gem 'activeadmin', '~>0.5.1'
 gem 'activeadmin-mongoid', :github => 'profmaad/activeadmin-mongoid', :branch => 'master'
 gem 'activeadmin-cancan'
 
