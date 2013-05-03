@@ -33,14 +33,32 @@ StudyServer::Application.routes.draw do
 
   resources :studies, :only => [:index] do
     resources :centers, :only => [:index]
+
+    member do
+      get 'wado_query'
+    end
   end
 
   resources :centers, :only => [:create] do
     resources :patients, :only => [:index]
+
+    member do
+      get 'wado_query'
+    end
   end
 
   resources :patients, :only => [:create] do
     resources :image_series, :only => [:index]
+
+    member do
+      get 'wado_query'
+    end
+  end
+
+  resources :visits, :only => [] do
+    member do
+      get 'wado_query'
+    end
   end
 
   resources :image_series, :only => [:create] do

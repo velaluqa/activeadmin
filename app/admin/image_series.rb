@@ -58,4 +58,10 @@ ActiveAdmin.register ImageSeries do
 
     render 'admin/shared/weasis_webstart.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
   end
+
+  sidebar :viewer_cart, :only => :index do
+    cart = session[:viewer_cart] || []
+
+    render :partial => 'admin/shared/viewer_cart', :locals => {:cart => cart}
+  end
 end

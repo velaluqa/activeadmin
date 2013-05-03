@@ -52,4 +52,11 @@ class Patient < ActiveRecord::Base
   def image_storage_path
     self.center.image_storage_path + '/' + self.id.to_s
   end
+
+  def wado_query
+    {:name => self.name, :visits => self.visits.map {|visit| visit.wado_query} +
+      [{:name => 'Unassigned', :image_series => self.image_series.where(:visit_id => nil).map {|i_s| i_s.wado_query}
+       }]
+    }
+  end
 end

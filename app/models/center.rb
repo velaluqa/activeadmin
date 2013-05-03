@@ -31,4 +31,8 @@ class Center < ActiveRecord::Base
   def image_storage_path
     self.study.image_storage_path + '/' + self.id.to_s
   end
+
+  def wado_query
+    self.patients.map {|patient| patient.wado_query}
+  end
 end

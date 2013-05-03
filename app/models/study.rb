@@ -83,6 +83,10 @@ class Study < ActiveRecord::Base
     return validation_errors
   end
 
+  def wado_query
+    self.patients.map {|patient| patient.wado_query}
+  end
+
   protected
 
   def run_schema_validation(config)

@@ -1,6 +1,7 @@
 class PatientsController < ApplicationController
-  before_filter :load_center
-  before_filter :load_patients, :only => :index
+  before_filter :load_center, :only => [:index, :create]
+  before_filter :load_patients, :only => [:index]
+  before_filter :load_the_patient, :only => [:wado_query]
 
   skip_before_filter :verify_authenticity_token, :only => [:create]
 
@@ -20,6 +21,15 @@ class PatientsController < ApplicationController
     end    
   end
 
+  def wado_query
+    @patients = [@patient.wado_query]
+
+    @authentication_token = current_user.authentication_token
+    respond_to do |format|
+      format.xml { render 'shared/wado_query' }
+    end
+  end
+
   protected
 
   def load_center
@@ -30,5 +40,10 @@ class PatientsController < ApplicationController
   def load_patients
     authorize! :read, Patient
     @patients = @center.patients.accessible_by(current_ability)
+  end
+
+  def load_the_patient
+    @patient = Patient.find(params[:id])
+    authorize! :manage, @patient
   end
 end

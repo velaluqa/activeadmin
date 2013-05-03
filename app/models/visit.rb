@@ -41,4 +41,10 @@ class Visit < ActiveRecord::Base
     self.patient.image_storage_path + '/' + self.id.to_s
   end
 
+  def wado_query
+    {:name => "Visit No. #{visit_number}", :image_series => 
+      self.image_series.map {|i_s| i_s.wado_query}
+    }
+  end
+
 end

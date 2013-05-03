@@ -22,11 +22,15 @@ class ImageSeriesController < ApplicationController
   end
 
   def wado_query
-    @images = @image_series.images.order('id ASC')
+    visit_name = (@image_series.visit.nil? ? 'Unassigned' : "Visit No. #{@image_series.visit.visit_number}""Visit No. #{@image_series.visit.visit_number}")
+    
+    @patients = [{:name => @image_series.patient.name, :visits =>
+                   [{:name => visit_name, :image_series => [@image_series.wado_query]}]
+                 }]                                                                  
 
     @authentication_token = current_user.authentication_token
     respond_to do |format|
-      format.xml
+      format.xml { render 'shared/wado_query' }
     end
   end
 
@@ -43,6 +47,6 @@ class ImageSeriesController < ApplicationController
   end
   def load_the_image_series
     @image_series = ImageSeries.find(params[:id])
-    #authorize! :manage, @image_series
+    authorize! :manage, @image_series
   end
 end
