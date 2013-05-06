@@ -29,6 +29,7 @@ module SchemaValidation
       when 'case_type_screen_layout'
         errors << Kwalify::ValidationError.new("When 'strict' is set, 'passive' can't be true.", path) if (value['strict'] and value['passive'])
         errors << Kwalify::ValidationError.new("'passive_annotations' requires 'passive' to be 'true'.", path) if (value['passive_annotations'] and not value['passive'])
+        errors << Kwalify::ValidationError.new("'active' and 'active_hidden' can't overlap.", path) if (value['active'] and value['active_hidden'] and not (value['active'] & value['active_hidden']).empty?)
       end
     end
   end

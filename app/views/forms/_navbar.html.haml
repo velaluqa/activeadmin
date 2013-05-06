@@ -25,11 +25,14 @@
         %li.divider
         %li.dropdown
           %a.dropdown-toggle{:'data-toggle' => 'dropdown', :href => '#'}
-            Passive Series..
+            Image Series..
             %span.caret
           %ul.dropdown-menu
             - @passive_series_list.each do |passive_case|
-              - next if (passive_case[:series].nil? or passive_case[:series].empty?)
+              - if passive_case.nil?
+                %li.divider
+                - next
+              - next if (passive_case[:series].nil? or passive_case[:series].empty?)              
               %li.dropdown-submenu
                 %a{:tabindex => -1, :href => '#'}= passive_case[:case_name]
                 %ul.dropdown-menu
