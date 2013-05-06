@@ -41,4 +41,6 @@ ActiveAdmin.register Visit do
   filter :patient
   filter :visit_number
   filter :visit_type
+  
+  viewer_cartable(:visit)
 end

@@ -118,4 +118,6 @@ ActiveAdmin.register Study do
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'study', :audit_trail_view_id => resource.id))
   end
+
+  viewer_cartable(:study)
 end

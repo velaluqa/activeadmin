@@ -1,4 +1,7 @@
 require 'aa_footer'
+require 'aa_viewer_cart_mixin'
+
+ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
 
 ActiveAdmin.setup do |config|
 
