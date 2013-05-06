@@ -38,7 +38,7 @@
               - next if repeatable.nil?
               %a.btn.add-repeat-btn.pull-right{:'data-id' => repeatable[:id], :'data-max-repeats' => repeatable[:max], :href => '#'}= "Add #{repeatable[:label]}"
         - else
-          .row-fluid.form-row-padding
+          .row-fluid.form-row-padding{:class => (field['indent'] == true ? 'indented-field-row' : '')}
             .control-group.pull-left
               - if (!current_group_index.nil? && first_in_group)
                 - first_in_group = false
