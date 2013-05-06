@@ -97,6 +97,11 @@ mapping:
                 sequence:
                   - type: str
                     unique: yes
+              "active_hidden":
+                type: seq
+                sequence:
+                  - type: str
+                    unique: yes
               "passive":
                 type: bool
               "passive_annotations":
