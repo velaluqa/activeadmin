@@ -102,7 +102,9 @@ class FormAnswer
     canonical_data = FormAnswer::canonical_json(data)
     signature_raw = Base64.decode64(signature)
     
-    return key.verify(OpenSSL::Digest::RIPEMD160.new, signature_raw, canonical_data)
+    result = key.verify(OpenSSL::Digest::RIPEMD160.new, signature_raw, canonical_data)
+    OpenSSL.errors
+    return result
   end
 
   def printable_answers
