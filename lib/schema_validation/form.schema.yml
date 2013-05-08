@@ -25,6 +25,8 @@ sequence:
         type: bool
       "belongs_to_repeatable":
         type: str
+      "indent":
+        type: bool
       "roi_values":
         type: map
         name: field_values

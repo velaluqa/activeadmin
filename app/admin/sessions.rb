@@ -70,18 +70,6 @@ ActiveAdmin.register Session do
     attributes_table do
       row :name
       row :study
-      # TODO: remove, is just for testing
-      row :rights do
-        if(can? :validate, session and can? :blind_read, session)
-          status_tag('Both', :error)
-        elsif(can? :validate, session)
-          status_tag('Validator', :ok)
-        elsif(can? :blind_read, session)
-          status_tag('Reader', :ok)
-        else
-          status_tag('None', :error)
-        end
-      end
       row :readers do
         if can? :manage, session
           render 'admin/sessions/list', :items => session.readers.map {|r| link_to(r.name, admin_user_path(r)) + ' (' + link_to('-', remove_reader_admin_session_path(session, :reader_id => r.id)) +')' }, :action_link => link_to('Add Reader', add_reader_form_admin_session_path(session)).html_safe

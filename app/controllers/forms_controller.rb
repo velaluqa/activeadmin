@@ -120,11 +120,16 @@ protected
     if(@case and @case.session)
       configuration = @case.session.locked_configuration
 
-      previous_cases = @case.patient.cases.where('position < ?', @case.position)
+      previous_cases = @case.patient.cases.where('position < ?', @case.position) + [nil, @case]
       previous_cases.each do |c|
+        if c.nil?
+          # this is interpreted by the view as a divider
+          passive_series_list << nil
+          next
+        end
         next if configuration['types'][c.case_type].nil?
 
-        case_series_map = {:case_name => c.name, :series => configuration['types'][c.case_type]['screen_layout']['active']}
+        case_series_map = {:case_name => c.name, :series => configuration['types'][c.case_type]['screen_layout']['active'] + (configuration['types'][c.case_type]['screen_layout']['active_hidden'].nil? ? [] : configuration['types'][c.case_type]['screen_layout']['active_hidden'])}
         case_series_map[:series] ||= []
         passive_series_list << case_series_map
       end
