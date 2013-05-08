@@ -11,7 +11,8 @@ ActiveAdmin.register Center do
 
   index do
     selectable_column
-    column :study
+    column :study, :sortable => :study_id
+    column :code
     column :name
     
     customizable_default_actions do |resource|
@@ -22,6 +23,7 @@ ActiveAdmin.register Center do
   show do |center|
     attributes_table do
       row :study
+      row :code
       row :name
       row :image_storage_path
     end
@@ -31,6 +33,7 @@ ActiveAdmin.register Center do
     f.inputs 'Details' do
       f.input :study
       f.input :name
+      f.input :code
     end
 
     f.buttons
@@ -39,6 +42,7 @@ ActiveAdmin.register Center do
   # filters
   filter :study
   filter :name
+  filter :code
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id))
