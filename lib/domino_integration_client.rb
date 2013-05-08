@@ -7,11 +7,35 @@ class DominoIntegrationClient
     @documents_resource = RestClient::Resource.new(@db_url + '/api/data/documents', :user => username, :password => password, :headers => {:accept => 'application/json', :content_type => 'application/json'})
   end
 
-  protected
+  def ensure_document_exists(query, form, properties)
+    existing_documents = find_document(query)
+
+    if(existing_documents and existing_documents.respond_to?(:length) and existing_documents.length > 0)
+      unid = existing_documents[0]['@unid']
+      update_document(unid, form, properties)
+
+      unid
+    else
+      create_document(form, properties)
+    end
+  end
+
+  #protected
+  
+  def update_document(unid, form, properties)
+    return @documents_resource['unid/'+unid].patch(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
+      response.code == 200
+    end
+  end
 
   def create_document(form, properties)
     return @documents_resource.post(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
-      response.code == 201
+      if(response.code == 201)
+        pp response.headers
+        response.headers[:location].split('/').last
+      else
+        nil
+      end
     end
   end
 
