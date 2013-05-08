@@ -29,6 +29,9 @@ ActiveAdmin.register Study do
   show do |study|
     attributes_table do
       row :name
+      row :domino_db_url do
+        link_to(study.domino_db_url, study.domino_db_url)
+      end
       row :image_storage_path
 
       if study.has_configuration?
@@ -70,6 +73,10 @@ ActiveAdmin.register Study do
   form do |f|
     f.inputs 'Details' do
       f.input :name, :required => true
+      if(!f.object.persisted? or current_user.is_app_admin?)
+        f.input :domino_db_url, :label => 'Domino DB URL', :required => true, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to data corruption unless the Domino DB was moved from the old URL to the new one.' : '')
+      end
+      f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
 
     f.buttons

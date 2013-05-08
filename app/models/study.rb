@@ -4,7 +4,7 @@ require 'schema_validation'
 class Study < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :name, :locked_version
+  attr_accessible :name, :locked_version, :domino_db_url
 
   has_many :sessions
 
@@ -15,7 +15,7 @@ class Study < ActiveRecord::Base
   has_many :visits, :through => :patients
   has_many :image_series, :through => :patients
 
-  validates_presence_of :name
+  validates_presence_of :name, :domino_db_url
 
   before_destroy do
     unless(sessions.empty? and centers.empty?)
