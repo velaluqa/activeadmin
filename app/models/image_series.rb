@@ -1,7 +1,7 @@
 class ImageSeries < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :name, :visit_id, :patient_id, :imaging_date
+  attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid
   attr_accessible :visit, :patient
 
   belongs_to :visit
@@ -68,5 +68,9 @@ class ImageSeries < ActiveRecord::Base
 
   def wado_query
     {:name => self.name, :images => self.images.order('id ASC')}
+  end
+
+  def lotus_notes_url
+    self.patient.center.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.patient.nil? or self.patient.center.nil? or self.patient.center.study.nil?  or self.patient.center.study.notes_links_base_uri.nil?)
   end
 end

@@ -1,7 +1,7 @@
 class Center < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :name, :study, :code
+  attr_accessible :name, :study, :code, :domino_unid
   attr_accessible :study_id
 
   belongs_to :study
@@ -35,5 +35,9 @@ class Center < ActiveRecord::Base
 
   def wado_query
     self.patients.map {|patient| patient.wado_query}
+  end
+
+  def lotus_notes_url
+    self.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.study.nil? or self.study.notes_links_base_uri.nil?)
   end
 end

@@ -58,4 +58,7 @@ StudyServer::Application.configure do
   config.dcmj2pnm = '/usr/bin/dcmj2pnm'
 
   config.wado_dicom_prefix = '999.999.999.'
+
+  config.domino_integration_username = 'erica'
+  config.domino_integration_password = 'test'
 end

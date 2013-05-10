@@ -1,7 +1,7 @@
 class Patient < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :center, :subject_id
+  attr_accessible :center, :subject_id, :domino_unid
   attr_accessible :center_id
 
   belongs_to :center
@@ -58,5 +58,9 @@ class Patient < ActiveRecord::Base
       [{:name => 'Unassigned', :image_series => self.image_series.where(:visit_id => nil).map {|i_s| i_s.wado_query}
        }]
     }
+  end
+
+  def lotus_notes_url
+    self.center.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.center.nil? or self.center.study.nil? or self.center.study.notes_links_base_uri.nil?)
   end
 end

@@ -1,10 +1,19 @@
+require 'uri'
+
 class DominoIntegrationClient
-  attr_reader :db_url
+  attr_reader :db_url, :db_base_url, :db_name
 
   def initialize(db_url, username, password)
     @db_url = db_url
 
+    db_uri = URI(@db_url)
+    @db_base_url = "#{db_uri.scheme}://#{db_uri.host}:#{db_uri.port}"
+    @db_name = db_uri.path.split('/').reject {|s| s.empty?}.last
+
+    @databases_resource = RestClient::Resource.new(db_base_url + '/api/data', :user => username, :password => password, :headers => {:accept => 'application/json', :content_type => 'application/json'})
+
     @documents_resource = RestClient::Resource.new(@db_url + '/api/data/documents', :user => username, :password => password, :headers => {:accept => 'application/json', :content_type => 'application/json'})
+    @collections_resource = RestClient::Resource.new(@db_url + '/api/data/collections', :user => username, :password => password, :headers => {:accept => 'application/json', :content_type => 'application/json'})
   end
 
   def ensure_document_exists(query, form, properties)
@@ -26,12 +35,31 @@ class DominoIntegrationClient
     end
   end
 
+  def replica_id
+    databases = list_databases
+    return nil if databases.nil?
+
+    our_database = databases.find {|database| database['@filepath'] == @db_name}
+    return nil if our_database.nil?
+
+    return our_database['@replicaid']
+  end
+
+  def collection_unid(collection_name)
+    collections = list_collections 
+    return nil if collections.nil?
+
+    target_collection = collections.find {|collection| collection['@title'] == collection_name}
+    return nil if target_collection.nil?
+
+    return target_collection['@unid']
+  end
+
   protected
-    
+
   def create_document(form, properties)
     return @documents_resource.post(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
       if(response.code == 201)
-        pp response.headers
         response.headers[:location].split('/').last
       else
         nil
@@ -59,4 +87,24 @@ class DominoIntegrationClient
       end
     end
   end
+
+  def list_databases
+    return @databases_resource.get() do |response|
+      if(response.code == 200)
+        JSON::parse(response.body)
+      else
+        nil
+      end
+    end
+  end  
+
+  def list_collections
+    return @collections_resource.get() do |response|
+      if(response.code == 200)
+        JSON::parse(response.body)
+      else
+        nil
+      end
+    end
+  end  
 end

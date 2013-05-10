@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130508124336) do
+ActiveRecord::Schema.define(:version => 20130510121808) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -48,9 +48,10 @@ ActiveRecord::Schema.define(:version => 20130508124336) do
   create_table "centers", :force => true do |t|
     t.string   "name"
     t.integer  "study_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
     t.string   "code"
+    t.string   "domino_unid"
   end
 
   create_table "forms", :force => true do |t|
@@ -70,6 +71,7 @@ ActiveRecord::Schema.define(:version => 20130508124336) do
     t.datetime "updated_at",   :null => false
     t.integer  "patient_id"
     t.date     "imaging_date"
+    t.string   "domino_unid"
   end
 
   create_table "images", :force => true do |t|
@@ -84,6 +86,7 @@ ActiveRecord::Schema.define(:version => 20130508124336) do
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
     t.integer  "center_id"
+    t.string   "domino_unid"
   end
 
   create_table "readers_sessions", :id => false, :force => true do |t|
@@ -113,10 +116,11 @@ ActiveRecord::Schema.define(:version => 20130508124336) do
 
   create_table "studies", :force => true do |t|
     t.string   "name"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
+    t.datetime "created_at",           :null => false
+    t.datetime "updated_at",           :null => false
     t.string   "locked_version"
     t.string   "domino_db_url"
+    t.string   "notes_links_base_uri"
   end
 
   create_table "users", :force => true do |t|
@@ -172,6 +176,7 @@ ActiveRecord::Schema.define(:version => 20130508124336) do
     t.integer  "patient_id"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
+    t.string   "domino_unid"
   end
 
 end

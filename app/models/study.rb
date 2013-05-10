@@ -1,10 +1,12 @@
 require 'git_config_repository'
 require 'schema_validation'
+require 'uri'
+require 'domino_integration_client'
 
 class Study < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :name, :locked_version, :domino_db_url
+  attr_accessible :name, :locked_version, :domino_db_url, :notes_links_base_uri
 
   has_many :sessions
 
@@ -21,6 +23,12 @@ class Study < ActiveRecord::Base
     unless(sessions.empty? and centers.empty?)
       errors.add :base, 'You cannot delete a study that still has sessions or centers associated with it.'
       return false
+    end
+  end
+
+  before_save do
+    if(self.changes.include?('domino_db_url'))
+      update_notes_links_base_uri
     end
   end
 
@@ -87,6 +95,10 @@ class Study < ActiveRecord::Base
     self.patients.map {|patient| patient.wado_query}
   end
 
+  def lotus_notes_url
+    self.notes_links_base_uri
+  end
+
   protected
 
   def run_schema_validation(config)
@@ -96,4 +108,28 @@ class Study < ActiveRecord::Base
     validator.validate(config)
   end
 
+  # Notes://<server>/<replica id>/<view id>/<document unid>
+  def update_notes_links_base_uri
+    new_notes_links_base_uri = URI(self.domino_db_url)
+    new_notes_links_base_uri.scheme = 'Notes'
+
+    begin
+      domino_integration_client = DominoIntegrationClient.new(self.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
+
+      replica_id = domino_integration_client.replica_id
+      collection_unid = domino_integration_client.collection_unid('All')
+    rescue SystemCallError => e
+      Rails.logger.warn "Failed to communicate with the Domino server: #{e.message}"
+      errors.add :domino_db_url, "Failed to communicate with the Domino server: #{e.message}"
+    end
+
+    if(replica_id.nil? or collection_unid.nil?)
+      self.notes_links_base_uri = nil
+      false
+    else
+      new_notes_links_base_uri.path = "/#{replica_id}/#{collection_unid}/"
+      self.notes_links_base_uri = new_notes_links_base_uri.to_s
+      true      
+    end
+  end
 end

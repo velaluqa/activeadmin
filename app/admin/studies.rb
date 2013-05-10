@@ -32,6 +32,9 @@ ActiveAdmin.register Study do
       row :domino_db_url do
         link_to(study.domino_db_url, study.domino_db_url)
       end
+      row :notes_links_base_uri do
+        link_to(study.notes_links_base_uri, study.notes_links_base_uri) unless study.notes_links_base_uri.nil?
+      end
       row :image_storage_path
 
       if study.has_configuration?

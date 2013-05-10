@@ -1,7 +1,7 @@
 class Visit < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :patient_id, :visit_number, :visit_type
+  attr_accessible :patient_id, :visit_number, :visit_type, :domino_unid
   attr_accessible :patient
   
   belongs_to :patient
@@ -47,4 +47,7 @@ class Visit < ActiveRecord::Base
     }
   end
 
+  def lotus_notes_url
+    self.patient.center.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.patient.nil? or self.patient.center.nil? or self.patient.center.study.nil? or self.patient.center.study.notes_links_base_uri.nil?)
+  end
 end
