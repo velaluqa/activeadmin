@@ -20,14 +20,14 @@ class DominoIntegrationClient
     end
   end
 
-  #protected
-  
   def update_document(unid, form, properties)
     return @documents_resource['unid/'+unid].patch(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
       response.code == 200
     end
   end
 
+  protected
+    
   def create_document(form, properties)
     return @documents_resource.post(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
       if(response.code == 201)
