@@ -28,6 +28,14 @@ class Visit < ActiveRecord::Base
     self.image_series.map {|is| is.imaging_date}.reject {|date| date.nil? }.min
   end
 
+  def study
+    if self.patient.nil?
+      nil
+    else
+      self.patient.study
+    end
+  end
+
   def previous_image_storage_path
     if(self.previous_changes.include?(:patient_id))
       previous_patient = Patient.find(self.previous_changes[:patient_id][0])
@@ -45,9 +53,5 @@ class Visit < ActiveRecord::Base
     {:name => "Visit No. #{visit_number}", :image_series => 
       self.image_series.map {|i_s| i_s.wado_query}
     }
-  end
-
-  def lotus_notes_url
-    self.patient.center.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.patient.nil? or self.patient.center.nil? or self.patient.center.study.nil? or self.patient.center.study.notes_links_base_uri.nil?)
   end
 end

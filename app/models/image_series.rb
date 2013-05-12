@@ -24,6 +24,14 @@ class ImageSeries < ActiveRecord::Base
     ImageSeriesData.destroy_all(:image_series_id => self.id)
   end
 
+  def study
+    if self.patient.nil?
+      nil
+    else
+      self.patient.study
+    end
+  end
+
   def image_series_data
     ImageSeriesData.where(:image_series_id => read_attribute(:id)).first
   end
@@ -68,9 +76,5 @@ class ImageSeries < ActiveRecord::Base
 
   def wado_query
     {:name => self.name, :images => self.images.order('id ASC')}
-  end
-
-  def lotus_notes_url
-    self.patient.center.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.patient.nil? or self.patient.center.nil? or self.patient.center.study.nil?  or self.patient.center.study.notes_links_base_uri.nil?)
   end
 end

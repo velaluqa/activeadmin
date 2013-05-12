@@ -1,6 +1,12 @@
+require 'domino_integration_client'
+
 module DominoDocument
   def self.included(base)
     base.before_save :ensure_domino_document_exists
+  end
+
+  def lotus_notes_url
+    self.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.study.notes_links_base_uri.nil?)
   end
 
   def domino_document_needs_update?

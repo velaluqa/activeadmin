@@ -1,4 +1,5 @@
 require 'aa_customizable_default_actions'
+require 'aa_domino'
 
 ActiveAdmin.register Center do
 
@@ -25,15 +26,7 @@ ActiveAdmin.register Center do
       row :study
       row :code
       row :name
-      row 'Domino' do
-        url = center.lotus_notes_url
-        
-        if center.domino_unid.nil? or url.nil?
-          nil
-        else
-          link_to(center.domino_unid, center.lotus_notes_url)
-        end
-      end
+      domino_link_row(center)
       row :image_storage_path
     end
   end

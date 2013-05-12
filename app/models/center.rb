@@ -1,4 +1,3 @@
-require 'domino_integration_client'
 require 'domino_document_mixin'
 
 class Center < ActiveRecord::Base

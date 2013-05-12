@@ -1,4 +1,8 @@
+require 'domino_document_mixin'
+
 class Patient < ActiveRecord::Base
+  include DominoDocument
+
   has_paper_trail
 
   attr_accessible :center, :subject_id, :domino_unid
@@ -25,6 +29,14 @@ class Patient < ActiveRecord::Base
 
   def form_answers
     return FormAnswer.where(:patient_id => self.id)
+  end
+
+  def study
+    if self.center.nil?
+      nil
+    else
+      self.center.study
+    end
   end
 
   # virtual attribute for pretty names
@@ -60,7 +72,32 @@ class Patient < ActiveRecord::Base
     }
   end
 
-  def lotus_notes_url
-    self.center.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.center.nil? or self.center.study.nil? or self.center.study.notes_links_base_uri.nil?)
+  def domino_patient_no
+    "#{center.code}#{subject_id}"
+  end
+  def domino_document_form
+    'TrialSubject'
+  end
+  def domino_document_query
+    {
+      'docCode' => 10028,
+      'CenterNo' => center.code,
+      'PatientNo' => domino_patient_no,
+    }
+  end
+  def domino_document_fields
+    ['subject_id']
+  end
+  def domino_document_properties
+    return {} if center.nil?
+
+    {
+      'Center' => center.name,
+      'shCenter' => center.name,
+      'CenterNo' => center.code,
+      'shCenterNo' => center.code,
+      'UIDCenter' => center.domino_unid,
+      'PatientNo' => domino_patient_no,
+    }
   end
 end

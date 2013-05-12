@@ -1,4 +1,5 @@
 require 'aa_customizable_default_actions'
+require 'aa_domino'
 
 ActiveAdmin.register Patient do
 
@@ -23,6 +24,7 @@ ActiveAdmin.register Patient do
     attributes_table do
       row :center
       row :subject_id
+      domino_link_row(patient)
       row :image_storage_path
       row :patient_data_raw do
         CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
@@ -33,7 +35,7 @@ ActiveAdmin.register Patient do
   form do |f|
     f.inputs 'Details' do
       f.input :center
-      f.input :subject_id
+      f.input :subject_id, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to problems in project management, because the Subject ID is used to identify patients across documents.' : '')
     end
 
     f.buttons
