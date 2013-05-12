@@ -1,4 +1,8 @@
+require 'domino_document_mixin'
+
 class Visit < ActiveRecord::Base
+  include DominoDocument
+
   has_paper_trail
 
   attr_accessible :patient_id, :visit_number, :visit_type, :domino_unid
@@ -52,6 +56,31 @@ class Visit < ActiveRecord::Base
   def wado_query
     {:name => "Visit No. #{visit_number}", :image_series => 
       self.image_series.map {|i_s| i_s.wado_query}
+    }
+  end
+
+  def domino_document_form
+    'ImagingVisit'
+  end
+  def domino_document_query
+    {
+      'docCode' => 10032,
+      'CenterNo' => patient.center.code,
+      'PatNo' => patient.domino_patient_no,
+      'ericaID' => id,
+    }
+  end
+  def domino_document_fields
+    ['id', 'visit_number']
+  end
+  def domino_document_properties
+    {
+      'Center' => patient.center.name,
+      'CenterNo' => patient.center.code,
+      'UIDCenter' => patient.center.domino_unid,
+      'PatNo' => patient.domino_patient_no,
+      'ericaID' => id,
+      'visitNo' => visit_number,
     }
   end
 end

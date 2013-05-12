@@ -1,3 +1,5 @@
+require 'aa_domino'
+
 ActiveAdmin.register Visit do
 
   controller do
@@ -23,6 +25,7 @@ ActiveAdmin.register Visit do
       row :visit_number
       row :visit_type
       row :visit_date
+      domino_link_row(visit)
       row :image_storage_path
    end
   end
