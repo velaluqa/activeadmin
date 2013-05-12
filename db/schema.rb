@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130510121808) do
+ActiveRecord::Schema.define(:version => 20130512115537) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -53,6 +53,8 @@ ActiveRecord::Schema.define(:version => 20130510121808) do
     t.string   "code"
     t.string   "domino_unid"
   end
+
+  add_index "centers", ["study_id", "code"], :name => "index_centers_on_study_id_and_code", :unique => true
 
   create_table "forms", :force => true do |t|
     t.string   "name"
