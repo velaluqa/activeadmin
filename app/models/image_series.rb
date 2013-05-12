@@ -97,7 +97,7 @@ class ImageSeries < ActiveRecord::Base
     ['id', 'imaging_date']
   end
   def domino_document_properties
-    {
+    properties = {
       'Center' => patient.center.name,
       'CenterNo' => patient.center.code,
       'UIDCenter' => patient.center.domino_unid,
@@ -108,10 +108,37 @@ class ImageSeries < ActiveRecord::Base
       'imaDateManual' => {'data' => imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}, # this is utterly ridiculous: sending the date in the corrent format (%Y-%m-%d) leads switched month/day for days where this can work (1-12). sending a completely broken format leads to correct parses... *doublefacepalm*
     }
 
+    unless(images.empty?)
+      image = images[(images.count-1)/2]
+      
+      unless image.nil?
+        dicom_meta_header, dicom_metadata = image.dicom_metadata
+        
+
+        dicom_properties = {
+          'ImageModality' => (dicom_metadata['0008,0060'].nil? ? '' : dicom_metadata['0008,0060'][:value]),
+        }
+
+        dicom_imaging_date = dicom_metadata['0008,0023']
+        dicom_imaging_date = dicom_metadata['0008,0022'] if dicom_imaging_date.nil?
+        pp dicom_imaging_date
+        dicom_imaging_date = DateTime.strptime(dicom_imaging_date[:value], '%Y%m%d') unless dicom_imaging_date.nil?
+        pp dicom_imaging_date
+        unless(dicom_imaging_date.nil?)
+          dicom_properties.merge!({
+                                    'imaDate' => dicom_imaging_date.strftime('%Y%m%d'),
+                                    'imaDate2' => dicom_imaging_date.strftime('%d-%m-%Y'),
+                                  })
+        end
+
+        properties.merge!(dicom_properties)
+      end
+    end
+
+    properties
+
     # from DICOM
-    # * imaDate/imaDate2
-    # *DICOMn
-    # * ImageModality?
+    # * DICOMn
     # from study config
     # * DICOMtextn
     # from image_series_data
