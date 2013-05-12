@@ -21,7 +21,7 @@ class DominoIntegrationClient
 
     if(existing_documents and existing_documents.respond_to?(:length) and existing_documents.length > 0)
       unid = existing_documents[0]['@unid']
-      update_document(unid, form, properties)
+      update_document(unid, form, properties)      
 
       unid
     else

@@ -25,6 +25,15 @@ ActiveAdmin.register Center do
       row :study
       row :code
       row :name
+      row 'Domino' do
+        url = center.lotus_notes_url
+        
+        if center.domino_unid.nil? or url.nil?
+          nil
+        else
+          link_to(center.domino_unid, center.lotus_notes_url)
+        end
+      end
       row :image_storage_path
     end
   end
@@ -33,7 +42,7 @@ ActiveAdmin.register Center do
     f.inputs 'Details' do
       f.input :study
       f.input :name
-      f.input :code
+      f.input :code, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to problems in project management, because the code is used to identify centers across documents.' : '')
     end
 
     f.buttons

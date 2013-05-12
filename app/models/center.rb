@@ -1,4 +1,9 @@
+require 'domino_integration_client'
+require 'domino_document_mixin'
+
 class Center < ActiveRecord::Base
+  include DominoDocument
+
   has_paper_trail
 
   attr_accessible :name, :study, :code, :domino_unid
@@ -39,5 +44,20 @@ class Center < ActiveRecord::Base
 
   def lotus_notes_url
     self.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.study.nil? or self.study.notes_links_base_uri.nil?)
+  end
+  def domino_document_form
+    'Center'
+  end
+  def domino_document_query
+    {'docCode' => 10005, 'CenterNo' => self.code}
+  end
+  def domino_document_fields
+    ['code', 'name']
+  end
+  def domino_document_properties
+    {
+      'CenterNo' => self.code,
+      'CenterShortName' => self.name,
+    }
   end
 end
