@@ -1,3 +1,5 @@
+require 'aa_domino'
+
 ActiveAdmin.register ImageSeries do
 
   scope :all, :default => true
@@ -25,6 +27,7 @@ ActiveAdmin.register ImageSeries do
       row :patient
       row :visit
       row :name
+      domino_link_row(image_series)
       row :image_storage_path
       row :imaging_date
       row 'Viewer' do

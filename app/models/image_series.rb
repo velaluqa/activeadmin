@@ -1,4 +1,8 @@
+require 'domino_document_mixin'
+
 class ImageSeries < ActiveRecord::Base
+  include DominoDocument
+
   has_paper_trail
 
   attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid
@@ -76,5 +80,44 @@ class ImageSeries < ActiveRecord::Base
 
   def wado_query
     {:name => self.name, :images => self.images.order('id ASC')}
+  end
+
+  def domino_document_form
+    'SOFDinventory'
+  end
+  def domino_document_query
+    {
+      'docCode' => 10030,
+      'CenterNo' => patient.center.code,
+      'imaPatNo' => patient.subject_id,
+      'imaSeriesNo' => id,
+    }
+  end
+  def domino_document_fields
+    ['id', 'imaging_date']
+  end
+  def domino_document_properties
+    {
+      'Center' => patient.center.name,
+      'CenterNo' => patient.center.code,
+      'UIDCenter' => patient.center.domino_unid,
+      'PatNo' => patient.domino_patient_no,
+      'imaPatNo' => patient.subject_id,
+      'imaSeriesNo' => id,
+      'imaDateMan' => imaging_date.strftime('%Y%m%d'),
+      'imaDateManual' => {'data' => imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}, # this is utterly ridiculous: sending the date in the corrent format (%Y-%m-%d) leads switched month/day for days where this can work (1-12). sending a completely broken format leads to correct parses... *doublefacepalm*
+    }
+
+    # from DICOM
+    # * imaDate/imaDate2
+    # *DICOMn
+    # * ImageModality?
+    # from study config
+    # * DICOMtextn
+    # from image_series_data
+    # * orientation
+    # * region
+    # * contrast
+    # * comment
   end
 end
