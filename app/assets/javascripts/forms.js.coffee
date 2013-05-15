@@ -113,9 +113,11 @@ update_enabled_options = (select) ->
     selected_by_select = roi['selected_by_select']
 
     if selected_by_select? and selected_by_select != id
-      hide_select_option(option, false)
+      option.attr('disabled', 'disabled')
+      #hide_select_option(option, false)
     else
-      hide_select_option(option, true)
+      option.removeAttr('disabled')
+      #hide_select_option(option, true)
 
 register_custom_validation_function = (func) ->
   window.custom_validation_functions = [] unless window.custom_validation_functions?
