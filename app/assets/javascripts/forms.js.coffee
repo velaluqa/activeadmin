@@ -94,22 +94,25 @@ update_roi_select = (select) ->
 
 # copied from: http://stackoverflow.com/questions/9234830/how-to-hide-a-option-in-a-select-menu-with-css
 hide_select_option = (option, show) ->
-  $(option).toggle(show)
+  option = $(option)
+  option.toggle(show)
 
   if(show)
-    if($(option).parent('span.toggleOption').length)
-      $(option).unwrap()
+    if(option.parent('span.toggleOption').length)
+      option.unwrap()
   else
-    $(option).wrap('<span class="toggleOption" style="display: none;" />')
+    option.wrap('<span class="toggleOption" style="display: none;" />')
 
 update_enabled_options = (select) ->
-  for option in $(select).find('option[value]')
+  select = $(select)
+  id = select.id
+  for option in select.find('option[value]')
     option = $(option)
     roi = window.rois[option.attr('data-roi-id')]
     continue unless roi?
     selected_by_select = roi['selected_by_select']
-  
-    if selected_by_select? and selected_by_select != $(select).attr('id')
+
+    if selected_by_select? and selected_by_select != id
       hide_select_option(option, false)
     else
       hide_select_option(option, true)
