@@ -104,8 +104,8 @@ hide_select_option = (option, show) ->
     option.wrap('<span class="toggleOption" style="display: none;" />')
 
 update_enabled_options = (select) ->
-  select = $(select)
   id = select.id
+  select = $(select)
   for option in select.find('option[value]')
     option = $(option)
     roi = window.rois[option.attr('data-roi-id')]
@@ -275,22 +275,16 @@ remove_no_validation = (elements) ->
 delay = (ms, func) -> window.setTimeout(func, ms)
 
 update_allowed_rois = (changed_select) ->
+  id = changed_select.id
   changed_select = $(changed_select)
 
-  selected_option = changed_select.find('option:selected')
-  return if selected_option.length == 0
-
-  new_selection = selected_option.attr('data-roi-id')
+  new_selection = changed_select.val()
   old_selection = changed_select.data('old_selection')
 
-  window.rois[old_selection]['selected_by_select'] = null if old_selection?
-  window.rois[new_selection]['selected_by_select'] = changed_select.attr('id') if new_selection?
+  window.rois[old_selection]['selected_by_select'] = null if(old_selection? and window.rois[old_selection]?)
+  window.rois[new_selection]['selected_by_select'] = id if (new_selection? and window.rois[new_selection]?)
 
-  # for id,select of window.roi_selects
-  #   continue if id == changed_select.id
-  #   update_enabled_options(select)
-
-  if(selected_option.val().length == 0)
+  if(not new_selection? or new_selection.length == 0)
     changed_select.removeData('old_selection')
   else
     changed_select.data('old_selection', new_selection)
@@ -350,8 +344,6 @@ update_rois_table = (new_rois) ->
 update_rois = ->
   rois = PharmTraceAPI.rois
   update_rois_table(rois)
-
-  #update_roi_select(select) for id,select of window.roi_selects
 
 update_nav_button_state = ->
   if $('#form_nav_select option').first().attr('selected') == 'selected'
@@ -502,6 +494,60 @@ remove_roi_selects = (removed_selects) ->
   for select in removed_selects
     delete window.roi_selects[select.id]
 
+filter_select2_options = (options, term) ->
+  result = []
+  return result unless options? and term?
+
+  for option in options
+    if new RegExp(term, 'i').test(option['text'])
+      result.push(option)
+      continue
+    else if option['children']? and option['children'].length > 0
+      filtered_children = filter_select2_options(option['children'], term)
+      result.push({'id': option['id'], 'text': option['text'], 'children': filtered_children}) unless filtered_children.length == 0
+
+  return result
+
+roi_select2_query = (query) ->
+  console.profile("Select2 Query")
+  id = query.element.get(0).id
+  options = window.roi_select_options[id]
+
+  filtered_options = filter_select2_options(options, query.term)
+
+  console.profileEnd()
+  query.callback({'results': filtered_options})
+
+generate_roi_select2_options = (select) ->
+  id = select.id
+  select = $(select)
+
+  roi_values = jQuery.parseJSON(select.attr('data-roi-values'))
+  values = jQuery.parseJSON(select.attr('data-values'))
+  has_old_roi = select.attr('data-old-roi')?
+
+  classic_options = []
+  for value, label of values
+    classic_options.push({'id': value, 'text': label})
+
+  roi_options = {}
+  for roi_id, roi of window.rois
+    series_uid = roi['seriesUID']
+    continue unless series_uid?
+
+    selected_by_select = roi['selected_by_select']
+    continue if(selected_by_select? and selected_by_select != id)
+      
+    roi_options[series_uid] = [] unless roi_options[series_uid]
+    roi_options[series_uid].push({'id': roi_id, 'text': roi['name']})
+
+  options = []
+  options.push({'text': 'Non-ROI options', 'children': classic_options})
+  for roi_series, children of roi_options
+    options.push({'text': roi_series, 'children': children})
+
+  window.roi_select_options[id] = options
+
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -509,26 +555,33 @@ $(document).ready ->
   window.name_to_roi_id = {}
   window.body_padding = $('body').css('padding-top').replace('px', '')
   window.roi_selects = {}
+  window.roi_select_options = {}
+
+  window.roi_select2_config = {
+    placeholder: "Please select",
+    allowClear: true,
+
+    query: roi_select2_query,    
+  }
 
   $(".datepicker-field").datepicker()
 
   update_calculated_fields()
   update_remove_buttons_visibility()
 
-  roi_selects = $('.select-roi')
+  roi_selects = $('.select-roi').not("[data-no-validation]")
 
-  roi_selects.mousedown ->
-    console.profile("Open ROI select")
+  roi_selects.select2(window.roi_select2_config)
+  roi_selects.on 'select2-opening', ->
+    console.profile('Open ROI select2')
     PharmTraceAPI.updateROIsSynchronously()
     update_rois()
-    update_roi_select(this)
-    update_enabled_options(this)
+    generate_roi_select2_options(this)
     console.profileEnd()
   roi_selects.change ->
+    console.profile('Processing ROI select value change')
+    update_allowed_rois(this)
     update_calculated_fields()
-  roi_selects.change ->
-    console.profile('Updating allowed ROIs')
-    update_allowed_rois($(this))
     console.profileEnd()
 
   add_roi_selects(roi_selects)
@@ -642,25 +695,24 @@ $(document).ready ->
     #console.log(repeatable_form)
 
     repeatable_roi_selects = repeatable_form.find('.select-roi')
-  
+
     repeatable_roi_selects.change ->
-      console.profile('Updating allowed ROIs')
-      update_allowed_rois($(this))
-      console.profileEnd()
-    repeatable_roi_selects.mousedown ->
-      console.profile("Open ROI select")
-      PharmTraceAPI.updateROIsSynchronously()
-      update_rois()
-      update_roi_select(this)
-      update_enabled_options(this)
-      console.profileEnd()
-    repeatable_roi_selects.change ->
+      console.profile('Processing ROI select value change')
+      update_allowed_rois(this)
       update_calculated_fields()
+      console.profileEnd()
     repeatable_form.find("input,select,textarea").not("[type=submit]").not("[data-no-validation]").jqBootstrapValidation()
     repeatable_form.find('.remove-repeat-btn').click ->
       remove_last_repeatable($(this))
       return false
 
+    repeatable_roi_selects.select2(window.roi_select2_config)
+    repeatable_roi_selects.on "select2-opening", ->
+      console.profile("Open ROI select2")
+      PharmTraceAPI.updateROIsSynchronously()
+      update_rois()
+      generate_roi_select2_options(this)
+      console.profileEnd()
     add_roi_selects(repeatable_roi_selects)
 
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
@@ -731,3 +783,13 @@ $(document).ready ->
       for image in images
         table_header_row.after($('<tr><td>'+image['path']+'</td><td>'+image['checksum']+'</td></tr>'))
     
+
+# plan for select2-based ROI fields:
+# - generate hidden_tag fields instead of selects in _field_roi
+# - store classic "values" into data property as json (data-values)
+# - generate list of available rois (roi_id, name) on select2-opening and store it into a map with the field id as the key
+# - use query function:
+#   - generate options hash directly from available rois (from map) + classical values
+# - use roi_id as value instead of JSON object
+# * when retrieving form answers, lookup ROI via roi_id==value, generate object
+# * BUG: exception (null.length) somewhere when selecting in a repeatable roi select ... no idea, yet
