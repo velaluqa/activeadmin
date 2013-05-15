@@ -278,14 +278,15 @@ update_allowed_rois = (changed_select) ->
   selected_option = changed_select.find('option:selected')
   return if selected_option.length == 0
 
-  new_selection = changed_select.find('option:selected').attr('data-roi-id')
+  new_selection = selected_option.attr('data-roi-id')
   old_selection = changed_select.data('old_selection')
 
   window.rois[old_selection]['selected_by_select'] = null if(old_selection? and window.rois[old_selection]?)
   window.rois[new_selection]['selected_by_select'] = changed_select.attr('id') if (new_selection? and window.rois[new_selection]?)
 
-  selects = $('.select-roi').not(changed_select)
-  update_enabled_options(select) for select in selects
+  for id,select of window.roi_selects
+    continue if id == changed_select.id
+    update_enabled_options(select)
 
   if(selected_option.val().length == 0)
     changed_select.removeData('old_selection')
@@ -348,8 +349,8 @@ update_rois = ->
   rois = PharmTraceAPI.rois
   update_rois_table(rois)
 
-  selects = $('.select-roi')
-  update_roi_select(select) for select in selects
+  console.log(window.roi_selects)
+  update_roi_select(select) for id,select of window.roi_selects
 
 update_nav_button_state = ->
   if $('#form_nav_select option').first().attr('selected') == 'selected'
@@ -455,9 +456,13 @@ remove_last_repeatable = (remove_button) ->
 
   elements_to_delete = start_element.nextUntil(group_end_element).add(start_element)
 
-  for select in elements_to_delete.find('.select-roi')
+  removed_selects = elements_to_delete.find('.select-roi')
+
+  for select in removed_selects
     $(select).val('')
     update_allowed_rois(select)
+
+  remove_roi_selects(removed_selects)
 
   elements_to_delete.remove()
 
@@ -487,18 +492,43 @@ update_remove_buttons_visibility = ->
     previous_id = id
 
   previous_button.show() if previous_button?
-                                                      
+
+add_roi_selects = (new_selects) ->
+  for select in new_selects
+    window.roi_selects[select.id] = select
+
+remove_roi_selects = (removed_selects) ->
+  for select in removed_selects
+    delete window.roi_selects[select.id]
+                                                                                   
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
   window.osirix_id_to_roi_id = {}
   window.name_to_roi_id = {}
   window.body_padding = $('body').css('padding-top').replace('px', '')
+  window.roi_selects = {}
 
   $(".datepicker-field").datepicker()
 
   update_calculated_fields()
   update_remove_buttons_visibility()
+
+  roi_selects = $('.select-roi')
+
+  roi_selects.mousedown ->
+    console.profile("Open ROI select")
+    PharmTraceAPI.updateROIsSynchronously()
+    update_rois()
+    console.profileEnd()
+  roi_selects.change ->
+    update_calculated_fields()
+  roi_selects.change ->
+    console.profile('Updating allowed ROIs')
+    update_allowed_rois($(this))
+    console.profileEnd()
+
+  add_roi_selects(roi_selects)
       
   $("#the_form input,select,textarea").not("[type=submit]").not("[data-no-validation]").jqBootstrapValidation(  
         submitSuccess: ($form, event) ->
@@ -584,6 +614,7 @@ $(document).ready ->
     return false
 
   $('.add-repeat-btn').click ->
+    console.profile('Adding a repeatable')
     repeatable_id = $(this).attr('data-id')
     console.log("Adding #{repeatable_id}")
 
@@ -607,17 +638,25 @@ $(document).ready ->
     #console.log(group_end_form)
     #console.log(repeatable_form)
 
-    repeatable_form.find('.select-roi').change ->
+    repeatable_roi_selects = repeatable_form.find('.select-roi')
+  
+    repeatable_roi_selects.change ->
+      console.profile('Updating allowed ROIs')
       update_allowed_rois($(this))
-    repeatable_form.find('.select-roi').mousedown ->
+      console.profileEnd()
+    repeatable_roi_selects.mousedown ->
+      console.profile("Open ROI select")
       PharmTraceAPI.updateROIsSynchronously()
       update_rois()
-    repeatable_form.find('.select-roi').change ->
+      console.profileEnd()
+    repeatable_roi_selects.change ->
       update_calculated_fields()
     repeatable_form.find("input,select,textarea").not("[type=submit]").not("[data-no-validation]").jqBootstrapValidation()
     repeatable_form.find('.remove-repeat-btn').click ->
       remove_last_repeatable($(this))
       return false
+
+    add_roi_selects(repeatable_roi_selects)
 
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
     group_end_form.before(e) for e in repeatable_form.children()
@@ -634,15 +673,11 @@ $(document).ready ->
     delay 10, -> 
       $(window).scrollTop(scroll_to_element.position().top-window.body_padding);
 
+    console.profileEnd()
+
   $('.remove-repeat-btn').click ->
     remove_last_repeatable($(this))
     return false
-
-  $('.select-roi').mousedown ->
-    PharmTraceAPI.updateROIsSynchronously()
-    update_rois()
-  $('.select-roi').change ->
-    update_calculated_fields()
 
   $('#recalc-btn').click ->
     $(this).button('loading')
@@ -691,5 +726,3 @@ $(document).ready ->
       for image in images
         table_header_row.after($('<tr><td>'+image['path']+'</td><td>'+image['checksum']+'</td></tr>'))
     
-  $('.select-roi').change ->
-    update_allowed_rois($(this))
