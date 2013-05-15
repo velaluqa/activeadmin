@@ -22,3 +22,4 @@
 //= require forms
 //= require moment.min
 //= require bootstrap-datepicker
+//= require select2
