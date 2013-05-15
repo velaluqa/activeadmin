@@ -1,3 +1,17 @@
+ROI_VALUE_NAMES = {
+  'length': 'Length',
+  'area': 'Area',
+  'min': 'Minimum',
+  'max': 'Maximum',
+  'mean': 'Mean',
+  'stddev': 'Standard Deviation',
+  'sum': 'Sum',
+  'x': 'X',
+  'y': 'Y',
+  'z': 'Z',
+  'volume': 'Volume',  
+}
+
 each = (arr, func, index=0) ->
   if index < arr.length then [ func(arr[index], index), each(arr, func, index + 1)... ] else []
 
@@ -35,7 +49,9 @@ update_roi_option = (option, values) ->
   option_value['location']['sopInstanceUID'] = roi['sopInstanceUID']
 
   for own key, value of values
-    label = label + camelize(value)+": "+roi[value]+", "
+    value_name = ROI_VALUE_NAMES[value]
+    value_name = value unless value_name?
+    label = label + value_name+": "+roi[value]+", "
     option_value[key] = roi[value]
 
   label = label.slice(0, -2)
