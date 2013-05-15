@@ -78,4 +78,4 @@ gem 'kwalify'
 gem 'diffy'
 
 # select2 gem for integration with asset pipeline
-gem 'select2-rails'
+gem 'select2-rails', :github => 'profmaad/select2-rails', :branch => 'master'
