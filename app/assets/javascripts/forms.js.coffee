@@ -68,7 +68,7 @@ roi_has_values = (roi, values) ->
 
 update_roi_select = (select) ->
   select = $(select)
-  console.log("Select: "+select.attr('name'))
+  #console.log("Select: "+select.attr('name'))
 
   values = jQuery.parseJSON(select.attr('data-roi-values'))
 
@@ -76,10 +76,10 @@ update_roi_select = (select) ->
   existing_ids = []
   for option in options
     if update_roi_option(option, values)?
-      console.log("update successful, adding id: "+$(option).attr('data-roi-id'))
+      #console.log("update successful, adding id: "+$(option).attr('data-roi-id'))
       existing_ids.push($(option).attr('data-roi-id'))
     else
-      console.log("update failed, removing option")
+      #console.log("update failed, removing option")
       $(option).remove()
 
   select.append(roi_to_option(roi, values)) for own roi_id, roi of window.rois when (!(roi_id in existing_ids) and roi_has_values(roi, values))
@@ -304,40 +304,42 @@ find_roi_id_by_data = (roi) ->
   return null
 
 update_rois_table = (new_rois) ->
-  console.log("UPDATING ROI TABLE---------------")
+  console.profile('Updating ROIs')
+  #console.log("UPDATING ROI TABLE---------------")
   new_rois_table = {}
   for roi in new_rois
-    console.log("Updating ROI: ")
-    console.log(roi)
+    #console.log("Updating ROI: ")
+    #console.log(roi)
     roi_id = null
     roi_name = roi['seriesUID']+'/'+roi['name']
-    console.log("ROI name: "+roi_name)
+    #console.log("ROI name: "+roi_name)
     if window.osirix_id_to_roi_id[roi['id']]?
       roi_id = window.osirix_id_to_roi_id[roi['id']]
-      console.log("found ROI ID via OsiriX ID: "+roi_id)
+      #console.log("found ROI ID via OsiriX ID: "+roi_id)
     else if window.name_to_roi_id[roi_name]?
       roi_id = window.name_to_roi_id[roi_name]
-      console.log("found ROI ID via name: "+roi_id)
+      #console.log("found ROI ID via name: "+roi_id)
     else
       # this is disabled because it causes more problems than it solves
       # roi_id = find_roi_id_by_data(roi)
       # console.log("found ROI ID via data: "+roi_id) if roi_id?
-      console.log("assigning new ROI ID: "+window.next_roi_id) unless roi_id?
+      #console.log("assigning new ROI ID: "+window.next_roi_id) unless roi_id?
       roi_id = window.next_roi_id++ unless roi_id?
 
     window.osirix_id_to_roi_id[roi['id']] = roi_id
-    console.log("updated osirix_id_to_roi_id: "+window.osirix_id_to_roi_id[roi['id']])
+    #console.log("updated osirix_id_to_roi_id: "+window.osirix_id_to_roi_id[roi['id']])
     window.name_to_roi_id[roi_name] = roi_id
-    console.log("updated name_id_to_roi_id: "+window.name_to_roi_id[roi_name])
+    #console.log("updated name_id_to_roi_id: "+window.name_to_roi_id[roi_name])
 
     roi['roi_id'] = roi_id
     roi['selected_by_select'] = window.rois[roi_id]['selected_by_select'] if window.rois[roi_id]?
 
     new_rois_table[roi_id] = roi
-    console.log("updated ROI table:")
-    console.log(new_rois_table[roi_id])
+    #console.log("updated ROI table:")
+    #console.log(new_rois_table[roi_id])
 
   window.rois = new_rois_table
+  console.profileEnd()
 
 update_rois = ->
   rois = PharmTraceAPI.rois
