@@ -2,19 +2,14 @@
 .controls
   - value, fixed_value_hash = fixed_value(field, data_hash)
   - value = field['selected_option'] if value.nil?
-  - selected_value = [value]
+  - selected_value = value
   - if @case.state == :reopened_in_progress
     - if (defined?(placeholder) and placeholder)
       - roi_value = nil
     - else
       - roi_value = value_for_reopened_case(field, @case)
-    - unless roi_value.nil?
-      - if roi_value.is_a?(String)
-        - selected_value = [roi_value]
-        - old_roi_options = []
-      - else
-        - selected_value = []
-        - old_roi_options = ["<option data-permanent-select-option=\"true\" value=\"#{ERB::Util.html_escape(JSON::generate(roi_value))}\" selected=\"selected\">Keep old ROI</option>"]
-  - old_roi_options = [] if old_roi_options.nil?
-  = select_tag(field['id'], options_from_values(field, selected_value, false, old_roi_options).html_safe, { :class => "#{input_size} select-roi", :'data-roi-values' => (field['roi_values'].nil? ? '{}' : field['roi_values'].to_json)}.merge(validators_hash(field)))
+    - if roi_value and roi_value.is_a?(String)
+      - selected_value = roi_value
+      - roi_value = nil
+  = hidden_field_tag(field['id'], value, { :class => "#{input_size} select-roi", :style => 'width: 270px;', :'data-values' => field['values'].to_json, :'data-roi-values' => (field['roi_values'].nil? ? '{}' : field['roi_values'].to_json)}.merge(validators_hash(field)).merge(roi_value.nil? ? {} : {:'data-old-roi' => old_roi.to_json}))
   %p.help-block
