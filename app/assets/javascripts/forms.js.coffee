@@ -286,9 +286,9 @@ update_allowed_rois = (changed_select) ->
   window.rois[old_selection]['selected_by_select'] = null if old_selection?
   window.rois[new_selection]['selected_by_select'] = changed_select.attr('id') if new_selection?
 
-  for id,select of window.roi_selects
-    continue if id == changed_select.id
-    update_enabled_options(select)
+  # for id,select of window.roi_selects
+  #   continue if id == changed_select.id
+  #   update_enabled_options(select)
 
   if(selected_option.val().length == 0)
     changed_select.removeData('old_selection')
@@ -351,8 +351,7 @@ update_rois = ->
   rois = PharmTraceAPI.rois
   update_rois_table(rois)
 
-  console.log(window.roi_selects)
-  update_roi_select(select) for id,select of window.roi_selects
+  #update_roi_select(select) for id,select of window.roi_selects
 
 update_nav_button_state = ->
   if $('#form_nav_select option').first().attr('selected') == 'selected'
@@ -502,7 +501,7 @@ add_roi_selects = (new_selects) ->
 remove_roi_selects = (removed_selects) ->
   for select in removed_selects
     delete window.roi_selects[select.id]
-                                                                                   
+
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -522,6 +521,8 @@ $(document).ready ->
     console.profile("Open ROI select")
     PharmTraceAPI.updateROIsSynchronously()
     update_rois()
+    update_roi_select(this)
+    update_enabled_options(this)
     console.profileEnd()
   roi_selects.change ->
     update_calculated_fields()
@@ -650,6 +651,8 @@ $(document).ready ->
       console.profile("Open ROI select")
       PharmTraceAPI.updateROIsSynchronously()
       update_rois()
+      update_roi_select(this)
+      update_enabled_options(this)
       console.profileEnd()
     repeatable_roi_selects.change ->
       update_calculated_fields()
