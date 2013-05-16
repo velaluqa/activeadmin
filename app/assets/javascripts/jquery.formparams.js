@@ -76,14 +76,10 @@
 						value = Boolean(value);
 					} else if ( type == 'select-multiple' && value == null) {
 					        value = []
-					} else {
-					        try {
-						    var parsed_object = jQuery.parseJSON(value);
-						    if(parsed_object != null && typeof parsed_object == 'object') {
-						    	     value = parsed_object;
-						    }
-						} catch (e) {
-						}						
+					} else if ( $(el).hasClass('select-roi') && isNumber(value) ) {
+					        window.form_answers_rois[el.name] = {'roi': window.rois[parseInt(value)], 'field': el};
+					} else if ( $(el).hasClass('select-roi') && value === '__KEEP_OLD_ROI' ) {
+					        window.form_answers_rois[el.name] = {'roi': value, 'field': el};
 					}					
 
 				}
