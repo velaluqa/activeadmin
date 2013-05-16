@@ -8,8 +8,9 @@
       - roi_value = nil
     - else
       - roi_value = value_for_reopened_case(field, @case)
+      - selected_value = '__KEEP_OLD_ROI'
     - if roi_value and roi_value.is_a?(String)
       - selected_value = roi_value
       - roi_value = nil
-  = hidden_field_tag(field['id'], value, { :class => "#{input_size} select-roi", :style => 'width: 270px;', :'data-values' => field['values'].to_json, :'data-roi-values' => (field['roi_values'].nil? ? '{}' : field['roi_values'].to_json)}.merge(validators_hash(field)).merge(roi_value.nil? ? {} : {:'data-old-roi' => old_roi.to_json}))
+  = hidden_field_tag(field['id'], selected_value, { :class => "#{input_size} select-roi", :style => 'width: 270px;', :'data-values' => field['values'].to_json, :'data-roi-values' => (field['roi_values'].nil? ? '{}' : field['roi_values'].to_json)}.merge(validators_hash(field)).merge(roi_value.nil? ? {} : {:'data-old-roi' => roi_value.to_json}))
   %p.help-block
