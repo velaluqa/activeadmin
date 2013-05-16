@@ -60,7 +60,24 @@ update_roi_option = (option, values) ->
   option.val(JSON.stringify(option_value))
 
   return option
-  
+
+generate_roi_answer_for_field = (roi, field) ->
+  field = $(field)
+  values = jQuery.parseJSON(field.attr('data-roi-values'))
+  return null unless values?
+
+  roi_answer = {}
+
+  roi_answer['location'] = {}
+  roi_answer['location']['seriesUID'] = roi['seriesUID']
+  roi_answer['location']['imageIndex'] = roi['imageIndex']
+  roi_answer['location']['sopInstanceUID'] = roi['sopInstanceUID']
+
+  for own key, value of values
+    roi_answer[key] = roi[value]
+
+  return roi_answer
+      
 roi_has_values = (roi, values) ->
   (return false if !(value of roi)) for own _,value of values
 
@@ -170,7 +187,7 @@ generate_pretty_answers = (answers, form_config, repeatables) ->
           pretty_repeatable_answers = []
         
         pretty_answers.push({'type': 'repeat', 'id': field['id'], 'answers': pretty_repeatable_answers})
-      when 'section' then
+      when 'section' then ''
       when 'group'
         pretty_answers.push({'type': 'group', 'label': field['label']})
       when 'fixed'
@@ -186,7 +203,7 @@ pretty_print_value = (value, field) ->
   else if(field['type'] == 'roi') and (typeof value == 'object')
     location = 'Location: '+value['location']['seriesUID']+' #'+value['location']['imageIndex'].toString()+"\n"
     value = location+((k+": "+v) for own k,v of value when k != 'location').join("\n")
-  else if(field['type'] == 'select') or ((field['type'] == 'roi') and (typeof value == 'string'))
+  else if(field['type'] == 'select') or ((field['type'] == 'roi') and (typeof value == 'string'))  
     answer_option = field['values'][value]
     value = if answer_option? and answer_option.length > 0 then answer_option else value
   else if(field['type'] == 'select_multiple')
@@ -205,14 +222,19 @@ fill_placeholder_cells = (root_elem, answers) ->
 fill_data_field = (field, answers) ->
   field_name = field.attr('name')
   return unless field_name?
-  answer = @value_at_path(answers, field_name)
+  answer = value_at_path(answers, field_name)
 
   if(field.attr('data-type') == 'bool')
     answer = if answer == yes then "Yes" else "No"
   else if(field.attr('data-type') == 'roi') and (typeof answer == 'object')
     location_html = '<p>Location: '+answer['location']['seriesUID']+' #'+answer['location']['imageIndex'].toString()+'</p>'
-    answer_html = location_html+(('<p>'+key+": "+value+'</p>') for own key,value of answer when key != 'location').join("\n")      
-  else if(field.attr('data-type') == 'select') or ((field.attr('data-type') == 'roi') and (typeof answer == 'string'))
+    answer_html = location_html+(('<p>'+key+": "+value+'</p>') for own key,value of answer when key != 'location').join("\n")
+  else if((field.attr('data-type') == 'roi') and (typeof answer == 'string'))
+    input = $('input[name="'+field_name+'"]')
+    values = jQuery.parseJSON(input.attr('data-values'))
+    answer_option = values[answer] if values?
+    answer = if answer_option? and answer_option.length > 0 then answer_option else answer    
+  else if(field.attr('data-type') == 'select')
     select_input = $('select[name="'+field_name+'"]')
     answer_option = select_input.find('option[value="'+answer+'"]').text()
     answer = if answer_option? and answer_option.length > 0 then answer_option else answer
@@ -418,7 +440,7 @@ validate_number_inputs = ->
 
     unless(Math.abs(Math.round(value*power) - value*power) < 0.00001) # epsilon calculation, since floating point math in JS is rediculously bad
       console.log('number input '+$number_input.attr('name')+' failed number step validation')
-      help_block.html("<ul role=\"alert\"><li>Invalid number, must be a mulitple of #{step}</li></ul>")
+      help_block.html("<ul role=\"alert\"><li>Invalid number, must be a multiple of #{step}</li></ul>")
       control_group.addClass('error')
       success = false
 
@@ -542,11 +564,39 @@ generate_roi_select2_options = (select) ->
     roi_options[series_uid].push({'id': roi_id, 'text': roi['name']})
 
   options = []
-  options.push({'text': 'Non-ROI options', 'children': classic_options})
+
+  if(has_old_roi)
+    options.push({'id': '__KEEP_OLD_ROI', 'text': 'Keep old ROI'})
+
+  options.push({'text': 'Non-ROI options', 'children': classic_options}) unless classic_options.length == 0
   for roi_series, children of roi_options
     options.push({'text': roi_series, 'children': children})
 
   window.roi_select_options[id] = options
+
+find_select2_option_by_value = (options, value) ->
+  return null unless options? and value?
+
+  for option in options
+    if(option['id'] == value)
+      return option
+    else if(option['children']?)
+      found_option = find_select2_option_by_value(option['children'], value)
+      return found_option if found_option?
+
+  return null
+
+roi_select2_init_selection = (element, callback) ->
+  element = element.get(0)
+  generate_roi_select2_options(element)
+  id = element.id
+  options = window.roi_select_options[id]
+  console.log(options)
+
+  selected_option = find_select2_option_by_value(options, $(element).val())
+  console.log(selected_option)
+
+  callback(selected_option)
 
 $(document).ready ->
   window.rois = {}
@@ -556,12 +606,14 @@ $(document).ready ->
   window.body_padding = $('body').css('padding-top').replace('px', '')
   window.roi_selects = {}
   window.roi_select_options = {}
+  window.form_answers_rois = {}
 
   window.roi_select2_config = {
     placeholder: "Please select",
     allowClear: true,
 
-    query: roi_select2_query,    
+    query: roi_select2_query,
+    initSelection: roi_select2_init_selection,
   }
 
   $(".datepicker-field").datepicker()
@@ -599,7 +651,19 @@ $(document).ready ->
 
           clear_custom_validation_messages()
 
+          window.form_answers_rois = {}
           form_data = find_arrays($('#the_form').formParams())
+          for path, roi_object of window.form_answers_rois
+            roi = roi_object['roi']
+            field = roi_object['field']
+            continue unless roi? and field?
+
+            if(roi == '__KEEP_OLD_ROI')
+              roi_answer = jQuery.parseJSON($(field).attr('data-old-roi'))
+            else
+              roi_answer = generate_roi_answer_for_field(roi, field)
+            result = set_value_at_path(form_data, path, roi_answer)
+            
           console.log(form_data)
 
           # create a clone so even if custom validators change the values, we don't use the changes
@@ -783,13 +847,3 @@ $(document).ready ->
       for image in images
         table_header_row.after($('<tr><td>'+image['path']+'</td><td>'+image['checksum']+'</td></tr>'))
     
-
-# plan for select2-based ROI fields:
-# - generate hidden_tag fields instead of selects in _field_roi
-# - store classic "values" into data property as json (data-values)
-# - generate list of available rois (roi_id, name) on select2-opening and store it into a map with the field id as the key
-# - use query function:
-#   - generate options hash directly from available rois (from map) + classical values
-# - use roi_id as value instead of JSON object
-# * when retrieving form answers, lookup ROI via roi_id==value, generate object
-# * BUG: exception (null.length) somewhere when selecting in a repeatable roi select ... no idea, yet
