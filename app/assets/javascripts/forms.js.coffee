@@ -274,21 +274,30 @@ find_arrays = (answers) ->
 
 set_index_in_name = (elements, index) ->
   for element in elements
-    name = $(element).attr('name').replace(/\[\]/, "[#{index}]")
+    element = $(element)
+    continue unless element.attr('name')?
+    name = element.attr('name').replace(/\[\]/, "[#{index}]")
 
-    $(element).attr('name', name)
+    element.attr('name', name)
 set_index_in_name_and_id = (elements, index) ->
   for element in elements
-    name = $(element).attr('name').replace(/\[\]/, "[#{index}]")
-    id = $(element).attr('id').replace(/__/, "_#{index}_")
+    element = $(element)
 
-    $(element).attr('name', name)
-    $(element).attr('id', id)
+    if(element.attr('name')?)
+      name = element.attr('name').replace(/\[\]/, "[#{index}]")
+      element.attr('name', name)
+
+    if(element.attr('id')?)
+      id = element.attr('id').replace(/__/, "_#{index}_")
+      element.attr('id', id)
+      
 set_index_in_for = (elements, index) ->
   for element in elements
-    name = $(element).attr('for').replace(/__/, "_#{index}_")
+    element = $(element)
+    continue unless element.attr('for')?
+    name = element.attr('for').replace(/__/, "_#{index}_")
 
-    $(element).attr('for', name)
+    element.attr('for', name)
 
 remove_no_validation = (elements) ->
   for element in elements
@@ -471,7 +480,7 @@ remove_last_repeatable = (remove_button) ->
 
   elements_to_delete = start_element.nextUntil(group_end_element).add(start_element)
 
-  removed_selects = elements_to_delete.find('.select-roi')
+  removed_selects = elements_to_delete.find('input.select-roi')
 
   for select in removed_selects
     $(select).val('')
@@ -544,7 +553,7 @@ render_roi_select2_option = (roi, roi_values) ->
   html = '<div class="roi-select2-item">'
   html += '<p>'+roi['name']+'</p>'
 
-  html += '<div class="roi-properties muted"><table>'
+  html += '<div class="roi-properties dark-muted"><table>'
   for own key, value of roi_values
     value_name = ROI_VALUE_NAMES[value]
     value_name = value unless value_name?
@@ -646,7 +655,7 @@ $(document).ready ->
   update_calculated_fields()
   update_remove_buttons_visibility()
 
-  roi_selects = $('.select-roi').not("[data-no-validation]")
+  roi_selects = $('input.select-roi').not("[data-no-validation]")
 
   roi_selects.select2(window.roi_select2_config)
   roi_selects.on 'select2-opening', ->
@@ -783,7 +792,7 @@ $(document).ready ->
     #console.log(group_end_form)
     #console.log(repeatable_form)
 
-    repeatable_roi_selects = repeatable_form.find('.select-roi')
+    repeatable_roi_selects = repeatable_form.find('input.select-roi')
 
     repeatable_roi_selects.change ->
       console.profile('Processing ROI select value change')
