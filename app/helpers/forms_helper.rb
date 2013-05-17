@@ -3,6 +3,11 @@ require 'key_path_accessor'
 module FormsHelper
   def validators_hash(field)
     attributes = {}
+
+    if(field[:is_repeatable])
+      attributes["data-no-validation"] = true
+    end
+
     return attributes if field['validations'].nil?
 
     field['validations'].each do |validation|
@@ -13,10 +18,6 @@ module FormsHelper
 
       attributes["data-validation-#{type}-message"] = message unless message.nil?
       attributes["data-validation-#{type}-#{type}"] = value
-    end
-
-    if(field[:is_repeatable])
-      attributes["data-no-validation"] = true
     end
 
     return attributes
