@@ -17,6 +17,10 @@ sequence:
         type: str
       "number_step":
         type: number
+      "dot_as_separator":
+        type: bool
+      "integer_only":
+        type: bool
       "selected_option":
         type: any
       "calculation_function":
