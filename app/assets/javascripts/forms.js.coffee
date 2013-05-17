@@ -540,6 +540,24 @@ roi_select2_query = (query) ->
   console.profileEnd()
   query.callback({'results': filtered_options})
 
+render_roi_select2_option = (roi, roi_values) ->
+  html = '<div class="roi-select2-item">'
+  html += '<p>'+roi['name']+'</p>'
+
+  html += '<div class="roi-properties muted"><table>'
+  for own key, value of roi_values
+    value_name = ROI_VALUE_NAMES[value]
+    value_name = value unless value_name?
+
+    return null unless roi[value]
+
+    html += '<tr><td>'+value_name+':</td><td>'+roi[value]+'</td></tr>'
+
+  html += '</table></div>'
+  html += '</div>'
+
+  return html
+
 generate_roi_select2_options = (select) ->
   id = select.id
   select = $(select)
@@ -550,7 +568,7 @@ generate_roi_select2_options = (select) ->
 
   classic_options = []
   for value, label of values
-    classic_options.push({'id': value, 'text': label})
+    classic_options.push({'id': value, 'type': 'classic', 'text': label})
 
   roi_options = {}
   for roi_id, roi of window.rois
@@ -559,18 +577,21 @@ generate_roi_select2_options = (select) ->
 
     selected_by_select = roi['selected_by_select']
     continue if(selected_by_select? and selected_by_select != id)
-      
+
+    roi_html = render_roi_select2_option(roi, roi_values)
+    continue unless roi_html?
+
     roi_options[series_uid] = [] unless roi_options[series_uid]
-    roi_options[series_uid].push({'id': roi_id, 'text': roi['name']})
+    roi_options[series_uid].push({'id': roi_id, 'type': 'roi', 'html': roi_html, 'text': roi['name']})
 
   options = []
 
   if(has_old_roi)
-    options.push({'id': '__KEEP_OLD_ROI', 'text': 'Keep old ROI'})
+    options.push({'id': '__KEEP_OLD_ROI', 'type': 'special', 'text': 'Keep old ROI'})
 
-  options.push({'text': 'Non-ROI options', 'children': classic_options}) unless classic_options.length == 0
+  options.push({'text': 'Non-ROI options', 'type': 'group', 'children': classic_options}) unless classic_options.length == 0
   for roi_series, children of roi_options
-    options.push({'text': roi_series, 'children': children})
+    options.push({'text': roi_series, 'type': 'group', 'children': children})
 
   window.roi_select_options[id] = options
 
@@ -598,6 +619,9 @@ roi_select2_init_selection = (element, callback) ->
 
   callback(selected_option)
 
+roi_select2_format = (item, container, query) ->
+  if (item.type? and item.type == 'roi') then item.html else item.text
+
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -614,6 +638,7 @@ $(document).ready ->
 
     query: roi_select2_query,
     initSelection: roi_select2_init_selection,
+    formatResult: roi_select2_format,
   }
 
   $(".datepicker-field").datepicker()
