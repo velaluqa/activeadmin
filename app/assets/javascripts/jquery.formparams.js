@@ -70,8 +70,8 @@
 					lastPart;
 
 				if ( convert ) {
-					if ( isNumber(value) && type == 'number' ) {
-						value = parseFloat(value);
+					if ( $(el).attr('data-type') == 'number' ) {
+						value = parseFloat(value.replace(',', '.'));
 					} else if ( value === 'true' || value === 'false' ) {
 						value = Boolean(value);
 					} else if ( type == 'select-multiple' && value == null) {
