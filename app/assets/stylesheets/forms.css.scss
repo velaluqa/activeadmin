@@ -120,6 +120,28 @@
     color: #777777;
 }
 
+.roi-select2-item
+{
+    line-height: 1em;
+    p
+    {
+	margin-bottom: 0;
+    }
+
+    .roi-properties
+    {
+	font-size: 85%;
+	line-height: 1em;
+
+	padding-left: 10px;
+
+	table tr > td
+	{
+	    padding-right: 3px;
+	}
+    }
+}
+
 #preview_modal .modal-body
 {
     max-height: 580px;
