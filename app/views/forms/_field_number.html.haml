@@ -1,6 +1,13 @@
 = label_tag(field['id'], field['label'].html_safe, :class => 'control-label')
 .controls
   - value, fixed_value_hash = fixed_value(field, data_hash)
-  - value = value_for_reopened_case(field, @case) if(@case.state == :reopened_in_progress and value.nil?)
-  = number_field_tag(field['id'], value, { :class => input_size, :step => (field['number_step'].nil? ? 0.01 : field['number_step']) }.merge(validators_hash(field)).merge(fixed_value_hash))
+  - value = value_for_reopened_case(field, @case) if(@case.state == :reopened_in_progress and value.nil?) unless (defined?(placeholder) and placeholder)
+  - decimal_separator = (field['dot_as_separator'] ? '\.' : ',')
+  - if(field['integer_only'] or field['number_step'] == 1)
+    - pattern = '-?\d+'
+    - message = 'Must be a valid integer.'
+  - else
+    - pattern = '-?\d+('+decimal_separator+'[\d+])?'
+    - message = 'Must be a valid number.'
+  = text_field_tag(field['id'], value, { :class => input_size, :'data-type' => 'number', :pattern => pattern, :'data-validation-pattern-message' => message }.merge(validators_hash(field)).merge(fixed_value_hash))
   %p.help-block

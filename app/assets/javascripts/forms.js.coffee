@@ -678,10 +678,10 @@ $(document).ready ->
 
           update_calculated_fields()
 
-          unless validate_number_inputs()
-            console.log('NUMBER VALIDATION FAILED')
-            display_validation_success(false)
-            return            
+          # unless validate_number_inputs()
+          #   console.log('NUMBER VALIDATION FAILED')
+          #   display_validation_success(false)
+          #   return            
 
           clear_custom_validation_messages()
 
