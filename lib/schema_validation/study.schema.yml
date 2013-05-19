@@ -1,13 +1,76 @@
 type: map
 name: root
 mapping:
+  "domino_integration":
+    type: map
+    required: yes
+    mapping:
+      "dicom_tags":
+        type: map
+        required: yes
+        name: dicom_tag_keys
+        mapping:
+          =:
+            type: str
+  "image_series_properties":
+    type: seq
+    required: yes
+    sequence:
+      - type: map
+        name: image_series_property
+        mapping:
+          "id":
+            type: str
+            unique: yes
+            required: yes
+          "type":
+            type: str
+            enum: ['select', 'string', 'bool']
+            required: yes
+          "label":
+            type: str
+            required: yes
+          "values":
+            type: map
+            name: field_values
+            mapping:
+              =:
+                type: str
   "visit_types":
     type: map
     required: yes
     mapping:
       =:
         type: map
-        mapping:
+        mapping:          
           "description":
             type: str
-          
+          "required_series":
+            type: map
+            required: yes
+            mapping:
+              =:
+                type: map
+                mapping:
+                  "tqc":
+                    type: seq
+                    required: yes
+                    sequence:
+                      - type: map
+                        name: tqc_question
+                        mapping:
+                          "id":
+                            type: str
+                            required: yes
+                            unique: yes
+                          "type":
+                            type: str
+                            required: yes
+                            enum: ['bool', 'dicom']
+                          "label":
+                            type: str
+                            required: yes
+                          "dicom_tag":
+                            type: str
+                          "expected_value":
+                            type: str
