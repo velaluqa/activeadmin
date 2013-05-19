@@ -5,7 +5,7 @@ class ImageSeries < ActiveRecord::Base
 
   has_paper_trail
 
-  attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid
+  attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number
   attr_accessible :visit, :patient
 
   belongs_to :visit
@@ -14,11 +14,18 @@ class ImageSeries < ActiveRecord::Base
   has_one :image_series_data
   
   validates_uniqueness_of :name, :scope => :visit_id
-  validates_presence_of :name, :patient_id, :imaging_date
+  validates_uniqueness_of :series_number, :scope => :patient_id
+  validates_presence_of :name, :patient_id, :imaging_date, :series_number
 
   scope :not_assigned, where(:visit_id => nil)
 
   before_save :ensure_visit_is_for_patient
+
+  before_validation do
+    if(self.new_record? and self.series_number.nil? and self.patient)
+      self.series_number = self.patient.next_series_number
+    end
+  end
 
   after_create do
     ImageSeriesData.create(:image_series_id => self.id)

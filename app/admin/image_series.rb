@@ -16,6 +16,7 @@ ActiveAdmin.register ImageSeries do
     selectable_column
     column :patient
     column :visit
+    column :series_number
     column :name
     column :imaging_date
     
@@ -26,6 +27,7 @@ ActiveAdmin.register ImageSeries do
     attributes_table do
       row :patient
       row :visit
+      row :series_number
       row :name
       domino_link_row(image_series)
       row :image_storage_path
@@ -40,6 +42,7 @@ ActiveAdmin.register ImageSeries do
     f.inputs 'Details' do
       f.input :patient
       f.input :visit
+      f.input :series_number, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
       f.input :name
       f.input :imaging_date, :as => :datepicker
     end
@@ -50,6 +53,7 @@ ActiveAdmin.register ImageSeries do
   # filters
   filter :patient
   filter :visit
+  filter :series_number
   filter :name
   filter :imaging_date
 

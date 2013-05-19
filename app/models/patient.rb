@@ -52,6 +52,11 @@ class Patient < ActiveRecord::Base
     PatientData.where(:patient_id => read_attribute(:id)).first
   end
 
+  def next_series_number
+    return 1 if self.image_series.empty?
+    return self.image_series.order('series_number DESC').first.series_number+1
+  end
+
   def previous_image_storage_path
     if(self.previous_changes.include?(:center_id))
       previous_center = Center.find(self.previous_changes[:center_id][0])
