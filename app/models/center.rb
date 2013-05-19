@@ -51,10 +51,11 @@ class Center < ActiveRecord::Base
     {'docCode' => 10005, 'CenterNo' => self.code}
   end
   def domino_document_fields
-    ['code', 'name']
+    ['id', 'code', 'name']
   end
   def domino_document_properties
     {
+      'ericaID' => self.id,
       'CenterNo' => self.code,
       'CenterShortName' => self.name,
     }

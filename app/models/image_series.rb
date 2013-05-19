@@ -105,6 +105,7 @@ class ImageSeries < ActiveRecord::Base
   end
   def domino_document_properties
     properties = {
+      'ericaID' => id,
       'Center' => patient.center.name,
       'CenterNo' => patient.center.code,
       'UIDCenter' => patient.center.domino_unid,

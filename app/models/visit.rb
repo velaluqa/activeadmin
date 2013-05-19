@@ -75,11 +75,11 @@ class Visit < ActiveRecord::Base
   end
   def domino_document_properties
     {
+      'ericaID' => id,
       'Center' => patient.center.name,
       'CenterNo' => patient.center.code,
       'UIDCenter' => patient.center.domino_unid,
       'PatNo' => patient.domino_patient_no,
-      'ericaID' => id,
       'visitNo' => visit_number,
     }
   end

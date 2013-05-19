@@ -91,12 +91,13 @@ class Patient < ActiveRecord::Base
     }
   end
   def domino_document_fields
-    ['subject_id']
+    ['id', 'subject_id']
   end
   def domino_document_properties
     return {} if center.nil?
 
     {
+      'ericaID' => id,
       'Center' => center.name,
       'shCenter' => center.name,
       'CenterNo' => center.code,
