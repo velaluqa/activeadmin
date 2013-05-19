@@ -22,10 +22,8 @@ module SchemaValidation
       when 'image_series_property'
         errors << Kwalify::ValidationError.new('Missing \'values\'', path) if(value['type'] == 'select' and value['values'].nil?)
         errors << Kwalify::ValidationError.new('Only type \'select\' can have \'values\'', path) unless (value['type'] == 'select' or value['values'].nil?)
-      when 'dicom_tag_keys'
-        value.each do |key,value|
-          errors << Kwalify::ValidationError.new("Key must be a string containing a valid DICOM tag in the format 'xxxx,yyyy'", (path.is_a?(String) ? path+'/'+key.to_s : path << key)) unless(key.is_a?(String) and key =~ /\h{4},\h{4}/)
-        end
+      when 'dicom_tag'
+        errors << Kwalify::ValidationError.new("Key must be a string containing a valid DICOM tag in the format 'xxxx,yyyy'", path) unless(value.is_a?(String) and value =~ /\h{4},\h{4}/)
       end
     end
   end

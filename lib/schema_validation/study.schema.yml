@@ -6,12 +6,19 @@ mapping:
     required: yes
     mapping:
       "dicom_tags":
-        type: map
+        type: seq
         required: yes
-        name: dicom_tag_keys
-        mapping:
-          =:
-            type: str
+        sequence:
+          - type: map
+            mapping:
+              "tag":
+                name: dicom_tag
+                type: str
+                required: yes
+                unique: yes
+              "label":
+                type: str
+                required: yes
   "image_series_properties":
     type: seq
     required: yes
