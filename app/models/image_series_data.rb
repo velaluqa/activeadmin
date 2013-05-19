@@ -3,6 +3,7 @@ class ImageSeriesData
 
   field :image_series_id, type: Integer
   field :tqc_results, type: Hash
+  field :properties, type: Hash
 
   def image_series
     begin

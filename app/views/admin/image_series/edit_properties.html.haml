@@ -1,0 +1,27 @@
+= form_tag(edit_properties_admin_image_series_path(@image_series), :method => :post, :multipart => true, :class => 'formtastic form') do
+  = field_set_tag('<span>Properties</span>'.html_safe, :class => 'inputs') do
+    %ol
+      - @properties_spec.each do |property_spec|
+        - field_name = 'properties['+property_spec['id']+']'
+        - current_value = @properties[property_spec['id']]
+        - case property_spec['type']
+        - when 'select'
+          %li.input.select
+            = label_tag(field_name, property_spec['label'])
+            = select_tag(field_name, options_for_select(property_spec['values'].map {|value, label| [label, value]}, current_value), :include_blank => true)
+        - when 'bool'
+          %li.input
+            = hidden_field_tag(field_name, '0')
+            = label_tag(field_name, property_spec['label'])
+            = check_box_tag(field_name, '1', current_value == true)
+        - when 'string'
+          %li.input.string
+            = label_tag(field_name, property_spec['label'])
+            = text_field_tag(field_name, current_value)
+
+  = field_set_tag(nil, :class => 'actions') do
+    %ol
+      %li.action.input_action
+        = submit_tag('Save Changes')
+      %li.cancel
+        = link_to('Cancel', admin_image_series_path(@image_series))

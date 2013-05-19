@@ -27,13 +27,11 @@ class ImageSeries < ActiveRecord::Base
     end
   end
 
-  after_create do
-    ImageSeriesData.create(:image_series_id => self.id)
-  end
+  after_create :ensure_image_series_data_exists
 
   before_destroy do
     ImageSeriesData.destroy_all(:image_series_id => self.id)
-  end
+  end  
 
   def study
     if self.patient.nil?
@@ -156,9 +154,12 @@ class ImageSeries < ActiveRecord::Base
     properties
 
     # from image_series_data
-    # * orientation
-    # * region
-    # * contrast
-    # * comment
+    # * image series properties
+  end
+
+  def ensure_image_series_data_exists
+    if(self.image_series_data.nil?)
+      ImageSeriesData.create(:image_series_id => self.id)
+    end
   end
 end

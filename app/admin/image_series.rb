@@ -72,5 +72,54 @@ ActiveAdmin.register ImageSeries do
     render 'admin/shared/weasis_webstart.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
   end
 
+  member_action :edit_properties, :method => :post do
+    @image_series = ImageSeries.find(params[:id])
+
+    if(@image_series.study.nil? or not @image_series.study.semantically_valid?)
+      flash[:error] = 'Properties can only be edited once a valid study configuration was uploaded.'
+      redirect_to({:action => :show})
+    end
+
+    @image_series.ensure_image_series_data_exists
+    image_series_data = @image_series.image_series_data
+
+    study_config = @image_series.study.current_configuration
+    properties_spec = study_config['image_series_properties']
+    image_series_data.properties = {} if image_series_data.properties.nil?
+
+    properties_spec.each do |property_spec|
+      new_value = params[:properties][property_spec['id']]
+
+      case property_spec['type']
+      when 'bool'
+        new_value = (new_value == '1')
+      end
+
+      image_series_data.properties[property_spec['id']] = new_value
+    end
+    image_series_data.save
+
+    redirect_to({:action => :show}, :notice => 'Properties successfully updated.')
+  end
+  member_action :edit_properties_form, :method => :get do
+    @image_series = ImageSeries.find(params[:id])
+    
+    if(@image_series.study.nil? or not @image_series.study.semantically_valid?)
+      flash[:error] = 'Properties can only be edited once a valid study configuration was uploaded.'
+      redirect_to({:action => :show})
+    end
+
+    study_config = @image_series.study.current_configuration
+    @properties_spec = study_config['image_series_properties']
+
+    @properties = (@image_series.image_series_data.nil? ? {} : @image_series.image_series_data.properties)
+
+    @page_title = 'Edit Properties'
+    render 'admin/image_series/edit_properties'
+  end
+  action_item  :only => :show do
+    link_to('Edit Properties', edit_properties_form_admin_image_series_path(resource))
+  end
+
   viewer_cartable(:image_series)
 end
