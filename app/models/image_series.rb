@@ -116,6 +116,8 @@ class ImageSeries < ActiveRecord::Base
       'imaDateManual' => {'data' => imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}, # this is utterly ridiculous: sending the date in the corrent format (%Y-%m-%d) leads switched month/day for days where this can work (1-12). sending a completely broken format leads to correct parses... *doublefacepalm*
     }
 
+    study_config = study.current_configuration
+
     unless(images.empty?)
       image = images[(images.count-1)/2]
       
@@ -129,9 +131,7 @@ class ImageSeries < ActiveRecord::Base
 
         dicom_imaging_date = dicom_metadata['0008,0023']
         dicom_imaging_date = dicom_metadata['0008,0022'] if dicom_imaging_date.nil?
-        pp dicom_imaging_date
         dicom_imaging_date = DateTime.strptime(dicom_imaging_date[:value], '%Y%m%d') unless dicom_imaging_date.nil?
-        pp dicom_imaging_date
         unless(dicom_imaging_date.nil?)
           dicom_properties.merge!({
                                     'imaDate' => dicom_imaging_date.strftime('%Y%m%d'),
@@ -140,15 +140,24 @@ class ImageSeries < ActiveRecord::Base
         end
 
         properties.merge!(dicom_properties)
+
+        if(study_config and study.semantically_valid?)
+          extra_dicom_tags = {}
+          study_config['domino_integration']['dicom_tags'].each_with_index do |tag, i|
+            pp tag
+            extra_dicom_tags['DICOM'+(i+1).to_s] = (dicom_metadata[tag['tag']].nil? ? '' : dicom_metadata[tag['tag']][:value])
+            extra_dicom_tags['DICOMtext'+(i+1).to_s] = tag['label']
+          end
+          pp extra_dicom_tags
+
+          properties.merge!(extra_dicom_tags)
+        end
       end
     end
 
+    pp properties
     properties
 
-    # from DICOM
-    # * DICOMn
-    # from study config
-    # * DICOMtextn
     # from image_series_data
     # * orientation
     # * region

@@ -19,6 +19,9 @@ ActiveAdmin.register ImageSeries do
     column :series_number
     column :name
     column :imaging_date
+    column :images do |image_series|
+      link_to(image_series.images.size, admin_images_path(:'q[image_series_id_eq]' => image_series.id))
+    end
     
     default_actions
   end
@@ -30,6 +33,9 @@ ActiveAdmin.register ImageSeries do
       row :series_number
       row :name
       domino_link_row(image_series)
+      row :images do
+        link_to(image_series.images.size, admin_images_path(:'q[image_series_id_eq]' => image_series.id))
+      end
       row :image_storage_path
       row :imaging_date
       row 'Viewer' do
