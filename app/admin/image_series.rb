@@ -42,6 +42,12 @@ ActiveAdmin.register ImageSeries do
         link_to('View in Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'))
       end
     end
+
+    if(image_series.study and image_series.study.semantically_valid? and image_series.image_series_data and image_series.image_series_data.properties)
+      properties_spec = image_series.study.current_configuration['image_series_properties']
+
+      render :partial => 'admin/image_series/properties_table', :locals => { :spec => properties_spec, :values => image_series.image_series_data.properties}
+    end
   end
 
   form do |f|

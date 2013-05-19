@@ -1,0 +1,27 @@
+- displayed_properties = []
+.panel
+  %h3 Properties
+  .panel_contents
+    .attributes_table
+      %table{:border => 0, :cellspacing => 0, :cellpadding => 0}
+        %tbody
+          - spec.each do |property|
+            %tr
+              %th= property['label']
+              %td
+                - value = values[property['id']]
+                - case property['type']
+                - when 'string'
+                  = value
+                - when 'bool'
+                  = (value ? 'Yes' : 'No')
+                - when 'select'
+                  = (property['values'][value].nil? ? value : property['values'][value])
+                - else
+                  value
+            - displayed_properties << property['id']
+          - values.each do |id, value|
+            - next if displayed_properties.include?(id)
+            %tr
+              %th= id
+              %td= value
