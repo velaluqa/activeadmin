@@ -55,6 +55,13 @@ class DominoIntegrationClient
     return target_collection['@unid']
   end
 
+  def trash_document(unid, form)
+    return update_document(unid, form, {'Trash' => 1})
+  end
+  def untrash_document(unid, form)
+    return update_document(unid, form, {'Trash' => 0})
+  end
+
   protected
 
   def create_document(form, properties)

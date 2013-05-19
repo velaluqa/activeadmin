@@ -3,6 +3,7 @@ require 'domino_integration_client'
 module DominoDocument
   def self.included(base)
     base.after_commit :ensure_domino_document_exists
+    base.after_destroy :trash_document
   end
 
   def lotus_notes_url
@@ -39,5 +40,17 @@ module DominoDocument
     end
 
     return result
+  end
+
+  def trash_document
+    return true if self.domino_unid.nil?
+
+    client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
+    if client.nil?
+      errors.add :name, 'Failed to communicate with the Domino server.'
+      return false
+    end
+
+    return client.trash_document(self.domino_unid, domino_document_form)
   end
 end
