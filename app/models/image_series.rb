@@ -111,7 +111,7 @@ class ImageSeries < ActiveRecord::Base
       'UIDCenter' => patient.center.domino_unid,
       'PatNo' => patient.domino_patient_no,
       'imaPatNo' => patient.subject_id,
-      'imaSeriesNo' => id,
+      'imaSeriesNo' => series_number,
       'imaDateMan' => imaging_date.strftime('%Y%m%d'),
       'imaDateManual' => {'data' => imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}, # this is utterly ridiculous: sending the date in the corrent format (%Y-%m-%d) leads switched month/day for days where this can work (1-12). sending a completely broken format leads to correct parses... *doublefacepalm*
     }
