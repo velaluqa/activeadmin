@@ -6,10 +6,12 @@ class ImageSeries < ActiveRecord::Base
   has_paper_trail
 
   attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number
-  attr_accessible :visit, :patient
+  attr_accessible :state, :tqc_version, :tqc_date, :tqc_user_id
+  attr_accessible :visit, :patient, :tqc_user
 
   belongs_to :visit
   belongs_to :patient
+  belongs_to :tqc_user, :class_name => 'User'
   has_many :images, :dependent => :destroy
   has_one :image_series_data
   
@@ -32,6 +34,28 @@ class ImageSeries < ActiveRecord::Base
   before_destroy do
     ImageSeriesData.destroy_all(:image_series_id => self.id)
   end  
+
+  STATE_SYMS = [:imported, :visit_assigned, :tqc_pending, :tqc_issues, :tqc_passed]
+
+  def self.state_sym_to_int(sym)
+    return ImageSeries::STATE_SYMS.index(sym)
+  end
+  def state
+    return -1 if read_attribute(:state).nil?
+    return ImageSeries::STATE_SYMS[read_attribute(:state)]
+  end
+  def state=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = ImageSeries::STATE_SYMS.index(sym)
+    
+    if index.nil?
+      throw "Unsupported state"
+      return
+    end
+    
+    write_attribute(:state, index)
+    puts "STATE CHANGED to #{index}"
+  end
 
   def study
     if self.patient.nil?

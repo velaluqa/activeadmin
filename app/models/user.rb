@@ -23,6 +23,8 @@ class User < ActiveRecord::Base
   has_and_belongs_to_many :blind_readable_sessions, :class_name => 'Session', :join_table => 'readers_sessions'
   has_and_belongs_to_many :validatable_sessions, :class_name => 'Session', :join_table => 'validators_sessions'
 
+  has_many :image_series, :dependent => :nullify, :foreign_key => 'tqc_user_id'
+
   before_save :ensure_authentication_token
   before_save :reset_authentication_token_on_password_change
 

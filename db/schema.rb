@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130519113129) do
+ActiveRecord::Schema.define(:version => 20130521122614) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -69,12 +69,16 @@ ActiveRecord::Schema.define(:version => 20130519113129) do
   create_table "image_series", :force => true do |t|
     t.string   "name"
     t.integer  "visit_id"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.datetime "created_at",                   :null => false
+    t.datetime "updated_at",                   :null => false
     t.integer  "patient_id"
     t.date     "imaging_date"
     t.string   "domino_unid"
     t.integer  "series_number"
+    t.string   "tqc_version"
+    t.datetime "tqc_date"
+    t.integer  "tqc_user_id"
+    t.integer  "state",         :default => 0
   end
 
   add_index "image_series", ["patient_id", "series_number"], :name => "index_image_series_on_patient_id_and_series_number", :unique => true

@@ -22,6 +22,20 @@ ActiveAdmin.register ImageSeries do
     column :images do |image_series|
       link_to(image_series.images.size, admin_images_path(:'q[image_series_id_eq]' => image_series.id))
     end
+    column :state, :sortable => :state do |image_series|
+      case image_series.state
+      when :imported
+        status_tag('Imported', :ok)
+      when :visit_assigned
+        status_tag('Visit assigned', :ok)
+      when :tqc_pending
+        status_tag('tQC pending', :warning)
+      when :tqc_issues
+        status_tag('tQC issues present', :error)
+      when :tqc_passed
+        status_tag('tQC passed', :ok)
+      end
+    end
     
     default_actions
   end
@@ -38,6 +52,20 @@ ActiveAdmin.register ImageSeries do
       end
       row :image_storage_path
       row :imaging_date
+      row :state do
+        case image_series.state
+        when :imported
+          status_tag('Imported', :ok)
+        when :visit_assigned
+          status_tag('Visit assigned', :ok)
+        when :tqc_pending
+          status_tag('tQC pending', :warning)
+        when :tqc_issues
+          status_tag('tQC issues present', :error)
+        when :tqc_passed
+          status_tag('tQC passed', :ok)
+        end
+      end
       row 'Viewer' do
         link_to('View in Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'))
       end
