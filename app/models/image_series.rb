@@ -5,13 +5,11 @@ class ImageSeries < ActiveRecord::Base
 
   has_paper_trail
 
-  attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number
-  attr_accessible :state, :tqc_version, :tqc_date, :tqc_user_id
-  attr_accessible :visit, :patient, :tqc_user
+  attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number, :state
+  attr_accessible :visit, :patient
 
   belongs_to :visit
   belongs_to :patient
-  belongs_to :tqc_user, :class_name => 'User'
   has_many :images, :dependent => :destroy
   has_one :image_series_data
   
@@ -32,7 +30,7 @@ class ImageSeries < ActiveRecord::Base
     ImageSeriesData.destroy_all(:image_series_id => self.id)
   end  
 
-  STATE_SYMS = [:imported, :visit_assigned, :tqc_pending, :tqc_issues, :tqc_passed]
+  STATE_SYMS = [:imported, :visit_assigned, :required_series_assigned, :not_required]
 
   def self.state_sym_to_int(sym)
     return ImageSeries::STATE_SYMS.index(sym)
@@ -51,7 +49,6 @@ class ImageSeries < ActiveRecord::Base
     end
     
     write_attribute(:state, index)
-    puts "STATE CHANGED to #{index}"
   end
 
   def study
@@ -198,20 +195,10 @@ class ImageSeries < ActiveRecord::Base
       new_visit_id = changes[:visit_id][1]
 
       if(not old_visit_id.nil? and new_visit_id.nil?)
-        puts "VISIT UNASSIGNED"
         self.state = :imported
-        self.tqc_user_id = nil
-        self.tqc_date = nil
-        self.tqc_version = nil
       elsif( (old_visit_id.nil? and not new_visit_id.nil? and state == :imported) or (old_visit_id != new_visit_id) )
-        puts "VISIT CHANGED/ASSIGNED"
         self.state = :visit_assigned
-        self.tqc_user_id = nil
-        self.tqc_date = nil
-        self.tqc_version = nil
       end
-
-      pp self
     end
   end
 

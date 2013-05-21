@@ -51,7 +51,7 @@ class Visit < ActiveRecord::Base
     VisitData.create(:visit_id => self.id) if self.visit_data.nil?
   end
 
-  def required_series
+  def required_series_specs
     return nil if(self.visit_type.nil? or self.study.nil? or not self.study.semantically_valid?)
 
     study_config = self.study.current_configuration
@@ -62,24 +62,37 @@ class Visit < ActiveRecord::Base
     return required_series
   end
   def required_series_names
-    required_series = self.required_series
-    return nil if required_series.nil?
-    return required_series.keys
+    required_series_specs = self.required_series_specs
+    return nil if required_series_specs.nil?
+    return required_series_specs.keys
+  end
+  def required_series
+    self.ensure_visit_data_exists
+    return self.visit_data.required_series
   end
   def assigned_required_series(required_series_name)
     self.ensure_visit_data_exists
-    return ImageSeries.find(self.visit_data.assigned_required_series[required_series_name])
+
+    required_series = self.required_series(required_series_name)
+    return nil if(required_series.nil? or required_series['image_series_id'].nil?)
+
+    return ImageSeries.find(required_series['image_series_id'])
   end
   def assigned_required_series_id_map
     self.ensure_visit_data_exists
 
-    return self.visit_data.assigned_required_series
+    id_map = {}
+    self.visit_data.required_series.each do |required_series_name, required_series|
+      id_map[required_series_name] = required_series['image_series_id']
+    end
+
+    return id_map
   end
   def assigned_required_series_map
     map = assigned_required_series_id_map
     object_map = {}
     map.each do |series_name, series_id|
-      object_map[series_name] = ImageSeries.find(series_id)
+      object_map[series_name] = ImageSeries.find(series_id) unless series_id.nil?
     end
 
     return object_map

@@ -2,7 +2,8 @@ class VisitData
   include Mongoid::Document
 
   field :visit_id, type: Integer
-  field :assigned_required_series, type: Hash, default: {}
+  field :assigned_image_series_index, type: Hash, default: {}
+  field :required_series, type: Hash, default: {}
 
   def visit
     begin

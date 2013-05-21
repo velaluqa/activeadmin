@@ -29,7 +29,7 @@ ActiveAdmin.register Visit do
       row :image_storage_path
     end
     
-    required_series_spec = visit.required_series
+    required_series_spec = visit.required_series_specs
     pp required_series_spec
     unless(required_series_spec.nil?)
       assigned_required_series = visit.assigned_required_series_map
@@ -60,14 +60,28 @@ ActiveAdmin.register Visit do
 
     @visit.ensure_visit_data_exists
     visit_data = @visit.visit_data
+
+    assignment_index = visit_data.assigned_image_series_index
+    #assignment_index = {}
+    
     @assignments.each do |required_series_name, series_id|
-      if(series_id.empty?)
-        visit_data.assigned_required_series.delete(required_series_name)
-      else
-        visit_data.assigned_required_series[required_series_name] = series_id
+      series_id = (series_id.blank? ? nil : series_id)
+      visit_data.required_series[required_series_name] = {} if visit_data.required_series[required_series_name].nil?
+
+      if(visit_data.required_series[required_series_name]['image_series_id'])
+        old_series_id = visit_data.required_series[required_series_name]['image_series_id'].to_s
+        
+        assignment_index[old_series_id].delete(required_series_name) unless(old_series_id.nil? or assignment_index[old_series_id].nil?)
       end
+
+      visit_data.required_series[required_series_name]['image_series_id'] = series_id
+
+      assignment_index[series_id] = [] if (series_id and assignment_index[series_id].nil?)
+      assignment_index[series_id] << required_series_name unless series_id.nil?
     end
+    visit_data.assigned_image_series_index = assignment_index
     visit_data.save
+    pp visit_data.assigned_image_series_index
 
     redirect_to({:action => :show}, :notice => 'Assignments of required series changed.')
   end
@@ -80,7 +94,7 @@ ActiveAdmin.register Visit do
     else
       @required_series_names = @required_series_names.split(',')
     end
-    @current_assignment = (@visit.visit_data.nil? ? {} : @visit.visit_data.assigned_required_series)
+    @current_assignment = (@visit.visit_data.nil? ? {} : @visit.assigned_required_series_id_map)
 
     @page_title = 'Assign image series as required series'
     render 'admin/visits/assign_required_series'

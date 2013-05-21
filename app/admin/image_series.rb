@@ -28,12 +28,10 @@ ActiveAdmin.register ImageSeries do
         status_tag('Imported', :ok)
       when :visit_assigned
         status_tag('Visit assigned', :ok)
-      when :tqc_pending
-        status_tag('tQC pending', :warning)
-      when :tqc_issues
-        status_tag('tQC issues present', :error)
-      when :tqc_passed
-        status_tag('tQC passed', :ok)
+      when :required_series_assigned
+        status_tag('Required series\' assigned', :warning)
+      when :not_required
+        status_tag('Not relevant for read', :error)
       end
     end
     
@@ -58,12 +56,10 @@ ActiveAdmin.register ImageSeries do
           status_tag('Imported', :ok)
         when :visit_assigned
           status_tag('Visit assigned', :ok)
-        when :tqc_pending
-          status_tag('tQC pending', :warning)
-        when :tqc_issues
-          status_tag('tQC issues present', :error)
-        when :tqc_passed
-          status_tag('tQC passed', :ok)
+        when :required_series_assigned
+          status_tag('Required series\' assigned', :warning)
+        when :not_required
+          status_tag('Not relevant for read', :error)
         end
       end
       row 'Viewer' do
