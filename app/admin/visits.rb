@@ -34,7 +34,7 @@ ActiveAdmin.register Visit do
     unless(required_series_spec.nil?)
       assigned_required_series = visit.assigned_required_series_map
 
-      render :partial => 'admin/visits/required_series', :locals => { :required_series_spec => required_series_spec, :assigned_required_series => assigned_required_series }
+      render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series_spec => required_series_spec, :assigned_required_series => assigned_required_series}
     end
   end
 
@@ -52,6 +52,42 @@ ActiveAdmin.register Visit do
   filter :patient
   filter :visit_number
   filter :visit_type
+
+  member_action :assign_required_series, :method => :post do
+    @visit = Visit.find(params[:id])
+
+    @assignments = params[:assignments] || {}
+
+    @visit.ensure_visit_data_exists
+    visit_data = @visit.visit_data
+    @assignments.each do |required_series_name, series_id|
+      if(series_id.empty?)
+        visit_data.assigned_required_series.delete(required_series_name)
+      else
+        visit_data.assigned_required_series[required_series_name] = series_id
+      end
+    end
+    visit_data.save
+
+    redirect_to({:action => :show}, :notice => 'Assignments of required series changed.')
+  end
+  member_action :assign_required_series_form, :method => :get do
+    @visit = Visit.find(params[:id])
+
+    @required_series_names = params[:required_series_names]
+    if(@required_series_names.nil?)
+      @required_series_names = @visit.required_series_names
+    else
+      @required_series_names = @required_series_names.split(',')
+    end
+    @current_assignment = (@visit.visit_data.nil? ? {} : @visit.visit_data.assigned_required_series)
+
+    @page_title = 'Assign image series as required series'
+    render 'admin/visits/assign_required_series'
+  end
+  action_item :only => :show do
+    link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource))
+  end
   
   viewer_cartable(:visit)
 end

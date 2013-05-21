@@ -68,12 +68,21 @@ class Visit < ActiveRecord::Base
   end
   def assigned_required_series(required_series_name)
     self.ensure_visit_data_exists
-    return self.visit_data.assigned_required_series[required_series_name]
+    return ImageSeries.find(self.visit_data.assigned_required_series[required_series_name])
   end
-  def assigned_required_series_map
+  def assigned_required_series_id_map
     self.ensure_visit_data_exists
 
     return self.visit_data.assigned_required_series
+  end
+  def assigned_required_series_map
+    map = assigned_required_series_id_map
+    object_map = {}
+    map.each do |series_name, series_id|
+      object_map[series_name] = ImageSeries.find(series_id)
+    end
+
+    return object_map
   end
 
   def previous_image_storage_path

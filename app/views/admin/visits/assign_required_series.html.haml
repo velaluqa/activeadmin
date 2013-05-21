@@ -1,0 +1,16 @@
+= form_tag(assign_required_series_admin_visit_path(@visit), :method => :post, :class => 'formtastic form') do
+  = field_set_tag('<span>Assignments</span>'.html_safe, :class => 'inputs') do
+    %ol
+      - image_series = @visit.image_series.map {|i_s| [i_s.name, i_s.id]}
+      - @required_series_names.each do |required_series_name|
+        %li.input.select
+          = label_tag("assignments[#{required_series_name}]", required_series_name)
+          = select_tag("assignments[#{required_series_name}]", options_for_select(image_series, @current_assignment[required_series_name]), :include_blank => true)
+
+  = field_set_tag(nil, :class => 'actions') do
+    %ol
+      %li.action.input_action
+        = submit_tag('Assign')
+      %li.cancel
+        = link_to('Cancel', admin_visit_path(@visit))
+        
