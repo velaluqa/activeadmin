@@ -22,12 +22,9 @@ class ImageSeries < ActiveRecord::Base
   scope :not_assigned, where(:visit_id => nil)
 
   before_save :ensure_visit_is_for_patient
+  before_save :update_state
 
-  before_validation do
-    if(self.new_record? and self.series_number.nil? and self.patient)
-      self.series_number = self.patient.next_series_number
-    end
-  end
+  before_validation :assign_series_number
 
   after_create :ensure_image_series_data_exists
 
@@ -186,4 +183,36 @@ class ImageSeries < ActiveRecord::Base
       ImageSeriesData.create(:image_series_id => self.id)
     end
   end
+
+  protected
+
+  def assign_series_number
+    if(self.new_record? and self.series_number.nil? and self.patient)
+      self.series_number = self.patient.next_series_number
+    end
+  end
+
+  def update_state
+    if(visit_id_changed?)
+      old_visit_id = changes[:visit_id][0]
+      new_visit_id = changes[:visit_id][1]
+
+      if(not old_visit_id.nil? and new_visit_id.nil?)
+        puts "VISIT UNASSIGNED"
+        self.state = :imported
+        self.tqc_user_id = nil
+        self.tqc_date = nil
+        self.tqc_version = nil
+      elsif( (old_visit_id.nil? and not new_visit_id.nil? and state == :imported) or (old_visit_id != new_visit_id) )
+        puts "VISIT CHANGED/ASSIGNED"
+        self.state = :visit_assigned
+        self.tqc_user_id = nil
+        self.tqc_date = nil
+        self.tqc_version = nil
+      end
+
+      pp self
+    end
+  end
+
 end
