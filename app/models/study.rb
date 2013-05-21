@@ -91,6 +91,14 @@ class Study < ActiveRecord::Base
     return validation_errors
   end
 
+  def visit_types
+    return [] unless self.has_configuration?
+
+    config = current_configuration
+    
+    return (config['visit_types'].nil? ? []: config['visit_types'].keys)
+  end
+
   def wado_query
     self.patients.map {|patient| patient.wado_query}
   end

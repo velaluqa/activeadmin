@@ -27,14 +27,22 @@ ActiveAdmin.register Visit do
       row :visit_date
       domino_link_row(visit)
       row :image_storage_path
-   end
+    end
+    
+    required_series_spec = visit.required_series
+    pp required_series_spec
+    unless(required_series_spec.nil?)
+      assigned_required_series = visit.assigned_required_series_map
+
+      render :partial => 'admin/visits/required_series', :locals => { :required_series_spec => required_series_spec, :assigned_required_series => assigned_required_series }
+    end
   end
 
   form do |f|
     f.inputs 'Details' do
       f.input :patient
       f.input :visit_number
-      f.input :visit_type
+      f.input :visit_type, :collection => (f.object.study.nil? ? [] : f.object.study.visit_types), :include_blank => false
     end
 
     f.buttons

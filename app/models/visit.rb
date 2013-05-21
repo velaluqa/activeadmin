@@ -10,6 +10,7 @@ class Visit < ActiveRecord::Base
   
   belongs_to :patient
   has_many :image_series
+  has_one :visit_data
 
   validates_uniqueness_of :visit_number, :scope => :patient_id
   validates_presence_of :visit_number, :visit_type, :patient_id
@@ -20,6 +21,9 @@ class Visit < ActiveRecord::Base
       is.save
     end
   end
+
+  after_create :ensure_visit_data_exists
+  before_destroy :destroy_visit_data
 
   def name
     if(patient.nil?)
@@ -38,6 +42,38 @@ class Visit < ActiveRecord::Base
     else
       self.patient.study
     end
+  end
+
+  def visit_data
+    VisitData.where(:visit_id => read_attribute(:id)).first    
+  end
+  def ensure_visit_data_exists
+    VisitData.create(:visit_id => self.id) if self.visit_data.nil?
+  end
+
+  def required_series
+    return nil if(self.visit_type.nil? or self.study.nil? or not self.study.semantically_valid?)
+
+    study_config = self.study.current_configuration
+
+    return nil if(study_config['visit_types'][self.visit_type].nil? or study_config['visit_types'][self.visit_type]['required_series'].nil?)
+    required_series = study_config['visit_types'][self.visit_type]['required_series']
+
+    return required_series
+  end
+  def required_series_names
+    required_series = self.required_series
+    return nil if required_series.nil?
+    return required_series.keys
+  end
+  def assigned_required_series(required_series_name)
+    self.ensure_visit_data_exists
+    return self.visit_data.assigned_required_series[required_series_name]
+  end
+  def assigned_required_series_map
+    self.ensure_visit_data_exists
+
+    return self.visit_data.assigned_required_series
   end
 
   def previous_image_storage_path
@@ -83,4 +119,10 @@ class Visit < ActiveRecord::Base
       'visitNo' => visit_number,
     }
   end
+
+  protected
+
+  def destory_visit_data
+    VisitData.destroy_all(:visit_id => self.id)
+  end  
 end
