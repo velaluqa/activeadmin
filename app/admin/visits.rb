@@ -62,7 +62,6 @@ ActiveAdmin.register Visit do
     visit_data = @visit.visit_data
 
     assignment_index = visit_data.assigned_image_series_index
-    #assignment_index = {}
     
     @assignments.each do |required_series_name, series_id|
       series_id = (series_id.blank? ? nil : series_id)
