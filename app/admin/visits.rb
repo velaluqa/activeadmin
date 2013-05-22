@@ -62,6 +62,8 @@ ActiveAdmin.register Visit do
     visit_data = @visit.visit_data
 
     assignment_index = visit_data.assigned_image_series_index
+
+    old_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
     
     @assignments.each do |required_series_name, series_id|
       series_id = (series_id.blank? ? nil : series_id)
@@ -78,9 +80,25 @@ ActiveAdmin.register Visit do
       assignment_index[series_id] = [] if (series_id and assignment_index[series_id].nil?)
       assignment_index[series_id] << required_series_name unless series_id.nil?
     end
+
+    new_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
+    (old_assigned_image_series - new_assigned_image_series).uniq.each do |unassigned_series_id|
+      unassigned_series = ImageSeries.where(:id => unassigned_series_id).first
+      if(unassigned_series and unassigned_series.state == :required_series_assigned)
+        unassigned_series.state = (unassigned_series.visit.nil? ? :imported : :visit_assigned)
+        unassigned_series.save
+      end
+    end
+    (new_assigned_image_series - old_assigned_image_series).uniq.each do |assigned_series_id|
+      assigned_series = ImageSeries.where(:id => assigned_series_id, :visit_id => @visit.id).first
+      if(assigned_series and assigned_series.state == :visit_assigned || assigned_series.state == :not_required)
+        assigned_series.state = :required_series_assigned
+        assigned_series.save
+      end
+    end
+
     visit_data.assigned_image_series_index = assignment_index
     visit_data.save
-    pp visit_data.assigned_image_series_index
 
     redirect_to({:action => :show}, :notice => 'Assignments of required series changed.')
   end
