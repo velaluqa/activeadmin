@@ -30,6 +30,31 @@ ActiveAdmin.register Visit do
     end
 
     required_series_objects = visit.required_series_objects
+    unless(params[:order].blank?)
+      split_position = params[:order].rindex('_')
+
+      unless(split_position.nil?)
+        key, direction = params[:order][0..split_position-1], params[:order][split_position+1..-1]
+        
+        if(['name', 'image_series_id', 'tqc_date', 'tqc_user_id', 'tqc_state'].include?(key))
+          required_series_objects.sort! do |a, b|
+            a_val = a.instance_variable_get('@'+key)
+            b_val = b.instance_variable_get('@'+key)
+            
+            if(a_val.nil? and b_val.nil?)
+              0
+            elsif(a_val.nil?)
+              -1
+            elsif(b_val.nil?)
+              1
+            else
+              a_val <=> b_val
+            end
+          end
+          required_series_objects.reverse! if (direction == 'desc')
+        end
+      end
+    end
     render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series => required_series_objects} unless required_series_objects.empty?
   end
 
