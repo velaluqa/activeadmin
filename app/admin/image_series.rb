@@ -25,13 +25,13 @@ ActiveAdmin.register ImageSeries do
     column :state, :sortable => :state do |image_series|
       case image_series.state
       when :imported
-        status_tag('Imported', :ok)
+        status_tag('Imported', :error)
       when :visit_assigned
-        status_tag('Visit assigned', :ok)
+        status_tag('Visit assigned', :warning)
       when :required_series_assigned
-        status_tag('Required series\' assigned', :warning)
+        status_tag('Required series\' assigned', :ok)
       when :not_required
-        status_tag('Not relevant for read', :error)
+        status_tag('Not relevant for read', :ok)
       end
     end
     
@@ -53,13 +53,13 @@ ActiveAdmin.register ImageSeries do
       row :state do
         case image_series.state
         when :imported
-          status_tag('Imported', :ok)
+          status_tag('Imported', :error)
         when :visit_assigned
-          status_tag('Visit assigned', :ok)
+          status_tag('Visit assigned', :warning)
         when :required_series_assigned
-          status_tag('Required series\' assigned', :warning)
+          status_tag('Required series\' assigned', :ok)
         when :not_required
-          status_tag('Not relevant for read', :error)
+          status_tag('Not relevant for read', :ok)
         end
       end
       row 'Viewer' do
