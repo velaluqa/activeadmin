@@ -14,8 +14,8 @@ ActiveAdmin.register ImageSeries do
 
   index do
     selectable_column
-    column :patient
-    column :visit
+    column :patient, :sortable => :patient_id
+    column :visit, :sortable => :visit_id
     column :series_number
     column :name
     column :imaging_date
