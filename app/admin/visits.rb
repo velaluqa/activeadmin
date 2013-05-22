@@ -106,9 +106,27 @@ ActiveAdmin.register Visit do
   member_action :tqc, :method => :post do
     @visit = Visit.find(params[:id])
 
-    pp params[:tqc_result]
+    required_series_name = params[:required_series_name]
+    if(required_series_name.nil?)
+      flash[:error] = 'Must specify the name of a required series.'
+      redirect_to :action => :show
+      return
+    end
 
-    redirect_to({:action => :show}, :notice => 'tQC results saved.')
+    tqc_result = {}
+    unless(params[:tqc_result].nil?)
+      params[:tqc_result].each do |id, value|
+        tqc_result[id] = (value == '1')
+      end
+    end
+
+    success = @visit.set_tqc_result(required_series_name, tqc_result, current_user)
+    if(success == true)
+      redirect_to({:action => :show}, :notice => 'tQC results saved.')
+    else
+      flash[:error] = 'Storing tQC results failed: '+sucess
+      redirect_to :action => :show
+    end
   end
   member_action :tqc_form, :method => :get do
     @visit = Visit.find(params[:id])
@@ -157,6 +175,28 @@ ActiveAdmin.register Visit do
     
     @page_title = "Perform tQC for #{@required_series.name}"
     render 'admin/visits/tqc_form'
+  end
+  member_action :required_series_viewer, :method => :get do
+    @visit = Visit.find(params[:id])
+
+    @required_series_name = params[:required_series_name]
+    if(@required_series_name.nil?)
+      flash[:error] = 'Must specify the name of a required series.'
+      redirect_to :action => :show
+      return
+    end
+    @required_series = RequiredSeries.new(@visit, @required_series_name)
+
+    if(@required_series.assigned_image_series.nil?)
+      flash[:error] = 'There is no image series assigned to this required series.'
+      redirect_to :action => :show
+      return
+    end
+
+    redirect_to viewer_admin_image_series_path(@required_series.assigned_image_series)
+  end
+  action_item :only => :tqc_form do
+    link_to('Open Viewer', required_series_viewer_admin_visit_path(resource, :required_series_name => params[:required_series_name]), :target => '_blank') unless params[:required_series_name].nil?
   end
   
   viewer_cartable(:visit)

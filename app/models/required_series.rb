@@ -35,7 +35,7 @@ class RequiredSeries
     return @assigned_image_series
   end
   def tqc_user
-    @tqc_user ||= User.where(:id => @tqc_user_id) unless @tqc_user_id.nil?
+    @tqc_user ||= User.where(:id => @tqc_user_id).first unless @tqc_user_id.nil?
 
     return @tqc_user
   end

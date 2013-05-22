@@ -1,4 +1,5 @@
 require 'domino_document_mixin'
+require 'git_config_repository'
 
 class Visit < ActiveRecord::Base
   include DominoDocument
@@ -196,6 +197,36 @@ class Visit < ActiveRecord::Base
 
     visit_data.assigned_image_series_index = assignment_index
     visit_data.save
+  end
+
+  def set_tqc_result(required_series_name, result, tqc_user)
+    required_series_specs = self.required_series_specs
+    return 'No valid study configuration exists.' if required_series_specs.nil?
+
+    tqc_spec = (required_series_specs[required_series_name].nil? ? nil : required_series_specs[required_series_name]['tqc'])
+    return 'No tQC config for this required series exists.' if tqc_spec.nil?
+
+    all_passed = true
+    tqc_spec.each do |spec|
+      all_passed &&= (result[spec['id']] == true)
+    end
+
+    required_series = self.visit_data.required_series[required_series_name]
+    return 'No assignment for this required series exists.' if required_series.nil?
+
+    required_series['tqc_state'] = RequiredSeries.tqc_state_sym_to_int((all_passed ? :passed : :issues))
+    required_series['tqc_user_id'] = tqc_user.id
+    required_series['tqc_date'] = Time.now
+    required_series['tqc_version'] = GitConfigRepository.new.current_version
+    required_series['tqc_results'] = result
+
+    visit_data = self.visit_data
+    visit_data.required_series[required_series_name] = required_series
+    visit_data.save
+
+    # TODO: send results to Domino?
+    
+    return true
   end
 
   protected

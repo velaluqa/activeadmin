@@ -1,4 +1,4 @@
-= form_tag(tqc_admin_visit_path(@visit), :method => :post, :class => 'formtastic form') do
+= form_tag(tqc_admin_visit_path(@visit, :required_series_name => @required_series.name), :method => :post, :class => 'formtastic form') do
   .panel
     %h3 Automatic DICOM tQC
     .panel_contents
