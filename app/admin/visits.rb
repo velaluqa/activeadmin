@@ -102,6 +102,62 @@ ActiveAdmin.register Visit do
   action_item :only => :show do
     link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource))
   end
+
+  member_action :tqc, :method => :post do
+    @visit = Visit.find(params[:id])
+
+    pp params[:tqc_result]
+
+    redirect_to({:action => :show}, :notice => 'tQC results saved.')
+  end
+  member_action :tqc_form, :method => :get do
+    @visit = Visit.find(params[:id])
+
+    @required_series_name = params[:required_series_name]
+    if(@required_series_name.nil?)
+      flash[:error] = 'Must specify the name of a required series.'
+      redirect_to :action => :show
+      return
+    end
+    @required_series = RequiredSeries.new(@visit, @required_series_name)
+
+    if(@required_series.assigned_image_series.nil? or @required_series.assigned_image_series.images.empty?)
+      flash[:error] = 'tQC can only be performed once an image series (containing at least one image) has been assigned for this required series.'
+      redirect_to :action => :show
+      return
+    end
+
+    required_series_specs = @visit.required_series_specs
+    if(required_series_specs.nil?)
+      flash[:error] = 'Performing tQC requires a valid study config.'
+      redirect_to :action => :show
+      return
+    end
+    if(required_series_specs[@required_series_name].blank? or required_series_specs[@required_series_name]['tqc'].blank?)
+      flash[:error] = 'The study configuration doesn\'t specify tQC for this required series.'
+      redirect_to :action => :show
+      return
+    end
+
+    tqc_spec = required_series_specs[@required_series_name]['tqc']
+    @dicom_tqc_spec, @manual_tqc_spec = tqc_spec.partition {|spec| spec['type'] == 'dicom'}
+
+    @dicom_image = @required_series.assigned_image_series.sample_image
+    @dicom_metadata = (@dicom_image.nil? ? {} : @dicom_image.dicom_metadata[1])
+    @dicom_tqc_spec.each do |dicom_tqc_spec|
+      dicom_tqc_spec['actual_value'] = (@dicom_metadata[dicom_tqc_spec['dicom_tag']].nil? ? nil : @dicom_metadata[dicom_tqc_spec['dicom_tag']][:value])
+      dicom_tqc_spec['result'] = if dicom_tqc_spec['actual_value'].nil?
+                                   nil
+                                 elsif dicom_tqc_spec['actual_value'] == dicom_tqc_spec['expected_value']
+                                   true
+                                 else
+                                   false
+                                 end
+    end
+    
+    @page_title = "Perform tQC for #{@required_series.name}"
+    render 'admin/visits/tqc_form'
+  end
   
   viewer_cartable(:visit)
 end

@@ -1,0 +1,56 @@
+= form_tag(tqc_admin_visit_path(@visit), :method => :post, :class => 'formtastic form') do
+  .panel
+    %h3 Automatic DICOM tQC
+    .panel_contents
+      %table
+        %thead
+          %tr
+            %th DICOM tag
+            %th Expected Value
+            %th Actual Value
+            %th Pass/Fail?
+        %tbody
+          - @dicom_tqc_spec.each do |spec|
+            %tr
+              - field_name = 'tqc_result['+spec['id']+']'
+              = hidden_field_tag(field_name, (spec['result'] == true ? '1' : '0'))
+              %td
+                = spec['label']
+                %span.dicom_tag_key= "(#{spec['dicom_tag']})"
+              %td= spec['expected_value']
+              %td
+                - if spec['actual_value'].nil?
+                  %span.status_tag.Missing.error N/A
+                - else
+                  = spec['actual_value']
+              %td
+                - case spec['result']
+                - when nil
+                  = check_box_tag(field_name, '1', false)
+                  %span{:style => 'margin-left: 0.7em;'} Pass?
+                - when true
+                  %span.status_tag.Pass.ok Pass
+                - else
+                  %span.status_tag.Fail.error Fail
+
+  = field_set_tag('<span>tQC Questions</span>'.html_safe, :class => 'inputs') do
+    %ol
+      - @manual_tqc_spec.each do |spec|
+        - field_name = 'tqc_result['+spec['id']+']'
+        - current_value = (@required_series.tqc_results.nil? ? nil : @required_series.tqc_results[spec['id']])
+        - case spec['type']
+        - when 'bool'
+          %li.input
+            = hidden_field_tag(field_name, '0')
+            = label_tag(nil, spec['label'])
+            = check_box_tag(field_name, '1', current_value == true)
+            %span{:style => 'margin-left: 0.7em;'} Pass?
+            - unless spec['description'].nil?
+              %p.inline-hints= spec['description']
+
+  = field_set_tag(nil, :class => 'actions') do
+    %ol
+      %li.action.input_action
+        = submit_tag('Save tQC Results')
+      %li.cancel
+        = link_to('Cancel', admin_visit_path(@visit))

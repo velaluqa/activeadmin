@@ -97,6 +97,11 @@ class ImageSeries < ActiveRecord::Base
     {:name => self.name, :images => self.images.order('id ASC')}
   end
 
+  def sample_image
+    return nil if self.images.empty?
+    return self.images[(self.images.count-1)/2]
+  end
+
   def domino_document_form
     'SOFDinventory'
   end
@@ -127,7 +132,7 @@ class ImageSeries < ActiveRecord::Base
     study_config = study.current_configuration
 
     unless(images.empty?)
-      image = images[(images.count-1)/2]
+      image = self.sample_image
       
       unless image.nil?
         dicom_meta_header, dicom_metadata = image.dicom_metadata
