@@ -13,7 +13,7 @@ class Visit < ActiveRecord::Base
   has_one :visit_data
 
   validates_uniqueness_of :visit_number, :scope => :patient_id
-  validates_presence_of :visit_number, :visit_type, :patient_id
+  validates_presence_of :visit_number, :patient_id
 
   before_destroy do
     self.image_series.each do |is|
@@ -21,6 +21,8 @@ class Visit < ActiveRecord::Base
       is.save
     end
   end
+
+  before_save :ensure_study_is_unchanged
 
   after_create :ensure_visit_data_exists
   before_destroy :destroy_visit_data
@@ -144,7 +146,20 @@ class Visit < ActiveRecord::Base
 
   protected
 
-  def destory_visit_data
+  def ensure_study_is_unchanged
+    if(self.patient_id_changed? and not self.patient_id_was.nil?)
+      old_patient = Patient.find(self.patient_id_was)
+
+      if(old_patient.study != self.patient.study)
+        self.errors[:patient] << 'A visit cannot be reassigned to a patient in a different study.'
+        return false
+      end
+    end
+
+    return true
+  end
+
+  def destroy_visit_data
     VisitData.destroy_all(:visit_id => self.id)
   end  
 end

@@ -76,7 +76,7 @@ ActiveAdmin.register ImageSeries do
 
   form do |f|
     f.inputs 'Details' do
-      f.input :patient
+      f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : Patient.all), :include_blank => (not f.object.persisted?)
       f.input :visit
       f.input :series_number, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
       f.input :name

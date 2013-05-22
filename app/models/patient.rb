@@ -27,6 +27,8 @@ class Patient < ActiveRecord::Base
     PatientData.destroy_all(:patient_id => self.id)
   end
 
+  before_save :ensure_study_is_unchanged
+
   def form_answers
     return FormAnswer.where(:patient_id => self.id)
   end
@@ -106,4 +108,20 @@ class Patient < ActiveRecord::Base
       'PatientNo' => domino_patient_no,
     }
   end
+
+  protected
+
+  def ensure_study_is_unchanged
+    if(self.center_id_changed? and not self.center_id_was.nil?)
+      old_center = Center.find(self.center_id_was)
+
+      if(old_center.study != self.center.study)
+        self.errors[:center] << 'A patient cannot be reassigned to a center in a different study.'
+        return false
+      end
+    end
+
+    return true
+  end
+
 end

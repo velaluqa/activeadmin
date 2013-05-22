@@ -19,6 +19,7 @@ class ImageSeries < ActiveRecord::Base
 
   scope :not_assigned, where(:visit_id => nil)
 
+  before_save :ensure_study_is_unchanged
   before_save :ensure_visit_is_for_patient
   before_save :update_state
 
@@ -61,15 +62,6 @@ class ImageSeries < ActiveRecord::Base
 
   def image_series_data
     ImageSeriesData.where(:image_series_id => read_attribute(:id)).first
-  end
-
-  def ensure_visit_is_for_patient
-    if(self.visit && self.visit.patient != self.patient)
-      self.errors[:visit] << 'The visits patient is different from this image series\' patient'
-      false
-    else
-      true
-    end
   end
 
   def previous_image_storage_path
@@ -182,6 +174,28 @@ class ImageSeries < ActiveRecord::Base
   end
 
   protected
+
+  def ensure_study_is_unchanged
+    if(self.patient_id_changed? and not self.patient_id_was.nil?)
+      old_patient = Patient.find(self.patient_id_was)
+
+      if(old_patient.study != self.patient.study)
+        self.errors[:patient] << 'An image series cannot be reassigned to a patient in a different study.'
+        return false
+      end
+    end
+
+    return true
+  end
+
+  def ensure_visit_is_for_patient
+    if(self.visit && self.visit.patient != self.patient)
+      self.errors[:visit] << 'The visits patient is different from this image series\' patient'
+      false
+    else
+      true
+    end
+  end
 
   def assign_series_number
     if(self.new_record? and self.series_number.nil? and self.patient)

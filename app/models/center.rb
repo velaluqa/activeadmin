@@ -24,6 +24,8 @@ class Center < ActiveRecord::Base
     return true
   end
 
+  before_save :ensure_study_is_unchanged
+
   def previous_image_storage_path
     if(self.previous_changes.include?(:study_id))
       previous_study = Study.find(self.previous_changes[:study_id][0])
@@ -59,5 +61,13 @@ class Center < ActiveRecord::Base
       'CenterNo' => self.code,
       'CenterShortName' => self.name,
     }
+  end
+
+  protected
+  
+  def ensure_study_is_unchanged
+    if(self.study_id_changed?)
+      errors[:study] << 'A center cannot be reassigned to a different study.'
+    end
   end
 end

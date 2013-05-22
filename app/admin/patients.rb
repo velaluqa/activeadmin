@@ -34,7 +34,7 @@ ActiveAdmin.register Patient do
 
   form do |f|
     f.inputs 'Details' do
-      f.input :center
+      f.input :center, :collection => (f.object.persisted? ? f.object.study.centers : Center.all), :include_blank => (not f.object.persisted?)
       f.input :subject_id, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to problems in project management, because the Subject ID is used to identify patients across documents.' : '')
     end
 
