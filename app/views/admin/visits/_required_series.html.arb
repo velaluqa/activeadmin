@@ -1,0 +1,28 @@
+table_for required_series, :sortable => true, :class => 'index_table index' do
+  column :name
+  column :assigned_image_series, :sortable => :image_series_id do |required_series|
+    assigned_series = required_series.assigned_image_series
+    if(assigned_series.nil?)
+      status_tag('Missing', :error)
+    else
+      status_tag('Assigned', :ok, :label => link_to(assigned_series.name, admin_image_series_path(assigned_series)).html_safe)
+    end
+  end
+  column 'tQC State', :tqc_state, :sortable => :tqc_state do |required_series|
+    case required_series.tqc_state
+    when :pending
+      status_tag('Pending', :warning)
+    when :issues
+      status_tag('Performed, issues present', :error)
+    when :passed
+      status_tag('Passed', :ok)
+    end
+  end
+  column 'tQC Date', :tqc_date
+  column 'tQC User', :tqc_user,  :sortable => :tqc_user_id do |required_series|
+    link_to(required_series.tqc_user.name, admin_user_path(required_series.tqc_user)) unless required_series.tqc_user.nil?
+  end
+  column do |required_series|
+    #action
+  end
+end

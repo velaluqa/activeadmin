@@ -72,6 +72,16 @@ class Visit < ActiveRecord::Base
     self.ensure_visit_data_exists
     return self.visit_data.required_series
   end
+  def required_series_objects
+    required_series_names = self.required_series_names
+    return [] if required_series_names.nil?
+
+    objects = required_series_names.map do |required_series_name|
+      RequiredSeries.new(self, required_series_name)
+    end
+
+    return objects
+  end
   def assigned_required_series(required_series_name)
     self.ensure_visit_data_exists
 

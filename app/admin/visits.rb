@@ -28,14 +28,9 @@ ActiveAdmin.register Visit do
       domino_link_row(visit)
       row :image_storage_path
     end
-    
-    required_series_spec = visit.required_series_specs
-    pp required_series_spec
-    unless(required_series_spec.nil?)
-      assigned_required_series = visit.assigned_required_series_map
 
-      render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series_spec => required_series_spec, :assigned_required_series => assigned_required_series}
-    end
+    required_series_objects = visit.required_series_objects
+    render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series => required_series_objects} unless required_series_objects.empty?
   end
 
   form do |f|
