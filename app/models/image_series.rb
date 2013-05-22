@@ -216,4 +216,19 @@ class ImageSeries < ActiveRecord::Base
     end
   end
 
+  # reassigning an image series to a different visit:
+  # * check if new visit has same visit type as current visit
+  # * if yes:
+  #   * check if there is already an assignment for the required series this image series is currently assigned to in the new visit
+  #   * if yes:
+  #     * ask user if he wants to go ahead
+  #     * if yes: continue
+  #     * if no: cancel move
+  #   * if no:
+  #     * unassign this image series from required series in current visit (update index + state)
+  #     * unassign currently assigned image series in new visit if present (update index + state)
+  #     * assign this image series to required series in new visit (update index + state)
+  # * if no:
+  #   * unassign this image series from required series in current visit (update index + state)
+
 end
