@@ -154,7 +154,7 @@ ActiveAdmin.register ImageSeries do
   member_action :mark_not_relevant, :method => :get do
     @image_series = ImageSeries.find(params[:id])
 
-    if(@image_series.state == :imported or @image_series.visit.nil?)
+    if(@image_series.state != :visit_assigned or @image_series.visit.nil?)
       flash[:error] = 'Series can only be marked as not relevant for read once it has been assigned to a visit.'
       redirect_to :action => :show
     end
@@ -165,11 +165,11 @@ ActiveAdmin.register ImageSeries do
     redirect_to({:action => :show}, :notice => 'Series marked as not relevant for read.')
   end
   action_item :only => :show do
-    link_to('Mark not relevant', mark_not_relevant_admin_image_series_path(resource)) unless (resource.state == :imported or resource.state == :not_required or resource.visit.nil?)
+    link_to('Mark not relevant', mark_not_relevant_admin_image_series_path(resource)) unless (resource.state != :visit_assigned or resource.visit.nil?)
   end
   batch_action :mark_not_relevant do |selection|
     ImageSeries.find(selection).each do |i_s|
-      next if (i_s.state == :imported or i_s.state == :not_required or i_s.visit.nil?)
+      next if (i_s.state != :visit_assigned or i_s.visit.nil?)
 
       i_s.state = :not_required
       i_s.save      
