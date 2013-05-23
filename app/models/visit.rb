@@ -215,6 +215,7 @@ class Visit < ActiveRecord::Base
       if(visit_data.required_series[required_series_name]['image_series_id'].nil?)
         FileUtils.rm(image_storage_root + self.required_series_image_storage_path(required_series_name), :force => true)
       else
+        FileUtils.rm(image_storage_root + self.required_series_image_storage_path(required_series_name), :force => true)
         FileUtils.ln_sf(series_id, image_storage_root + self.required_series_image_storage_path(required_series_name))
       end
 
@@ -236,7 +237,7 @@ class Visit < ActiveRecord::Base
       end
     end
     (new_assigned_image_series - old_assigned_image_series).uniq.each do |assigned_series_id|
-      assigned_series = ImageSeries.where(:id => assigned_series_id, :visit_id => self.id).first
+      assigned_series = ImageSeries.where(:id => assigned_series_id).first
       if(assigned_series and assigned_series.state == :visit_assigned || assigned_series.state == :not_required)
         assigned_series.state = :required_series_assigned
         assigned_series.save
@@ -261,7 +262,7 @@ class Visit < ActiveRecord::Base
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
   end
-  def set_tqc_result(required_series_name, result, tqc_user)
+  def set_tqc_result(required_series_name, result, tqc_user, tqc_date = nil, tqc_version = nil)
     required_series_specs = self.required_series_specs
     return 'No valid study configuration exists.' if required_series_specs.nil?
 
@@ -277,9 +278,9 @@ class Visit < ActiveRecord::Base
     return 'No assignment for this required series exists.' if required_series.nil?
 
     required_series['tqc_state'] = RequiredSeries.tqc_state_sym_to_int((all_passed ? :passed : :issues))
-    required_series['tqc_user_id'] = tqc_user.id
-    required_series['tqc_date'] = Time.now
-    required_series['tqc_version'] = GitConfigRepository.new.current_version
+    required_series['tqc_user_id'] = (tqc_user.is_a?(User) ? tqc_user.id : tqc_user)
+    required_series['tqc_date'] = (tqc_date.nil? ? Time.now : tqc_date)
+    required_series['tqc_version'] = (tqc_version.nil? ? GitConfigRepository.new.current_version : tqc_version)
     required_series['tqc_results'] = result
 
     visit_data = self.visit_data

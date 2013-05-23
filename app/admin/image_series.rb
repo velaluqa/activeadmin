@@ -10,6 +10,63 @@ ActiveAdmin.register ImageSeries do
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
+
+    def update
+      image_series = ImageSeries.find(params[:id])
+      currently_assigned_required_series_names = image_series.assigned_required_series
+      original_visit = image_series.visit
+      new_visit = (params[:image_series][:visit_id].nil? ? nil : Visit.find(params[:image_series][:visit_id]))
+      
+      if(params[:image_series][:visit_id] != image_series.visit_id and params[:image_series][:force_update] != 'true')
+        if(original_visit and new_visit and original_visit.visit_type != new_visit.visit_type)
+          flash[:error] = 'The new visit has a different visit type than the current visit. Therefore, this image series will lose all its assignments to required series of the current visit, including all tQC results. If you want to continue, press "Update" again.'
+          redirect_to edit_admin_image_series_path(image_series, :force_update => true, :visit_id => params[:image_series][:visit_id])
+          return
+        end
+        
+        unless(new_visit.nil?)
+          new_visit_assignment_map = new_visit.assigned_required_series_id_map
+          already_assigned_required_series_names = []
+          currently_assigned_required_series_names.each do |required_series_name|
+            already_assigned_required_series_names << required_series_name unless new_visit_assignment_map[required_series_name].nil?
+          end
+
+          unless(already_assigned_required_series_names.empty?)
+            flash[:error] = 'The following required series\' in the new visit will have their assignment and tQC results overwritten by this change: '+already_assigned_required_series_names.join(", ")+'. If you want to continue, press "Update" again.'
+            redirect_to edit_admin_image_series_path(image_series, :force_update => true, :visit_id => params[:image_series][:visit_id])
+            return
+          end
+        end
+      end
+      params[:image_series].delete(:force_update)
+
+      original_required_series = (original_visit.nil? or original_visit.visit_data.nil? ? nil : original_visit.visit_data.required_series)
+
+      original_visit_assignment_changes = {}
+      new_visit_assignment_changes = {}
+      currently_assigned_required_series_names.each do |required_series_name|
+        original_visit_assignment_changes[required_series_name] = nil
+        new_visit_assignment_changes[required_series_name] = image_series.id.to_s
+      end
+      original_visit.change_required_series_assignment(original_visit_assignment_changes) unless original_visit.nil?
+      unless(new_visit.nil? or original_visit.visit_type != new_visit.visit_type)
+        new_visit.change_required_series_assignment(new_visit_assignment_changes)
+
+        unless(original_required_series.nil?)
+          currently_assigned_required_series_names.each do |required_series_name|
+            next if original_required_series[required_series_name].nil?
+            new_visit.set_tqc_result(required_series_name,
+                                     original_required_series[required_series_name]['tqc_results'], 
+                                     original_required_series[required_series_name]['tqc_user_id'],
+                                     original_required_series[required_series_name]['tqc_date'],
+                                     original_required_series[required_series_name]['tqc_version'])
+          end
+        end
+      end
+      
+      update!
+      puts 'YEEEHAAAA!!!'
+    end
   end
 
   index do
@@ -87,12 +144,15 @@ ActiveAdmin.register ImageSeries do
   end
 
   form do |f|
+    resource.visit_id = params[:visit_id].to_i unless params[:visit_id].blank?
     f.inputs 'Details' do
       f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : Patient.all), :include_blank => (not f.object.persisted?)
       f.input :visit
       f.input :series_number, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
       f.input :name
       f.input :imaging_date, :as => :datepicker
+      f.input :force_update, :as => :hidden, :value => (params[:force_update] ? 'true' : 'false') if f.object.persisted?
+      f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
 
     f.buttons

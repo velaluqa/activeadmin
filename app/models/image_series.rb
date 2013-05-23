@@ -283,10 +283,17 @@ class ImageSeries < ActiveRecord::Base
 
       if(not old_visit_id.nil? and new_visit_id.nil?)
         self.state = :imported
-      elsif( (old_visit_id.nil? and not new_visit_id.nil? and state == :imported) or (old_visit_id != new_visit_id) )
+      elsif( (old_visit_id.nil? and not new_visit_id.nil? and state == :imported))
         self.state = :visit_assigned
       end
     end
+  end
+
+  # fake attributes for the somewhat laborious implementation of visit assignment changes
+  def force_update
+    nil
+  end
+  def force_update=(val)
   end
 
   # reassigning an image series to a different visit:
