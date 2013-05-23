@@ -215,6 +215,20 @@ class ImageSeries < ActiveRecord::Base
     end
   end
 
+  def assigned_required_series
+    required_series = []
+    return required_series if self.visit.nil?
+
+    self.visit.ensure_visit_data_exists
+    if(self.visit.visit_data.assigned_image_series_index and self.visit.visit_data.assigned_image_series_index[self.id.to_s])
+      self.visit.visit_data.assigned_image_series_index[self.id.to_s].each do |required_series_name|
+        required_series << required_series_name
+      end
+    end
+
+    return required_series
+  end
+
   protected
 
   def ensure_study_is_unchanged

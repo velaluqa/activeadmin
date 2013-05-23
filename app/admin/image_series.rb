@@ -62,6 +62,18 @@ ActiveAdmin.register ImageSeries do
           status_tag('Not relevant for read', :ok)
         end
       end
+      row 'Required Series' do
+        assigned_required_series = image_series.assigned_required_series
+        if(assigned_required_series.empty?)
+          "None assigned"
+        else
+          ul do
+            assigned_required_series.each do |required_series_name|
+              li { required_series_name }
+            end
+          end
+        end
+      end
       row 'Viewer' do
         link_to('View in Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'))
       end
