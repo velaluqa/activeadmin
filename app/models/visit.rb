@@ -150,6 +150,9 @@ class Visit < ActiveRecord::Base
   def image_storage_path
     self.patient.image_storage_path + '/' + self.id.to_s
   end
+  def required_series_image_storage_path(required_series_name)
+    self.image_storage_path + '/' + required_series_name
+  end
 
   def wado_query
     {:name => "Visit No. #{visit_number}", :image_series => 
@@ -189,21 +192,39 @@ class Visit < ActiveRecord::Base
     assignment_index = visit_data.assigned_image_series_index
 
     old_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
+
+    image_storage_root = Rails.application.config.image_storage_root
+    image_storage_root += '/' unless(image_storage_root.end_with?('/'))
     
     changed_assignments.each do |required_series_name, series_id|
       series_id = (series_id.blank? ? nil : series_id)
+      old_series_id = nil
       visit_data.required_series[required_series_name] = {} if visit_data.required_series[required_series_name].nil?
 
       if(visit_data.required_series[required_series_name]['image_series_id'])
         old_series_id = visit_data.required_series[required_series_name]['image_series_id'].to_s
         
-        assignment_index[old_series_id].delete(required_series_name) unless(old_series_id.nil? or assignment_index[old_series_id].nil?)
+        assignment_index[old_series_id].delete(required_series_name) unless(old_series_id.blank? or assignment_index[old_series_id].nil?)
       end
 
       visit_data.required_series[required_series_name]['image_series_id'] = series_id
 
       assignment_index[series_id] = [] if (series_id and assignment_index[series_id].nil?)
       assignment_index[series_id] << required_series_name unless(series_id.nil? or assignment_index[series_id].include?(required_series_name))
+
+      if(visit_data.required_series[required_series_name]['image_series_id'].nil?)
+        FileUtils.rm(image_storage_root + self.required_series_image_storage_path(required_series_name), :force => true)
+      else
+        FileUtils.ln_sf(series_id, image_storage_root + self.required_series_image_storage_path(required_series_name))
+      end
+
+      if(old_series_id != series_id)
+        visit_data.required_series[required_series_name]['tqc_state'] = RequiredSeries.tqc_state_sym_to_int(:pending)
+        visit_data.required_series[required_series_name].delete('tqc_user_id')
+        visit_data.required_series[required_series_name].delete('tqc_date')
+        visit_data.required_series[required_series_name].delete('tqc_version')
+        visit_data.required_series[required_series_name].delete('tqc_results')
+      end
     end
     
     new_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
@@ -226,6 +247,20 @@ class Visit < ActiveRecord::Base
     visit_data.save
   end
 
+  def reset_tqc_result(required_series_name)
+    visit_data = self.visit_data
+    return if(visit_data.nil? or visit_data.required_series.nil? or visit_data.required_series[required_series_name].nil?)
+
+    required_series = visit_data.required_series[required_series_name]
+    required_series['tqc_state'] = :pending
+    required_series.delete('tqc_user_id')
+    required_series.delete('tqc_date')
+    required_series.delete('tqc_version')
+    required_series.delete('tqc_results')
+
+    visit_data.required_series[required_series_name] = required_series
+    visit_data.save
+  end
   def set_tqc_result(required_series_name, result, tqc_user)
     required_series_specs = self.required_series_specs
     return 'No valid study configuration exists.' if required_series_specs.nil?
