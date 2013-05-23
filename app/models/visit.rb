@@ -110,6 +110,33 @@ class Visit < ActiveRecord::Base
 
     return object_map
   end
+  def remove_orphaned_required_series
+    current_required_series_names = self.required_series_names
+    return if current_required_series_names.nil?
+
+    visit_data = self.visit_data
+    saved_required_series_names = (visit_data.nil? or visit_data.required_series.nil? ? [] : visit_data.required_series.keys)
+
+    pp current_required_series_names
+    pp saved_required_series_names
+    orphaned_required_series_names = (saved_required_series_names - current_required_series_names)
+    pp orphaned_required_series_names
+    unless(orphaned_required_series_names.empty?)
+      required_series = visit_data.required_series
+      changed_assignments = {}
+
+      orphaned_required_series_names.each do |orphaned_required_series_name|
+        deleted_series = required_series.delete(orphaned_required_series_name)
+        changed_assignments[orphaned_required_series_name] = nil unless (deleted_series.nil? or deleted_series['image_series_id'].nil?)
+      end
+
+      self.change_required_series_assignment(changed_assignments)
+      visit_data.required_series = required_series
+      visit_data.save
+      
+      Rails.logger.info "Removed #{orphaned_required_series_names.size} orphaned required series from visit #{self.inspect}: #{orphaned_required_series_names.inspect}"
+    end
+  end
 
   def previous_image_storage_path
     if(self.previous_changes.include?(:patient_id))
@@ -176,7 +203,7 @@ class Visit < ActiveRecord::Base
       visit_data.required_series[required_series_name]['image_series_id'] = series_id
 
       assignment_index[series_id] = [] if (series_id and assignment_index[series_id].nil?)
-      assignment_index[series_id] << required_series_name unless series_id.nil?
+      assignment_index[series_id] << required_series_name unless(series_id.nil? or assignment_index[series_id].include?(required_series_name))
     end
     
     new_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys

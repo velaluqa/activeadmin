@@ -20,6 +20,8 @@ ActiveAdmin.register Visit do
   end
 
   show do |visit|
+    visit.remove_orphaned_required_series
+
     attributes_table do
       row :patient
       row :visit_number
