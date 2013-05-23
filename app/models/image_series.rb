@@ -155,13 +155,14 @@ class ImageSeries < ActiveRecord::Base
         properties.merge!(dicom_properties)
 
         if(study_config and study.semantically_valid?)
-          extra_dicom_tags = {}
+          dicom_tag_names = []
+          dicom_values = []
           study_config['domino_integration']['dicom_tags'].each_with_index do |tag, i|
-            extra_dicom_tags['DICOM'+(i+1).to_s] = (dicom_metadata[tag['tag']].nil? ? '' : dicom_metadata[tag['tag']][:value])
-            extra_dicom_tags['DICOMtext'+(i+1).to_s] = tag['label']
-          end
+            dicom_values << (dicom_metadata[tag['tag']].nil? ? 'N/A' : dicom_metadata[tag['tag']][:value]).to_s
+            dicom_tag_names << tag['label'].to_s
+          end          
 
-          properties.merge!(extra_dicom_tags)
+          properties.merge!({'DICOMTagName' => dicom_tag_names.join("\n"), 'DICOMValue' => dicom_values.join("\n")})
         end
       end
     end
