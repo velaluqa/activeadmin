@@ -1,4 +1,5 @@
 require 'git_config_repository'
+require 'schema_validation'
 
 ActiveAdmin.register Study do
 
@@ -109,10 +110,38 @@ ActiveAdmin.register Study do
       flash[:error] = "You must specify a configuration file to upload"
       redirect_to({:action => :show})
     else
+      current_config = @study.current_configuration
+      old_visit_types = (current_config.nil? or current_config['visit_types'].nil? ? [] : current_config['visit_types'].keys)
+
+      begin
+        new_config = YAML.load_file(params[:study][:file].tempfile)
+
+        validator = SchemaValidation::StudyValidator.new
+        new_config = nil unless(validator.validate(new_config).empty?)
+      rescue
+        new_config = nil
+      end
+
+      # if the new config is invalid YAML, we won't apply any changed
+      nullified_visits = 0
+      unless(new_config.nil?)
+        new_visit_types = (new_config['visit_types'].nil? ? [] : new_config['visit_types'].keys)
+        removed_visit_types = (old_visit_types - new_visit_types).uniq
+        pp new_visit_types
+        pp removed_visit_types
+
+        @study.visits.where(:visit_type => removed_visit_types).each do |visit|
+          pp visit
+          visit.visit_type = nil
+          visit.save
+          nullified_visits += 1
+        end
+      end
+      
       repo = GitConfigRepository.new
       repo.update_config_file(@study.relative_config_file_path, params[:study][:file].tempfile, current_user, "New configuration file for study #{@study.id}")
         
-      redirect_to({:action => :show}, :notice => "Configuration successfully uploaded")
+      redirect_to({:action => :show}, :notice => 'Configuration successfully uploaded.' + (nullified_visits == 0 ? '' : " #{nullified_visits} visits had their visit type reset, because their former visit type no longer exists."))
     end
   end
   member_action :upload_config_form, :method => :get do
