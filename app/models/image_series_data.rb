@@ -2,7 +2,7 @@ class ImageSeriesData
   include Mongoid::Document
 
   field :image_series_id, type: Integer
-  field :properties, type: Hash
+  field :properties, type: Hash, :default => {}
 
   def image_series
     begin

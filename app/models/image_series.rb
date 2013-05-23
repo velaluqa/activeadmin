@@ -162,15 +162,51 @@ class ImageSeries < ActiveRecord::Base
             dicom_tag_names << tag['label'].to_s
           end          
 
-          properties.merge!({'DICOMTagName' => dicom_tag_names.join("\n"), 'DICOMValue' => dicom_values.join("\n")})
+          properties.merge!({'DICOMTagNames' => dicom_tag_names.join("\n"), 'DICOMValues' => dicom_values.join("\n")})
         end
       end
     end
 
-    properties
+    image_series_data = self.image_series_data
+    if(study_config and study.semantically_valid? and image_series_data and image_series_data.properties)
+      properties_spec = study_config['image_series_properties']
+      property_names = []
+      property_values = []
 
-    # from image_series_data
-    # * image series properties
+      processed_properties = []
+
+      unless(properties_spec.nil?)
+        properties_spec.each do |property|
+          property_names << property['label']
+
+          raw_value = image_series_data.properties[property['id']]
+          value = case property['type']
+                  when 'string'
+                    raw_value
+                  when 'bool'
+                    raw_value ? 'Yes' : 'No'
+                  when 'select'
+                    property['values'][raw_value].nil? ? raw_value : property['values'][raw_value]
+                  else 
+                    raw_value
+                  end
+          value = 'Not set' if value.blank?
+
+          property_values << value
+          processed_properties << property['id']
+        end
+      end
+
+      image_series_data.properties.each do |id, value|
+        next if processed_properties.include?(id)
+        property_names << id.to_s
+        property_values << (value.nil? ? 'Not set' : value.to_s)
+      end
+
+      properties.merge!({'PropertyNames' => property_names.join("\n"), 'PropertyValues' => property_values.join("\n")})
+    end
+
+    properties
   end
 
   def ensure_image_series_data_exists
