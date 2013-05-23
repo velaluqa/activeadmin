@@ -184,7 +184,11 @@ class ImageSeries < ActiveRecord::Base
                   when 'string'
                     raw_value
                   when 'bool'
-                    raw_value ? 'Yes' : 'No'
+                    if(raw_value.nil?)
+                      'Not set'
+                    else
+                      raw_value ? 'Yes' : 'No'
+                    end
                   when 'select'
                     property['values'][raw_value].nil? ? raw_value : property['values'][raw_value]
                   else 
