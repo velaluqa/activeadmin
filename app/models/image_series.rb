@@ -204,7 +204,7 @@ class ImageSeries < ActiveRecord::Base
       image_series_data.properties.each do |id, value|
         next if processed_properties.include?(id)
         property_names << id.to_s
-        property_values << (value.nil? ? 'Not set' : value.to_s)
+        property_values << (value.blank? ? 'Not set' : value.to_s)
       end
 
       properties.merge!({'PropertyNames' => property_names.join("\n"), 'PropertyValues' => property_values.join("\n")})
