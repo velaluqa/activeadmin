@@ -105,6 +105,29 @@ ActiveAdmin.register Visit do
     link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource))
   end
 
+  member_action :tqc_results, :method => :get do
+    @visit = Visit.find(params[:id])
+
+    @required_series_name = params[:required_series_name]
+    if(@required_series_name.nil?)
+      flash[:error] = 'Must specify the name of a required series.'
+      redirect_to :action => :show
+      return
+    end
+    @required_series = RequiredSeries.new(@visit, @required_series_name)
+
+    tqc_spec = @required_series.tqc_spec_with_results
+    if(tqc_spec.nil?)
+      flash[:error] = 'Viewing tQC results requires a valid study config containing tQC specifications for this required series and existing tQC results.'
+      redirect_to :action => :show
+      return
+    end
+
+    @dicom_tqc_spec, @manual_tqc_spec = tqc_spec.partition {|spec| spec['type'] == 'dicom'}
+
+    @page_title = "tQC results for #{@required_series.name}"
+    render 'admin/visits/tqc_results'
+  end
   member_action :tqc, :method => :post do
     @visit = Visit.find(params[:id])
 
@@ -147,19 +170,13 @@ ActiveAdmin.register Visit do
       return
     end
 
-    required_series_specs = @visit.required_series_specs
-    if(required_series_specs.nil?)
-      flash[:error] = 'Performing tQC requires a valid study config.'
-      redirect_to :action => :show
-      return
-    end
-    if(required_series_specs[@required_series_name].blank? or required_series_specs[@required_series_name]['tqc'].blank?)
-      flash[:error] = 'The study configuration doesn\'t specify tQC for this required series.'
+    tqc_spec = @required_series.tqc_spec
+    if(tqc_spec.nil?)
+      flash[:error] = 'Performing tQC requires a valid study config containing tQC specifications for this required series.'
       redirect_to :action => :show
       return
     end
 
-    tqc_spec = required_series_specs[@required_series_name]['tqc']
     @dicom_tqc_spec, @manual_tqc_spec = tqc_spec.partition {|spec| spec['type'] == 'dicom'}
 
     @dicom_image = @required_series.assigned_image_series.sample_image

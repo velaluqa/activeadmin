@@ -49,4 +49,28 @@ class RequiredSeries
     return -1 if @tqc_state.nil?
     return RequiredSeries::TQC_STATE_SYMS[@tqc_state]
   end
+
+  def spec
+    required_series_specs = @visit.required_series_specs
+    return nil if required_series_specs.nil?
+
+    return required_series_specs[@name]
+  end
+  def tqc_spec
+    spec = self.spec
+    return nil if spec.nil?
+
+    return spec['tqc']
+  end
+
+  def tqc_spec_with_results
+    tqc_spec = self.tqc_spec
+    return nil if tqc_spec.nil? or @tqc_results.nil?
+
+    tqc_spec.each do |question|
+      question['answer'] = @tqc_results[question['id']]
+    end
+
+    return tqc_spec
+  end
 end

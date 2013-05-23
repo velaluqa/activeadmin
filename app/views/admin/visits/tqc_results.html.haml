@@ -1,0 +1,55 @@
+.panel
+  %h3 tQC Details
+  .panel_contents
+    .attributes_table
+      %table{:border => 0, :cellspacing => 0, :cellpadding => 0}
+        %tbody
+          %tr
+            %th State
+            %td
+              - case @required_series.tqc_state
+              - when :pending
+                %span.status_tag.Pending.warning Pending
+              - when :issues
+                %span.status_tag.Issues.error Performed, issues present                
+              - when :passed
+                %span.status_tag.Passed.ok Passed
+          %tr
+            %th Date
+            %td= pretty_format(@required_series.tqc_date.localtime) unless @required_series.tqc_date.nil?
+          %tr
+            %th User
+            %td= link_to(@required_series.tqc_user.name, admin_user_path(@required_series.tqc_user)) unless @required_series.tqc_user.nil?
+          %tr
+            %th Assigned Image Series
+            %td= link_to(@required_series.assigned_image_series.name, admin_image_series_path(@required_series.assigned_image_series)) unless @required_series.assigned_image_series.nil?
+
+.panel
+  %h3 Automatic DICOM tQC
+  .panel_contents
+    .attributes_table
+      %table{:border => 0, :cellspacing => 0, :cellpadding => 0}
+        - @dicom_tqc_spec.each do |question|
+          %tr
+            %th
+              = question['label']
+              %span.dicom_tag_key= "(#{question['dicom_tag']})"
+            %td
+              - if question['answer'] == true
+                %span.status_tag.Pass.ok Pass
+              - else
+                %span.status_tag.Fail.error Fail
+
+.panel
+  %h3 tQC Question
+  .panel_contents
+    .attributes_table
+      %table{:border => 0, :cellspacing => 0, :cellpadding => 0}
+        - @manual_tqc_spec.each do |question|
+          %tr
+            %th= question['label']
+            %td
+              - if question['answer'] == true
+                %span.status_tag.Pass.ok Pass
+              - else
+                %span.status_tag.Fail.error Fail
