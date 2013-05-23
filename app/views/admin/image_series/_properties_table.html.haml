@@ -14,11 +14,14 @@
                 - when 'string'
                   = value
                 - when 'bool'
-                  = (value ? 'Yes' : 'No')
+                  - if value.nil?
+                    = nil
+                  - else
+                    = (value ? 'Yes' : 'No')
                 - when 'select'
                   = (property['values'][value].nil? ? value : property['values'][value])
                 - else
-                  value
+                  = value
             - displayed_properties << property['id']
           - values.each do |id, value|
             - next if displayed_properties.include?(id)
