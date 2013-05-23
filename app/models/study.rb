@@ -83,7 +83,7 @@ class Study < ActiveRecord::Base
   def validate
     return nil unless has_configuration?
     config = current_configuration
-    return if config.nil?
+    return nil if config.nil?
 
     validation_errors = run_schema_validation(config)
     return validation_errors unless validation_errors == []
