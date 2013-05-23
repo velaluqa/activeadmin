@@ -127,8 +127,6 @@ ActiveAdmin.register Study do
       unless(new_config.nil?)
         new_visit_types = (new_config['visit_types'].nil? ? [] : new_config['visit_types'].keys)
         removed_visit_types = (old_visit_types - new_visit_types).uniq
-        pp new_visit_types
-        pp removed_visit_types
 
         @study.visits.where(:visit_type => removed_visit_types).each do |visit|
           pp visit
