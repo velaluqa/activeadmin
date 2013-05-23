@@ -129,7 +129,41 @@ class ImageSeries < ActiveRecord::Base
       'imaDateManual' => {'data' => imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}, # this is utterly ridiculous: sending the date in the corrent format (%Y-%m-%d) leads switched month/day for days where this can work (1-12). sending a completely broken format leads to correct parses... *doublefacepalm*
     }
 
-    study_config = study.current_configuration
+    properties.merge!(self.dicom_metadata_to_domino)
+    properties.merge!(self.properties_to_domino)
+
+    pp properties
+    properties
+  end
+  def update_image_series_properties_in_domino
+    self.update_domino_document(self.properties_to_domino)
+  end
+
+  def ensure_image_series_data_exists
+    if(self.image_series_data.nil?)
+      ImageSeriesData.create(:image_series_id => self.id)
+    end
+  end
+
+  def assigned_required_series
+    required_series = []
+    return required_series if self.visit.nil?
+
+    self.visit.ensure_visit_data_exists
+    if(self.visit.visit_data.assigned_image_series_index and self.visit.visit_data.assigned_image_series_index[self.id.to_s])
+      self.visit.visit_data.assigned_image_series_index[self.id.to_s].each do |required_series_name|
+        required_series << required_series_name
+      end
+    end
+
+    return required_series
+  end
+
+  protected
+
+  def dicom_metadata_to_domino
+    study_config = (self.study.nil? ? nil : self.study.current_configuration)
+    result = {}
 
     unless(images.empty?)
       image = self.sample_image
@@ -138,21 +172,15 @@ class ImageSeries < ActiveRecord::Base
         dicom_meta_header, dicom_metadata = image.dicom_metadata
         
 
-        dicom_properties = {
-          'ImageModality' => (dicom_metadata['0008,0060'].nil? ? '' : dicom_metadata['0008,0060'][:value]),
-        }
+        result['ImageModality'] = (dicom_metadata['0008,0060'].nil? ? '' : dicom_metadata['0008,0060'][:value])
 
         dicom_imaging_date = dicom_metadata['0008,0023']
         dicom_imaging_date = dicom_metadata['0008,0022'] if dicom_imaging_date.nil?
         dicom_imaging_date = DateTime.strptime(dicom_imaging_date[:value], '%Y%m%d') unless dicom_imaging_date.nil?
         unless(dicom_imaging_date.nil?)
-          dicom_properties.merge!({
-                                    'imaDate' => dicom_imaging_date.strftime('%Y%m%d'),
-                                    'imaDate2' => dicom_imaging_date.strftime('%d-%m-%Y'),
-                                  })
+          result['imaDate'] = dicom_imaging_date.strftime('%Y%m%d')
+          result['imaDate2'] = dicom_imaging_date.strftime('%d-%m-%Y')
         end
-
-        properties.merge!(dicom_properties)
 
         if(study_config and study.semantically_valid?)
           dicom_tag_names = []
@@ -162,12 +190,19 @@ class ImageSeries < ActiveRecord::Base
             dicom_tag_names << tag['label'].to_s
           end          
 
-          properties.merge!({'DICOMTagNames' => dicom_tag_names.join("\n"), 'DICOMValues' => dicom_values.join("\n")})
+          result['DICOMTagNames'] = dicom_tag_names.join("\n")
+          result['DICOMValues'] = dicom_values.join("\n")
         end
       end
     end
-
+    
+    return result
+  end
+  def properties_to_domino
     image_series_data = self.image_series_data
+    study_config = (self.study.nil? ? nil : self.study.current_configuration)
+    result = {}
+
     if(study_config and study.semantically_valid? and image_series_data and image_series_data.properties)
       properties_spec = study_config['image_series_properties']
       property_names = []
@@ -207,33 +242,11 @@ class ImageSeries < ActiveRecord::Base
         property_values << (value.blank? ? 'Not set' : value.to_s)
       end
 
-      properties.merge!({'PropertyNames' => property_names.join("\n"), 'PropertyValues' => property_values.join("\n")})
+      result = {'PropertyNames' => property_names.join("\n"), 'PropertyValues' => property_values.join("\n")}
     end
 
-    properties
+    return result
   end
-
-  def ensure_image_series_data_exists
-    if(self.image_series_data.nil?)
-      ImageSeriesData.create(:image_series_id => self.id)
-    end
-  end
-
-  def assigned_required_series
-    required_series = []
-    return required_series if self.visit.nil?
-
-    self.visit.ensure_visit_data_exists
-    if(self.visit.visit_data.assigned_image_series_index and self.visit.visit_data.assigned_image_series_index[self.id.to_s])
-      self.visit.visit_data.assigned_image_series_index[self.id.to_s].each do |required_series_name|
-        required_series << required_series_name
-      end
-    end
-
-    return required_series
-  end
-
-  protected
 
   def ensure_study_is_unchanged
     if(self.patient_id_changed? and not self.patient_id_was.nil?)

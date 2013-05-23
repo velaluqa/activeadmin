@@ -42,6 +42,21 @@ module DominoDocument
     return result
   end
 
+  def update_domino_document(changed_properties)
+    return self.ensure_document_exists if self.domino_unid.nil?
+    
+    client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
+    if client.nil?
+      errors.add :name, 'Failed to communicate with the Domino server.'
+      return false
+    end
+
+    result = client.update_document(self.domino_unid, domino_document_form, changed_properties)
+    errors.add :name, 'Failed to communicate with the Domino server.' if (result == false)
+
+    return result
+  end
+
   def trash_document
     return true if self.domino_unid.nil?
 
