@@ -12,6 +12,10 @@ gem 'pg'
 gem 'mongoid', '~> 3.0.0'
 gem 'bson_ext'
 
+# HAML templating engine
+# needs to be added explicitely, otherwise it might not register itself as a templating engine in Rails
+gem 'haml'
+
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
