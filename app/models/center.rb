@@ -66,8 +66,11 @@ class Center < ActiveRecord::Base
   protected
   
   def ensure_study_is_unchanged
-    if(self.study_id_changed?)
+    if(self.persisted? and self.study_id_changed?)
       errors[:study] << 'A center cannot be reassigned to a different study.'
+      return false
     end
+
+    return true
   end
 end
