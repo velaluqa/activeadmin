@@ -31,7 +31,11 @@ ActiveAdmin.register Study do
     attributes_table do
       row :name
       row :domino_db_url do
-        link_to(study.domino_db_url, study.domino_db_url)
+        if study.domino_integration_enabled?
+          link_to(study.domino_db_url, study.domino_db_url)
+        else
+          status_tag('Disabled', :warning, :label => "Domino integration not enabled")
+        end
       end
       row :notes_links_base_uri do
         link_to(study.notes_links_base_uri, study.notes_links_base_uri) unless study.notes_links_base_uri.nil?
@@ -78,7 +82,7 @@ ActiveAdmin.register Study do
     f.inputs 'Details' do
       f.input :name, :required => true
       if(!f.object.persisted? or current_user.is_app_admin?)
-        f.input :domino_db_url, :label => 'Domino DB URL', :required => true, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to data corruption unless the Domino DB was moved from the old URL to the new one.' : '')
+        f.input :domino_db_url, :label => 'Domino DB URL', :required => false, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to data corruption unless the Domino DB was moved from the old URL to the new one.' : 'If left blank, Domino integration will not be enabled for this study. You can enable it later by changing this value.')
       end
       f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end

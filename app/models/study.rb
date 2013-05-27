@@ -17,7 +17,7 @@ class Study < ActiveRecord::Base
   has_many :visits, :through => :patients
   has_many :image_series, :through => :patients
 
-  validates_presence_of :name, :domino_db_url
+  validates_presence_of :name
 
   before_destroy do
     unless(sessions.empty? and centers.empty?)
@@ -103,6 +103,9 @@ class Study < ActiveRecord::Base
     self.patients.map {|patient| patient.wado_query}
   end
 
+  def domino_integration_enabled?
+    (not self.domino_db_url.blank? and not self.notes_links_base_uri.blank?)
+  end
   def lotus_notes_url
     self.notes_links_base_uri
   end
@@ -118,6 +121,8 @@ class Study < ActiveRecord::Base
 
   # Notes://<server>/<replica id>/<view id>/<document unid>
   def update_notes_links_base_uri
+    return true if self.domino_db_url.blank?
+    
     new_notes_links_base_uri = URI(self.domino_db_url)
     new_notes_links_base_uri.scheme = 'Notes'
 
