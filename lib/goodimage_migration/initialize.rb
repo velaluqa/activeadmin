@@ -30,6 +30,13 @@ module GoodImageMigration
     return true
   end
 
+  def self.setup_migration_db
+    GoodImageMigration::Migration::Mapping.auto_upgrade!
+  end
+  def self.clear_migration_db
+    GoodImageMigration::Migration::Mapping.auto_migrate!
+  end
+
   def self.pp_array(a)
     a.each do |e|
       pp e
