@@ -1,0 +1,9 @@
+development:
+  migration_db:
+    adapter: sqlite
+    database: db/migration_development.sqlite3
+  goodimage_db:
+    adapter: mysql
+    database: goodimage
+    username: root
+    
