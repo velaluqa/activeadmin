@@ -3,6 +3,10 @@ module GoodImageMigration
     class SeriesImageSet
       include DataMapper::Resource
 
+      def self.default_repository_name
+        :goodimage
+      end
+
       storage_names[:goodimage] = 'series_image_set'
 
       property :id, Serial

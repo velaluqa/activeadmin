@@ -3,6 +3,10 @@ module GoodImageMigration
     class SeriesType
       include DataMapper::Resource
 
+      def self.default_repository_name
+        :goodimage
+      end
+
       storage_names[:goodimage] = 'series_type'
 
       property :id, Serial

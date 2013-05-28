@@ -3,6 +3,10 @@ module GoodImageMigration
     class ParameterToSegment
       include DataMapper::Resource
 
+      def self.default_repository_name
+        :goodimage
+      end
+
       storage_names[:goodimage] = 'parameter_to_segment'
 
       property :id, Serial

@@ -3,6 +3,10 @@ module GoodImageMigration
     class Report
       include DataMapper::Resource
 
+      def self.default_repository_name
+        :goodimage
+      end
+
       storage_names[:goodimage] = 'report'
 
       property :id, Serial

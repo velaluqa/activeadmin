@@ -3,6 +3,10 @@ module GoodImageMigration
     class QCFData
       include DataMapper::Resource
 
+      def self.default_repository_name
+        :goodimage
+      end
+
       storage_names[:goodimage] = 'qcf_data'
 
       property :id, Serial

@@ -3,6 +3,10 @@ module GoodImageMigration
     class CD
       include DataMapper::Resource
 
+      def self.default_repository_name
+        :goodimage
+      end
+
       storage_names[:goodimage] = 'cd'
 
       property :id, Serial

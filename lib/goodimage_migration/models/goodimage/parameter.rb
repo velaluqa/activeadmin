@@ -3,6 +3,10 @@ module GoodImageMigration
     class Parameter
       include DataMapper::Resource
 
+      def self.default_repository_name
+        :goodimage
+      end
+
       storage_names[:goodimage] = 'parameter'
 
       property :id, Serial

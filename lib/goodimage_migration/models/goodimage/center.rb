@@ -3,6 +3,10 @@ module GoodImageMigration
     class Center
       include DataMapper::Resource
 
+      def self.default_repository_name
+        :goodimage
+      end
+
       storage_names[:goodimage] = 'center'
 
       property :id, Serial
