@@ -553,7 +553,7 @@ render_roi_select2_option = (roi, roi_values) ->
   html = '<div class="roi-select2-item">'
   html += '<p>'+roi['name']+'</p>'
 
-  html += '<div class="roi-properties dark-muted"><table>'
+  html += '<div class="roi-properties"><table>'
   for own key, value of roi_values
     value_name = ROI_VALUE_NAMES[value]
     value_name = value unless value_name?
