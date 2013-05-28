@@ -6,8 +6,7 @@ require 'goodimage_migration/models'
 
 module GoodImageMigration
   def self.initialize
-    environment = Rails.env
-    pp Rails.application.config
+    environment = ENV['MIGRATION_ENV'] || Rails.env
 
     DataMapper::Logger.new($stdout, :debug)
 
