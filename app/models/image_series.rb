@@ -110,7 +110,7 @@ class ImageSeries < ActiveRecord::Base
       'docCode' => 10030,
       'CenterNo' => patient.center.code,
       'imaPatNo' => patient.subject_id,
-      'imaSeriesNo' => id,
+      'imaSeriesNo' => series_number,
     }
   end
   def domino_document_fields
