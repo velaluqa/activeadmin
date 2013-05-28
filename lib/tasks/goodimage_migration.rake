@@ -1,4 +1,5 @@
 require 'goodimage_migration/initialize'
+require 'goodimage_migration/migrations'
 
 namespace :goodimage_migration do  
   desc "Initialize the migration environment (without initializing the Rails environment)"
