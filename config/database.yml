@@ -8,6 +8,11 @@ development:
   database: db/development.sqlite3
   pool: 5
   timeout: 5000
+production:
+  adapter: sqlite3
+  database: db/production.sqlite3
+  pool: 5
+  timeout: 5000
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -18,10 +23,10 @@ test:
   pool: 5
   timeout: 5000
 
-production:
-  adapter: postgresql
-  encoding: unicode
-  database: pharmtrace_study_server_production
-  pool: 5
-  timeout: 5000
-  username: profmaad
+#production:
+#  adapter: postgresql
+#  encoding: unicode
+#  database: pharmtrace_study_server_production
+#  pool: 5
+#  timeout: 5000
+#  username: profmaad
