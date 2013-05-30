@@ -25,3 +25,9 @@ production:
   pool: 5
   timeout: 5000
   username: profmaad
+
+migration_test:
+  adapter: sqlite3
+  database: db/migration_test.sqlite3
+  pool: 5
+  timeout: 5000

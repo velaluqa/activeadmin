@@ -78,3 +78,11 @@ test:
         # low amounts for fast failures.
         max_retries: 1
         retry_interval: 0
+
+migration_test:
+  sessions:
+    default:
+      database: erica_migration_test
+      hosts:
+        - localhost:27017
+      options:
