@@ -2,7 +2,7 @@ class PatientData
   include Mongoid::Document
 
   field :patient_id, type: Integer
-  field :data, type: Hash
+  field :data, type: Hash, default: {}
 
   def patient
     begin
