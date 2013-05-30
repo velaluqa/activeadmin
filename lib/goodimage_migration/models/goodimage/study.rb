@@ -50,6 +50,10 @@ module GoodImageMigration
       has n, :patients, through: :center_to_studies
       
       has n, :examinations, child_key: 'study__id'
+
+      def migration_children
+        return self.center_to_studies
+      end
     end
   end
 end

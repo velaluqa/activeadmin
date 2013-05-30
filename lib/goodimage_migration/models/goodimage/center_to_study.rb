@@ -19,6 +19,10 @@ module GoodImageMigration
       belongs_to :center, child_key: 'center__id'
       belongs_to :study,  child_key: 'study__id'
       has n, :patients, child_key: 'center_to_study__id'
+
+      def migration_children
+        return self.patients
+      end
     end
   end
 end
