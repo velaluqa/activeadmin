@@ -17,18 +17,18 @@ class ImageStorageObserver < ActiveRecord::Observer
       end
     end
 
-    puts "AFTER COMMIT HOOK FOR"
+    #puts "AFTER COMMIT HOOK FOR"
     pp model
     if model.send(:transaction_include_action?, :create)
-      puts "CREATE-------------------"
+      #puts "CREATE-------------------"
       create_image_storage_path(model)
     end
     if model.send(:transaction_include_action?, :update)
-      puts "UPDATE-------------------"
+      #puts "UPDATE-------------------"
       move_image_storage_path(model)
     end
     if model.send(:transaction_include_action?, :destroy)
-      puts "DESTROY-------------------"
+      #puts "DESTROY-------------------"
       remove_image_storage_path(model)
     end
   end

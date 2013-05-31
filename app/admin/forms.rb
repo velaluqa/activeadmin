@@ -295,9 +295,7 @@ ActiveAdmin.register Form do
     subform_copy_count = 0
     if(params[:form][:include_subforms] == '1')
       @form.included_forms.each do |included_form_name|
-        puts included_form_name
         included_form = Form.where(:name => included_form_name, :session_id => @form.session_id).first
-        puts included_form
         next if included_form.nil?
         
         copy_to_session(included_form, @session)
