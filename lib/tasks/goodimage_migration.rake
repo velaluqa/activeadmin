@@ -60,7 +60,42 @@ namespace :goodimage_migration do
       end_time = Time.now
       puts "Migration started at #{start_time.inspect}"
       puts "Migration ended at #{end_time.inspect}"
-      puts "Migration took: #{end_time - start_time}"
+      puts "Migration took #{end_time - start_time} seconds"
     end
+  end
+
+  desc "Migrate all GoodImage studies to ERICA"
+  task :migrate_study => [:initialize] do
+    config = GoodImageMigration.migration_config
+    if(config.nil? or config['goodimage_image_storage'].nil?)
+      puts "No valid config containing 'goodimage_image_storage' found, aborting."
+      next
+    end
+
+    puts "Attempting migration for all GoodImage studies"
+    goodimage_studies = GoodImageMigration::GoodImage::Study.all
+    
+    puts "Found #{goodimage_studies.count} studies in GoodImage, starting migration..."
+    migrator = GoodImageMigration::Migrator.new(config, goodimage_studies.count)
+    start_time = Time.now
+    
+    success = true
+    goodimage_studies.each do |goodimage_study|
+      unless(migrator.migrate(goodimage_study, nil))
+        success = false
+        break
+      end
+    end
+    
+    if(success)
+      puts "Migration successful!"
+    else
+      puts "Migration failed, please consult the log for details."
+    end
+
+    end_time = Time.now
+    puts "Migration started at #{start_time.inspect}"
+    puts "Migration ended at #{end_time.inspect}"
+    puts "Migration took #{end_time - start_time} seconds"
   end
 end
