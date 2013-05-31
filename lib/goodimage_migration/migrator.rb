@@ -4,7 +4,7 @@ require 'git_config_repository'
 module GoodImageMigration
   class Migrator
 
-    def initialize(config)
+    def initialize(config, number_of_studies = 1)
       @imaging_date_parameter_ids = GoodImageMigration::GoodImage::Parameter.all(:dicom => ['00080023', '00080022']).map {|parameter| parameter.id}
 
       @config = config
@@ -12,20 +12,30 @@ module GoodImageMigration
       @goodimage_image_storage_root += '/' unless @goodimage_image_storage_root.end_with?('/')      
       @rails_image_storage_root = Rails.application.config.image_storage_root
       @rails_image_storage_root += '/' unless(@rails_image_storage_root.end_with?('/'))
+
+      reset_counters(number_of_studies)
     end
     
     def migrate(goodimage_resource, erica_parent_resource)
-      Rails.logger.info "Starting migration for #{goodimage_resource.inspect} (with parent resource #{erica_parent_resource.inspect}"
+      Rails.logger.info "Starting migration for #{goodimage_resource.inspect}"
       if(goodimage_resource.class == GoodImage::Study)
         reset_study_migration_state
       end
 
       erica_resource = case goodimage_resource
-                       when GoodImage::Study                         
+                       when GoodImage::Study
+                         set_max_counters(goodimage_resource)
+                         update_counters(:studies)
+                         print_counters                         
                          self.migrate_resource(goodimage_resource, ::Study) {|goodimage_study, erica_study| update_study(goodimage_study, erica_study)}
                        when GoodImage::CenterToStudy
+                         set_max_counters(goodimage_resource)
+                         update_counters(:centers)
+                         print_counters
                          self.migrate_resource(goodimage_resource, ::Center) {|goodimage_study, erica_study| update_center(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::Patient
+                         update_counters(:patients)
+                         print_counters
                          self.migrate_resource(goodimage_resource, ::Patient, Proc.new {|goodimage_resource, erica_resource| update_patient_data(goodimage_resource, erica_resource)}) {|goodimage_study, erica_study| update_patient(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::SeriesImageSet
                          self.migrate_resource(goodimage_resource, ::ImageSeries, Proc.new {|goodimage_resource, erica_resource| update_required_series_assignment(goodimage_resource, erica_resource)}) {|goodimage_study, erica_study| update_image_series(goodimage_study, erica_study, erica_parent_resource)}
@@ -57,6 +67,45 @@ module GoodImageMigration
     
     protected
 
+    def reset_counters(number_of_studies)
+      @counters = {
+        studies: 0,
+        centers: 0,
+        patients: 0
+      }
+      @max_counters = {
+        studies: number_of_studies,
+        centers: -1,
+        patients: -1
+      }
+    end
+    def set_max_counters(goodimage_resource)
+      case goodimage_resource
+      when GoodImage::Study
+        @max_counters[:centers] = goodimage_resource.center_to_studies.count
+      when GoodImage::CenterToStudy
+        @max_counters[:patients] = goodimage_resource.patients.count
+      end
+    end
+    def update_counters(type)
+      @counters[type] += 1
+
+      case type
+      when :studies
+        @counters[:centers] = 0
+        @counters[:patients] = 0
+      when :centers
+        @counters[:patients] = 0
+      end
+    end
+    def print_counters
+      print "Currently migrating study #{@counters[:studies]}/#{@max_counters[:studies]}"
+      print ", center #{@counters[:centers]}/#{@max_counters[:centers]}" unless(@counters[:centers] == 0)
+      print ", patient #{@counters[:patients]}/#{@max_counters[:patients]}" unless(@counters[:patients] == 0)
+
+      puts ".."
+    end
+    
     def reset_study_migration_state
       @study_config = {
         'visit_types' => {},
@@ -167,8 +216,8 @@ module GoodImageMigration
         erica_image_series.state = :required_series_assigned
         erica_image_series.save
 
-        FileUtils.rm(@rails_image_storage_root + erica_parent_visit.required_series_image_storage_path(erica_required_series_name), :force => true, :verbose => true)
-        FileUtils.ln_sf(erica_image_series.id.to_s, @rails_image_storage_root + erica_parent_visit.required_series_image_storage_path(erica_required_series_name), :verbose => true)
+        FileUtils.rm(@rails_image_storage_root + erica_parent_visit.required_series_image_storage_path(erica_required_series_name), :force => true)
+        FileUtils.ln_sf(erica_image_series.id.to_s, @rails_image_storage_root + erica_parent_visit.required_series_image_storage_path(erica_required_series_name))
       end
     end
     def update_image(goodimage_image, erica_image, erica_parent_image_series)
@@ -176,7 +225,7 @@ module GoodImageMigration
     end
     def copy_image_file(goodimage_image, erica_image)
       begin
-        FileUtils.cp(@goodimage_image_storage_root + goodimage_image.file_path, erica_image.absolute_image_storage_path, :verbose => true, :preserve => true)
+        FileUtils.cp(@goodimage_image_storage_root + goodimage_image.file_path, erica_image.absolute_image_storage_path, :preserve => true)
       rescue SystemCallError => e
         Rails.logger.error "Failed to copy image file for #{goodimage_image.inspect} from #{@goodimage_image_storage_root + goodimage_image.file_path} to #{erica_image.absolute_image_storage_path}:"
         Rails.logger.error e.message
