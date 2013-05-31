@@ -18,40 +18,6 @@ namespace :goodimage_migration do
     GoodImageMigration.clear_migration_db
   end
 
-  task :image_path_test => [:initialize] do
-    images_index = {}
-    File.open('/home/profmaad/Workspace/freelance/PharmTrace/GoodImage Migration/Documentation/goodimage_file_listing.txt', 'r') do |f|
-      f.each_line do |line|
-        line.strip!
-        images_index[line[2..-1]] = true if line.end_with?('.dcm')
-      end
-    end
-    puts "Indexed #{images_index.size} file names"
-
-    total_images_count = GoodImageMigration::GoodImage::Image.count
-    puts "Checking whether all #{total_images_count} files are present and accounted for..."
-    offenders = []
-    count = 2440000
-    while(count < total_images_count)
-      GoodImageMigration::GoodImage::Image.all(:limit => 10000, :offset => count).each do |image|
-        if(images_index[image.file_path].nil? and image.study_internal_id != '340044')
-          offenders << image
-          break if offenders.size > 23
-        end        
-
-        count += 1
-      end
-      print '.'
-      puts "\n#{count}" if(count % 100000 == 0)
-      break if offenders.size > 23
-    end
-    puts "Result: #{offenders.empty?}"
-    unless(offenders.empty?)
-      puts "Offenders:"
-      GoodImageMigration.pp_array offenders
-    end
-  end
- 
   desc "Open an IRB instance in the GoodImage DB context"
   task :goodimage_irb => [:initialize] do
     puts "Working in GoodImage context!"
