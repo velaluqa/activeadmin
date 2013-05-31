@@ -102,6 +102,12 @@ module GoodImageMigration
           
           erica_image_series.visit_id = erica_parent_visit_id
           erica_image_series.state = :visit_assigned
+
+          # TODO: required series assignment
+          # * add assigned_equivalent_series.patient_examination_series.patient_examination.examination.name as visit type (visit_type)
+          # * add assigned_equivalent_series.patient_examination_series.name (or .label) as required series for visit_type (required_series_name)
+          # * assign erica_image_series to required series (VisitData.required_series[required_series_name] = {'id' => erica_image_series.id})
+          # * set tqc results: VisitData.required_series[required_series_name]['tqc_state'] = :passed/:issues
         end
       end      
     end
