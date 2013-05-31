@@ -38,6 +38,9 @@ StudyServer::Application.configure do
   # default URL for devise
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
+  # Logging level
+  config.log_level = :info  
+
   # custom app config
   config.data_directory = 'data'
 
