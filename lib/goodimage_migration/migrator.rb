@@ -3,8 +3,12 @@ require 'goodimage_migration/models'
 module GoodImageMigration
   class Migrator
 
-    def initialize
+    def initialize(config)
       @imaging_date_parameter_ids = GoodImageMigration::GoodImage::Parameter.all(:dicom => ['00080023', '00080022']).map {|parameter| parameter.id}
+
+      @config = config
+      @goodimage_image_storage_root = config['goodimage_image_storage']
+      @goodimage_image_storage_root += '/' unless @goodimage_image_storage_root.end_with?('/')
     end
     
     def migrate(goodimage_resource, erica_parent_resource)
@@ -15,13 +19,13 @@ module GoodImageMigration
                        when GoodImage::CenterToStudy
                          self.migrate_resource(goodimage_resource, ::Center) {|goodimage_study, erica_study| update_center(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::Patient
-                         self.migrate_resource(goodimage_resource, ::Patient) {|goodimage_study, erica_study| update_patient(goodimage_study, erica_study, erica_parent_resource)}
+                         self.migrate_resource(goodimage_resource, ::Patient, Proc.new {|goodimage_resource, erica_resource| update_patient_data(goodimage_resource, erica_resource)}) {|goodimage_study, erica_study| update_patient(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::SeriesImageSet
                          self.migrate_resource(goodimage_resource, ::ImageSeries) {|goodimage_study, erica_study| update_image_series(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::PatientExamination
                          self.migrate_resource(goodimage_resource, ::Visit) {|goodimage_study, erica_study| update_visit(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::Image
-                         self.migrate_resource(goodimage_resource, ::Image) {|goodimage_study, erica_study| update_image(goodimage_study, erica_study, erica_parent_resource)}
+                         self.migrate_resource(goodimage_resource, ::Image, Proc.new {|goodimage_resource, erica_resource| copy_image_file(goodimage_resource, erica_resource)}) {|goodimage_study, erica_study| update_image(goodimage_study, erica_study, erica_parent_resource)}
                        else
                          nil
                        end
@@ -59,11 +63,10 @@ module GoodImageMigration
 
       erica_patient.center_id = erica_parent_center.id
 
-      # this is very ugly, maybe it will be removed again
-
+    end
+    def update_patient_data(goodimage_patient, erica_patient)
       erica_patient_data = erica_patient.patient_data
       if(erica_patient_data.nil?)
-        return unless erica_patient.save
         erica_patient_data = ::PatientData.new
         erica_patient_data.patient_id = erica_patient.id
       end
@@ -105,8 +108,18 @@ module GoodImageMigration
     def update_image(goodimage_image, erica_image, erica_parent_image_series)
       erica_image.image_series_id = erica_parent_image_series.id
     end
+    def copy_image_file(goodimage_image, erica_image)
+      begin
+        FileUtils.cp(@goodimage_image_storage_root + goodimage_image.file_path, erica_image.absolute_image_storage_path, :verbose => true, :preserve => true)
+      rescue SystemCallError => e
+        Rails.logger.error "Failed to copy image file for #{goodimage_image.inspect} from #{@goodimage_image_storage_root + goodimage_image.file_path} to #{erica_image.absolute_image_storage_path}:"
+        Rails.logger.error e.message
+        return false
+      end
+      return true
+    end
 
-    def migrate_resource(goodimage_resource, erica_resource_class, &block)
+    def migrate_resource(goodimage_resource, erica_resource_class, aftersave_proc = nil, &block)
       Rails.logger.debug "GoodImage Resource: #{goodimage_resource.inspect}"
 
       resource_type = GoodImageMigration::Migration::Mapping.resource_type(goodimage_resource)
@@ -125,6 +138,10 @@ module GoodImageMigration
       unless(erica_resource.save)
         Rails.logger.fatal "Failed to save ERICA resource, aborting"
         return nil
+      end
+
+      unless(aftersave_proc.nil?)
+        aftersave_proc.call(goodimage_resource, erica_resource)
       end
 
       new_modification_timestamp = goodimage_resource.respond_to?(:modification_timestamp) ? goodimage_resource.modification_timestamp : Time.now
