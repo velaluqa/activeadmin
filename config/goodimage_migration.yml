@@ -6,4 +6,5 @@ development:
     adapter: mysql
     database: goodimage
     username: root
+  goodimage_image_storage: "/home/profmaad/Workspace/freelance/PharmTrace/GoodImage Migration/goodimage_image_storage"
     
