@@ -18,7 +18,7 @@ class ImageStorageObserver < ActiveRecord::Observer
     end
 
     #puts "AFTER COMMIT HOOK FOR"
-    pp model
+    #pp model
     if model.send(:transaction_include_action?, :create)
       #puts "CREATE-------------------"
       create_image_storage_path(model)

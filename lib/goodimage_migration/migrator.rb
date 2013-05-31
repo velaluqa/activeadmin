@@ -45,7 +45,6 @@ module GoodImageMigration
       
       children = goodimage_resource.respond_to?(:migration_children) ? goodimage_resource.migration_children : []
       children.each do |child|
-        pp child
         success &&= migrate(child, erica_resource)
         break unless success
       end
