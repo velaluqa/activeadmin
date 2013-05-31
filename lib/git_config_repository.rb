@@ -53,7 +53,11 @@ class GitConfigRepository
 
     tree = index.write_tree
     
-    author_hash = {:email => author.id.to_s, :name => author.username, :time => Time.now}
+    if(author.nil?)
+      author_hash = {:email => '-1', :name => 'no_author_given', :time => Time.now}
+    else
+      author_hash = {:email => author.id.to_s, :name => author.username, :time => Time.now}
+    end
 
     options = {}
     options[:author] = author_hash
