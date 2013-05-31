@@ -17,14 +17,8 @@ namespace :goodimage_migration do
   task :clear_migration_db => :base_initialize do
     GoodImageMigration.clear_migration_db
   end
- 
-  desc "Open an IRB instance in the GoodImage DB context"
-  task :goodimage_irb => [:initialize] do
-    puts "Working in GoodImage context!"
 
-    argv = ARGV
-    ARGV.replace([])
-
+  task :image_path_test => [:initialize] do
     images_index = {}
     File.open('/home/profmaad/Workspace/freelance/PharmTrace/GoodImage Migration/Documentation/goodimage_file_listing.txt', 'r') do |f|
       f.each_line do |line|
@@ -56,6 +50,14 @@ namespace :goodimage_migration do
       puts "Offenders:"
       GoodImageMigration.pp_array offenders
     end
+  end
+ 
+  desc "Open an IRB instance in the GoodImage DB context"
+  task :goodimage_irb => [:initialize] do
+    puts "Working in GoodImage context!"
+
+    argv = ARGV
+    ARGV.replace([])
 
     IRB.start
 
