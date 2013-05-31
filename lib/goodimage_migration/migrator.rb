@@ -1,4 +1,5 @@
 require 'goodimage_migration/models'
+require 'git_config_repository'
 
 module GoodImageMigration
   class Migrator
@@ -8,22 +9,28 @@ module GoodImageMigration
 
       @config = config
       @goodimage_image_storage_root = config['goodimage_image_storage']
-      @goodimage_image_storage_root += '/' unless @goodimage_image_storage_root.end_with?('/')
+      @goodimage_image_storage_root += '/' unless @goodimage_image_storage_root.end_with?('/')      
+      @rails_image_storage_root = Rails.application.config.image_storage_root
+      @rails_image_storage_root += '/' unless(@rails_image_storage_root.end_with?('/'))
     end
     
     def migrate(goodimage_resource, erica_parent_resource)
       Rails.logger.info "Starting migration for #{goodimage_resource.inspect} (with parent resource #{erica_parent_resource.inspect}"
+      if(goodimage_resource.class == GoodImage::Study)
+        reset_study_migration_state
+      end
+
       erica_resource = case goodimage_resource
-                       when GoodImage::Study
+                       when GoodImage::Study                         
                          self.migrate_resource(goodimage_resource, ::Study) {|goodimage_study, erica_study| update_study(goodimage_study, erica_study)}
                        when GoodImage::CenterToStudy
                          self.migrate_resource(goodimage_resource, ::Center) {|goodimage_study, erica_study| update_center(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::Patient
                          self.migrate_resource(goodimage_resource, ::Patient, Proc.new {|goodimage_resource, erica_resource| update_patient_data(goodimage_resource, erica_resource)}) {|goodimage_study, erica_study| update_patient(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::SeriesImageSet
-                         self.migrate_resource(goodimage_resource, ::ImageSeries) {|goodimage_study, erica_study| update_image_series(goodimage_study, erica_study, erica_parent_resource)}
+                         self.migrate_resource(goodimage_resource, ::ImageSeries, Proc.new {|goodimage_resource, erica_resource| update_required_series_assignment(goodimage_resource, erica_resource)}) {|goodimage_study, erica_study| update_image_series(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::PatientExamination
-                         self.migrate_resource(goodimage_resource, ::Visit) {|goodimage_study, erica_study| update_visit(goodimage_study, erica_study, erica_parent_resource)}
+                         self.migrate_resource(goodimage_resource, ::Visit, Proc.new {|goodimage_resource, erica_resource| reset_visit_data(goodimage_resource, erica_resource)}) {|goodimage_study, erica_study| update_visit(goodimage_study, erica_study, erica_parent_resource)}
                        when GoodImage::Image
                          self.migrate_resource(goodimage_resource, ::Image, Proc.new {|goodimage_resource, erica_resource| copy_image_file(goodimage_resource, erica_resource)}) {|goodimage_study, erica_study| update_image(goodimage_study, erica_study, erica_parent_resource)}
                        else
@@ -43,10 +50,32 @@ module GoodImageMigration
         break unless success
       end
 
+      if(goodimage_resource.class == GoodImage::Study and success)
+        write_erica_study_config(erica_resource)
+      end
       return success
     end
     
     protected
+
+    def reset_study_migration_state
+      @study_config = {
+        'visit_types' => {},
+        'domino_integration' => {
+          'dicom_tags' => []
+        },
+        'image_series_properties' => {}
+      }
+    end
+    def write_erica_study_config(erica_study)
+      config_file = Tempfile.new(['study_config_'+erica_study.id.to_s, '.yml'])
+      
+      config_file.write(@study_config.to_yaml)
+      config_file.close
+
+      repo = GitConfigRepository.new
+      repo.update_config_file(erica_study.relative_config_file_path, config_file.path, nil, "New configuration file for study #{erica_study.id}")
+    end
 
     def update_study(goodimage_study, erica_study)
       erica_study.name = goodimage_study.internal_id
@@ -86,6 +115,16 @@ module GoodImageMigration
       erica_visit.visit_number = goodimage_patient_examination.examination.idx
 
       erica_visit.patient_id = erica_parent_patient.id
+
+      erica_visit.visit_type = goodimage_patient_examination.examination.underscored_name
+      @study_config['visit_types'][erica_visit.visit_type] = {'required_series' => {}} if @study_config['visit_types'][erica_visit.visit_type].nil?
+    end
+    def reset_visit_data(goodimage_patient_examination, erica_visit)
+      erica_visit.ensure_visit_data_exists
+      erica_visit_data = erica_visit.visit_data
+
+      erica_visit_data.required_series = {}
+      erica_visit_data.assigned_image_series_index = {}
     end
     def update_image_series(goodimage_series_image_set, erica_image_series, erica_parent_patient)
       erica_image_series.name = goodimage_series_image_set.proper_series_name
@@ -102,14 +141,36 @@ module GoodImageMigration
           
           erica_image_series.visit_id = erica_parent_visit_id
           erica_image_series.state = :visit_assigned
-
-          # TODO: required series assignment
-          # * add assigned_equivalent_series.patient_examination_series.patient_examination.examination.name as visit type (visit_type)
-          # * add assigned_equivalent_series.patient_examination_series.name (or .label) as required series for visit_type (required_series_name)
-          # * assign erica_image_series to required series (VisitData.required_series[required_series_name] = {'id' => erica_image_series.id})
-          # * set tqc results: VisitData.required_series[required_series_name]['tqc_state'] = :passed/:issues
         end
-      end      
+      end
+    end
+    def update_required_series_assignment(goodimage_series_image_set, erica_image_series)
+      return if erica_image_series.visit.nil?
+
+      assigned_equivalent_series = goodimage_series_image_set.equivalent_series.reject{|series| series.id == goodimage_series_image_set.id or series.patient_examination_series.nil?}.first
+      unless(assigned_equivalent_series.nil?)
+        erica_required_series_name = assigned_equivalent_series.patient_examination_series.underscored_label        
+        erica_parent_visit = erica_image_series.visit
+    
+        unless(erica_parent_visit.visit_type.blank? or @study_config['visit_types'][erica_parent_visit.visit_type].nil?)
+          @study_config['visit_types'][erica_parent_visit.visit_type]['required_series'][erica_required_series_name] = {'tqc' => []} if @study_config['visit_types'][erica_parent_visit.visit_type]['required_series'][erica_required_series_name].nil?
+        end
+
+        erica_parent_visit.ensure_visit_data_exists
+        erica_parent_visit_data = erica_parent_visit.visit_data
+        
+        # TODO: set correct tQC state
+        erica_parent_visit_data.required_series[erica_required_series_name] = {'image_series_id' => erica_image_series.id, 'tqc_state' => ::RequiredSeries.tqc_state_sym_to_int(:pending), 'tqc_results' => {}}
+        erica_parent_visit_data.assigned_image_series_index[erica_image_series.id] = [erica_required_series_name]
+
+        erica_parent_visit_data.save
+
+        erica_image_series.state = :required_series_assigned
+        erica_image_series.save
+
+        FileUtils.rm(@rails_image_storage_root + erica_parent_visit.required_series_image_storage_path(erica_required_series_name), :force => true, :verbose => true)
+        FileUtils.ln_sf(erica_image_series.id.to_s, @rails_image_storage_root + erica_parent_visit.required_series_image_storage_path(erica_required_series_name), :verbose => true)
+      end
     end
     def update_image(goodimage_image, erica_image, erica_parent_image_series)
       erica_image.image_series_id = erica_parent_image_series.id

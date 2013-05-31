@@ -21,6 +21,10 @@ module GoodImageMigration
       belongs_to :study, child_key: 'study__id'
       has n, :segments, child_key: 'examination__id'
       has n, :patient_examinations, child_key: 'examination__id'
+
+      def underscored_name
+        name.gsub(/[- .]/, '_')
+      end
     end
   end
 end

@@ -34,6 +34,10 @@ module GoodImageMigration
       belongs_to :examination_series, child_key: 'examination_series__id'
       has n, :patient_parameters, child_key: 'patient_examination_series__id'
       has n, :series_image_sets, child_key: 'patient_examination_series__id'
+
+      def underscored_label
+        label.gsub(/[- .]/, '_')
+      end
     end
   end
 end
