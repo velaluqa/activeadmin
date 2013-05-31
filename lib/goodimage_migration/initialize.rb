@@ -21,7 +21,7 @@ module GoodImageMigration
   end
 
   def self.initialize
-    DataMapper::Logger.new($stdout, :debug)
+    DataMapper::Logger.new($stdout, :info)
 
     config = self.migration_config
     if(config['migration_db'].nil? or config['goodimage_db'].nil?)
