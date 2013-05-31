@@ -40,6 +40,10 @@ module GoodImageMigration
 
       belongs_to :series_image_set, child_key: 'series_image_set__id', required: false
       has n, :image_dicom_key_values, 'ImageDICOMKeyValue', child_key: 'image__id'
+
+      def file_path
+        "disk#{study_internal_id}/Images/#{media_id}__center#{center_internal_id}/#{file}"
+      end
     end
   end
 end
