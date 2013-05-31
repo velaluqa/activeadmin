@@ -149,7 +149,7 @@ module GoodImageMigration
 
       assigned_equivalent_series = goodimage_series_image_set.equivalent_series.reject{|series| series.id == goodimage_series_image_set.id or series.patient_examination_series.nil?}.first
       unless(assigned_equivalent_series.nil?)
-        erica_required_series_name = assigned_equivalent_series.patient_examination_series.underscored_label        
+        erica_required_series_name = assigned_equivalent_series.patient_examination_series.underscored_name
         erica_parent_visit = erica_image_series.visit
     
         unless(erica_parent_visit.visit_type.blank? or @study_config['visit_types'][erica_parent_visit.visit_type].nil?)
