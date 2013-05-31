@@ -64,7 +64,7 @@ module GoodImageMigration
         'domino_integration' => {
           'dicom_tags' => []
         },
-        'image_series_properties' => {}
+        'image_series_properties' => []
       }
     end
     def write_erica_study_config(erica_study)
