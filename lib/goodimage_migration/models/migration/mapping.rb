@@ -3,6 +3,8 @@ module GoodImageMigration
     class Mapping
       include DataMapper::Resource
 
+      storage_names[:default] = 'mapping'
+
       property :id, Serial
 
       property :type, String, index: true
