@@ -27,6 +27,11 @@
 # Ignore binaries installed via bundle install --binstubs
 /bin
 
+# Ignore unicorn config files
+/config/unicorn.rb
+/script/unicorn_start.sh
+/script/unicorn_stop.sh
+
 # Ignore the ERICA data directory
 /data
 
