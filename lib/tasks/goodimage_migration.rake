@@ -65,7 +65,7 @@ namespace :goodimage_migration do
   end
 
   desc "Migrate all GoodImage studies to ERICA"
-  task :migrate_study => [:initialize] do
+  task :migrate => [:initialize] do
     config = GoodImageMigration.migration_config
     if(config.nil? or config['goodimage_image_storage'].nil?)
       puts "No valid config containing 'goodimage_image_storage' found, aborting."
