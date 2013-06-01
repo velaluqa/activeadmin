@@ -127,6 +127,8 @@ module GoodImageMigration
 
     def update_study(goodimage_study, erica_study)
       erica_study.name = goodimage_study.internal_id
+
+      erica_study.domino_db_url = @config['domino_urls'][erica_study.name] unless @config['domino_urls'].nil? or @config['domino_urls'][erica_study.name].blank?
     end
     def update_center(goodimage_center_to_study, erica_center, erica_parent_study)
       erica_center.name = goodimage_center_to_study.center.name
