@@ -62,7 +62,11 @@ module GoodImageMigration
         end
 
         return nil if imaging_date_raw.nil?
-        return Date.strptime(imaging_date_raw, '%Y%m%d')
+        begin
+          return Date.strptime(imaging_date_raw, '%Y%m%d')
+        rescue ArgumentError
+          return nil
+        end
       end
 
       def equivalent_series
