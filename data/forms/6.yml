@@ -1,9 +1,0 @@
-- include: test_form_reader
-- id: test_tumor_size
-  type: roi
-  value: length
-  label: Tumour Size
-  description: You are being tested - again.
-  validations:
-    - required: true
-      message: This field is still mandatory.
