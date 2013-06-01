@@ -13,7 +13,20 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
-/data
+
+# Ignore config files that change per deployment
 /config/database.yml
 /config/mongoid.yml
+
+# Ignore gems installed in deployment mode
+/vendor/bundle
+
+# Ignore compiled assets
+/public/assets
+
+# Ignore binaries installed via bundle install --binstubs
+/bin
+
+# Ignore the ERICA data directory
+/data
 
