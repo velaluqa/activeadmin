@@ -5,6 +5,8 @@ ActiveAdmin.register ImageSeries do
   scope :all, :default => true
   scope :not_assigned
 
+  config.per_page = 100
+
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection

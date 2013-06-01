@@ -9,6 +9,8 @@ ActiveAdmin.register Case do
   actions :index, :show, :edit, :update, :destroy
   config.clear_action_items! # get rid of the default action items, since we have to handle 'delete' on a case-by-case basis
 
+  config.per_page = 100
+
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection

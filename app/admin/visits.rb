@@ -2,6 +2,8 @@ require 'aa_domino'
 
 ActiveAdmin.register Visit do
 
+  config.per_page = 100
+
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection

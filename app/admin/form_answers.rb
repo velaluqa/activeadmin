@@ -3,6 +3,8 @@ ActiveAdmin.register FormAnswer do
 
   actions :index, :show, :destroy #TEMP
 
+  config.per_page = 100
+
   controller do
     helper :forms
 
