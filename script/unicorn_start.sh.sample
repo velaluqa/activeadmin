@@ -1,0 +1,3 @@
+#!/bin/bash
+
+bundle exec unicorn -Eproduction -c /srv/ERICA/server/config/unicorn.rb -D
