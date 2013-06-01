@@ -17,6 +17,7 @@
 # Ignore config files that change per deployment
 /config/database.yml
 /config/mongoid.yml
+/config/goodimage_migration.yml
 
 # Ignore gems installed in deployment mode
 /vendor/bundle
