@@ -132,7 +132,6 @@ class ImageSeries < ActiveRecord::Base
     properties.merge!(self.dicom_metadata_to_domino)
     properties.merge!(self.properties_to_domino)
 
-    pp properties
     properties
   end
   def update_image_series_properties_in_domino
