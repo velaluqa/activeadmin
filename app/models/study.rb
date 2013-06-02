@@ -131,7 +131,7 @@ class Study < ActiveRecord::Base
 
       replica_id = domino_integration_client.replica_id
       collection_unid = domino_integration_client.collection_unid('All')
-    rescue SystemCallError => e
+    rescue Exception => e
       Rails.logger.warn "Failed to communicate with the Domino server: #{e.message}"
       errors.add :domino_db_url, "Failed to communicate with the Domino server: #{e.message}"
     end
