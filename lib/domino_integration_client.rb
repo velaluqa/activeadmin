@@ -88,7 +88,12 @@ class DominoIntegrationClient
 
     return @documents_resource.get({:params => {:search => query_string}}) do |response|
       if(response.code == 200)
-        JSON::parse(response.body)
+        begin
+          JSON::parse(response.body)
+        rescue JSON::JSONError => e
+          Rails.logger.warn 'Failed to parse JSON response from Domino server: '+e.message
+          nil
+        end
       else
         nil
       end
@@ -98,7 +103,12 @@ class DominoIntegrationClient
   def list_databases
     return @databases_resource.get() do |response|
       if(response.code == 200)
-        JSON::parse(response.body)
+        begin
+          JSON::parse(response.body)
+        rescue JSON::JSONError => e
+          Rails.logger.warn 'Failed to parse JSON response from Domino server: '+e.message
+          nil
+        end
       else
         nil
       end
@@ -108,7 +118,12 @@ class DominoIntegrationClient
   def list_collections
     return @collections_resource.get() do |response|
       if(response.code == 200)
-        JSON::parse(response.body)
+        begin
+          JSON::parse(response.body)
+        rescue JSON::JSONError => e
+          Rails.logger.warn 'Failed to parse JSON response from Domino server: '+e.message
+          nil
+        end
       else
         nil
       end
