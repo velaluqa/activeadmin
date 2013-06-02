@@ -8,7 +8,7 @@ class DominoIntegrationClient
 
     db_uri = URI(@db_url)
     @db_base_url = "#{db_uri.scheme}://#{db_uri.host}:#{db_uri.port}"
-    @db_name = db_uri.path.split('/').reject {|s| s.empty?}.last
+    @db_name = db_uri.path[1..-1]
 
     @databases_resource = RestClient::Resource.new(db_base_url + '/api/data', :user => username, :password => password, :headers => {:accept => 'application/json', :content_type => 'application/json'})
 
@@ -39,7 +39,7 @@ class DominoIntegrationClient
     databases = list_databases
     return nil if databases.nil?
 
-    our_database = databases.find {|database| database['@filepath'] == @db_name}
+    our_database = databases.find {|database| database['@filepath'] == @db_name.gsub('/', '\/')}
     return nil if our_database.nil?
 
     return our_database['@replicaid']
