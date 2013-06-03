@@ -413,7 +413,7 @@ update_calculated_fields = ->
 
 update_results_list = ->
   current_result = window.results_list[window.results_list.length-1]
-  current_result.answers = find_arrays($('#the_form').formParams())
+  current_result.answers = generate_form_answers()
 
 calculate_decimals_for_step = (step) ->
   decimals = 0
@@ -631,6 +631,23 @@ roi_select2_init_selection = (element, callback) ->
 roi_select2_format = (item, container, query) ->
   if (item.type? and item.type == 'roi') then item.html else item.text
 
+generate_form_answers = ->
+  window.form_answers_rois = {}
+  form_data = find_arrays($('#the_form').formParams())
+  for path, roi_object of window.form_answers_rois
+    roi = roi_object['roi']
+    field = roi_object['field']
+    continue unless roi? and field?
+
+    if(roi == '__KEEP_OLD_ROI')
+      roi_answer = jQuery.parseJSON($(field).attr('data-old-roi'))
+    else
+      roi_answer = generate_roi_answer_for_field(roi, field)
+    result = set_value_at_path(form_data, path, roi_answer)
+            
+  console.log(form_data)
+  return form_data
+
 $(document).ready ->
   window.rois = {}
   window.next_roi_id = 0
@@ -685,20 +702,7 @@ $(document).ready ->
 
           clear_custom_validation_messages()
 
-          window.form_answers_rois = {}
-          form_data = find_arrays($('#the_form').formParams())
-          for path, roi_object of window.form_answers_rois
-            roi = roi_object['roi']
-            field = roi_object['field']
-            continue unless roi? and field?
-
-            if(roi == '__KEEP_OLD_ROI')
-              roi_answer = jQuery.parseJSON($(field).attr('data-old-roi'))
-            else
-              roi_answer = generate_roi_answer_for_field(roi, field)
-            result = set_value_at_path(form_data, path, roi_answer)
-            
-          console.log(form_data)
+          form_data = generate_form_answers()
 
           # create a clone so even if custom validators change the values, we don't use the changes
           form_data_clone = jQuery.extend(true, {}, form_data)
