@@ -204,11 +204,11 @@ pretty_print_value = (value, field) ->
     location = 'Location: '+value['location']['seriesUID']+' #'+value['location']['imageIndex'].toString()+"\n"
     value = location+((k+": "+v) for own k,v of value when k != 'location').join("\n")
   else if(field['type'] == 'select') or ((field['type'] == 'roi') and (typeof value == 'string'))  
-    answer_option = field['values'][value]
+    answer_option = if field['values']? then field['values'][value] else null
     value = if answer_option? and answer_option.length > 0 then answer_option else value
   else if(field['type'] == 'select_multiple')
     value = for v in value
-      option = field['values'][v]
+      option = if field['values']? then field['values'][v] else null
       (if option? and option.length > 0 then option else v)
     value = value.join("\n")
 
@@ -400,7 +400,6 @@ update_calculated_field = (field) ->
   # elements are returned by jquery in document order
   # by updating the form answers between every calculated fields, later fields can depend on the results of earlier fields
   update_results_list()
-  console.log("Results list:")
 
   [display_value, value] = @[calculation_function](window.results_list)
   console.log("Calculation result: #{display_value} / #{value}")
