@@ -412,7 +412,7 @@ update_calculated_fields = ->
   update_calculated_field(field) for field in $('.calculated-field')
 
 update_results_list = ->
-  current_result = window.results_list[window.results_list.length-1]
+  current_result = _.last(window.results_list)
   current_result.answers = generate_form_answers()
 
 calculate_decimals_for_step = (step) ->
