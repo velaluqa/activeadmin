@@ -67,9 +67,6 @@ StudyServer::Application.routes.draw do
     end
   end
   resources :images, :only => [:create] do
-    collection do
-      post 'batch_create'
-    end
   end
 
   match 'wado' => 'wado#wado'
