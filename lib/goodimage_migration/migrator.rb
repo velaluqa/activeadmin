@@ -69,7 +69,7 @@ module GoodImageMigration
       end
       return success
     end
-    
+
     protected
 
     def reset_counters(number_of_studies)
@@ -147,7 +147,7 @@ module GoodImageMigration
 
     def find_visits_in_domino(erica_study)
       return unless erica_study.domino_integration_enabled?
-
+      
       @domino_integration_client = DominoIntegrationClient.new(erica_study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
       if(@domino_integration_client.nil?)
         Rails.logger.fatal "Failed to communicate with Domino server at #{erica_study.domino_db_url}, can't assign visits to Domino documents."
@@ -156,9 +156,14 @@ module GoodImageMigration
 
       visits = erica_study.visits
 
-      visits.each do |visit|
+      puts "Attempting to link #{visits.size} visits to their corresponding Domino documents via SOFDinventory documents.."
+
+      visits.each_with_index do |visit, index|
         find_visit_in_domino(visit)
+        print (index+1).to_s+'..' if((index+1) % 10 == 0)
       end
+
+      puts 'done'
 
       @domino_integration_client = nil
     end
@@ -174,13 +179,28 @@ module GoodImageMigration
         patient_number = image_series_domino_document['PatNo']
         next if patient_number.blank?
 
-        imaging_date = if image_series_domino_document['imaDateManual'].blank?
+        imaging_date_raw = if image_series_domino_document['imaDateManual'].blank?
                          image_series_domino_document['imaDate2']
                        else
                          image_series_domino_document['imaDateManual']
                        end
-        next if imaging_date.blank?
-        imaging_date_string = imaging_date.strftime('%d-%m-%Y')
+        next if imaging_date_raw.blank?
+        begin
+          imaging_date = DateTime.strptime(imaging_date_raw, '%Y-%m-%dT%H:%M:%SZ')
+        rescue Exception => e
+          Rails.logger.warning "Failed to parse imaging date (#{imaging_date_raw}) for visit #{erica_visit}: #{e.message}"
+          imaging_date = nil
+        end
+        next if imaging_date.nil?
+
+        # this is a bit of a hack
+        # Domino returns dates that are in some weird way time-zone corrected
+        # problem is: the time zone offset isn't returned
+        # usually (CET/CEST), the offset is up to two hours back, so we simply check whether the time is actually in the last two hours of the day and if it is, we go one day ahead
+        if(imaging_date.hour >= 22)
+          imaging_date += 1.day
+        end
+        imaging_date_string = imaging_date.strftime('%d/%m/%Y')
 
         matching_visits = @domino_integration_client.find_document({'docCode' => 10032, 'PatNo' => patient_number, 'VisitDate' => imaging_date_string})
         if(matching_visits.is_a?(Array) and not matching_visits.empty?)

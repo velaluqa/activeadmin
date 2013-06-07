@@ -116,7 +116,7 @@ class DominoIntegrationClient
   protected
 
   def create_document(form, properties)
-    return false unless Rails.application.config.domino_integration_readonly == false
+    return nil unless Rails.application.config.domino_integration_readonly == false
     return @documents_resource.post(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
       if(response.code == 201)
         response.headers[:location].split('/').last
