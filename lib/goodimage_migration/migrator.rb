@@ -19,7 +19,7 @@ module GoodImageMigration
     def migrate(goodimage_resource, erica_parent_resource)
       Rails.logger.info "Starting migration for #{goodimage_resource.inspect}"
       if(goodimage_resource.class == GoodImage::Study)
-        reset_study_migration_state
+        initialize_study_migration_state(goodimage_resource)
       end
 
       erica_resource = case goodimage_resource
@@ -52,6 +52,10 @@ module GoodImageMigration
         return false
       end
       success = true
+
+      if(goodimage_resource.class == GoodImage::Study)
+        write_initial_study_config(erica_resource)
+      end
       
       children = goodimage_resource.respond_to?(:migration_children) ? goodimage_resource.migration_children : []
       children.each do |child|
@@ -60,7 +64,7 @@ module GoodImageMigration
       end
 
       if(goodimage_resource.class == GoodImage::Study and success)
-        write_erica_study_config(erica_resource)
+        add_visit_types_to_erica_study_config(erica_resource)
       end
       return success
     end
@@ -106,23 +110,30 @@ module GoodImageMigration
       puts ".."
     end
     
-    def reset_study_migration_state
-      @study_config = {
-        'visit_types' => {},
-        'domino_integration' => {
-          'dicom_tags' => []
-        },
-        'image_series_properties' => []
-      }
+    def initialize_study_migration_state(goodimage_study)
+      @study_config = @config['study_configs'][goodimage_study.internal_id]
+      @study_config['visit_types'] = {}
     end
-    def write_erica_study_config(erica_study)
+    def write_initial_study_config(erica_study)
       config_file = Tempfile.new(['study_config_'+erica_study.id.to_s, '.yml'])
       
       config_file.write(@study_config.to_yaml)
       config_file.close
-
+      
       repo = GitConfigRepository.new
-      repo.update_config_file(erica_study.relative_config_file_path, config_file.path, nil, "New configuration file for study #{erica_study.id}")
+      repo.update_config_file(erica_study.relative_config_file_path, config_file.path, nil, "New configuration file for study #{erica_study.id}")      
+    end
+    def add_visit_types_to_erica_study_config(erica_study)
+      begin
+        File.open(erica_study.config_file_path, 'w') do |f|
+          f.write(@study_config.to_yaml)
+        end
+        repo = GitConfigRepository.new
+        repo.update_path(erica_study.relative_config_file_path, nil, "Adding automatically generated visit types based on GoodImage migration for study #{erica_study.id}")
+      rescue Exception => e
+        Rails.logger.error "Failed to update the study config for study #{erica_studyid}"
+        return
+      end
     end
 
     def update_study(goodimage_study, erica_study)
