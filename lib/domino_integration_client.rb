@@ -72,17 +72,19 @@ class DominoIntegrationClient
     return update_document(unid, form, {'Trash' => 0})
   end
 
-  protected
-
-  def create_document(form, properties)
-    return false unless Rails.application.config.domino_integration_readonly == false
-    return @documents_resource.post(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
-      if(response.code == 201)
-        response.headers[:location].split('/').last
+  def get_document_by_unid(unid)
+    return @documents_resource['unid/'+unid].get() do |response|
+      if(response.code == 200)
+        begin
+          JSON::parse(response.body)
+        rescue JSON::JSONError => e
+          Rails.logger.warn 'Failed to parse JSON response from Domino server: '+e.message
+          nil
+        end
       else
         nil
       end
-    end
+    end    
   end
 
   # query is a hash, specifying field name / value pairs
@@ -105,6 +107,19 @@ class DominoIntegrationClient
           Rails.logger.warn 'Failed to parse JSON response from Domino server: '+e.message
           nil
         end
+      else
+        nil
+      end
+    end
+  end
+
+  protected
+
+  def create_document(form, properties)
+    return false unless Rails.application.config.domino_integration_readonly == false
+    return @documents_resource.post(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
+      if(response.code == 201)
+        response.headers[:location].split('/').last
       else
         nil
       end
