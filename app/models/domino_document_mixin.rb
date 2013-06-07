@@ -18,6 +18,19 @@ module DominoDocument
     not (self.previous_changes.keys & domino_document_fields).empty?
   end
 
+  def domino_document
+    return nil unless domino_integration_enabled?
+    return nil if self.domino_unid.nil?
+
+    client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
+    if client.nil?
+      Rails.logger.error 'Failed to communicate with the Domino server.'
+      return nil
+    end
+
+    return client.get_document_by_unid(self.domino_unid)
+  end
+
   def ensure_domino_document_exists
     # this is the case if this after_save callback was called for the very save action done is this callback
     # if we wouldn't catch this, we could end up in an infinite loop
@@ -77,5 +90,14 @@ module DominoDocument
     end
 
     return client.trash_document(self.domino_unid, domino_document_form)
+  end
+
+  def set_domino_unid(domino_unid)
+    self.domino_unid = domino_unid
+    self.save
+
+    if(Rails.application.config.domino_integration_readonly == :erica_id_only or Rails.application.config.domino_integration_readonly == false)
+      self.update_domino_document({'ericaID' => self.id})
+    end
   end
 end
