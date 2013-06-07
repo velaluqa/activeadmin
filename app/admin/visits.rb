@@ -216,8 +216,30 @@ ActiveAdmin.register Visit do
 
     redirect_to viewer_admin_image_series_path(@required_series.assigned_image_series)
   end
+  member_action :required_series_dicom_metadata, :method => :get do
+    @visit = Visit.find(params[:id])
+
+    @required_series_name = params[:required_series_name]
+    if(@required_series_name.nil?)
+      flash[:error] = 'Must specify the name of a required series.'
+      redirect_to :action => :show
+      return
+    end
+    @required_series = RequiredSeries.new(@visit, @required_series_name)
+
+    if(@required_series.assigned_image_series.nil? or @required_series.assigned_image_series.images.empty?)
+      flash[:error] = 'There is no image series assigned to this required series or the assigned series contains no images.'
+      redirect_to :action => :show
+      return
+    end
+
+    redirect_to dicom_metadata_admin_image_series_path(@required_series.assigned_image_series)
+  end
   action_item :only => :tqc_form do
     link_to('Open Viewer', required_series_viewer_admin_visit_path(resource, :required_series_name => params[:required_series_name]), :target => '_blank') unless params[:required_series_name].nil?
+  end
+  action_item :only => :tqc_form do
+    link_to('DICOM Metadata', required_series_dicom_metadata_admin_visit_path(resource, :required_series_name => params[:required_series_name]), :target => '_blank') unless params[:required_series_name].nil?
   end
   
   viewer_cartable(:visit)

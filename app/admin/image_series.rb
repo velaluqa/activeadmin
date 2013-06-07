@@ -253,5 +253,24 @@ ActiveAdmin.register ImageSeries do
     redirect_to(:back, :notice => 'Selected image series\' were marked as not relevant for read.')
   end
 
+  member_action :dicom_metadata, :method => :get do
+    @image_series = ImageSeries.find(params[:id])
+    authorize! :read, @image_series
+
+    sample_image = @image_series.sample_image
+    if(sample_image.nil?)
+      flash[:error] = 'This image series contains no images, so no DICOM Metadata is available.'
+      redirect_to({:action => :show})
+    end
+    authorize! :read, sample_image
+
+    @dicom_meta_header, @dicom_metadata = sample_image.dicom_metadata_as_arrays
+
+    render 'admin/images/dicom_metadata'
+  end
+  action_item :only => :show do
+    link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(resource)) unless resource.images.empty?
+  end
+
   viewer_cartable(:image_series)
 end

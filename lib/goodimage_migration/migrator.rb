@@ -157,7 +157,6 @@ module GoodImageMigration
     def find_visit_in_domino(erica_visit)
       return unless erica_visit.domino_unid.nil?
 
-      # visit_doc = visit.where(PatNo => is.PatNo, visitDate => is.imaDate2/imaDateManual
       visit_domino_unid = nil
 
       erica_visit.image_series.each do |image_series|
