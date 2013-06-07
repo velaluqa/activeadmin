@@ -13,7 +13,6 @@ class ImageSeries < ActiveRecord::Base
   has_many :images, :dependent => :destroy
   has_one :image_series_data
   
-  validates_uniqueness_of :name, :scope => :patient_id
   validates_uniqueness_of :series_number, :scope => :patient_id
   validates_presence_of :name, :patient_id, :imaging_date, :series_number
 
