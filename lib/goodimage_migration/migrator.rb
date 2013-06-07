@@ -112,8 +112,16 @@ module GoodImageMigration
     end
     
     def initialize_study_migration_state(goodimage_study)
-      @study_config = @config['study_configs'][goodimage_study.internal_id]
-      @study_config['visit_types'] = {}
+      unless(@config['study_configs'][goodimage_study.internal_id].blank?)
+        @study_config = YAML.load_file(@config['study_configs'][goodimage_study.internal_id])
+        @study_config['visit_types'] = {}
+      else
+        @study_config = {
+          'visit_types' => {},
+          'domino_integration' => {'dicom_tags' => []},
+          'image_series_properties' => []
+        }
+      end
     end
     def write_initial_study_config(erica_study)
       config_file = Tempfile.new(['study_config_'+erica_study.id.to_s, '.yml'])
