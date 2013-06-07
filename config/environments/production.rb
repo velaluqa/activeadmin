@@ -88,6 +88,7 @@ StudyServer::Application.configure do
 
   config.domino_integration_username = 'erica'
   config.domino_integration_password = 'test'
+  config.domino_integration_readonly = false
 
   config.airbrake_api_key = '21996bca9601d39ad1aa911e03922000'
 end

@@ -64,4 +64,5 @@ StudyServer::Application.configure do
 
   config.domino_integration_username = 'erica'
   config.domino_integration_password = 'test'
+  config.domino_integration_readonly = :erica_id_only
 end

@@ -21,7 +21,7 @@ class DominoIntegrationClient
 
     if(existing_documents and existing_documents.respond_to?(:length) and existing_documents.length > 0)
       unid = existing_documents[0]['@unid']
-      update_document(unid, form, properties)      
+      update_document(unid, form, properties)
 
       unid
     else
@@ -30,6 +30,16 @@ class DominoIntegrationClient
   end
 
   def update_document(unid, form, properties)
+    if(Rails.application.config.domino_integration_readonly == :erica_id_only)
+      if(properties['ericaID'].nil?)
+        return false
+      else
+        properties = {'ericaID' => properties['ericaID']}
+      end
+    elsif(Rails.application.config.domino_integration_readonly == true)
+      return false
+    end
+
     return @documents_resource['unid/'+unid].patch(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
       response.code == 200
     end
@@ -65,6 +75,7 @@ class DominoIntegrationClient
   protected
 
   def create_document(form, properties)
+    return false unless Rails.application.config.domino_integration_readonly == false
     return @documents_resource.post(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
       if(response.code == 201)
         response.headers[:location].split('/').last
