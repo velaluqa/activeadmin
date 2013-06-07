@@ -65,6 +65,7 @@ module GoodImageMigration
 
       if(goodimage_resource.class == GoodImage::Study and success)
         add_visit_types_to_erica_study_config(erica_resource)
+        find_visits_in_domino(erica_resource)
       end
       return success
     end
@@ -133,6 +134,56 @@ module GoodImageMigration
       rescue Exception => e
         Rails.logger.error "Failed to update the study config for study #{erica_studyid}"
         return
+      end
+    end
+
+    def find_visits_in_domino(erica_study)
+      return unless erica_study.domino_integration_enabled?
+
+      @domino_integration_client = DominoIntegrationClient.new(erica_study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
+      if(@domino_integration_client.nil?)
+        Rails.logger.fatal "Failed to communicate with Domino server at #{erica_study.domino_db_url}, can't assign visits to Domino documents."
+        return
+      end
+
+      visits = erica_study.visits
+
+      visits.each do |visit|
+        find_visit_in_domino(visit)
+      end
+
+      @domino_integration_client = nil
+    end
+    def find_visit_in_domino(erica_visit)
+      return unless erica_visit.domino_unid.nil?
+
+      # visit_doc = visit.where(PatNo => is.PatNo, visitDate => is.imaDate2/imaDateManual
+      visit_domino_unid = nil
+
+      erica_visit.image_series.each do |image_series|
+        image_series_domino_document = image_series.domino_document
+        next if image_series_domino_document.nil?
+
+        patient_number = image_series_domino_document['PatNo']
+        next if patient_number.blank?
+
+        imaging_date = if image_series_domino_document['imaDateManual'].blank?
+                         image_series_domino_document['imaDate2']
+                       else
+                         image_series_domino_document['imaDateManual']
+                       end
+        next if imaging_date.blank?
+        imaging_date_string = imaging_date.strftime('%d-%m-%Y')
+
+        matching_visits = @domino_integration_client.find_document({'docCode' => 10032, 'PatNo' => patient_number, 'VisitDate' => imaging_date_string})
+        if(matching_visits.is_a?(Array) and not matching_visits.empty?)
+          visit_domino_unid = matching_visits[0]['@unid']
+          break unless visit_domino_unid.blank?
+        end        
+      end
+
+      unless(visit_domino_unid.blank?)
+        erica_visit.set_domino_unid(visit_domino_unid)
       end
     end
 
