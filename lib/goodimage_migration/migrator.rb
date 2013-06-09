@@ -331,7 +331,7 @@ module GoodImageMigration
       resource_type = GoodImageMigration::Migration::Mapping.resource_type(goodimage_resource)
       erica_resource, migration_mapping = erica_resource_from_mapping(resource_type, goodimage_resource.id)
       if(erica_resource == true)
-        return erica_resource
+        return migration_mapping.target
       elsif(erica_resource.nil?)
         erica_resource = erica_resource_class.new
       end
