@@ -343,6 +343,7 @@ module GoodImageMigration
 
       unless(erica_resource.save)
         Rails.logger.fatal "Failed to save ERICA resource, aborting"
+        Rails.logger.fatal erica_resource.errors.inspect
         return nil
       end
 
