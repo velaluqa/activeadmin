@@ -74,9 +74,13 @@ module GoodImageMigration
 
         first_image = self.images.first
         dicom_instance_uid = first_image.dicom_instance_uid
-        return nil if dicom_instance_uid.nil?
+        study_id = first_image.study_internal_id
+        center_id = first_image.center_internal_id
+        patient_id = first_image.patient_internal_id
+        media_id = first_image.media_id
+        return nil if(dicom_instance_uid.nil? or study_id.nil? or center_id.nil? or patient_id.nil? or media_id.nil?)
 
-        equivalent_images = GoodImageMigration::GoodImage::Image.all(:id.not => first_image.id, :dicom_instance_uid => dicom_instance_uid)
+        equivalent_images = GoodImageMigration::GoodImage::Image.all(:id.not => first_image.id, :dicom_instance_uid => dicom_instance_uid, :study_internal_id => study_id, :center_internal_id => center_id, :patient_internal_id => patient_id, :media_id => media_id)
 
         equivalent_series = equivalent_images.map {|image| image.series_image_set}.uniq
 
