@@ -93,3 +93,7 @@ group :goodimage_migration do
   gem 'dm-mysql-adapter'
   gem 'dm-sqlite-adapter'
 end
+
+# used for DICOM based checks in tQC (ability to specify simple formulas)
+# the gem on rubygems.org is not up-to-date, so we use the code from github directly
+gem 'dentaku', :github => 'rubysolo/dentaku', :branch => 'master'

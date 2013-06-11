@@ -185,18 +185,50 @@ ActiveAdmin.register Visit do
     @dicom_metadata = (@dicom_image.nil? ? {} : @dicom_image.dicom_metadata[1])
     @dicom_tqc_spec.each do |dicom_tqc_spec|
       dicom_tqc_spec['actual_value'] = (@dicom_metadata[dicom_tqc_spec['dicom_tag']].nil? ? nil : @dicom_metadata[dicom_tqc_spec['dicom_tag']][:value])
-      dicom_tqc_spec['result'] = if dicom_tqc_spec['actual_value'].nil?
-                                   nil
-                                 elsif dicom_tqc_spec['actual_value'] == dicom_tqc_spec['expected_value']
-                                   true
-                                 else
-                                   false
-                                 end
+      dicom_tqc_spec['result'] = perform_dicom_tqc_check(dicom_tqc_spec['expected'], dicom_tqc_spec['actual_value'])
     end
     
     @page_title = "Perform tQC for #{@required_series.name}"
     render 'admin/visits/tqc_form'
   end
+
+  controller do
+    def perform_dicom_tqc_check(expected, actual)
+      return nil if actual.nil?
+
+      actual_as_numeric = begin Float(actual) rescue nil end
+
+      result = false
+      if(expected.is_a?(Array))        
+        expected.each do |allowed_value|
+          if(allowed_value.is_a?(Numeric) and not actual_as_numeric.nil?)
+            if(allowed_value == actual_as_numeric)
+              result = true
+              break
+            end
+          elsif(allowed_value.is_a?(String))
+            if(allowed_value == actual)
+              result = true
+              break
+            end
+          end
+        end
+      else
+        begin
+          formula = (expected.is_a?(String) ? expected : 'x = '+expected.to_s)
+          pp formula
+          pp actual
+          result = Dentaku(formula, {:x => actual_as_numeric})
+        rescue Exception => e
+          pp e
+          result = false
+        end
+      end
+      
+      return result
+    end
+  end
+
   member_action :required_series_viewer, :method => :get do
     @visit = Visit.find(params[:id])
 

@@ -6,7 +6,7 @@
         %thead
           %tr
             %th DICOM tag
-            %th Expected Value
+            %th Expected
             %th Actual Value
             %th Pass/Fail?
         %tbody
@@ -18,7 +18,7 @@
               %td
                 = spec['label']
                 %span.dicom_tag_key= "(#{spec['dicom_tag']})"
-              %td= spec['expected_value']
+              %td= (spec['expected'].is_a?(Array) ? spec['expected'].join(', ') : spec['expected'].to_s)
               %td
                 - if spec['actual_value'].nil?
                   %span.status_tag.Missing.error N/A

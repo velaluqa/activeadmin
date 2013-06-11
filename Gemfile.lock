@@ -26,6 +26,13 @@ GIT
       sass-rails (>= 3.2)
       thor (~> 0.14)
 
+GIT
+  remote: git://github.com/rubysolo/dentaku.git
+  revision: c7b230669dad90db0fdbdfc3e76c4473db3dcf6d
+  branch: master
+  specs:
+    dentaku (0.2.10)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -311,6 +318,7 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   data_mapper
   debugger
+  dentaku!
   devise
   diffy
   dm-mysql-adapter
