@@ -7,7 +7,11 @@ ActiveAdmin.register Visit do
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
+      if(session[:selected_study_id].nil?)
+        end_of_association_chain.accessible_by(current_ability)
+      else
+        end_of_association_chain.accessible_by(current_ability).includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
+      end
     end
   end
 
