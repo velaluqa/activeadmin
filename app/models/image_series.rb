@@ -93,7 +93,7 @@ class ImageSeries < ActiveRecord::Base
   end
 
   def wado_query
-    {:name => self.name, :images => self.images.order('id ASC')}
+    {:id => self.id, :name => self.name, :images => self.images.order('id ASC')}
   end
 
   def sample_image

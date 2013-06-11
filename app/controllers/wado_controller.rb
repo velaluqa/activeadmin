@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 class WadoController < ApplicationController
+  before_filter :skip_trackable # do not track requests to the WADO API as logins/logouts, because every single request would be counted as one login
   before_filter :authenticate_user!
   before_filter :authorize_user!
-  before_filter :skip_trackable # do not track requests to the WADO API as logins/logouts, because every single request would be counted as one login
   
   before_filter :check_request_type
 

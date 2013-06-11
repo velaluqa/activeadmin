@@ -155,7 +155,7 @@ class Visit < ActiveRecord::Base
   end
 
   def wado_query
-    {:name => "Visit No. #{visit_number}", :image_series => 
+    {:id => self.id, :name => "Visit No. #{visit_number}", :image_series => 
       self.image_series.map {|i_s| i_s.wado_query}
     }
   end

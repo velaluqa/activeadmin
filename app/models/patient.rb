@@ -73,8 +73,8 @@ class Patient < ActiveRecord::Base
   end
 
   def wado_query
-    {:name => self.name, :visits => self.visits.map {|visit| visit.wado_query} +
-      [{:name => 'Unassigned', :image_series => self.image_series.where(:visit_id => nil).map {|i_s| i_s.wado_query}
+    {:id => self.id, :name => self.name, :visits => self.visits.map {|visit| visit.wado_query} +
+      [{:id => 0, :name => 'Unassigned', :image_series => self.image_series.where(:visit_id => nil).map {|i_s| i_s.wado_query}
        }]
     }
   end

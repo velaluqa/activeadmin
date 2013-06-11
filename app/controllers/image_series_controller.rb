@@ -23,9 +23,10 @@ class ImageSeriesController < ApplicationController
 
   def wado_query
     visit_name = (@image_series.visit.nil? ? 'Unassigned' : "Visit No. #{@image_series.visit.visit_number}""Visit No. #{@image_series.visit.visit_number}")
+    visit_id = (@image_series.visit.nil? ? 0 : @image_series.visit.id)
     
-    @patients = [{:name => @image_series.patient.name, :visits =>
-                   [{:name => visit_name, :image_series => [@image_series.wado_query]}]
+    @patients = [{:id => @image_series.patient.id, :name => @image_series.patient.name, :visits =>
+                   [{:id => visit_id, :name => visit_name, :image_series => [@image_series.wado_query]}]
                  }]                                                                  
 
     @authentication_token = current_user.authentication_token

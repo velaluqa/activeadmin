@@ -44,6 +44,8 @@
   <!-- Main class -->
   <application-desc main-class="org.weasis.launcher.WebstartLauncher">
     <!-- Example for opening dicom files from remote xml file -->
-    <argument>$dicom:get -w <%= @wado_query_urls.map{ |url| '"'+url+'"' }.join(' ').html_safe %></argument>
+    <% @wado_query_urls.each do |url| %>
+      <argument>$dicom:get -w <%= url.html_safe %></argument>
+    <% end %>
   </application-desc>
 </jnlp>
