@@ -23,6 +23,9 @@ ActiveAdmin.register Study do
         status_tag('Missing', :error)
       end
     end
+    column 'Select for Session' do |study|
+      link_to('Select', select_for_session_admin_study_path(study))
+    end
     
     default_actions
   end
@@ -158,6 +161,39 @@ ActiveAdmin.register Study do
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'study', :audit_trail_view_id => resource.id))
+  end
+
+  member_action :select_for_session, :method => :get do
+    @study = Study.find(params[:id])
+    
+    session[:selected_study_id] = @study.id
+    session[:selected_study_name] = @study.name
+
+    redirect_to(admin_studies_path, :notice => "Study #{@study.name} was selected for this session.")
+  end
+  action_item :only => :show do
+    link_to('Select for Session', select_for_session_admin_study_path(resource))
+  end
+  collection_action :selected_study, :method => :get do
+    if(session[:selected_study_id].nil?)
+      flash[:error] = 'No study selected for current session.'
+      redirect_to(admin_studies_path)
+    else
+      redirect_to(admin_study_path(session[:selected_study_id]))
+    end
+  end
+  collection_action :deselect_study, :method => :get do
+    if(session[:selected_study_id].nil?)
+      flash[:error] = 'No study selected for current session.'
+      redirect_to(admin_studies_path)
+    else
+      session[:selected_study_id] = nil
+      session[:selected_study_name] = nil
+      redirect_to(admin_studies_path, :notice => 'The study was deselected for the current session.')
+    end
+  end
+  action_item :only => :index do
+    link_to('Deselect Study', deselect_study_admin_studies_path) unless session[:selected_study_id].nil?
   end
 
   viewer_cartable(:study)

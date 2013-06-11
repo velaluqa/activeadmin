@@ -1,4 +1,5 @@
 require 'aa_footer'
+require 'aa_site_title'
 require 'aa_viewer_cart_mixin'
 
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
@@ -157,5 +158,6 @@ ActiveAdmin.setup do |config|
 
   # customize the footer
   config.view_factory.footer = PharmTraceERICAFooter
+  config.view_factory.site_title = PharmTraceERICASiteTitle
 end
 
