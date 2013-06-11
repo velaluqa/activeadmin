@@ -94,7 +94,7 @@ ActiveAdmin.register ImageSeries do
       when :required_series_assigned
         status_tag('Required series\' assigned', :ok)
       when :not_required
-        status_tag('Not relevant for read', :ok)
+        status_tag('Not relevant for read')
       end
     end
     
@@ -122,7 +122,7 @@ ActiveAdmin.register ImageSeries do
         when :required_series_assigned
           status_tag('Required series\' assigned', :ok)
         when :not_required
-          status_tag('Not relevant for read', :ok)
+          status_tag('Not relevant for read')
         end
       end
       row 'Required Series' do
