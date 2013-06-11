@@ -47,10 +47,10 @@ module DominoDocument
     end
 
     if self.domino_unid.nil?
-      self.domino_unid = client.ensure_document_exists(domino_document_query, domino_document_form, domino_document_properties)
+      self.domino_unid = client.ensure_document_exists(domino_document_query, domino_document_form, domino_document_properties(:create), domino_document_properties(:update))
       result = (not self.domino_unid.nil?)      
     else
-      result = client.update_document(self.domino_unid, domino_document_form, domino_document_properties)
+      result = client.update_document(self.domino_unid, domino_document_form, domino_document_properties(:update))
     end
     errors.add :name, 'Failed to communicate with the Domino server.' if (result == false)
 

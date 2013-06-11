@@ -174,7 +174,7 @@ class Visit < ActiveRecord::Base
   def domino_document_fields
     ['id', 'visit_number']
   end
-  def domino_document_properties
+  def domino_document_properties(action = :update)
     {
       'ericaID' => id,
       'Center' => patient.center.name,

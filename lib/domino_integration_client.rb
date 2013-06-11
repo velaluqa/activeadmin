@@ -16,16 +16,16 @@ class DominoIntegrationClient
     @collections_resource = RestClient::Resource.new(@db_url + '/api/data/collections', :user => username, :password => password, :headers => {:accept => 'application/json', :content_type => 'application/json'})
   end
 
-  def ensure_document_exists(query, form, properties)
+  def ensure_document_exists(query, form, create_properties, update_properties)
     existing_documents = find_document(query)
 
     if(existing_documents and existing_documents.respond_to?(:length) and existing_documents.length > 0)
       unid = existing_documents[0]['@unid']
-      update_document(unid, form, properties)
+      update_document(unid, form, update_properties)
 
       unid
     else
-      create_document(form, properties)
+      create_document(form, create_properties)
     end
   end
 

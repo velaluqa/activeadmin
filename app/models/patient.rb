@@ -95,7 +95,7 @@ class Patient < ActiveRecord::Base
   def domino_document_fields
     ['id', 'subject_id']
   end
-  def domino_document_properties
+  def domino_document_properties(action = :update)
     return {} if center.nil?
 
     {

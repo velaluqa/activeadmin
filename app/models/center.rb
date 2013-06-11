@@ -55,12 +55,11 @@ class Center < ActiveRecord::Base
   def domino_document_fields
     ['id', 'code', 'name']
   end
-  def domino_document_properties
+  def domino_document_properties(action = :update)
     {
       'ericaID' => self.id,
       'CenterNo' => self.code,
-      'CenterShortName' => self.name,
-    }
+    }.merge!(action == :create ? {'CenterShortName' => self.name} : {})    
   end
 
   protected

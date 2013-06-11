@@ -115,7 +115,7 @@ class ImageSeries < ActiveRecord::Base
   def domino_document_fields
     ['id', 'imaging_date']
   end
-  def domino_document_properties
+  def domino_document_properties(action = :update)
     properties = {
       'ericaID' => id,
       'Center' => patient.center.name,
