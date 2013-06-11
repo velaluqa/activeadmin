@@ -1,4 +1,5 @@
 require 'aa_footer'
+require 'aa_site_title'
 
 ActiveAdmin.setup do |config|
 
@@ -154,5 +155,6 @@ ActiveAdmin.setup do |config|
 
   # customize the footer
   config.view_factory.footer = PharmTraceERICAFooter
+  config.view_factory.site_title = PharmTraceERICASiteTitle
 end
 
