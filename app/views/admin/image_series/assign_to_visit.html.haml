@@ -1,0 +1,15 @@
+= form_tag(batch_assign_to_visit_admin_image_series_index_path, :method => :post, :multipart => true, :class => 'formtastic form') do
+  = hidden_field_tag('image_series', selection)
+
+  = field_set_tag('<span>Assign to Visit</span>'.html_safe, :class => 'inputs') do
+    %ol
+      %li.input.select
+        = label_tag('visit_id', 'Visit')
+        = select_tag('visit_id', options_from_collection_for_select(visits, 'id', 'name'), :include_blank => true)
+
+  = field_set_tag(nil, :class => 'actions') do
+    %ol
+      %li.action.input_action
+        = submit_tag('Assign')
+      %li.cancel
+        = link_to('Cancel', admin_image_series_index_path)
