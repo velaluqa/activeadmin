@@ -5,3 +5,4 @@
 
 //= require select2
 //= require cases_advanced_filters
+//= require aa_advanced_filters

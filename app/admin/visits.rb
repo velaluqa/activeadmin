@@ -8,11 +8,97 @@ ActiveAdmin.register Visit do
     load_and_authorize_resource :except => :index
     def scoped_collection
       if(session[:selected_study_id].nil?)
-        end_of_association_chain.accessible_by(current_ability)
+        end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)
       else
         end_of_association_chain.accessible_by(current_ability).includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
       end
     end
+
+    def generate_filter_options
+      studies = if session[:selected_study_id].nil? then Study.accessible_by(current_ability) else Study.where(:id => session[:selected_study_id]).accessible_by(current_ability) end
+
+      studies.map do |study|
+        centers = study.centers.accessible_by(current_ability)
+        
+        centers_optgroups = centers.map do |center|
+          patients = center.patients.accessible_by(current_ability)
+
+          patient_options = patients.map do |patient|
+            {:id => "patient_#{patient.id.to_s}", :text => patient.subject_id}
+          end
+
+          {:id => "center_#{center.id.to_s}", :text => center.name, :children => patient_options}
+        end
+
+        {:id => "study_#{study.id.to_s}", :text => study.name, :children => centers_optgroups}
+      end
+    end
+    def generate_filter_options_map(filter_options)
+      filter_options_map = {}
+
+      filter_options.each do |study|
+        filter_options_map[study[:id]] = study[:text]
+
+        study[:children].each do |center|
+          filter_options_map[center[:id]] = center[:text]
+
+          center[:children].each do |patient|
+            filter_options_map[patient[:id]] = patient[:text]
+          end
+        end
+      end
+      
+      filter_options_map
+    end
+    def generate_selected_filters
+      selected_filters = []
+
+      selected_filters += params[:q][:patient_id_in].map {|s_id| "patient_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:patient_id_in].nil?)
+      selected_filters += params[:q][:patient_center_id_in].map {|s_id| "center_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:patient_center_id_in].nil?)
+      selected_filters += params[:q][:patient_center_study_id_in].map {|s_id| "study_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:patient_center_study_id_in].nil?)
+
+      return selected_filters
+    end
+
+    def index
+      if(params[:q] and params[:q][:patient_id_in] == [""])
+        params[:q].delete(:patient_id_in)
+      elsif(params[:q] and
+         params[:q][:patient_id_in].respond_to?(:length) and
+         params[:q][:patient_id_in].length == 1 and
+         params[:q][:patient_id_in][0].include?(','))
+        params[:q][:patient_id_in] = params[:q][:patient_id_in][0].split(',')
+      end
+
+      if(params[:q] and params[:q][:patient_id_in].respond_to?(:each)) 
+        patient_id_in = []
+
+        params[:q][:patient_id_in].each do |id|         
+          if(id =~ /^center_([0-9]*)/)
+            params[:q][:patient_center_id_in] ||= []
+            params[:q][:patient_center_id_in] << $1
+          elsif(id =~ /^study_([0-9]*)/)
+            params[:q][:patient_center_study_id_in] ||= []
+            params[:q][:patient_center_study_id_in] << $1
+          elsif(id =~ /^patient_([0-9]*)/)
+            patient_id_in << $1
+          end
+        end
+
+        params[:q][:patient_id_in] = patient_id_in
+      end
+      pp params
+
+      index!
+    end
+  end
+
+  # this is a "fake" sidebar entry, which is only here to ensure that our data array for the advanced patient filter is rendered to the index page, even if it is empty
+  # the resulting sidebar is hidden by the advanced filters javascript
+  sidebar :advanced_filter_data, :only => :index do
+    filter_select2_data = controller.generate_filter_options
+    filter_options_map = controller.generate_filter_options_map(filter_select2_data)
+    render :partial => 'admin/shared/advanced_filter_data', :locals => {:filter_select2_data => filter_select2_data, :filter_options_map => filter_options_map, :selected_filters => controller.generate_selected_filters, :filter_select2_id => 'patient_id'}
   end
 
   index do
@@ -80,7 +166,7 @@ ActiveAdmin.register Visit do
   end
 
   # filters
-  filter :patient
+  filter :patient, :collection => []
   filter :visit_number
   filter :visit_type
 
