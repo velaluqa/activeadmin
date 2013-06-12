@@ -29,6 +29,7 @@ StudyServer::Application.routes.draw do
     post 'users/authenticate', :to => 'users/sessions#authenticate_user'
     get 'users/change_password', :to => 'users#change_password'
     put 'users/update_password', :to => 'users#update_password'
+    get 'users/uploader_rights', :to => 'users#uploader_rights'
   end
 
   resources :studies, :only => [:index] do

@@ -38,6 +38,29 @@ class UsersController < ActionController::Base
     end    
   end
 
+  def uploader_rights
+    uploader_right = false
+    modify_properties_right = false
+
+    @user.roles.each do |role|
+      next unless role.system_role?
+
+      case(role.role)
+      when :image_manage
+        modify_properties_right = true
+        uploader_right = true
+      when :image_import
+        uploader_right = true
+      end
+
+      break if(uploader_right and modify_properties_right)
+    end
+
+    respond_to do |format|
+      format.json { render :json => {'upload' => uploader_right, 'modify_properties' => modify_properties_right} }
+    end
+  end
+
   protected
   
   def set_user
