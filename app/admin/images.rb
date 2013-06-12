@@ -2,7 +2,9 @@ require 'rexml/document'
 
 ActiveAdmin.register Image do
 
+  menu false
   actions :index, :show, :destroy
+  config.filters = false
 
   config.per_page = 100
 
@@ -57,7 +59,4 @@ ActiveAdmin.register Image do
   action_item :only => :show do
     link_to('DICOM Metadata', dicom_metadata_admin_image_path(resource)) if resource.file_is_present?
   end
-
-  # filters
-  filter :image_series
 end
