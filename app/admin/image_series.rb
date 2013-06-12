@@ -216,6 +216,7 @@ ActiveAdmin.register ImageSeries do
     if(@image_series.study.nil? or not @image_series.study.semantically_valid?)
       flash[:error] = 'Properties can only be edited once a valid study configuration was uploaded.'
       redirect_to({:action => :show})
+      return
     end
 
     study_config = @image_series.study.current_configuration
@@ -236,6 +237,7 @@ ActiveAdmin.register ImageSeries do
     if(@image_series.state != :visit_assigned or @image_series.visit.nil?)
       flash[:error] = 'Series can only be marked as not relevant for read once it has been assigned to a visit.'
       redirect_to :action => :show
+      return
     end
 
     @image_series.state = :not_required
@@ -274,6 +276,62 @@ ActiveAdmin.register ImageSeries do
   end
   action_item :only => :show do
     link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(resource)) unless resource.images.empty?
+  end
+
+  collection_action :batch_assign_to_visit, :method => :post do
+    if(params[:visit_id].nil?)
+      flash[:error] = 'You have to select a visit to assign these image series\' to.'
+      redirect_to :back
+      return
+    elsif(params[:image_series].nil?)
+      flash[:error] = 'You have to specify at least one image series to assign to this visit.'
+      redirect_to :back
+      return
+    end
+
+    image_series_ids = params[:image_series].split(' ')
+    image_series = ImageSeries.find(image_series_ids)
+
+    visit = Visit.find(params[:visit_id])
+    authorize! :manage, visit
+
+    image_series.each do |i_s|
+      authorize! :manage, i_s
+      next unless i_s.visit_id.nil?
+      
+      i_s.visit = visit
+      i_s.save
+    end
+
+    redirect_to :action => :index, :notice => 'The image series\' were assigned to the visit.'
+  end
+  batch_action :assign_to_visit do |selection|
+    patient_id = nil
+    visits = []
+    failure = false
+    
+    ImageSeries.find(selection).each do |image_series|
+      if patient_id.nil?
+        patient_id = image_series.patient_id
+        visits = image_series.patient.visits
+      end
+      
+      if(image_series.patient_id != patient_id)
+        flash[:error] = 'Not all selected image series\' belong to the same patient. Batch assignment can only be used for series\' from one patient which are not currently assigned to a visit.'
+        redirect_to :back
+        failure = true
+        break
+      elsif(image_series.visit_id != nil)
+        flash[:error] = 'Not all selected image series\' are currently unassigned. Batch assignment can only be used for series\' from one patient which are not currently assigned to a visit.'
+        redirect_to :back
+        failure = true
+        break
+      end
+    end
+    next if failure
+
+    @page_title = 'Assign to Visit'
+    render 'admin/image_series/assign_to_visit', :locals => {:selection => selection, :visits => visits}
   end
 
   viewer_cartable(:image_series)
