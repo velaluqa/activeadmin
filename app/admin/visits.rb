@@ -154,11 +154,20 @@ ActiveAdmin.register Visit do
   end
 
   form do |f|
+    patients = (session[:selected_study_id].nil? ? Patient.accessible_by(current_ability) : Study.find(session[:selected_study_id]).patients.accessible_by(current_ability))
+    visit_types = if(f.object.persisted? and not f.object.study.nil?)
+                    f.object.study.visit_types
+                  elsif(not session[:selected_study_id].nil?)
+                    Study.find(session[:selected_study_id]).visit_types
+                  else
+                    nil
+                  end
+
     f.inputs 'Details' do
-      f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : Patient.all), :include_blank => (not f.object.persisted?)
-      f.input :visit_number, :hint => (f.object.persisted? ? nil : 'A visit type can only be assigned once the visit was created. Please click on "Edit Visit" after this step to assign a visit type.')
-      if(f.object.persisted?)
-        f.input :visit_type, :collection => (f.object.study.nil? ? [] : f.object.study.visit_types), :include_blank => false
+      f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : patients), :include_blank => (not f.object.persisted?)
+      f.input :visit_number, :hint => (visit_types.nil? ? nil : 'A visit type can only be assigned once the visit was created. Please click on "Edit Visit" after this step to assign a visit type.')
+      unless(visit_types.nil?)
+        f.input :visit_type, :collection => visit_types, :include_blank => false
       end
       f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end

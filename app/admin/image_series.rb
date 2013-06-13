@@ -266,9 +266,13 @@ ActiveAdmin.register ImageSeries do
 
   form do |f|
     resource.visit_id = params[:visit_id].to_i unless params[:visit_id].blank?
+
+    patients = (session[:selected_study_id].nil? ? Patient.accessible_by(current_ability) : Study.find(session[:selected_study_id]).patients.accessible_by(current_ability))
+    visits = (session[:selected_study_id].nil? ? Visit.accessible_by(current_ability) : Study.find(session[:selected_study_id]).visits.accessible_by(current_ability))
+
     f.inputs 'Details' do
-      f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : Patient.all), :include_blank => (not f.object.persisted?)
-      f.input :visit
+      f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : patients), :include_blank => (not f.object.persisted?)
+      f.input :visit, :collection => (f.object.persisted? ? f.object.study.visits : visits)
       f.input :series_number, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
       f.input :name
       f.input :imaging_date, :as => :datepicker

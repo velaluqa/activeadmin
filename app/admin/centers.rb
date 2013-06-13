@@ -39,7 +39,7 @@ ActiveAdmin.register Center do
 
   form do |f|
     f.inputs 'Details' do
-      f.input :study unless f.object.persisted?
+      f.input :study, :collection => (session[:selected_study_id].nil? ? Study.accessible_by(current_ability) : Study.where(:id => session[:selected_study_id]).accessible_by(current_ability)) unless f.object.persisted?
       f.input :name
       f.input :code, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to problems in project management, because the code is used to identify centers across documents.' : '')
     end
@@ -48,7 +48,7 @@ ActiveAdmin.register Center do
   end
 
   # filters
-  filter :study
+  filter :study, :collection => proc { session[:selected_study_id].nil? ? Study.accessible_by(current_ability) : Study.where(:id => session[:selected_study_id]).accessible_by(current_ability) }
   filter :name
   filter :code
 
