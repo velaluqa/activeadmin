@@ -198,11 +198,12 @@ ActiveAdmin.register ImageSeries do
       end
     end
     
-    column 'ERICA Actions' do |image_series|
+    column 'View (in)' do |image_series|
       result = ''
 
-      result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'), :class => 'member_link')
-      result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'memeber_link', :target => '_blank') unless image_series.images.empty?
+      result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'), :class => 'member_link') unless image_series.images.empty?
+      result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank') unless image_series.images.empty?
+      result += link_to('Domino', image_series.lotus_notes_url, :class => 'memeber_link') unless image_series.domino_unid.nil? or image_series.lotus_notes_url.nil?
       
       result.html_safe
     end
