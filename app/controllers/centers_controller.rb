@@ -14,7 +14,7 @@ class CentersController < ApplicationController
   def create
     authorize! :create, Center
 
-    center = Center.create(:name => params[:center][:name], :study => @study)
+    center = Center.create(:name => params[:center][:name], :code => params[:center][:code], :study => @study)
 
     respond_to do |format|
       format.json { render :json => {:success => !center.nil?, :center => center} }
