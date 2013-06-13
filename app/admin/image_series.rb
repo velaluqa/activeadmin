@@ -198,6 +198,15 @@ ActiveAdmin.register ImageSeries do
       end
     end
     
+    column 'ERICA Actions' do |image_series|
+      result = ''
+
+      result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'), :class => 'member_link')
+      result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'memeber_link', :target => '_blank') unless image_series.images.empty?
+      
+      result.html_safe
+    end
+    
     default_actions
   end
 
