@@ -3,6 +3,8 @@ require 'aa_domino'
 
 ActiveAdmin.register Center do
 
+  config.sort_order = 'code_asc'
+
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
