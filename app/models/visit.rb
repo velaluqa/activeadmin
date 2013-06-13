@@ -30,9 +30,9 @@ class Visit < ActiveRecord::Base
 
   def name
     if(patient.nil?)
-      "Visit No. #{visit_number}"
+      "\##{visit_number}"
     else
-      "#{patient.name}, Visit No. #{visit_number}"
+      "#{patient.name}\##{visit_number}"
     end
   end
   def visit_date
