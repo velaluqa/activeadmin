@@ -14,7 +14,7 @@ class ImageSeries < ActiveRecord::Base
   has_one :image_series_data
   
   validates_uniqueness_of :series_number, :scope => :patient_id
-  validates_presence_of :name, :patient_id, :imaging_date, :series_number
+  validates_presence_of :name, :patient_id, :imaging_date
 
   scope :not_assigned, where(:visit_id => nil)
 
@@ -22,7 +22,7 @@ class ImageSeries < ActiveRecord::Base
   before_save :ensure_visit_is_for_patient
   before_save :update_state
 
-  before_validation :assign_series_number
+  #before_validation :assign_series_number
 
   after_create :ensure_image_series_data_exists
 

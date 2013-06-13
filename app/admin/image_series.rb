@@ -273,7 +273,7 @@ ActiveAdmin.register ImageSeries do
     f.inputs 'Details' do
       f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : patients), :include_blank => (not f.object.persisted?)
       f.input :visit, :collection => (f.object.persisted? ? f.object.study.visits : visits)
-      f.input :series_number, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
+      f.input :series_number#, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
       f.input :name
       f.input :imaging_date, :as => :datepicker
       f.input :force_update, :as => :hidden, :value => (params[:force_update] ? 'true' : 'false') if f.object.persisted?
