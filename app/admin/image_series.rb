@@ -21,7 +21,7 @@ ActiveAdmin.register ImageSeries do
       image_series = ImageSeries.find(params[:id])
       currently_assigned_required_series_names = image_series.assigned_required_series
       original_visit = image_series.visit
-      new_visit = (params[:image_series][:visit_id].nil? ? nil : Visit.find(params[:image_series][:visit_id]))
+      new_visit = (params[:image_series][:visit_id].blank? ? nil : Visit.find(params[:image_series][:visit_id]))
       
       if(params[:image_series][:visit_id] != image_series.visit_id and params[:image_series][:force_update] != 'true')
         if(original_visit and new_visit and original_visit.visit_type != new_visit.visit_type)
