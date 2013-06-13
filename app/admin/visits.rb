@@ -16,18 +16,19 @@ ActiveAdmin.register Visit do
 
     def generate_filter_options
       studies = if session[:selected_study_id].nil? then Study.accessible_by(current_ability) else Study.where(:id => session[:selected_study_id]).accessible_by(current_ability) end
+      studies = studies.order('name asc')
 
       studies.map do |study|
-        centers = study.centers.accessible_by(current_ability)
+        centers = study.centers.accessible_by(current_ability).order('code asc')
         
         centers_optgroups = centers.map do |center|
-          patients = center.patients.accessible_by(current_ability)
+          patients = center.patients.accessible_by(current_ability).order('subject_id asc')
 
           patient_options = patients.map do |patient|
             {:id => "patient_#{patient.id.to_s}", :text => patient.subject_id}
           end
 
-          {:id => "center_#{center.id.to_s}", :text => center.name, :children => patient_options}
+          {:id => "center_#{center.id.to_s}", :text => center.full_name, :children => patient_options}
         end
 
         {:id => "study_#{study.id.to_s}", :text => study.name, :children => centers_optgroups}

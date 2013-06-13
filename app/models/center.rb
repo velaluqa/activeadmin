@@ -26,6 +26,10 @@ class Center < ActiveRecord::Base
 
   before_save :ensure_study_is_unchanged
 
+  def full_name
+    "#{self.code} - #{self.name}"
+  end
+  
   def previous_image_storage_path
     if(self.previous_changes.include?(:study_id))
       previous_study = Study.find(self.previous_changes[:study_id][0])

@@ -76,15 +76,16 @@ ActiveAdmin.register ImageSeries do
 
     def generate_filter_options
       studies = if session[:selected_study_id].nil? then Study.accessible_by(current_ability) else Study.where(:id => session[:selected_study_id]).accessible_by(current_ability) end
+      studies = studies.order('name asc')
 
       studies.map do |study|
-        centers = study.centers.accessible_by(current_ability)
+        centers = study.centers.accessible_by(current_ability).order('code asc')
         
         centers_optgroups = centers.map do |center|
-          patients = center.patients.accessible_by(current_ability)
+          patients = center.patients.accessible_by(current_ability).order('subject_id asc')
 
           patient_optgroups = patients.map do |patient|
-            visits = patient.visits.accessible_by(current_ability)
+            visits = patient.visits.accessible_by(current_ability).order('visit_number asc')
 
             visit_options = visits.map do |visit|
               {:id => "visit_#{visit.id.to_s}", :text => '#'+visit.visit_number.to_s}
@@ -93,7 +94,7 @@ ActiveAdmin.register ImageSeries do
             {:id => "patient_#{patient.id.to_s}", :text => patient.subject_id, :children => visit_options}
           end
 
-          {:id => "center_#{center.id.to_s}", :text => center.name, :children => patient_optgroups}
+          {:id => "center_#{center.id.to_s}", :text => center.full_name, :children => patient_optgroups}
         end
 
         {:id => "study_#{study.id.to_s}", :text => study.name, :children => centers_optgroups}
