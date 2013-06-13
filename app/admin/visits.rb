@@ -25,7 +25,7 @@ ActiveAdmin.register Visit do
           patients = center.patients.accessible_by(current_ability).order('subject_id asc')
 
           patient_options = patients.map do |patient|
-            {:id => "patient_#{patient.id.to_s}", :text => patient.subject_id}
+            {:id => "patient_#{patient.id.to_s}", :text => patient.name}
           end
 
           {:id => "center_#{center.id.to_s}", :text => center.full_name, :children => patient_options}

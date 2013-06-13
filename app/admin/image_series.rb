@@ -91,7 +91,7 @@ ActiveAdmin.register ImageSeries do
               {:id => "visit_#{visit.id.to_s}", :text => '#'+visit.visit_number.to_s}
             end
 
-            {:id => "patient_#{patient.id.to_s}", :text => patient.subject_id, :children => visit_options}
+            {:id => "patient_#{patient.id.to_s}", :text => patient.name, :children => visit_options}
           end
 
           {:id => "center_#{center.id.to_s}", :text => center.full_name, :children => patient_optgroups}
