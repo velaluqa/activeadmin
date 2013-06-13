@@ -183,6 +183,7 @@ ActiveAdmin.register ImageSeries do
     column :series_number
     column :name
     column :imaging_date
+    column 'Import Date', :created_at
     column :images do |image_series|
       link_to(image_series.images.size, admin_images_path(:'q[image_series_id_eq]' => image_series.id))
     end
@@ -224,6 +225,9 @@ ActiveAdmin.register ImageSeries do
       end
       row :image_storage_path
       row :imaging_date
+      row 'Import Date' do
+        pretty_format(image_series.created_at)
+      end
       row :state do
         case image_series.state
         when :imported
@@ -280,6 +284,7 @@ ActiveAdmin.register ImageSeries do
   filter :series_number
   filter :name
   filter :imaging_date
+  filter :created_at, :label => 'Import Date'
 
   member_action :viewer, :method => :get do
     @image_series = ImageSeries.find(params[:id])
