@@ -205,7 +205,9 @@ ActiveAdmin.register ImageSeries do
 
       result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'), :class => 'member_link')
       result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank')
-      result += link_to('Domino', image_series.lotus_notes_url, :class => 'memeber_link') unless image_series.domino_unid.nil? or image_series.lotus_notes_url.nil?
+      result += link_to('Domino', image_series.lotus_notes_url, :class => 'member_link') unless image_series.domino_unid.nil? or image_series.lotus_notes_url.nil?
+      result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
+      result += link_to('Assign RS', assign_required_series_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') unless image_series.visit_id.nil?
       
       result.html_safe
     end
@@ -451,6 +453,51 @@ ActiveAdmin.register ImageSeries do
 
     @page_title = 'Assign to Visit'
     render 'admin/image_series/assign_to_visit', :locals => {:selection => selection, :visits => visits}
+  end
+
+  member_action :assign_visit, :method => :post do
+    @image_series = ImageSeries.find(params[:id])
+    authorize! :manage, @image_series
+
+    visit = Visit.find(params[:image_series][:visit_id])
+    if(visit.patient_id != @image_series.patient_id)
+      flash[:error] = 'Visit doesn\'t belong to the image series\' curent patient. To change the patient, please \'Edit\' the image series.'
+      redirect_to :back
+      return
+    end
+
+    @image_series.visit = visit
+    @image_series.save
+
+    redirect_to params[:return_url], :notice => 'Image Series successfully assigned to visit.'
+  end
+  member_action :assign_visit_form, :method => :get do
+    @image_series = ImageSeries.find(params[:id])
+    authorize! :manage, @image_series
+
+    @return_url = params[:return_url]
+
+    @page_title = 'Assign Visit'
+  end
+
+  member_action :assign_required_series, :method => :post do
+    @image_series = ImageSeries.find(params[:id])
+    authorize! :manage, @image_series
+
+    @image_series.change_required_series_assignment(params[:image_series][:assigned_required_series].reject {|rs| rs.blank?})
+
+    redirect_to params[:return_url], :notice => 'Image Series successfully assigned to required series\'.'
+  end
+  member_action :assign_required_series_form, :method => :get do
+    @image_series = ImageSeries.find(params[:id])
+    authorize! :manage, @image_series
+
+    @required_series = @image_series.visit.required_series_names
+    @assigned_required_series = @image_series.assigned_required_series
+
+    @return_url = params[:return_url]
+
+    @page_title = 'Assign Required Series\''
   end
 
   viewer_cartable(:image_series)

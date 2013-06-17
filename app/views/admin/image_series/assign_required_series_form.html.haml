@@ -1,0 +1,21 @@
+= form_tag(assign_required_series_admin_image_series_path(@image_series, :return_url => @return_url), :method => :post, :class => 'formtastic form') do
+  = field_set_tag('<span>Assign to Required Series\'</span>'.html_safe, :class => 'inputs') do
+    %ol
+      %li.input.check_boxes
+        %fieldset.choices
+          %legend.label            
+            %label Assigned Required Series'
+          = hidden_field_tag('image_series_assigned_required_series_none', nil, :name => 'image_series[assigned_required_series][]')
+          %ol.choices-group
+            - @required_series.each do |required_series_name|
+              %li.choice
+                = label_tag('image_series_assigned_required_series_'+required_series_name) do
+                  = check_box_tag('image_series_assigned_required_series_'+required_series_name, required_series_name, @assigned_required_series.include?(required_series_name), :name => 'image_series[assigned_required_series][]')
+                  = required_series_name
+
+  = field_set_tag(nil, :class => 'actions') do
+    %ol
+      %li.action.input_action
+        = submit_tag('Assign')
+      %li.cancel
+        = link_to('Cancel', @return_url)

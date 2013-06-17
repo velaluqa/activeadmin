@@ -156,6 +156,24 @@ class ImageSeries < ActiveRecord::Base
 
     return required_series
   end
+  def change_required_series_assignment(new_assignment)
+    return if self.visit.nil?
+    changes = {}
+    
+    current_assignment = self.assigned_required_series
+    
+    pp current_assignment
+    pp new_assignment
+    
+    (current_assignment-new_assignment).each do |unassigned_required_series|
+      changes[unassigned_required_series] = nil
+    end
+    (new_assignment-current_assignment).each do |assigned_required_series|
+      changes[assigned_required_series] = self.id.to_s
+    end
+
+    self.visit.change_required_series_assignment(changes)
+  end
 
   protected
 
