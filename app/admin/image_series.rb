@@ -75,7 +75,6 @@ ActiveAdmin.register ImageSeries do
     end
 
     def generate_filter_options
-      benchmark('Generate filter options') do
       studies = if session[:selected_study_id].nil? then Study.accessible_by(current_ability) else Study.where(:id => session[:selected_study_id]).accessible_by(current_ability) end
       studies = studies.order('name asc')
 
@@ -100,10 +99,8 @@ ActiveAdmin.register ImageSeries do
 
         {:id => "study_#{study.id.to_s}", :text => study.name, :children => centers_optgroups}
       end
-      end
     end
     def generate_filter_options_map(filter_options)
-      benchmark('Generate filter options map') do
       filter_options_map = {}
 
       filter_options.each do |study|
@@ -123,10 +120,8 @@ ActiveAdmin.register ImageSeries do
       end
       
       filter_options_map
-      end
     end
     def generate_selected_filters
-      benchmark('Generate selected filters') do
       selected_filters = []
 
       selected_filters += params[:q][:visit_id_in].map {|s_id| "visit_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:visit_id_in].nil?)
@@ -135,11 +130,9 @@ ActiveAdmin.register ImageSeries do
       selected_filters += params[:q][:patient_center_study_id_in].map {|s_id| "study_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:patient_center_study_id_in].nil?)
 
       return selected_filters
-      end
     end
 
     def index
-      benchmark('Processing advanced filters') do
       if(params[:q] and params[:q][:visit_id_in] == [""])
         params[:q].delete(:visit_id_in)
       elsif(params[:q] and
@@ -170,7 +163,6 @@ ActiveAdmin.register ImageSeries do
         params[:q][:visit_id_in] = visit_id_in
       end
       pp params
-      end
 
       index!
     end
@@ -179,25 +171,23 @@ ActiveAdmin.register ImageSeries do
   # this is a "fake" sidebar entry, which is only here to ensure that our data array for the advanced patient filter is rendered to the index page, even if it is empty
   # the resulting sidebar is hidden by the advanced filters javascript
   sidebar :advanced_filter_data, :only => :index do
-    benchmark('Generating advanced filters') do
     filter_select2_data = controller.generate_filter_options
     filter_options_map = controller.generate_filter_options_map(filter_select2_data)
     render :partial => 'admin/shared/advanced_filter_data', :locals => {:filter_select2_data => filter_select2_data, :filter_options_map => filter_options_map, :selected_filters => controller.generate_selected_filters, :filter_select2_id => 'visit_id'}
-    end
   end
 
   index do
     selectable_column
-    benchmark('Column Patient') do column :patient, :sortable => :patient_id end
-    benchmark('Column Visit') do column :visit, :sortable => :visit_id end
-    benchmark('Column Series Number') do column :series_number end
-    benchmark('Column Name') do column :name end
-    benchmark('Column Imaging Date') do column :imaging_date end
-    benchmark('Column Import Date') do column 'Import Date', :created_at end
-    benchmark('Column Images') do column :images do |image_series|
+    column :patient, :sortable => :patient_id
+    column :visit, :sortable => :visit_id
+    column :series_number
+    column :name
+    column :imaging_date
+    column 'Import Date', :created_at
+    column :images do |image_series|
       link_to('List', admin_images_path(:'q[image_series_id_eq]' => image_series.id))
-    end end
-    benchmark('Column State') do column :state, :sortable => :state do |image_series|
+    end
+    column :state, :sortable => :state do |image_series|
       case image_series.state
       when :imported
         status_tag('Imported', :error)
@@ -208,9 +198,9 @@ ActiveAdmin.register ImageSeries do
       when :not_required
         status_tag('Not relevant for read')
       end
-    end end
+    end
     
-    benchmark('Column Actions') do column 'View (in)' do |image_series|
+    column 'View (in)' do |image_series|
       result = ''
 
       result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'), :class => 'member_link')
@@ -218,7 +208,7 @@ ActiveAdmin.register ImageSeries do
       result += link_to('Domino', image_series.lotus_notes_url, :class => 'memeber_link') unless image_series.domino_unid.nil? or image_series.lotus_notes_url.nil?
       
       result.html_safe
-    end end
+    end
     
     default_actions
   end
