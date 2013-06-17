@@ -195,7 +195,7 @@ ActiveAdmin.register ImageSeries do
     benchmark('Column Imaging Date') do column :imaging_date end
     benchmark('Column Import Date') do column 'Import Date', :created_at end
     benchmark('Column Images') do column :images do |image_series|
-      link_to(image_series.images.size, admin_images_path(:'q[image_series_id_eq]' => image_series.id))
+      link_to('List', admin_images_path(:'q[image_series_id_eq]' => image_series.id))
     end end
     benchmark('Column State') do column :state, :sortable => :state do |image_series|
       case image_series.state
