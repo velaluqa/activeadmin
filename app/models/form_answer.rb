@@ -20,6 +20,9 @@ class FormAnswer
   field :is_test_data, type: Boolean
   field :versions, type: Array
 
+  index user_id: 1
+  index case_id: 1
+
   before_destroy do
     c = self.case
     c.state = :unread

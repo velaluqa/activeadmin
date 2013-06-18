@@ -5,6 +5,8 @@ class VisitData
   field :assigned_image_series_index, type: Hash, default: {}
   field :required_series, type: Hash, default: {}
 
+  index visit_id: 1
+
   def visit
     begin
       return Visit.find(read_attribute(:visit_id))

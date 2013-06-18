@@ -4,6 +4,8 @@ class PatientData
   field :patient_id, type: Integer
   field :data, type: Hash, default: {}
 
+  index patient_id: 1
+
   def patient
     begin
       return Patient.find(read_attribute(:patient_id))

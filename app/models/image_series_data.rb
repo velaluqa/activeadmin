@@ -4,6 +4,8 @@ class ImageSeriesData
   field :image_series_id, type: Integer
   field :properties, type: Hash, :default => {}
 
+  index image_series_id: 1
+
   def image_series
     begin
       return ImageSeries.find(read_attribute(:image_series_id))

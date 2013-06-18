@@ -4,6 +4,8 @@ class CaseData
   field :case_id, type: Integer
   field :data, type: Hash
 
+  index case_id: 1
+
   def case
     begin
       return Case.find(read_attribute(:case_id))

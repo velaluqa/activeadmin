@@ -377,7 +377,7 @@ ActiveAdmin.register ImageSeries do
   action_item :only => :show do
     link_to('Mark not relevant', mark_not_relevant_admin_image_series_path(resource)) unless (resource.state != :visit_assigned or resource.visit.nil?)
   end
-  batch_action :mark_not_relevant do |selection|
+  batch_action :mark_not_relevant, :confirm => 'This will mark all selected image series\' as not relevant. Are you sure?' do |selection|
     ImageSeries.find(selection).each do |i_s|
       next if (i_s.state != :visit_assigned or i_s.visit.nil?)
 
@@ -434,7 +434,7 @@ ActiveAdmin.register ImageSeries do
 
     redirect_to params[:return_url], :notice => 'The image series\' were assigned to the visit.'
   end
-  batch_action :assign_to_visit do |selection|
+  batch_action :assign_to_visit, :confirm => 'This will modify all selected image series\'. Are you sure?'  do |selection|
     patient_id = nil
     visits = []
     failure = false
