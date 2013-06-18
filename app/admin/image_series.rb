@@ -187,6 +187,7 @@ ActiveAdmin.register ImageSeries do
     column :images do |image_series|
       link_to('List', admin_images_path(:'q[image_series_id_eq]' => image_series.id))
     end
+    benchmark('State column') do 
     column :state, :sortable => :state do |image_series|
       case image_series.state
       when :imported
@@ -194,10 +195,17 @@ ActiveAdmin.register ImageSeries do
       when :visit_assigned
         status_tag('Visit assigned', :warning)
       when :required_series_assigned
-        status_tag('Required series\' assigned', :ok)
+        assigned_required_series = image_series.assigned_required_series
+
+        label = '<ul>'
+        label += assigned_required_series.map {|ars| '<li>'+ars+'</li>'}.join('')
+        label += '</ul>'
+
+        ('<div class="status_tag required_series_assigned ok">'+label+'</div>').html_safe
       when :not_required
         status_tag('Not relevant for read')
       end
+    end
     end
     
     column 'View (in)' do |image_series|
