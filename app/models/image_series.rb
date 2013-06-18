@@ -144,17 +144,14 @@ class ImageSeries < ActiveRecord::Base
   end
 
   def assigned_required_series
-    required_series = []
-    return required_series if self.visit.nil?
+    return [] if self.visit.nil?
 
     self.visit.ensure_visit_data_exists
     if(self.visit.visit_data.assigned_image_series_index and self.visit.visit_data.assigned_image_series_index[self.id.to_s])
-      self.visit.visit_data.assigned_image_series_index[self.id.to_s].each do |required_series_name|
-        required_series << required_series_name
-      end
+      return self.visit.visit_data.assigned_image_series_index[self.id.to_s]
     end
 
-    return required_series
+    return []
   end
   def change_required_series_assignment(new_assignment)
     return if self.visit.nil?
