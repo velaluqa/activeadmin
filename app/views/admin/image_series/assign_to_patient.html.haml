@@ -1,0 +1,15 @@
+= form_tag(batch_assign_to_patient_admin_image_series_index_path(:return_url => @return_url), :method => :post, :class => 'formtastic form') do
+  = hidden_field_tag('image_series', selection)
+
+  = field_set_tag('<span>Assign to Patient</span>'.html_safe, :class => 'inputs') do
+    %ol
+      %li.input.select
+        = label_tag('patient_id', 'Patient')
+        = select_tag('patient_id', options_from_collection_for_select(patients, 'id', 'name'), :include_blank => true)
+
+  = field_set_tag(nil, :class => 'actions') do
+    %ol
+      %li.action.input_action
+        = submit_tag('Assign')
+      %li.cancel
+        = link_to('Cancel', @return_url)
