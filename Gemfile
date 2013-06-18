@@ -97,3 +97,9 @@ end
 # used for DICOM based checks in tQC (ability to specify simple formulas)
 # the gem on rubygems.org is not up-to-date, so we use the code from github directly
 gem 'dentaku', :github => 'rubysolo/dentaku', :branch => 'master'
+
+# gems for prettier errors in development
+group :development do
+  gem 'better_errors'
+  gem 'binding_of_caller'
+end
