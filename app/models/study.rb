@@ -6,7 +6,7 @@ require 'domino_integration_client'
 class Study < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :name, :locked_version, :domino_db_url, :notes_links_base_uri
+  attr_accessible :name, :locked_version, :domino_db_url, :domino_server_name, :notes_links_base_uri
 
   has_many :sessions
 
@@ -27,7 +27,7 @@ class Study < ActiveRecord::Base
   end
 
   before_save do
-    if(self.changes.include?('domino_db_url'))
+    if(self.changes.include?('domino_db_url') or self.changes.include?('domino_server_name'))
       update_notes_links_base_uri
     end
   end
@@ -124,6 +124,12 @@ class Study < ActiveRecord::Base
     return true if self.domino_db_url.blank?
     
     new_notes_links_base_uri = URI(self.domino_db_url)
+    begin
+      new_notes_links_base_uri.host = self.domino_server_name unless self.domino_server_name.blank?
+    rescue URI::InvalidComponentError => e
+      errors[:domino_server_name] = 'Invalid format: '+e.message
+      return false
+    end
     new_notes_links_base_uri.scheme = 'Notes'
 
     begin

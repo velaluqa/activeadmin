@@ -40,6 +40,7 @@ ActiveAdmin.register Study do
           status_tag('Disabled', :warning, :label => "Domino integration not enabled")
         end
       end
+      row :domino_server_name
       row :notes_links_base_uri do
         link_to(study.notes_links_base_uri, study.notes_links_base_uri) unless study.notes_links_base_uri.nil?
       end
@@ -86,6 +87,7 @@ ActiveAdmin.register Study do
       f.input :name, :required => true
       if(!f.object.persisted? or current_user.is_app_admin?)
         f.input :domino_db_url, :label => 'Domino DB URL', :required => false, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to data corruption unless the Domino DB was moved from the old URL to the new one.' : 'If left blank, Domino integration will not be enabled for this study. You can enable it later by changing this value.')
+        f.input :domino_server_name, :label => 'Domino Server Name', :required => false, :hint => 'Please enter the name of the Domino Server as seen in Lotus Notes (without the domain after the slash), for example \'pharmtrace-server\' instead of \'pharmtrace-server/pharmtrace\'. This is used to generate links that refer to the server name instead of its IP address. If left blank, the IP/hostname from the Domino DB URL will be used instead.'
       end
       f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
