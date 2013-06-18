@@ -432,7 +432,7 @@ ActiveAdmin.register ImageSeries do
       i_s.save
     end
 
-    redirect_to :action => :index, :notice => 'The image series\' were assigned to the visit.'
+    redirect_to params[:return_url], :notice => 'The image series\' were assigned to the visit.'
   end
   batch_action :assign_to_visit do |selection|
     patient_id = nil
@@ -458,6 +458,8 @@ ActiveAdmin.register ImageSeries do
       end
     end
     next if failure
+
+    @return_url = request.referer
 
     @page_title = 'Assign to Visit'
     render 'admin/image_series/assign_to_visit', :locals => {:selection => selection, :visits => visits}

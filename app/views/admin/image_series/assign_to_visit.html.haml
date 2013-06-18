@@ -1,4 +1,4 @@
-= form_tag(batch_assign_to_visit_admin_image_series_index_path, :method => :post, :multipart => true, :class => 'formtastic form') do
+= form_tag(batch_assign_to_visit_admin_image_series_index_path(:return_url => @return_url), :method => :post, :multipart => true, :class => 'formtastic form') do
   = hidden_field_tag('image_series', selection)
 
   = field_set_tag('<span>Assign to Visit</span>'.html_safe, :class => 'inputs') do
