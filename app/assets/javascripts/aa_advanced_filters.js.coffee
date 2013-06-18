@@ -8,6 +8,11 @@ $(document).ready ->
   return unless filter_select2_id?
   hide_fake_sidebar_entry()
   replace_stock_filter(filter_select2_id)
+
+  $(".clear_filters_btn").off('click')
+  $(".clear_filters_btn").on 'click', ->
+    window.location.search = '?clear_filter=true'
+    false
   
   $('#q_'+filter_select2_id).select2({
     multiple: true

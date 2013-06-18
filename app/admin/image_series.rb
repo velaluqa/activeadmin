@@ -133,14 +133,23 @@ ActiveAdmin.register ImageSeries do
     end
 
     def index
+      session[:current_images_filter] = nil if(params[:clear_filter] == 'true')
+
       if(params[:q] and params[:q][:visit_id_in] == [""])
         params[:q].delete(:visit_id_in)
+
+        params[:q][:visit_id_in] = session[:current_images_filter] unless session[:current_images_filter].blank?
+      elsif(params[:q].nil? or params[:q][:visit_id_in].nil?)
+        params[:q] = {} if params[:q].nil?
+        params[:q][:visit_id_in] = session[:current_images_filter] unless session[:current_images_filter].blank?
       elsif(params[:q] and
          params[:q][:visit_id_in].respond_to?(:length) and
          params[:q][:visit_id_in].length == 1 and
-         params[:q][:visit_id_in][0].include?(','))
+         params[:q][:visit_id_in][0].include?(',')
+            )
         params[:q][:visit_id_in] = params[:q][:visit_id_in][0].split(',')
       end
+      session[:current_images_filter] = params[:q][:visit_id_in] unless params[:q].nil? or params[:q][:visit_id_in].nil?
 
       if(params[:q] and params[:q][:visit_id_in].respond_to?(:each)) 
         visit_id_in = []
