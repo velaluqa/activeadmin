@@ -178,6 +178,9 @@ class ImageSeries < ActiveRecord::Base
     study_config = (self.study.nil? ? nil : self.study.current_configuration)
     result = {}
 
+    result['DICOMTagNames'] = "Series Name\n"
+    result['DICOMValues'] = self.name + "\n"
+
     unless(images.empty?)
       image = self.sample_image
       
@@ -203,8 +206,8 @@ class ImageSeries < ActiveRecord::Base
             dicom_tag_names << tag['label'].to_s
           end          
 
-          result['DICOMTagNames'] = dicom_tag_names.join("\n")
-          result['DICOMValues'] = dicom_values.join("\n")
+          result['DICOMTagNames'] += dicom_tag_names.join("\n")
+          result['DICOMValues'] += dicom_values.join("\n")
         end
       end
     end
