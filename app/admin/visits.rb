@@ -106,6 +106,7 @@ ActiveAdmin.register Visit do
     selectable_column
     column :patient
     column :visit_number
+    column :description
     column :visit_type
     column :visit_date
     
@@ -118,6 +119,7 @@ ActiveAdmin.register Visit do
     attributes_table do
       row :patient
       row :visit_number
+      row :description
       row :visit_type
       row :visit_date
       domino_link_row(visit)
@@ -166,6 +168,7 @@ ActiveAdmin.register Visit do
     f.inputs 'Details' do
       f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : patients), :include_blank => (not f.object.persisted?)
       f.input :visit_number, :hint => (visit_types.nil? ? nil : 'A visit type can only be assigned once the visit was created. Please click on "Edit Visit" after this step to assign a visit type.')
+      f.input :description
       unless(visit_types.nil?)
         f.input :visit_type, :collection => visit_types, :include_blank => false
       end
@@ -178,6 +181,7 @@ ActiveAdmin.register Visit do
   # filters
   filter :patient, :collection => []
   filter :visit_number
+  filter :description
   filter :visit_type
 
   member_action :assign_required_series, :method => :post do

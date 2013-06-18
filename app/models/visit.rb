@@ -6,7 +6,7 @@ class Visit < ActiveRecord::Base
 
   has_paper_trail
 
-  attr_accessible :patient_id, :visit_number, :visit_type, :domino_unid
+  attr_accessible :patient_id, :visit_number, :description, :visit_type, :domino_unid
   attr_accessible :patient
   
   belongs_to :patient
