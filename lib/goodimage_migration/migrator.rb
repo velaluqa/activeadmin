@@ -24,7 +24,7 @@ module GoodImageMigration
       missing_count = 0
       Image.find_each do |erica_image|
         count += 1
-        print count.to_s+'..' if(count % 1000 == 0)
+        print count.to_s+'/'+missing_count.to_s+'..' if(count % 1000 == 0)
         
         next if erica_image.file_is_present?
         missing_count += 1
