@@ -70,6 +70,12 @@ StudyServer::Application.routes.draw do
   resources :images, :only => [:create] do
   end
 
+  resources :images_search, :only => [] do
+    collection do
+      get 'search'
+    end
+  end
+
   match 'wado' => 'wado#wado'
 
   # The priority is based upon order of creation:
