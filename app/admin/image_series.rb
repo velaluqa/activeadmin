@@ -570,6 +570,11 @@ ActiveAdmin.register ImageSeries do
     authorize! :manage, @image_series
 
     @required_series = @image_series.visit.required_series_names
+    if(@required_series.blank?)
+      flash[:error] = 'The associated visit has no required series\'. This could be due to an invalid study config, no assigned visit type or an empty visit type.'
+      redirect_to params[:return_url]
+      return
+    end
     @assigned_required_series = @image_series.assigned_required_series
 
     @return_url = params[:return_url]
