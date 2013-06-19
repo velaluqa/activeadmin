@@ -15,6 +15,28 @@ module GoodImageMigration
 
       reset_counters(number_of_studies)
     end
+
+    def copy_missing_images
+      images_count = Image.count
+      Rails.logger.info "Checking #{images_count} ERICA Images for missing files"
+
+      count = 0
+      missing_count = 0
+      Image.find_each do |erica_image|
+        count += 1
+        print count.to_s+'..' if(count % 1000 == 0)
+        
+        next if erica_image.file_is_present?
+        missing_count += 1
+
+        goodimage_image = goodimage_resource_from_mapping('image', erica_image.id)
+        next if goodimage_image.nil?
+
+        copy_image_file(goodimage_image, erica_image)
+      end
+      puts
+      Rails.logger.info "Finished, #{missing_count} images were missing"
+    end
     
     def migrate(goodimage_resource, erica_parent_resource)
       Rails.logger.info "Starting migration for #{goodimage_resource.inspect}"
@@ -387,6 +409,20 @@ module GoodImageMigration
       end
 
       return [erica_resource, migration_mapping]
+    end
+    def goodimage_resource_from_mapping(type, erica_id)
+      goodimage_resource = nil
+      migration_mapping = Migration::Mapping.first(:type => type, :target_id => erica_id)
+      if(migration_mapping)
+        goodimage_resource_id = migration_mapping.source_id
+
+
+        goodimage_resource = migration_mapping.source
+        
+        return goodimage_resource
+      end
+
+      return nil
     end
   end
 end

@@ -98,4 +98,23 @@ namespace :goodimage_migration do
     puts "Migration ended at #{end_time.inspect}"
     puts "Migration took #{end_time - start_time} seconds"
   end
+
+  desc "Copy all missing images from GoodImage to the ERICA image storage"
+  task :copy_missing_images => [:initialize] do
+    config = GoodImageMigration.migration_config
+    if(config.nil? or config['goodimage_image_storage'].nil?)
+      puts "No valid config containing 'goodimage_image_storage' found, aborting."
+      next
+    end
+
+    migrator = GoodImageMigration::Migrator.new(config, goodimage_studies.count)
+    start_time = Time.now
+
+    migrator.copy_missing_images
+
+    end_time = Time.now
+    puts "Migration started at #{start_time.inspect}"
+    puts "Migration ended at #{end_time.inspect}"
+    puts "Migration took #{end_time - start_time} seconds"
+  end
 end
