@@ -56,6 +56,11 @@ class Image < ActiveRecord::Base
   def dicom_metadata_as_arrays
     dicom_metadata_doc = self.dicom_metadata_xml
 
+    if(dicom_metadata_doc.nil? or dicom_metadata_doc.root.nil?)
+      Rails.logger.warn 'Failed to retrieve metadata for image '+self.id.to_s' at '+self.image_storage_path
+      return [[],[]]
+    end
+
     dicom_meta_header = []
     unless(dicom_metadata_doc.root.elements['meta-header'].nil?)
       dicom_metadata_doc.root.elements['meta-header'].each_element('element') do |e|
