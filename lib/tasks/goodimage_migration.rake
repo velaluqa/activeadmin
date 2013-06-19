@@ -107,7 +107,7 @@ namespace :goodimage_migration do
       next
     end
 
-    migrator = GoodImageMigration::Migrator.new(config, goodimage_studies.count)
+    migrator = GoodImageMigration::Migrator.new(config, 0)
     start_time = Time.now
 
     migrator.copy_missing_images
