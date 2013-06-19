@@ -33,6 +33,7 @@ class Ability
       can [:create, :read], Image
     end
     if(user.has_system_role?(:image_manage))
+      can :image_manage, :system
       can :manage, Study
       can :manage, Center
       can :manage, Patient
