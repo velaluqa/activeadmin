@@ -57,7 +57,7 @@ class Image < ActiveRecord::Base
     dicom_metadata_doc = self.dicom_metadata_xml
 
     if(dicom_metadata_doc.nil? or dicom_metadata_doc.root.nil?)
-      Rails.logger.warn 'Failed to retrieve metadata for image '+self.id.to_s' at '+self.image_storage_path
+      Rails.logger.warn 'Failed to retrieve metadata for image '+self.id.to_s+' at '+self.image_storage_path
       return [[],[]]
     end
 
