@@ -536,7 +536,18 @@ ActiveAdmin.register ImageSeries do
     @image_series = ImageSeries.find(params[:id])
     authorize! :manage, @image_series
 
-    visit = Visit.find(params[:image_series][:visit_id])
+    if(params[:image_series][:visit_id] == 'new')
+      if(params[:image_series][:visit][:visit_type].blank?)
+        flash[:error] = 'When creating a new visit, a visit type must be selected.'
+        redirect_to :back
+        return
+      end
+
+      visit = Visit.create(:patient => @image_series.patient, :visit_number => params[:image_series][:visit][:visit_number], :visit_type => params[:image_series][:visit][:visit_type], :description => params[:image_series][:visit][:description])
+    else
+      visit = Visit.find(params[:image_series][:visit_id])
+    end
+
     if(visit.patient_id != @image_series.patient_id)
       flash[:error] = 'Visit doesn\'t belong to the image series\' curent patient. To change the patient, please \'Edit\' the image series.'
       redirect_to :back
@@ -551,6 +562,13 @@ ActiveAdmin.register ImageSeries do
   member_action :assign_visit_form, :method => :get do
     @image_series = ImageSeries.find(params[:id])
     authorize! :manage, @image_series
+
+    if(@image_series.patient_id.nil?)
+      flash[:error] = 'This image series is not assigned to a patient. Please assign a patient first!'
+      redirect_to params[:return_url]
+      return
+    end
+    @visit_types = (@image_series.patient and @image_series.patient.study ? @image_series.patient.study.visit_types : [])
 
     @return_url = params[:return_url]
 
