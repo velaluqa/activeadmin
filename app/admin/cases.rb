@@ -307,7 +307,7 @@ ActiveAdmin.register Case do
 
     return unless @errors.empty?
 
-    case_ids = params[:cases].split(' ')      
+    case_ids = params[:cases].split(' ')
     begin
       cases = Case.find(case_ids)
     rescue ActiveRecord::RecordNotFound => e
@@ -354,7 +354,7 @@ ActiveAdmin.register Case do
 
         repeat_count.times do |r|
           row = {}
-          answers['_REPEAT'] = repeat_array[r].merge({'_ID' => r}) unless repeat_array.nil?
+          answers['_REPEAT'] = repeat_array[r].merge({'_ID' => r, '_REPEATABLE_ID' => row_spec['repeat']}) unless repeat_array.nil?
 
           row['ID'] = c.id if(row_spec['include_id'] == true)
           
