@@ -1,0 +1,18 @@
+= form_tag(batch_export_for_ericav1_admin_patients_path, :method => :post, :class => 'formtastic form') do
+  - pp selection
+  - puts selection.class
+  = hidden_field_tag('patients', selection)
+  = field_set_tag('<span>Export Settings</span>'.html_safe, :class => 'inputs') do
+    %ol
+      %li.input.string
+        = label_tag('export_folder', 'Export Folder')
+        = text_field_tag('export_folder')
+        %p.inline-hints Please only use characters valid in folder names, i.e. no /. Refraining from using whitespace could also reduce possible headaches.
+
+  = field_set_tag(nil, :class => 'actions') do
+    %ol
+      %li.action.input_action
+        = submit_tag('Export')
+      %li.cancel
+        = link_to('Cancel', admin_patients_path)
+        

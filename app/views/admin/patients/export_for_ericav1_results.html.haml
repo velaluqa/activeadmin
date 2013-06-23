@@ -1,0 +1,6 @@
+.panel
+  %h3 Export Results
+  .panel_contents
+    %p= 'The export was successfully created at ' + export_root + '. Below is the corresponding case list for ERICAv1.'
+    %p
+      = text_area_tag('case_list', case_list_csv, :rows => case_list_rows, :cols => 100)

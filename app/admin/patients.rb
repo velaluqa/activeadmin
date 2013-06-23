@@ -139,5 +139,90 @@ ActiveAdmin.register Patient do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id))
   end
 
+  controller do
+    def export_patients_for_ericav1(export_folder, patients)
+      case_list = []
+
+      export_root_path = Pathname.new(Rails.application.config.image_export_root + '/' + export_folder)
+      if(export_root_path.exist? and not export_root_path.directory?)
+        raise 'The export target folder '+export_root_path.to_s+' exists, but isn\'t a folder.'
+      end
+      
+      patients.each do |patient|
+        patient_export_path = Pathname.new(export_root_path.to_s + '/' + patient.name)
+        patient_export_path.rmtree if patient_export_path.exist?
+        patient_export_path.mkpath
+        
+        patient.visits.each do |visit|
+          next if visit.visit_number.blank?
+
+          visit_export_path = Pathname.new(patient_export_path.to_s + '/' + visit.visit_number.to_s)
+          visit_export_path.mkdir
+
+          visit.required_series_objects.each do |required_series|
+            next if required_series.assigned_image_series.nil?
+
+            required_series_export_path = Pathname.new(visit_export_path.to_s + '/' + required_series.name)
+            assigned_image_series_path = Pathname.new(required_series.assigned_image_series.absolute_image_storage_path)          
+
+            required_series_export_path.make_symlink(assigned_image_series_path.relative_path_from(visit_export_path))
+          end
+
+          case_list << {:patient => patient.name, :images => visit.visit_number, :case_type => visit.visit_type}
+        end
+      end
+
+      return case_list
+    end
+  end
+
+  collection_action :batch_export_for_ericav1, :method => :post do
+    if(params[:export_folder].blank?)
+      flash[:error] = 'You have to specify an export folder.'
+      redirect_to admin_patients_path
+      return
+    end
+
+    patient_ids = params[:patients].split(' ')      
+    patients = Patient.find(patient_ids)
+    
+    begin
+      case_list = export_patients_for_ericav1(params[:export_folder], patients)
+    rescue => e
+      flash[:error] = e.message
+      redirect_to admin_patients_path
+      return
+    end
+
+    csv_options = {
+      :col_sep => ',',
+      :row_sep => :auto,
+      :quote_char => '"',
+      :headers => true,
+      :converters => [:all, :date],
+      :unconverted_fields => true,
+    }    
+    case_list_csv = CSV.generate(csv_options) do |csv|
+      csv << ['patient', 'images', 'type']
+      case_list.each do |c|
+        csv << [c[:patient], c[:images], c[:case_type]]
+      end
+    end
+
+    @page_title = 'Export Results'
+    render 'admin/patients/export_for_ericav1_results', :locals => {:export_root => Rails.application.config.image_export_root + '/' + params[:export_folder], :case_list_csv => case_list_csv, :case_list_rows => case_list.size+1+1}
+  end
+  member_action :export_for_ericav1, :method => :get do    
+    @page_title = 'Export for ERICAv1'
+    render 'admin/patients/export_for_ericav1_form', :locals => {:selection => [resource.id.to_s]}
+  end
+  action_item :only => :show do
+    link_to('Export for ERICAv1', export_for_ericav1_admin_patient_path(resource))
+  end
+  batch_action :export_for_ericav1 do |selection|
+    @page_title = 'Export for ERICAv1'
+    render 'admin/patients/export_for_ericav1_form', :locals => {:selection => selection}
+  end
+
   viewer_cartable(:patient)
 end

@@ -91,6 +91,9 @@ class ImageSeries < ActiveRecord::Base
       self.visit.image_storage_path + '/' + self.id.to_s
     end
   end
+  def absolute_image_storage_path
+    Rails.application.config.image_storage_root + '/' + self.image_storage_path
+  end
 
   def wado_query
     {:id => self.id, :name => self.name, :images => self.images.order('id ASC')}
