@@ -343,14 +343,10 @@ ActiveAdmin.register Case do
       spec.each do |row_spec|
         if(row_spec['repeat'].nil?)
           repeat_array = nil
+          repeat_count = 1
         else
           repeat_array = KeyPathAccessor::access_by_path(answers, row_spec['repeat'])
-        end
-        if(repeat_array.is_a?(Array))
-          repeat_count = repeat_array.size
-        else
-          repeat_array = nil
-          repeat_count = 1
+          repeat_count = (repeat_array.is_a?(Array) ? repeat_array.size : 0)
         end
 
         answers = answers.merge(c.data_hash)
