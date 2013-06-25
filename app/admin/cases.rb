@@ -358,9 +358,13 @@ ActiveAdmin.register Case do
           row['ID'] = c.id if(row_spec['include_id'] == true)
           
           row_spec['values'].each do |name, path|
-            value = KeyPathAccessor::access_by_path(answers, path)
+            if(path =~ /^_TEXT\[(.*)\]$/)
+              value = $1
+            else
+              value = KeyPathAccessor::access_by_path(answers, path)
 
-            value = value.join(',') if value.is_a?(Array)
+              value = value.join(',') if value.is_a?(Array)
+            end
             
             row[name] = value
           end
