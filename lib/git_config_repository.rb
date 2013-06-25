@@ -90,6 +90,12 @@ class GitConfigRepository
 
     return file_blob.text
   end
+  def file_exists_at_version?(path, version = nil)
+    version = current_version if version.nil?
+
+    file = file_at_version(path, version)
+    return (not file.nil?)
+  end
 
   protected
   
