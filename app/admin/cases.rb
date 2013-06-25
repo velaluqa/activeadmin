@@ -220,7 +220,9 @@ ActiveAdmin.register Case do
     column :case_type
     column :flag
     column :state
-    column :exported_at    
+    column :exported_at
+    column(:reader) {|c| (c.form_answer.nil? or c.form_answer.user.nil?) ? '' : c.form_answer.user.name }
+    column(:submitted_at) {|c| c.form_answer.nil? ? '' : c.form_answer.submitted_at }
   end
 
   # filters
