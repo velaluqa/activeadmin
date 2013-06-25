@@ -552,19 +552,24 @@ render_roi_select2_option = (roi, roi_values) ->
   html = '<div class="roi-select2-item">'
   html += '<p>'+roi['name']+'</p>'
 
+  text = roi['name']+': '
+
   html += '<div class="roi-properties"><table>'
   for own key, value of roi_values
     value_name = ROI_VALUE_NAMES[value]
     value_name = value unless value_name?
 
-    return null unless roi[value]
+    return [null, null] unless roi[value]
 
     html += '<tr><td>'+value_name+':</td><td>'+roi[value]+'</td></tr>'
+    text += value_name + ' = ' + roi[value] + ', '
 
   html += '</table></div>'
   html += '</div>'
 
-  return html
+  text.slice(0, -2)
+
+  return [html, text]
 
 generate_roi_select2_options = (select) ->
   id = select.id
@@ -586,11 +591,11 @@ generate_roi_select2_options = (select) ->
     selected_by_select = roi['selected_by_select']
     continue if(selected_by_select? and selected_by_select != id)
 
-    roi_html = render_roi_select2_option(roi, roi_values)
-    continue unless roi_html?
+    [roi_html, roi_text] = render_roi_select2_option(roi, roi_values)
+    continue unless(roi_html? and roi_text?)
 
     roi_options[series_uid] = [] unless roi_options[series_uid]
-    roi_options[series_uid].push({'id': roi_id, 'type': 'roi', 'html': roi_html, 'text': roi['name']})
+    roi_options[series_uid].push({'id': roi_id, 'type': 'roi', 'html': roi_html, 'text': roi_text})
 
   options = []
 
