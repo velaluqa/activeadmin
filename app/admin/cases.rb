@@ -217,7 +217,9 @@ ActiveAdmin.register Case do
     column :case_type
     column :flag
     column :state
-    column :exported_at    
+    column :exported_at
+    column(:reader) {|c| (c.form_answer.nil? or c.form_answer.user.nil?) ? '' : c.form_answer.user.name }
+    column(:submitted_at) {|c| c.form_answer.nil? ? '' : c.form_answer.submitted_at }
   end
 
   # filters
@@ -350,14 +352,18 @@ ActiveAdmin.register Case do
 
         repeat_count.times do |r|
           row = {}
-          answers['_REPEAT'] = repeat_array[r].merge({'_ID' => r, '_REPEATABLE_ID' => row_spec['repeat']}) unless repeat_array.nil?
+          answers['_REPEAT'] = repeat_array[r].merge({'_ID' => (r+1), '_REPEATABLE_ID' => row_spec['repeat']}) unless repeat_array.nil?
 
           row['ID'] = c.id if(row_spec['include_id'] == true)
           
           row_spec['values'].each do |name, path|
-            value = KeyPathAccessor::access_by_path(answers, path)
+            if(path =~ /^_TEXT\[(.*)\]$/)
+              value = $1
+            else
+              value = KeyPathAccessor::access_by_path(answers, path)
 
-            value = value.join(',') if value.is_a?(Array)
+              value = value.join(',') if value.is_a?(Array)
+            end
             
             row[name] = value
           end

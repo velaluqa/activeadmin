@@ -55,7 +55,11 @@ class Form < ActiveRecord::Base
     copied_form.state = :draft
     copied_form.save
 
-    GitConfigRepository.new.update_config_file(copied_form.relative_config_file_path, self.config_file_path, current_user, "Copied form #{self.id} into session #{session.id}") if self.has_configuration?
+    git_config_repository = GitConfigRepository.new
+    git_config_repository.update_config_file(copied_form.relative_config_file_path, self.config_file_path, current_user, "Copied form #{self.id} into session #{session.id}") if self.has_configuration?
+
+    git_config_repository.update_config_file(copied_form.relative_validator_file_path, self.validator_file_path, current_user, "Copied form #{self.id} validators into session #{session.id}") if(self.has_configuration? and git_config_repository.file_exists_at_version?(self.relative_validator_file_path))
+    git_config_repository.update_config_file(copied_form.relative_stylesheet_file_path, self.stylesheet_file_path, current_user, "Copied form #{self.id} stylesheets into session #{session.id}") if(self.has_configuration? and git_config_repository.file_exists_at_version?(self.relative_stylesheet_file_path))
 
     copied_form
   end

@@ -119,8 +119,9 @@ protected
 
     if(@case and @case.session)
       configuration = @case.session.locked_configuration
+      passive_images = (configuration['types'][@case.case_type].nil? or configuration['types'][@case.case_type]['screen_layout'].nil? ? true : configuration['types'][@case.case_type]['screen_layout']['passive'])
 
-      previous_cases = @case.patient.cases.where('position < ?', @case.position) + [nil, @case]
+      previous_cases = (passive_images == false ? [] : @case.patient.cases.where('position < ?', @case.position)) + [nil, @case]
       previous_cases.each do |c|
         if c.nil?
           # this is interpreted by the view as a divider

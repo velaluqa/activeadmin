@@ -9,9 +9,6 @@
       %p= simple_format(@form.description) 
     = form_tag('', :class => 'form-horizontal', :id => 'the_form') do
       = hidden_field_tag('form_id', @form.id)
-      .control-group.error
-        .controls
-          %p#custom-validation-help-block.help-block
       - current_group_index = nil
       - first_in_group = false
       %a.offset-anchor#form-top
@@ -48,6 +45,9 @@
       .form-actions
         %button.btn.btn-primary{:type => 'submit'} Submit Answers
         %p.submit-errors.text-error
+      .control-group.error
+        .controls
+          %p#custom-validation-help-block.help-block
 
   #preview_modal.modal.hide.fade
     .modal-header
