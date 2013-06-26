@@ -1,6 +1,6 @@
 class ImagesSearch < ActiveRecord::Base
 
-  set_table_name 'images_search'
+  self.table_name = 'images_search'
 
   attr_accessible :text, :result_id, :result_type
 
