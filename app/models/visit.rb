@@ -175,7 +175,7 @@ class Visit < ActiveRecord::Base
     ['id', 'visit_number']
   end
   def domino_document_properties(action = :update)
-    {
+    properties = {
       'ericaID' => id,
       'Center' => patient.center.name,
       'CenterNo' => patient.center.code,
@@ -183,6 +183,13 @@ class Visit < ActiveRecord::Base
       'PatNo' => patient.domino_patient_no,
       'visitNo' => visit_number,
     }
+
+    visit_date = self.visit_date
+    unless(visit_date.nil?)
+      properties.merge!({
+                          'VisitDate' => {'data' => visit_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}
+                        })
+    end
   end
 
   def change_required_series_assignment(changed_assignments)
