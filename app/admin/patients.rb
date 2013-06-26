@@ -15,38 +15,12 @@ ActiveAdmin.register Patient do
       end
     end
 
-    def generate_filter_options
-      studies = if session[:selected_study_id].nil? then Study.accessible_by(current_ability) else Study.where(:id => session[:selected_study_id]).accessible_by(current_ability) end
-      studies = studies.order('name asc')
-
-      studies.map do |study|
-        centers = study.centers.accessible_by(current_ability).order('code asc')
-        
-        centers_optgroups = centers.map do |center|
-          {:id => "center_#{center.id.to_s}", :text => center.full_name}
-        end
-
-        {:id => "study_#{study.id.to_s}", :text => study.name, :children => centers_optgroups}
-      end
-    end
-    def generate_filter_options_map(filter_options)
-      filter_options_map = {}
-
-      filter_options.each do |study|
-        filter_options_map[study[:id]] = study[:text]
-
-        study[:children].each do |center|
-          filter_options_map[center[:id]] = center[:text]
-        end
-      end
-      
-      filter_options_map
-    end
     def generate_selected_filters
       selected_filters = []
 
-      selected_filters += params[:q][:center_id_in].map {|s_id| "center_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:center_id_in].nil?)
-      selected_filters += params[:q][:center_study_id_in].map {|s_id| "study_#{s_id.to_s}"} unless(params[:q].nil? or params[:q][:center_study_id_in].nil?)
+      selected_filters += Patient.accessible_by(current_ability).where(:id => params[:q][:id_in]).map {|patient| {:id => 'patient_'+patient.id.to_s, :text => patient.name, :type => 'patient'} } unless(params[:q][:id_in].nil?)
+      selected_filters += Center.accessible_by(current_ability).where(:id => params[:q][:center_id_in]).map {|center| {:id => 'center_'+center.id.to_s, :text => center.code + ' - ' + center.name, :type => 'center'} } unless(params[:q][:center_id_in].nil?)
+      selected_filters += Study.accessible_by(current_ability).where(:id => params[:q][:center_study_id_in]).map {|study| {:id => 'study_'+study.id.to_s, :text => study.name, :type => 'study'} } unless(params[:q][:center_study_id_in].nil?)
 
       return selected_filters
     end
@@ -79,6 +53,9 @@ ActiveAdmin.register Patient do
           elsif(id =~ /^study_([0-9]*)/)
             params[:q][:center_study_id_in] ||= []
             params[:q][:center_study_id_in] << $1
+          elsif(id =~ /^patient_([0-9]*)/)
+            params[:q][:id_in] ||= []
+            params[:q][:id_in] << $1
           end
         end
 
@@ -93,9 +70,7 @@ ActiveAdmin.register Patient do
   # this is a "fake" sidebar entry, which is only here to ensure that our data array for the advanced patient filter is rendered to the index page, even if it is empty
   # the resulting sidebar is hidden by the advanced filters javascript
   sidebar :advanced_filter_data, :only => :index do
-    filter_select2_data = controller.generate_filter_options
-    filter_options_map = controller.generate_filter_options_map(filter_select2_data)
-    render :partial => 'admin/shared/advanced_filter_data', :locals => {:filter_select2_data => filter_select2_data, :filter_options_map => filter_options_map, :selected_filters => controller.generate_selected_filters, :filter_select2_id => 'center_id'}
+     render :partial => 'admin/shared/advanced_filter_data', :locals => {:selected_filters => controller.generate_selected_filters, :filter_select2_id => 'center_id'}
   end
 
   index do
