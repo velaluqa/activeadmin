@@ -19,7 +19,7 @@ GIT
 
 GIT
   remote: git://github.com/profmaad/select2-rails.git
-  revision: 8d57eb9bb8fe57824e857cce38242223cbbfaa29
+  revision: a4b96e696bb9389c587c5d0adf4708061f72b868
   branch: master
   specs:
     select2-rails (3.4.0)
@@ -193,7 +193,7 @@ GEM
       haml (>= 3.1, < 4.1)
       railties (>= 3.1, < 4.1)
     has_scope (0.5.1)
-    hike (1.2.2)
+    hike (1.2.3)
     i18n (0.6.1)
     inherited_resources (1.4.0)
       has_scope (~> 0.5.0)
@@ -202,7 +202,7 @@ GEM
     jquery-rails (2.2.1)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
-    json (1.7.7)
+    json (1.8.0)
     json_pure (1.8.0)
     kaminari (0.14.1)
       actionpack (>= 3.0.0)
@@ -231,7 +231,7 @@ GEM
       origin (~> 1.0)
       tzinfo (~> 0.3.22)
     moped (1.4.5)
-    multi_json (1.7.2)
+    multi_json (1.7.7)
     origin (1.1.0)
     orm_adapter (0.4.0)
     paper_trail (2.7.1)
@@ -264,7 +264,7 @@ GEM
       rdoc (~> 3.4)
       thor (>= 0.14.6, < 2.0)
     raindrops (0.11.0)
-    rake (10.0.4)
+    rake (10.1.0)
     rdoc (3.12.2)
       json (~> 1.4)
     ref (1.0.4)
@@ -272,7 +272,7 @@ GEM
       railties (~> 3.1)
     rest-client (1.6.7)
       mime-types (>= 1.16)
-    sass (3.2.8)
+    sass (3.2.9)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
@@ -288,7 +288,7 @@ GEM
       libv8 (~> 3.11.8.12)
       ref
     thor (0.18.1)
-    tilt (1.4.0)
+    tilt (1.4.1)
     treetop (1.4.12)
       polyglot
       polyglot (>= 0.3.1)
