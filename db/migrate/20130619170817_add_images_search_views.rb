@@ -9,7 +9,7 @@ class AddImagesSearchViews < ActiveRecord::Migration
         create view centers_search as select centers.code || ' - ' || centers.name as text, 'center_' || centers.id as result_id, text 'center' as result_type from centers;
       SQL
       execute <<-SQL
-        create view patients_search as select centers.code || patients.subject_id as text, 'patient_' || patients.id as result_id, txt 'patient' as result_type from patients, centers where centers.id = patients.center_id;
+        create view patients_search as select centers.code || patients.subject_id as text, 'patient_' || patients.id as result_id, text 'patient' as result_type from patients, centers where centers.id = patients.center_id;
       SQL
       execute <<-SQL
         create view visits_search as select centers.code || patients.subject_id || '#' || visits.visit_number as text, 'visit_' || visits.id as result_id, text 'visit' as result_type from visits,patients,centers where visits.patient_id = patients.id and patients.center_id = centers.id;
