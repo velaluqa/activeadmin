@@ -546,6 +546,10 @@ ActiveAdmin.register ImageSeries do
       return
     end
     @assigned_required_series = @image_series.assigned_required_series
+    @otherwise_assigned_required_series = []
+    @image_series.visit.assigned_required_series_id_map.each do |required_series_name, assigned_image_series_id|
+      @otherwise_assigned_required_series << required_series_name unless(assigned_image_series_id.blank? or assigned_image_series_id.to_i == @image_series.id)
+    end
 
     @return_url = params[:return_url]
 
