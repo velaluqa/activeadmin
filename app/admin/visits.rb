@@ -177,7 +177,7 @@ ActiveAdmin.register Visit do
       @required_series_names = @required_series_names.split(',')
     end
     if(@required_series_names.nil?)
-      flash[:error] = 'This visit has no required series\' defined. Either the study config is invalid, the visit doesn\'t have a visit type or its visit type doesn\'t define any required series.'
+      flash[:error] = 'This visit has no required series defined. Either the study config is invalid, the visit doesn\'t have a visit type or its visit type doesn\'t define any required series.'
       redirect_to :back
       return
     end

@@ -38,7 +38,7 @@ ActiveAdmin.register ImageSeries do
           end
 
           unless(already_assigned_required_series_names.empty?)
-            flash[:error] = 'The following required series\' in the new visit will have their assignment and tQC results overwritten by this change: '+already_assigned_required_series_names.join(", ")+'. If you want to continue, press "Update" again.'
+            flash[:error] = 'The following required series in the new visit will have their assignment and tQC results overwritten by this change: '+already_assigned_required_series_names.join(", ")+'. If you want to continue, press "Update" again.'
             redirect_to edit_admin_image_series_path(image_series, :force_update => true, :visit_id => params[:image_series][:visit_id])
             return
           end
@@ -206,7 +206,7 @@ ActiveAdmin.register ImageSeries do
         when :visit_assigned
           status_tag('Visit assigned', :warning)
         when :required_series_assigned
-          status_tag('Required series\' assigned', :ok)
+          status_tag('Required series assigned', :ok)
         when :not_required
           status_tag('Not relevant for read')
         end
@@ -338,7 +338,7 @@ ActiveAdmin.register ImageSeries do
   action_item :only => :show do
     link_to('Mark not relevant', mark_not_relevant_admin_image_series_path(resource)) unless (resource.state != :visit_assigned or resource.visit.nil?)
   end
-  batch_action :mark_not_relevant, :confirm => 'This will mark all selected image series\' as not relevant. Are you sure?' do |selection|
+  batch_action :mark_not_relevant, :confirm => 'This will mark all selected image series as not relevant. Are you sure?' do |selection|
     ImageSeries.find(selection).each do |i_s|
       next if (i_s.state != :visit_assigned or i_s.visit.nil?)
 
@@ -346,7 +346,7 @@ ActiveAdmin.register ImageSeries do
       i_s.save      
     end
 
-    redirect_to(:back, :notice => 'Selected image series\' were marked as not relevant for read.')
+    redirect_to(:back, :notice => 'Selected image series were marked as not relevant for read.')
   end
 
   member_action :dicom_metadata, :method => :get do
@@ -370,7 +370,7 @@ ActiveAdmin.register ImageSeries do
 
   collection_action :batch_assign_to_patient, :method => :post do
     if(params[:patient_id].nil?)
-      flash[:error] = 'You have to select a patient to assign these image series\' to.'
+      flash[:error] = 'You have to select a patient to assign these image series to.'
       redirect_to :back
       return
     elsif(params[:image_series].nil?)
@@ -396,9 +396,9 @@ ActiveAdmin.register ImageSeries do
       i_s.save
     end
 
-    redirect_to params[:return_url], :notice => 'The image series\' were assigned to the patient.'
+    redirect_to params[:return_url], :notice => 'The image series were assigned to the patient.'
   end
-  batch_action :assign_to_patient, :confirm => 'This will modify all selected image series\'. Are you sure?'  do |selection|
+  batch_action :assign_to_patient, :confirm => 'This will modify all selected image series. Are you sure?'  do |selection|
     failure = false
     study_id = nil
     
@@ -406,12 +406,12 @@ ActiveAdmin.register ImageSeries do
       study_id = image_series.study.id if study_id.nil?
 
       if(image_series.study.id != study_id)
-        flash[:error] = 'Not all selected image series\' belong to the same study. Batch assignment can only be used for series\' of the same study.'
+        flash[:error] = 'Not all selected image series belong to the same study. Batch assignment can only be used for series of the same study.'
         redirect_to :back
         failure = true
         break      
       elsif(image_series.visit_id != nil)
-        flash[:error] = 'Not all selected image series\' are currently unassigned. Batch assignment can only be used for series\' which are not currently assigned to a visit.'
+        flash[:error] = 'Not all selected image series are currently unassigned. Batch assignment can only be used for series which are not currently assigned to a visit.'
         redirect_to :back
         failure = true
         break
@@ -428,7 +428,7 @@ ActiveAdmin.register ImageSeries do
 
   collection_action :batch_assign_to_visit, :method => :post do
     if(params[:visit_id].nil?)
-      flash[:error] = 'You have to select a visit to assign these image series\' to.'
+      flash[:error] = 'You have to select a visit to assign these image series to.'
       redirect_to :back
       return
     elsif(params[:image_series].nil?)
@@ -451,9 +451,9 @@ ActiveAdmin.register ImageSeries do
       i_s.save
     end
 
-    redirect_to params[:return_url], :notice => 'The image series\' were assigned to the visit.'
+    redirect_to params[:return_url], :notice => 'The image series were assigned to the visit.'
   end
-  batch_action :assign_to_visit, :confirm => 'This will modify all selected image series\'. Are you sure?'  do |selection|
+  batch_action :assign_to_visit, :confirm => 'This will modify all selected image series. Are you sure?'  do |selection|
     patient_id = nil
     visits = []
     failure = false
@@ -465,12 +465,12 @@ ActiveAdmin.register ImageSeries do
       end
       
       if(image_series.patient_id != patient_id)
-        flash[:error] = 'Not all selected image series\' belong to the same patient. Batch assignment can only be used for series\' from one patient which are not currently assigned to a visit.'
+        flash[:error] = 'Not all selected image series belong to the same patient. Batch assignment can only be used for series from one patient which are not currently assigned to a visit.'
         redirect_to :back
         failure = true
         break
       elsif(image_series.visit_id != nil)
-        flash[:error] = 'Not all selected image series\' are currently unassigned. Batch assignment can only be used for series\' from one patient which are not currently assigned to a visit.'
+        flash[:error] = 'Not all selected image series are currently unassigned. Batch assignment can only be used for series from one patient which are not currently assigned to a visit.'
         redirect_to :back
         failure = true
         break
@@ -501,7 +501,7 @@ ActiveAdmin.register ImageSeries do
     end
 
     if(visit.patient_id != @image_series.patient_id)
-      flash[:error] = 'Visit doesn\'t belong to the image series\' curent patient. To change the patient, please \'Edit\' the image series.'
+      flash[:error] = 'Visit doesn\'t belong to the image series curent patient. To change the patient, please \'Edit\' the image series.'
       redirect_to :back
       return
     end
@@ -533,7 +533,7 @@ ActiveAdmin.register ImageSeries do
 
     @image_series.change_required_series_assignment(params[:image_series][:assigned_required_series].reject {|rs| rs.blank?})
 
-    redirect_to params[:return_url], :notice => 'Image Series successfully assigned to required series\'.'
+    redirect_to params[:return_url], :notice => 'Image Series successfully assigned to required series.'
   end
   member_action :assign_required_series_form, :method => :get do
     @image_series = ImageSeries.find(params[:id])
@@ -541,7 +541,7 @@ ActiveAdmin.register ImageSeries do
 
     @required_series = @image_series.visit.required_series_names
     if(@required_series.blank?)
-      flash[:error] = 'The associated visit has no required series\'. This could be due to an invalid study config, no assigned visit type or an empty visit type.'
+      flash[:error] = 'The associated visit has no required series. This could be due to an invalid study config, no assigned visit type or an empty visit type.'
       redirect_to params[:return_url]
       return
     end
@@ -549,7 +549,7 @@ ActiveAdmin.register ImageSeries do
 
     @return_url = params[:return_url]
 
-    @page_title = 'Assign Required Series\''
+    @page_title = 'Assign Required Series'
   end
 
   viewer_cartable(:image_series)
