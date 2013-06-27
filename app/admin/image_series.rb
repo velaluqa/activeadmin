@@ -139,6 +139,13 @@ ActiveAdmin.register ImageSeries do
 
   index do
     selectable_column
+    benchmark('Study Column') do
+      if(session[:selected_study_id].blank?)
+        column :study do |image_series|
+          link_to(image_series.study.name, admin_study_path(image_series.study)) unless image_series.study.nil?
+        end
+      end
+    end                
     column :patient, :sortable => :patient_id
     column :visit, :sortable => :visit_id
     column :series_number
