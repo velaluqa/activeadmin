@@ -103,3 +103,11 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
 end
+
+# Sidekiq is used for asynchronous job execution, i.e. DICOM searches, exports, ...
+gem 'sidekiq'
+group :development do
+  # for the Sidekiq monitoring interface
+  gem 'slim', '>= 1.1.0'
+  gem 'sinatra', '>= 1.3.0', :require => nil
+end
