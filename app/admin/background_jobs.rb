@@ -1,0 +1,82 @@
+ActiveAdmin.register BackgroundJob do
+  before_filter { @skip_sidebar = true }
+
+  menu priority: 22
+  config.filters = false
+  actions :index, :show, :destroy
+
+  scope :all, :default => true
+  scope :completed
+  scope :running
+
+  controller do
+    load_and_authorize_resource :except => :index
+    def scoped_collection
+      end_of_association_chain.where(user_id: current_user.id)
+    end
+
+    def destroy
+      if(not BackgroundJob.find(params[:id]).finished?)
+        flash[:error] = 'Running jobs cannot be deleted!'
+        redirect_to :back
+        return
+      end
+      
+      destroy!
+    end
+  end
+
+  index do
+    selectable_column
+
+    column :name
+    column :created_at
+    column 'State', :sortable => :completed do |background_job|
+      if(background_job.finished? and not background_job.failed?)
+        status_tag('Completed', :ok)
+      elsif(background_job.failed?)
+        status_tag('Failed', :error)
+      else
+        status_tag('Running', :warning, :label => 'Running: '+ ('%.2f' % (background_job.progress*100))+ '% completed')
+      end
+    end
+    column :completed_at
+
+    default_actions
+  end
+
+  show do |background_job|
+    attributes_table do
+      row :name
+      row :user
+      row 'State' do
+        if(background_job.finished? and not background_job.failed?)
+          status_tag('Completed', :ok)
+        elsif(background_job.failed?)
+          status_tag('Failed', :error)
+        else
+          status_tag('Running', :warning, :label => 'Running: '+ ('%.2f' % (background_job.progress*100))+ '% completed')
+        end
+      end
+      row :error_message if(background_job.failed? and not background_job.error_message.blank?)
+      row :created_at
+      row :updated_at
+      row :completed_at
+    end
+    
+    unless(background_job.results.blank?)
+      panel 'Results' do
+        div(:class => 'attributes_table') do
+          table(:border => 0, :cellspacing => 0, :cellpadding => 0) do
+            background_job.results.each do |label, value|
+              tr do
+                th { label }
+                td { simple_format(value) }
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+end

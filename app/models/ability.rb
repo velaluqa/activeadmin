@@ -6,6 +6,10 @@ class Ability
 
     return if user.roles.empty?
 
+    can [:read, :destroy], BackgroundJob do |job|
+      job.user_id == user.id
+    end
+
     # App Admin
     if user.is_app_admin?
       can :manage, :system
