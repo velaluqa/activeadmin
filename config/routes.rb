@@ -78,6 +78,11 @@ StudyServer::Application.routes.draw do
 
   match 'wado' => 'wado#wado'
 
+  if(Rails.env.development?)
+    require 'sidekiq/web'
+    mount Sidekiq::Web => '/sidekiq'
+  end
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
