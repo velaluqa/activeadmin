@@ -193,7 +193,7 @@ class Visit < ActiveRecord::Base
   end
 
   def rename_required_series(old_name, new_name)
-    visit_data = visit.visit_data
+    visit_data = self.visit_data
     return if visit_data.nil? or visit_data.required_series.nil?
 
     required_series_data = visit_data.required_series.delete(old_name)
