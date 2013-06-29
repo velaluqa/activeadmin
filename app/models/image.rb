@@ -35,6 +35,11 @@ class Image < ActiveRecord::Base
   def dicom_metadata
     dicom_metadata_doc = self.dicom_metadata_xml
 
+    if(dicom_metadata_doc.nil? or dicom_metadata_doc.root.nil?)
+      Rails.logger.warn 'Failed to retrieve metadata for image '+self.id.to_s+' at '+self.image_storage_path
+      return [{},{}]
+    end
+
     dicom_meta_header = {}
     unless(dicom_metadata_doc.root.elements['meta-header'].nil?)
       dicom_metadata_doc.root.elements['meta-header'].each_element('element') do |e|
@@ -83,7 +88,12 @@ class Image < ActiveRecord::Base
   def dicom_metadata_xml
     file_path = self.absolute_image_storage_path
     dicom_xml = `#{Rails.application.config.dcm2xml} --quiet '#{file_path}'`
-    dicom_metadata_doc = REXML::Document.new(dicom_xml)
+    begin
+      dicom_metadata_doc = REXML::Document.new(dicom_xml)
+    rescue => e
+      Rails.logger.warn 'Failed to parse DICOM metadata XML for image '+self.id.to_s+': '+e.message
+      return nil
+    end
 
     return dicom_metadata_doc
   end
