@@ -10,7 +10,7 @@ class Visit < ActiveRecord::Base
   attr_accessible :patient
   
   belongs_to :patient
-  has_many :image_series, after_add: ensure_domino_document_exists, after_remove: ensure_domino_document_exists
+  has_many :image_series, after_add: :ensure_domino_document_exists, after_remove: :ensure_domino_document_exists
   has_one :visit_data
 
   validates_uniqueness_of :visit_number, :scope => :patient_id
