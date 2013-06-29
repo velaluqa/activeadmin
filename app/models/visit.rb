@@ -161,34 +161,34 @@ class Visit < ActiveRecord::Base
   end
 
   def domino_document_form
-    'ImagingVisit'
+    'ImagingVisit_mqc'
   end
   def domino_document_query
     {
-      'docCode' => 10032,
-      'CenterNo' => patient.center.code,
-      'PatNo' => patient.domino_patient_no,
-      'ericaID' => id,
+      'docCode' => 10045,
+      'ericaID' => self.id,
     }
-  end
-  def domino_document_fields
-    ['id', 'visit_number']
   end
   def domino_document_properties(action = :update)
     properties = {
       'ericaID' => id,
-      'Center' => patient.center.name,
+      'ProjectNo' => study.name,
       'CenterNo' => patient.center.code,
-      'UIDCenter' => patient.center.domino_unid,
       'PatNo' => patient.domino_patient_no,
-      'visitNo' => visit_number,
+      'VisitNo' => self.visit_number,
+      'visitDescription' => self.description,
     }
 
     visit_date = self.visit_date
     unless(visit_date.nil?)
       properties.merge!({
-                          'VisitDate' => {'data' => visit_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}
+                          'DateImaging' => {'data' => visit_date.strftime('%d-%m-%Y'), 'type' => 'datetime'},
                         })
+    end
+  end
+  def domino_sync_required_series
+    self.required_series_objects.each do |required_series|
+      required_series.ensure_domino_document_exists
     end
   end
 
@@ -215,6 +215,7 @@ class Visit < ActiveRecord::Base
     FileUtils.mv(image_storage_root + self.required_series_image_storage_path(old_name), image_storage_root + self.required_series_image_storage_path(new_name)) if File.exists?(image_storage_root + self.required_series_image_storage_path(old_name))
 
     visit_data.save
+    RequiredSeries.new(self, new_name).ensure_domino_document_exists
   end
 
   def change_required_series_assignment(changed_assignments)
@@ -276,8 +277,10 @@ class Visit < ActiveRecord::Base
       end
     end
 
-    visit_data.assigned_image_series_index = assignment_index
+    visit_data.reconstruct_assignment_index
     visit_data.save
+
+    domino_sync_required_series
   end
 
   def reset_tqc_result(required_series_name)
@@ -293,6 +296,8 @@ class Visit < ActiveRecord::Base
 
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
+
+    RequiredSeries.new(self, required_series_name).ensure_domino_document_exists
   end
   def set_tqc_result(required_series_name, result, tqc_user, tqc_date = nil, tqc_version = nil)
     required_series_specs = self.required_series_specs
@@ -321,6 +326,7 @@ class Visit < ActiveRecord::Base
 
     # TODO: send results to Domino?
     
+    RequiredSeries.new(self, required_series_name).ensure_domino_document_exists
     return true
   end
 

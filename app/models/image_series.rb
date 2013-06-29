@@ -105,30 +105,24 @@ class ImageSeries < ActiveRecord::Base
   end
 
   def domino_document_form
-    'SOFDinventory'
+    'SeriesInventory'
   end
   def domino_document_query
     {
-      'docCode' => 10030,
-      'CenterNo' => patient.center.code,
-      'imaPatNo' => patient.subject_id,
-      'imaSeriesNo' => series_number,
+      'docCode' => 10043,
+      'ericaID' => self.id,
     }
-  end
-  def domino_document_fields
-    ['id', 'imaging_date']
   end
   def domino_document_properties(action = :update)
     properties = {
       'ericaID' => id,
-      'Center' => patient.center.name,
+      'ProjectNo' => study.name,
       'CenterNo' => patient.center.code,
-      'UIDCenter' => patient.center.domino_unid,
       'PatNo' => patient.domino_patient_no,
-      'imaPatNo' => patient.subject_id,
-      'imaSeriesNo' => series_number,
-      'imaDateMan' => imaging_date.strftime('%Y%m%d'),
-      'imaDateManual' => {'data' => imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}, # this is utterly ridiculous: sending the date in the corrent format (%Y-%m-%d) leads switched month/day for days where this can work (1-12). sending a completely broken format leads to correct parses... *doublefacepalm*
+      'VisitNo' => (self.visit.nil? ? nil : self.visit.visit_number),
+      'DateImaging' => {'data' => imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}, # this is utterly ridiculous: sending the date in the corrent format (%Y-%m-%d) leads switched month/day for days where this can work (1-12). sending a completely broken format leads to correct parses... *doublefacepalm*
+      'SeriesDescription' => self.name,
+      'AssignedTo' => self.assigned_required_series.join("\n"),      
     }
 
     properties.merge!(self.dicom_metadata_to_domino)
@@ -175,14 +169,9 @@ class ImageSeries < ActiveRecord::Base
     self.visit.change_required_series_assignment(changes)
   end
 
-  protected
-
   def dicom_metadata_to_domino
     study_config = (self.study.nil? ? nil : self.study.current_configuration)
     result = {}
-
-    result['DICOMTagNames'] = "Series Name\n"
-    result['DICOMValues'] = self.name + "\n"
 
     unless(images.empty?)
       image = self.sample_image
@@ -190,17 +179,6 @@ class ImageSeries < ActiveRecord::Base
       unless image.nil?
         dicom_meta_header, dicom_metadata = image.dicom_metadata
         
-
-        result['ImageModality'] = (dicom_metadata['0008,0060'].nil? ? '' : dicom_metadata['0008,0060'][:value])
-
-        dicom_imaging_date = dicom_metadata['0008,0023']
-        dicom_imaging_date = dicom_metadata['0008,0022'] if dicom_imaging_date.nil?
-        dicom_imaging_date = DateTime.strptime(dicom_imaging_date[:value], '%Y%m%d') unless dicom_imaging_date.nil?
-        unless(dicom_imaging_date.nil?)
-          result['imaDate'] = dicom_imaging_date.strftime('%Y%m%d')
-          result['imaDate2'] = dicom_imaging_date.strftime('%d-%m-%Y')
-        end
-
         if(study_config and study.semantically_valid?)
           dicom_tag_names = []
           dicom_values = []
@@ -209,14 +187,17 @@ class ImageSeries < ActiveRecord::Base
             dicom_tag_names << tag['label'].to_s
           end          
 
-          result['DICOMTagNames'] += dicom_tag_names.join("\n")
-          result['DICOMValues'] += dicom_values.join("\n")
+          result['DICOMTagNames'] = dicom_tag_names.join("\n")
+          result['DICOMValues'] = dicom_values.join("\n")
         end
       end
     end
     
     return result
   end
+
+  protected
+
   def properties_to_domino
     image_series_data = self.image_series_data
     study_config = (self.study.nil? ? nil : self.study.current_configuration)

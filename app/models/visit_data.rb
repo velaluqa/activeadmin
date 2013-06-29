@@ -18,4 +18,17 @@ class VisitData
   def visit=(visit)
     write_attribute(:visit_id, visit.id)
   end
+
+  def reconstruct_assignment_index
+    new_index = {}
+    
+    self.required_series.each do |rs_name, data|
+      next if data['image_series_id'].blank?
+
+      new_index[data['image_series_id']] ||= []
+      new_index[data['image_series_id']] << rs_name
+    end
+
+    self.assigned_image_series_index = new_index
+  end
 end

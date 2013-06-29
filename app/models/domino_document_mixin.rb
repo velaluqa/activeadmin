@@ -14,10 +14,6 @@ module DominoDocument
     self.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.study.notes_links_base_uri.nil?)
   end
 
-  def domino_document_needs_update?
-    not (self.previous_changes.keys & domino_document_fields).empty?
-  end
-
   def domino_document
     return nil unless domino_integration_enabled?
     return nil if self.domino_unid.nil?
@@ -37,8 +33,6 @@ module DominoDocument
     return true if self.previous_changes.include?('domino_unid')
 
     return true unless domino_integration_enabled?
-
-    return true unless(domino_document_needs_update? or self.domino_unid.nil?)
 
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
