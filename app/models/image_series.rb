@@ -116,7 +116,6 @@ class ImageSeries < ActiveRecord::Base
   def domino_document_properties(action = :update)
     properties = {
       'ericaID' => id,
-      'ProjectNo' => study.name,
       'CenterNo' => patient.center.code,
       'PatNo' => patient.domino_patient_no,
       'VisitNo' => (self.visit.nil? ? nil : self.visit.visit_number),

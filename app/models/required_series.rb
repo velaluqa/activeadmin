@@ -90,7 +90,6 @@ class RequiredSeries
   def domino_document_properties(action = :update)
     properties = {
       'ericaID' => @visit.id,
-      'ProjectNo' => @visit.study.name,
       'CenterNo' => @visit.patient.center.code,
       'PatNo' => @visit.patient.domino_patient_no,
       'VisitNo' => @visit.visit_number,
