@@ -192,6 +192,31 @@ class Visit < ActiveRecord::Base
     end
   end
 
+  def rename_required_series(old_name, new_name)
+    visit_data = visit.visit_data
+    return if visit_data.nil? or visit_data.required_series.nil?
+
+    required_series_data = visit_data.required_series.delete(old_name)
+    unless(required_series_data.nil?)
+      visit_data.required_series[new_name] = required_series_data
+    end
+
+    unless(visit_data.assigned_image_series_index.nil?)
+      visit_data.assigned_image_series_index.each do |series_id, assignment|
+        if(assignment.include?(old_name))
+          assignment.delete(old_name)
+          assignment << new_name
+        end
+      end
+    end
+    
+    image_storage_root = Rails.application.config.image_storage_root
+    image_storage_root += '/' unless(image_storage_root.end_with?('/'))
+    FileUtils.mv(image_storage_root + self.required_series_image_storage_path(old_name), image_storage_root + self.required_series_image_storage_path(new_name)) if File.exists?(image_storage_root + self.required_series_image_storage_path(old_name))
+
+    visit_data.save
+  end
+
   def change_required_series_assignment(changed_assignments)
     self.ensure_visit_data_exists
     visit_data = self.visit_data
