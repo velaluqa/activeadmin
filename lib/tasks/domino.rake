@@ -8,7 +8,7 @@ namespace :erica do
     study_id = args[:study_id]
     study = Study.find(study_id)
 
-    print 'Deactiving after_commit Domino sync callback...'
+    print 'Deactivating after_commit Domino sync callback...'
     ImageSeries.skip_callback :commit, :after, :ensure_domino_document_exists
     Visit.skip_callback :commit, :after, :ensure_domino_document_exists
     puts 'done'
