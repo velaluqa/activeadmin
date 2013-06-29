@@ -26,6 +26,8 @@ class ImageSeries < ActiveRecord::Base
 
   after_create :ensure_image_series_data_exists
 
+  after_commit :domino_sync_visit
+
   before_destroy do
     ImageSeriesData.destroy_all(:image_series_id => self.id)
   end  
@@ -245,6 +247,10 @@ class ImageSeries < ActiveRecord::Base
     end
 
     return result
+  end
+
+  def domino_sync_visit
+    self.visit.ensure_domino_document_exists unless self.visit.nil?
   end
 
   def ensure_study_is_unchanged
