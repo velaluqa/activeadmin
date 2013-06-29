@@ -37,4 +37,33 @@ namespace :erica do
       print "#{index}.." if(index % 100 == 0)
     end
   end
+
+  desc "Fix assignment indices in visit data"
+  task :fix_assignment_indices => [:environment] do
+    study = Study.find(2)
+    next if study.nil?
+   
+    visits_count = study.visits.count
+
+    puts "Attempting to fix assignment indices for #{visits_count} visits"
+ 
+    study.visits.each_with_index do |visit, index|
+      visit_data = visit.visit_data
+      next if visit_data.nil?
+
+      new_index = {}
+      
+      visit.required_series.each do |rs_name, data|
+        next if data['image_series_id'].blank?
+
+        new_index[data['image_series_id']] ||= []
+        new_index[data['image_series_id']] << rs_name
+      end
+
+      visit_data.assigned_image_series_index = new_index
+      visit_data.save
+
+      print "#{index}.." if(index % 100 == 0)
+    end
+  end
 end
