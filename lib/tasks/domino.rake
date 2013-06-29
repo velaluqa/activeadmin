@@ -8,6 +8,11 @@ namespace :erica do
     study_id = args[:study_id]
     study = Study.find(study_id)
 
+    print 'Deactiving after_commit Domino sync callback...'
+    ImageSeries.skip_callback :commit, :after, :ensure_domino_document_exists
+    Visit.skip_callback :commit, :after, :ensure_domino_document_exists
+    puts 'done'
+
     print "Resetting #{study.image_series.count} image series..."
     study.image_series.each do |image_series|
       image_series.domino_unid = nil
@@ -19,7 +24,7 @@ namespace :erica do
     study.visits.each do |visit|
       visit.domino_unid = nil
       visit.save
-    end    
+    end
     puts 'done'
   end
 
