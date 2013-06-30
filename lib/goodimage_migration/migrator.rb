@@ -17,6 +17,8 @@ module GoodImageMigration
     end
 
     def copy_missing_images
+      fail_file = File.open('/tmp/missing_images', 'a')
+
       images_count = Image.count
       Rails.logger.info "Checking #{images_count} ERICA Images for missing files"
 
@@ -40,9 +42,11 @@ module GoodImageMigration
         success = copy_image_file(goodimage_image, erica_image)
         if(success == false)
           failed_copy += 1
+          fail_file.puts erica_image.id.to_s
         end
       end
       puts
+      fail_file.close
       Rails.logger.info "Finished, #{missing_count} images were missing, #{not_found} were not found in GoodImage, #{failed_copy} failed to copy."
     end
     
