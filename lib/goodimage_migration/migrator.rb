@@ -338,6 +338,7 @@ module GoodImageMigration
     end
     def copy_image_file(goodimage_image, erica_image)
       begin
+        FileUtils.mkpath(erica_image.image_series.absolute_image_storage_path)
         FileUtils.cp(@goodimage_image_storage_root + goodimage_image.file_path, erica_image.absolute_image_storage_path, :preserve => true)
       rescue SystemCallError => e
         Rails.logger.error "Failed to copy image file for #{goodimage_image.inspect} from #{@goodimage_image_storage_root + goodimage_image.file_path} to #{erica_image.absolute_image_storage_path}:"
