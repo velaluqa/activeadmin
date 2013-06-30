@@ -22,6 +22,8 @@ module GoodImageMigration
 
       count = 0
       missing_count = 0
+      not_found = 0
+      failed_copy = 0
       Image.find_each do |erica_image|
         count += 1
         print count.to_s+'/'+missing_count.to_s+'..' if(count % 1000 == 0)
@@ -30,12 +32,18 @@ module GoodImageMigration
         missing_count += 1
 
         goodimage_image = goodimage_resource_from_mapping('image', erica_image.id)
-        next if goodimage_image.nil?
+        if goodimage_image.nil?
+          not_found += 1
+          next
+        end
 
-        copy_image_file(goodimage_image, erica_image)
+        success = copy_image_file(goodimage_image, erica_image)
+        if(success == false)
+          failed_copy += 1
+        end
       end
       puts
-      Rails.logger.info "Finished, #{missing_count} images were missing"
+      Rails.logger.info "Finished, #{missing_count} images were missing, #{not_found} were not found in GoodImage, #{failed_copy} failed to copy."
     end
     
     def migrate(goodimage_resource, erica_parent_resource)
