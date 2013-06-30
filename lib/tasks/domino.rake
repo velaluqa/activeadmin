@@ -13,18 +13,29 @@ namespace :erica do
     Visit.skip_callback :commit, :after, :ensure_domino_document_exists
     puts 'done'
 
-    print "Resetting #{study.image_series.count} image series..."
+    count = 0
+
+    puts "Resetting #{study.image_series.count} image series..."
     study.image_series.each do |image_series|
       image_series.domino_unid = nil
       image_series.save
+
+      count += 1
+      print count.to_s+'..' if(count %100 == 0)
     end
+    puts
     puts 'done'
 
-    print "Resetting #{study.visits.count} visits..."
+    count = 0
+    puts "Resetting #{study.visits.count} visits..."
     study.visits.each do |visit|
       visit.domino_unid = nil
       visit.save
+
+      count += 1
+      print count.to_s+'..' if(count %100 == 0)
     end
+    puts
     puts 'done'
   end
 
@@ -37,29 +48,49 @@ namespace :erica do
     study_id = args[:study_id]
     study = Study.find(study_id)
     
-    print "Syncing #{study.centers.count} centers..."
+    count = 0
+    puts "Syncing #{study.centers.count} centers..."
     study.centers.each do |center|
       center.ensure_domino_document_exists
+
+      count += 1
+      print count.to_s+'..' if(count %100 == 0)
     end
+    puts
     puts 'done'
 
-    print "Syncing #{study.patients.count} patients..."
+    count = 0
+    puts "Syncing #{study.patients.count} patients..."
     study.patients.each do |patient|
       patient.ensure_domino_document_exists
+
+      count += 1
+      print count.to_s+'..' if(count %100 == 0)
     end
+    puts
     puts 'done'
 
-    print "Syncing #{study.image_series.count} image series..."
+    count = 0
+    puts "Syncing #{study.image_series.count} image series..."
     study.image_series.each do |image_series|
       image_series.ensure_domino_document_exists
+
+      count += 1
+      print count.to_s+'..' if(count %100 == 0)
     end
+    puts
     puts 'done'
 
-    print "Syncing #{study.visits.count} visits..."
+    count = 0
+    puts "Syncing #{study.visits.count} visits..."
     study.visits.each do |visit|
       visit.ensure_domino_document_exists
       visit.domino_sync_required_series
+
+      count += 1
+      print count.to_s+'..' if(count %100 == 0)
     end
+    puts
     puts 'done'
   end
 end
