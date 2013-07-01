@@ -13,8 +13,6 @@
           - @dicom_tqc_spec.each do |spec|
             %tr
               - field_name = 'tqc_result['+spec['id']+']'
-              - unless spec['result'].nil?
-                = hidden_field_tag(field_name, (spec['result'] == true ? '1' : '0'))
               %td
                 = spec['label']
                 %span.dicom_tag_key= "(#{spec['dicom_tag']})"
@@ -25,13 +23,9 @@
                 - else
                   = spec['actual_value']
               %td
-                - case spec['result']
-                - when nil
-                  = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], '0'), :include_blank => false)
-                - when true
-                  %span.status_tag.Pass.ok Pass
-                - else
-                  %span.status_tag.Fail.error Fail
+                - current_value = (@required_series.tqc_results.nil? ? nil : @required_series.tqc_results[spec['id']])
+                - current_value = (spec['result'] == true) if current_value.nil?
+                = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false)
 
   = field_set_tag('<span>tQC Questions</span>'.html_safe, :class => 'inputs') do
     %ol
