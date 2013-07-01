@@ -503,11 +503,13 @@ ActiveAdmin.register ImageSeries do
       end
 
       visit = Visit.create(:patient => @image_series.patient, :visit_number => params[:image_series][:visit][:visit_number], :visit_type => params[:image_series][:visit][:visit_type], :description => params[:image_series][:visit][:description])
+    elsif(params[:image_series][:visit_id].blank?)
+      visit = nil
     else
       visit = Visit.find(params[:image_series][:visit_id])
     end
 
-    if(visit.patient_id != @image_series.patient_id)
+    if(visit and visit.patient_id != @image_series.patient_id)
       flash[:error] = 'Visit doesn\'t belong to the image series curent patient. To change the patient, please \'Edit\' the image series.'
       redirect_to :back
       return
