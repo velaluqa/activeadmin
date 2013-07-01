@@ -38,7 +38,7 @@ module DominoDocument
 
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
-      errors.add :name, 'Failed to communicate with the Domino server.'
+      errors.add :name, 'Failed to communicate with the Domino server.' if self.is_a?(ActiveRecord::Base)
       return false
     end
 
@@ -48,7 +48,7 @@ module DominoDocument
     else
       result = client.update_document(self.domino_unid, domino_document_form, domino_document_properties(:update))
     end
-    errors.add :name, 'Failed to communicate with the Domino server.' if (result == false)
+    errors.add :name, 'Failed to communicate with the Domino server.' if (result == false and self.is_a?(ActiveRecord::Base))
 
     if(self.is_a?(ActiveRecord::Base) and not self.changes.empty?)
       result &&= self.save
@@ -64,12 +64,12 @@ module DominoDocument
     
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
-      errors.add :name, 'Failed to communicate with the Domino server.'
+      errors.add :name, 'Failed to communicate with the Domino server.' if self.is_a?(ActiveRecord::Base)
       return false
     end
 
     result = client.update_document(self.domino_unid, domino_document_form, changed_properties)
-    errors.add :name, 'Failed to communicate with the Domino server.' if (result == false)
+    errors.add :name, 'Failed to communicate with the Domino server.' if (result == false and self.is_a?(ActiveRecord::Base))
 
     return result
   end
@@ -81,7 +81,7 @@ module DominoDocument
 
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
-      errors.add :name, 'Failed to communicate with the Domino server.'
+      errors.add :name, 'Failed to communicate with the Domino server.' if self.is_a?(ActiveRecord::Base)
       return false
     end
 
