@@ -7,6 +7,8 @@ mapping:
   "annotated_images_root":
     type: str
     required: yes
+  "annotated_images_root_validation":
+    type: str
   "paper_trail":
     type: bool
   "preview_paper_trail":
