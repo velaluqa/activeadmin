@@ -126,8 +126,10 @@ class Visit < ActiveRecord::Base
       changed_assignments = {}
 
       orphaned_required_series_names.each do |orphaned_required_series_name|
+        RequiredSeries.new(self, orphaned_required_series_name).trash_document
+
         deleted_series = required_series.delete(orphaned_required_series_name)
-        changed_assignments[orphaned_required_series_name] = nil unless (deleted_series.nil? or deleted_series['image_series_id'].nil?)
+        changed_assignments[orphaned_required_series_name] = nil unless (deleted_series.nil? or deleted_series['image_series_id'].nil?)        
       end
 
       self.change_required_series_assignment(changed_assignments)
@@ -187,7 +189,7 @@ class Visit < ActiveRecord::Base
   end
   def domino_sync_required_series
     self.required_series_objects.each do |required_series|
-      required_series.ensure_domino_document_exists
+      required_series.domino_sync
     end
   end
 
@@ -214,7 +216,7 @@ class Visit < ActiveRecord::Base
     FileUtils.mv(image_storage_root + self.required_series_image_storage_path(old_name), image_storage_root + self.required_series_image_storage_path(new_name)) if File.exists?(image_storage_root + self.required_series_image_storage_path(old_name))
 
     visit_data.save
-    RequiredSeries.new(self, new_name).ensure_domino_document_exists
+    RequiredSeries.new(self, new_name).domino_sync
   end
 
   def change_required_series_assignment(changed_assignments)
@@ -296,7 +298,7 @@ class Visit < ActiveRecord::Base
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
 
-    RequiredSeries.new(self, required_series_name).ensure_domino_document_exists
+    RequiredSeries.new(self, required_series_name).domino_sync
   end
   def set_tqc_result(required_series_name, result, tqc_user, tqc_date = nil, tqc_version = nil)
     required_series_specs = self.required_series_specs
@@ -323,9 +325,7 @@ class Visit < ActiveRecord::Base
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
 
-    # TODO: send results to Domino?
-    
-    RequiredSeries.new(self, required_series_name).ensure_domino_document_exists
+    RequiredSeries.new(self, required_series_name).domino_sync
     return true
   end
 

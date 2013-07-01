@@ -2,8 +2,10 @@ require 'domino_integration_client'
 
 module DominoDocument
   def self.included(base)
-    base.after_commit :ensure_domino_document_exists
-    base.after_destroy :trash_document
+    if(self.is_a?(ActiveRecord::Base))
+      base.after_commit :ensure_domino_document_exists
+      base.after_destroy :trash_document
+    end
   end
 
   def domino_integration_enabled?
@@ -30,7 +32,7 @@ module DominoDocument
   def ensure_domino_document_exists
     # this is the case if this after_save callback was called for the very save action done is this callback
     # if we wouldn't catch this, we could end up in an infinite loop
-    return true if self.previous_changes.include?('domino_unid')
+    return true if(self.is_a?(ActiveRecord::Base) and self.previous_changes.include?('domino_unid'))
 
     return true unless domino_integration_enabled?
 
@@ -48,7 +50,7 @@ module DominoDocument
     end
     errors.add :name, 'Failed to communicate with the Domino server.' if (result == false)
 
-    unless self.changes.empty?
+    if(self.is_a?(ActiveRecord::Base) and not self.changes.empty?)
       result &&= self.save
     end
 
@@ -87,6 +89,7 @@ module DominoDocument
   end
 
   def set_domino_unid(domino_unid)
+    return unless self.is_a?(ActiveRecord::Base)
     self.domino_unid = domino_unid
     self.save
 

@@ -1,8 +1,11 @@
+require 'domino_document_mixin'
+
 # note: this is not a proper activerecord model
 # it is a simple container class implementing the bare bones needed by the view components of activeadmin
 
 class RequiredSeries
   extend ActiveModel::Naming
+  include DominoDocument
 
   attr_reader :visit, :name
   attr_reader :image_series_id, :assigned_image_series
@@ -31,7 +34,14 @@ class RequiredSeries
   def to_key
     nil
   end
+  
+  def study
+    @visit.study
+  end
 
+  def assigned?
+    return (not @image_series_id.blank?)
+  end
   def assigned_image_series
     @assigned_image_series ||= ImageSeries.where(:id => @image_series_id, :visit_id => @visit.id).first unless @image_series_id.nil?
 
@@ -110,35 +120,24 @@ class RequiredSeries
     return properties
   end
 
-  def ensure_domino_document_exists
-    return true unless @visit.domino_integration_enabled?
+  def domino_unid=(new_unid)
+    visit_data = visit.visit_data
+    unless(visit_data.nil? or visit_data.required_series.nil?)
+      visit_data.required_series[self.name] ||= {}
+      visit_data.required_series[self.name]['domino_unid'] = new_unid
 
-    client = DominoIntegrationClient.new(@visit.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
-    if client.nil?
-      @visit.errors.add :name, 'Failed to communicate with the Domino server.'
-      return false
+      visit_data.save
     end
-
-    new_domino_unid = nil
-    if self.domino_unid.nil?
-      new_domino_unid = client.ensure_document_exists(domino_document_query, domino_document_form, domino_document_properties(:create), domino_document_properties(:update))
-      result = (not new_domino_unid.nil?)      
+  end
+  def domino_sync
+    if(self.assigned?)
+      self.ensure_domino_document_exists
+    elsif(not self.domino_unid.blank?)
+      self.trash_document
+      self.domino_unid = nil
     else
-      result = client.update_document(self.domino_unid, domino_document_form, domino_document_properties(:update))
+      return true
     end
-    @visit.errors.add :name, 'Failed to communicate with the Domino server.' if (result == false)
-
-    unless new_domino_unid.nil?
-      visit_data = visit.visit_data
-      unless(visit_data.nil? or visit_data.required_series.nil?)
-        visit_data.required_series[self.name] ||= {}
-        visit_data.required_series[self.name]['domino_unid'] = new_domino_unid
-
-        result &&= visit_data.save
-      end
-    end
-
-    return result
   end
 
   protected
