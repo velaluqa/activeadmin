@@ -54,7 +54,7 @@ class SessionsController < ApplicationController
       session[:min_reserved_case_position] ||= 0
 
       count.times do |i|
-        c = @session.reserve_next_case(session[:min_reserved_case_position]+i)
+        c = @session.reserve_next_case_for_reader(session[:min_reserved_case_position]+i, current_user)
         break if c.nil?
         cases << c
       end

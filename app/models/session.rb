@@ -142,10 +142,10 @@ class Session < ActiveRecord::Base
     end
   end
 
-  def reserve_next_case(min_position = 0)
+  def reserve_next_case_for_reader(min_position = 0, reader)
     flag = (self.state == :testing ? :validation : :regular)
 
-    c = self.cases.where(:state => Case::state_sym_to_int(:unread), :flag => Case::flag_sym_to_int(flag)).where('position >= ?', min_position).reject {|c| not c.form_answer.nil? }.first
+    c = self.cases.where(:state => Case::state_sym_to_int(:unread), :flag => Case::flag_sym_to_int(flag)).where('position >= ?', min_position).reject {|c| not c.form_answer.nil? }.reject {|c| not c.assigned_reader.nil? and c.assigned_reader != reader }.first
     return nil if c.nil?
     c.state = :in_progress
     c.save
