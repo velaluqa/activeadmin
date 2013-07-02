@@ -16,7 +16,7 @@ namespace :erica do
     count = 0
 
     puts "Resetting #{study.image_series.count} image series..."
-    study.image_series.each do |image_series|
+    study.image_series.find_each do |image_series|
       image_series.domino_unid = nil
       image_series.save
 
@@ -28,7 +28,7 @@ namespace :erica do
 
     count = 0
     puts "Resetting #{study.visits.count} visits..."
-    study.visits.each do |visit|
+    study.visits.find_each do |visit|
       visit.domino_unid = nil
       visit.save
 
@@ -50,7 +50,7 @@ namespace :erica do
     
     count = 0
     puts "Syncing #{study.centers.count} centers..."
-    study.centers.each do |center|
+    study.centers.find_each do |center|
       center.ensure_domino_document_exists
 
       count += 1
@@ -61,7 +61,7 @@ namespace :erica do
 
     count = 0
     puts "Syncing #{study.patients.count} patients..."
-    study.patients.each do |patient|
+    study.patients.find_each do |patient|
       patient.ensure_domino_document_exists
 
       count += 1
@@ -72,7 +72,7 @@ namespace :erica do
 
     count = 0
     puts "Syncing #{study.image_series.count} image series..."
-    study.image_series.each do |image_series|
+    study.image_series.find_each do |image_series|
       image_series.ensure_domino_document_exists
 
       count += 1
@@ -83,7 +83,7 @@ namespace :erica do
 
     count = 0
     puts "Syncing #{study.visits.count} visits..."
-    study.visits.each do |visit|
+    study.visits.find_each do |visit|
       visit.ensure_domino_document_exists
       visit.domino_sync_required_series
 
