@@ -150,7 +150,13 @@ ActiveAdmin.register Case do
     column 'Submission Date' do |c|
       pretty_format(c.form_answer.submitted_at) unless c.form_answer.nil?
     end
-    column 'Last Export', :exported_at
+    column 'Last Export', :exported_at, :sortable => :exported_at do |c|
+      if c.no_export
+        status_tag('No Export')
+      else
+        pretty_format(c.exported_at) unless c.exported_at.nil?
+      end
+    end
    
     customizable_default_actions do |resource|
       (resource.state == :unread and resource.form_answer.nil?) ? [] : [:edit, :destroy]
@@ -189,7 +195,13 @@ ActiveAdmin.register Case do
           status_tag('Reopened In Progress', :warning, :label => link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
         end
       end
-      row :exported_at
+      row :exported_at do
+        if c.no_export
+          status_tag('No Export')
+        else
+          pretty_format(c.exported_at) unless c.exported_at.nil?
+        end
+      end
       row :case_data_raw do
         CodeRay.scan(JSON::pretty_generate(c.case_data.data), :json).div(:css => :class).html_safe unless c.case_data.nil?
       end
@@ -231,6 +243,7 @@ ActiveAdmin.register Case do
   filter :flag, :as => :check_boxes, :collection => Case::FLAG_SYMS.each_with_index.map {|flag, i| [flag, i]}
   filter :state, :as => :check_boxes, :collection => Case::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
   filter :exported_at, :label => 'Last Export'
+  filter :no_export, :as => :select
 
   member_action :reopen, :only => :show do
     @case = Case.find(params[:id])
@@ -288,6 +301,27 @@ ActiveAdmin.register Case do
     redirect_to :action => :index
   end
 
+  batch_action :mark_as_no_export do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+
+      c.no_export = true
+      c.save
+    end
+
+    redirect_to :back, :notice => 'Cases were marked as not exportable.'
+  end
+  batch_action :reset_no_export do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+
+      c.no_export = false
+      c.save
+    end
+
+    redirect_to :back, :notice => 'Cases were marked as exportable.'
+  end
+
   collection_action :batch_export, :method => :post do
     if(params[:export_specification].nil? or params[:export_specification].tempfile.nil?)
       flash[:error] = 'You need to supply an export specification.'
@@ -320,6 +354,11 @@ ActiveAdmin.register Case do
     cases.each do |c|
       unless(can? :manage, c)
         @results[c.id] = :unauthorized
+        next
+      end
+
+      if(c.no_export == true)
+        @results[c.id] = :no_export
         next
       end
 
