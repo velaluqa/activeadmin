@@ -503,7 +503,7 @@ ActiveAdmin.register Session do
     @session_config_version_dates = {}
     @form_config_version_dates = {}
     @forms = {}
-    @session.cases.find_each do |c|
+    @session.cases.where(:flag => Case::flag_sym_to_int(:regular)).find_each do |c|
       form_answer = c.form_answer
       next if form_answer.nil?
 
