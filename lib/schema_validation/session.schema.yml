@@ -19,6 +19,8 @@ mapping:
     type: int
     range:
       min: 1
+  "auto_assign_patients_to_readers":
+    type: bool
   "reader_testing":
     type: map
     mapping:
