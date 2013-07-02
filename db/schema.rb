@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130702120654) do
+ActiveRecord::Schema.define(:version => 20130702122512) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(:version => 20130702120654) do
     t.integer  "flag",        :default => 0
     t.datetime "exported_at"
     t.boolean  "no_export",   :default => false
+    t.string   "comment"
   end
 
   add_index "cases", ["patient_id"], :name => "index_views_on_patient_id"

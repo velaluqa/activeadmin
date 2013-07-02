@@ -11,6 +11,7 @@ class Case < ActiveRecord::Base
   attr_accessible :session_id, :patient_id
   attr_accessible :session, :patient
   attr_accessible :exported_at, :no_export
+  attr_accessible :comment
 
   validates_uniqueness_of :position, :scope => :session_id  
 
