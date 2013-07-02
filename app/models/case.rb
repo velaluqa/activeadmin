@@ -7,10 +7,15 @@ class Case < ActiveRecord::Base
   belongs_to :patient
   has_one :form_answer
   has_one :case_data
+  belongs_to :assigned_reader, :class_name => 'User', :inverse_of => :assigned_cases
+  belongs_to :current_reader, :class_name => 'User', :inverse_of => :current_cases
+
   attr_accessible :images, :position, :case_type, :state, :flag
   attr_accessible :session_id, :patient_id
   attr_accessible :session, :patient
-  attr_accessible :exported_at
+  attr_accessible :exported_at, :no_export
+  attr_accessible :comment
+  attr_accessible :assigned_reader_id
 
   validates_uniqueness_of :position, :scope => :session_id  
 

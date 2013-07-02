@@ -14,7 +14,7 @@ ActiveAdmin.register Session do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :switch_state, :deep_clone_form, :deep_clone]
+    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :download_configuration_at_version, :switch_state, :deep_clone_form, :deep_clone]
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
@@ -46,9 +46,12 @@ ActiveAdmin.register Session do
     column :state, :sortable => :state do |session|
       session.state.to_s.camelize
     end
+    benchmark('Progress Column') do 
     column 'Progress' do |session|
       "#{session.case_list(:read).size} / #{session.case_list(:all).size}"
     end
+    end
+    benchmark('Config Column') do
     column :configuration do |session|
       if(session.has_configuration?)
         status_tag('Available', :ok)
@@ -56,13 +59,16 @@ ActiveAdmin.register Session do
         status_tag('Missing', :error)
       end
     end
+    end
 
+    benchmark('Actions Column') do
     customizable_default_actions do |session|
       except = []
       except << :destroy unless can? :destroy, session
       except << :edit unless can? :edit, session
       
       except
+    end
     end
   end
 
@@ -285,6 +291,13 @@ ActiveAdmin.register Session do
     data = GitConfigRepository.new.data_at_version(@session.relative_config_file_path, @session.locked_version)
     send_data data, :filename => "session_#{@session.id}_#{@session.locked_version}.yml" unless data.nil?
   end
+  member_action :download_configuration_at_version do
+    @session = Session.find(params[:id])
+    authorize! :read, @session
+
+    data = GitConfigRepository.new.data_at_version(@session.relative_config_file_path, params[:version])
+    send_data data, :filename => "session_#{@session.id}_#{params[:version]}.yml" unless data.nil?
+  end
   member_action :upload_config, :method => :post do
     @session = Session.find(params[:id])
 
@@ -488,6 +501,52 @@ ActiveAdmin.register Session do
     end
   end
 
+  member_action :config_summary_report, :method => :get do
+    @session = Session.find(params[:id])
+
+    @session_config_versions = {}
+    @form_config_versions = {}
+    @session_config_version_dates = {}
+    @form_config_version_dates = {}
+    @forms = {}
+    @session.cases.where(:flag => Case::flag_sym_to_int(:regular)).find_each do |c|
+      form_answer = c.form_answer
+      next if form_answer.nil?
+
+      form_versions = form_answer.form_versions
+      next if form_versions.nil?
+
+      @session_config_versions[form_versions['session']] ||= []
+      @session_config_versions[form_versions['session']] << c.id
+
+      @session_config_version_dates[form_versions['session']] ||= {:min => form_answer.submitted_at, :max => form_answer.submitted_at}
+      @session_config_version_dates[form_versions['session']][:min] = form_answer.submitted_at if form_answer.submitted_at < @session_config_version_dates[form_versions['session']][:min]
+      @session_config_version_dates[form_versions['session']][:max] = form_answer.submitted_at if form_answer.submitted_at > @session_config_version_dates[form_versions['session']][:max]
+
+      form_versions.reject {|v| v == 'session'}.each do |form_id, version|
+        form_id = form_id.to_i
+        @forms[form_id] ||= Form.find(form_id)
+
+        @form_config_versions[form_id] ||= {}
+        @form_config_versions[form_id][version] ||= []
+        @form_config_versions[form_id][version] << c.id
+
+        @form_config_version_dates[form_id] ||= {}
+        @form_config_version_dates[form_id][version] ||= {:min => form_answer.submitted_at, :max => form_answer.submitted_at}
+        @form_config_version_dates[form_id][version][:min] = form_answer.submitted_at if form_answer.submitted_at < @form_config_version_dates[form_id][version][:min]
+        @form_config_version_dates[form_id][version][:max] = form_answer.submitted_at if form_answer.submitted_at > @form_config_version_dates[form_id][version][:max]
+      end
+    end
+
+    @session_config_version_dates = @session_config_version_dates.sort_by {|e| e[1][:min]}
+
+    sorted_form_config_version_dates = {}
+    @form_config_version_dates.each do |form_id, versions|
+      sorted_form_config_version_dates[form_id] = versions.sort_by {|e| e[1][:min]}
+    end
+    @form_config_version_dates = sorted_form_config_version_dates
+  end
+
   member_action :session_summary_report, :method => :get do
     @sessions = [Session.find(params[:id])]
     @cases_counts = cases_counts(@sessions)
@@ -505,6 +564,9 @@ ActiveAdmin.register Session do
   end
   action_item :only => :show do
     link_to 'Summary', session_summary_report_admin_session_path(session)
+  end
+  action_item :only => :show do
+    link_to 'Config Summary', config_summary_report_admin_session_path(session)
   end
 
   member_action :deep_clone, :method => :post do

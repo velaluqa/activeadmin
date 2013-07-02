@@ -20,12 +20,12 @@ class SessionsController < ApplicationController
   def list
     blind_readable = current_user.blind_readable_sessions
       .reject {|s| s.state != :production}
-      .reject {|s| s.case_list(:unread).empty? and s.case_list(:reopened).reject {|c| c.form_answer.nil? or c.form_answer.user != current_user }.empty?}
+      .reject {|s| s.case_list(:unread).reject {|c| c.assigned_reader and c.assigned_reader != current_user}.empty? and s.case_list(:reopened).reject {|c| c.form_answer.nil? or c.form_answer.user != current_user }.empty?}
       .map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
 
     validatable = current_user.validatable_sessions
       .reject {|s| s.state != :testing}
-      .reject {|s| s.case_list(:unread).empty? and s.case_list(:reopened).reject {|c| c.form_answer.nil? or c.form_answer.user != current_user }.empty?}
+      .reject {|s| s.case_list(:unread).reject {|c| c.assigned_reader and c.assigned_reader != current_user}.empty? and s.case_list(:reopened).reject {|c| c.form_answer.nil? or c.form_answer.user != current_user }.empty?}
       .map {|s| {:name => s.name, :id => s.id, :study_name => s.study.name} }
 
     respond_to do |format|
@@ -54,15 +54,33 @@ class SessionsController < ApplicationController
       session[:min_reserved_case_position] ||= 0
 
       count.times do |i|
-        c = @session.reserve_next_case(session[:min_reserved_case_position]+i)
+        c = @session.reserve_next_case_for_reader(session[:min_reserved_case_position]+i, current_user)
         break if c.nil?
+
         cases << c
+
+        c.current_reader = current_user
+
+        if(config['auto_assign_patients_to_readers'] == true and c.assigned_reader.nil? and c.patient)
+          cases_to_assign = c.patient.cases.where(:state => Case::state_sym_to_int(:unread), :assigned_reader_id => nil, :flag => Case::flag_sym_to_int(c.flag))
+
+          cases_to_assign.each do |case_to_assign|
+            case_to_assign.assigned_reader = current_user
+            case_to_assign.save
+          end
+
+          c.assigned_reader = current_user
+          c.save
+        end
+        
+        c.save
       end
 
       session[:min_reserved_case_position] = cases.last.position+1 unless cases.empty?
     else
       @reopened_cases.each do |c|
         c.state = :reopened_in_progress
+        c.current_reader = current_user
         c.save
 
         cases << c

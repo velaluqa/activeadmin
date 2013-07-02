@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'aa_customizable_default_actions'
 require 'schema_validation'
 require 'key_path_accessor'
@@ -133,24 +134,45 @@ ActiveAdmin.register Case do
       when :unread
         status_tag('Unread', :error)
       when :in_progress
-        status_tag('In Progress', :warning)
+        status_tag('In Progress', :warning, :label => (c.current_reader.nil? ? 'In Progress' : ('In Progress: '+link_to(c.current_reader.name, admin_user_path(c.current_reader))).html_safe))
       when :read
         status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       when :reopened
         status_tag('Reopened', :warning, :label => link_to('Reopened', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       when :reopened_in_progress
-        status_tag('Reopened In Progress', :warning, :label => link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
+        status_tag('Reopened In Progress', :warning, :label => (link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)) + (c.current_reader.nil? ? '' : ': ' + link_to(c.current_reader.name, admin_user_path(c.current_reader)))).html_safe) unless c.form_answer.nil?
       when :postponed
         status_tag('Postponed', :warning)
       end
     end
     column :reader do |c|
-      link_to(c.form_answer.user.name, admin_user_path(c.form_answer.user)) unless c.form_answer.nil?
+      if(c.form_answer.nil?)
+        if(c.assigned_reader.nil?)
+          link_to('Assign Reader', assign_reader_form_admin_cases_path(:return_url => request.fullpath, :selection => [c.id]))
+        else
+          ('Assigned to: '+link_to(c.assigned_reader.name, admin_user_path(c.assigned_reader)) + link_to(icon(:pen), assign_reader_form_admin_cases_path(:return_url => request.fullpath, :selection => [c.id]), :class => 'member_link')).html_safe
+        end
+      else
+        link_to(c.form_answer.user.name, admin_user_path(c.form_answer.user))
+      end
     end
     column 'Submission Date' do |c|
       pretty_format(c.form_answer.submitted_at) unless c.form_answer.nil?
     end
-    column 'Last Export', :exported_at
+    column 'Last Export', :exported_at, :sortable => :exported_at do |c|
+      if c.no_export
+        status_tag('No Export')
+      else
+        pretty_format(c.exported_at) unless c.exported_at.nil?
+      end
+    end
+    column :comment, :sortable => :comment do |c|
+      if(c.comment.blank?)
+        link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
+      else
+        (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
+      end
+    end
    
     customizable_default_actions do |resource|
       (resource.state == :unread and resource.form_answer.nil?) ? [] : [:edit, :destroy]
@@ -189,7 +211,21 @@ ActiveAdmin.register Case do
           status_tag('Reopened In Progress', :warning, :label => link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
         end
       end
-      row :exported_at
+      row :assigned_reader
+      row :exported_at do
+        if c.no_export
+          status_tag('No Export')
+        else
+          pretty_format(c.exported_at) unless c.exported_at.nil?
+        end
+      end
+      row :comment do
+        if(c.comment.blank?)
+          link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
+        else
+          (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
+        end
+      end
       row :case_data_raw do
         CodeRay.scan(JSON::pretty_generate(c.case_data.data), :json).div(:css => :class).html_safe unless c.case_data.nil?
       end
@@ -203,6 +239,7 @@ ActiveAdmin.register Case do
       f.input :position
       f.input :case_type
       f.input :flag, :as => :radio, :collection => {'Regular' => :regular, 'Validation' => :validation}
+      f.input :comment
     end
     
     f.buttons
@@ -218,8 +255,10 @@ ActiveAdmin.register Case do
     column :flag
     column :state
     column :exported_at
+    column(:assigned_reader) {|c| c.assigned_reader.username}
     column(:reader) {|c| (c.form_answer.nil? or c.form_answer.user.nil?) ? '' : c.form_answer.user.name }
     column(:submitted_at) {|c| c.form_answer.nil? ? '' : c.form_answer.submitted_at }
+    column :comment
   end
 
   # filters
@@ -230,7 +269,10 @@ ActiveAdmin.register Case do
   filter :case_type
   filter :flag, :as => :check_boxes, :collection => Case::FLAG_SYMS.each_with_index.map {|flag, i| [flag, i]}
   filter :state, :as => :check_boxes, :collection => Case::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
+  filter :assigned_reader, :as => :select
   filter :exported_at, :label => 'Last Export'
+  filter :no_export, :as => :select
+  filter :comment
 
   member_action :reopen, :only => :show do
     @case = Case.find(params[:id])
@@ -288,6 +330,27 @@ ActiveAdmin.register Case do
     redirect_to :action => :index
   end
 
+  batch_action :mark_as_no_export do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+
+      c.no_export = true
+      c.save
+    end
+
+    redirect_to :back, :notice => 'Cases were marked as not exportable.'
+  end
+  batch_action :reset_no_export do |selection|
+    Case.find(selection).each do |c|
+      next unless can? :manage, c
+
+      c.no_export = false
+      c.save
+    end
+
+    redirect_to :back, :notice => 'Cases were marked as exportable.'
+  end
+
   collection_action :batch_export, :method => :post do
     if(params[:export_specification].nil? or params[:export_specification].tempfile.nil?)
       flash[:error] = 'You need to supply an export specification.'
@@ -320,6 +383,11 @@ ActiveAdmin.register Case do
     cases.each do |c|
       unless(can? :manage, c)
         @results[c.id] = :unauthorized
+        next
+      end
+
+      if(c.no_export == true)
+        @results[c.id] = :no_export
         next
       end
 
@@ -436,6 +504,7 @@ ActiveAdmin.register Case do
         c.state = :reopened
       end
 
+      c.current_reader = nil
       c.save
     end
 
@@ -464,6 +533,73 @@ ActiveAdmin.register Case do
 
     redirect_to(:back, :notice => 'Selected cases have been "unpostponed".')
   end
+
+  member_action :edit_comment, :method => :post do
+    @case = Case.find(params[:id])
+    authorize! :manage, @case
+
+    @case.comment = params[:case][:comment]
+    @case.save
+
+    if(params[:return_url].blank?)
+      redirect_to :action => :index, :notice => 'Comment changed.'
+    else
+      redirect_to params[:return_url], :notice => 'Comment changed.'
+    end
+  end
+  member_action :edit_comment_form, :method => :get do
+    @case = Case.find(params[:id])
+    authorize! :manage, @case
+
+    @return_url = params[:return_url]
+    @page_title = 'Edit Comment'    
+  end
+
+  collection_action :assign_reader, :method => :post do
+    @cases = Case.find(params[:selection])
+
+    @cases.each do |c|
+      authorize! :manage, c
+
+      c.assigned_reader_id = params[:case][:assigned_reader_id]
+      c.save
+    end
+
+    if(params[:return_url].blank?)
+      redirect_to :action => :index, :notice => 'Reader assigned.'
+    else
+      redirect_to params[:return_url], :notice => 'Reader assigned.'
+    end
+  end
+  collection_action :assign_reader_form, :method => :get do
+    if(params[:selection].blank?)
+      flash[:error] = 'You must select at least on case.'
+      redirect_to (paramſ[:return_url].blank? ? :back : params[:return_url])
+      return
+    end
+
+    @selection = params[:selection]
+    @cases = Case.find(params[:selection])
+
+    session_id = nil
+    @cases.each do |c|
+      authorize! :manage, c
+
+      session_id ||= c.session_id
+      if(session_id != c.session_id)
+        flash[:error] = 'All cases must be from the same session.'
+        redirect_to (paramſ[:return_url].blank? ? :back : params[:return_url])
+        return
+      end
+    end
+
+    @return_url = params[:return_url]
+    @page_title = 'Assign Reader'    
+  end
+  batch_action :batch_assign_reader do |selection|
+    redirect_to assign_reader_form_admin_cases_path(:selection => selection, :return_url => request.referer)
+  end
+
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'case', :audit_trail_view_id => resource.id))

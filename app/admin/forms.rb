@@ -12,7 +12,7 @@ ActiveAdmin.register Form do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :download_current_custom_validators, :download_locked_custom_validators, :copy, :copy_form]
+    skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :download_configuration_at_version, :download_current_custom_validators, :download_locked_custom_validators, :download_custom_validators_at_version, :copy, :copy_form]
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
@@ -186,6 +186,13 @@ ActiveAdmin.register Form do
     data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, @form.locked_version)
     send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.yml" unless data.nil?
   end
+  member_action :download_configuration_at_version do
+    @form = Form.find(params[:id])
+    authorize! :read, @form
+
+    data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, params[:version])
+    send_data data, :filename => "form_#{@form.id}_#{params[:version]}.yml" unless data.nil?
+  end
   member_action :download_current_custom_validators do
     @form = Form.find(params[:id])
     authorize! :read, @form
@@ -199,6 +206,13 @@ ActiveAdmin.register Form do
 
     data = GitConfigRepository.new.data_at_version(@form.relative_validator_file_path, @form.locked_version)
     send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.js" unless data.nil?
+  end
+  member_action :download_custom_validators_at_version do
+    @form = Form.find(params[:id])
+    authorize! :read, @form
+
+    data = GitConfigRepository.new.data_at_version(@form.relative_validator_file_path, params[:version])
+    send_data data, :filename => "form_#{@form.id}_#{params[:version]}.js" unless data.nil?
   end
 
   member_action :upload_config, :method => :post do

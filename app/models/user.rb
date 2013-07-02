@@ -18,6 +18,8 @@ class User < ActiveRecord::Base
   has_many :form_answers
 
   has_many :sessions, :through => :roles, :source => :subject, :source_type => 'Session'
+  has_many :assigned_cases, :class_name => 'Case', :foreign_key => 'assigned_reader_id', :inverse_of => :assigned_reader, :dependent => :nullify
+  has_many :current_cases, :class_name => 'Case', :foreign_key => 'current_reader_id', :inverse_of => :current_reader, :dependent => :nullify
 
   has_and_belongs_to_many :blind_readable_sessions, :class_name => 'Session', :join_table => 'readers_sessions'
   has_and_belongs_to_many :validatable_sessions, :class_name => 'Session', :join_table => 'validators_sessions'

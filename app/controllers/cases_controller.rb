@@ -6,6 +6,7 @@ class CasesController < ApplicationController
   def cancel_read
     if(@case.state == :in_progress || @case.state == :reopened_in_progress)
       @case.state = (@case.state == :reopened_in_progress ? :reopened : :unread)
+      @case.current_reader = nil
       @case.save
 
       if(@case.state == :unread and @case.flag == :reader_testing)
