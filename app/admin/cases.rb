@@ -160,6 +160,13 @@ ActiveAdmin.register Case do
         pretty_format(c.exported_at) unless c.exported_at.nil?
       end
     end
+    column :comment, :sortable => :comment do |c|
+      if(c.comment.blank?)
+        link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
+      else
+        (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
+      end
+    end
    
     customizable_default_actions do |resource|
       (resource.state == :unread and resource.form_answer.nil?) ? [] : [:edit, :destroy]
@@ -205,6 +212,13 @@ ActiveAdmin.register Case do
           pretty_format(c.exported_at) unless c.exported_at.nil?
         end
       end
+      row :comment do
+        if(c.comment.blank?)
+          link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
+        else
+          (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
+        end
+      end
       row :case_data_raw do
         CodeRay.scan(JSON::pretty_generate(c.case_data.data), :json).div(:css => :class).html_safe unless c.case_data.nil?
       end
@@ -218,6 +232,7 @@ ActiveAdmin.register Case do
       f.input :position
       f.input :case_type
       f.input :flag, :as => :radio, :collection => {'Regular' => :regular, 'Validation' => :validation}
+      f.input :comment
     end
     
     f.buttons
@@ -235,6 +250,7 @@ ActiveAdmin.register Case do
     column :exported_at
     column(:reader) {|c| (c.form_answer.nil? or c.form_answer.user.nil?) ? '' : c.form_answer.user.name }
     column(:submitted_at) {|c| c.form_answer.nil? ? '' : c.form_answer.submitted_at }
+    column :comment
   end
 
   # filters
@@ -247,6 +263,7 @@ ActiveAdmin.register Case do
   filter :state, :as => :check_boxes, :collection => Case::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
   filter :exported_at, :label => 'Last Export'
   filter :no_export, :as => :select
+  filter :comment
 
   member_action :reopen, :only => :show do
     @case = Case.find(params[:id])
@@ -505,6 +522,27 @@ ActiveAdmin.register Case do
     end
 
     redirect_to(:back, :notice => 'Selected cases have been "unpostponed".')
+  end
+
+  member_action :edit_comment, :method => :post do
+    @case = Case.find(params[:id])
+    authorize! :manage, @case
+
+    @case.comment = params[:case][:comment]
+    @case.save
+
+    if(params[:return_url].blank?)
+      redirect_to :action => :index, :notice => 'Comment changed.'
+    else
+      redirect_to params[:return_url], :notice => 'Comment changed.'
+    end
+  end
+  member_action :edit_comment_form, :method => :get do
+    @case = Case.find(params[:id])
+    authorize! :manage, @case
+
+    @return_url = params[:return_url]
+    @page_title = 'Edit Comment'    
   end
 
   action_item :only => :show do
