@@ -10,7 +10,7 @@ class Case < ActiveRecord::Base
   attr_accessible :images, :position, :case_type, :state, :flag
   attr_accessible :session_id, :patient_id
   attr_accessible :session, :patient
-  attr_accessible :exported_at
+  attr_accessible :exported_at, :no_export
 
   validates_uniqueness_of :position, :scope => :session_id  
 
