@@ -87,6 +87,7 @@ class FormAnswersController < ApplicationController
     pp answer
 
     @case.state = :read
+    @case.current_reader = nil
     @case.save
     
     if(@case.flag == :reader_testing)

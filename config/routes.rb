@@ -29,6 +29,7 @@ StudyServer::Application.routes.draw do
     post 'users/authenticate', :to => 'users/sessions#authenticate_user'
     get 'users/change_password', :to => 'users#change_password'
     put 'users/update_password', :to => 'users#update_password'
+    get 'users/cancel_current_cases', :to => 'users#cancel_current_cases'
   end
 
   # The priority is based upon order of creation:

@@ -134,13 +134,13 @@ ActiveAdmin.register Case do
       when :unread
         status_tag('Unread', :error)
       when :in_progress
-        status_tag('In Progress', :warning)
+        status_tag('In Progress', :warning, :label => (c.current_reader.nil? ? 'In Progress' : ('In Progress: '+link_to(c.current_reader.name, admin_user_path(c.current_reader))).html_safe))
       when :read
         status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       when :reopened
         status_tag('Reopened', :warning, :label => link_to('Reopened', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       when :reopened_in_progress
-        status_tag('Reopened In Progress', :warning, :label => link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
+        status_tag('Reopened In Progress', :warning, :label => (link_to('Reopened & In Progress', admin_form_answer_path(c.form_answer)) + (c.current_reader.nil? ? '' : ': ' + link_to(c.current_reader.name, admin_user_path(c.current_reader)))).html_safe) unless c.form_answer.nil?
       when :postponed
         status_tag('Postponed', :warning)
       end
@@ -504,6 +504,7 @@ ActiveAdmin.register Case do
         c.state = :reopened
       end
 
+      c.current_reader = nil
       c.save
     end
 
