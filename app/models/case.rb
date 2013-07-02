@@ -8,6 +8,7 @@ class Case < ActiveRecord::Base
   has_one :form_answer
   has_one :case_data
   belongs_to :assigned_reader, :class_name => 'User', :inverse_of => :assigned_cases
+  belongs_to :current_reader, :class_name => 'User', :inverse_of => :current_cases
 
   attr_accessible :images, :position, :case_type, :state, :flag
   attr_accessible :session_id, :patient_id

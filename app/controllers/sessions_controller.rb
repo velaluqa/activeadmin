@@ -56,13 +56,18 @@ class SessionsController < ApplicationController
       count.times do |i|
         c = @session.reserve_next_case_for_reader(session[:min_reserved_case_position]+i, current_user)
         break if c.nil?
+
         cases << c
+
+        c.current_reader = current_user
+        c.save
       end
 
       session[:min_reserved_case_position] = cases.last.position+1 unless cases.empty?
     else
       @reopened_cases.each do |c|
         c.state = :reopened_in_progress
+        c.current_reader = current_user
         c.save
 
         cases << c

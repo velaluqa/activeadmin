@@ -210,6 +210,7 @@ class Session < ActiveRecord::Base
 
         new_case.exported_at = nil
         new_case.state = :unread
+        new_case.current_reader = nil
 
         new_case.save
 
