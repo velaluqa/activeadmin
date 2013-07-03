@@ -104,7 +104,7 @@ class SessionsController < ApplicationController
     patient = Patient.where(:subject_id => config['reader_testing']['patient'], :session_id => @session.id).first
     return nil if patient.nil?
 
-    test_case = Case.create(:session_id => @session.id, :patient_id => patient.id, :position => @session.next_position, :images => config['reader_testing']['images'], :case_type => config['reader_testing']['case_type'], :state => :in_progress, :flag => :reader_testing)
+    test_case = Case.create(:session_id => @session.id, :patient_id => patient.id, :position => @session.next_position, :images => config['reader_testing']['images'], :case_type => config['reader_testing']['case_type'], :state => :in_progress, :flag => :reader_testing, :assigned_reader_id => current_user.id, :current_reader_id => current_user.id)
     return nil unless test_case.persisted?
 
     test_case_answer = FormAnswer.create(:user_id => current_user.id, :session_id => @session.id, :case_id => test_case.id, :submitted_at => Time.now)
