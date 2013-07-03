@@ -4,12 +4,13 @@ require 'aa_domino'
 ActiveAdmin.register Patient do
 
   config.per_page = 100
+  config.sort_order = 'centers.code_asc'
 
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
       if(session[:selected_study_id].nil?)
-        end_of_association_chain.accessible_by(current_ability)
+        end_of_association_chain.accessible_by(current_ability).includes(:center)
       else
         end_of_association_chain.accessible_by(current_ability).includes(:center).where('centers.study_id' => session[:selected_study_id])
       end
@@ -75,7 +76,7 @@ ActiveAdmin.register Patient do
 
   index do
     selectable_column
-    column :center, :sortabel => :center_id
+    column :center, :sortable => 'centers.code'
     column :subject_id
     
     customizable_default_actions do |resource|
