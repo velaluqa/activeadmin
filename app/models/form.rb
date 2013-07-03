@@ -68,8 +68,8 @@ class Form < ActiveRecord::Base
     session_id.nil?
   end
 
-  def full_current_configuration
-    full_configuration(:current)
+  def full_current_configuration(include_all_repeatables = false)
+    full_configuration(:current, nil, true, nil, include_all_repeatables)
   end
   def full_locked_configuration
     full_configuration(:locked)
@@ -204,7 +204,7 @@ class Form < ActiveRecord::Base
     end
   end
 
-  def full_configuration(versions, already_included_forms = nil, stringify = true, the_case = nil)
+  def full_configuration(versions, already_included_forms = nil, stringify = true, the_case = nil, include_all_repeatables = false)
     parsed_version = parse_version_sym(versions)
     form_config = parse_config(parsed_version)
     return [nil,nil,nil] if form_config.nil?
@@ -217,12 +217,12 @@ class Form < ActiveRecord::Base
     unless(the_case.nil? or the_case.form_answer.nil?)
       previous_answers = the_case.form_answer.answers
     end
-    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms, read_attribute(:session_id), versions, previous_answers)
+    form_config, form_components, repeatables = process_imports(form_config, form_components, already_included_forms, read_attribute(:session_id), versions, previous_answers, include_all_repeatables)
     form_components = stringify_form_components(form_components) if stringify
 
     return [form_config, form_components, repeatables]
   end
-  def process_imports(config, components, already_included, session_id, versions, previous_answers = nil)
+  def process_imports(config, components, already_included, session_id, versions, previous_answers = nil, include_all_repeatables = false)
     full_config = []
     full_components = components
     repeatables = []
@@ -264,6 +264,7 @@ class Form < ActiveRecord::Base
             min_repeat = previous_answers[field['repeat']['prefix']].size if previous_answers[field['repeat']['prefix']].size > min_repeat
           end
           min_repeat = 0 if min_repeat.nil?
+          min_repeat = 1 if(min_repeat < 1 and include_all_repeatables == true)
           min_repeat.times do |i|
             config_copy = Marshal.load(Marshal.dump(included_config))
             

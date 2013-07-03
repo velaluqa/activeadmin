@@ -147,6 +147,34 @@
     max-height: 580px;
 }
 
+.data_dict_field_id
+{
+    color: red;
+    border: 1px solid red;
+    width: auto;
+    float: left;
+    padding: 2px;
+    margin-right: 5px;
+}
+.data_dict_select_options
+{
+    color: red;
+    border: 1px solid red;
+    width: auto;
+    margin-top: 2px;
+    
+    ul
+    {
+	margin-left: 5px;
+	margin-bottom: 0;
+
+	li
+	{
+	    list-style-type: none;
+	}
+    }
+}
+
 @media print
 {
     #form-navbar { display: none !important; }
