@@ -19,6 +19,7 @@ class FormAnswer
   field :annotated_images_signature, type:  String
   field :is_test_data, type: Boolean
   field :versions, type: Array
+  field :reader_testing_config_index, type: Integer
 
   before_destroy do
     c = self.case

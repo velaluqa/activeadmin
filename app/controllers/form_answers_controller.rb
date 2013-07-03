@@ -28,6 +28,7 @@ class FormAnswersController < ApplicationController
     end
 
     if @case.flag == :reader_testing
+      @reader_testing_config_index = @case.form_answer.reader_testing_config_index
       @case.form_answer.destroy
       is_test_data = true
     end
@@ -69,11 +70,8 @@ class FormAnswersController < ApplicationController
       @case.form_answer.version_current_answers
 
       answer = @case.form_answer
-      pp answer
     end
 
-    pp params
-        
     answer.answers = params['answers']
     answer.answers_signature = params['answers_signature']
 
@@ -81,10 +79,9 @@ class FormAnswersController < ApplicationController
     answer.annotated_images_signature = params['annotated_images_signature']
     
     answer.submitted_at = Time.now
+    answer.reader_testing_config_index = @reader_testing_config_index
 
     answer.save
-
-    pp answer
 
     @case.state = :read
     @case.current_reader = nil
@@ -102,6 +99,7 @@ class FormAnswersController < ApplicationController
   end
 
   def run_form_judgement_function(form_answer)
+    return false if form_answer.form.nil?
     source = form_answer.form.components_at_version(form_answer.form_versions[form_answer.form.id])[:validators].first
     return false if source.nil?
 
@@ -116,8 +114,16 @@ class FormAnswersController < ApplicationController
 
     results_list = construct_results_list(form_answer.case)
     pp results_list
+    
+    judgement_function = if(session_config['reader_testing']['configs'].nil?)
+                           session_config['reader_testing']['judgement_function']                           
+                         else
+                           config = (form_answer.reader_testing_config_index.nil? ? session_config['reader_testing']['configs'][0] : session_config['reader_testing']['configs'][form_answer.reader_testing_config_index])
+                           config['judgement_function'] unless config.nil?
+                         end
+    return false if judgement_function.nil?
 
-    result = js_context.call(session_config['reader_testing']['judgement_function'], results_list)
+    result = js_context.call(judgement_function, results_list)
 
     return result
   end

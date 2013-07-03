@@ -46,9 +46,10 @@ class SessionsController < ApplicationController
 
     if(@reopened_cases.empty?)
       last_reader_testing_result = current_user.test_results_for_session(@session).last
-      if(config['reader_testing'] and (last_reader_testing_result.nil? or last_reader_testing_result.submitted_at < Time.now - config['reader_testing']['interval']))
-        cases << create_reader_test_case(config)
+      if(config['reader_testing'] and (last_reader_testing_result.nil? or last_reader_testing_result.submitted_at < Time.now - config['reader_testing']['interval']) and session[:reader_testing_performed] != true)
+        cases << create_reader_test_case(config, last_reader_testing_result.reader_testing_config_index)
         count -= 1
+        session[:reader_testing_performed] = true
       end
 
       session[:min_reserved_case_position] ||= 0
@@ -100,14 +101,22 @@ class SessionsController < ApplicationController
 
   protected
 
-  def create_reader_test_case(config)
-    patient = Patient.where(:subject_id => config['reader_testing']['patient'], :session_id => @session.id).first
+  def create_reader_test_case(config, last_config_index)
+    reader_testing_configs = config['reader_testing']['configs']
+    reader_testing_configs ||= [config['reader_testing']]
+    return nil if reader_testing_configs.blank?
+
+    config_index = (last_config_index.nil? ? 0 : (last_config_index + 1) % reader_testing_configs.size)
+    reader_testing_config = reader_testing_configs[config_index]
+    return nil if reader_testing_config.nil?
+
+    patient = Patient.where(:subject_id => reader_testing_config['patient'], :session_id => @session.id).first
     return nil if patient.nil?
 
-    test_case = Case.create(:session_id => @session.id, :patient_id => patient.id, :position => @session.next_position, :images => config['reader_testing']['images'], :case_type => config['reader_testing']['case_type'], :state => :in_progress, :flag => :reader_testing)
+    test_case = Case.create(:session_id => @session.id, :patient_id => patient.id, :position => @session.next_position, :images => reader_testing_config['images'], :case_type => reader_testing_config['case_type'], :state => :in_progress, :flag => :reader_testing, :assigned_reader_id => current_user.id, :current_reader_id => current_user.id)
     return nil unless test_case.persisted?
 
-    test_case_answer = FormAnswer.create(:user_id => current_user.id, :session_id => @session.id, :case_id => test_case.id, :submitted_at => Time.now)
+    test_case_answer = FormAnswer.create(:user_id => current_user.id, :session_id => @session.id, :case_id => test_case.id, :submitted_at => Time.now, :reader_testing_config_index => config_index)
 
     return test_case
   end
