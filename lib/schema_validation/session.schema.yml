@@ -29,18 +29,24 @@ mapping:
         required: yes
         range:
           min: 0
-      "case_type":
-        type: str
+      "configs":
+        type: seq
         required: yes
-      "patient":
-        type: str
-        required: yes
-      "images":
-        type: str
-        required: yes
-      "judgement_function":
-        type: str
-        required: yes
+        sequence:
+          - type: map
+            mapping:
+              "case_type":
+                type: str
+                required: yes
+              "patient":
+                type: str
+                required: yes
+              "images":
+                type: str
+                required: yes
+              "judgement_function":
+                type: str
+                required: yes
   "types":
     type: map
     required: yes
