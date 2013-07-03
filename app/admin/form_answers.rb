@@ -78,7 +78,7 @@ ActiveAdmin.register FormAnswer do
         end
       end
       row :answers do
-        render "forms/results_table", :caption => '', :cases => [form_answer.case], :skip_header => true
+        render "forms/results_table", :caption => '', :cases => [form_answer.case], :skip_header => true unless form_answer.answers.nil?
       end
       row :answers_raw do        
         CodeRay.scan(JSON::pretty_generate(form_answer.answers), :json).div(:css => :class).html_safe unless form_answer.answers.nil?

@@ -110,8 +110,13 @@ class Session < ActiveRecord::Base
       validation_errors << "Included form '#{included_form}' is missing" if Form.where(:name => included_form, :session_id => self.id).empty?
     end
     if(config['reader_testing'])
-      validation_errors << "Reader testing case type '#{config['reader_testing']['case_type']}' does not exist" if config['types'][config['reader_testing']['case_type']].nil?
-      validation_errors << "Reader testing patient '#{config['reader_testing']['patient']}' does not exist" if Patient.where(:subject_id => config['reader_testing']['patient'], :session_id => self.id).empty?
+      reader_testing_configs = config['reader_testing']['configs']
+      reader_testing_configs ||= [config['reader_testing']]
+
+      reader_testing_configs.each_with_index do |reader_testing_config, index|
+        validation_errors << "The case type '#{reader_testing_config['case_type']}' for reader testing config number #{index+1} does not exist" if config['types'][reader_testing_config['case_type']].nil?
+        validation_errors << "The patient '#{reader_testing_config['patient']}' for reader testing config number #{index+1} does not exist" if Patient.where(:subject_id => reader_testing_config['patient'], :session_id => self.id).empty?
+      end
     end
 
     return validation_errors
