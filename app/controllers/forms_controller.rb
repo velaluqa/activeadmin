@@ -38,7 +38,9 @@ class FormsController < ApplicationController
     @form = Form.find(params[:id])
     authorize! :read, @form
 
-    @form_config, @form_components, @repeatables = @form.full_current_configuration
+    @show_internal_annotations = (params[:show_internal_annotations] == 'true')
+
+    @form_config, @form_components, @repeatables = @form.full_current_configuration(@show_internal_annotations)
     if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
       flash[:error] = 'This form does not have a (valid) configuration.'
       redirect_to :controller => 'admin/forms', :action => :show, :id => params[:id]

@@ -13,4 +13,10 @@
       - selected_value = roi_value
       - roi_value = nil
   = hidden_field_tag(field['id'], selected_value, { :class => "#{input_size} select-roi", :style => 'width: 270px;', :'data-values' => (field['values'].nil? ? '{}' : field['values'].to_json), :'data-roi-values' => (field['roi_values'].nil? ? '{}' : field['roi_values'].to_json)}.merge(validators_hash(field)).merge(roi_value.nil? ? {} : {:'data-old-roi' => roi_value.to_json}))
+  - if(defined?(show_internal_annotations) and show_internal_annotations == true)
+    - unless field['values'].blank?
+      .data_dict_select_options
+        %ul
+          - field['values'].each do |value, label|
+            %li= label + ' => ' + value
   %p.help-block
