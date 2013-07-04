@@ -22,8 +22,13 @@ ActiveAdmin.register ImageSeries do
       currently_assigned_required_series_names = image_series.assigned_required_series
       original_visit = image_series.visit
       new_visit = (params[:image_series][:visit_id].blank? ? nil : Visit.find(params[:image_series][:visit_id]))
+
+      if(params[:image_series][:visit_id].to_i == image_series.visit_id)
+        params[:image_series].delete(:force_update)
+        return update!
+      end
       
-      if(params[:image_series][:visit_id] != image_series.visit_id and params[:image_series][:force_update] != 'true')
+      if(params[:image_series][:visit_id].to_i != image_series.visit_id and params[:image_series][:force_update] != 'true')
         if(original_visit and new_visit and original_visit.visit_type != new_visit.visit_type)
           flash[:error] = 'The new visit has a different visit type than the current visit. Therefore, this image series will lose all its assignments to required series of the current visit, including all tQC results. If you want to continue, press "Update" again.'
           redirect_to edit_admin_image_series_path(image_series, :force_update => true, :visit_id => params[:image_series][:visit_id])
