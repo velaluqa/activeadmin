@@ -309,7 +309,7 @@ class Visit < ActiveRecord::Base
 
     all_passed = true
     tqc_spec.each do |spec|
-      all_passed &&= (result[spec['id']] == true)
+      all_passed &&= (not result.nil? and result[spec['id']] == true)
     end
 
     required_series = self.visit_data.required_series[required_series_name]
