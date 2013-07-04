@@ -84,13 +84,13 @@ protected
           @table_type = :custom
           @table_config = previous_results_config['table']
           @merge_table_columns = previous_results_config['merge_columns']
-          @previous_cases = @case.patient.cases.where('position < ?', @case.position).reject {|c| c.form_answer.nil?}
+          @previous_cases = @case.patient.cases.where('position < ? and flag = ?', @case.position, Case::flag_sym_to_int(@case.flag)).reject {|c| c.form_answer.nil?}
         end
       end
     end
   end
   def construct_previous_cases(enabled_case_types = nil)
-    previous_cases_list = @case.patient.cases.where('position < ?', @case.position).reject {|c| c.form_answer.nil?}
+    previous_cases_list = @case.patient.cases.where('position < ? and flag = ?', @case.position, Case::flag_sym_to_int(@case.flag)).reject {|c| c.form_answer.nil?}
     
     previous_cases = {}
     previous_cases_list.each do |c|
@@ -105,7 +105,7 @@ protected
     return previous_cases
   end
   def construct_previous_results_list
-    previous_cases = @case.patient.cases.where('position < ?', @case.position).reject {|c| c.form_answer.nil?}
+    previous_cases = @case.patient.cases.where('position < ? and flag = ?', @case.position, Case::flag_sym_to_int(@case.flag)).reject {|c| c.form_answer.nil?}
 
     previous_results = []
     previous_cases.each do |c|
@@ -123,7 +123,7 @@ protected
       configuration = @case.session.locked_configuration
       passive_images = (configuration['types'][@case.case_type].nil? or configuration['types'][@case.case_type]['screen_layout'].nil? ? true : configuration['types'][@case.case_type]['screen_layout']['passive'])
 
-      previous_cases = (passive_images == false ? [] : @case.patient.cases.where('position < ?', @case.position)) + [nil, @case]
+      previous_cases = (passive_images == false ? [] : @case.patient.cases.where('position < ? and flag = ?', @case.position, Case::flag_sym_to_int(@case.flag))) + [nil, @case]
       previous_cases.each do |c|
         if c.nil?
           # this is interpreted by the view as a divider
