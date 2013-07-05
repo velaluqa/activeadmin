@@ -51,7 +51,7 @@ namespace :erica do
     count = 0
     puts "Syncing #{study.centers.count} centers..."
     study.centers.find_each do |center|
-      center.ensure_domino_document_exists
+      center.domino_sync
 
       count += 1
       print count.to_s+'..' if(count %100 == 0)
@@ -62,7 +62,7 @@ namespace :erica do
     count = 0
     puts "Syncing #{study.patients.count} patients..."
     study.patients.find_each do |patient|
-      patient.ensure_domino_document_exists
+      patient.domino_sync
 
       count += 1
       print count.to_s+'..' if(count %100 == 0)
@@ -73,7 +73,7 @@ namespace :erica do
     count = 0
     puts "Syncing #{study.image_series.count} image series..."
     study.image_series.find_each do |image_series|
-      image_series.ensure_domino_document_exists
+      image_series.domino_sync
 
       count += 1
       print count.to_s+'..' if(count %100 == 0)
@@ -84,8 +84,10 @@ namespace :erica do
     count = 0
     puts "Syncing #{study.visits.count} visits..."
     study.visits.find_each do |visit|
-      visit.ensure_domino_document_exists
-      visit.domino_sync_required_series
+      visit.domino_sync
+      visit.required_series_objects.each do |required_series|
+        required_series.domino_sync
+      end
 
       count += 1
       print count.to_s+'..' if(count %100 == 0)
