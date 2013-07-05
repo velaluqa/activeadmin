@@ -79,7 +79,7 @@ StudyServer::Application.routes.draw do
 
   match 'wado' => 'wado#wado'
 
-  if(Rails.env.development?)
+  authenticate :user, lambda {|u| u.is_app_admin?} do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'
   end
