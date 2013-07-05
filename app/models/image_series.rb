@@ -251,6 +251,10 @@ class ImageSeries < ActiveRecord::Base
 
   def domino_sync_visit
     self.visit.ensure_domino_document_exists unless self.visit.nil?
+    if(self.previous_changes.include?('visit_id') and not self.previous_changes['visit_id'][0].blank?)
+      previous_visit = Visit.where(:id => self.previous_changes['visit_id'][0]).first
+      previous_visit.ensure_domino_document_exists unless previous_visit.nil?
+    end
   end
 
   def ensure_study_is_unchanged
