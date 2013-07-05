@@ -2,7 +2,7 @@ require 'domino_integration_client'
 
 module DominoDocument
   def self.included(base)
-    if(self.is_a?(ActiveRecord::Base))
+    if(base.respond_to?(:after_commit) and base.respond_to?(:after_destroy))
       base.after_commit :ensure_domino_document_exists
       base.after_destroy :trash_document
     end
@@ -32,7 +32,7 @@ module DominoDocument
   def ensure_domino_document_exists
     # this is the case if this after_save callback was called for the very save action done is this callback
     # if we wouldn't catch this, we could end up in an infinite loop
-    return true if(self.is_a?(ActiveRecord::Base) and self.previous_changes.include?('domino_unid'))
+    return true if(self.respond_to?(:previous_changes) and self.previous_changes.include?('domino_unid'))
 
     return true unless domino_integration_enabled?
 
