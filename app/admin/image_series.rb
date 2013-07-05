@@ -308,7 +308,7 @@ ActiveAdmin.register ImageSeries do
       image_series_data.properties[property_spec['id']] = new_value
     end
     image_series_data.save
-    @image_series.update_image_series_properties_in_domino
+    @image_series.schedule_domino_sync
 
     redirect_to({:action => :show}, :notice => 'Properties successfully updated.')
   end

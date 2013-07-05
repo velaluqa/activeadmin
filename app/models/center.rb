@@ -65,6 +65,9 @@ class Center < ActiveRecord::Base
       'CenterNo' => self.code,
     }.merge!(action == :create ? {'CenterShortName' => self.name} : {})    
   end
+  def domino_sync
+    self.ensure_domino_document_exists
+  end
 
   protected
   

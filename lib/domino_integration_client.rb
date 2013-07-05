@@ -78,8 +78,7 @@ class DominoIntegrationClient
         begin
           JSON::parse(response.body)
         rescue JSON::JSONError => e
-          Rails.logger.warn 'Failed to parse JSON response from Domino server: '+e.message
-          nil
+          raise 'Failed to parse JSON response from Domino server: '+e.message
         end
       else
         nil
@@ -104,8 +103,7 @@ class DominoIntegrationClient
         begin
           JSON::parse(response.body)
         rescue JSON::JSONError => e
-          Rails.logger.warn 'Failed to parse JSON response from Domino server: '+e.message
-          nil
+          raise 'Failed to parse JSON response from Domino server: '+e.message
         end
       else
         nil
@@ -132,8 +130,7 @@ class DominoIntegrationClient
         begin
           JSON::parse(response.body)
         rescue JSON::JSONError => e
-          Rails.logger.warn 'Failed to parse JSON response from Domino server: '+e.message
-          nil
+          raise 'Failed to parse JSON response from Domino server: '+e.message
         end
       else
         nil
@@ -147,8 +144,7 @@ class DominoIntegrationClient
         begin
           JSON::parse(response.body)
         rescue JSON::JSONError => e
-          Rails.logger.warn 'Failed to parse JSON response from Domino server: '+e.message
-          nil
+          raise 'Failed to parse JSON response from Domino server: '+e.message
         end
       else
         nil

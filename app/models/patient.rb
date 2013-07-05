@@ -108,6 +108,9 @@ class Patient < ActiveRecord::Base
       'PatientNo' => domino_patient_no,
     }
   end
+  def domino_sync
+    self.ensure_domino_document_exists
+  end
 
   protected
 

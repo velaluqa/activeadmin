@@ -3,8 +3,8 @@ require 'domino_integration_client'
 module DominoDocument
   def self.included(base)
     if(base.respond_to?(:after_commit) and base.respond_to?(:after_destroy))
-      base.after_commit :ensure_domino_document_exists
-      base.after_destroy :trash_document
+      base.after_commit :schedule_domino_sync
+      base.after_destroy :schedule_domino_document_trashing
     end
   end
 
@@ -16,6 +16,7 @@ module DominoDocument
     self.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.study.notes_links_base_uri.nil?)
   end
 
+
   def domino_document
     return nil unless domino_integration_enabled?
     return nil if self.domino_unid.nil?
@@ -23,10 +24,13 @@ module DominoDocument
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
       Rails.logger.error 'Failed to communicate with the Domino server.'
-      return nil
     end
 
     return client.get_document_by_unid(self.domino_unid)
+  end
+
+  def schedule_domino_sync
+    DominoSyncWorker.perform_async(self.class.to_s, self.id)
   end
 
   def ensure_domino_document_exists
@@ -38,7 +42,7 @@ module DominoDocument
 
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
-      errors.add :name, 'Failed to communicate with the Domino server.' if self.is_a?(ActiveRecord::Base)
+      raise 'Failed to communicate with the Domino server.'
       return false
     end
 
@@ -48,7 +52,7 @@ module DominoDocument
     else
       result = client.update_document(self.domino_unid, domino_document_form, domino_document_properties(:update))
     end
-    errors.add :name, 'Failed to communicate with the Domino server.' if (result == false and self.is_a?(ActiveRecord::Base))
+    raise 'Failed to communicate with the Domino server.' if (result == false)
 
     if(self.is_a?(ActiveRecord::Base) and not self.changes.empty?)
       result &&= self.save
@@ -64,14 +68,18 @@ module DominoDocument
     
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
-      errors.add :name, 'Failed to communicate with the Domino server.' if self.is_a?(ActiveRecord::Base)
+      raise'Failed to communicate with the Domino server.'
       return false
     end
 
     result = client.update_document(self.domino_unid, domino_document_form, changed_properties)
-    errors.add :name, 'Failed to communicate with the Domino server.' if (result == false and self.is_a?(ActiveRecord::Base))
+    raise 'Failed to communicate with the Domino server.' if (result == false)
 
     return result
+  end
+
+  def schedule_domino_document_trashing
+    DominoTrashWorker.perform_async(self.class.to_s, self.id)
   end
 
   def trash_document
@@ -81,7 +89,7 @@ module DominoDocument
 
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
-      errors.add :name, 'Failed to communicate with the Domino server.' if self.is_a?(ActiveRecord::Base)
+      raise 'Failed to communicate with the Domino server.'
       return false
     end
 

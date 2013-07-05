@@ -10,7 +10,7 @@ class Visit < ActiveRecord::Base
   attr_accessible :patient
   
   belongs_to :patient
-  has_many :image_series, after_add: :ensure_domino_document_exists, after_remove: :ensure_domino_document_exists
+  has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
   has_one :visit_data
 
   validates_uniqueness_of :visit_number, :scope => :patient_id
@@ -126,7 +126,7 @@ class Visit < ActiveRecord::Base
       changed_assignments = {}
 
       orphaned_required_series_names.each do |orphaned_required_series_name|
-        RequiredSeries.new(self, orphaned_required_series_name).trash_document
+        RequiredSeries.new(self, orphaned_required_series_name).schedule_domino_document_trashing
 
         deleted_series = required_series.delete(orphaned_required_series_name)
         changed_assignments[orphaned_required_series_name] = nil unless (deleted_series.nil? or deleted_series['image_series_id'].nil?)        
@@ -187,9 +187,12 @@ class Visit < ActiveRecord::Base
                         })
     end
   end
-  def domino_sync_required_series
+  def domino_sync
+    self.ensure_domino_document_exists
+  end
+  def schedule_required_series_domino_sync
     self.required_series_objects.each do |required_series|
-      required_series.domino_sync
+      required_series.schedule_domino_sync
     end
   end
 
@@ -216,7 +219,7 @@ class Visit < ActiveRecord::Base
     FileUtils.mv(image_storage_root + self.required_series_image_storage_path(old_name), image_storage_root + self.required_series_image_storage_path(new_name)) if File.exists?(image_storage_root + self.required_series_image_storage_path(old_name))
 
     visit_data.save
-    RequiredSeries.new(self, new_name).domino_sync
+    RequiredSeries.new(self, new_name).schedule_domino_sync
   end
 
   def change_required_series_assignment(changed_assignments)
@@ -281,7 +284,7 @@ class Visit < ActiveRecord::Base
     visit_data.reconstruct_assignment_index
     visit_data.save
 
-    domino_sync_required_series
+    schedule_required_series_domino_sync
   end
 
   def reset_tqc_result(required_series_name)
@@ -298,7 +301,7 @@ class Visit < ActiveRecord::Base
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
 
-    RequiredSeries.new(self, required_series_name).domino_sync
+    RequiredSeries.new(self, required_series_name).schedule_domino_sync
   end
   def set_tqc_result(required_series_name, result, tqc_user, tqc_date = nil, tqc_version = nil)
     required_series_specs = self.required_series_specs
@@ -325,7 +328,7 @@ class Visit < ActiveRecord::Base
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
 
-    RequiredSeries.new(self, required_series_name).domino_sync
+    RequiredSeries.new(self, required_series_name).schedule_domino_sync
     return true
   end
 

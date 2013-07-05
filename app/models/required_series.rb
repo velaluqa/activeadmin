@@ -13,6 +13,11 @@ class RequiredSeries
   attr_reader :tqc_user
   attr_reader :domino_unid
 
+  def self.find(id)
+    visit = Visit.find(id[0])
+    return RequiredSeries.new(visit, id[1])
+  end
+
   def initialize(visit, name)
     @visit = visit
     @name = name
@@ -29,6 +34,10 @@ class RequiredSeries
 
       @domino_unid = data['domino_unid']
     end
+  end
+
+  def id
+    return [(@visit.nil? ? nil : @visit.id), @name]
   end
 
   def to_key

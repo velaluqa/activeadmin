@@ -26,8 +26,6 @@ class ImageSeries < ActiveRecord::Base
 
   after_create :ensure_image_series_data_exists
 
-  after_commit :domino_sync_visit
-
   before_destroy do
     ImageSeriesData.destroy_all(:image_series_id => self.id)
   end  
@@ -131,8 +129,18 @@ class ImageSeries < ActiveRecord::Base
 
     properties
   end
-  def update_image_series_properties_in_domino
-    self.update_domino_document(self.properties_to_domino)
+
+  def domino_sync
+    self.ensure_domino_document_exists
+
+    unless(self.visit.nil?)
+      self.visit.domino_sync
+
+      assigned_required_series_names = self.assigned_required_series || []      
+      assigned_required_series_names.each do |as_name|
+        RequiredSeries.new(self.visit, as_name).domino_sync
+      end
+    end
   end
 
   def ensure_image_series_data_exists
@@ -247,14 +255,6 @@ class ImageSeries < ActiveRecord::Base
     end
 
     return result
-  end
-
-  def domino_sync_visit
-    self.visit.ensure_domino_document_exists unless self.visit.nil?
-    if(self.previous_changes.include?('visit_id') and not self.previous_changes['visit_id'][0].blank?)
-      previous_visit = Visit.where(:id => self.previous_changes['visit_id'][0]).first
-      previous_visit.ensure_domino_document_exists unless previous_visit.nil?
-    end
   end
 
   def ensure_study_is_unchanged
