@@ -93,9 +93,11 @@ ActiveAdmin.register User do
     f.inputs 'User Information' do
       f.input :username
       f.input :name
-      unless f.object.persisted?
+      if(current_user.is_app_admin? or not f.object.persisted?)
         f.input :password
-        f.input :password_confirmation, :required => true
+        f.input :password_confirmation
+      end
+      unless f.object.persisted?
         f.input :signature_password, :required => true
         f.input :signature_password_confirmation, :required => true
       end
