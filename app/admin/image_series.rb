@@ -60,7 +60,7 @@ ActiveAdmin.register ImageSeries do
         new_visit_assignment_changes[required_series_name] = image_series.id.to_s
       end
       original_visit.change_required_series_assignment(original_visit_assignment_changes) unless original_visit.nil?
-      unless(new_visit.nil? or original_visit.visit_type != new_visit.visit_type)
+      unless(original_visit.nil? or new_visit.nil? or original_visit.visit_type != new_visit.visit_type)
         new_visit.change_required_series_assignment(new_visit_assignment_changes)
 
         unless(original_required_series.nil?)
