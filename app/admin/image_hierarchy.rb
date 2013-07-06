@@ -1,4 +1,5 @@
 ActiveAdmin.register_page 'Image Hierarchy' do
+  menu false
 
   content do
     div(:id => 'hierarchy_tree', :'data-url' => nodes_admin_image_hierarchy_path) do
