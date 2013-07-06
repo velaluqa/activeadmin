@@ -186,6 +186,8 @@ class Visit < ActiveRecord::Base
                           'DateImaging' => {'data' => visit_date.strftime('%d-%m-%Y'), 'type' => 'datetime'},
                         })
     end
+
+    properties
   end
   def domino_sync
     self.ensure_domino_document_exists
