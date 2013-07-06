@@ -27,7 +27,7 @@ class Center < ActiveRecord::Base
   before_save :ensure_study_is_unchanged
 
   def full_name
-    "#{self.code} - #{self.name}"
+    self.code + ' - ' + self.name
   end
   
   def previous_image_storage_path
