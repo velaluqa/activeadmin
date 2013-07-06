@@ -570,5 +570,53 @@ ActiveAdmin.register ImageSeries do
     @page_title = 'Assign Required Series'
   end
 
+  controller do
+    def build_image_series_tree_data(image_series)
+      data = image_series.map do |i_s|
+        children = i_s.images.map do |image|
+          {'label' => view_context.link_to(image.id.to_s, admin_image_path(image), :target => '_blank').html_safe, 'id' => 'image_'+image.id.to_s, 'type' => 'image'}
+        end
+        
+        {'label' => view_context.link_to(i_s.imaging_date.to_s + ' - ' +i_s.name, admin_image_series_path(i_s), :target => '_blank').html_safe, 'id' => 'image_series_'+i_s.id.to_s, 'children' => children, 'type' => 'image'}
+      end
+
+      return data
+    end
+  end
+  collection_action :store_rearranged_images, :method => :post do
+    begin
+      raw_assignment = JSON.parse(params[:assignment])
+    rescue JSON::JSONError => e
+      Rails.logger.warn 'Failed to parse JSON coming from iamge series rearrange: '+e.message
+      flash[:error] = 'Failed to save new assignment: '+e.message
+      redirect_to :action => :index
+      return
+    end
+
+    raw_assignment.each do |image_series|
+      if(image_series['id'] =~ /^image_series_([0-9]*)$/)
+        image_series_id = $1.to_i
+      else
+        next
+      end
+
+      next if image_series['children'].blank?
+      image_series['children'].each do |image|
+        if(image['id'] =~ /^image_([0-9]*)$/)
+          image = Image.find($1)
+          image.image_series_id = image_series_id
+          image.save
+        end        
+      end
+    end
+
+    redirect_to({:action => :index}, :notice => 'The images were successfully reassigned.')
+  end
+  batch_action :rearrange, :label => 'Rearrange Images of ' do |selection|
+    @tree_data = build_image_series_tree_data(ImageSeries.find(selection))
+
+    render 'admin/image_series/rearrange'
+  end
+
   viewer_cartable(:image_series)
 end

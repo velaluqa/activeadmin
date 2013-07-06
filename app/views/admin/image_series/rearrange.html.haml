@@ -1,0 +1,13 @@
+:javascript
+  var tree_data = #{@tree_data.to_json}
+
+= javascript_include_tag('image_series_rearrange')
+
+.panel
+  %h3 Rearrange Images in Image Series
+  .panel_contents
+    #images_tree
+    = form_tag(store_rearranged_images_admin_image_series_index_path, :method => :post, :id => 'save_form') do
+      -#%button#add_series_btn{:type => 'button'} Add Series
+      = hidden_field_tag('assignment', nil)
+      = submit_tag('Save')
