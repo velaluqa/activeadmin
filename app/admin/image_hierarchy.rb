@@ -1,12 +1,12 @@
 ActiveAdmin.register_page 'Image Hierarchy' do
 
   content do
-    div(id: 'hierarchy_tree', 'data-url': nodes_admin_image_hierarchy_path) do
+    div(:id => 'hierarchy_tree', :'data-url' => nodes_admin_image_hierarchy_path) do
       
     end
   end
 
-  page_action :nodes, :method => get do
+  page_action :nodes, :method => :get do
     raw_node_id = params[:node_id]
     node = nil
 
@@ -26,6 +26,5 @@ ActiveAdmin.register_page 'Image Hierarchy' do
       end
       return
     end
-
   end
 end

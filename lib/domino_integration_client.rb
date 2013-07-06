@@ -41,6 +41,7 @@ class DominoIntegrationClient
     end
 
     return @documents_resource['unid/'+unid].patch(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
+      pp response if response.code == 400
       response.code == 200
     end
   end

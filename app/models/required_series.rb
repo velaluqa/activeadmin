@@ -108,7 +108,6 @@ class RequiredSeries
   end
   def domino_document_properties(action = :update)
     properties = {
-      'trash' => 0,
       'ericaID' => @visit.id,
       'CenterNo' => @visit.patient.center.code,
       'PatNo' => @visit.patient.domino_patient_no,
@@ -116,17 +115,26 @@ class RequiredSeries
       'RequiredSeries' => self.name,
     }
 
-    unless(self.assigned_image_series.nil?)
+    if(self.assigned_image_series.nil?)
       properties.merge!({
+                          'trash' => 1,
+                          'ericaASID' => nil,
+                          'DateImaging' => '01-01-0001',
+                          'SeriesDescription' => nil,
+                          'DICOMTagNames' => nil,
+                          'DICOMValues' => nil,                          
+                        })
+    else
+      properties.merge!({
+                          'trash' => 0,
                           'ericaASID' => self.assigned_image_series.id,
                           'DateImaging' => {'data' => self.assigned_image_series.imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'},
                           'SeriesDescription' => self.assigned_image_series.name,
                         })
-      properties.merge!(self.assigned_image_series.dicom_metadata_to_domino)
-
-      properties.merge!(tqc_to_domino)
+      properties.merge!(self.assigned_image_series.dicom_metadata_to_domino)      
     end
-
+    properties.merge!(tqc_to_domino)
+    
     return properties
   end
 
@@ -140,14 +148,7 @@ class RequiredSeries
     end
   end
   def domino_sync
-    if(self.assigned?)
-      self.ensure_domino_document_exists
-    elsif(not self.domino_unid.blank?)
-      self.trash_document
-      self.domino_unid = nil
-    else
-      return true
-    end
+    self.ensure_domino_document_exists
   end
 
   protected
@@ -155,8 +156,8 @@ class RequiredSeries
   def tqc_to_domino
     result = {}
 
-    result['QCdate'] = {'data' => self.tqc_date.strftime('%d-%m-%Y'), 'type' => 'datetime'} unless self.tqc_date.nil?
-    result['QCperson'] = self.tqc_user.name unless self.tqc_user.nil?
+    result['QCdate'] = {'data' => (self.tqc_date.nil? ? '01-01-0001' : self.tqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime'}
+    result['QCperson'] = (self.tqc_user.nil? ? nil : self.tqc_user.name)
 
     result['QCresult'] = case self.tqc_state
                          when :pending then 'Pending'
@@ -167,7 +168,10 @@ class RequiredSeries
     criteria_names = []
     criteria_values = []
     results = self.tqc_spec_with_results
-    unless(results.nil?)
+    if(results.nil?)
+      result['QCCriteriaNames'] = nil
+      result['QCValues'] = nil
+    else
       results.each do |criterion|
         criteria_names << criterion['label']
         criteria_values << (criterion['answer'] == true ? 'Pass' : 'Fail')
