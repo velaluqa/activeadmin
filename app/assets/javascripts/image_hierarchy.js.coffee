@@ -1,4 +1,6 @@
 $(document).ready ->
   $('#hierarchy_tree').tree({
-    dragAndDrop: true
+    dragAndDrop: false
+    useContentMenu: true
+    autoEscape: false
   })
