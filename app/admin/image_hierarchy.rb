@@ -10,7 +10,7 @@ ActiveAdmin.register_page 'Image Hierarchy' do
     raw_node_id = params[:node]
 
     children_nodes = if(raw_node_id.blank?)
-                       Study.accessible_by(current_ability).order('name asc').map {|s| {'label' => view_context.link_to(s.name, admin_study_path(s), :target => '_blank').html_safe, 'id' => 'study_'+s.id.to_s, 'load_on_demand' => true} }
+                       (session[:selected_study_id].blank? ? Study : Study.where(:id => session[:selected_study_id]) ).accessible_by(current_ability).order('name asc').map {|s| {'label' => view_context.link_to(s.name, admin_study_path(s), :target => '_blank').html_safe, 'id' => 'study_'+s.id.to_s, 'load_on_demand' => true} }
                      elsif(raw_node_id =~ /^study_([0-9]*)$/)
                        Study.find($1).centers.accessible_by(current_ability).order('code asc').map {|c| {'label' => view_context.link_to(c.full_name, admin_center_path(c), :target => '_blank').html_safe, 'id' => 'center_'+c.id.to_s, 'load_on_demand' => true} }
                      elsif(raw_node_id =~ /^center_([0-9]*)$/)
