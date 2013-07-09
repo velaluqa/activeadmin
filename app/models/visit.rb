@@ -366,6 +366,49 @@ class Visit < ActiveRecord::Base
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
     return true
   end
+  def set_mqc_result(result, mqc_user, mqc_comment, mqc_date = nil, mqc_version = nil)
+    mqc_spec = self.mqc_spec
+    return 'No valid study configuration exists or it doesn\'t contain an mQC config for this visits visit type.' if mqc_spec.nil?
+
+    all_passed = true
+    mqc_spec.each do |spec|
+      all_passed &&= (not result.nil? and result[spec['id']] == true)
+    end
+
+    self.ensure_visit_data_exists
+    visit_data = self.visit_data
+
+    self.state = (all_passed ? :mqc_passed : :mqc_issues)
+    self.mqc_user_id = (mqc_user.is_a?(User) ? mqc_user.id : mqc_user)
+    self.mqc_date = (mqc_date.nil? ? Time.now : mqc_date)
+    visit_data.mqc_version = (mqc_version.nil? ? GitConfigRepository.new.current_version : mqc_version)
+    visit_data.mqc_results = result
+    visit_data.mqc_comment = mqc_comment
+
+    visit_data.save
+    self.save
+
+    self.schedule_domino_sync
+
+    return true
+  end
+  def mqc_spec
+    config = study.current_configuration
+    return nil if config.nil? or config['visit_types'].nil? or config['visit_types'][self.visit_type].nil?
+    
+    return config['visit_types'][self.visit_type]['mqc']
+  end
+  def mqc_spec_with_results
+    mqc_spec = self.mqc_spec
+    mqc_results = (self.visit_data.nil? ? nil : self.visit_data.mqc_results)
+    return nil if mqc_spec.nil? or mqc_results.nil?
+
+    mqc_spec.each do |question|
+      question['answer'] = mqc_results[question['id']]
+    end
+    
+    return mqc_spec
+  end
 
   protected
 

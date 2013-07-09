@@ -304,6 +304,74 @@ ActiveAdmin.register Visit do
     render 'admin/visits/tqc_form'
   end
 
+  member_action :mqc_results, :method => :get do
+    @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
+
+    @mqc_spec = @visit.mqc_spec_with_results
+    if(@mqc_spec.nil?)
+      flash[:error] = 'Viewing mQC results requires a valid study config containing mQC specifications for this visits visit type and existing mQC results.'
+      redirect_to :action => :show
+      return
+    end
+
+    @page_title = "mQC results"
+    render 'admin/visits/mqc_results'
+  end
+  member_action :mqc, :method => :post do
+    @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
+
+    unless(@visit.state == :complete || @visit.state == :mqc_issues)
+      flash[:error] = 'mQC cannot be performed before this visit is complete (all required series are assigned and have passed tQC).'
+      redirect_to :action => :show
+      return
+    end
+
+    mqc_result = {}
+    unless(params[:mqc_result].nil?)
+      params[:mqc_result].each do |id, value|
+        mqc_result[id] = (value == '1')
+      end
+    end
+
+    success = @visit.set_mqc_result(mqc_result, current_user, params[:mqc_comment])
+    if(success == true)
+      redirect_to({:action => :show}, :notice => 'mQC results saved.')
+    else
+      flash[:error] = 'Storing mQC results failed: '+sucess
+      redirect_to :action => :show
+    end
+  end
+  member_action :mqc_form, :method => :get do
+    @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
+
+    unless(@visit.state == :complete || @visit.state == :mqc_issues)
+      flash[:error] = 'mQC cannot be performed before this visit is complete (all required series are assigned and have passed tQC).'
+      redirect_to :action => :show
+      return
+    end
+
+    @mqc_spec = @visit.mqc_spec
+    if(@mqc_spec.nil?)
+      flash[:error] = 'Performing mQC requires a valid study config containing mQC specifications for this visits visit type.'
+      redirect_to :action => :show
+      return
+    end
+    @visit.ensure_visit_data_exists
+    @visit_data = @visit.visit_data
+
+    @page_title = "Perform mQC"
+    render 'admin/visits/mqc_form'
+  end
+  action_item :only => :show do
+    link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if(resource.state == :complete or resource.state == :mqc_issues)
+  end
+  action_item :only => :show do
+    link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.state == :mqc_issues or resource.state == :mqc_passed)
+  end
+
   controller do
     def perform_dicom_tqc_check(expected, actual)
       return nil if actual.nil?
