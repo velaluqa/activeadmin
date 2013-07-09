@@ -83,6 +83,18 @@ ActiveAdmin.register Visit do
     column :description
     column :visit_type
     column :visit_date
+    column :state, :sortable => :state do |visit|
+      case(visit.state)
+      when :incomplete then status_tag('Incomplete')
+      when :complete then status_tag('Complete', :warning)
+      when :mqc_issues then status_tag('mQC, issues present', :error)
+      when :mqc_passed then status_tag('mQC passed', :ok)
+      end
+    end
+    column 'mQC Date', :mqc_date
+    column 'mQC User', :mqc_user, :sortable => :mqc_user_id do |visit|
+      link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user)) unless visit.mqc_user.nil?
+    end
     
     default_actions
   end
@@ -96,6 +108,14 @@ ActiveAdmin.register Visit do
       row :description
       row :visit_type
       row :visit_date
+      row :state do
+        case(visit.state)
+        when :incomplete then status_tag('Incomplete')
+        when :complete then status_tag('Complete', :warning)
+        when :mqc_issues then status_tag('mQC, issues present', :error)
+        when :mqc_passed then status_tag('mQC passed', :ok)
+        end
+      end
       domino_link_row(visit)
       row :image_storage_path
     end

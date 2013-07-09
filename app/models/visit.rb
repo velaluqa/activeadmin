@@ -6,12 +6,15 @@ class Visit < ActiveRecord::Base
 
   has_paper_trail
 
-  attr_accessible :patient_id, :visit_number, :description, :visit_type, :domino_unid
+  attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid
   attr_accessible :patient
+  attr_accessible :mqc_date, :mqc_user_id
+  attr_accessible :mqc_user
   
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
   has_one :visit_data
+  belongs_to :mqc_user, :class_name => 'User'
 
   validates_uniqueness_of :visit_number, :scope => :patient_id
   validates_presence_of :visit_number, :patient_id
@@ -45,6 +48,27 @@ class Visit < ActiveRecord::Base
     else
       self.patient.study
     end
+  end
+
+  STATE_SYMS = [:incomplete, :complete, :mqc_issues, :mqc_passed]
+
+  def self.state_sym_to_int(sym)
+    return Visit::STATE_SYMS.index(sym)
+  end
+  def state
+    return -1 if read_attribute(:state).nil?
+    return Visit::STATE_SYMS[read_attribute(:state)]
+  end
+  def state=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Visit::STATE_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported state"
+      return
+    end
+
+    write_attribute(:state, index)
   end
 
   def visit_data
@@ -338,6 +362,41 @@ class Visit < ActiveRecord::Base
   end
 
   protected
+
+  def reset_mqc
+    visit_data = self.visit_data
+    unless(visit_data.nil?)
+      visit_data.mqc_results = {}
+      visit_data.mqc_comment = nil
+      visit_data.mqc_version = nil
+
+      visit_data.save
+    end
+
+    self.mqc_user_id = nil
+    self.mqc_date = nil
+
+    self.save
+  end
+
+  def update_state
+    old_state = self.state
+
+    visit_complete = self.required_series_objects.map {|rs| rs.assigned? and rs.tqc_state == :passed}.reduce(:&)
+
+    new_state = if(not visit_complete)                  
+                  reset_mqc unless(old_state == :complete || :incomplete)
+
+                  :incomplete
+                elsif(visit_complete and old_state == :incomplete)
+                  :complete
+                else
+                  old_state
+                end
+
+    self.state = new_state
+    self.save
+  end
 
   def ensure_study_is_unchanged
     if(self.patient_id_changed? and not self.patient_id_was.nil?)
