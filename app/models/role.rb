@@ -9,8 +9,8 @@ class Role < ActiveRecord::Base
 
   # ROLE_SYMS = [:manage, :validate, :blind_read]
   # ROLE_NAMES = ['Manager', 'Validator', 'Reader']
-  ROLE_SYMS = [:manage, :image_import, :image_manage]
-  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager']
+  ROLE_SYMS = [:manage, :image_import, :image_manage, :medical_qc]
+  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager', 'Medical QC']
 
   before_save :fix_subject
 

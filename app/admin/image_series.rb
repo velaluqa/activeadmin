@@ -2,6 +2,8 @@ require 'aa_domino'
 
 ActiveAdmin.register ImageSeries do
 
+  menu if: proc { can? :read, ImageSeries }
+
   scope :all, :default => true
   scope :not_assigned
 
@@ -9,6 +11,8 @@ ActiveAdmin.register ImageSeries do
 
   controller do
     load_and_authorize_resource :except => :index
+    skip_load_and_authorize_resource :only => [:viewer, :dicom_metadata]
+
     def scoped_collection
       if(session[:selected_study_id].nil?)
         end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)
@@ -276,6 +280,7 @@ ActiveAdmin.register ImageSeries do
 
   member_action :viewer, :method => :get do
     @image_series = ImageSeries.find(params[:id])
+    authorize! :read, @image_series
 
     current_user.ensure_authentication_token!
     @wado_query_urls = [wado_query_image_series_url(@image_series, :format => :xml, :authentication_token => current_user.authentication_token)]

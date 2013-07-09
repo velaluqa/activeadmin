@@ -14,6 +14,6 @@ class VisitsController < ApplicationController
 
   def load_the_visit
     @visit = Visit.find(params[:id])
-    authorize! :manage, @visit
+    authorize! :read, @visit
   end
 end

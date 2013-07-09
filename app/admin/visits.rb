@@ -2,10 +2,14 @@ require 'aa_domino'
 
 ActiveAdmin.register Visit do
 
+  menu if: proc { can? :read, Visit }
+
   config.per_page = 100
 
   controller do
     load_and_authorize_resource :except => :index
+    skip_load_and_authorize_resource :only => [:assign_required_series, :assign_required_series_form, :tqc_results, :tqc, :tqc_form, :required_series_viewer, :required_series_dicom_metadata]
+    
     def scoped_collection
       if(session[:selected_study_id].nil?)
         end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)
@@ -180,6 +184,7 @@ ActiveAdmin.register Visit do
 
   member_action :assign_required_series, :method => :post do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     @assignments = params[:assignments] || {}
 
@@ -189,6 +194,7 @@ ActiveAdmin.register Visit do
   end
   member_action :assign_required_series_form, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     @required_series_names = params[:required_series_names]
     if(@required_series_names.nil?)
@@ -212,6 +218,7 @@ ActiveAdmin.register Visit do
 
   member_action :tqc_results, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)
@@ -235,6 +242,7 @@ ActiveAdmin.register Visit do
   end
   member_action :tqc, :method => :post do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     required_series_name = params[:required_series_name]
     if(required_series_name.nil?)
@@ -260,6 +268,7 @@ ActiveAdmin.register Visit do
   end
   member_action :tqc_form, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)
@@ -334,6 +343,7 @@ ActiveAdmin.register Visit do
 
   member_action :required_series_viewer, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :read, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)
@@ -353,6 +363,7 @@ ActiveAdmin.register Visit do
   end
   member_action :required_series_dicom_metadata, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :read, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)
