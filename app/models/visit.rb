@@ -311,6 +311,8 @@ class Visit < ActiveRecord::Base
     visit_data.reconstruct_assignment_index
     visit_data.save
 
+    update_state
+
     schedule_required_series_domino_sync
   end
 
@@ -330,6 +332,8 @@ class Visit < ActiveRecord::Base
     visit_data.save
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
+
+    update_state
   end
   def set_tqc_result(required_series_name, result, tqc_user, tqc_comment, tqc_date = nil, tqc_version = nil)
     required_series_specs = self.required_series_specs
@@ -356,6 +360,8 @@ class Visit < ActiveRecord::Base
     visit_data = self.visit_data
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
+
+    update_state
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
     return true
