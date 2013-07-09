@@ -67,8 +67,9 @@ ActiveAdmin.register ImageSeries do
           currently_assigned_required_series_names.each do |required_series_name|
             next if original_required_series[required_series_name].nil?
             new_visit.set_tqc_result(required_series_name,
-                                     original_required_series[required_series_name]['tqc_results'], 
+                                     original_required_series[required_series_name]['tqc_results'],
                                      original_required_series[required_series_name]['tqc_user_id'],
+                                     original_required_series[required_series_name]['tqc_comment'],
                                      original_required_series[required_series_name]['tqc_date'],
                                      original_required_series[required_series_name]['tqc_version'])
           end

@@ -230,7 +230,7 @@ ActiveAdmin.register Visit do
       end
     end
 
-    success = @visit.set_tqc_result(required_series_name, tqc_result, current_user)
+    success = @visit.set_tqc_result(required_series_name, tqc_result, current_user, params[:tqc_comment])
     if(success == true)
       redirect_to({:action => :show}, :notice => 'tQC results saved.')
     else

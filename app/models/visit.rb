@@ -264,6 +264,7 @@ class Visit < ActiveRecord::Base
         visit_data.required_series[required_series_name].delete('tqc_date')
         visit_data.required_series[required_series_name].delete('tqc_version')
         visit_data.required_series[required_series_name].delete('tqc_results')
+        visit_data.required_series[required_series_name].delete('tqc_comment')
       end
     end
     
@@ -299,13 +300,14 @@ class Visit < ActiveRecord::Base
     required_series.delete('tqc_date')
     required_series.delete('tqc_version')
     required_series.delete('tqc_results')
+    required_series.delete('tqc_comment')
 
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
   end
-  def set_tqc_result(required_series_name, result, tqc_user, tqc_date = nil, tqc_version = nil)
+  def set_tqc_result(required_series_name, result, tqc_user, tqc_comment, tqc_date = nil, tqc_version = nil)
     required_series_specs = self.required_series_specs
     return 'No valid study configuration exists.' if required_series_specs.nil?
 
@@ -325,6 +327,7 @@ class Visit < ActiveRecord::Base
     required_series['tqc_date'] = (tqc_date.nil? ? Time.now : tqc_date)
     required_series['tqc_version'] = (tqc_version.nil? ? GitConfigRepository.new.current_version : tqc_version)
     required_series['tqc_results'] = result
+    required_series['tqc_comment'] = tqc_comment
 
     visit_data = self.visit_data
     visit_data.required_series[required_series_name] = required_series

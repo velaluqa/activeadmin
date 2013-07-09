@@ -9,7 +9,7 @@ class RequiredSeries
 
   attr_reader :visit, :name
   attr_reader :image_series_id, :assigned_image_series
-  attr_reader :tqc_results, :tqc_date, :tqc_version, :tqc_user_id, :tqc_state
+  attr_reader :tqc_results, :tqc_date, :tqc_version, :tqc_user_id, :tqc_state, :tqc_comment
   attr_reader :tqc_user
   attr_reader :domino_unid
 
@@ -27,6 +27,7 @@ class RequiredSeries
     unless(data.nil?)
       @image_series_id = data['image_series_id']
       @tqc_results = data['tqc_results']
+      @tqc_comment = data['tqc_comment']
       @tqc_date = data['tqc_date']
       @tqc_version = data['tqc_version']
       @tqc_user_id = data['tqc_user_id']
@@ -164,6 +165,8 @@ class RequiredSeries
                          when :issues then 'Performed, issues present'
                          when :passed then 'Performed, no issues present'
                          end
+
+    result['QCcomment'] = self.tqc_comment
 
     criteria_names = []
     criteria_values = []
