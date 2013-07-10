@@ -1,0 +1,14 @@
+.panel
+  %h3 Visits
+  .panel_content
+    %ul.sortable#visits_sortable
+      - @visits.each do |v|
+        %li{:'data-visit-id' => v.id}= (v.description.blank? ? v.name : v.name + ' - ' + v.description)
+= form_tag(reorder_visits_admin_patient_path(@patient)) do
+  = hidden_field_tag('new_visits_list', @visits.map{|v| v.id.to_s}.join(','))
+  %fieldset.actions
+    %ol
+      %li.action.input_action
+        %input{:name => 'commit', :type => 'submit', :value => 'Submit'}
+      %li.cancel
+        %a{:href => admin_patient_path(@patient)} Cancel

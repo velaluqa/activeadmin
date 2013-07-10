@@ -2,6 +2,7 @@
 
 //= require jquery.sortable
 //= require reorder_case_list
+//= require reorder_visits
 
 //= require select2
 //= require cases_advanced_filters
