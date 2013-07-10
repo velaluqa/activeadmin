@@ -65,7 +65,7 @@ namespace :erica do
     end
     
     print "Backing up configuration files..\t\t"
-    data_tar_command = "tar czf \"#{backup_folder}/data.tar.gz\" \"#{Rails.application.config.data_directory}\""
+    data_tar_command = "tar --exclude=#{Rails.application.config.image_storage_root} --exclude=#{Rails.application.config.image_export_root} -czf \"#{backup_folder}/data.tar.gz\" \"#{Rails.application.config.data_directory}\""
     pp data_tar_command
     if(system(data_tar_command))
       puts 'DONE'
