@@ -211,6 +211,8 @@ class Visit < ActiveRecord::Base
                         })
     end
 
+    properties.merge!(mqc_to_domino)
+
     properties
   end
   def domino_sync
@@ -388,8 +390,6 @@ class Visit < ActiveRecord::Base
     visit_data.save
     self.save
 
-    self.schedule_domino_sync
-
     return true
   end
   def mqc_spec
@@ -401,7 +401,7 @@ class Visit < ActiveRecord::Base
   def mqc_spec_with_results
     mqc_spec = self.mqc_spec
     mqc_results = (self.visit_data.nil? ? nil : self.visit_data.mqc_results)
-    return nil if mqc_spec.nil? or mqc_results.nil?
+    return nil if mqc_spec.nil? or mqc_results.blank?
 
     mqc_spec.each do |question|
       question['answer'] = mqc_results[question['id']]
@@ -427,14 +427,49 @@ class Visit < ActiveRecord::Base
 
     self.save
   end
+  def mqc_to_domino
+    self.ensure_visit_data_exists
+
+    result = {}
+
+    result['QCdate'] = {'data' => (self.mqc_date.nil? ? '01-01-0001' : self.mqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime'}
+    result['QCperson'] = (self.mqc_user.nil? ? nil : self.mqc_user.name)
+
+    result['QCresult'] = case self.state
+                         when :incomplete then 'Visit incomplete'
+                         when :complete then 'Pending'
+                         when :mqc_issues then 'Performed, issues present'
+                         when :mqc_passed then 'Performed, no issues present'
+                         end
+
+    result['QCcomment'] = self.visit_data.mqc_comment
+
+    criteria_names = []
+    criteria_values = []
+    results = self.mqc_spec_with_results
+    if(results.nil?)
+      result['QCCriteriaNames'] = nil
+      result['QCValues'] = nil
+    else
+      results.each do |criterion|
+        criteria_names << criterion['label']
+        criteria_values << (criterion['answer'] == true ? 'Pass' : 'Fail')
+      end
+
+      result['QCCriteriaNames'] = criteria_names.join("\n")
+      result['QCValues'] = criteria_values.join("\n")
+    end
+
+    return result
+  end
 
   def update_state
     old_state = self.state
 
     visit_complete = self.required_series_objects.map {|rs| rs.assigned? and rs.tqc_state == :passed}.reduce(:&)
 
-    new_state = if(not visit_complete)                  
-                  reset_mqc unless(old_state == :complete || :incomplete)
+    new_state = if(not visit_complete)
+                  reset_mqc unless(old_state == :complete || old_state == :incomplete)
 
                   :incomplete
                 elsif(visit_complete and old_state == :incomplete)
