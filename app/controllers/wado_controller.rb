@@ -136,6 +136,7 @@ class WadoController < ApplicationController
     image_id = @wado_request[:object_uid].slice(Rails.application.config.wado_dicom_prefix.length..-1).to_i
 
     @image = Image.where(:id => image_id).first
+    authorize! :read, @image
     pp @image
     return head :not_found if @image.nil?
 

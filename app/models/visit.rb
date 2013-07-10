@@ -6,12 +6,15 @@ class Visit < ActiveRecord::Base
 
   has_paper_trail
 
-  attr_accessible :patient_id, :visit_number, :description, :visit_type, :domino_unid
+  attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid
   attr_accessible :patient
+  attr_accessible :mqc_date, :mqc_user_id
+  attr_accessible :mqc_user
   
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
   has_one :visit_data
+  belongs_to :mqc_user, :class_name => 'User'
 
   validates_uniqueness_of :visit_number, :scope => :patient_id
   validates_presence_of :visit_number, :patient_id
@@ -45,6 +48,27 @@ class Visit < ActiveRecord::Base
     else
       self.patient.study
     end
+  end
+
+  STATE_SYMS = [:incomplete, :complete, :mqc_issues, :mqc_passed]
+
+  def self.state_sym_to_int(sym)
+    return Visit::STATE_SYMS.index(sym)
+  end
+  def state
+    return -1 if read_attribute(:state).nil?
+    return Visit::STATE_SYMS[read_attribute(:state)]
+  end
+  def state=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Visit::STATE_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported state"
+      return
+    end
+
+    write_attribute(:state, index)
   end
 
   def visit_data
@@ -187,6 +211,8 @@ class Visit < ActiveRecord::Base
                         })
     end
 
+    properties.merge!(mqc_to_domino)
+
     properties
   end
   def domino_sync
@@ -264,6 +290,7 @@ class Visit < ActiveRecord::Base
         visit_data.required_series[required_series_name].delete('tqc_date')
         visit_data.required_series[required_series_name].delete('tqc_version')
         visit_data.required_series[required_series_name].delete('tqc_results')
+        visit_data.required_series[required_series_name].delete('tqc_comment')
       end
     end
     
@@ -286,6 +313,8 @@ class Visit < ActiveRecord::Base
     visit_data.reconstruct_assignment_index
     visit_data.save
 
+    update_state
+
     schedule_required_series_domino_sync
   end
 
@@ -299,13 +328,16 @@ class Visit < ActiveRecord::Base
     required_series.delete('tqc_date')
     required_series.delete('tqc_version')
     required_series.delete('tqc_results')
+    required_series.delete('tqc_comment')
 
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
+
+    update_state
   end
-  def set_tqc_result(required_series_name, result, tqc_user, tqc_date = nil, tqc_version = nil)
+  def set_tqc_result(required_series_name, result, tqc_user, tqc_comment, tqc_date = nil, tqc_version = nil)
     required_series_specs = self.required_series_specs
     return 'No valid study configuration exists.' if required_series_specs.nil?
 
@@ -325,16 +357,130 @@ class Visit < ActiveRecord::Base
     required_series['tqc_date'] = (tqc_date.nil? ? Time.now : tqc_date)
     required_series['tqc_version'] = (tqc_version.nil? ? GitConfigRepository.new.current_version : tqc_version)
     required_series['tqc_results'] = result
+    required_series['tqc_comment'] = tqc_comment
 
     visit_data = self.visit_data
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
 
+    update_state
+
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
     return true
   end
+  def set_mqc_result(result, mqc_user, mqc_comment, mqc_date = nil, mqc_version = nil)
+    mqc_spec = self.mqc_spec
+    return 'No valid study configuration exists or it doesn\'t contain an mQC config for this visits visit type.' if mqc_spec.nil?
+
+    all_passed = true
+    mqc_spec.each do |spec|
+      all_passed &&= (not result.nil? and result[spec['id']] == true)
+    end
+
+    self.ensure_visit_data_exists
+    visit_data = self.visit_data
+
+    self.state = (all_passed ? :mqc_passed : :mqc_issues)
+    self.mqc_user_id = (mqc_user.is_a?(User) ? mqc_user.id : mqc_user)
+    self.mqc_date = (mqc_date.nil? ? Time.now : mqc_date)
+    visit_data.mqc_version = (mqc_version.nil? ? GitConfigRepository.new.current_version : mqc_version)
+    visit_data.mqc_results = result
+    visit_data.mqc_comment = mqc_comment
+
+    visit_data.save
+    self.save
+
+    return true
+  end
+  def mqc_spec
+    config = study.current_configuration
+    return nil if config.nil? or config['visit_types'].nil? or config['visit_types'][self.visit_type].nil?
+    
+    return config['visit_types'][self.visit_type]['mqc']
+  end
+  def mqc_spec_with_results
+    mqc_spec = self.mqc_spec
+    mqc_results = (self.visit_data.nil? ? nil : self.visit_data.mqc_results)
+    return nil if mqc_spec.nil? or mqc_results.blank?
+
+    mqc_spec.each do |question|
+      question['answer'] = mqc_results[question['id']]
+    end
+    
+    return mqc_spec
+  end
 
   protected
+
+  def reset_mqc
+    visit_data = self.visit_data
+    unless(visit_data.nil?)
+      visit_data.mqc_results = {}
+      visit_data.mqc_comment = nil
+      visit_data.mqc_version = nil
+
+      visit_data.save
+    end
+
+    self.mqc_user_id = nil
+    self.mqc_date = nil
+
+    self.save
+  end
+  def mqc_to_domino
+    self.ensure_visit_data_exists
+
+    result = {}
+
+    result['QCdate'] = {'data' => (self.mqc_date.nil? ? '01-01-0001' : self.mqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime'}
+    result['QCperson'] = (self.mqc_user.nil? ? nil : self.mqc_user.name)
+
+    result['QCresult'] = case self.state
+                         when :incomplete then 'Visit incomplete'
+                         when :complete then 'Pending'
+                         when :mqc_issues then 'Performed, issues present'
+                         when :mqc_passed then 'Performed, no issues present'
+                         end
+
+    result['QCcomment'] = self.visit_data.mqc_comment
+
+    criteria_names = []
+    criteria_values = []
+    results = self.mqc_spec_with_results
+    if(results.nil?)
+      result['QCCriteriaNames'] = nil
+      result['QCValues'] = nil
+    else
+      results.each do |criterion|
+        criteria_names << criterion['label']
+        criteria_values << (criterion['answer'] == true ? 'Pass' : 'Fail')
+      end
+
+      result['QCCriteriaNames'] = criteria_names.join("\n")
+      result['QCValues'] = criteria_values.join("\n")
+    end
+
+    return result
+  end
+
+  def update_state
+    old_state = self.state
+
+    visit_complete = self.required_series_objects.map {|rs| rs.assigned? and rs.tqc_state == :passed}.reduce(:&)
+
+    new_state = if(not visit_complete)
+                  reset_mqc unless(old_state == :complete || old_state == :incomplete)
+
+                  :incomplete
+                elsif(visit_complete and old_state == :incomplete)
+                  :complete
+                else
+                  old_state
+                end
+
+    self.state = new_state
+    self.save
+  end
 
   def ensure_study_is_unchanged
     if(self.patient_id_changed? and not self.patient_id_was.nil?)

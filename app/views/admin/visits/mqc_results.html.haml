@@ -1,0 +1,39 @@
+.panel
+  %h3 mQC Details
+  .panel_contents
+    .attributes_table
+      %table{:border => 0, :cellspacing => 0, :cellpadding => 0}
+        %tbody
+          %tr
+            %th State
+            %td
+              - case @visit.state
+              - when :complete
+                %span.status_tag.Pending.warning Pending
+              - when :mqc_issues
+                %span.status_tag.Issues.error Performed, issues present                
+              - when :mqc_passed
+                %span.status_tag.Passed.ok Passed
+          %tr
+            %th Date
+            %td= pretty_format(@visit.mqc_date.localtime) unless @visit.mqc_date.nil?
+          %tr
+            %th User
+            %td= link_to(@visit.mqc_user.name, admin_user_path(@visit.mqc_user)) unless @visit.mqc_user.nil?
+          %tr
+            %th Comment
+            %td= @visit.visit_data.mqc_comment unless @visit.visit_data.nil?
+
+.panel
+  %h3 mQC Question
+  .panel_contents
+    .attributes_table
+      %table{:border => 0, :cellspacing => 0, :cellpadding => 0}
+        - @mqc_spec.each do |question|
+          %tr
+            %th= question['label']
+            %td
+              - if question['answer'] == true
+                %span.status_tag.Pass.ok Pass
+              - else
+                %span.status_tag.Fail.error Fail

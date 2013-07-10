@@ -2,10 +2,14 @@ require 'aa_domino'
 
 ActiveAdmin.register Visit do
 
+  menu if: proc { can? :read, Visit }
+
   config.per_page = 100
 
   controller do
     load_and_authorize_resource :except => :index
+    skip_load_and_authorize_resource :only => [:assign_required_series, :assign_required_series_form, :tqc_results, :tqc, :tqc_form, :required_series_viewer, :required_series_dicom_metadata]
+    
     def scoped_collection
       if(session[:selected_study_id].nil?)
         end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)
@@ -83,6 +87,18 @@ ActiveAdmin.register Visit do
     column :description
     column :visit_type
     column :visit_date
+    column :state, :sortable => :state do |visit|
+      case(visit.state)
+      when :incomplete then status_tag('Incomplete')
+      when :complete then status_tag('Complete', :warning)
+      when :mqc_issues then status_tag('mQC, issues present', :error)
+      when :mqc_passed then status_tag('mQC passed', :ok)
+      end
+    end
+    column 'mQC Date', :mqc_date
+    column 'mQC User', :mqc_user, :sortable => :mqc_user_id do |visit|
+      link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user)) unless visit.mqc_user.nil?
+    end
     
     default_actions
   end
@@ -96,6 +112,14 @@ ActiveAdmin.register Visit do
       row :description
       row :visit_type
       row :visit_date
+      row :state do
+        case(visit.state)
+        when :incomplete then status_tag('Incomplete')
+        when :complete then status_tag('Complete', :warning)
+        when :mqc_issues then status_tag('mQC, issues present', :error)
+        when :mqc_passed then status_tag('mQC passed', :ok)
+        end
+      end
       domino_link_row(visit)
       row :image_storage_path
     end
@@ -160,6 +184,7 @@ ActiveAdmin.register Visit do
 
   member_action :assign_required_series, :method => :post do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     @assignments = params[:assignments] || {}
 
@@ -169,6 +194,7 @@ ActiveAdmin.register Visit do
   end
   member_action :assign_required_series_form, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     @required_series_names = params[:required_series_names]
     if(@required_series_names.nil?)
@@ -192,6 +218,7 @@ ActiveAdmin.register Visit do
 
   member_action :tqc_results, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)
@@ -215,6 +242,7 @@ ActiveAdmin.register Visit do
   end
   member_action :tqc, :method => :post do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     required_series_name = params[:required_series_name]
     if(required_series_name.nil?)
@@ -230,7 +258,7 @@ ActiveAdmin.register Visit do
       end
     end
 
-    success = @visit.set_tqc_result(required_series_name, tqc_result, current_user)
+    success = @visit.set_tqc_result(required_series_name, tqc_result, current_user, params[:tqc_comment])
     if(success == true)
       redirect_to({:action => :show}, :notice => 'tQC results saved.')
     else
@@ -240,6 +268,7 @@ ActiveAdmin.register Visit do
   end
   member_action :tqc_form, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)
@@ -273,6 +302,74 @@ ActiveAdmin.register Visit do
     
     @page_title = "Perform tQC for #{@required_series.name}"
     render 'admin/visits/tqc_form'
+  end
+
+  member_action :mqc_results, :method => :get do
+    @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
+
+    @mqc_spec = @visit.mqc_spec_with_results
+    if(@mqc_spec.nil?)
+      flash[:error] = 'Viewing mQC results requires a valid study config containing mQC specifications for this visits visit type and existing mQC results.'
+      redirect_to :action => :show
+      return
+    end
+
+    @page_title = "mQC results"
+    render 'admin/visits/mqc_results'
+  end
+  member_action :mqc, :method => :post do
+    @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
+
+    unless(@visit.state == :complete || @visit.state == :mqc_issues)
+      flash[:error] = 'mQC cannot be performed before this visit is complete (all required series are assigned and have passed tQC).'
+      redirect_to :action => :show
+      return
+    end
+
+    mqc_result = {}
+    unless(params[:mqc_result].nil?)
+      params[:mqc_result].each do |id, value|
+        mqc_result[id] = (value == '1')
+      end
+    end
+
+    success = @visit.set_mqc_result(mqc_result, current_user, params[:mqc_comment])
+    if(success == true)
+      redirect_to({:action => :show}, :notice => 'mQC results saved.')
+    else
+      flash[:error] = 'Storing mQC results failed: '+sucess
+      redirect_to :action => :show
+    end
+  end
+  member_action :mqc_form, :method => :get do
+    @visit = Visit.find(params[:id])
+    authorize! :mqc, @visit unless can? :manage, @visit
+
+    unless(@visit.state == :complete || @visit.state == :mqc_issues)
+      flash[:error] = 'mQC cannot be performed before this visit is complete (all required series are assigned and have passed tQC).'
+      redirect_to :action => :show
+      return
+    end
+
+    @mqc_spec = @visit.mqc_spec
+    if(@mqc_spec.nil?)
+      flash[:error] = 'Performing mQC requires a valid study config containing mQC specifications for this visits visit type.'
+      redirect_to :action => :show
+      return
+    end
+    @visit.ensure_visit_data_exists
+    @visit_data = @visit.visit_data
+
+    @page_title = "Perform mQC"
+    render 'admin/visits/mqc_form'
+  end
+  action_item :only => :show do
+    link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if(resource.state == :complete or resource.state == :mqc_issues)
+  end
+  action_item :only => :show do
+    link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.state == :mqc_issues or resource.state == :mqc_passed)
   end
 
   controller do
@@ -314,6 +411,7 @@ ActiveAdmin.register Visit do
 
   member_action :required_series_viewer, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :read, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)
@@ -333,6 +431,7 @@ ActiveAdmin.register Visit do
   end
   member_action :required_series_dicom_metadata, :method => :get do
     @visit = Visit.find(params[:id])
+    authorize! :read, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)

@@ -5,6 +5,10 @@ class VisitData
   field :assigned_image_series_index, type: Hash, default: {}
   field :required_series, type: Hash, default: {}
 
+  field :mqc_results, type: Hash, default: {}
+  field :mqc_comment, type: String
+  field :mqc_version, type: String
+
   index visit_id: 1
 
   def visit

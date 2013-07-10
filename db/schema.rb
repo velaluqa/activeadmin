@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130702141017) do
+ActiveRecord::Schema.define(:version => 20130709135452) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -185,10 +185,13 @@ ActiveRecord::Schema.define(:version => 20130702141017) do
     t.integer  "visit_number"
     t.string   "visit_type"
     t.integer  "patient_id"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
     t.string   "domino_unid"
     t.string   "description"
+    t.datetime "mqc_date"
+    t.integer  "mqc_user_id"
+    t.integer  "state",        :default => 0
   end
 
 end

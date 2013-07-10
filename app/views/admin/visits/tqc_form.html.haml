@@ -1,4 +1,5 @@
-= form_tag(tqc_admin_visit_path(@visit, :required_series_name => @required_series.name), :method => :post, :class => 'formtastic form') do
+= javascript_include_tag('tqc_validation')
+= form_tag(tqc_admin_visit_path(@visit, :required_series_name => @required_series.name), :method => :post, :class => 'formtastic form', :id => 'tqc_form') do
   .panel
     %h3 Automatic DICOM tQC
     .panel_contents
@@ -40,6 +41,12 @@
             = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false)
             - unless spec['description'].nil?
               %p.inline-hints= spec['description']
+  = field_set_tag('<span>Comment / Observation</span>'.html_safe, :class => 'inputs') do
+    %ol
+      %li.input.string
+        = label_tag('tqc_comment', 'Comment', :id => 'tqc_comment_label')
+        = text_field_tag('tqc_comment', @required_series.tqc_comment)
+        %p.inline-hints#tqc_comment_hint A comment is required if any of the above criteria were answered with 'Fail'
 
   = field_set_tag(nil, :class => 'actions') do
     %ol

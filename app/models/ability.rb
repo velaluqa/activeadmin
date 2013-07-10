@@ -46,6 +46,27 @@ class Ability
       can :manage, Image
     end
 
+    # handle mQC roles
+    # we have to do this in this slightly awkward fassion to allow fetching visit records for any combination of image uploader/manager and mqc role
+    can :mqc, Study, Study.where('id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |study|
+      !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)}).nil?
+    end
+    if(not (user.has_system_role?(:image_import) or user.has_system_role?(:image_manage)))
+      can [:read, :mqc], Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |visit|
+        can? :mqc, visit.study
+      end
+      can :read, ImageSeries, ImageSeries.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |image_series|
+        can? :mqc, image_series.study
+      end
+      can :read, Image do |image|
+        can? :read, image.image_series
+      end
+    elsif(user.has_system_role?(:image_import) and not user.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)).empty?)
+      can :mqc, Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |visit|
+        can? :mqc, visit.study
+      end      
+    end
+
     # Session Admin
     can :manage, Session, ['sessions.id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |session|
       !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?) or
@@ -88,4 +109,5 @@ class Ability
   APP_ADMIN_SUBQUERY = 'EXISTS(SELECT id FROM roles WHERE subject_type IS NULL and subject_id IS NULL AND role = 0 AND user_id = ?)'
   SESSION_ROLES_SUBQUERY = 'SELECT roles.subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE \'Session\' AND roles.role = 0 AND roles.user_id = ?'
   SESSION_STUDY_ROLES_SUBQUERY = '(SELECT sessions.id FROM sessions WHERE sessions.study_id IN (SELECT roles.subject_id FROM roles INNER JOIN studies ON roles.subject_id = studies.id WHERE roles.subject_type LIKE \'Study\' AND roles.role = 0 AND roles.user_id = ?) UNION ALL '+SESSION_ROLES_SUBQUERY+')'
+  MQC_STUDY_ROLES_SUBQUERY = '(SELECT roles.subject_id FROM roles WHERE roles.subject_type LIKE \'Study\' AND roles.role = 3 AND roles.user_id = ?)'
 end

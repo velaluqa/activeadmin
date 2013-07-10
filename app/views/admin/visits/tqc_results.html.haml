@@ -23,6 +23,9 @@
           %tr
             %th Assigned Image Series
             %td= link_to(@required_series.assigned_image_series.name, admin_image_series_path(@required_series.assigned_image_series)) unless @required_series.assigned_image_series.nil?
+          %tr
+            %th Comment
+            %td= @required_series.tqc_comment
 
 .panel
   %h3 Automatic DICOM tQC

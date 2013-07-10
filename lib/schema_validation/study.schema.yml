@@ -79,3 +79,21 @@ mapping:
                             type: str
                           "expected":
                             type: any
+          "mqc":
+            type: seq
+            sequence:
+              - type: map
+                name: mqc_question
+                mapping:
+                  "id":
+                    type: str
+                    required: yes
+                    unique: yes
+                  "type":
+                    type: str
+                    required: yes
+                    enum: ['bool']
+                  "label":
+                    type: str
+                    required: yes
+                    

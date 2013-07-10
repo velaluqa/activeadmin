@@ -48,6 +48,6 @@ class ImageSeriesController < ApplicationController
   end
   def load_the_image_series
     @image_series = ImageSeries.find(params[:id])
-    authorize! :manage, @image_series
+    authorize! :read, @image_series
   end
 end
