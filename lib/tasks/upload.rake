@@ -37,7 +37,7 @@ namespace :erica do
       dicom_imaging_date = (dicom_metadata['0008,0022'].nil? ? dicom_metadata['0008,0023'] : dicom_metadata['0008,0022'])
       dicom_imaging_date = ActiveAdmin::ImagesHelper.pretty_print_dicom_tag(dicom_imaging_date[:value], dicom_imaging_date[:vr]) unless dicom_imaging_date.nil?
 
-      mismatch = (dicom_patient_name != erica_)
+      mismatch = (dicom_patient_name != erica_subject_id)
       failed_count += 1 if mismatch
 
       puts '"'+study_name+'","'+erica_patient_name+'","'+dicom_patient_name.to_s+'","'+erica_imaging_date.to_s+'","'+dicom_imaging_date.to_s+'","'+series_description+'","'+images_count.to_s+'","'+is.created_at.to_s+'","http://192.168.1.28/admin/image_series/'+is.id.to_s+'",'+(mismatch ? 'Yes' : 'No')
