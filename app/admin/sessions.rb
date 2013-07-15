@@ -92,9 +92,11 @@ ActiveAdmin.register Session do
           li { link_to('All Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :all)) }
           li { link_to('All Regular Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :regular)) }
           li { link_to('All Validation Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :validation)) }
+          li { link_to('All Reader Testing Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :reader_testing)) }
           li { link_to('Unexported Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :all)) }
           li { link_to('Unexported Regular Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :regular)) }
           li { link_to('Unexported Validation Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :validation)) }
+          li { link_to('Unexported Reader Testing Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :reader_testing)) }
         end
       end
       row :reorder_cases do
@@ -276,21 +278,36 @@ ActiveAdmin.register Session do
     authorize! :read, @session
 
     data = GitConfigRepository.new.data_at_version(@session.relative_config_file_path, nil)
-    send_data data, :filename => "session_#{@session.id}_current.yml" unless data.nil?
+    if(data.nil?)
+      flash[:error] = 'No configuration exist for this version.'
+      redirect_to :back
+    else
+      send_data data, :filename => "session_#{@session.id}_current.yml"
+    end
   end
   member_action :download_locked_configuration do
     @session = Session.find(params[:id])
     authorize! :read, @session
 
     data = GitConfigRepository.new.data_at_version(@session.relative_config_file_path, @session.locked_version)
-    send_data data, :filename => "session_#{@session.id}_#{@session.locked_version}.yml" unless data.nil?
+    if(data.nil?)
+      flash[:error] = 'No configuration exist for this version.'
+      redirect_to :back
+    else
+      send_data data, :filename => "session_#{@session.id}_#{@session.locked_version}.yml"
+    end
   end
   member_action :download_configuration_at_version do
     @session = Session.find(params[:id])
     authorize! :read, @session
 
     data = GitConfigRepository.new.data_at_version(@session.relative_config_file_path, params[:version])
-    send_data data, :filename => "session_#{@session.id}_#{params[:version]}.yml" unless data.nil?
+    if(data.nil?)
+      flash[:error] = 'No configuration exist for this version.'
+      redirect_to :back
+    else
+      send_data data, :filename => "session_#{@session.id}_#{params[:version]}.yml"
+    end
   end
   member_action :upload_config, :method => :post do
     @session = Session.find(params[:id])
@@ -498,12 +515,14 @@ ActiveAdmin.register Session do
   member_action :config_summary_report, :method => :get do
     @session = Session.find(params[:id])
 
+    case_flag = (params[:case_flag] == 'validation' ? :validation : :regular)
+
     @session_config_versions = {}
     @form_config_versions = {}
     @session_config_version_dates = {}
     @form_config_version_dates = {}
     @forms = {}
-    @session.cases.where(:flag => Case::flag_sym_to_int(:regular)).find_each do |c|
+    @session.cases.where(:flag => Case::flag_sym_to_int(case_flag)).find_each do |c|
       form_answer = c.form_answer
       next if form_answer.nil?
 
@@ -539,6 +558,16 @@ ActiveAdmin.register Session do
       sorted_form_config_version_dates[form_id] = versions.sort_by {|e| e[1][:min]}
     end
     @form_config_version_dates = sorted_form_config_version_dates
+
+    @page_title = 'Config Summary Report'
+    @page_title += case case_flag
+                   when :regular
+                     ' (Regular Cases)'
+                   when :validation
+                     ' (Validation Cases)'
+                   when :reader_testing
+                     ' (Reader Testing Cases)'
+                   end
   end
 
   member_action :session_summary_report, :method => :get do
@@ -561,6 +590,12 @@ ActiveAdmin.register Session do
   end
   action_item :only => :show do
     link_to 'Config Summary', config_summary_report_admin_session_path(session)
+  end
+  action_item :only => :config_summary_report do
+    link_to 'Validation Cases', config_summary_report_admin_session_path(session, :case_flag => 'validation') unless params[:case_flag] == 'validation'
+  end
+  action_item :only => :config_summary_report do
+    link_to 'Regular Cases', config_summary_report_admin_session_path(session, :case_flag => 'regular') if params[:case_flag] == 'validation'
   end
 
   member_action :deep_clone, :method => :post do

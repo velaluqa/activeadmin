@@ -39,7 +39,7 @@ ActiveAdmin.register Role do
       f.input :user, :required => true
       # HACK: we transform the malformed subject type in the Role model via a before_save filter and expand it into the proper subject_type and subject_id
       f.input :subject_type, :label => 'Subject', :collection => subjects
-      f.input :role, :collection => {"Manager" => :manage}, :as => :select, :include_blank => false
+      f.input :role, :collection => {'Manager' => :manage, 'Audit' => :audit}, :as => :select, :include_blank => false
     end
     
     f.buttons
