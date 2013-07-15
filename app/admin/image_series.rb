@@ -633,6 +633,23 @@ ActiveAdmin.register ImageSeries do
   batch_action :rearrange, :label => 'Rearrange Images of ' do |selection|
     @tree_data = build_image_series_tree_data(ImageSeries.find(selection))
 
+    patient_id = nil
+    patient_mismatch = false
+    image_series = ImageSeries.find(selection)
+    image_series.each do |is|
+      patient_id ||= is.patient_id
+
+      if(patient_id != is.patient_id)
+        patient_mismatch = true
+        break
+      end
+    end
+    if(patient_mismatch)
+      flash[:error] = 'All image series must belong to the same patient.'
+      redirect_to :back
+      next
+    end
+
     render 'admin/image_series/rearrange'
   end
 
