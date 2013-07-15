@@ -3,6 +3,8 @@ require 'aa_domino'
 
 ActiveAdmin.register Patient do
 
+  menu if: proc { can? :read, Patient }
+
   config.per_page = 100
   config.sort_order = 'centers.code_asc'
 
