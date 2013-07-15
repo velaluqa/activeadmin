@@ -595,7 +595,7 @@ ActiveAdmin.register ImageSeries do
           {'label' => view_context.link_to(image.id.to_s, admin_image_path(image), :target => '_blank').html_safe, 'id' => 'image_'+image.id.to_s, 'type' => 'image'}
         end
         
-        {'label' => view_context.link_to(i_s.imaging_date.to_s + ' - ' +i_s.name, admin_image_series_path(i_s), :target => '_blank').html_safe, 'id' => 'image_series_'+i_s.id.to_s, 'children' => children, 'type' => 'image'}
+        {'label' => view_context.link_to(i_s.imaging_date.to_s + ' - ' +i_s.name, admin_image_series_path(i_s), :target => '_blank').html_safe, 'id' => 'image_series_'+i_s.id.to_s, 'children' => children, 'type' => 'image_series'}
       end
 
       return data

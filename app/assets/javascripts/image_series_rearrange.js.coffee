@@ -14,6 +14,20 @@ $(document).ready ->
         return false
   })
 
+  images_tree.bind('tree.click', (event) ->
+    event.preventDefault();
+
+    selected_node = event.node
+    console.log(selected_node)
+    return unless selected_node.type == 'image'
+    if(images_tree.tree('isNodeSelected', selected_node))
+      console.log('remove')
+      images_tree.tree('removeFromSelection', selected_node)
+    else
+      console.log('add')
+      images_tree.tree('addToSelection', selected_node)
+  )
+
   # $('#add_series_btn').click ->
   #   images_tree.tree('appendNode', {label: 'New Series', id: 'image_series__new', type: 'image_series'})
 
