@@ -48,23 +48,25 @@ class Ability
 
     # handle mQC roles
     # we have to do this in this slightly awkward fassion to allow fetching visit records for any combination of image uploader/manager and mqc role
-    can :mqc, Study, Study.where('id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |study|
-      !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)}).nil?
-    end
-    if(not (user.has_system_role?(:image_import) or user.has_system_role?(:image_manage)))
-      can [:read, :mqc], Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |visit|
-        can? :mqc, visit.study
+    unless(user.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)).empty?)
+      can :mqc, Study, Study.where('id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |study|
+        !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)}).nil?
       end
-      can :read, ImageSeries, ImageSeries.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |image_series|
-        can? :mqc, image_series.study
+      if(not (user.has_system_role?(:image_import) or user.has_system_role?(:image_manage) or user.is_app_admin?))
+        can [:read, :mqc], Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |visit|
+          can? :mqc, visit.study
+        end
+        can :read, ImageSeries, ImageSeries.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |image_series|
+          can? :mqc, image_series.study
+        end
+        can :read, Image do |image|
+          can? :read, image.image_series
+        end
+      elsif(user.has_system_role?(:image_import))
+        can :mqc, Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |visit|
+          can? :mqc, visit.study
+        end      
       end
-      can :read, Image do |image|
-        can? :read, image.image_series
-      end
-    elsif(user.has_system_role?(:image_import) and not user.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)).empty?)
-      can :mqc, Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |visit|
-        can? :mqc, visit.study
-      end      
     end
 
     # Session Admin
