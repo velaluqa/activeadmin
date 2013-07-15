@@ -60,6 +60,7 @@ StudyServer::Application.routes.draw do
   resources :visits, :only => [] do
     member do
       get 'wado_query'
+      get 'required_series_wado_query'
     end
   end
 
