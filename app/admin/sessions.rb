@@ -46,12 +46,9 @@ ActiveAdmin.register Session do
     column :state, :sortable => :state do |session|
       session.state.to_s.camelize
     end
-    benchmark('Progress Column') do 
     column 'Progress' do |session|
       session.case_list(:read).size.to_s + ' / ' + session.case_list(:all).size.to_s
     end
-    end
-    benchmark('Config Column') do
     column :configuration do |session|
       if(session.has_configuration?)
         status_tag('Available', :ok)
@@ -59,16 +56,13 @@ ActiveAdmin.register Session do
         status_tag('Missing', :error)
       end
     end
-    end
 
-    benchmark('Actions Column') do
     customizable_default_actions do |session|
       except = []
       except << :destroy unless can? :destroy, session
       except << :edit unless can? :edit, session
       
       except
-    end
     end
   end
 
