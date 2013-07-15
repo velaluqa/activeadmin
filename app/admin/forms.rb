@@ -177,42 +177,72 @@ ActiveAdmin.register Form do
     authorize! :read, @form
 
     data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, nil)
-    send_data data, :filename => "form_#{@form.id}_current.yml" unless data.nil?
+    if(data.nil?)
+      flash[:error] = 'No configuration exist for this version.'
+      redirect_to :back
+    else
+      send_data data, :filename => "form_#{@form.id}_current.yml"
+    end
   end
   member_action :download_locked_configuration do
     @form = Form.find(params[:id])
     authorize! :read, @form
 
     data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, @form.locked_version)
-    send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.yml" unless data.nil?
+    if(data.nil?)
+      flash[:error] = 'No configuration exist for this version.'
+      redirect_to :back
+    else
+      send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.yml"
+    end
   end
   member_action :download_configuration_at_version do
     @form = Form.find(params[:id])
     authorize! :read, @form
 
     data = GitConfigRepository.new.data_at_version(@form.relative_config_file_path, params[:version])
-    send_data data, :filename => "form_#{@form.id}_#{params[:version]}.yml" unless data.nil?
+    if(data.nil?)
+      flash[:error] = 'No configuration exist for this version.'
+      redirect_to :back
+    else
+      send_data data, :filename => "form_#{@form.id}_#{params[:version]}.yml"
+    end
   end
   member_action :download_current_custom_validators do
     @form = Form.find(params[:id])
     authorize! :read, @form
 
     data = GitConfigRepository.new.data_at_version(@form.relative_validator_file_path, nil)
-    send_data data, :filename => "form_#{@form.id}_current.js" unless data.nil?
+    if(data.nil?)
+      flash[:error] = 'No custom validators exist for this version.'
+      redirect_to :back
+    else
+      send_data data, :filename => "form_#{@form.id}_current.js"
+    end
   end
   member_action :download_locked_custom_validators do
     @form = Form.find(params[:id])
     authorize! :read, @form
 
     data = GitConfigRepository.new.data_at_version(@form.relative_validator_file_path, @form.locked_version)
-    send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.js" unless data.nil?
+    if(data.nil?)
+      flash[:error] = 'No custom validators exist for this version.'
+      redirect_to :back
+    else
+      send_data data, :filename => "form_#{@form.id}_#{@form.locked_version}.js"
+    end
   end
   member_action :download_custom_validators_at_version do
     @form = Form.find(params[:id])
     authorize! :read, @form
 
     data = GitConfigRepository.new.data_at_version(@form.relative_validator_file_path, params[:version])
-    send_data data, :filename => "form_#{@form.id}_#{params[:version]}.js" unless data.nil?
+    if(data.nil?)
+      flash[:error] = 'No custom validators exist for this version.'
+      redirect_to :back
+    else
+      send_data data, :filename => "form_#{@form.id}_#{params[:version]}.js"
+    end
   end
 
   member_action :upload_config, :method => :post do
