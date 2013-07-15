@@ -92,9 +92,11 @@ ActiveAdmin.register Session do
           li { link_to('All Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :all)) }
           li { link_to('All Regular Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :regular)) }
           li { link_to('All Validation Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :validation)) }
+          li { link_to('All Reader Testing Cases', export_cases_admin_session_path(session, :export_state => :all, :export_kind => :reader_testing)) }
           li { link_to('Unexported Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :all)) }
           li { link_to('Unexported Regular Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :regular)) }
           li { link_to('Unexported Validation Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :validation)) }
+          li { link_to('Unexported Reader Testing Cases', export_cases_admin_session_path(session, :export_state => :unexported, :export_kind => :reader_testing)) }
         end
       end
       row :reorder_cases do
