@@ -48,7 +48,7 @@ ActiveAdmin.register Session do
     end
     benchmark('Progress Column') do 
     column 'Progress' do |session|
-      "#{session.case_list(:read).size} / #{session.case_list(:all).size}"
+      session.case_list(:read).size.to_s + ' / ' + session.case_list(:all).size.to_s
     end
     end
     benchmark('Config Column') do
