@@ -133,15 +133,15 @@ class Session < ActiveRecord::Base
     flag = (self.state == :testing ? :validation : :regular)
     case mode
     when :unread
-      self.cases.where(:state => Case::state_sym_to_int(:unread), :flag => Case::flag_sym_to_int(flag)).reject {|c| not c.form_answer.nil? }
+      self.cases.where(:state => Case::state_sym_to_int(:unread), :flag => Case::flag_sym_to_int(flag))
     when :in_progress
       self.cases.where(:state => Case::state_sym_to_int(:in_progress), :flag => Case::flag_sym_to_int(flag))
     when :read
-      self.cases.where(:state => Case::state_sym_to_int(:read), :flag => Case::flag_sym_to_int(flag)).reject {|c| c.form_answer.nil? }
+      self.cases.where(:state => Case::state_sym_to_int(:read), :flag => Case::flag_sym_to_int(flag))
     when :reopened
-      self.cases.where(:state => Case::state_sym_to_int(:reopened), :flag => Case::flag_sym_to_int(flag)).reject {|c| c.form_answer.nil? }
+      self.cases.where(:state => Case::state_sym_to_int(:reopened), :flag => Case::flag_sym_to_int(flag))
     when :reopened_in_progress
-      self.cases.where(:state => Case::state_sym_to_int(:reopened_in_progress), :flag => Case::flag_sym_to_int(flag)).reject {|c| c.form_answer.nil? }
+      self.cases.where(:state => Case::state_sym_to_int(:reopened_in_progress), :flag => Case::flag_sym_to_int(flag))
     when :all
       self.cases.where(:flag => Case::flag_sym_to_int(flag))
     end
@@ -156,12 +156,6 @@ class Session < ActiveRecord::Base
     c.save
 
     return c
-  end
-  def next_unread_case
-    case_list(:unread).first
-  end
-  def last_read_case
-    case_list(:read).last    
   end
 
   def next_position
