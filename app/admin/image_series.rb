@@ -445,11 +445,11 @@ ActiveAdmin.register ImageSeries do
   end
 
   collection_action :batch_assign_to_visit, :method => :post do
-    if(params[:visit_id].nil?)
+    if(params[:visit_id].blank?)
       flash[:error] = 'You have to select a visit to assign these image series to.'
       redirect_to :back
       return
-    elsif(params[:image_series].nil?)
+    elsif(params[:image_series].blank?)
       flash[:error] = 'You have to specify at least one image series to assign to this visit.'
       redirect_to :back
       return
@@ -458,7 +458,17 @@ ActiveAdmin.register ImageSeries do
     image_series_ids = params[:image_series].split(' ')
     image_series = ImageSeries.find(image_series_ids)
 
-    visit = Visit.find(params[:visit_id])
+    if(params[:visit_id] == 'new')
+      if(params[:visit][:visit_type].blank?)
+        flash[:error] = 'When creating a new visit, a visit type must be selected.'
+        redirect_to :back
+        return
+      end
+
+      visit = Visit.create(:patient => image_series.first.patient, :visit_number => params[:visit][:visit_number], :visit_type => params[:visit][:visit_type], :description => params[:visit][:description])
+    else
+      visit = Visit.find(params[:visit_id])
+    end
     authorize! :manage, visit
 
     image_series.each do |i_s|
@@ -474,12 +484,14 @@ ActiveAdmin.register ImageSeries do
   batch_action :assign_to_visit, :confirm => 'This will modify all selected image series. Are you sure?'  do |selection|
     patient_id = nil
     visits = []
+    visit_types = []
     failure = false
     
     ImageSeries.find(selection).each do |image_series|
       if patient_id.nil?
         patient_id = image_series.patient_id
         visits = image_series.patient.visits
+        visit_types = (image_series.study ? image_series.study.visit_types : [])
       end
       
       if(image_series.patient_id != patient_id)
@@ -499,7 +511,7 @@ ActiveAdmin.register ImageSeries do
     @return_url = request.referer
 
     @page_title = 'Assign to Visit'
-    render 'admin/image_series/assign_to_visit', :locals => {:selection => selection, :visits => visits}
+    render 'admin/image_series/assign_to_visit', :locals => {:selection => selection, :visits => visits, :visit_types => visit_types}
   end
 
   member_action :assign_visit, :method => :post do
@@ -583,7 +595,7 @@ ActiveAdmin.register ImageSeries do
           {'label' => view_context.link_to(image.id.to_s, admin_image_path(image), :target => '_blank').html_safe, 'id' => 'image_'+image.id.to_s, 'type' => 'image'}
         end
         
-        {'label' => view_context.link_to(i_s.imaging_date.to_s + ' - ' +i_s.name, admin_image_series_path(i_s), :target => '_blank').html_safe, 'id' => 'image_series_'+i_s.id.to_s, 'children' => children, 'type' => 'image'}
+        {'label' => view_context.link_to(i_s.imaging_date.to_s + ' - ' +i_s.name, admin_image_series_path(i_s), :target => '_blank').html_safe, 'id' => 'image_series_'+i_s.id.to_s, 'children' => children, 'type' => 'image_series'}
       end
 
       return data
@@ -620,6 +632,23 @@ ActiveAdmin.register ImageSeries do
   end
   batch_action :rearrange, :label => 'Rearrange Images of ' do |selection|
     @tree_data = build_image_series_tree_data(ImageSeries.find(selection))
+
+    patient_id = nil
+    patient_mismatch = false
+    image_series = ImageSeries.find(selection)
+    image_series.each do |is|
+      patient_id ||= is.patient_id
+
+      if(patient_id != is.patient_id)
+        patient_mismatch = true
+        break
+      end
+    end
+    if(patient_mismatch)
+      flash[:error] = 'All image series must belong to the same patient.'
+      redirect_to :back
+      next
+    end
 
     render 'admin/image_series/rearrange'
   end

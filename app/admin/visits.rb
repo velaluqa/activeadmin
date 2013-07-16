@@ -8,7 +8,7 @@ ActiveAdmin.register Visit do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:assign_required_series, :assign_required_series_form, :tqc_results, :tqc, :tqc_form, :required_series_viewer, :required_series_dicom_metadata]
+    skip_load_and_authorize_resource :only => [:assign_required_series, :assign_required_series_form, :tqc_results, :tqc, :tqc_form, :required_series_viewer, :required_series_dicom_metadata, :all_required_series_viewer]
     
     def scoped_collection
       if(session[:selected_study_id].nil?)
@@ -454,6 +454,19 @@ ActiveAdmin.register Visit do
   end
   action_item :only => :tqc_form do
     link_to('DICOM Metadata', required_series_dicom_metadata_admin_visit_path(resource, :required_series_name => params[:required_series_name]), :target => '_blank') unless params[:required_series_name].nil?
+  end
+
+  member_action :all_required_series_viewer, :method => :get do
+    @visit = Visit.find(params[:id])
+    authorize! :read, @visit
+
+    current_user.ensure_authentication_token!
+    @wado_query_urls = [required_series_wado_query_visit_url(@visit, :format => :xml, :authentication_token => current_user.authentication_token)]
+
+    render 'admin/shared/weasis_webstart.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
+  end
+  action_item :only => [:show, :mqc_form, :mqc_results] do
+    link_to('Viewer (RS)', all_required_series_viewer_admin_visit_path(resource))
   end
   
   viewer_cartable(:visit)

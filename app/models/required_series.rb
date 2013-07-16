@@ -97,6 +97,12 @@ class RequiredSeries
     return tqc_spec
   end
 
+  def wado_query
+    return nil unless self.assigned?
+
+    {:id => (@visit.nil? ? '_'+self.name : @visit.id.to_s+'_'+self.name), :name => self.name, :images => self.assigned_image_series.images.order('id ASC')}
+  end
+
   def domino_document_form
     'RequiredSeries'
   end

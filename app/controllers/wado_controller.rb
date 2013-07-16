@@ -144,6 +144,8 @@ class WadoController < ApplicationController
   end
 
   def image_to_transfer_syntax(transfer_syntax)
+    return File.new(@image.absolute_image_storage_path)
+
     return nil unless [:explicit_vr_little_endian, :explicit_vr_big_endian, :implicit_vr_little_endian].include?(transfer_syntax)
 
     transfer_syntax_option = case transfer_syntax

@@ -185,6 +185,11 @@ class Visit < ActiveRecord::Base
       self.image_series.map {|i_s| i_s.wado_query}
     }
   end
+  def required_series_wado_query
+    {:id => self.id, :name => "Visit No. #{visit_number}", :image_series => 
+      self.required_series_objects.reject {|rs| not rs.assigned?}.map {|rs| rs.wado_query}.reject {|query| query.blank?}
+    }
+  end
 
   def domino_document_form
     'ImagingVisit_mqc'

@@ -21,7 +21,9 @@
           %tbody
             - @form_config_version_dates[form_id].each do |version, dates|
               %tr
-                %th= link_to(version, download_configuration_at_version_admin_form_path(form, :version => version))
+                %th
+                  = link_to(version, download_configuration_at_version_admin_form_path(form, :version => version))
+                  = link_to('(JS Validations)', download_custom_validators_at_version_admin_form_path(form, :version => version))
                 %td
                   %p= "First Use: #{pretty_format(dates[:min])}"
                   %p= "Last Use: #{pretty_format(dates[:max])}"

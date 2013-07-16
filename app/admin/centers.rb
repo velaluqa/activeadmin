@@ -3,6 +3,8 @@ require 'aa_domino'
 
 ActiveAdmin.register Center do
 
+  menu if: proc { can? :read, Center }
+
   config.sort_order = 'code_asc'
 
   controller do

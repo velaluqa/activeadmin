@@ -3,6 +3,8 @@ require 'aa_domino'
 
 ActiveAdmin.register Patient do
 
+  menu if: proc { can? :read, Patient }
+
   config.per_page = 100
   config.sort_order = 'centers.code_asc'
 
@@ -147,6 +149,42 @@ ActiveAdmin.register Patient do
   batch_action :export_for_ericav1 do |selection|
     @page_title = 'Export for ERICAv1'
     render 'admin/patients/export_for_ericav1_form', :locals => {:selection => selection}
+  end
+
+  member_action :reorder_visits, :method => :post do
+    @patient = Patient.find(params[:id])
+
+    new_visits_list = params[:new_visits_list].split(',')
+    
+    visits = new_visits_list.map {|v| Visit.find(v.to_i)}
+
+    available_visit_numbers = visits.map {|v| v.visit_number}.sort
+    next_free_visit_number = (@patient.visits.empty? ? 0 : @patient.visits.order('visit_number desc').first.visit_number+1)
+
+    Visit.transaction do
+      # first we set the visit_number to some unused number, so it won't clash with existing visit numbers when setting the correct one next
+      visits.each do |v|
+        v.visit_number = next_free_visit_number
+        v.save
+        next_free_visit_number += 1
+      end
+ 
+      visits.each do |v|
+        v.visit_number = available_visit_numbers.shift
+        v.save
+      end
+    end
+
+    redirect_to({:action => :show}, :notice => "The visits was successfully reordered")
+  end
+  member_action :reorder_visits_form, :method => :get do
+    @patient = Patient.find(params[:id])
+
+    @page_title = 'Reorder Visits'
+    @visits = @patient.visits
+  end
+  action_item :only => :show do
+    link_to('Reorder Visits', reorder_visits_form_admin_patient_path(resource)) unless resource.visits.empty?
   end
 
   viewer_cartable(:patient)

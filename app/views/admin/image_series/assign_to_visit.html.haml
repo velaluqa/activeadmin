@@ -5,7 +5,19 @@
     %ol
       %li.input.select
         = label_tag('visit_id', 'Visit')
-        = select_tag('visit_id', options_from_collection_for_select(visits, 'id', 'name'), :include_blank => true)
+        = select_tag('visit_id', '<option value="new">Create new Visit</option>'+options_from_collection_for_select(visits, 'id', 'name'), :include_blank => true)
+
+  = field_set_tag('<span>When creating a new Visit</span>'.html_safe, :class => 'inputs') do
+    %ol
+      %li.input.string.required
+        = label_tag('visit[visit_number]', 'Visit Number')
+        = text_field_tag('visit[visit_number]')
+      %li.input.select.required
+        = label_tag('visit[visit_type]', 'Visit Type')
+        = select_tag('visit[visit_type]', options_for_select(visit_types), :include_blank => true)
+      %li.input.string
+        = label_tag('visit[description]', 'Description')
+        = text_field_tag('visit[description]')
 
   = field_set_tag(nil, :class => 'actions') do
     %ol
