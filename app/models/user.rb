@@ -24,6 +24,8 @@ class User < ActiveRecord::Base
   has_and_belongs_to_many :blind_readable_sessions, :class_name => 'Session', :join_table => 'readers_sessions'
   has_and_belongs_to_many :validatable_sessions, :class_name => 'Session', :join_table => 'validators_sessions'
 
+  has_many :public_keys
+
   before_destroy do
     self.roles.destroy_all
   end
@@ -51,7 +53,18 @@ class User < ActiveRecord::Base
 
     self.private_key = new_private_key.to_pem(OpenSSL::Cipher.new('DES-EDE3-CBC'), private_key_password)
     self.public_key = new_public_key.to_pem
-    self.save! if save_to_db
+    
+    if(save_to_db)
+      transaction do
+        self.public_keys.active.last.deactivate unless self.public_keys.active.empty?
+        PublicKey.create(:user => self, :public_key => self.public_key, :active => true)
+
+        self.save!
+      end
+    end
+  end
+  def active_public_key
+    self.public_keys.active.last
   end
 
   # fake attributes to enable us to use them in the create user form

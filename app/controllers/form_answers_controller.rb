@@ -77,6 +77,8 @@ class FormAnswersController < ApplicationController
 
     answer.annotated_images = params['annotated_images']
     answer.annotated_images_signature = params['annotated_images_signature']
+
+    answer.signature_public_key_id = (current_user.active_public_key.nil? ? nil : current_user.active_public_key.id)
     
     answer.submitted_at = Time.now
     answer.reader_testing_config_index = @reader_testing_config_index
