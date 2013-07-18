@@ -1,8 +1,10 @@
 require 'aa_footer'
 require 'aa_site_title'
 require 'aa_viewer_cart_mixin'
+require 'aa_erica_comment'
 
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
+ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICACommentMixin::DSL)
 
 ActiveAdmin.setup do |config|
 

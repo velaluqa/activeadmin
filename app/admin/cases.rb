@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'aa_customizable_default_actions'
+require 'aa_erica_comment'
 require 'schema_validation'
 require 'key_path_accessor'
 require 'csv'
@@ -169,13 +170,7 @@ ActiveAdmin.register Case do
         pretty_format(c.exported_at) unless c.exported_at.nil?
       end
     end
-    column :comment, :sortable => :comment do |c|
-      if(c.comment.blank?)
-        link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
-      else
-        (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
-      end
-    end
+    comment_column(:comment, 'Comment')
    
     customizable_default_actions do |resource|
       (resource.state == :unread and resource.form_answer.nil?) ? [] : [:edit, :destroy]
@@ -222,13 +217,7 @@ ActiveAdmin.register Case do
           pretty_format(c.exported_at) unless c.exported_at.nil?
         end
       end
-      row :comment do
-        if(c.comment.blank?)
-          link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
-        else
-          (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
-        end
-      end
+      comment_row(c, :comment, 'Comment')
       row :case_data_raw do
         CodeRay.scan(JSON::pretty_generate(c.case_data.data), :json).div(:css => :class).html_safe unless c.case_data.nil?
       end
@@ -537,26 +526,7 @@ ActiveAdmin.register Case do
     redirect_to(:back, :notice => 'Selected cases have been "unpostponed".')
   end
 
-  member_action :edit_comment, :method => :post do
-    @case = Case.find(params[:id])
-    authorize! :manage, @case
-
-    @case.comment = params[:case][:comment]
-    @case.save
-
-    if(params[:return_url].blank?)
-      redirect_to :action => :index, :notice => 'Comment changed.'
-    else
-      redirect_to params[:return_url], :notice => 'Comment changed.'
-    end
-  end
-  member_action :edit_comment_form, :method => :get do
-    @case = Case.find(params[:id])
-    authorize! :manage, @case
-
-    @return_url = params[:return_url]
-    @page_title = 'Edit Comment'    
-  end
+  erica_commentable(:comment, 'Comment')
 
   collection_action :assign_reader, :method => :post do
     @cases = Case.find(params[:selection])
