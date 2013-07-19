@@ -88,8 +88,9 @@ class Image < ActiveRecord::Base
   def dicom_metadata_xml
     file_path = self.absolute_image_storage_path
     dicom_xml = `#{Rails.application.config.dcm2xml} --quiet '#{file_path}'`
+    dicom_xml_clean = dicom_xml.scan(/[[:print:]]/).join
     begin
-      dicom_metadata_doc = REXML::Document.new(dicom_xml)
+      dicom_metadata_doc = REXML::Document.new(dicom_xml_clean)
     rescue => e
       Rails.logger.warn 'Failed to parse DICOM metadata XML for image '+self.id.to_s+': '+e.message
       return nil
