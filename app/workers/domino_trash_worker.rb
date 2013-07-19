@@ -3,11 +3,13 @@ class DominoTrashWorker
 
   # This worker is designed to throw exceptions on all errors/misuses, since Sidekiq handles those nicely
 
-  def perform(resource_class_name, resource_id)
-    # I am not sure whether I like this, admittedly convenient, way of doing it.
-    # There are no checks as to what classes are passed in :/
-    resource = resource_class_name.constantize.find(resource_id)
+  def perform(study_domino_db_url, domino_unid, domino_document_form)
+    client = DominoIntegrationClient.new(study_domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
+    if client.nil?
+      raise 'Failed to communicate with the Domino server.'
+      return
+    end
 
-    resource.trash_document
+    client.trash_document(domino_unid, domino_document_form)
   end
 end
