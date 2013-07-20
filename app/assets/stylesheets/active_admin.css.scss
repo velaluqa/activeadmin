@@ -62,3 +62,9 @@
 
 // jqTree
 @import "jqtree";
+
+// align icons with the text
+.icon
+{
+  vertical-align: top !important;
+}
