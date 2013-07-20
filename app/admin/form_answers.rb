@@ -77,6 +77,13 @@ ActiveAdmin.register FormAnswer do
           status_tag('No', :ok)
         end
       end
+      row :signature_public_key do
+        if(form_answer.signature_public_key_id.blank?)
+          link_to('Here', admin_public_key_path(form_answer.user.active_public_key))
+        else
+          link_to('Here', admin_public_key_path(form_answer.signature_public_key_id))
+        end
+      end
       row :answers do
         render "forms/results_table", :caption => '', :cases => [form_answer.case], :skip_header => true unless form_answer.answers.nil?
       end
