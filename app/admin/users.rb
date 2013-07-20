@@ -1,6 +1,11 @@
 ActiveAdmin.register User do
 
   controller do
+    load_and_authorize_resource :except => :index
+    def scoped_collection
+      end_of_association_chain.accessible_by(current_ability)
+    end
+
     def create
       private_key_password = params[:user][:signature_password]
       if(private_key_password != params[:user][:signature_password_confirmation])
@@ -78,6 +83,9 @@ ActiveAdmin.register User do
         else
           link_to 'Download Public Key', download_public_key_admin_user_path(user)
         end
+      end
+      row 'Past public keys' do
+        link_to(user.public_keys.count, admin_public_keys_path(:'q[user_id_eq]' => user.id))
       end
       row :private_key do
         if user.private_key.nil?

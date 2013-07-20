@@ -107,7 +107,7 @@ class FormAnswer
     return signature_is_valid?(read_attribute(:answers), read_attribute(:answers_signature), self.signature_public_key)
   end
   def annotated_images_signature_is_valid?
-    return signature_is_valid?(read_attribute(:annotated_images), read_attribute(:annotated_images_signature), , self.signature_public_key)
+    return signature_is_valid?(read_attribute(:annotated_images), read_attribute(:annotated_images_signature), self.signature_public_key)
   end
 
   def signature_is_valid?(data, signature, public_key)

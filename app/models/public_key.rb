@@ -1,5 +1,5 @@
 class PublicKey < ActiveRecord::Base
-  attr_accessible :public_key, :user_id, :active, :deactived_at
+  attr_accessible :public_key, :user_id, :active, :deactivated_at
   attr_accessible :user
   
   belongs_to :user
@@ -9,6 +9,10 @@ class PublicKey < ActiveRecord::Base
 
   scope :active, where(:active => true)
   scope :deactivated, where(:active => false)
+
+  def active?
+    self.active
+  end
 
   def deactivate
     self.active = false

@@ -26,12 +26,20 @@ class Ability
       can :manage, Version
       can :manage, User
       can :manage, Role
+      can :manage, PublicKey
       can :manage, Study
       can [:create, :read, :edit, :destroy], Session
       can :manage, Form, ['forms.session_id IS NULL'] do |form|
         form.is_template?
       end
-    end    
+    else
+      can :read, PublicKey, ['public_keys.user_id = ?', user.id] do |public_key|
+        public_key.user == user
+      end
+      can :read, User, ['users.id = ?', user.id] do |db_user|
+        db_user == user
+      end
+    end
 
     # Session Admin
     can :manage, Session, ['sessions.id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |session|
