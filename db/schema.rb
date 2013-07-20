@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130709135452) do
+ActiveRecord::Schema.define(:version => 20130718121312) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -80,6 +80,7 @@ ActiveRecord::Schema.define(:version => 20130709135452) do
     t.string   "domino_unid"
     t.integer  "series_number"
     t.integer  "state",         :default => 0
+    t.string   "comment"
   end
 
   add_index "image_series", ["patient_id", "series_number"], :name => "index_image_series_on_patient_id_and_series_number", :unique => true

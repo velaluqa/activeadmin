@@ -79,21 +79,11 @@ module DominoDocument
   end
 
   def schedule_domino_document_trashing
-    DominoTrashWorker.perform_async(self.class.to_s, self.id)
-  end
-
-  def trash_document
     return true unless domino_integration_enabled?
 
     return true if self.domino_unid.nil?
 
-    client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
-    if client.nil?
-      raise 'Failed to communicate with the Domino server.'
-      return false
-    end
-
-    return client.trash_document(self.domino_unid, domino_document_form)
+    DominoTrashWorker.perform_async(self.study.domino_db_url, self.domino_unid, domino_document_form)
   end
 
   def set_domino_unid(domino_unid)

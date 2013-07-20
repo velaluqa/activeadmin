@@ -5,7 +5,7 @@ class ImageSeries < ActiveRecord::Base
 
   has_paper_trail
 
-  attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number, :state
+  attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number, :state, :comment
   attr_accessible :visit, :patient
 
   belongs_to :visit

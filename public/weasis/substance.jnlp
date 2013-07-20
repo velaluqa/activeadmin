@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" href="substance.jnlp">
+<jnlp spec="1.6+" version="7.0.0" href="substance.jnlp">
   <information>
     <title>Substance</title>
     <vendor>Kirill Grouchnikov</vendor>
@@ -10,6 +10,8 @@
     <all-permissions/>
   </security>
   <resources>
+  	<!-- Allows to get the file in pack200 compression -->
+    <property name="jnlp.packEnabled" value="true"/>
     <jar href="substance.jar"/>
   </resources>
   <component-desc/>

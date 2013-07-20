@@ -1,4 +1,5 @@
 require 'aa_domino'
+require 'aa_erica_comment'
 
 ActiveAdmin.register ImageSeries do
 
@@ -149,13 +150,12 @@ ActiveAdmin.register ImageSeries do
 
   index do
     selectable_column
-    benchmark('Study Column') do
-      if(session[:selected_study_id].blank?)
-        column :study do |image_series|
-          link_to(image_series.study.name, admin_study_path(image_series.study)) unless image_series.study.nil?
-        end
+    column :id
+    if(session[:selected_study_id].blank?)
+      column :study do |image_series|
+        link_to(image_series.study.name, admin_study_path(image_series.study)) unless image_series.study.nil?
       end
-    end                
+    end
     column :patient, :sortable => :patient_id
     column :visit, :sortable => :visit_id
     column :series_number
@@ -165,7 +165,6 @@ ActiveAdmin.register ImageSeries do
     column :images do |image_series|
       link_to('List', admin_images_path(:'q[image_series_id_eq]' => image_series.id))
     end
-    benchmark('State column') do 
     column :state, :sortable => :state do |image_series|
       case image_series.state
       when :imported
@@ -184,7 +183,7 @@ ActiveAdmin.register ImageSeries do
         status_tag('Not relevant for read')
       end
     end
-    end
+    comment_column(:comment, 'Comment')
     
     column 'View (in)' do |image_series|
       result = ''
@@ -228,6 +227,7 @@ ActiveAdmin.register ImageSeries do
           status_tag('Not relevant for read')
         end
       end
+      comment_row(image_series, :comment, 'Comment')
       row 'Required Series' do
         assigned_required_series = image_series.assigned_required_series
         if(assigned_required_series.empty?)
@@ -265,6 +265,7 @@ ActiveAdmin.register ImageSeries do
       f.input :name
       f.input :imaging_date, :as => :datepicker
       f.input :force_update, :as => :hidden, :value => (params[:force_update] ? 'true' : 'false') if f.object.persisted?
+      f.input :comment
       f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
 
@@ -277,6 +278,7 @@ ActiveAdmin.register ImageSeries do
   filter :name
   filter :imaging_date
   filter :created_at, :label => 'Import Date'
+  filter :comment
 
   member_action :viewer, :method => :get do
     @image_series = ImageSeries.find(params[:id])
@@ -654,4 +656,5 @@ ActiveAdmin.register ImageSeries do
   end
 
   viewer_cartable(:image_series)
+  erica_commentable(:comment, 'Comment')
 end
