@@ -18,7 +18,7 @@ ActiveAdmin.register Version do
       when 'case'
         end_of_association_chain.where('item_type LIKE \'Case\' and item_id = ?', params[:audit_trail_view_id].to_i)
       when 'patient'
-        end_of_association_chain.where('item_type LIKE \'Patient\' and item_id = ?', params[:audit_trail_view_id].to_i)
+        end_of_association_chain.where('(item_type LIKE \'Patient\' and item_id = :patient_id) or (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.patient_id = :patient_id))', {:patient_id => params[:audit_trail_view_id].to_i})
       when 'form'
         end_of_association_chain.where('item_type LIKE \'Form\' and item_id = ?', params[:audit_trail_view_id].to_i)
       when 'role'
@@ -34,7 +34,7 @@ ActiveAdmin.register Version do
                                        {:study_id => params[:audit_trail_view_id].to_i})
       else
         end_of_association_chain
-      end
+      end.accessible_by(current_ability)
     end
 
     def self.classify_event(version)
