@@ -1,6 +1,6 @@
 ActiveAdmin.register_page 'Image Hierarchy' do
 
-  menu :if => proc { Rails.env.development? }
+  menu :if => proc { can? :read, Study and can? :read, Center and can? :read, Patient and can? :read, Visit and can? :read, ImageSeries }
 
   content do
     render 'content'
