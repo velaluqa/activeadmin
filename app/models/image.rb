@@ -88,7 +88,7 @@ class Image < ActiveRecord::Base
   def dicom_metadata_xml
     file_path = self.absolute_image_storage_path
     dicom_xml = `#{Rails.application.config.dcm2xml} --quiet '#{file_path}'`
-    dicom_xml_clean = dicom_xml.scan(/[[:print:]]/).join
+    dicom_xml_clean = dicom_xml.encode('UTF-8', 'ISO-8859-1').scan(/[[:print:]]/).join
     begin
       dicom_metadata_doc = REXML::Document.new(dicom_xml_clean)
     rescue => e
