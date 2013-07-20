@@ -67,6 +67,14 @@ class User < ActiveRecord::Base
     self.public_keys.active.last
   end
 
+  def sign(data, signature_password)
+    private_key = OpenSSL::PKey::RSA.new(self.private_key, signature_password)
+
+    signature = private_key.sign(OpenSSL::Digest::RIPEMD160.new, data)
+    pp OpenSSL.errors
+    return signature
+  end
+
   # fake attributes to enable us to use them in the create user form
   attr_accessible :signature_password, :signature_password_confirmation
   def signature_password

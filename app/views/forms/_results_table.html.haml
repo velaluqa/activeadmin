@@ -3,6 +3,7 @@
 - display_type = 'results' unless placeholders_only
 - roi_links = false unless (defined? roi_links)
 - versions = nil unless (defined? versions and not versions.nil? and versions.size == cases.size)
+- data_cleaning_buttons = false unless(defined? data_cleaning_buttons and data_cleaning_buttons == true and cases.size == 1)
 
 - if placeholders_only
   - printable_answers = [form_config]
@@ -24,7 +25,9 @@
       %col{:style => 'width: 2%'}
       %col{:style => 'width: 23%'}
       - cases.count.times do
-        %col{:style => "width: #{(75.0/cases.count).floor}%"}
+        %col{:style => "width: #{((data_cleaning_buttons ? 70.0 : 75.0)/cases.count).floor}%"}
+      - if data_cleaning_buttons
+        %col{:style => 'width: 5%'}
     - unless skip_header
       %thead
         %tr
@@ -34,6 +37,8 @@
           - else
             - cases.each do |c|
               %th= c.images_folder
+          - if data_cleaning_buttons
+            %th= Clean!
     %tbody
       - printable_answers[0].each_with_index do |field_spec,i|
         - case field_spec['type']
@@ -53,7 +58,7 @@
             %th{:colspan => 2+cases.count}= field_spec['label'].html_safe
         - when 'section'
         - else
-          = render 'forms/results_table_row', :current_group_index => current_group_index, :first_in_group => first_in_group, :field_spec => field_spec, :printable_answers => printable_answers, :cases => cases, :placeholders_only => placeholders_only, :roi_links => roi_links
+          = render 'forms/results_table_row', :current_group_index => current_group_index, :first_in_group => first_in_group, :field_spec => field_spec, :printable_answers => printable_answers, :cases => cases, :placeholders_only => placeholders_only, :roi_links => roi_links, :data_cleaning_buttons => data_cleaning_buttons
           - first_in_group = false
 - else
   = "Failed to render form answers"

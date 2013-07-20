@@ -1,3 +1,5 @@
+require 'key_path_accessor'
+
 ActiveAdmin.register FormAnswer do
   before_filter { @skip_sidebar = true }
 
@@ -83,7 +85,7 @@ ActiveAdmin.register FormAnswer do
         end
       end
       row :answers do
-        render "forms/results_table", :caption => '', :cases => [form_answer.case], :skip_header => true unless form_answer.answers.nil?
+        render "forms/results_table", :caption => '', :cases => [form_answer.case], :skip_header => true, :data_cleaning_buttons => (can? :manage, form_answer) unless form_answer.answers.nil?
       end
       row :answers_raw do        
         CodeRay.scan(JSON::pretty_generate(form_answer.answers), :json).div(:css => :class).html_safe unless form_answer.answers.nil?
@@ -106,5 +108,78 @@ ActiveAdmin.register FormAnswer do
         end
       end
     end
+  end
+
+  member_action :data_cleaning, :method => :post do
+    @form_answer = FormAnswer.find(params[:id])
+    authorize! :this_is, :FORBIDDEN
+    authorize! :manage, @form_answer
+
+    new_value = params[:cleaned_value]
+    field_type = params[:field_type]
+    field_id = params[:field_id]
+
+    if(['fixed', 'group', 'section', 'calculated', 'roi'].include?(field_type))
+      flash[:error] = 'The chosen field type cannot be changed via the data cleaning tool.'
+      redirect_to :action => :show
+      return
+    end
+
+    case field_type
+    when 'bool'
+      new_value = (new_value == 'true')
+    when 'number'
+      new_value = new_value.to_f
+    when 'select_multiple'
+      new_value = new_value.split(',').map {|v| v.strip}
+    end
+
+    @form_answer.version_current_answers
+    @form_answer.answers = KeyPathAccessor.set_by_path(@form_answer.answers, field_id, new_value)
+    begin
+      @form_answer.answers_signature = Base64.encode64(current_user.sign(FormAnswer::canonical_json(@form_answer.answers), params[:signature_password]))
+      @form_answer.annotated_images_signature = Base64.encode64(current_user.sign(FormAnswer::canonical_json(@form_answer.annotated_images), params[:signature_password]))
+    rescue OpenSSL::PKey::RSAError => e
+      flash[:error] = 'Wrong signature password or invalid private key.'
+      redirect_to :back
+      return
+    end
+
+    @form_answer.submitted_at = Time.now
+    @form_answer.signature_public_key_id = current_user.active_public_key.id
+
+    @form_answer.save
+
+    redirect_to :action => :show, :notice => 'The value was successfully changed.'
+  end
+  member_action :data_cleaning_form, :method => :get do
+    @form_answer = FormAnswer.find(params[:id])
+    @field_id = params[:field_id]
+
+    authorize! :this_is, :FORBIDDEN
+    authorize! :manage, @form_answer
+
+    if(@field_id =~ /^(.*?)\[[0-9]*?\]\[(.*?)\]$/ or @field_id =~ /^(.*?)\[(.*?)\]$/)
+      field_repeatable = $1
+      field_sub_id = $2
+    end
+
+    @field_spec = if field_repeatable.blank?
+                    @form_answer.form_fields_hash[0][@field_id]
+                  else
+                    @form_answer.form_fields_hash[1][field_repeatable][field_sub_id]
+                  end
+    pp @field_spec
+
+    @field_value = KeyPathAccessor::access_by_path(@form_answer.answers, @field_id)    
+    pp @field_value
+    case @field_spec['type']
+    when 'select_multiple'
+      @field_value = @field_value.join(',')
+    when 'bool'
+      @field_value = (@field_value.nil? ? false : @field_value)
+    end
+    
+    @page_title = 'Data Cleaning Tool - ' + @field_id
   end
 end
