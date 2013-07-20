@@ -16,6 +16,7 @@ class Ability
       can :manage, Version
       can :manage, User
       can :manage, Role
+      can :manage, PublicKey
       can :manage, Study
       can :read, Center
       can :read, Patient
@@ -26,6 +27,12 @@ class Ability
       can :manage, Form, ['forms.session_id IS NULL'] do |form|
         form.is_template?
       end
+    else
+      can :read, PublicKey, ['public_keys.user_id = ?', user.id] do |public_key|
+        public_key.user == user
+      end
+      can :read, User, ['users.id = ?', user.id] do |db_user|
+        db_user == user
     end
 
     if(user.has_system_role?(:image_import))
