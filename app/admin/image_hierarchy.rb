@@ -23,9 +23,11 @@ ActiveAdmin.register_page 'Image Hierarchy' do
 
                        visit_nodes
                      elsif(raw_node_id =~ /^visit_([0-9]*)$/)
-                       Visit.find($1).image_series.accessible_by(current_ability).order('imaging_date asc').map {|is| {'label' => view_context.link_to(is.imaging_date.to_s + ' - ' +is.name, admin_image_series_path(is), :target => '_blank').html_safe, 'id' => 'image_series_'+is.id.to_s} }
+                       Visit.find($1).image_series.accessible_by(current_ability).order('imaging_date asc').map {|is| {'label' => view_context.link_to(is.imaging_date.to_s + ' - ' +is.name, admin_image_series_path(is), :target => '_blank').html_safe, 'id' => 'image_series_'+is.id.to_s} } + [{'label' => 'Required Series', 'id' => 'visit_required_series_'+$1.to_s, 'load_on_demand' => true}]
                      elsif(raw_node_id =~ /^visit_unassigned_([0-9]*)$/)
                        Patient.find($1).image_series.where(:visit_id => nil).accessible_by(current_ability).order('imaging_date asc').map {|is| {'label' => view_context.link_to(is.imaging_date.to_s + ' - ' +is.name, admin_image_series_path(is), :target => '_blank').html_safe, 'id' => 'image_series_'+is.id.to_s} }
+                     elsif(raw_node_id =~ /^visit_required_series_([0-9]*)$/)
+                       Visit.find($1).required_series_objects.map {|rs| {'label' => (rs.assigned? ? view_context.link_to(rs.name + ' -> ' + rs.assigned_image_series.imaging_date.to_s + ' - ' + rs.assigned_image_series.name, admin_image_series_path(rs.assigned_image_series), :target => '_blank').html_safe : rs.name), 'id' => 'visit_required_series_'+$1.to_s+'_'+rs.name}}
                      else
                        []
                      end
