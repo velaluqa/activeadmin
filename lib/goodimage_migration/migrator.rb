@@ -16,6 +16,16 @@ module GoodImageMigration
       reset_counters(number_of_studies)
     end
 
+    def migration_report(goodimage_study, report_path)
+      report_file = File.open(report_path, 'w')
+
+      report_file.puts 'type,goodimage_id,erica_id,file_copy_success'
+
+      migration_report_for_goodimage_resource(goodimage_study, report_file)
+
+      report_file.close
+    end
+
     def copy_missing_images
       fail_file = File.open('/tmp/missing_images', 'a')
 
@@ -396,6 +406,38 @@ module GoodImageMigration
         return erica_resource
       else
         return nil
+      end
+    end
+
+    def migration_report_for_goodimage_resource(goodimage_resource, report_file)
+      resource_type = GoodImageMigration::Migration::Mapping.resource_type(goodimage_resource)
+
+      report_file.print resource_type + ','
+
+      migration_mapping = Migration::Mapping.first(:type => resource_type, :source_id => goodimage_resource.id)
+      erica_resource = migration_mapping.target unless migration_mapping.nil?
+
+      report_file.print goodimage_resource.id.to_s + ','
+
+      if(erica_resource.nil?)
+        report_file.print 'missing,'
+      else
+        report_file.print erica_resource.id.to_s + ','
+      end
+
+      if(resource_type == 'image')
+        if(erica_resource.is_a?(::Image) and erica_resource.file_is_present?)
+          report_file.print 'yes'
+        else
+          report_file.print 'no'
+        end
+      end
+
+      report_file.puts
+            
+      children = goodimage_resource.respond_to?(:migration_children) ? goodimage_resource.migration_children : []
+      children.each do |child|
+        migration_report_for_goodimage_resource(child, report_file)
       end
     end
 
