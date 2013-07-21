@@ -142,13 +142,15 @@ namespace :goodimage_migration do
     goodimage_study = GoodImageMigration::GoodImage::Study.get(goodimage_study_id)
     if(goodimage_study.nil?)
       puts 'Could not find the study in GoodImage, aborting...'
+      next
     else
       puts 'Found the study in GoodImage, generating report...'
+    end
 
     migrator = GoodImageMigration::Migrator.new(config, 0)
     start_time = Time.now
 
-    migrator.migration_report(goodimage_study, report_path)x
+    migrator.migration_report(goodimage_study, report_path)
 
     end_time = Time.now
     puts "Process started at #{start_time.inspect}"
