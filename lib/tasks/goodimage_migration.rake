@@ -117,4 +117,42 @@ namespace :goodimage_migration do
     puts "Migration ended at #{end_time.inspect}"
     puts "Migration took #{end_time - start_time} seconds"
   end
+
+  desc 'Generate a migration report for the given GoodImage study, based on a past migration (info in migration mapping db)'
+  task :migration_report, [:goodimage_study_id, :report_path] => [:initialize] do |t, args|
+    if(args[:goodimage_study_id].blank?)
+      puts 'No GoodImage study id given, aborting...'
+      next
+    end
+    goodimage_study_id = args[:goodimage_study_id]
+
+    if(args[:report_path].blank?)
+      puts 'No path for report given, aborting...'
+      next
+    end
+    report_path = args[:report_path]
+
+    config = GoodImageMigration.migration_config
+    if(config.nil? or config['goodimage_image_storage'].nil?)
+      puts "No valid config containing 'goodimage_image_storage' found, aborting..."
+      next
+    end
+
+    puts 'Fetching GoodImage study with id '+goodimage_study_id.to_s+'...'
+    goodimage_study = GoodImageMigration::GoodImage::Study.get(goodimage_study_id)
+    if(goodimage_study.nil?)
+      puts 'Could not find the study in GoodImage, aborting...'
+    else
+      puts 'Found the study in GoodImage, generating report...'
+
+    migrator = GoodImageMigration::Migrator.new(config, 0)
+    start_time = Time.now
+
+    migrator.migration_report(goodimage_study, report_path)x
+
+    end_time = Time.now
+    puts "Process started at #{start_time.inspect}"
+    puts "Process ended at #{end_time.inspect}"
+    puts "Process took #{end_time - start_time} seconds"
+  end
 end
