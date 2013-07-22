@@ -112,7 +112,6 @@ ActiveAdmin.register FormAnswer do
 
   member_action :data_cleaning, :method => :post do
     @form_answer = FormAnswer.find(params[:id])
-    authorize! :this_is, :FORBIDDEN
     authorize! :manage, @form_answer
 
     new_value = params[:cleaned_value]
@@ -156,7 +155,6 @@ ActiveAdmin.register FormAnswer do
     @form_answer = FormAnswer.find(params[:id])
     @field_id = params[:field_id]
 
-    authorize! :this_is, :FORBIDDEN
     authorize! :manage, @form_answer
 
     if(@field_id =~ /^(.*?)\[[0-9]*?\]\[(.*?)\]$/ or @field_id =~ /^(.*?)\[(.*?)\]$/)
