@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130702141017) do
+ActiveRecord::Schema.define(:version => 20130718141353) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -66,6 +66,18 @@ ActiveRecord::Schema.define(:version => 20130702141017) do
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
   end
+
+  create_table "public_keys", :force => true do |t|
+    t.integer  "user_id",        :null => false
+    t.text     "public_key",     :null => false
+    t.boolean  "active",         :null => false
+    t.datetime "deactivated_at"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
+
+  add_index "public_keys", ["active"], :name => "index_public_keys_on_active"
+  add_index "public_keys", ["user_id"], :name => "index_public_keys_on_user_id"
 
   create_table "readers_sessions", :id => false, :force => true do |t|
     t.integer "user_id"

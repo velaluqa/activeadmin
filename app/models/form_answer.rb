@@ -17,6 +17,7 @@ class FormAnswer
   field :answers_signature, type:  String
   field :annotated_images, type:  Hash
   field :annotated_images_signature, type:  String
+  field :signature_public_key_id, type: Integer
   field :is_test_data, type: Boolean
   field :versions, type: Array
   field :reader_testing_config_index, type: Integer
@@ -55,6 +56,17 @@ class FormAnswer
       return nil
     end
   end
+  def signature_public_key
+    if(self.signature_public_key_id.blank?)
+      return user_public_key_rsa
+    end
+
+    begin
+      PublicKey.find(read_attribute(:signature_public_key_id)).openssl_key
+    rescue ActiveRecord::RecordNotFound
+      return nil
+    end
+  end
 
   def session=(session)
     write_attribute(:session_id, session.id)
@@ -84,6 +96,7 @@ class FormAnswer
     new_version[:annotated_images] = self.annotated_images
     new_version[:annotated_images_signature] = self.annotated_images_signature
     new_version[:submitted_at] = self.submitted_at
+    new_version[:signature_public_key_id] = self.signature_public_key_id
 
     self.versions = [] if self.versions.nil?
     self.versions << new_version
@@ -91,19 +104,18 @@ class FormAnswer
   end
 
   def answers_signature_is_valid?
-    return signature_is_valid?(read_attribute(:answers), read_attribute(:answers_signature))
+    return signature_is_valid?(read_attribute(:answers), read_attribute(:answers_signature), self.signature_public_key)
   end
   def annotated_images_signature_is_valid?
-    return signature_is_valid?(read_attribute(:annotated_images), read_attribute(:annotated_images_signature))
+    return signature_is_valid?(read_attribute(:annotated_images), read_attribute(:annotated_images_signature), self.signature_public_key)
   end
 
-  def signature_is_valid?(data, signature)
-    key = user_public_key_rsa
-    return false if (key.nil? or data.nil? or signature.nil?)
+  def signature_is_valid?(data, signature, public_key)
+    return false if (public_key.nil? or data.nil? or signature.nil?)
     canonical_data = FormAnswer::canonical_json(data)
     signature_raw = Base64.decode64(signature)
     
-    result = key.verify(OpenSSL::Digest::RIPEMD160.new, signature_raw, canonical_data)
+    result = public_key.verify(OpenSSL::Digest::RIPEMD160.new, signature_raw, canonical_data)
     OpenSSL.errors
     return result
   end

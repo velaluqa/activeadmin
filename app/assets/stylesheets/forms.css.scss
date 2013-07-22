@@ -179,26 +179,6 @@
 {
     #form-navbar { display: none !important; }
     #previous_results { display: none !important; }
-    #form_area { display: none !important; }
+    //#form_area { display: none !important; }
     #preview_modal { display: none !important; }
-    #print_version
-    {
-	display: block !important;
-	-webkit-print-color-adjust: exact !important;
-    }
-
-    .print-header
-    {
-	margin-bottom: 50px;
-    }
-    .print-body
-    {
-	margin-bottom: 50px;
-    }
-
-    .print-signature
-    {
-	padding-top: 50px;
-	padding-bottom: 50px;
-    }
 }
