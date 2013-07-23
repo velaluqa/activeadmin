@@ -240,6 +240,7 @@ ActiveAdmin.register Case do
   csv do
     column :id
     column :session_id
+    column ('Session Name') {|c| c.session.nil? ? nil : c.session.name}
     column :position
     column('Subject ID') {|c| c.patient.nil? ? '' : c.patient.subject_id}
     column :images
@@ -247,10 +248,11 @@ ActiveAdmin.register Case do
     column :flag
     column :state
     column :exported_at
-    column(:assigned_reader) {|c| c.assigned_reader.username}
+    column(:assigned_reader) {|c| (c.assigned_reader.nil? ? nil : c.assigned_reader.username)}
     column(:reader) {|c| (c.form_answer.nil? or c.form_answer.user.nil?) ? '' : c.form_answer.user.name }
     column(:submitted_at) {|c| c.form_answer.nil? ? '' : c.form_answer.submitted_at }
     column :comment
+    column :created_at
   end
 
   # filters

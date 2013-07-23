@@ -1,21 +1,22 @@
 class Ability
   include CanCan::Ability  
-
+  
   def initialize(user)
     return if user.nil? # guest users have no access whatsoever
-
+    
     return if user.roles.empty?
-
+    
     can [:read, :destroy], BackgroundJob do |job|
       job.user_id == user.id
     end
-
+    
     # App Admin
     if user.is_app_admin?
       can :manage, :system
       can :manage, Version
       can :manage, User
       can :manage, Role
+      can :manage, PublicKey
       can :manage, Study
       can :read, Center
       can :read, Patient
@@ -25,6 +26,13 @@ class Ability
       can [:create, :read, :edit, :destroy], Session
       can :manage, Form, ['forms.session_id IS NULL'] do |form|
         form.is_template?
+      end
+    else
+      can :read, PublicKey, ['public_keys.user_id = ?', user.id] do |public_key|
+        public_key.user == user
+      end
+      can :read, User, ['users.id = ?', user.id] do |db_user|
+        db_user == user
       end
     end
 
@@ -161,8 +169,6 @@ class Ability
   end
   
   protected
-  APP_ADMIN_SUBQUERY = 'EXISTS(SELECT id FROM roles WHERE subject_type IS NULL and subject_id IS NULL AND role = 0 AND user_id = ?)'
-
   SESSION_ROLES_SUBQUERY = 'SELECT roles.subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE \'Session\' AND roles.role = 0 AND roles.user_id = ?'
   SESSION_STUDY_ROLES_SUBQUERY = '(SELECT sessions.id FROM sessions WHERE sessions.study_id IN (SELECT roles.subject_id FROM roles INNER JOIN studies ON roles.subject_id = studies.id WHERE roles.subject_type LIKE \'Study\' AND roles.role = 0 AND roles.user_id = ?) UNION ALL '+SESSION_ROLES_SUBQUERY+')'
 

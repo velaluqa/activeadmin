@@ -265,6 +265,8 @@ class Visit < ActiveRecord::Base
 
     image_storage_root = Rails.application.config.image_storage_root
     image_storage_root += '/' unless(image_storage_root.end_with?('/'))
+
+    domino_sync_series_ids = []
     
     changed_assignments.each do |required_series_name, series_id|
       series_id = (series_id.blank? ? nil : series_id)
@@ -297,6 +299,9 @@ class Visit < ActiveRecord::Base
         visit_data.required_series[required_series_name].delete('tqc_results')
         visit_data.required_series[required_series_name].delete('tqc_comment')
       end
+
+      domino_sync_series_ids << old_series_id unless old_series_id.blank?
+      domino_sync_series_ids << series_id unless series_id.blank?
     end
     
     new_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
@@ -321,6 +326,11 @@ class Visit < ActiveRecord::Base
     update_state
 
     schedule_required_series_domino_sync
+
+    domino_sync_series_ids.uniq.each do |series_id|
+      image_series = ImageSeries.where(:id => series_id).first
+      image_series.schedule_domino_sync unless image_series.nil?
+    end
   end
 
   def reset_tqc_result(required_series_name)
