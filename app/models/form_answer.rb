@@ -22,6 +22,9 @@ class FormAnswer
   field :versions, type: Array
   field :reader_testing_config_index, type: Integer
 
+  index user_id: 1
+  index case_id: 1
+
   before_destroy do
     c = self.case
     c.state = :unread

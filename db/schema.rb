@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130718141353) do
+ActiveRecord::Schema.define(:version => 20130726134403) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -45,7 +45,10 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.integer  "current_reader_id"
   end
 
+  add_index "cases", ["assigned_reader_id"], :name => "index_cases_on_assigned_reader_id"
+  add_index "cases", ["current_reader_id"], :name => "index_cases_on_current_reader_id"
   add_index "cases", ["patient_id"], :name => "index_views_on_patient_id"
+  add_index "cases", ["position"], :name => "index_cases_on_position"
   add_index "cases", ["session_id", "position"], :name => "index_views_on_session_id_and_position", :unique => true
   add_index "cases", ["session_id"], :name => "index_views_on_session_id"
 
@@ -58,6 +61,8 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.integer  "state",          :default => 0
     t.string   "locked_version"
   end
+
+  add_index "forms", ["session_id"], :name => "index_forms_on_session_id"
 
   create_table "patients", :force => true do |t|
     t.string   "subject_id"
@@ -95,6 +100,10 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.datetime "updated_at",   :null => false
   end
 
+  add_index "roles", ["subject_id"], :name => "index_roles_on_subject_id"
+  add_index "roles", ["subject_type"], :name => "index_roles_on_subject_type"
+  add_index "roles", ["user_id"], :name => "index_roles_on_user_id"
+
   create_table "sessions", :force => true do |t|
     t.string   "name"
     t.integer  "study_id"
@@ -103,6 +112,8 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.integer  "state",          :default => 0
     t.string   "locked_version"
   end
+
+  add_index "sessions", ["study_id"], :name => "index_sessions_on_study_id"
 
   create_table "studies", :force => true do |t|
     t.string   "name"
