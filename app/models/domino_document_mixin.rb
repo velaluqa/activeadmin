@@ -51,7 +51,7 @@ module DominoDocument
       result = (not self.domino_unid.nil?)      
     else
       result = client.update_document(self.domino_unid, domino_document_form, domino_document_properties(:update))
-      if(result == :404)
+      if(result == :'404')
         self.domino_unid = create_document(domino_document_form, domino_document_properties(:create))
         result = (not self.domino_unid.nil?)
       end
