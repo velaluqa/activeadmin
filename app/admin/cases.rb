@@ -575,7 +575,6 @@ ActiveAdmin.register Case do
     redirect_to assign_reader_form_admin_cases_path(:selection => selection, :return_url => request.referer)
   end
 
-
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'case', :audit_trail_view_id => resource.id))
   end

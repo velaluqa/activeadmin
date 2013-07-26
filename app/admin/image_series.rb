@@ -657,4 +657,8 @@ ActiveAdmin.register ImageSeries do
 
   viewer_cartable(:image_series)
   erica_commentable(:comment, 'Comment')
+
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image_series', :audit_trail_view_id => resource.id))
+  end
 end
