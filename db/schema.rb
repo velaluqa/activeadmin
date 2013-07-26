@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130718141353) do
+ActiveRecord::Schema.define(:version => 20130726132409) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -45,7 +45,10 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.integer  "current_reader_id"
   end
 
+  add_index "cases", ["assigned_reader_id"], :name => "index_cases_on_assigned_reader_id"
+  add_index "cases", ["current_reader_id"], :name => "index_cases_on_current_reader_id"
   add_index "cases", ["patient_id"], :name => "index_views_on_patient_id"
+  add_index "cases", ["position"], :name => "index_cases_on_position"
   add_index "cases", ["session_id", "position"], :name => "index_views_on_session_id_and_position", :unique => true
   add_index "cases", ["session_id"], :name => "index_views_on_session_id"
 
@@ -59,6 +62,7 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
   end
 
   add_index "centers", ["study_id", "code"], :name => "index_centers_on_study_id_and_code", :unique => true
+  add_index "centers", ["study_id"], :name => "index_centers_on_study_id"
 
   create_table "forms", :force => true do |t|
     t.string   "name"
@@ -69,6 +73,8 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.integer  "state",          :default => 0
     t.string   "locked_version"
   end
+
+  add_index "forms", ["session_id"], :name => "index_forms_on_session_id"
 
   create_table "image_series", :force => true do |t|
     t.string   "name"
@@ -84,12 +90,17 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
   end
 
   add_index "image_series", ["patient_id", "series_number"], :name => "index_image_series_on_patient_id_and_series_number", :unique => true
+  add_index "image_series", ["patient_id"], :name => "index_image_series_on_patient_id"
+  add_index "image_series", ["series_number"], :name => "index_image_series_on_series_number"
+  add_index "image_series", ["visit_id"], :name => "index_image_series_on_visit_id"
 
   create_table "images", :force => true do |t|
     t.integer  "image_series_id"
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
   end
+
+  add_index "images", ["image_series_id"], :name => "index_images_on_image_series_id"
 
   create_table "patients", :force => true do |t|
     t.string   "subject_id"
@@ -99,6 +110,8 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.integer  "center_id"
     t.string   "domino_unid"
   end
+
+  add_index "patients", ["center_id"], :name => "index_patients_on_center_id"
 
   create_table "public_keys", :force => true do |t|
     t.integer  "user_id",        :null => false
@@ -128,6 +141,10 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.datetime "updated_at",   :null => false
   end
 
+  add_index "roles", ["subject_id"], :name => "index_roles_on_subject_id"
+  add_index "roles", ["subject_type"], :name => "index_roles_on_subject_type"
+  add_index "roles", ["user_id"], :name => "index_roles_on_user_id"
+
   create_table "sessions", :force => true do |t|
     t.string   "name"
     t.integer  "study_id"
@@ -136,6 +153,8 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.integer  "state",          :default => 0
     t.string   "locked_version"
   end
+
+  add_index "sessions", ["study_id"], :name => "index_sessions_on_study_id"
 
   create_table "studies", :force => true do |t|
     t.string   "name"
@@ -206,5 +225,9 @@ ActiveRecord::Schema.define(:version => 20130718141353) do
     t.integer  "mqc_user_id"
     t.integer  "state",        :default => 0
   end
+
+  add_index "visits", ["mqc_user_id"], :name => "index_visits_on_mqc_user_id"
+  add_index "visits", ["patient_id"], :name => "index_visits_on_patient_id"
+  add_index "visits", ["visit_number"], :name => "index_visits_on_visit_number"
 
 end
