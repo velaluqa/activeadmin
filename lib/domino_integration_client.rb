@@ -42,7 +42,11 @@ class DominoIntegrationClient
 
     return @documents_resource['unid/'+unid].patch(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
       pp response if response.code == 400
-      response.code == 200
+      if(response.code == 404)
+        :404
+      else
+        response.code == 200
+      end
     end
   end
 
@@ -112,8 +116,6 @@ class DominoIntegrationClient
     end
   end
 
-  protected
-
   def create_document(form, properties)
     return nil unless Rails.application.config.domino_integration_readonly == false
     return @documents_resource.post(properties.to_json, {:params => {:form => form, :computewithform => true}}) do |response|
@@ -124,6 +126,8 @@ class DominoIntegrationClient
       end
     end
   end
+
+  protected
 
   def list_databases
     return @databases_resource.get() do |response|
