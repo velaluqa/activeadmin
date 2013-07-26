@@ -42,21 +42,25 @@ module DominoDocument
 
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
-      raise 'Failed to communicate with the Domino server.'
+      raise 'Failed to create Domino Integration Client.'
       return false
     end
 
+    error_message = nil
     if self.domino_unid.nil?
       self.domino_unid = client.ensure_document_exists(domino_document_query, domino_document_form, domino_document_properties(:create), domino_document_properties(:update))
       result = (not self.domino_unid.nil?)      
+      error_message = 'Failed to create new document or find/update existing via query.'
     else
       result = client.update_document(self.domino_unid, domino_document_form, domino_document_properties(:update))
       if(result == :'404')
         self.domino_unid = client.create_document(domino_document_form, domino_document_properties(:create))
         result = (not self.domino_unid.nil?)
+        error_message = 'Failed to create new document after 404.'
       end
+      error_message = 'Failed to update document.' if(result == false)
     end
-    raise 'Failed to communicate with the Domino server.' if (result == false)
+    raise error_message if (result == false)
 
     if(self.is_a?(ActiveRecord::Base) and not self.changes.empty?)
       result &&= self.save
@@ -72,12 +76,12 @@ module DominoDocument
     
     client = DominoIntegrationClient.new(self.study.domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
     if client.nil?
-      raise'Failed to communicate with the Domino server.'
+      raise 'Failed to create Domino Integration Client.'
       return false
     end
 
     result = client.update_document(self.domino_unid, domino_document_form, changed_properties)
-    raise 'Failed to communicate with the Domino server.' if (result == false)
+    raise 'Failed to update document.' if (result == false)
 
     return result
   end
