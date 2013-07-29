@@ -24,6 +24,7 @@ class Ability
     if user.is_app_admin?
       can :manage, :system
       can :manage, Version
+      can :manage, MongoidHistoryTracker
       can :manage, User
       can :manage, Role
       can :manage, PublicKey
@@ -80,7 +81,10 @@ class Ability
     end
 
     # Audit role
-    can :read, Version
+    unless user.is_app_admin?
+      can :read, Version
+      can :read, MongoidHistoryTracker
+    end
     can :read, Session, ['sessions.id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |session|
       !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:audit)}).nil?) or
         (session.study and !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:audit)}).nil?))      
