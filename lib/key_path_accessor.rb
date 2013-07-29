@@ -23,9 +23,9 @@ class KeyPathAccessor
     path_components = path.gsub(/\]/,'').split('[', 2)
     
     if(value.is_a? Array)
-      value[path_components[0].to_i] = (path_components[1].blank? ? new_value : set_by_path(result, path_components[1]))
+      value[path_components[0].to_i] = (path_components[1].blank? ? new_value : set_by_path(value[path_components[0].to_i], path_components[1], new_value))
     else
-      value[path_components[0]] = (path_components[1].blank? ? new_value : set_by_path(result, path_components[1]))
+      value[path_components[0]] = (path_components[1].blank? ? new_value : set_by_path(value[path_components[0]], path_components[1], new_value))
     end
 
     return value
