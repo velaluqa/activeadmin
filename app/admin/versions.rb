@@ -206,4 +206,7 @@ ActiveAdmin.register Version do
   action_item :only => :show_git_commit do
     link_to 'Back', git_commits_admin_versions_path
   end
+  action_item :only => [:index, :git_commits] do
+    link_to 'MongoDB', admin_mongoid_history_trackers_path
+  end
 end

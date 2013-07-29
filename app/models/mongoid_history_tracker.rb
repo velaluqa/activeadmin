@@ -1,5 +1,6 @@
 class MongoidHistoryTracker
   include Mongoid::History::Tracker
+  include Mongoid::Document
 
   field :modifier_id, type: Integer
 
@@ -27,5 +28,5 @@ class MongoidHistoryTracker
     else
       nil
     end
-  end    
+  end
 end
