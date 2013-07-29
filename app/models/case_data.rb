@@ -1,10 +1,14 @@
 class CaseData
   include Mongoid::Document
 
+  include Mongoid::History::Trackable
+
   field :case_id, type: Integer
   field :data, type: Hash
 
   index case_id: 1
+
+  track_history :track_create => true, :track_update => true, :track_destroy => true
 
   def case
     begin

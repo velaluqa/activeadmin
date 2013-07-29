@@ -114,3 +114,6 @@ end
 
 # Ruby DICOM lib
 gem 'dicom'
+
+# MongoDB audit trail
+gem 'mongoid-history'
