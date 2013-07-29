@@ -1,0 +1,21 @@
+%table
+  %thead
+    %tr
+      %th Field
+      %th Previous Value
+      %th New Value
+  %tbody
+    - changeset.each do |field, values|
+      %tr
+        %td= item.class.human_attribute_name(field)
+        %td
+          - if(values[:from].is_a?(Array) or values[:from].is_a?(Hash))
+            = CodeRay.scan(JSON::pretty_generate(values[:from]), :json).div(:css => :class).html_safe
+          - else
+            = values[:from]
+        %td
+          - if(values[:to].is_a?(Array) or values[:to].is_a?(Hash))
+            = CodeRay.scan(JSON::pretty_generate(values[:to]), :json).div(:css => :class).html_safe
+          - else
+            = values[:to]
+
