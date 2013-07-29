@@ -1,15 +1,15 @@
 ActiveAdmin.register MongoidHistoryTracker do
   before_filter { @skip_sidebar = true }
 
-  menu :label => 'MHT', :priority => 99, :if => proc{ can?(:manage, MongoidHistoryTracker) }
+  menu false
 
   actions :index, :show
 
   controller do
     load_and_authorize_resource :except => :index
-    # def scoped_collection
-    #   end_of_association_chain.accessible_by(current_ability)
-    # end
+    def scoped_collection
+      end_of_association_chain.accessible_by(current_ability)
+    end
   end
 
   index do
@@ -118,5 +118,12 @@ ActiveAdmin.register MongoidHistoryTracker do
         render 'admin/mongoid_history_trackers/changeset', :changeset => tracker.tracked_changes, :item => tracker.resource
       end
     end
+  end
+
+  action_item :only => :index do
+    link_to 'Versions', admin_versions_path
+  end
+  action_item :only => :index do
+    link_to 'Configuration Changes', git_commits_admin_versions_path
   end
 end
