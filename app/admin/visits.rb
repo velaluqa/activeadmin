@@ -470,4 +470,8 @@ ActiveAdmin.register Visit do
   end
   
   viewer_cartable(:visit)
+
+  action_item :only => :show do
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'visit', :audit_trail_view_id => resource.id))
+  end
 end

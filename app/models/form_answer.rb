@@ -6,6 +6,8 @@ require 'exceptions'
 class FormAnswer
   include Mongoid::Document
 
+  include Mongoid::History::Trackable
+
   field :user_id, type: Integer
   field :session_id, type: Integer
   field :case_id, type: Integer
@@ -24,6 +26,8 @@ class FormAnswer
 
   index user_id: 1
   index case_id: 1
+
+  track_history :track_create => true, :track_update => true, :track_destroy => true, :modifier_field => :modifier
 
   before_destroy do
     c = self.case
