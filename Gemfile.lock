@@ -183,6 +183,7 @@ GEM
       data_objects (= 0.10.13)
     do_sqlite3 (0.10.13)
       data_objects (= 0.10.13)
+    easy_diff (0.0.2)
     erubis (2.7.0)
     execjs (1.4.0)
       multi_json (~> 1.0)
@@ -234,6 +235,10 @@ GEM
       moped (~> 1.2)
       origin (~> 1.0)
       tzinfo (~> 0.3.22)
+    mongoid-history (0.4.0)
+      activesupport
+      easy_diff
+      mongoid (~> 3.0)
     moped (1.4.5)
     multi_json (1.7.7)
     origin (1.1.0)
@@ -364,6 +369,7 @@ DEPENDENCIES
   less-rails
   libv8 (~> 3.11.8)
   mongoid (~> 3.0.0)
+  mongoid-history
   paper_trail (~> 2)
   pg
   rails (= 3.2.13)
