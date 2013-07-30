@@ -93,6 +93,29 @@ ActiveAdmin.register Version do
 
       return version.event
     end
+
+    def audit_trail_resource
+      return nil if(params[:audit_trail_view_type].blank? or params[:audit_trail_view_id].blank?)
+
+      result = case params[:audit_trail_view_type]
+               when 'case' then Case.where(:id => params[:audit_trail_view_id].to_i).first
+               when 'patient' then Patient.where(:id => params[:audit_trail_view_id].to_i).first
+               when 'form' then Form.where(:id => params[:audit_trail_view_id].to_i).first
+               when 'role' then Role.where(:id => params[:audit_trail_view_id].to_i).first
+               when 'user' then User.where(:id => params[:audit_trail_view_id].to_i).first
+               when 'session' then Session.where(:id => params[:audit_trail_view_id].to_i).first
+               when 'study' then Study.where(:id => params[:audit_trail_view_id].to_i).first
+               when 'form_answer' then FormAnswer.where(:id => params[:audit_trail_view_id]).first
+               else nil
+               end
+
+      return result
+    end
+  end
+
+  action_item :only => :index do
+    resource = controller.audit_trail_resource
+    status_tag(params[:audit_trail_view_type] + ': ' + (resource.respond_to?(:name) ? resource.name : '<'+resource.id+'>'), :error, :class => 'audit_trail_indicator') unless resource.nil?
   end
 
   index do
@@ -227,12 +250,12 @@ ActiveAdmin.register Version do
     link_to 'Configuration Changes', git_commits_admin_versions_path
   end
   action_item :only => :git_commits do
-    link_to 'Versions', admin_versions_path
+    link_to 'Versions', admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]}))
   end
   action_item :only => :show_git_commit do
-    link_to 'Back', git_commits_admin_versions_path
+    link_to 'Back', git_commits_admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]}))
   end
   action_item :only => [:index, :git_commits] do
-    link_to 'MongoDB', admin_mongoid_history_trackers_path
+    link_to 'MongoDB', admin_mongoid_history_trackers_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]}))
   end
 end
