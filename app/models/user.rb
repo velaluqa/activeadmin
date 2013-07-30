@@ -34,6 +34,14 @@ class User < ActiveRecord::Base
     false
   end
 
+  # hack to allow mongoid-history to store the modifier using an ActiveRecord model (this model)
+  def self.using_object_ids?
+    false
+  end
+  def self.fields
+    [:id]
+  end
+
   def is_app_admin?
     !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(:manage) }).nil?)
   end
