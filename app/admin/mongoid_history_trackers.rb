@@ -14,28 +14,53 @@ ActiveAdmin.register MongoidHistoryTracker do
       case params[:audit_trail_view_type]
       when 'case'
         end_of_association_chain.where(:'association_chain.name' => 'CaseData').in(:'association_chain.id' => CaseData.where(:case_id => params[:audit_trail_view_id].to_i).map {|cd| cd.id})
+      when 'image_series'
+        end_of_association_chain.where(:'association_chain.name' => 'ImageSeriesData').in(:'association_chain.id' => ImageSeriesData.where(:image_series_id => params[:audit_trail_view_id].to_i).map {|isd| isd.id})
+      when 'visit'
+        end_of_association_chain.or({:'association_chain.name' => 'VisitData', :'association_chain.id'.in => VisitData.where(:visit_id => params[:audit_trail_view_id].to_i).map {|vd| vd.id}},
+                                    {:'association_chain.name' => 'ImageSeriesData', :'association_chain.id'.in => ImageSeriesData.where(:image_series_id.in => ImageSeries.where(:visit_id => params[:audit_trail_view_id].to_i).map {|is| is.id}).map {|isd| isd.id}})
       when 'patient'
-        end_of_association_chain.where(:'association_chain.name' => 'PatientData').in(:'association_chain.id' => PatientData.where(:patient_id => params[:audit_trail_view_id].to_i).map {|pd| pd.id})
+        visit_data_ids = VisitData.in(:visit_id => Visit.where(:patient_id => params[:audit_trail_view_id].to_i).map {|v| v.id}).map {|vd| vd.id}
+        image_series_data_ids = ImageSeriesData.in(:image_series_id => ImageSeries.where(:patient_id => params[:audit_trail_view_id].to_i).map {|is| is.id}).map {|isd| isd.id}
+
+        end_of_association_chain.or({:'association_chain.name' => 'PatientData', :'association_chain.id'.in => PatientData.where(:patient_id => params[:audit_trail_view_id].to_i).map {|pd| pd.id}},
+                                    {:'association_chain.name' => 'VisitData', :'association_chain.id'.in => visit_data_ids},
+                                    {:'association_chain.name' => 'ImageSeriesData', :'association_chain.id'.in => image_series_data_ids})                                    
       when 'form_answer'
         end_of_association_chain.where('association_chain' => {'name' => 'FormAnswer', 'id' => Moped::BSON::ObjectId.from_string(params[:audit_trail_view_id])})
+      when 'center'
+        patient_ids = Patient.where(:center_id => params[:audit_trail_view_id].to_i).map {|p| p.id}
+
+        patient_data_ids = PatientData.in(:patient_id => patient_ids).map {|pd| pd.id}
+        visit_data_ids = VisitData.in(:visit_id => Visit.where(:patient_id => patient_ids).map {|v| v.id}).map {|vd| vd.id}
+        image_series_data_ids = ImageSeriesData.in(:image_series_id => ImageSeries.where(:patient_id => patient_ids).map {|is| is.id}).map {|isd| isd.id}
+
+        end_of_association_chain.or({:'association_chain.name' => 'PatientData', :'association_chain.id'.in => patient_data_ids},
+                                    {:'association_chain.name' => 'VisitData', :'association_chain.id'.in => visit_data_ids},
+                                    {:'association_chain.name' => 'ImageSeriesData', :'association_chain.id'.in => image_series_data_ids})                                    
       when 'session'
         case_data_ids = CaseData.in(:case_id => Case.where(:session_id => params[:audit_trail_view_id].to_i).map {|c| c.id}).map {|cd| cd.id}
-        patient_data_ids = PatientData.in(:patient_id => Patient.where(:session_id => params[:audit_trail_view_id].to_i).map {|p| p.id}).map {|pd| pd.id}
         form_answer_ids = FormAnswer.where(:session_id => params[:audit_trail_view_id].to_i).map {|fa| fa.id}
 
         end_of_association_chain.or({:'association_chain.name' => 'CaseData', :'association_chain.id'.in => case_data_ids},
-                                    {:'association_chain.name' => 'PatientData', :'association_chain.id'.in => patient_data_ids},
                                     {:'association_chain.name' => 'FormAnswer', :'association_chain.id'.in => form_answer_ids})
       when 'study'
         session_ids = Session.where(:study_id => params[:audit_trail_view_id].to_i).map {|s| s.id}
 
         case_data_ids = CaseData.in(:case_id => Case.where(:session_id => session_ids).map {|c| c.id}).map {|cd| cd.id}
-        patient_data_ids = PatientData.in(:patient_id => Patient.where(:session_id => session_ids).map {|p| p.id}).map {|pd| pd.id}
         form_answer_ids = FormAnswer.where(:session_id.in => session_ids).map {|fa| fa.id}
 
+        patient_ids = Patient.where(:center_id => Center.where(:study_id => params[:audit_trail_view_id].to_i).map {|c| c.id}).map {|p| p.id}
+
+        patient_data_ids = PatientData.in(:patient_id => patient_ids).map {|pd| pd.id}
+        visit_data_ids = VisitData.in(:visit_id => Visit.where(:patient_id => patient_ids).map {|v| v.id}).map {|vd| vd.id}
+        image_series_data_ids = ImageSeriesData.in(:image_series_id => ImageSeries.where(:patient_id => patient_ids).map {|is| is.id}).map {|isd| isd.id}
+
         end_of_association_chain.or({:'association_chain.name' => 'CaseData', :'association_chain.id'.in => case_data_ids},
+                                    {:'association_chain.name' => 'FormAnswer', :'association_chain.id'.in => form_answer_ids},
                                     {:'association_chain.name' => 'PatientData', :'association_chain.id'.in => patient_data_ids},
-                                    {:'association_chain.name' => 'FormAnswer', :'association_chain.id'.in => form_answer_ids})
+                                    {:'association_chain.name' => 'VisitData', :'association_chain.id'.in => visit_data_ids},
+                                    {:'association_chain.name' => 'ImageSeriesData', :'association_chain.id'.in => image_series_data_ids})
       else
         end_of_association_chain
       end.accessible_by(current_ability)
@@ -53,6 +78,10 @@ ActiveAdmin.register MongoidHistoryTracker do
                when 'session' then Session.where(:id => params[:audit_trail_view_id].to_i).first
                when 'study' then Study.where(:id => params[:audit_trail_view_id].to_i).first
                when 'form_answer' then FormAnswer.where(:id => params[:audit_trail_view_id]).first
+               when 'center' then Center.where(:id => params[:audit_trail_view_id]).first
+               when 'visit' then Visit.where(:id => params[:audit_trail_view_id]).first
+               when 'image_series' then ImageSeries.where(:id => params[:audit_trail_view_id]).first
+               when 'image' then Image.where(:id => params[:audit_trail_view_id]).first
                else nil
                end
 
@@ -91,6 +120,20 @@ ActiveAdmin.register MongoidHistoryTracker do
             'Patient Data '+tracker.association_chain[0]['id'].to_s
           else
             ('Patient Data for '+link_to(patient_data.patient.name.to_s, admin_patient_path(patient_data.patient))).html_safe
+          end
+        when 'ImageSeriesData'
+          image_series_data = ImageSeriesData.where(:id => tracker.association_chain[0]['id']).first
+          if(image_series_data.nil? or image_series_data.image_series.nil?)
+            'Image Series Data '+tracker.association_chain[0]['id'].to_s
+          else
+            ('Image Series Data for '+link_to(image_series_data.image_series.name.to_s, admin_image_series_path(image_series_data.image_series))).html_safe
+          end
+        when 'VisitData'
+          visit_data = VisitData.where(:id => tracker.association_chain[0]['id']).first
+          if(visit_data.nil? or visit_data.visit.nil?)
+            'Visit Data '+tracker.association_chain[0]['id'].to_s
+          else
+            ('Visit Data for '+link_to(visit_data.visit.name.to_s, admin_visit_path(visit_data.visit))).html_safe
           end
         else
           nil
@@ -144,6 +187,20 @@ ActiveAdmin.register MongoidHistoryTracker do
               'Patient Data '+tracker.association_chain[0]['id'].to_s
             else
               ('Patient Data for '+link_to(patient_data.patient.name.to_s, admin_patient_path(patient_data.patient))).html_safe
+            end
+          when 'ImageSeriesData'
+            image_series_data = ImageSeriesData.where(:id => tracker.association_chain[0]['id']).first
+            if(image_series_data.nil? or image_series_data.image_series.nil?)
+              'Image Series Data '+tracker.association_chain[0]['id'].to_s
+            else
+              ('Image Series Data for '+link_to(image_series_data.image_series.name.to_s, admin_image_series_path(image_series_data.image_series))).html_safe
+            end
+          when 'VisitData'
+            visit_data = VisitData.where(:id => tracker.association_chain[0]['id']).first
+            if(visit_data.nil? or visit_data.visit.nil?)
+              'Visit Data '+tracker.association_chain[0]['id'].to_s
+            else
+              ('Visit Data for '+link_to(visit_data.visit.name.to_s, admin_visit_path(visit_data.visit))).html_safe
             end
           else
             nil

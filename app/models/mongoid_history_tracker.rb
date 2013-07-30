@@ -25,6 +25,10 @@ class MongoidHistoryTracker
       CaseData.where(:id => self.association_chain[0]['id']).first
     when 'PatientData'
       PatientData.where(:id => self.association_chain[0]['id']).first
+    when 'ImageSeriesData'
+      ImageSeriesData.where(:id => self.association_chain[0]['id']).first
+    when 'VisitData'
+      VisitData.where(:id => self.association_chain[0]['id']).first
     else
       nil
     end

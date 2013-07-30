@@ -1,6 +1,8 @@
 class VisitData
   include Mongoid::Document
 
+  include Mongoid::History::Trackable
+
   field :visit_id, type: Integer
   field :assigned_image_series_index, type: Hash, default: {}
   field :required_series, type: Hash, default: {}
@@ -10,6 +12,8 @@ class VisitData
   field :mqc_version, type: String
 
   index visit_id: 1
+
+  track_history :track_create => true, :track_update => true, :track_destroy => true
 
   def visit
     begin

@@ -106,6 +106,10 @@ ActiveAdmin.register Version do
                when 'session' then Session.where(:id => params[:audit_trail_view_id].to_i).first
                when 'study' then Study.where(:id => params[:audit_trail_view_id].to_i).first
                when 'form_answer' then FormAnswer.where(:id => params[:audit_trail_view_id]).first
+               when 'center' then Center.where(:id => params[:audit_trail_view_id]).first
+               when 'visit' then Visit.where(:id => params[:audit_trail_view_id]).first
+               when 'image_series' then ImageSeries.where(:id => params[:audit_trail_view_id]).first
+               when 'image' then Image.where(:id => params[:audit_trail_view_id]).first
                else nil
                end
 
