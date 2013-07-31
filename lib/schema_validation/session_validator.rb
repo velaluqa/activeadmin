@@ -27,9 +27,12 @@ module SchemaValidation
       when 'case_type'
         errors << Kwalify::ValidationError.new("Must have either 'screen_layout' or 'dont_use_viewer: true'", path) unless ((not value['screen_layout'].nil?) ^ value['dont_use_viewer'])
       when 'case_type_screen_layout'
+        errors << Kwalify::ValidationError.new("When 'strict' is set, 'sidebar' can't be true.", path) if (value['strict'] and value['sidebar'])
         errors << Kwalify::ValidationError.new("When 'strict' is set, 'passive' can't be true.", path) if (value['strict'] and value['passive'])
         errors << Kwalify::ValidationError.new("'passive_annotations' requires 'passive' to be 'true'.", path) if (value['passive_annotations'] and not value['passive'])
-        errors << Kwalify::ValidationError.new("'active' and 'active_hidden' can't overlap.", path) if (value['active'] and value['active_hidden'] and not (value['active'] & value['active_hidden']).empty?)
+      when 'case_type_screen_layout_series'        
+        errors << Kwalify::ValidationError.new("'display' can't contain any series that is not contained in 'import'. Offending series: #{(value['display']-value['import']).join(',')}.", path) unless (value['display']-value['import']).empty?
+        errors << Kwalify::ValidationError.new("'roi' can't contain any series that is not contained in 'import'. Offending series: #{(value['roi']-value['import']).join(',')}.", path) unless (value['roi']-value['import']).empty?
       end
     end
   end
