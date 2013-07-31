@@ -673,6 +673,10 @@ $(document).ready ->
 
   $(".datepicker-field").datepicker()
 
+  $('.iaf_select').select2({
+    width: 'resolve',
+  })
+
   update_calculated_fields()
   update_remove_buttons_visibility()
 

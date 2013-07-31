@@ -3,7 +3,7 @@
   - value, fixed_value_hash = fixed_value(field, data_hash)
   - value = value_for_reopened_case(field, @case) if(@case.state == :reopened_in_progress and value.nil?) unless (defined?(placeholder) and placeholder)
   - value = field['selected_option'] if value.nil?
-  = select_tag(field['id'], options_from_values(field, [value]).html_safe, { :class => "#{input_size}" }.merge(validators_hash(field)).merge(fixed_value_hash))
+  = select_tag(field['id'], options_from_values(field, [value]).html_safe, { :class => "#{input_size} iaf_select" }.merge(validators_hash(field)).merge(fixed_value_hash))
   - if(defined?(show_internal_annotations) and show_internal_annotations == true)
     .data_dict_select_options
       %ul
