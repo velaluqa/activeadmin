@@ -132,7 +132,7 @@ protected
         end
         next if configuration['types'][c.case_type].nil?
 
-        case_series_map = {:case_name => c.name, :series => configuration['types'][c.case_type]['screen_layout']['active'] + (configuration['types'][c.case_type]['screen_layout']['active_hidden'].nil? ? [] : configuration['types'][c.case_type]['screen_layout']['active_hidden'])}
+        case_series_map = {:case_name => c.name, :series => (configuration['types'][c.case_type]['screen_layout']['series'].blank? ? (configuration['types'][c.case_type]['screen_layout']['active'] + (configuration['types'][c.case_type]['screen_layout']['active_hidden'].nil? ? [] : configuration['types'][c.case_type]['screen_layout']['active_hidden'])) : configuration['types'][c.case_type]['screen_layout']['series']['import'])}
         case_series_map[:series] ||= []
         passive_series_list << case_series_map
       end
