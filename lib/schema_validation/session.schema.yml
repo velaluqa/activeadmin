@@ -101,18 +101,32 @@ mapping:
                 required: yes
                 range:
                   min: 1
-              "active":
-                type: seq
+              "series":
+                type: map
                 required: yes
-                sequence:
-                  - type: str
-                    unique: yes
-              "active_hidden":
-                type: seq
-                sequence:
-                  - type: str
-                    unique: yes
+                name: case_type_screen_layout_series
+                mapping:
+                  "import":
+                    type: seq
+                    required: yes
+                    sequence:
+                      - type: str
+                        unique: yes
+                  "display":
+                    type: seq
+                    required: yes
+                    sequence:
+                      - type: str
+                        unique: yes
+                  "roi":
+                    type: seq
+                    required: yes
+                    sequence:
+                      - type: str
+                        unique: yes
               "passive":
+                type: bool
+              "sidebar":
                 type: bool
               "passive_annotations":
                 type: bool
