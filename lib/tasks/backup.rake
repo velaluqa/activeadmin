@@ -55,7 +55,7 @@ namespace :erica do
     end
 
     print "Backing up MongoDB database..\t\t"
-    mongodump_command = "mongodump --host #{mongodb_config['hosts'].first} --db #{mongodb_config['database']} --out \"#{backup_folder}/mongodb\""
+    mongodump_command = "mongodump --host #{mongodb_config['hosts'].first} --db #{mongodb_config['database']} -u #{mongodb_config['username']} -p '#{mongodb_config['password']}' --out \"#{backup_folder}/mongodb\""
     pp mongodump_command
     if(system(mongodump_command))
       puts 'DONE'
