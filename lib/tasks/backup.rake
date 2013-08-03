@@ -54,15 +54,15 @@ namespace :erica do
       next
     end
 
-    print "Backing up MongoDB database..\t\t"
-    mongodump_command = "mongodump --host #{mongodb_config['hosts'].first} --db #{mongodb_config['database']} -u #{mongodb_config['username']} -p '#{mongodb_config['password']}' --out \"#{backup_folder}/mongodb\""
-    pp mongodump_command
-    if(system(mongodump_command))
-      puts 'DONE'
-    else
-      puts 'FAILED'
-      next
-    end
+    # print "Backing up MongoDB database..\t\t"
+    # mongodump_command = "mongodump --host #{mongodb_config['hosts'].first} --db #{mongodb_config['database']} -u #{mongodb_config['username']} -p '#{mongodb_config['password']}' --out \"#{backup_folder}/mongodb\""
+    # pp mongodump_command
+    # if(system(mongodump_command))
+    #   puts 'DONE'
+    # else
+    #   puts 'FAILED'
+    #   next
+    # end
     
     print "Backing up configuration files..\t\t"
     data_tar_command = "tar --exclude=#{Rails.application.config.image_storage_root} --exclude=#{Rails.application.config.image_export_root} -czf \"#{backup_folder}/data.tar.gz\" \"#{Rails.application.config.data_directory}\""
