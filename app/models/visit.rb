@@ -323,8 +323,6 @@ class Visit < ActiveRecord::Base
     visit_data.reconstruct_assignment_index
     visit_data.save
 
-    update_state
-
     schedule_required_series_domino_sync
 
     domino_sync_series_ids.uniq.each do |series_id|
@@ -349,8 +347,6 @@ class Visit < ActiveRecord::Base
     visit_data.save
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
-
-    update_state
   end
   def set_tqc_result(required_series_name, result, tqc_user, tqc_comment, tqc_date = nil, tqc_version = nil)
     required_series_specs = self.required_series_specs
@@ -377,8 +373,6 @@ class Visit < ActiveRecord::Base
     visit_data = self.visit_data
     visit_data.required_series[required_series_name] = required_series
     visit_data.save
-
-    update_state
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
     return true
@@ -478,24 +472,24 @@ class Visit < ActiveRecord::Base
     return result
   end
 
-  def update_state
-    old_state = self.state
+  # def update_state
+  #   old_state = self.state
 
-    visit_complete = self.required_series_objects.map {|rs| rs.assigned? and rs.tqc_state == :passed}.reduce(:&)
+  #   visit_complete = self.required_series_objects.map {|rs| rs.assigned? and rs.tqc_state == :passed}.reduce(:&)
 
-    new_state = if(not visit_complete)
-                  reset_mqc unless(old_state == :complete || old_state == :incomplete)
+  #   new_state = if(not visit_complete)
+  #                 reset_mqc unless(old_state == :complete || old_state == :incomplete)
 
-                  :incomplete
-                elsif(visit_complete and old_state == :incomplete)
-                  :complete
-                else
-                  old_state
-                end
+  #                 :incomplete
+  #               elsif(visit_complete and old_state == :incomplete)
+  #                 :complete
+  #               else
+  #                 old_state
+  #               end
 
-    self.state = new_state
-    self.save
-  end
+  #   self.state = new_state
+  #   self.save
+  # end
 
   def ensure_study_is_unchanged
     if(self.patient_id_changed? and not self.patient_id_was.nil?)
