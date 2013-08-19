@@ -372,6 +372,32 @@ ActiveAdmin.register Visit do
     link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.state == :mqc_issues or resource.state == :mqc_passed)
   end
 
+  member_action :edit_state, :method => :post do
+    @visit = Visit.find(params[:id])
+    authorize! :manage, @visit
+
+    @visit.state = params[:visit][:state]
+
+    if @visit.save
+      flash[:notice] = 'Visit state was changed successfully.'
+    else
+      flash[:error] = 'Visit state change failed.'
+    end
+    redirect_to params[:return_url]
+  end
+  member_action :edit_state_form, :method => :get do
+    @visit = Visit.find(params[:id])
+    authorize! :manage, @visit
+
+    @states = [['Incomplete', :incomplete], ['Complete', :complete], ['mQC performed, issues present', :mqc_issues], ['mQC passed', :mqc_passed]]
+
+    @return_url = params[:return_url] || admin_visit_path(@visit)
+    @page_title = 'Change Visit State'
+  end
+  action_item :only => :show do
+    link_to('Change State', edit_state_form_admin_visit_path(resource, :return_url => request.fullpath)) if can? :manage, resource
+  end
+
   controller do
     def perform_dicom_tqc_check(expected, actual)
       return nil if actual.nil?
