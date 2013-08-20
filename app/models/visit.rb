@@ -8,7 +8,7 @@ class Visit < ActiveRecord::Base
 
   attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid
   attr_accessible :patient
-  attr_accessible :mqc_date, :mqc_user_id
+  attr_accessible :mqc_date, :mqc_user_id, :mqc_state
   attr_accessible :mqc_user
   
   belongs_to :patient
@@ -50,7 +50,8 @@ class Visit < ActiveRecord::Base
     end
   end
 
-  STATE_SYMS = [:incomplete, :complete, :mqc_issues, :mqc_passed]
+  STATE_SYMS = [:incomplete_na, :complete_tqc_passed, :incomplete_queried, :complete_tqc_pending, :complete_tqc_issues]
+  MQC_STATE_SYMS = [:pending, :issues, :passed]
 
   def self.state_sym_to_int(sym)
     return Visit::STATE_SYMS.index(sym)
@@ -69,6 +70,24 @@ class Visit < ActiveRecord::Base
     end
 
     write_attribute(:state, index)
+  end
+  def self.mqc_state_sym_to_int(sym)
+    return Visit::MQC_STATE_SYMS.index(sym)
+  end
+  def mqc_state
+    return -1 if read_attribute(:state).nil?
+    return Visit::MQC_STATE_SYMS[read_attribute(:mqc_state)]
+  end
+  def mqc_state=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Visit::MQC_STATE_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported mQC state"
+      return
+    end
+
+    write_attribute(:mqc_state, index)
   end
 
   def visit_data
@@ -217,6 +236,14 @@ class Visit < ActiveRecord::Base
     end
 
     properties.merge!(mqc_to_domino)
+
+    properties['visitStatus'] = case self.state
+                                when :incomplete_na then 'Incomplete, not available'
+                                when :complete_tqc_passed then 'Complete, tQC of all series passed'
+                                when :incomplete_queried then 'Incomplete, queried'
+                                when :complete_tqc_pending then 'Complete, tQC not finished'
+                                when :complete_tqc_issues then 'Complete, tQC finished, not all series passed'
+                                end
 
     properties
   end
@@ -389,7 +416,7 @@ class Visit < ActiveRecord::Base
     self.ensure_visit_data_exists
     visit_data = self.visit_data
 
-    self.state = (all_passed ? :mqc_passed : :mqc_issues)
+    self.mqc_state = (all_passed ? :passed : :issues)
     self.mqc_user_id = (mqc_user.is_a?(User) ? mqc_user.id : mqc_user)
     self.mqc_date = (mqc_date.nil? ? Time.now : mqc_date)
     visit_data.mqc_version = (mqc_version.nil? ? GitConfigRepository.new.current_version : mqc_version)
@@ -433,6 +460,7 @@ class Visit < ActiveRecord::Base
 
     self.mqc_user_id = nil
     self.mqc_date = nil
+    self.mqc_state = :pending
 
     self.save
   end
@@ -444,11 +472,10 @@ class Visit < ActiveRecord::Base
     result['QCdate'] = {'data' => (self.mqc_date.nil? ? '01-01-0001' : self.mqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime'}
     result['QCperson'] = (self.mqc_user.nil? ? nil : self.mqc_user.name)
 
-    result['QCresult'] = case self.state
-                         when :incomplete then 'Visit incomplete'
-                         when :complete then 'Pending'
-                         when :mqc_issues then 'Performed, issues present'
-                         when :mqc_passed then 'Performed, no issues present'
+    result['QCresult'] = case self.mqc_state
+                         when :pending then 'Pending'
+                         when :issues then 'Performed, issues present'
+                         when :passed then 'Performed, no issues present'
                          end
 
     result['QCcomment'] = self.visit_data.mqc_comment
@@ -471,25 +498,6 @@ class Visit < ActiveRecord::Base
 
     return result
   end
-
-  # def update_state
-  #   old_state = self.state
-
-  #   visit_complete = self.required_series_objects.map {|rs| rs.assigned? and rs.tqc_state == :passed}.reduce(:&)
-
-  #   new_state = if(not visit_complete)
-  #                 reset_mqc unless(old_state == :complete || old_state == :incomplete)
-
-  #                 :incomplete
-  #               elsif(visit_complete and old_state == :incomplete)
-  #                 :complete
-  #               else
-  #                 old_state
-  #               end
-
-  #   self.state = new_state
-  #   self.save
-  # end
 
   def ensure_study_is_unchanged
     if(self.patient_id_changed? and not self.patient_id_was.nil?)
