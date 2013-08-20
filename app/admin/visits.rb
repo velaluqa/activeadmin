@@ -89,10 +89,18 @@ ActiveAdmin.register Visit do
     column :visit_date
     column :state, :sortable => :state do |visit|
       case(visit.state)
-      when :incomplete then status_tag('Incomplete')
-      when :complete then status_tag('Complete', :warning)
-      when :mqc_issues then status_tag('mQC, issues present', :error)
-      when :mqc_passed then status_tag('mQC passed', :ok)
+      when :incomplete_na then status_tag('Incomplete, not available')
+      when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
+      when :incomplete_queried then status_tag('Incomplete, queried', :warning)
+      when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
+      when :complete_tqc_issues then stauts_tag('Complete, tQC finished, not all series passed', :error)
+      end
+    end
+    column 'mQC State', :mqc_state, :sortable => :mqc_state do |visit|
+      case(visit.mqc_state)
+      when :pending then status_tag('Pending')
+      when :issues then status_tag('Performed, issues present', :error)
+      when :passed then status_tag('Performed, passed', :ok)
       end
     end
     column 'mQC Date', :mqc_date
@@ -114,10 +122,18 @@ ActiveAdmin.register Visit do
       row :visit_date
       row :state do
         case(visit.state)
-        when :incomplete then status_tag('Incomplete')
-        when :complete then status_tag('Complete', :warning)
-        when :mqc_issues then status_tag('mQC, issues present', :error)
-        when :mqc_passed then status_tag('mQC passed', :ok)
+        when :incomplete_na then status_tag('Incomplete, not available')
+        when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
+        when :incomplete_queried then status_tag('Incomplete, queried', :warning)
+        when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
+        when :complete_tqc_issues then stauts_tag('Complete, tQC finished, not all series passed', :error)
+        end
+      end
+      row 'mQC State' do
+        case(visit.mqc_state)
+        when :pending then status_tag('Pending')
+        when :issues then status_tag('Performed, issues present', :error)
+        when :passed then status_tag('Performed, passed', :ok)
         end
       end
       domino_link_row(visit)
@@ -322,8 +338,8 @@ ActiveAdmin.register Visit do
     @visit = Visit.find(params[:id])
     authorize! :mqc, @visit unless can? :manage, @visit
 
-    unless(@visit.state == :complete || @visit.state == :mqc_issues)
-      flash[:error] = 'mQC cannot be performed before this visit is complete (all required series are assigned and have passed tQC).'
+    unless([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(@visit.state))
+      flash[:error] = 'mQC cannot be performed for a visit in this state.'
       redirect_to :action => :show
       return
     end
@@ -347,8 +363,8 @@ ActiveAdmin.register Visit do
     @visit = Visit.find(params[:id])
     authorize! :mqc, @visit unless can? :manage, @visit
 
-    unless(@visit.state == :complete || @visit.state == :mqc_issues)
-      flash[:error] = 'mQC cannot be performed before this visit is complete (all required series are assigned and have passed tQC).'
+    unless([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(@visit.state))
+      flash[:error] = 'mQC cannot be performed for a visit in this state.'
       redirect_to :action => :show
       return
     end
@@ -366,10 +382,10 @@ ActiveAdmin.register Visit do
     render 'admin/visits/mqc_form'
   end
   action_item :only => :show do
-    link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if(resource.state == :complete or resource.state == :mqc_issues)
+    link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(resource.state))
   end
   action_item :only => :show do
-    link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.state == :mqc_issues or resource.state == :mqc_passed)
+    link_to('mQC Results', mqc_results_admin_visit_path(resource)) unless(resource.mqc_state == :pending)
   end
 
   member_action :edit_state, :method => :post do
@@ -388,8 +404,8 @@ ActiveAdmin.register Visit do
   member_action :edit_state_form, :method => :get do
     @visit = Visit.find(params[:id])
     authorize! :manage, @visit
-
-    @states = [['Incomplete', :incomplete], ['Complete', :complete], ['mQC performed, issues present', :mqc_issues], ['mQC passed', :mqc_passed]]
+    
+    @states = [['Incomplete, not available', :incomplete_na], ['Complete, tQC of all series passed', :complete_tqc_passed], ['Incomplete, queried', :incomplete_queried], ['Complete, tQC not finished', :complete_tqc_pending], ['Complete, tQC finished, not all series passed', :complete_tqc_issues]]
 
     @return_url = params[:return_url] || admin_visit_path(@visit)
     @page_title = 'Change Visit State'

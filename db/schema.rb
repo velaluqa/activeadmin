@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130726132409) do
+ActiveRecord::Schema.define(:version => 20130820122035) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -224,6 +224,7 @@ ActiveRecord::Schema.define(:version => 20130726132409) do
     t.datetime "mqc_date"
     t.integer  "mqc_user_id"
     t.integer  "state",        :default => 0
+    t.integer  "mqc_state",    :default => 0
   end
 
   add_index "visits", ["mqc_user_id"], :name => "index_visits_on_mqc_user_id"
