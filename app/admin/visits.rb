@@ -385,7 +385,7 @@ ActiveAdmin.register Visit do
     link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(resource.state))
   end
   action_item :only => :show do
-    link_to('mQC Results', mqc_results_admin_visit_path(resource)) if([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(resource.state))
+    link_to('mQC Results', mqc_results_admin_visit_path(resource)) unless(resource.mqc_state == :pending)
   end
 
   member_action :edit_state, :method => :post do
