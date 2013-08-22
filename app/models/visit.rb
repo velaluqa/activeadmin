@@ -237,7 +237,7 @@ class Visit < ActiveRecord::Base
 
     properties.merge!(mqc_to_domino)
 
-    properties['visitStatus'] = case self.state
+    properties['Status'] = case self.state
                                 when :incomplete_na then 'Incomplete, not available'
                                 when :complete_tqc_passed then 'Complete, tQC of all series passed'
                                 when :incomplete_queried then 'Incomplete, queried'
