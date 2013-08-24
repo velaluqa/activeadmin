@@ -272,6 +272,19 @@ ActiveAdmin.register ImageSeries do
     f.buttons
   end
 
+  csv do
+    column :id
+    column :name
+    column :created_at
+    column :updated_at
+    column :imaging_date
+    column :series_number
+    column :state
+    column :comment
+    column('Patient') {|is| is.patient.nil? ? '' : is.patient.name}
+    column('Visit Number') {|is| is.visit.nil? ? '' : is.visit.visit_number}
+  end
+
   # filters
   filter :visit, :collection => []
   filter :series_number
