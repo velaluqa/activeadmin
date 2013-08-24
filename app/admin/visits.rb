@@ -192,6 +192,19 @@ ActiveAdmin.register Visit do
     f.buttons
   end
 
+  csv do
+    column :id
+    column :visit_number
+    column :visit_type
+    column :created_at
+    column :updated_at
+    column :description
+    column :state
+    column :mqc_date
+    column :mqc_state
+    column('Patient') {|v| v.patient.nil? ? '' : v.patient.name}
+  end
+
   # filters
   filter :patient, :collection => []
   filter :visit_number
