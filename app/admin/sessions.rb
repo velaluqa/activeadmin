@@ -15,6 +15,11 @@ ActiveAdmin.register Session do
   controller do
     load_and_authorize_resource :except => :index
     skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :download_configuration_at_version, :switch_state, :deep_clone_form, :deep_clone]
+
+    def max_csv_records
+      1_000_000
+    end
+
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
