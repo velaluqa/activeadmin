@@ -14,6 +14,10 @@ ActiveAdmin.register ImageSeries do
     load_and_authorize_resource :except => :index
     skip_load_and_authorize_resource :only => [:viewer, :dicom_metadata]
 
+    def max_csv_records
+      1_000_000
+    end
+
     def scoped_collection
       if(session[:selected_study_id].nil?)
         end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)

@@ -9,6 +9,11 @@ ActiveAdmin.register Center do
 
   controller do
     load_and_authorize_resource :except => :index
+
+    def max_csv_records
+      1_000_000
+    end
+
     def scoped_collection
       if(session[:selected_study_id].nil?)
         end_of_association_chain.accessible_by(current_ability)

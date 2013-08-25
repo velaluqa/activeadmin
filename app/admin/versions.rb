@@ -11,6 +11,11 @@ ActiveAdmin.register Version do
   filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
   controller do
+
+    def max_csv_records
+      1_000_000
+    end
+
     def scoped_collection
       return end_of_association_chain if(params[:audit_trail_view_type].nil? or params[:audit_trail_view_id].nil?)
 

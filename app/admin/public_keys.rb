@@ -5,6 +5,11 @@ ActiveAdmin.register PublicKey do
 
   controller do
     load_and_authorize_resource :except => :index
+
+    def max_csv_records
+      1_000_000
+    end
+
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
