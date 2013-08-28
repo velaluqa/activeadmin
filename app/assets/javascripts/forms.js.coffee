@@ -673,7 +673,7 @@ $(document).ready ->
 
   $(".datepicker-field").datepicker()
 
-  $('.iaf_select').select2({
+  $('.iaf_select').not("[data-no-validation]").select2({
     width: 'resolve',
   })
 
@@ -825,8 +825,14 @@ $(document).ready ->
       console.profileEnd()
     add_roi_selects(repeatable_roi_selects)
 
+    repeatable_form_select_fields = repeatable_form.find('.iaf_select')
+
     scroll_to_element = group_end_form.before(repeatable_form.children().first()).prev()
     group_end_form.before(e) for e in repeatable_form.children()
+
+    repeatable_form_select_fields.select2({
+      width: 'resolve',
+    })
 
     repeatable_preview = $("#repeatable_table_#{repeatable_id} tbody").clone()
     repeatable_preview.find('.form-group-index-cell').text(index+1)
