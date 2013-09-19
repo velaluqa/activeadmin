@@ -103,10 +103,11 @@ ActiveAdmin.register Session do
         link_to('Reorder Case List', reorder_case_list_form_admin_session_path(session))
       end
       row :cases do
-        if session.case_list(:all).empty?
-          nil
-        else
-          render 'admin/sessions/list', :items => session.case_list(:all).map {|c| link_to(c.name, admin_case_path(c))}
+        ul do
+          li { link_to(session.cases.count.to_s + ' cases in total', admin_cases_path(:'q[patient_id_in][]' => 'session_'+session.id.to_s)) }
+          li { link_to(session.cases.where(:flag => Case::flag_sym_to_int(:regular)).count.to_s + ' regular cases', admin_cases_path(:'q[patient_id_in][]' => 'session_'+session.id.to_s, :'q[flag_in][]' => Case::flag_sym_to_int(:regular))) }
+          li { link_to(session.cases.where(:flag => Case::flag_sym_to_int(:validation)).count.to_s + ' validation cases', admin_cases_path(:'q[patient_id_in][]' => 'session_'+session.id.to_s, :'q[flag_in][]' => Case::flag_sym_to_int(:validation))) }
+          li { link_to(session.cases.where(:flag => Case::flag_sym_to_int(:reader_testing)).count.to_s + ' reader testing cases', admin_cases_path(:'q[patient_id_in][]' => 'session_'+session.id.to_s, :'q[flag_in][]' => Case::flag_sym_to_int(:reader_testing))) }
         end
       end
       row :annotations_layouts do
