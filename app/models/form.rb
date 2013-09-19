@@ -163,7 +163,7 @@ class Form < ActiveRecord::Base
       self.locked_version
     when Hash
       if(resolve_hash)
-        version[self.id]
+        version[self.id] || version[self.id.to_s]
       else
         version
       end

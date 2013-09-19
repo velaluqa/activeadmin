@@ -293,6 +293,23 @@ ActiveAdmin.register Case do
   action_item :only => :show do
     link_to('Reopen', reopen_admin_case_path(resource)) if (resource.state == :read and resource.form_answer)
   end
+  member_action :cancel_reopen, :only => :show do
+    @case = Case.find(params[:id])
+
+    if(@case.state != :reopened)
+      flash[:error] = 'Only reopened (and not in progress) cases can be closed again.'
+      redirect_to :action => :show
+      return
+    end
+
+    @case.state = :read
+    @case.save
+
+    redirect_to({:action => :show}, :notice => 'The case is no longer reopened.')
+  end
+  action_item :only => :show do
+    link_to('Cancel Reopen', cancel_reopen_admin_case_path(resource)) if (resource.state == :reopened)
+  end
 
   action_item :only => :show do
     # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
