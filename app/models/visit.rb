@@ -247,6 +247,10 @@ class Visit < ActiveRecord::Base
 
     properties
   end
+  def schedule_domino_sync
+    DominoSyncWorker.perform_async(self.class.to_s, self.id)
+    self.schedule_required_series_domino_sync
+  end
   def domino_sync
     self.ensure_domino_document_exists
   end
