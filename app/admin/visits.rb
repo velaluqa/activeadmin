@@ -207,6 +207,7 @@ ActiveAdmin.register Visit do
     column :mqc_date
     column :mqc_state
     column('Patient') {|v| v.patient.nil? ? '' : v.patient.name}
+    column('Visit Date') {|v| v.visit_date}
   end
 
   # filters
