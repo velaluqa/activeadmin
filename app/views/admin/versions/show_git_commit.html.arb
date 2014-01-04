@@ -6,6 +6,8 @@ panel 'Commit Details' do
     session = Session.find_by_id($1)
   elsif commit.message =~ /form ([0-9]*)$/
     form = Form.find_by_id($1)
+  elsif commit.message =~ /study ([0-9]*)$/
+    study = Study.find_by_id($1)
   end
 
   attributes_table_for commit do
@@ -20,6 +22,8 @@ panel 'Commit Details' do
         commit.message.gsub(/session [0-9]*$/, link_to("session #{session.id}", admin_session_path(session))).html_safe
       elsif form
         commit.message.gsub(/form [0-9]*$/, link_to("form #{form.id}", admin_form_path(form))).html_safe
+      elsif study
+        commit.message.gsub(/study [0-9]*$/, link_to("study #{study.id}", admin_study_path(study))).html_safe
       else
         commit.message
       end
@@ -33,6 +37,8 @@ panel 'Commit Details' do
         config_path = session.relative_config_file_path
       elsif form
         config_path = form.relative_config_file_path
+      elsif study
+        config_path = study.relative_config_file_path
       end
 
       changes = {}

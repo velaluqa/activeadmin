@@ -5,7 +5,8 @@
     - cart.each_with_index do |item, index|
       %li
         %a{:href => cart_item_url(item)}= "#{ActiveSupport::Inflector::humanize(item[:type].to_s)} #{item[:id]}"
-  %a.button{:href => admin_viewer_cart_path} Open Cart
-  %a.button{:href => admin_viewer_cart_start_path} Start Viewer
+  %a.button.viewer_cart_button{:href => admin_viewer_cart_path} Open
+  %a.button.viewer_cart_button{:href => admin_viewer_cart_start_path} Start Viewer
+  %a.button.viewer_cart_button{:href => admin_viewer_cart_empty_path} Empty
 
     

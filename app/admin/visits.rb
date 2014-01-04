@@ -67,6 +67,8 @@ ActiveAdmin.register Visit do
           elsif(id =~ /^visit_([0-9]*)/)
             params[:q][:id_in] ||= []
             params[:q][:id_in] << $1
+          elsif(id =~ /^([0-9]*)/)
+            patient_id_in << $1
           end
         end
 

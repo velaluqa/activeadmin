@@ -135,6 +135,8 @@ ActiveAdmin.register ImageSeries do
             params[:q][:patient_id_in] << $1
           elsif(id =~ /^visit_([0-9]*)/)
             visit_id_in << $1
+          elsif(id =~ /^([0-9]*)/)
+            visit_id_in << $1
           end
         end
 

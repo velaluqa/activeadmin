@@ -64,6 +64,8 @@ ActiveAdmin.register Patient do
           elsif(id =~ /^patient_([0-9]*)/)
             params[:q][:id_in] ||= []
             params[:q][:id_in] << $1
+          elsif(id =~ /^([0-9]*)/)
+            center_id_in << $1
           end
         end
 

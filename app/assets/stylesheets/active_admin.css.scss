@@ -74,3 +74,12 @@
 {
     margin-right: 1em !important;
 }
+
+// make buttons on viewer cart smaller to better fit sidebar
+.viewer_cart_button
+{
+	font-size: 0.75em !important;
+        line-height: 9px !important;
+	padding: 5px 12px 4px !important;
+	margin-right: 2px !important;
+}
