@@ -62,7 +62,7 @@ gem 'cancan'
 gem 'paper_trail', '~>2'
 
 # ActiveAdmin
-gem 'activeadmin', '~>0.5.1'
+gem 'activeadmin', '~>0.5.1', :github => 'profmaad/active_admin', :branch => 'v0.5.1-checkboxtoggler_fix'
 gem 'activeadmin-mongoid', :github => 'profmaad/activeadmin-mongoid', :branch => 'master'
 gem 'activeadmin-cancan'
 
