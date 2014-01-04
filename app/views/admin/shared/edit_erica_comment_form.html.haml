@@ -1,4 +1,4 @@
-= semantic_form_for @resource, :url => url_for(:action => :edit_erica_comment, :return_url => request.fullpath), :method => :post do |f|
+= semantic_form_for @resource, :url => url_for(:action => :edit_erica_comment, :return_url => @return_url), :method => :post do |f|
   = f.inputs 'Edit '+@label do
     = f.input @field
 
