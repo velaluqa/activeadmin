@@ -26,7 +26,8 @@
               %td
                 - current_value = (@required_series.tqc_results.nil? ? nil : @required_series.tqc_results[spec['id']])
                 - current_value = (spec['result'] == true) if current_value.nil?
-                = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false)
+                = hidden_field_tag('result_'+field_name, (spec['result'] == true ? '1' : '0'))
+                = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false, :class => 'dicom_value_tqc')
 
   = field_set_tag('<span>tQC Questions</span>'.html_safe, :class => 'inputs') do
     %ol
