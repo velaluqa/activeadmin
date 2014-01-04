@@ -57,6 +57,7 @@ ActiveAdmin.register Case do
       return selected_patients
     end
 
+    alias original_aa_index index
     def index
       if(params[:q] and params[:q][:patient_id_in] == [""])
         params[:q].delete(:patient_id_in)
@@ -85,7 +86,7 @@ ActiveAdmin.register Case do
         params[:q][:patient_id_in] = patient_id_in
       end
 
-      index!
+      original_aa_index
     end
 
     def update
@@ -261,6 +262,26 @@ ActiveAdmin.register Case do
     column(:submitted_at) {|c| c.form_answer.nil? ? '' : c.form_answer.submitted_at }
     column :comment
     column :created_at
+  end
+
+  xlsx do
+    clear_columns
+
+    column :id
+    column :session_id
+    column ('Session Name') {|c| c.session.nil? ? nil : c.session.name}
+    column :position
+    column('Subject ID') {|c| c.patient.nil? ? '' : c.patient.subject_id}
+    column :images
+    column :case_type
+    column :flag
+    column :state
+    column :exported_at
+    column(:assigned_reader) {|c| (c.assigned_reader.nil? ? nil : c.assigned_reader.username)}
+    column(:reader) {|c| (c.form_answer.nil? or c.form_answer.user.nil?) ? '' : c.form_answer.user.name }
+    column(:submitted_at) {|c| c.form_answer.nil? ? '' : c.form_answer.submitted_at }
+    column :comment
+    column :created_at    
   end
 
   # filters
