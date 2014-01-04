@@ -98,6 +98,15 @@ class Case < ActiveRecord::Base
     result['case']['flag'] = self.flag
     result['case']['state'] = self.state
 
+    reader = (self.form_answer.nil? or self.form_answer.user.nil? ? nil : self.form_answer.user)
+    if(reader.nil?)
+      result['case']['reader_name'] = ''
+      result['case']['reader_id'] = ''
+    else
+      result['case']['reader_name'] = reader.name
+      result['case']['reader_id'] = reader.id
+    end
+
     return result
   end
 
