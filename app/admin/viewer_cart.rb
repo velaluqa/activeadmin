@@ -35,6 +35,10 @@ ActiveAdmin.register_page 'Viewer Cart' do
     render 'admin/viewer_cart/viewer_cart', :cart => cart
   end
 
+  page_action :empty, :method => :get do
+    session[:viewer_cart] = []
+    redirect_to :back
+  end
   page_action :clear, :method => :get do
     session[:viewer_cart] = []
 
