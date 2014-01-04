@@ -82,3 +82,6 @@ gem 'select2-rails', :github => 'profmaad/select2-rails', :branch => 'master'
 
 # MongoDB audit trail
 gem 'mongoid-history'
+
+# ActiveAdmin XLSX export option
+gem 'activeadmin-axlsx'
