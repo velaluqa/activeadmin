@@ -351,7 +351,7 @@ ActiveAdmin.register ImageSeries do
       return
     end
 
-    study_config = @image_series.study.current_configuration
+    study_config = @image_series.study.locked_configuration
     @properties_spec = study_config['image_series_properties']
 
     @properties = (@image_series.image_series_data.nil? ? {} : @image_series.image_series_data.properties)

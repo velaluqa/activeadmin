@@ -185,7 +185,7 @@ class ImageSeries < ActiveRecord::Base
   end
 
   def dicom_metadata_to_domino
-    study_config = (self.study.nil? ? nil : self.study.current_configuration)
+    study_config = (self.study.nil? ? nil : self.study.locked_configuration)
     result = {}
 
     unless(images.empty?)
