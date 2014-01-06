@@ -116,6 +116,8 @@ class Ability
     # Audit role
     unless user.is_app_admin?
       can :read, Version
+      can :git_commits, Version
+      can :show_git_commit, Version
       can :read, MongoidHistoryTracker
     end
 

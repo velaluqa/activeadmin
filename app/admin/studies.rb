@@ -3,9 +3,13 @@ require 'schema_validation'
 
 ActiveAdmin.register Study do
 
+  scope :all, :default => true
+  scope :building
+  scope :production
+
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => []
+    skip_load_and_authorize_resource :only => [:lock, :unlock]
 
     def max_csv_records
       1_000_000
@@ -27,6 +31,9 @@ ActiveAdmin.register Study do
       else
         status_tag('Missing', :error)
       end
+    end
+    column :state, :sortable => :state do |study|
+      study.state.to_s.camelize
     end
     column 'Select for Session' do |study|
       link_to('Select', select_for_session_admin_study_path(study))
@@ -51,8 +58,12 @@ ActiveAdmin.register Study do
       end
       row :image_storage_path
 
+      row :state do
+        study.state.to_s.camelize + (study.locked_version.nil? ? '' : " (Version: #{study.locked_version})")
+      end
+
       if study.has_configuration?
-        row :configuration_validation do        
+        row :configuration_validation do
           render 'admin/shared/schema_validation_results', :errors => study.validate
         end
       end
@@ -102,6 +113,7 @@ ActiveAdmin.register Study do
 
   # filters
   filter :name
+  filter :state, :as => :check_boxes, :collection => Study::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
 
   member_action :download_current_configuration do
     @study = Study.find(params[:id])
@@ -202,6 +214,52 @@ ActiveAdmin.register Study do
   action_item :only => :index do
     link_to('Deselect Study', deselect_study_admin_studies_path) unless session[:selected_study_id].nil?
   end
+
+  member_action :lock do
+    @study = Study.find(params[:id])
+
+    if(cannot? :manage, @study)
+      flash[:error] = 'You are not authorized to lock this study!'
+      redirect_to :action => :show
+      return
+    end
+    unless(@study.semantically_valid?)
+      flash[:error] = 'The study still has validation errors. These need to be fixed before the study can be locked.'
+      redirect_to :action => :show
+      return
+    end
+
+    @study.state = :production
+    @study.locked_version = GitConfigRepository.new.current_version
+    @study.save
+
+    redirect_to({:action => :show}, :notice => 'Study locked')
+  end
+  member_action :unlock do
+    @study = Study.find(params[:id])
+
+    if(cannot? :manage, @study)
+      flash[:error] = 'You are not authorized to unlock this study!'
+      redirect_to :action => :show
+      return
+    end
+
+    @study.state = :building
+    @study.locked_version = nil
+    @study.save
+
+    redirect_to({:action => :show}, :notice => 'Form unlocked')
+  end
+  action_item :only => :show do
+    next unless can? :manage, study
+
+    if resource.state == :building
+      link_to 'Lock', lock_admin_study_path(resource)
+    elsif resource.state == :production
+      link_to 'Unlock', unlock_admin_study_path(resource)
+    end
+  end
+
 
   viewer_cartable(:study)
 end

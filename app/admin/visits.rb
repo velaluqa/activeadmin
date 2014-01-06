@@ -320,7 +320,7 @@ ActiveAdmin.register Visit do
       return
     end
 
-    tqc_spec = @required_series.tqc_spec
+    tqc_spec = @required_series.locked_tqc_spec
     if(tqc_spec.nil?)
       flash[:error] = 'Performing tQC requires a valid study config containing tQC specifications for this required series.'
       redirect_to :action => :show
@@ -344,7 +344,9 @@ ActiveAdmin.register Visit do
     @visit = Visit.find(params[:id])
     authorize! :mqc, @visit unless can? :manage, @visit
 
-    @mqc_spec = @visit.mqc_spec_with_results
+    visit_data = @visit.visit_data
+    mqc_version = (visit_data.nil? ? @visit.study.locked_version : visit_data.mqc_version)
+    @mqc_spec = @visit.mqc_spec_with_results_at_version(mqc_version)
     if(@mqc_spec.nil?)
       flash[:error] = 'Viewing mQC results requires a valid study config containing mQC specifications for this visits visit type and existing mQC results.'
       redirect_to :action => :show
@@ -389,7 +391,7 @@ ActiveAdmin.register Visit do
       return
     end
 
-    @mqc_spec = @visit.mqc_spec
+    @mqc_spec = @visit.locked_mqc_spec
     if(@mqc_spec.nil?)
       flash[:error] = 'Performing mQC requires a valid study config containing mQC specifications for this visits visit type.'
       redirect_to :action => :show

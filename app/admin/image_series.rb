@@ -251,8 +251,10 @@ ActiveAdmin.register ImageSeries do
       end
     end
 
-    if(image_series.study and image_series.study.semantically_valid? and image_series.image_series_data and image_series.image_series_data.properties)
-      properties_spec = image_series.study.current_configuration['image_series_properties']
+    properties_version = (image_series.image_series_data.nil? ? nil : image_series.image_series_data.properties_version) || (image_series.study.nil? ? nil : image_series.study.locked_version)
+    study_config = (image_series.study.nil? ? nil : image_series.study.configuration_at_version(properties_version))
+    if(image_series.study and study_config and image_series.study.semantically_valid_at_version?(properties_version) and image_series.image_series_data and image_series.image_series_data.properties)
+      properties_spec = study_config['image_series_properties']
 
       render :partial => 'admin/image_series/properties_table', :locals => { :spec => properties_spec, :values => image_series.image_series_data.properties}
     end
@@ -312,15 +314,15 @@ ActiveAdmin.register ImageSeries do
   member_action :edit_properties, :method => :post do
     @image_series = ImageSeries.find(params[:id])
 
-    if(@image_series.study.nil? or not @image_series.study.semantically_valid?)
-      flash[:error] = 'Properties can only be edited once a valid study configuration was uploaded.'
+    if(@image_series.study.nil? or not @image_series.study.locked_semantically_valid?)
+      flash[:error] = 'Properties can only be edited once a valid study configuration was uploaded and locked.'
       redirect_to({:action => :show})
     end
 
     @image_series.ensure_image_series_data_exists
     image_series_data = @image_series.image_series_data
 
-    study_config = @image_series.study.current_configuration
+    study_config = @image_series.study.locked_configuration
     properties_spec = study_config['image_series_properties']
     image_series_data.properties = {} if image_series_data.properties.nil?
 
@@ -334,6 +336,7 @@ ActiveAdmin.register ImageSeries do
 
       image_series_data.properties[property_spec['id']] = new_value
     end
+    image_series_data.properties_version = @image_series.study.locked_version
     image_series_data.save
     @image_series.schedule_domino_sync
 
@@ -342,8 +345,8 @@ ActiveAdmin.register ImageSeries do
   member_action :edit_properties_form, :method => :get do
     @image_series = ImageSeries.find(params[:id])
     
-    if(@image_series.study.nil? or not @image_series.study.semantically_valid?)
-      flash[:error] = 'Properties can only be edited once a valid study configuration was uploaded.'
+    if(@image_series.study.nil? or not @image_series.study.locked_semantically_valid?)
+      flash[:error] = 'Properties can only be edited once a valid study configuration was uploaded and locked.'
       redirect_to({:action => :show})
       return
     end

@@ -6,7 +6,7 @@ require 'domino_integration_client'
 class Study < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessible :name, :locked_version, :domino_db_url, :domino_server_name, :notes_links_base_uri
+  attr_accessible :name, :locked_version, :domino_db_url, :domino_server_name, :notes_links_base_uri, :state
 
   has_many :sessions
 
@@ -19,6 +19,9 @@ class Study < ActiveRecord::Base
 
   validates_presence_of :name
 
+  scope :building, where(state: 0)
+  scope :production, where(state: 1)
+
   before_destroy do
     unless(sessions.empty? and centers.empty?)
       errors.add :base, 'You cannot delete a study that still has sessions or centers associated with it.'
@@ -30,6 +33,27 @@ class Study < ActiveRecord::Base
     if(self.changes.include?('domino_db_url') or self.changes.include?('domino_server_name'))
       update_notes_links_base_uri
     end
+  end
+
+  STATE_SYMS = [:building, :production]
+
+  def self.state_sym_to_int(sym)
+    return Study::STATE_SYMS.index(sym)
+  end
+  def state
+    return -1 if read_attribute(:state).nil?
+    return Study::STATE_SYMS[read_attribute(:state)]
+  end
+  def state=(sym)
+    sym = sym.to_sym if sym.is_a? String
+    index = Study::STATE_SYMS.index(sym)
+
+    if index.nil?
+      throw "Unsupported state"
+      return
+    end
+
+    write_attribute(:state, index)
   end
 
   def previous_image_storage_path
@@ -80,9 +104,19 @@ class Study < ActiveRecord::Base
   def semantically_valid?
     return self.validate == []
   end
-  def validate
+  def locked_semantically_valid?
+    return self.validate(self.locked_version) == []
+  end
+  def semantically_valid_at_version?(version)
+    return self.validate(version) == []
+  end
+  def validate(version = nil)
     return nil unless has_configuration?
-    config = current_configuration
+    if(version.nil?)
+      config = current_configuration
+    else
+      config = configuration_at_version(version)
+    end
     return nil if config.nil?
 
     validation_errors = run_schema_validation(config)
