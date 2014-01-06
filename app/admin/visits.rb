@@ -142,6 +142,11 @@ ActiveAdmin.register Visit do
         when :passed then status_tag('Performed, passed', :ok)
         end
       end
+      if(visit.mqc_version)
+        row 'mQC Configuration' do
+          link_to('Download', download_configuration_at_version_admin_study_path(visit.study, config_version: visit.mqc_version))
+        end
+      end
       domino_link_row(visit)
       row :image_storage_path
     end
@@ -270,6 +275,14 @@ ActiveAdmin.register Visit do
       redirect_to :action => :show
       return
     end
+
+    @tqc_version = if @required_series.tqc_version
+                     @required_series.tqc_version
+                   elsif @visit.study and @visit.study.locked_version
+                     @visit.study.locked_version
+                   else
+                     nil
+                   end
 
     @dicom_tqc_spec, @manual_tqc_spec = tqc_spec.partition {|spec| spec['type'] == 'dicom'}
 

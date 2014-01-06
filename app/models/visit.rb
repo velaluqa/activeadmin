@@ -447,6 +447,15 @@ class Visit < ActiveRecord::Base
     return true
   end
 
+  def mqc_version
+    if(self.visit_data and self.visit_data.mqc_version)
+      self.visit_data.mqc_version
+    elsif(self.study and self.study.locked_version)
+      self.study.locked_version
+    else
+      nil
+    end
+  end
   def mqc_spec
     reutrn mqc_spec_at_version(self.mqc_version || self.study.locked_version)
   end

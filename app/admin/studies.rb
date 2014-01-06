@@ -122,12 +122,20 @@ ActiveAdmin.register Study do
     data = GitConfigRepository.new.data_at_version(@study.relative_config_file_path, nil)
     send_data data, :filename => "study_#{@study.id}_current.yml" unless data.nil?
   end
-  member_action :download_locked_configuration do
+  member_action :download_locked_configuration do    
     @study = Study.find(params[:id])
     authorize! :read, @study
 
     data = GitConfigRepository.new.data_at_version(@study.relative_config_file_path, @study.locked_version)
     send_data data, :filename => "study_#{@study.id}_#{@study.locked_version}.yml" unless data.nil?
+  end
+  member_action :download_configuration_at_version do
+    @study = Study.find(params[:id])
+    authorize! :read, @study
+    @version = params[:config_version]
+
+    data = GitConfigRepository.new.data_at_version(@study.relative_config_file_path, @version)
+    send_data data, :filename => "study_#{@study.id}_#{@version}.yml" unless data.nil?
   end
   member_action :upload_config, :method => :post do
     @study = Study.find(params[:id])
