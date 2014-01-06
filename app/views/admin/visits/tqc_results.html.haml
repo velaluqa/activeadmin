@@ -26,6 +26,10 @@
           %tr
             %th Comment
             %td= @required_series.tqc_comment
+          - unless @tqc_version.blank?
+            %tr
+              %th tQC Configuration
+              %td= link_to('Download', download_configuration_at_version_admin_study_path(@required_series.study, config_version: @tqc_version))
 
 .panel
   %h3 Automatic DICOM tQC

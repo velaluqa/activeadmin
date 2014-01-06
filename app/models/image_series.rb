@@ -185,7 +185,7 @@ class ImageSeries < ActiveRecord::Base
   end
 
   def dicom_metadata_to_domino
-    study_config = (self.study.nil? ? nil : self.study.current_configuration)
+    study_config = (self.study.nil? ? nil : self.study.locked_configuration)
     result = {}
 
     unless(images.empty?)
@@ -215,10 +215,17 @@ class ImageSeries < ActiveRecord::Base
 
   def properties_to_domino
     image_series_data = self.image_series_data
-    study_config = (self.study.nil? ? nil : self.study.current_configuration)
+    properties_version = if(image_series_data.nil? and self.study.nil?)
+                           nil
+                         elsif(image_series_data.nil? or image_series_data.properties_version.blank?)
+                           self.study.locked_version
+                         else
+                           image_series_data.properties_version
+                         end
+    study_config = (self.study.nil? or image_series_data.nil? ? nil : self.study.configuration_at_version(properties_version))
     result = {}
 
-    if(study_config and study.semantically_valid? and image_series_data and image_series_data.properties)
+    if(study_config and study.semantically_valid_at_version?(properties_version) and image_series_data and image_series_data.properties)
       properties_spec = study_config['image_series_properties']
       property_names = []
       property_values = []

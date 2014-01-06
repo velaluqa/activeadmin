@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130820122035) do
+ActiveRecord::Schema.define(:version => 20140106074533) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -158,12 +158,13 @@ ActiveRecord::Schema.define(:version => 20130820122035) do
 
   create_table "studies", :force => true do |t|
     t.string   "name"
-    t.datetime "created_at",           :null => false
-    t.datetime "updated_at",           :null => false
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
     t.string   "locked_version"
     t.string   "domino_db_url"
     t.string   "notes_links_base_uri"
     t.string   "domino_server_name"
+    t.integer  "state",                :default => 0
   end
 
   create_table "users", :force => true do |t|

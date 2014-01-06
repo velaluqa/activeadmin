@@ -5,6 +5,7 @@ class ImageSeriesData
 
   field :image_series_id, type: Integer
   field :properties, type: Hash, :default => {}
+  field :properties_version, type: String
 
   index image_series_id: 1
 

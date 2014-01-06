@@ -97,18 +97,32 @@ class Visit < ActiveRecord::Base
     VisitData.create(:visit_id => self.id) if self.visit_data.nil?
   end
 
-  def required_series_specs
+  def current_required_series_specs
     return nil if(self.visit_type.nil? or self.study.nil? or not self.study.semantically_valid?)
 
-    study_config = self.study.current_configuration
+    required_series_specs_for_configuration(self.study.current_configuration)
+  end
+  def locked_required_series_specs
+    return nil if(self.visit_type.nil? or self.study.nil? or not self.study.locked_semantically_valid?)
+
+    required_series_specs_for_configuration(self.study.locked_configuration)
+  end
+  def required_series_specs_at_version(version)
+    return nil if(self.visit_type.nil? or self.study.nil? or not self.study.semantically_valid_at_version?(version))    
+
+    required_series_specs_for_configuration(self.study.configuration_at_version(version))
+  end
+  def required_series_specs_for_configuration(study_config)
+    return nil if self.visit_type.nil?
 
     return nil if(study_config['visit_types'][self.visit_type].nil? or study_config['visit_types'][self.visit_type]['required_series'].nil?)
     required_series = study_config['visit_types'][self.visit_type]['required_series']
 
     return required_series
   end
+
   def required_series_names
-    required_series_specs = self.required_series_specs
+    required_series_specs = self.locked_required_series_specs
     return nil if required_series_specs.nil?
     return required_series_specs.keys
   end
@@ -380,7 +394,7 @@ class Visit < ActiveRecord::Base
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
   end
   def set_tqc_result(required_series_name, result, tqc_user, tqc_comment, tqc_date = nil, tqc_version = nil)
-    required_series_specs = self.required_series_specs
+    required_series_specs = self.locked_required_series_specs
     return 'No valid study configuration exists.' if required_series_specs.nil?
 
     tqc_spec = (required_series_specs[required_series_name].nil? ? nil : required_series_specs[required_series_name]['tqc'])
@@ -397,7 +411,7 @@ class Visit < ActiveRecord::Base
     required_series['tqc_state'] = RequiredSeries.tqc_state_sym_to_int((all_passed ? :passed : :issues))
     required_series['tqc_user_id'] = (tqc_user.is_a?(User) ? tqc_user.id : tqc_user)
     required_series['tqc_date'] = (tqc_date.nil? ? Time.now : tqc_date)
-    required_series['tqc_version'] = (tqc_version.nil? ? GitConfigRepository.new.current_version : tqc_version)
+    required_series['tqc_version'] = (tqc_version.nil? ? self.study.locked_version : tqc_version)
     required_series['tqc_results'] = result
     required_series['tqc_comment'] = tqc_comment
 
@@ -409,7 +423,7 @@ class Visit < ActiveRecord::Base
     return true
   end
   def set_mqc_result(result, mqc_user, mqc_comment, mqc_date = nil, mqc_version = nil)
-    mqc_spec = self.mqc_spec
+    mqc_spec = self.locked_mqc_spec
     return 'No valid study configuration exists or it doesn\'t contain an mQC config for this visits visit type.' if mqc_spec.nil?
 
     all_passed = true
@@ -423,7 +437,7 @@ class Visit < ActiveRecord::Base
     self.mqc_state = (all_passed ? :passed : :issues)
     self.mqc_user_id = (mqc_user.is_a?(User) ? mqc_user.id : mqc_user)
     self.mqc_date = (mqc_date.nil? ? Time.now : mqc_date)
-    visit_data.mqc_version = (mqc_version.nil? ? GitConfigRepository.new.current_version : mqc_version)
+    visit_data.mqc_version = (mqc_version.nil? ? self.study.locked_version : mqc_version)
     visit_data.mqc_results = result
     visit_data.mqc_comment = mqc_comment
 
@@ -432,14 +446,45 @@ class Visit < ActiveRecord::Base
 
     return true
   end
+
+  def mqc_version
+    if(self.visit_data and self.visit_data.mqc_version)
+      self.visit_data.mqc_version
+    elsif(self.study and self.study.locked_version)
+      self.study.locked_version
+    else
+      nil
+    end
+  end
   def mqc_spec
-    config = study.current_configuration
+    reutrn mqc_spec_at_version(self.mqc_version || self.study.locked_version)
+  end
+  def locked_mqc_spec
+    return mqc_spec_at_version(self.study.locked_version)
+  end
+  def mqc_spec_at_version(version)
+    config = study.configuration_at_version(version)
     return nil if config.nil? or config['visit_types'].nil? or config['visit_types'][self.visit_type].nil?
     
     return config['visit_types'][self.visit_type]['mqc']
   end
-  def mqc_spec_with_results
-    mqc_spec = self.mqc_spec
+
+  def locked_mqc_spec_with_results
+    mqc_spec = self.locked_mqc_spec
+    mqc_results = (self.visit_data.nil? ? nil : self.visit_data.mqc_results)
+    return nil if mqc_spec.nil? or mqc_results.blank?
+
+    mqc_spec.each do |question|
+      question['answer'] = mqc_results[question['id']]
+    end
+    
+    return mqc_spec
+  end
+  def locked_mqc_spec_with_results
+    return mqc_spec_with_results_at_version(self.study.locked_version)
+  end
+  def mqc_spec_with_results_at_version(version)
+    mqc_spec = self.mqc_spec_at_version(version)
     mqc_results = (self.visit_data.nil? ? nil : self.visit_data.mqc_results)
     return nil if mqc_spec.nil? or mqc_results.blank?
 
@@ -486,7 +531,7 @@ class Visit < ActiveRecord::Base
 
     criteria_names = []
     criteria_values = []
-    results = self.mqc_spec_with_results
+    results = self.mqc_spec_with_results_at_version(self.visit_date.mqc_version)
     if(results.nil?)
       result['QCCriteriaNames'] = nil
       result['QCValues'] = nil

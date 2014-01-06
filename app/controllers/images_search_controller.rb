@@ -5,6 +5,7 @@ class ImagesSearchController < ApplicationController
     authorize! :image_manage, :system unless can? :mqc, Visit
 
     term = params[:term]
+    selected_study_id = session[:selected_study_id]
     if(term.length < 3)
       respond_to do |format|
         format.json { render :json => {:success => false, :error_message => 'Search term is too short.'} }
@@ -12,7 +13,7 @@ class ImagesSearchController < ApplicationController
       return
     end
 
-    results = ImagesSearch.perform_search(term)
+    results = ImagesSearch.perform_search(term, selected_study_id)
     results_json = results.map do |result|
       {
         :text => result.text,

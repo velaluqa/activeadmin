@@ -73,21 +73,33 @@ class RequiredSeries
     return RequiredSeries::TQC_STATE_SYMS[@tqc_state]
   end
 
-  def spec
-    required_series_specs = @visit.required_series_specs
+  def locked_spec
+    return spec_at_version(self.study.locked_version)
+  end
+  def spec_at_version(version)
+    required_series_specs = @visit.required_series_specs_at_version(version)
     return nil if required_series_specs.nil?
 
     return required_series_specs[@name]
   end
-  def tqc_spec
-    spec = self.spec
+  def locked_tqc_spec
+    return tqc_spec_at_version(self.study.locked_version)
+  end
+  def tqc_spec_at_version(version)
+    spec = self.spec_at_version(version)
     return nil if spec.nil?
 
     return spec['tqc']
   end
 
   def tqc_spec_with_results
-    tqc_spec = self.tqc_spec
+    return tqc_spec_with_results_at_version(self.tqc_version || self.study.locked_version)
+  end
+  def locked_tqc_spec_with_results
+    return tqc_spec_with_results_at_version(self.study.locked_version)
+  end
+  def tqc_spec_with_results_at_version(version)
+    tqc_spec = self.tqc_spec_at_version(version)
     return nil if tqc_spec.nil? or @tqc_results.nil?
 
     tqc_spec.each do |question|
@@ -176,7 +188,7 @@ class RequiredSeries
 
     criteria_names = []
     criteria_values = []
-    results = self.tqc_spec_with_results
+    results = self.tqc_spec_with_results_at_version(self.tqc_version) || self.study.locked_version
     if(results.nil?)
       result['QCCriteriaNames'] = nil
       result['QCValues'] = nil
