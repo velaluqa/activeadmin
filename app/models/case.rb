@@ -98,7 +98,7 @@ class Case < ActiveRecord::Base
     result['case']['flag'] = self.flag
     result['case']['state'] = self.state
 
-    reader = (self.form_answer.nil? or self.form_answer.user.nil? ? nil : self.form_answer.user)
+    reader = ((self.form_answer.nil? or self.form_answer.user.nil?) ? nil : self.form_answer.user)
     if(reader.nil?)
       result['case']['reader_name'] = ''
       result['case']['reader_id'] = ''
