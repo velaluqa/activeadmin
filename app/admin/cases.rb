@@ -485,6 +485,9 @@ ActiveAdmin.register Case do
     when 'csv'
       @export_data = create_csv(@results)
       @export_suffix = 'csv'
+    when 'csv_excel'
+      @export_data = create_csv(@results, true)
+      @export_suffix = 'csv'
     else
       @export_data = nil
       @errors << "Unknown export format '#{params[:export_format]}'"
@@ -495,7 +498,22 @@ ActiveAdmin.register Case do
   end
 
   controller do
-    def create_csv(results)
+    CSV_EXCEL_FIELD_NEWLINE_CONVERTER = lambda do |value|
+      if(value.is_a?(String))
+        value.gsub("\r\n", "\n")
+      else
+        value
+      end
+    end
+    CSV::Converters[:excel_field_newline] = CSV_EXCEL_FIELD_NEWLINE_CONVERTER
+
+    CSV_EXCEL_OPTIONS = {
+      col_sep: ';',
+      row_sep: "\r\n",
+      converters: [:excel_field_newline],
+    }
+
+    def create_csv(results, excel_compatible = false)
       column_names = Set.new
 
       results.each do |case_id, rows|
@@ -523,7 +541,7 @@ ActiveAdmin.register Case do
         end
       end
 
-      return csv_table.to_csv
+      return csv_table.to_csv(excel_compatible ? CSV_EXCEL_OPTIONS : {})
     end
   end
 

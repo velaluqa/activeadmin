@@ -5,7 +5,7 @@
     %ol
       %li.input.select
         = label_tag('export_format', 'Format')
-        = select_tag('export_format', options_for_select([['CSV', 'csv']]), :include_blank => false)
+        = select_tag('export_format', options_for_select([['CSV', 'csv'], ['CSV for Excel', 'csv_excel']]), :include_blank => false)
       %li.input.file
         = label_tag('export_specification', 'Export Specification')
         = file_field_tag('export_specification')
