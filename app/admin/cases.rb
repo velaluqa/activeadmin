@@ -21,7 +21,9 @@ ActiveAdmin.register Case do
     end
 
     def generate_patients_options
-      Study.all.map do |study|
+      studies = if session[:selected_study_id].nil? then Study.accessible_by(current_ability) else Study.where(:id => session[:selected_study_id]).accessible_by(current_ability) end
+
+      studies.map do |study|
         sessions = study.sessions.accessible_by(current_ability)
         
         sessions_optgroups = sessions.map do |session|
