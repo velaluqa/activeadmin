@@ -13,11 +13,17 @@ ActiveAdmin.register Case do
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:session)
+      if(session[:selected_study_id].nil?)
+        end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:session)
+      else
+        end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:session).where('sessions.study_id' => session[:selected_study_id])
+      end
     end
 
     def generate_patients_options
-      Study.all.map do |study|
+      studies = if session[:selected_study_id].nil? then Study.accessible_by(current_ability) else Study.where(:id => session[:selected_study_id]).accessible_by(current_ability) end
+
+      studies.map do |study|
         sessions = study.sessions.accessible_by(current_ability)
         
         sessions_optgroups = sessions.map do |session|
@@ -485,32 +491,39 @@ ActiveAdmin.register Case do
     when 'csv'
       @export_data = create_csv(@results)
       @export_suffix = 'csv'
+      @export_mimetype = 'text/csv'
+      @export_encoding = 'utf-8'
     when 'csv_excel'
       @export_data = create_csv(@results, true)
       @export_suffix = 'csv'
+      @export_mimetype = 'text/csv'
+      @export_encoding = 'utf-8'
     else
       @export_data = nil
       @errors << "Unknown export format '#{params[:export_format]}'"
     end
 
-    send_data @export_data, :filename => "export.#{@export_suffix}" unless @export_data.nil?
+    send_data @export_data, :filename => "export.#{@export_suffix}", :type => @export_mimetype+'; charset='+@export_encoding unless @export_data.nil?
     flash[:error] = 'Export failed'
   end
 
   controller do
-    CSV_EXCEL_FIELD_NEWLINE_CONVERTER = lambda do |value|
+    def convert_csv_field_for_excel(value)
       if(value.is_a?(String))
+        #value.gsub("\n", "\r\n")
         value.gsub("\r\n", "\n")
       else
         value
       end
     end
+    CSV_EXCEL_FIELD_NEWLINE_CONVERTER = lambda do |value|
+      convert_csv_field_for_excel(value)
+    end
     CSV::Converters[:excel_field_newline] = CSV_EXCEL_FIELD_NEWLINE_CONVERTER
 
     CSV_EXCEL_OPTIONS = {
-      col_sep: ';',
+      col_sep: ";",
       row_sep: "\r\n",
-      converters: [:excel_field_newline],
     }
 
     def create_csv(results, excel_compatible = false)
@@ -534,14 +547,20 @@ ActiveAdmin.register Case do
 
         rows.each do |row|
           row_data = Array.new(column_names.size) do |i|
-            row[column_names[i]]
+            if(excel_compatible)
+              convert_csv_field_for_excel(row[column_names[i]])
+            else
+              row[column_names[i]]
+            end
           end
           
           csv_table << CSV::Row.new(column_names, row_data, false)
         end
       end
 
-      return csv_table.to_csv(excel_compatible ? CSV_EXCEL_OPTIONS : {})
+      csv_data = (excel_compatible ? "\xEF\xBB\xBF" : '') + csv_table.to_csv(excel_compatible ? CSV_EXCEL_OPTIONS : {}).encode('utf-8')
+
+      return csv_data
     end
   end
 

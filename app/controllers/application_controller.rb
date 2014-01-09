@@ -64,4 +64,12 @@ class ApplicationController < ActionController::Base
   def current_ability
     @current_ability ||= Ability.new(current_user)
   end
+
+  def after_sign_in_path_for(resource)
+    if(current_user and can? :read, Study)
+      admin_studies_path
+    else
+      admin_root_path
+    end
+  end
 end

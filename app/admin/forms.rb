@@ -14,7 +14,11 @@ ActiveAdmin.register Form do
     load_and_authorize_resource :except => :index
     skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :download_configuration_at_version, :download_current_custom_validators, :download_locked_custom_validators, :download_custom_validators_at_version, :copy, :copy_form]
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
+      if(session[:selected_study_id].nil?)
+        end_of_association_chain.accessible_by(current_ability)
+      else
+        end_of_association_chain.accessible_by(current_ability).includes(:session).where('sessions.study_id' => session[:selected_study_id])
+      end
     end
 
     def update
