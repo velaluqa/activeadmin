@@ -1,5 +1,10 @@
 ActiveAdmin.register Study do
 
+  controller do
+    load_and_authorize_resource :except => :index
+    skip_load_and_authorize_resource :only => [:select_for_session, :selected_study, :deselect_study]
+  end
+
   index do
     selectable_column
     column :name, :sortable => :name do |study|
