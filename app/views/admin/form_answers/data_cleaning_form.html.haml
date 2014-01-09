@@ -4,9 +4,17 @@
 
   = field_set_tag(('<span>Clean Variable '+@field_id+'</span>').html_safe, :class => 'inputs') do
     %ol
-      %li.input.string
-        = label_tag('cleaned_value', @field_id)
-        = text_field_tag('cleaned_value', ((@field_spec['type'] == 'select_multiple' and @field_value.respond_to?(:join)) ? @field_value.join(',') : @field_value))
+      - case @field_spec['type']
+      - when 'roi'
+        = hidden_field_tag('cleaned_value[location]', @field_value.delete('location').to_json)
+        - @field_spec['roi_values'].each do |key, label|
+          %li.input.string.stringish
+            = label_tag('cleaned_value['+key+']', "#{label} (#{key}):")
+            = text_field_tag('cleaned_value['+key+']', @field_value[key])
+      - else
+        %li.input.string.stringish
+          = label_tag('cleaned_value', @field_id)
+          = text_field_tag('cleaned_value', ((@field_spec['type'] == 'select_multiple' and @field_value.respond_to?(:join)) ? @field_value.join(',') : @field_value))
 
   = field_set_tag('<span>Value encoding</span>'.html_safe, :class => 'inputs') do
     %div{:style => 'margin: 0 20px;'}

@@ -118,7 +118,7 @@ ActiveAdmin.register FormAnswer do
     field_type = params[:field_type]
     field_id = params[:field_id]
 
-    if(['fixed', 'group', 'section', 'calculated', 'roi'].include?(field_type))
+    if(['fixed', 'group', 'section', 'calculated'].include?(field_type))
       flash[:error] = 'The chosen field type cannot be changed via the data cleaning tool.'
       redirect_to :action => :show
       return
@@ -131,6 +131,12 @@ ActiveAdmin.register FormAnswer do
       new_value = new_value.to_f
     when 'select_multiple'
       new_value = new_value.split(',').map {|v| v.strip}
+    when 'roi'
+      new_value['location'] = JSON::parse(new_value['location'])
+      new_value.each do |key, value|
+        next if key == 'location'
+        new_value[key] = value.to_f
+      end
     end
 
     @form_answer.version_current_answers
