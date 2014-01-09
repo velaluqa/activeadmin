@@ -1,12 +1,19 @@
 ActiveAdmin.register Study do
 
+  menu if: Proc.new {can? :read, Study}
+
   controller do
     load_and_authorize_resource :except => :index
     skip_load_and_authorize_resource :only => [:select_for_session, :selected_study, :deselect_study]
+
+    def scoped_collection
+      end_of_association_chain.accessible_by(current_ability)
+    end
   end
 
   index do
     selectable_column
+
     column :name, :sortable => :name do |study|
       link_to study.name, admin_study_path(study)
     end
@@ -40,6 +47,7 @@ ActiveAdmin.register Study do
 
   member_action :select_for_session, :method => :get do
     @study = Study.find(params[:id])
+    authorize! :read, @study
     
     session[:selected_study_id] = @study.id
     session[:selected_study_name] = @study.name

@@ -40,7 +40,7 @@ class Ability
       can :read, User, ['users.id = ?', user.id] do |db_user|
         db_user == user
       end
-      can :index, Study
+      can :read, Study
     end
 
     # Session Admin
