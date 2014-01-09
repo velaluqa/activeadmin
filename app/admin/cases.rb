@@ -13,7 +13,11 @@ ActiveAdmin.register Case do
   controller do
     load_and_authorize_resource :except => :index
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:session)
+      if(session[:selected_study_id].nil?)
+        end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:session)
+      else
+        end_of_association_chain.accessible_by(current_ability).includes(:patient).includes(:session).where('sessions.study_id' => session[:selected_study_id])
+      end
     end
 
     def generate_patients_options

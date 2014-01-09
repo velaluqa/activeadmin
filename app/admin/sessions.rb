@@ -16,7 +16,11 @@ ActiveAdmin.register Session do
     load_and_authorize_resource :except => :index
     skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :download_configuration_at_version, :switch_state, :deep_clone_form, :deep_clone]
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
+      if session[:selected_study_id].nil?
+        end_of_association_chain.accessible_by(current_ability)
+      else
+        end_of_association_chain.accessible_by(current_ability).where('study_id' => session[:selected_study_id])
+      end
     end
 
     def update

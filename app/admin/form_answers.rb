@@ -10,7 +10,12 @@ ActiveAdmin.register FormAnswer do
 
     load_and_authorize_resource :except => :index
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
+      if session[:selected_study_id].nil?
+        end_of_association_chain.accessible_by(current_ability)
+      else
+        study_session_ids = Study.find(session[:selected_study_id]).sessions.pluck(:id)
+        end_of_association_chain.accessible_by(current_ability).in(session_id: study_session_ids)
+      end
     end
   end
 
