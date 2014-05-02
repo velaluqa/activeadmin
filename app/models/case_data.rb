@@ -5,6 +5,7 @@ class CaseData
 
   field :case_id, type: Integer
   field :data, type: Hash
+  field :adjudication_data, type: Hash
 
   track_history :track_create => true, :track_update => true, :track_destroy => true
 
