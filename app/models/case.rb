@@ -171,7 +171,7 @@ class Case < ActiveRecord::Base
 
       adjudication_data = {}
       unless(row.unconverted_fields[row.index('adjudication')].blank?)
-        adjudication_config = row.unconverted_fields[row.index('adjudication')].split(':')
+        adjudication_config = row.unconverted_fields[row.index('adjudication')].split(':').map {|s| s.to_i}
         adjudication_data['assignment'] = adjudication_config
       end
 
