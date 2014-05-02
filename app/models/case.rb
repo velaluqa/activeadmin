@@ -164,12 +164,18 @@ class Case < ActiveRecord::Base
       new_case = Case.create(:patient => patient, :session => session, :images => images, :case_type => case_type, :position => position, :flag => case_flag)
       
       case_data = {}
-      data_headers = row.headers.reject {|h| ['patient', 'images', 'type'].include?(h)}
+      data_headers = row.headers.reject {|h| ['patient', 'images', 'type', 'adjudication'].include?(h)}
       data_headers.each do |field|
         case_data[field] = row[field]
       end
 
-      CaseData.create(:case => new_case, :data => case_data)
+      adjudication_data = {}
+      unless(row.unconverted_fields[row.index('adjudication')].blank?)
+        adjudication_config = row.unconverted_fields[row.index('adjudication')].split(':')
+        adjudication_data['assignment'] = adjudication_config
+      end
+
+      CaseData.create(:case => new_case, :data => case_data, :adjudication_data => adjudication_data)
       
       position += 1
     end
