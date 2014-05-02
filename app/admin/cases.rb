@@ -219,6 +219,11 @@ ActiveAdmin.register Case do
         end
       end
       row :assigned_reader
+      if(c.case_data and c.case_data.adjudication_data and c.case_data.adjudication_data['assignment'])
+        row 'Adjudication' do
+          c.case_data.adjudication_data['assignment'].join(', ')
+        end
+      end
       row :exported_at do
         if c.no_export
           status_tag('No Export')
