@@ -132,7 +132,7 @@ module FormsHelper
     if answer_spec.nil?
       format_fixed_value(answer)
     else
-      simple_format(FormAnswer.pretty_print_answer(answer_spec, answer))
+      simple_format(FormAnswer.pretty_print_answer(answer_spec, answer, nil, false))
     end
   end
 

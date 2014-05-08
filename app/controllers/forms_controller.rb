@@ -26,6 +26,17 @@ class FormsController < ApplicationController
     @show_previous_results = true if params[:previous_results] == 'true'
 
     @passive_series_list = construct_passive_series_list
+
+    @adjudication_values = {}
+    if(@case.session)
+      configuration = @case.session.locked_configuration
+
+      if(configuration['type'] == 'adjudication')
+        configuration['adjudication']['sessions'].each_with_index do |session_id, index|
+          @adjudication_values["reader#{index+1}"] = "Reader #{index+1}"
+        end
+      end
+    end
     
     return if (@form_config.nil? or @form_components.nil? or @repeatables.nil?)
   end
@@ -64,6 +75,17 @@ class FormsController < ApplicationController
 
     @previous_results = [{:images => 'preview'}]
     @passive_series_list = []
+
+    @adjudication_values = {}
+    if(@case.session)
+      configuration = @case.session.current_configuration
+
+      if(configuration['type'] == 'adjudication' and configuration['adjudication'] and configuration['adjudication']['sessions'])
+        configuration['adjudication']['sessions'].each_with_index do |session_id, index|
+          @adjudication_values["reader#{index+1}"] = "Reader #{index+1}"
+        end
+      end
+    end
 
     render :show
   end
