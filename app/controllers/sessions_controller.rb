@@ -109,6 +109,8 @@ class SessionsController < ApplicationController
         end
         case_hash.merge!({:adjudication_annotation_sets => adjudication_annotation_sets})
       end
+
+      case_hash
     end
     pp case_hashes
 
