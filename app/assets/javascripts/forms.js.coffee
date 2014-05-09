@@ -203,7 +203,7 @@ pretty_print_value = (value, field) ->
   else if(field['type'] == 'roi') and (typeof value == 'object')
     location = 'Location: '+value['location']['seriesUID']+' #'+value['location']['imageIndex'].toString()+"\n"
     value = location+((k+": "+v) for own k,v of value when k != 'location').join("\n")
-  else if(field['type'] == 'select') or ((field['type'] == 'roi') and (typeof value == 'string'))  
+  else if(field['type'] == 'select') or (field['type'] == 'adjudication') or ((field['type'] == 'roi') and (typeof value == 'string'))  
     answer_option = if field['values']? then field['values'][value] else null
     value = if answer_option? and answer_option.length > 0 then answer_option else value
   else if(field['type'] == 'select_multiple')
@@ -234,7 +234,7 @@ fill_data_field = (field, answers) ->
     values = jQuery.parseJSON(input.attr('data-values'))
     answer_option = values[answer] if values?
     answer = if answer_option? and answer_option.length > 0 then answer_option else answer    
-  else if(field.attr('data-type') == 'select')
+  else if((field.attr('data-type') == 'select') or (field.attr('data-type') == 'adjudication'))
     select_input = $('select[name="'+field_name+'"]')
     answer_option = select_input.find('option[value="'+answer+'"]').text()
     answer = if answer_option? and answer_option.length > 0 then answer_option else answer

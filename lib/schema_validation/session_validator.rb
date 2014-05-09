@@ -5,6 +5,7 @@ module SchemaValidation
   class SessionValidator < Kwalify::Validator
     ## load schema definition
     @@schema = YAML.load_file('lib/schema_validation/session.schema.yml') #HC
+    COLOR_REGEXP = /^#[A-Fa-f0-9]{6}$/
 
     def initialize
       super(@@schema)
@@ -12,6 +13,14 @@ module SchemaValidation
 
     def validate_hook(value, rule, path, errors)
       case rule.name
+      when 'root'
+        errors << Kwalify::ValidationError.new("Sessions with type 'adjudication' must specify the 'adjudication' configuration", path) unless (value['type'] != 'adjudication' or not value['adjudication'].blank?)
+      when 'session_type'
+        errors << Kwalify::ValidationError.new("'type' must be one of 'standard', 'adjudication'", path) unless (['standard', 'adjudication'].include?(value))
+      when 'color'
+        errors << Kwalify::ValidationError.new("adjudication color values must be valid three-component hexadecimal color values, e.g. '\#ff0077'. Please note that color values must be enclosed in double quotes.", path) unless(COLOR_REGEXP.match(value))
+      when 'adjudication_session'
+        errors << Kwalify::ValidationError.new("Session specified for adjudication must exist. Please specify the ERICA ID of the session as a number.", path) unless(Session.exists?(:id => value))
       when 'previous_results'
         errors << Kwalify::ValidationError.new("Must contain either 'default_table' or 'table'", path) unless ((not value['default_table'].nil?) ^ (not value['table'].nil?))
         errors << Kwalify::ValidationError.new("'merge_columns' can only be used with 'table', not 'default_table'", path) unless (value['default_table'].nil? or value['merge_columns'].nil?)

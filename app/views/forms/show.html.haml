@@ -40,7 +40,7 @@
               - if (!current_group_index.nil? && first_in_group)
                 - first_in_group = false
                 %h3.form-group-index.pull-left= current_group_index
-              = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hash, :show_internal_annotations => (defined?(@show_internal_annotations) and @show_internal_annotations == true)
+              = render "forms/field_#{field['type']}", :field => field, :input_size => 'input-xlarge', :data_hash => @data_hash, :show_internal_annotations => (defined?(@show_internal_annotations) and @show_internal_annotations == true), :adjudication_values => @adjudication_values
             .dark-muted.form-field-description
               - if(defined?(@show_internal_annotations) and @show_internal_annotations == true)
                 .data_dict_field_id= field['id']

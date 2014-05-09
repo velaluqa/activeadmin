@@ -83,21 +83,23 @@ ActiveAdmin.register FormAnswer do
         end
       end
       row :signature_public_key do
-        if(form_answer.signature_public_key_id.blank?)
+        if(form_answer.signature_public_key_id.blank? and form_answer.user.active_public_key.blank?)
+          link_to('Download', download_public_key_admin_user_path(form_answer.user))
+        elsif(form_answer.signature_public_key_id.blank?)
           link_to('Here', admin_public_key_path(form_answer.user.active_public_key))
         else
           link_to('Here', admin_public_key_path(form_answer.signature_public_key_id))
         end
       end
       row :answers do
-        render "forms/results_table", :caption => '', :cases => [form_answer.case], :skip_header => true, :data_cleaning_buttons => (can? :manage, form_answer) unless form_answer.answers.nil?
+        render "forms/results_table", :caption => '', :cases => [form_answer.case], :skip_header => true, :data_cleaning_buttons => (can? :manage, form_answer), :do_resolve_randomisation => true unless form_answer.answers.nil?
       end
       row :answers_raw do        
         CodeRay.scan(JSON::pretty_generate(form_answer.answers), :json).div(:css => :class).html_safe unless form_answer.answers.nil?
       end
       unless(form_answer.versions.nil? or form_answer.versions.empty?)
         row :previous_versions do
-          render "admin/form_answers/previous_versions", :form_answer => form_answer
+          render "admin/form_answers/previous_versions", :form_answer => form_answer, :do_resolve_randomisation => true
         end
       end
       row :annotated_images_raw do       

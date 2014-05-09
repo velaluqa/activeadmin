@@ -118,6 +118,12 @@ class Session < ActiveRecord::Base
         validation_errors << "The patient '#{reader_testing_config['patient']}' for reader testing config number #{index+1} does not exist" if Patient.where(:subject_id => reader_testing_config['patient'], :session_id => self.id).empty?
       end
     end
+    if(config['type'] == 'adjudication' and config['adjudication'])
+      config['adjudication']['sessions'].each do |session_id|
+        session = Session.where(:id => session_id).last
+        validation_errors << "The adjudication base session #{session_id} does either not exist or is still being built." unless(session and session.state != :building)
+      end
+    end
 
     return validation_errors
   end

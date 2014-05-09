@@ -91,8 +91,28 @@ class SessionsController < ApplicationController
     passive_cases = passive_cases_for_case_list(cases)
 
     case_hashes = cases.map do |c|
-      c.to_hash.merge({:passive_cases => passive_cases[c.id]})
+      case_hash = c.to_hash.merge({:passive_cases => passive_cases[c.id]})
+      if(config['type'] == 'adjudication' and c.case_data and c.case_data.adjudication_data)
+        adjudication_assignment = c.case_data.adjudication_data['assignment']
+
+        adjudication_annotation_sets = []
+
+        config['adjudication']['sessions'].each_with_index do |session_id, index|
+          base_session = Session.find(session_id)
+
+          annotated_images_root = base_session.locked_configuration['annotated_images_root']
+          assignment = adjudication_assignment[index].to_i - 1
+
+          annotation_set = {:path => annotated_images_root + '/' + c.images_folder, :color => config['adjudication']['colors'][assignment], :name => "Reader #{assignment+1}: "}
+
+          adjudication_annotation_sets << annotation_set
+        end
+        case_hash.merge!({:adjudication_annotation_sets => adjudication_annotation_sets})
+      end
+
+      case_hash
     end
+    pp case_hashes
 
     respond_to do |format|
       format.json { render :json => {:cases => case_hashes} }

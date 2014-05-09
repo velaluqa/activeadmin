@@ -21,6 +21,26 @@ mapping:
       min: 1
   "auto_assign_patients_to_readers":
     type: bool
+  "type":
+    name: "session_type"
+    type: str
+  "adjudication":
+    type: map
+    mapping:
+      "sessions":
+        type: seq
+        required: yes
+        sequence:
+          - type: int
+            name: "adjudication_session"
+            range:
+              min: 0
+      "colors":
+        type: seq
+        required: yes
+        sequence:
+          - type: str
+            name: "color"
   "reader_testing":
     type: map
     mapping:

@@ -8,6 +8,8 @@ class FormAnswer
 
   include Mongoid::History::Trackable
 
+  ADJUDICATION_ANSWER_REGEXP = /^reader([0-9]+)$/
+
   field :user_id, type: Integer
   field :session_id, type: Integer
   field :case_id, type: Integer
@@ -23,6 +25,7 @@ class FormAnswer
   field :is_test_data, type: Boolean
   field :versions, type: Array
   field :reader_testing_config_index, type: Integer
+  field :adjudication_randomisation, type: Hash
 
   index user_id: 1
   index case_id: 1
@@ -127,7 +130,22 @@ class FormAnswer
     return result
   end
 
-  def printable_answers
+  def resolve_randomisation(answer)
+    reader = answer
+    if(reader =~ ADJUDICATION_ANSWER_REGEXP)
+      reader = $1
+    else
+      reader = answer
+    end
+
+    if(self.adjudication_randomisation.blank?)
+      return nil
+    end
+
+    return self.adjudication_randomisation[reader.to_s]
+  end
+
+  def printable_answers(do_resolve_randomisation = false)
     begin
       form_config, form_components, repeatables = form.full_configuration_at_versions(self.form_versions)
     rescue Exceptions::FormNotFoundError => e
@@ -140,9 +158,9 @@ class FormAnswer
       repeatables_map[r[:id]] = r[:config]
     end
 
-    return form_config_and_answers_to_display_list(form_config, repeatables_map, answers)
+    return form_config_and_answers_to_display_list(form_config, repeatables_map, answers, [], do_resolve_randomisation)
   end
-  def printable_answers_for_version(i)
+  def printable_answers_for_version(i, do_resolve_randomisation = false)
     return nil if i >= self.versions.size
     begin
       form_config, form_components, repeatables = form.full_configuration_at_versions(self.form_versions)
@@ -156,7 +174,7 @@ class FormAnswer
       repeatables_map[r[:id]] = r[:config]
     end
 
-    return form_config_and_answers_to_display_list(form_config, repeatables_map, self.versions[i]['answers'])
+    return form_config_and_answers_to_display_list(form_config, repeatables_map, self.versions[i]['answers'], [], do_resolve_randomisation)
   end
 
   def form_fields_hash
@@ -170,26 +188,28 @@ class FormAnswer
     return @form_fields_hash
   end
 
-  def self.pretty_print_answer(field, answer)
-   case field['type']
-   when 'bool'
-     return (answer == true ? 'Yes' : 'No')
-   when 'select'
-     return FormAnswer.pretty_print_select_answer(field, answer)
-   when 'select_multiple'
-     return 'None' if answer.nil?
-     return answer.map {|a| FormAnswer.pretty_print_select_answer(field, a)}.join(', ')
-   when 'roi'
-     return FormAnswer.printable_roi_answer(field, answer)
-   else
+  def self.pretty_print_answer(field, answer, form_answer = nil, do_resolve_randomisation = false)
+    case field['type']
+    when 'bool'
+      return (answer == true ? 'Yes' : 'No')
+    when 'select'
+      return FormAnswer.pretty_print_select_answer(field, answer)
+    when 'select_multiple'
+      return 'None' if answer.nil?
+      return answer.map {|a| FormAnswer.pretty_print_select_answer(field, a)}.join(', ')
+    when 'roi'
+      return FormAnswer.printable_roi_answer(field, answer)
+    when 'adjudication'
+      return FormAnswer.pretty_print_adjudication_answer(field, answer, form_answer, do_resolve_randomisation)
+    else
      return answer
-   end
-
+    end
+    
     return nil
   end
   
   private
-
+  
   def generate_form_fields_hash
     begin
       form_config, form_components, repeatables = form.full_configuration_at_versions(self.form_versions)
@@ -219,7 +239,7 @@ class FormAnswer
     return  [form_fields_map, repeatables_map]
   end
 
-  def form_config_and_answers_to_display_list(form_config, repeatables, answers, indices = [])
+  def form_config_and_answers_to_display_list(form_config, repeatables, answers, indices = [], do_resolve_randomisation = false)
     display_list = []
 
     skip_group = false
@@ -240,7 +260,7 @@ class FormAnswer
         next if repeatable_answer.nil?
 
         repeatable_answer.each_with_index do |answer, i|
-          display_list += form_config_and_answers_to_display_list(Marshal.load(Marshal.dump(repeatable)), repeatables, answers, indices + [i])
+          display_list += form_config_and_answers_to_display_list(Marshal.load(Marshal.dump(repeatable)), repeatables, answers, indices + [i], do_resolve_randomisation)
         end
       when 'include_end'
         display_list << field
@@ -249,7 +269,7 @@ class FormAnswer
         display_list << field
       else
         answer = KeyPathAccessor::access_by_path(answers, id)
-        answer = FormAnswer.pretty_print_answer(field, answer)
+        answer = FormAnswer.pretty_print_answer(field, answer, self, do_resolve_randomisation)
 
         if field['type'] == 'roi'
           field.merge!({'seriesUID' => answer['location']['seriesUID'], 'imageIndex' => answer['location']['imageIndex'].to_i}) unless answer['location'].nil?
@@ -287,6 +307,33 @@ class FormAnswer
     else
       "#{field['values'][answer]}"
     end          
+  end
+
+  def self.pretty_print_adjudication_answer(field, answer, form_answer = nil, do_resolve_randomisation = false)
+    puts caller
+    pp field
+    pp answer
+    pp form_answer
+    pp do_resolve_randomisation
+    if (answer.respond_to?(:'empty?') and answer.empty?)
+      "None given"
+    elsif answer =~ ADJUDICATION_ANSWER_REGEXP
+      if do_resolve_randomisation and form_answer
+        session_id = form_answer.resolve_randomisation(answer)
+        pp session_id
+        return "Reader #{$1}" if session_id.blank?
+        
+        session = Session.where(:id => session_id).first
+        pp session
+        return "Session #{session_id}" if session.nil?
+
+        "Session: #{session.name} (#{session_id})"
+      else
+        "Reader #{$1}"
+      end
+    else
+      answer
+    end
   end
 
   def user_public_key_rsa

@@ -83,6 +83,21 @@ class FormAnswersController < ApplicationController
     answer.submitted_at = Time.now
     answer.reader_testing_config_index = @reader_testing_config_index
 
+    answer.adjudication_randomisation = {}
+    if(@case.session)
+      session_config = @case.session.locked_configuration
+
+      if(session_config and session_config['type'] == 'adjudication' and session_config['adjudication'] and session_config['adjudication']['sessions'] and @case.case_data and @case.case_data.adjudication_data and @case.case_data.adjudication_data['assignment'])
+        adjudication_assignment = @case.case_data.adjudication_data['assignment']
+        
+        session_config['adjudication']['sessions'].each_with_index do |session_id, index|
+          assignment = adjudication_assignment[index].to_i
+
+          answer.adjudication_randomisation[assignment] = session_id
+        end
+      end
+    end
+    
     answer.save
 
     @case.state = :read
