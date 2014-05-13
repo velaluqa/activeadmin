@@ -107,6 +107,7 @@ class FormAnswer
     new_version[:annotated_images_signature] = self.annotated_images_signature
     new_version[:submitted_at] = self.submitted_at
     new_version[:signature_public_key_id] = self.signature_public_key_id
+    new_version[:adjudication_randomisation] = self.adjudication_randomisation
 
     self.versions = [] if self.versions.nil?
     self.versions << new_version
@@ -130,7 +131,7 @@ class FormAnswer
     return result
   end
 
-  def resolve_randomisation(answer)
+  def resolve_randomisation(answer, adjudication_randomisation)
     reader = answer
     if(reader =~ ADJUDICATION_ANSWER_REGEXP)
       reader = $1
@@ -138,11 +139,11 @@ class FormAnswer
       reader = answer
     end
 
-    if(self.adjudication_randomisation.blank?)
+    if(adjudication_randomisation.blank?)
       return nil
     end
 
-    return self.adjudication_randomisation[reader.to_s]
+    return adjudication_randomisation[reader.to_s]
   end
 
   def printable_answers(do_resolve_randomisation = false)
@@ -158,7 +159,7 @@ class FormAnswer
       repeatables_map[r[:id]] = r[:config]
     end
 
-    return form_config_and_answers_to_display_list(form_config, repeatables_map, answers, [], do_resolve_randomisation)
+    return form_config_and_answers_to_display_list(form_config, repeatables_map, answers, [], (do_resolve_randomisation ? self.adjudication_randomisation : nil))
   end
   def printable_answers_for_version(i, do_resolve_randomisation = false)
     return nil if i >= self.versions.size
@@ -174,7 +175,7 @@ class FormAnswer
       repeatables_map[r[:id]] = r[:config]
     end
 
-    return form_config_and_answers_to_display_list(form_config, repeatables_map, self.versions[i]['answers'], [], do_resolve_randomisation)
+    return form_config_and_answers_to_display_list(form_config, repeatables_map, self.versions[i]['answers'], [], (do_resolve_randomisation ? self.versions[i]['adjudication_randomisation'] : nil))
   end
 
   def form_fields_hash
@@ -188,7 +189,7 @@ class FormAnswer
     return @form_fields_hash
   end
 
-  def self.pretty_print_answer(field, answer, form_answer = nil, do_resolve_randomisation = false)
+  def self.pretty_print_answer(field, answer, form_answer = nil, adjudication_randomisation)
     case field['type']
     when 'bool'
       return (answer == true ? 'Yes' : 'No')
@@ -200,7 +201,7 @@ class FormAnswer
     when 'roi'
       return FormAnswer.printable_roi_answer(field, answer)
     when 'adjudication'
-      return FormAnswer.pretty_print_adjudication_answer(field, answer, form_answer, do_resolve_randomisation)
+      return FormAnswer.pretty_print_adjudication_answer(field, answer, form_answer, adjudication_randomisation)
     else
      return answer
     end
@@ -239,7 +240,7 @@ class FormAnswer
     return  [form_fields_map, repeatables_map]
   end
 
-  def form_config_and_answers_to_display_list(form_config, repeatables, answers, indices = [], do_resolve_randomisation = false)
+  def form_config_and_answers_to_display_list(form_config, repeatables, answers, indices = [], adjudication_randomisation)
     display_list = []
 
     skip_group = false
@@ -260,7 +261,7 @@ class FormAnswer
         next if repeatable_answer.nil?
 
         repeatable_answer.each_with_index do |answer, i|
-          display_list += form_config_and_answers_to_display_list(Marshal.load(Marshal.dump(repeatable)), repeatables, answers, indices + [i], do_resolve_randomisation)
+          display_list += form_config_and_answers_to_display_list(Marshal.load(Marshal.dump(repeatable)), repeatables, answers, indices + [i], adjudication_randomisation)
         end
       when 'include_end'
         display_list << field
@@ -269,7 +270,7 @@ class FormAnswer
         display_list << field
       else
         answer = KeyPathAccessor::access_by_path(answers, id)
-        answer = FormAnswer.pretty_print_answer(field, answer, self, do_resolve_randomisation)
+        answer = FormAnswer.pretty_print_answer(field, answer, self, adjudication_randomisation)
 
         if field['type'] == 'roi'
           field.merge!({'seriesUID' => answer['location']['seriesUID'], 'imageIndex' => answer['location']['imageIndex'].to_i}) unless answer['location'].nil?
@@ -309,17 +310,12 @@ class FormAnswer
     end          
   end
 
-  def self.pretty_print_adjudication_answer(field, answer, form_answer = nil, do_resolve_randomisation = false)
-    puts caller
-    pp field
-    pp answer
-    pp form_answer
-    pp do_resolve_randomisation
+  def self.pretty_print_adjudication_answer(field, answer, form_answer = nil, adjudication_randomisation)
     if (answer.respond_to?(:'empty?') and answer.empty?)
       "None given"
     elsif answer =~ ADJUDICATION_ANSWER_REGEXP
-      if do_resolve_randomisation and form_answer
-        session_id = form_answer.resolve_randomisation(answer)
+      if adjudication_randomisation and form_answer
+        session_id = form_answer.resolve_randomisation(answer, adjudication_randomisation)
         pp session_id
         return "Reader #{$1}" if session_id.blank?
         

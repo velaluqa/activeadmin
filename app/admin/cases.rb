@@ -454,6 +454,13 @@ ActiveAdmin.register Case do
         next
       end
 
+      session_config = c.session.configuration_at_version(c.form_answer.form_versions['session'])
+      if(session_config and session_config['type'] == 'adjudication')
+        is_adjudication_case = true
+      else
+        is_adjudication_case = false
+      end
+
       c.exported_at = Time.now
       c.save
 
@@ -482,6 +489,9 @@ ActiveAdmin.register Case do
               value = KeyPathAccessor::access_by_path(answers, path)
 
               value = value.join(',') if value.is_a?(Array)
+              if(not c.form_answer.adjudication_randomisation.blank? and is_adjudication_case)
+                value = c.form_answer.resolve_randomisation(value, c.form_answer.adjudication_randomisation)
+              end
             end
             
             row[name] = value
