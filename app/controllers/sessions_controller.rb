@@ -100,7 +100,7 @@ class SessionsController < ApplicationController
         config['adjudication']['sessions'].each_with_index do |session_id, index|
           base_session = Session.find(session_id)
 
-          annotated_images_root = base_session.locked_configuration['annotated_images_root']
+          annotated_images_root = (base_session.state == :testing and base_session.locked_configuration['annotated_images_root_validation']) ? base_session.locked_configuration['annotated_images_root_validation'] : base_session.locked_configuration['annotated_images_root']
           assignment = adjudication_assignment[index].to_i - 1
 
           annotation_set = {:path => annotated_images_root + '/' + c.images_folder, :color => config['adjudication']['colors'][assignment], :name => "Reader #{assignment+1}: "}
