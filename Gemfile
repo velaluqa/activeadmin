@@ -88,11 +88,11 @@ gem 'select2-rails', :github => 'profmaad/select2-rails', :branch => 'master'
 gem 'rest-client'
 
 # Used during GoodImage migration
-group :goodimage_migration do
-  gem 'data_mapper'
-  gem 'dm-mysql-adapter'
-  gem 'dm-sqlite-adapter'
-end
+# group :goodimage_migration do
+#   gem 'data_mapper'
+#   gem 'dm-mysql-adapter'
+#   gem 'dm-sqlite-adapter'
+# end
 
 # used for DICOM based checks in tQC (ability to specify simple formulas)
 # the gem on rubygems.org is not up-to-date, so we use the code from github directly
