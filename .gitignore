@@ -36,3 +36,5 @@
 # Ignore the ERICA data directory
 /data
 
+# Ignore annoying Mac OS X files
+.DS_Store
