@@ -45,6 +45,8 @@
               - if(defined?(@show_internal_annotations) and @show_internal_annotations == true)
                 .data_dict_field_id= field['id']
               = (field['description'].nil? ? '' : field['description'].html_safe)
+            - unless(field['first_in_repeatable'].blank? || field['min_repeat'].blank?)
+              %a.remove-repeat-btn.pull-right{:href => '#', :'data-id' => field['first_in_repeatable'], :'data-min-repeats' => field['min_repeat']} &times;
       .form-actions
         %button.btn.btn-primary{:type => 'submit'} Submit Answers
         %p.submit-errors.text-error
