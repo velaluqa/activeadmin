@@ -271,6 +271,8 @@ class Form < ActiveRecord::Base
             config_copy.each do |included_field|
               included_field['id'] = "#{field['repeat']['prefix']}[#{i}][#{included_field['id']}]"
             end
+            config_copy.first['first_in_repeatable'] = field['repeat']['prefix']
+            config_copy.first['min_repeat'] = field['repeat']['min']
 
             config_copy << {'type' => 'include_divider'}
 
