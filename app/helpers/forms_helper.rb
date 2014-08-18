@@ -23,6 +23,21 @@ module FormsHelper
     return attributes
   end
 
+  def form_answer_for_case(c)
+    if c.is_a?(FormAnswer)
+      c
+    else
+      c.form_answer
+    end
+  end
+  def case_for_case(c)
+    if c.is_a?(FormAnswer)
+      c.case
+    else
+      c
+    end
+  end
+
   def options_from_values(field, selected_values, no_default = false, additional_options = [])
     values = field['values']
     values = {} if values.nil?
