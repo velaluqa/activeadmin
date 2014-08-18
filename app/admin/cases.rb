@@ -480,7 +480,8 @@ ActiveAdmin.register Case do
           row = {}
           answers['_REPEAT'] = repeat_array[r].merge({'_ID' => (r+1), '_REPEATABLE_ID' => row_spec['repeat']}) unless repeat_array.nil?
 
-          row['ID'] = c.id if(row_spec['include_id'] == true)
+          # we can't use uppercase ID because of: http://support.microsoft.com/kb/215591
+          row['id'] = c.id if(row_spec['include_id'] == true)
           
           row_spec['values'].each do |name, path|
             if(path =~ /^_TEXT\[(.*)\]$/)
@@ -488,12 +489,17 @@ ActiveAdmin.register Case do
             else
               value = KeyPathAccessor::access_by_path(answers, path)
 
-              value = value.join(',') if value.is_a?(Array)
+              value = value.join(';') if value.is_a?(Array)
               if(not c.form_answer.adjudication_randomisation.blank? and is_adjudication_case)
                 value = c.form_answer.resolve_randomisation(value, c.form_answer.adjudication_randomisation)
               end
             end
             
+            # sanitise data to not cause problems when importing into excel etc.
+            value.gsub!(/\r\n/, '-')
+            value.gsub!(/\n/, '-')
+            value.gsub!(/,/, ';')
+
             row[name] = value
           end
 
