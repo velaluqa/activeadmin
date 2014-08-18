@@ -90,6 +90,10 @@ ActiveAdmin.register Case do
         end
 
         params[:q][:patient_id_in] = patient_id_in
+
+        if(!(params[:q][:patient_id_in].blank? && params[:q][:session_id_in].blank?))
+          params[:order] = 'position_asc'
+        end
       end
 
       original_aa_index
