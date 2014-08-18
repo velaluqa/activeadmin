@@ -1,5 +1,5 @@
 :css
   body { padding-top: 10px; }
 .container
-  - unless @previous_cases.nil?
+  - unless (@previous_cases.nil? and @adjudication_previous_cases.nil?)
     = render 'forms/previous_cases_tables'

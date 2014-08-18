@@ -121,11 +121,40 @@ module FormsHelper
     answer = nil
     if value.start_with?('patient[') or value.start_with?('case[')
       answer = KeyPathAccessor::access_by_path(the_case.data_hash, value)
-    else
+    elsif(the_case.form_answer)
       answer = KeyPathAccessor::access_by_path(the_case.form_answer.answers, value)      
+    else
+      answer = nil
     end
 
     return answer
+  end
+
+  def adjudication_results_table_answers_for_column(column, row_spec, repeatable)
+    answers = []
+    cases = []
+    values = []
+    column.each do |c|
+      value = (row_spec['value'].nil? ? row_spec['values'][c.case_type] : row_spec['value'])
+
+      unless value.nil?
+        unless repeatable.nil?
+          prefix = repeatable[:prefixes][c.case_type]
+          full_value = "#{prefix}[#{repeatable[:index]}][" + value + ']'
+        else
+          full_value = value
+        end
+
+        answers << results_table_find_answer(c, full_value)
+      else
+        answers << nil
+      end
+
+      cases << c
+      values << value
+    end
+
+    return [answers, cases, values]
   end
 
   def results_table_format_answer(answer, answer_spec)
