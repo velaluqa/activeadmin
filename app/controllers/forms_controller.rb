@@ -109,6 +109,30 @@ protected
           @previous_cases = @case.patient.cases.where('position < ? and flag = ?', @case.position, Case::flag_sym_to_int(@case.flag)).reject {|c| c.form_answer.nil?}
         end
       end
+
+      unless (configuration.nil? or configuration['types'].nil? or configuration['types'][@case.case_type].nil? or configuration['type'] != 'adjudication' or configuration['types'][@case.case_type]['adjudication_previous_results'].nil? or @case.case_data.nil? or @case.case_data.adjudication_data.nil?)
+        previous_results_config = configuration['types'][@case.case_type]['adjudication_previous_results']
+        adjudication_assignment = @case.case_data.adjudication_data['assignment']
+
+        adjudication_cases = @case.patient.cases.where('position <= ? and flag = ?', @case.position, Case::flag_sym_to_int(@case.flag))
+        @adjudication_previous_cases = []
+
+        adjudication_cases.each do |adjudication_c|
+          base_cases = []
+          configuration['adjudication']['sessions'].each_with_index do |session_id, index|
+            assignment = adjudication_assignment[index].to_i - 1
+
+            base_cases[assignment] = Case.includes(:patient).where('cases.session_id = ? and cases.flag = ? and patients.subject_id = ? and cases.images = ?', session_id, Case::flag_sym_to_int(@case.flag), adjudication_c.patient.subject_id, adjudication_c.images).first
+          end
+
+          @adjudication_previous_cases << base_cases
+        end
+
+        @adjudication_table_type = :custom
+        @adjudication_table_config = previous_results_config['table']
+        @adjudication_merge_table_columns = previous_results_config['merge_columns']
+      end
+
     end
   end
   def construct_previous_cases(enabled_case_types = nil)

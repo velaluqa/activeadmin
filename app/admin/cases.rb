@@ -90,6 +90,10 @@ ActiveAdmin.register Case do
         end
 
         params[:q][:patient_id_in] = patient_id_in
+
+        if(!(params[:q][:patient_id_in].blank? && params[:q][:session_id_in].blank?))
+          params[:order] = 'position_asc'
+        end
       end
 
       original_aa_index
@@ -143,7 +147,11 @@ ActiveAdmin.register Case do
       when :in_progress
         status_tag('In Progress', :warning, :label => (c.current_reader.nil? ? 'In Progress' : ('In Progress: '+link_to(c.current_reader.name, admin_user_path(c.current_reader))).html_safe))
       when :read
-        status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
+        if c.form_answer.nil?
+          status_tag('Read', :ok)
+        else
+          status_tag('Read', :ok, :label => link_to('Read', admin_form_answer_path(c.form_answer)).html_safe)
+        end
       when :reopened
         status_tag('Reopened', :warning, :label => link_to('Reopened', admin_form_answer_path(c.form_answer)).html_safe) unless c.form_answer.nil?
       when :reopened_in_progress
@@ -480,7 +488,8 @@ ActiveAdmin.register Case do
           row = {}
           answers['_REPEAT'] = repeat_array[r].merge({'_ID' => (r+1), '_REPEATABLE_ID' => row_spec['repeat']}) unless repeat_array.nil?
 
-          row['ID'] = c.id if(row_spec['include_id'] == true)
+          # we can't use uppercase ID because of: http://support.microsoft.com/kb/215591
+          row['id'] = c.id if(row_spec['include_id'] == true)
           
           row_spec['values'].each do |name, path|
             if(path =~ /^_TEXT\[(.*)\]$/)
@@ -488,12 +497,17 @@ ActiveAdmin.register Case do
             else
               value = KeyPathAccessor::access_by_path(answers, path)
 
-              value = value.join(',') if value.is_a?(Array)
+              value = value.join(';') if value.is_a?(Array)
               if(not c.form_answer.adjudication_randomisation.blank? and is_adjudication_case)
                 value = c.form_answer.resolve_randomisation(value, c.form_answer.adjudication_randomisation)
               end
             end
             
+            # sanitise data to not cause problems when importing into excel etc.
+            value.gsub!(/\r\n/, '-')
+            value.gsub!(/\n/, '-')
+            value.gsub!(/,/, ';')
+
             row[name] = value
           end
 

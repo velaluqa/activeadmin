@@ -10,12 +10,12 @@
   - printable_answers = [form_config]
 - else
   - if versions.nil?
-    - printable_answers = cases.map {|c| c.form_answer.printable_answers(do_resolve_randomisation)}
+    - printable_answers = cases.map {|c| form_answer_for_case(c).printable_answers(do_resolve_randomisation)}
   - else
     - printable_answers = []
     - cases.each_with_index do |c,i|
       - versions[i].each do |version_index|
-        - printable_answers << c.form_answer.printable_answers_for_version(version_index, do_resolve_randomisation)
+        - printable_answers << form_answer_for_case(c).printable_answers_for_version(version_index, do_resolve_randomisation)
 - current_group_index = nil
 - first_in_group = false
 - unless printable_answers[0].nil?
@@ -37,7 +37,7 @@
             %th= Answer
           - else
             - cases.each do |c|
-              %th= c.images_folder
+              %th= case_for_case(c).images_folder
           - if data_cleaning_buttons
             %th= Clean!
     %tbody

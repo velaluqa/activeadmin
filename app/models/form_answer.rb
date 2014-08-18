@@ -26,6 +26,7 @@ class FormAnswer
   field :versions, type: Array
   field :reader_testing_config_index, type: Integer
   field :adjudication_randomisation, type: Hash
+  field :is_obsolete, type: Boolean, default: false
 
   index user_id: 1
   index case_id: 1
@@ -187,6 +188,20 @@ class FormAnswer
     @form_fields_hash = generate_form_fields_hash
 
     return @form_fields_hash
+  end
+
+  def mark_obsolete
+    c = self.case
+    case(c.state)
+    when :read
+      c.state = :unread
+    when :in_progress, :reopened_in_progress
+      return
+    end
+    c.save
+
+    self.is_obsolete = true
+    self.save
   end
 
   def self.pretty_print_answer(field, answer, form_answer = nil, adjudication_randomisation)

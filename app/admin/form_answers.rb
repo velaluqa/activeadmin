@@ -40,6 +40,13 @@ ActiveAdmin.register FormAnswer do
         status_tag('No', :ok)
       end
     end
+    column 'Obsolete?', :is_obsolete do |form_answer|
+      if(form_answer.is_obsolete)
+        status_tag('Yes', :warning)
+      else
+        status_tag('No', :ok)
+      end
+    end
 
     default_actions
   end
@@ -82,6 +89,13 @@ ActiveAdmin.register FormAnswer do
           status_tag('No', :ok)
         end
       end
+      row 'Obsolete?' do
+        if(form_answer.is_obsolete)
+          status_tag('Yes', :warning)
+        else
+          status_tag('No', :ok)
+        end
+      end
       row :signature_public_key do
         if(form_answer.signature_public_key_id.blank? and form_answer.user.active_public_key.blank?)
           link_to('Download', download_public_key_admin_user_path(form_answer.user))
@@ -92,7 +106,7 @@ ActiveAdmin.register FormAnswer do
         end
       end
       row :answers do
-        render "forms/results_table", :caption => '', :cases => [form_answer.case], :skip_header => true, :data_cleaning_buttons => (can? :manage, form_answer), :do_resolve_randomisation => true unless form_answer.answers.nil?
+        render "forms/results_table", :caption => '', :cases => [form_answer], :skip_header => true, :data_cleaning_buttons => (can? :manage, form_answer), :do_resolve_randomisation => true unless form_answer.answers.nil?
       end
       row :answers_raw do        
         CodeRay.scan(JSON::pretty_generate(form_answer.answers), :json).div(:css => :class).html_safe unless form_answer.answers.nil?
@@ -115,6 +129,26 @@ ActiveAdmin.register FormAnswer do
         end
       end
     end
+  end
+
+  batch_action :mark_as_obsolete do |selection|
+    FormAnswer.find(selection).each do |f|
+      authorize! :manage, f
+
+      c.mark_obsolete()
+    end
+
+    redirect_to :action => :index
+  end
+  action_item :only => :show do
+    link_to 'Mark obsolete', mark_obsolete_admin_form_answer_path(form_answer) if can? :manage, form_answer
+  end
+  member_action :mark_obsolete, :method => :get do
+    @form_answer = FormAnswer.find(params[:id])
+    authorize! :manage, @form_answer
+
+    @form_answer.mark_obsolete()
+    redirect_to({:action => :show}, :notice => "Form answer successfully marked as obsolete")
   end
 
   member_action :data_cleaning, :method => :post do

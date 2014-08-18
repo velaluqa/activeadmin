@@ -79,7 +79,7 @@ class Case < ActiveRecord::Base
   end
 
   def form_answer
-    FormAnswer.where(:case_id => read_attribute(:id)).first
+    FormAnswer.where(:case_id => read_attribute(:id), :is_obsolete.ne => true).first
   end
 
   def case_data
