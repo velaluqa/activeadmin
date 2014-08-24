@@ -366,6 +366,52 @@ ActiveAdmin.register Case do
     end
   end 
 
+  batch_action :move do |selection|
+    session = nil
+    selection.each do |case_id|
+      c = Case.find(case_id)
+      if session.nil?
+        session = c.session
+      elsif session != c.session
+        flash[:error] = 'All cases for a move must belong to the same session.'
+        redirect_to action: :index
+        return
+      end
+    end
+    authorize! :manage, session
+
+    @page_title = 'Move selected Cases'
+    render 'admin/cases/move_settings', :locals => {:selection => selection, :cases => session.cases.where('id NOT IN (?)', selection).order(:position)}
+  end
+  collection_action :batch_move, :method => :post do
+    # identify starting position
+    insert_after_case = Case.find(params[:new_position])
+    pp insert_after_case
+    authorize! :manage, insert_after_case.session
+
+    moved_cases = Case.find(params[:cases].split(' ')).sort {|a,b| a.position <=> b.position}
+    pp moved_cases
+    later_cases = insert_after_case.session.cases.where('id NOT IN (?) and position > ?', params[:cases].split(' '), insert_after_case.position).order(:position)
+    pp later_cases
+
+    next_position = insert_after_case.position + 1
+    next_free_position = insert_after_case.session.next_position
+    (moved_cases + later_cases).each do |c|
+      c.position = next_free_position
+      c.save
+      next_free_position += 1
+    end
+    next_position = insert_after_case.position + 1
+    (moved_cases + later_cases).each do |c|
+      c.position = next_position
+      c.save
+      next_position += 1
+    end
+
+    flash[:notice] = "#{moved_cases.size} cases moved to after #{insert_after_case.name}"
+    redirect_to :action => :index
+  end
+
   batch_action :mark_as_regular do |selection|
     Case.find(selection).each do |c|
       authorize! :manage, c

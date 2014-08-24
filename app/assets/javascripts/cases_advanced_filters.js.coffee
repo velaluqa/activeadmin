@@ -7,6 +7,8 @@ replace_stock_patient_filter = ->
 $(document).ready ->
   hide_fake_sidebar_entry()
   replace_stock_patient_filter()
+
+  $('.select2_select_box').select2()
   
   $('#q_patient_id').select2({
     multiple: true
