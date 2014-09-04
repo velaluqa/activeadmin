@@ -135,7 +135,7 @@ ActiveAdmin.register FormAnswer do
     FormAnswer.find(selection).each do |f|
       authorize! :manage, f
 
-      c.mark_obsolete()
+      f.mark_obsolete()
     end
 
     redirect_to :action => :index
