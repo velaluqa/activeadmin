@@ -7,8 +7,8 @@ class Role < ActiveRecord::Base
   belongs_to :user
   belongs_to :subject, :polymorphic => true  
 
-  ROLE_SYMS = [:manage, :image_import, :image_manage, :medical_qc, :audit]
-  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager', 'Medical QC', 'Audit']
+  ROLE_SYMS = [:manage, :image_import, :image_manage, :medical_qc, :audit, :readonly]
+  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager', 'Medical QC', 'Audit', 'Read-only']
 
   before_save :fix_subject
 

@@ -151,8 +151,8 @@ class Ability
     end
 
     can :read, Session, ['sessions.id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |session|
-      !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:audit)}).nil?) or
-        (session.study and !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:audit)}).nil?))      
+      !(session.roles.first(:conditions => { :user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]}).nil?) or
+        (session.study and !(session.study.roles.first(:conditions => { :user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]}).nil?))
     end
     can :read, Case, ['cases.session_id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |c|
       can? :read, c.session
@@ -180,7 +180,7 @@ class Ability
 
   MQC_STUDY_ROLES_SUBQUERY = '(SELECT roles.subject_id FROM roles WHERE roles.subject_type LIKE \'Study\' AND roles.role = 3 AND roles.user_id = ?)'
 
-  STUDY_AUDIT_ROLES_SUBQUERY = '(SELECT roles.subject_id FROM roles WHERE roles.subject_type LIKE \'Study\' AND roles.role = 4 AND roles.user_id = ?)'
-  SESSION_AUDIT_ROLES_SUBQUERY = 'SELECT roles.subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE \'Session\' AND roles.role = 4 AND roles.user_id = ?'
-  SESSION_STUDY_AUDIT_ROLES_SUBQUERY = '(SELECT sessions.id FROM sessions WHERE sessions.study_id IN (SELECT roles.subject_id FROM roles INNER JOIN studies ON roles.subject_id = studies.id WHERE roles.subject_type LIKE \'Study\' AND roles.role = 4 AND roles.user_id = ?) UNION ALL '+SESSION_AUDIT_ROLES_SUBQUERY+')'
+  STUDY_AUDIT_ROLES_SUBQUERY = '(SELECT roles.subject_id FROM roles WHERE roles.subject_type LIKE \'Study\' AND (roles.role = 4 OR roles.role = 5) AND roles.user_id = ?)'
+  SESSION_AUDIT_ROLES_SUBQUERY = 'SELECT roles.subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE \'Session\' AND (roles.role = 4 OR roles.role = 5) AND roles.user_id = ?'
+  SESSION_STUDY_AUDIT_ROLES_SUBQUERY = '(SELECT sessions.id FROM sessions WHERE sessions.study_id IN (SELECT roles.subject_id FROM roles INNER JOIN studies ON roles.subject_id = studies.id WHERE roles.subject_type LIKE \'Study\' AND (roles.role = 4 OR roles.role = 5) AND roles.user_id = ?) UNION ALL '+SESSION_AUDIT_ROLES_SUBQUERY+')'
 end

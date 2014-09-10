@@ -56,7 +56,7 @@ ActiveAdmin.register Role do
       f.input :user, :required => true
       # HACK: we transform the malformed subject type in the Role model via a before_save filter and expand it into the proper subject_type and subject_id
       f.input :subject_type, :label => 'Subject', :collection => subjects
-      f.input :role, :collection => roles, :as => :select, :include_blank => false
+      f.input :role, :collection => roles, :as => :select, :include_blank => false, :hint => 'Please note that audit and read-only roles cannot be assigned system-wide and have to be assigned at a study or session level.'
     end
     
     f.buttons
