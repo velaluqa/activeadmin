@@ -122,7 +122,7 @@ class Ability
     end
 
     can :read, Study, ['id IN '+STUDY_AUDIT_ROLES_SUBQUERY, user.id] do |study|
-      !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:audit)}).nil?
+      !study.roles.first(:conditions => { :user_id => user.id, :role => [Role.role_sym_to_int(:audit), Role.role_sym_to_int(:readonly)]}).nil?
     end
     unless(self.can? :read, Center)
       can :read, Center, ['centers.study_id IN '+STUDY_AUDIT_ROLES_SUBQUERY, user.id] do |center|
@@ -145,7 +145,7 @@ class Ability
       end
     end
     unless(self.can? :read, Image)
-      can :read, Image do |image|
+      can :read, Image, Image.includes(:image_series => {:patient => :center}).where('centers.study_id IN '+STUDY_AUDIT_ROLES_SUBQUERY, user.id) do |image|
         can? :read, image.study
       end
     end
