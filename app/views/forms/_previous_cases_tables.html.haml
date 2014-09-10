@@ -1,5 +1,6 @@
-#adjudication_previous_results.offset1.span10
-  = render 'forms/adjudication_custom_results_table', :caption => 'Results from sessions under adjudication for this Patient', :cases => @adjudication_previous_cases, :table_config => @adjudication_table_config, :roi_links => true
+- unless @adjudication_previous_cases.blank?
+  #adjudication_previous_results.offset1.span10
+    = render 'forms/adjudication_custom_results_table', :caption => 'Results from sessions under adjudication for this Patient', :cases => @adjudication_previous_cases, :table_config => @adjudication_table_config, :roi_links => true
 
 #previous_results.offset1.span10
   - case @table_type
