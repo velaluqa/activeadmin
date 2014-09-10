@@ -531,7 +531,7 @@ class Visit < ActiveRecord::Base
 
     criteria_names = []
     criteria_values = []
-    results = self.mqc_spec_with_results_at_version(self.visit_date.mqc_version)
+    results = self.mqc_spec_with_results_at_version(self.visit_data.mqc_version)
     if(results.nil?)
       result['QCCriteriaNames'] = nil
       result['QCValues'] = nil

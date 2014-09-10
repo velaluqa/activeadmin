@@ -188,7 +188,7 @@ class RequiredSeries
 
     criteria_names = []
     criteria_values = []
-    results = self.tqc_spec_with_results_at_version(self.tqc_version) || self.study.locked_version
+    results = self.tqc_spec_with_results_at_version(self.tqc_version || self.study.locked_version)
     if(results.nil?)
       result['QCCriteriaNames'] = nil
       result['QCValues'] = nil
