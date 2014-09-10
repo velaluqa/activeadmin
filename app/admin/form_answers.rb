@@ -135,20 +135,43 @@ ActiveAdmin.register FormAnswer do
     FormAnswer.find(selection).each do |f|
       authorize! :manage, f
 
-      f.mark_obsolete()
+      f.mark_obsolete() unless f.is_obsolete
     end
 
     redirect_to :action => :index
   end
   action_item :only => :show do
-    link_to 'Mark obsolete', mark_obsolete_admin_form_answer_path(form_answer) if can? :manage, form_answer
+    link_to 'Mark obsolete', mark_obsolete_admin_form_answer_path(form_answer) if (can? :manage, form_answer and not form_answer.is_obsolete)
   end
   member_action :mark_obsolete, :method => :get do
     @form_answer = FormAnswer.find(params[:id])
     authorize! :manage, @form_answer
 
+    if @form_answer.is_obsolete
+      flash[:error] = 'This form answer is already marked obsolete.'
+      redirect_to :action => :show
+      return
+    end
+
     @form_answer.mark_obsolete()
     redirect_to({:action => :show}, :notice => "Form answer successfully marked as obsolete")
+  end
+
+  action_item :only => :show do
+    link_to 'Undo obsoletion', undo_obsoletion_admin_form_answer_path(form_answer) if (can? :manage, form_answer and form_answer.case.state == :unread and form_answer == form_answer.case.latest_obsolete_form_answer)
+  end
+  member_action :undo_obsoletion, :method => :get do
+    @form_answer = FormAnswer.find(params[:id])
+    authorize! :manage, @form_answer
+
+    unless(@form_answer.case.state == :unread and @form_answer == @form_answer.case.latest_obsolete_form_answer)
+      flash[:error] = 'This form answer cannot be made active again. The corresponding case must be unread and this must be the last submitted form answer for that case.'
+      redirect_to :action => :show
+      return
+    end
+
+    @form_answer.undo_obsoletion()
+    redirect_to({:action => :show}, :notice => "Form answer obsoletion was successfully undone")
   end
 
   member_action :data_cleaning, :method => :post do
