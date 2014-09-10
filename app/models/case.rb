@@ -82,6 +82,10 @@ class Case < ActiveRecord::Base
     FormAnswer.where(:case_id => read_attribute(:id), :is_obsolete.ne => true).first
   end
 
+  def obsolete_form_answers
+    FormAnswer.where(:case_id => read_attribute(:id), :is_obsolete => true)
+  end
+
   def case_data
     CaseData.where(:case_id => read_attribute(:id)).first
   end
