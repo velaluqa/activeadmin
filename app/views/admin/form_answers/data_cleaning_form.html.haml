@@ -35,6 +35,8 @@
         %p Date values are specified in the format 'DD-MM-YYYY'.
       - when 'bool'
         %p Boolean values are encoded as 'true' for a positive (Yes) answer and 'false' for a negative (No) answer.
+      - when 'calculated'
+        %p This is a calculated field, meanings its original value was automatically calculated when the answers were submitted. While all text is saved 'as-is' into the database, please ensure that meaningful data is entered.
 
   = field_set_tag(('<span>Signature Password</span>').html_safe, :class => 'inputs') do
     %ol

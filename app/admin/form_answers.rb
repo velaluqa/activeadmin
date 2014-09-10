@@ -159,7 +159,7 @@ ActiveAdmin.register FormAnswer do
     field_type = params[:field_type]
     field_id = params[:field_id]
 
-    if(['fixed', 'group', 'section', 'calculated'].include?(field_type))
+    if(['fixed', 'group', 'section', ].include?(field_type))
       flash[:error] = 'The chosen field type cannot be changed via the data cleaning tool.'
       redirect_to :action => :show
       return

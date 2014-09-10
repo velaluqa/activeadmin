@@ -20,5 +20,5 @@
         = answer['answer'].respond_to?(:to_s) ? simple_format(answer['answer'].to_s) : answer['answer']
         - if(field_spec['type'] == 'roi' and roi_links and not (answer['seriesUID'].nil? or answer['imageIndex'].nil?))
           %a.roi_link{:href => '#', :onclick => "PharmTraceAPI.jumpToImage('#{answer['seriesUID']}', #{answer['imageIndex']}); return false;"} Jump to ROI
-  - if(defined?(data_cleaning_buttons) and (data_cleaning_buttons == true) and form_answer_for_case(cases.first) and not ['fixed', 'group', 'section', 'calculated'].include?(field_spec['type']))
+  - if(defined?(data_cleaning_buttons) and (data_cleaning_buttons == true) and form_answer_for_case(cases.first) and not ['fixed', 'group', 'section'].include?(field_spec['type'])) and (field_spec['type'] != 'calculated' or field_spec['store_calculated_value'])
     %td= link_to('Clean!', data_cleaning_form_admin_form_answer_path(form_answer_for_case(cases.first), :field_id => field_spec['id']))
