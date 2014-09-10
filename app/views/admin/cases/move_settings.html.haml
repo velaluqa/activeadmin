@@ -1,0 +1,18 @@
+:css
+  #new_position { width: 20em; }
+
+= form_tag(batch_move_admin_cases_path, :method => :post, :multipart => true, :class => 'formtastic form') do
+  = hidden_field_tag('cases', selection)
+
+  = field_set_tag('<span>Move Settings</span>'.html_safe, :class => 'inputs') do
+    %ol
+      %li.input.select
+        = label_tag('new_position', 'Move to after:')
+        = select_tag('new_position', options_for_select(cases.map {|c| [c.name + " (Position: #{c.position})", c.id]}), :include_blank => false, :class => 'select2_select_box')
+
+  = field_set_tag(nil, :class => 'actions') do
+    %ol
+      %li.action.input_action
+        = submit_tag('Move')
+      %li.cancel
+        = link_to('Cancel', admin_cases_path)
