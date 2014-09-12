@@ -6,6 +6,7 @@
 - form_answer_field_maps = {}
 - cases.each do |cs|
   - cs.each do |c|
+    - next if c.nil?
     - if c.form_answer
       - form_answer_field_maps[c.id] = c.form_answer.form_fields_hash
     - else
