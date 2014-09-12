@@ -5,6 +5,7 @@ class PatientData
 
   field :patient_id, type: Integer
   field :data, type: Hash, default: {}
+  field :export_history, type: Array, default: []
 
   index patient_id: 1
 
