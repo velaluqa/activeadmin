@@ -8,6 +8,14 @@ class Image < ActiveRecord::Base
 
   validates_presence_of :image_series_id
 
+  def study
+    if self.image_series.nil?
+      nil
+    else
+      self.image_series.study
+    end
+  end
+
   def previous_image_storage_path
     if(self.previous_changes.include?(:image_series_id))
       previous_image_series = ImageSeries.find(self.previous_changes[:image_series_id][0])

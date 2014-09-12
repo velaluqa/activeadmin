@@ -10,6 +10,7 @@ ActiveAdmin.register Image do
 
   controller do
     load_and_authorize_resource :except => :index
+    skip_load_and_authorize_resource :only => [:dicom_metadata]
 
     def max_csv_records
       1_000_000
