@@ -160,6 +160,9 @@ ActiveAdmin.register Case do
         status_tag('Postponed', :warning)
       end
     end
+    column 'Obsoletes' do |c|
+      c.obsolete_form_answers.count
+    end
     column :reader do |c|
       if(c.form_answer.nil?)
         if(c.assigned_reader.nil?)
@@ -210,6 +213,19 @@ ActiveAdmin.register Case do
           status_tag('Validation', :warning)
         when :reader_testing
           status_tag('Reader Testing', :warning)
+        end
+      end
+      row 'Obsolete Form Answers' do
+        if(c.obsolete_form_answers.empty?)
+          'None'
+        else
+          ul do
+            c.obsolete_form_answers.each do |fa|
+              li do
+                link_to(fa.id, admin_form_answer_path(fa))
+              end
+            end
+          end
         end
       end
       row :state do

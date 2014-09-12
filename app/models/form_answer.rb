@@ -203,6 +203,17 @@ class FormAnswer
     self.is_obsolete = true
     self.save
   end
+  def undo_obsoletion
+    c = self.case
+
+    return unless(c.state == :unread and c.latest_obsolete_form_answer == self)
+
+    c.state = :read
+    c.save
+
+    self.is_obsolete = false
+    self.save
+  end
 
   def self.pretty_print_answer(field, answer, form_answer = nil, adjudication_randomisation)
     case field['type']

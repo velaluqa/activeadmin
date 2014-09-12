@@ -1,4 +1,4 @@
 %ol
   - form_answer.versions.each_with_index do |version, i|
-    %li= render 'forms/results_table', :caption => version['submitted_at'].to_s, :skip_header => false, :cases => [form_answer.case], :versions => [[i]], :do_resolve_randomisation => (defined? do_resolve_randomisation ? do_resolve_randomisation : false)
+    %li= render 'forms/results_table', :caption => version['submitted_at'].to_s, :skip_header => false, :cases => [form_answer], :versions => [[i]], :do_resolve_randomisation => (defined? do_resolve_randomisation ? do_resolve_randomisation : false)
     
