@@ -24,7 +24,10 @@
       %tr
         %th{:colspan => 2} Field
         - cases.each do |c|
-          %th= c.first.images_folder
+          - if c.blank?
+            %th
+          - else
+            %th= c.first.images_folder
   %tbody
     - table_config.each_with_index do |row_spec,i|
       - if row_spec['group']
@@ -35,7 +38,7 @@
       - elsif row_spec['repeatable']
         - prefixes = row_spec['repeatable']['prefixes']
         - rows = row_spec['repeatable']['rows']
-        - repeatable_size = cases.map{|cs| cs.map{|c| c.form_answer.answers[prefixes[c.case_type]].nil? ? 0 : c.form_answer.answers[prefixes[c.case_type]].size}.max }.max
+        - repeatable_size = cases.map{|cs| cs.map{|c| if (c.form_answer and c.form_answer.answers) then c.form_answer.answers[prefixes[c.case_type]].nil? ? 0 : c.form_answer.answers[prefixes[c.case_type]].size else 0 end}.max }.max
         - repeatable_size.times do |repeatable_index|
           - row_spec['repeatable']['rows'].each_with_index do |repeatable_row_spec, repeatable_row_index|
             = render 'forms/adjudication_custom_results_table_row', :row_spec => repeatable_row_spec, :columns => cases, :roi_links => roi_links, :repeatable => {:index => repeatable_index, :first_row => (repeatable_row_index == 0), :prefixes => prefixes}, :form_answer_field_maps => form_answer_field_maps
