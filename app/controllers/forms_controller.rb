@@ -122,7 +122,8 @@ protected
           configuration['adjudication']['sessions'].each_with_index do |session_id, index|
             assignment = adjudication_assignment[index].to_i - 1
 
-            base_cases[assignment] = Case.includes(:patient).where('cases.session_id = ? and cases.flag = ? and patients.subject_id = ? and cases.images = ?', session_id, Case::flag_sym_to_int(@case.flag), adjudication_c.patient.subject_id, adjudication_c.images).first
+            c = Case.includes(:patient).where('cases.session_id = ? and cases.flag = ? and patients.subject_id = ? and cases.images = ?', session_id, Case::flag_sym_to_int(:regular), adjudication_c.patient.subject_id, adjudication_c.images).first
+            base_cases[assignment] = c unless c.nil?
           end
 
           @adjudication_previous_cases << base_cases
