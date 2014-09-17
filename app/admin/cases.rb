@@ -566,9 +566,11 @@ ActiveAdmin.register Case do
             end
             
             # sanitise data to not cause problems when importing into excel etc.
-            value.gsub!(/\r\n/, '-')
-            value.gsub!(/\n/, '-')
-            value.gsub!(/,/, ';')
+            if value.respond_to?(:gsub!)
+              value.gsub!(/\r\n/, '-')
+              value.gsub!(/\n/, '-')
+              value.gsub!(/,/, ';')
+            end
 
             row[name] = value
           end
