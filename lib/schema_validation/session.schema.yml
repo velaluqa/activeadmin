@@ -41,6 +41,8 @@ mapping:
         sequence:
           - type: str
             name: "color"
+      "show_all_base_cases":
+        type: bool
   "reader_testing":
     type: map
     mapping:

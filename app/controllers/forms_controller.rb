@@ -114,19 +114,38 @@ protected
         previous_results_config = configuration['types'][@case.case_type]['adjudication_previous_results']
         adjudication_assignment = @case.case_data.adjudication_data['assignment']
 
-        adjudication_cases = @case.patient.cases.where('position <= ? and flag = ?', @case.position, Case::flag_sym_to_int(@case.flag))
-        @adjudication_previous_cases = []
+        if configuration['adjudication']['show_all_base_cases']
+          start_images_number = @case.images.to_i
 
-        adjudication_cases.each do |adjudication_c|
-          base_cases = []
-          configuration['adjudication']['sessions'].each_with_index do |session_id, index|
-            assignment = adjudication_assignment[index].to_i - 1
+          @adjudication_previous_cases = []
 
-            c = Case.includes(:patient).where('cases.session_id = ? and cases.flag = ? and cases.state = ? and patients.subject_id = ? and cases.images = ?', session_id, Case::flag_sym_to_int(:regular), Case::state_sym_to_int(:read), adjudication_c.patient.subject_id, adjudication_c.images).first
-            base_cases[assignment] = c unless c.nil?
+          (0..start_images_number).each do |images_i|
+            puts images_i
+            base_cases = []
+            configuration['adjudication']['sessions'].each_with_index do |session_id, index|
+              assignment = adjudication_assignment[index].to_i - 1
+
+              c = Case.includes(:patient).where('cases.session_id = ? and cases.flag = ? and cases.state = ? and patients.subject_id = ? and cases.images = ?', session_id, Case::flag_sym_to_int(:regular), Case::state_sym_to_int(:read), @case.patient.subject_id, images_i.to_s).first
+              base_cases[assignment] = c unless c.nil?
+            end
+
+            @adjudication_previous_cases << base_cases unless (base_cases.empty? or base_cases.all? {|e| e.nil?})
           end
+        else
+          adjudication_cases = @case.patient.cases.where('position <= ? and flag = ?', @case.position, Case::flag_sym_to_int(@case.flag))
+          @adjudication_previous_cases = []
 
-          @adjudication_previous_cases << base_cases
+          adjudication_cases.each do |adjudication_c|
+            base_cases = []
+            configuration['adjudication']['sessions'].each_with_index do |session_id, index|
+              assignment = adjudication_assignment[index].to_i - 1
+
+              c = Case.includes(:patient).where('cases.session_id = ? and cases.flag = ? and cases.state = ? and patients.subject_id = ? and cases.images = ?', session_id, Case::flag_sym_to_int(:regular), Case::state_sym_to_int(:read), adjudication_c.patient.subject_id, adjudication_c.images).first
+              base_cases[assignment] = c unless c.nil?
+            end
+
+            @adjudication_previous_cases << base_cases
+          end
         end
 
         @adjudication_table_type = :custom
