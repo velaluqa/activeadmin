@@ -88,6 +88,18 @@ class SessionsController < ApplicationController
       end
     end
 
+    # if(config['type'] == 'adjudication' and config['adjudication'] and config['adjudication']['show_all_base_cases'])
+
+    #   cases.each do |c|
+    #     session[:last_subject_id] ||= c.patient.subject_id
+    #     session[:last_images_folder] ||= 0
+
+    #     (session[:last_images_folder]..c.images.to_i).each do |images_i|
+
+    #     end
+    #   end
+    # end
+
     passive_cases = passive_cases_for_case_list(cases)
 
     case_hashes = cases.map do |c|
