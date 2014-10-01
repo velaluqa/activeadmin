@@ -154,6 +154,13 @@ ActiveAdmin.register Case do
         status_tag('Postponed', :warning)
       end
     end
+    column 'Background', :sortable => :is_adjudication_background_case do |c|
+      if c.is_adjudication_background_case
+        status_tag('Yes', :error)
+      else
+        status_tag('No', :ok)
+      end
+    end
     column :reader do |c|
       if(c.form_answer.nil?)
         if(c.assigned_reader.nil?)
@@ -198,6 +205,13 @@ ActiveAdmin.register Case do
           status_tag('Validation', :warning)
         when :reader_testing
           status_tag('Reader Testing', :warning)
+        end
+      end
+      row 'Background' do
+        if c.is_adjudication_background_case
+          status_tag('Yes', :error)
+        else
+          status_tag('No', :ok)
         end
       end
       row :state do
@@ -252,6 +266,7 @@ ActiveAdmin.register Case do
     column :case_type
     column :flag
     column :state
+    column :is_adjudication_background_case
     column :exported_at
     column(:assigned_reader) {|c| (c.assigned_reader.nil? ? nil : c.assigned_reader.username)}
     column(:reader) {|c| (c.form_answer.nil? or c.form_answer.user.nil?) ? '' : c.form_answer.user.name }
@@ -268,6 +283,7 @@ ActiveAdmin.register Case do
   filter :case_type
   filter :flag, :as => :check_boxes, :collection => Case::FLAG_SYMS.each_with_index.map {|flag, i| [flag, i]}
   filter :state, :as => :check_boxes, :collection => Case::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
+  filter :is_adjudication_background_case
   filter :assigned_reader, :as => :select
   filter :exported_at, :label => 'Last Export'
   filter :no_export, :as => :select
@@ -323,6 +339,29 @@ ActiveAdmin.register Case do
       next unless (c.state == :unread and c.form_answer.nil?)
 
       c.flag = :validation
+      c.save
+    end
+
+    redirect_to :action => :index
+  end
+
+  batch_action :mark_as_background do |selection|
+    Case.find(selection).each do |c|
+      authorize! :manage, c
+      next unless (c.state == :unread and c.form_answer.nil?)
+
+      c.is_adjudication_background_case = true
+      c.save
+    end
+
+    redirect_to :action => :index
+  end
+  batch_action :mark_as_not_background do |selection|
+    Case.find(selection).each do |c|
+      authorize! :manage, c
+      next unless (c.state == :unread and c.form_answer.nil?)
+
+      c.is_adjudication_background_case = false
       c.save
     end
 
