@@ -16,6 +16,7 @@ class Case < ActiveRecord::Base
   attr_accessible :exported_at, :no_export
   attr_accessible :comment
   attr_accessible :assigned_reader_id, :current_reader_id
+  attr_accessible :is_adjudication_background_case
 
   validates_uniqueness_of :position, :scope => :session_id  
 
@@ -135,6 +136,7 @@ class Case < ActiveRecord::Base
       :patient => self.patient.nil? ? '' : self.patient.subject_id,
       :flag => self.flag,
       :state => self.state,
+      :is_adjudication_background_case => (self.is_adjudication_background_case == true),
     }      
   end
 
@@ -168,10 +170,12 @@ class Case < ActiveRecord::Base
       patient = Patient.where(:subject_id => subject_id, :session_id => session.id).first
       patient = Patient.create(:subject_id => subject_id, :session => session) if patient.nil?
 
-      new_case = Case.create(:patient => patient, :session => session, :images => images, :case_type => case_type, :position => position, :flag => case_flag)
+      is_adjudication_background_case = (row.index('background') and row['background'])
+
+      new_case = Case.create(:patient => patient, :session => session, :images => images, :case_type => case_type, :position => position, :flag => case_flag, :is_adjudication_background_case => is_adjudication_background_case)
       
       case_data = {}
-      data_headers = row.headers.reject {|h| ['patient', 'images', 'type', 'adjudication'].include?(h)}
+      data_headers = row.headers.reject {|h| ['patient', 'images', 'type', 'adjudication', 'background'].include?(h)}
       data_headers.each do |field|
         case_data[field] = row[field]
       end

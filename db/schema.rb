@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130726134403) do
+ActiveRecord::Schema.define(:version => 20141001053132) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -33,16 +33,17 @@ ActiveRecord::Schema.define(:version => 20130726134403) do
     t.integer  "session_id"
     t.integer  "patient_id"
     t.string   "images"
-    t.datetime "created_at",                            :null => false
-    t.datetime "updated_at",                            :null => false
+    t.datetime "created_at",                                         :null => false
+    t.datetime "updated_at",                                         :null => false
     t.string   "case_type"
-    t.integer  "state",              :default => 0
-    t.integer  "flag",               :default => 0
+    t.integer  "state",                           :default => 0
+    t.integer  "flag",                            :default => 0
     t.datetime "exported_at"
-    t.boolean  "no_export",          :default => false
+    t.boolean  "no_export",                       :default => false
     t.string   "comment"
     t.integer  "assigned_reader_id"
     t.integer  "current_reader_id"
+    t.boolean  "is_adjudication_background_case", :default => false
   end
 
   add_index "cases", ["assigned_reader_id"], :name => "index_cases_on_assigned_reader_id"
