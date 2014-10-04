@@ -636,7 +636,10 @@ ActiveAdmin.register Case do
       @errors << "Unknown export format '#{params[:export_format]}'"
     end
 
-    send_data @export_data, :filename => "export.#{@export_suffix}", :type => @export_mimetype+'; charset='+@export_encoding unless @export_data.nil?
+    original_filename = params[:export_specification].original_filename
+    original_filename = File.basename(original_filename, '.yml')
+
+    send_data @export_data, :filename => "#{original_filename}.#{@export_suffix}", :type => @export_mimetype+'; charset='+@export_encoding unless @export_data.nil?
     flash[:error] = 'Export failed'
   end
 
