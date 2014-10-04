@@ -147,6 +147,35 @@ class FormAnswer
     return adjudication_randomisation[reader.to_s]
   end
 
+  def run_form_judgement_function()
+    return false if self.form.nil?
+    source = self.form.components_at_version(self.form_versions[self.form.id])[:validators].first
+    return false if source.nil?
+
+    session_config = self.session.configuration_at_version(self.form_versions['session'])
+    return false if (session_config.nil? or session_config['reader_testing'].nil?)
+
+    # load utility libraries for usage in judgement functions via the sprockets environment
+    underscore_source = Rails.application.assets.find_asset('underscore.js').source
+    value_at_path_source = Rails.application.assets.find_asset('value_at_path.js').source
+
+    js_context = ExecJS.compile(underscore_source+value_at_path_source+source)
+
+    results_list = construct_results_list(self.case)
+
+    judgement_function = if(session_config['reader_testing']['configs'].nil?)
+                           session_config['reader_testing']['judgement_function']
+                         else
+                           config = (self.reader_testing_config_index.nil? ? session_config['reader_testing']['configs'][0] : session_config['reader_testing']['configs'][self.reader_testing_config_index])
+                           config['judgement_function'] unless config.nil?
+                         end
+    return false if judgement_function.nil?
+
+    result = js_context.call(judgement_function, results_list)
+
+    return result
+  end
+
   def printable_answers(do_resolve_randomisation = false)
     begin
       form_config, form_components, repeatables = form.full_configuration_at_versions(self.form_versions)
@@ -236,6 +265,16 @@ class FormAnswer
   end
   
   private
+  def construct_results_list(the_case)
+    previous_cases = the_case.patient.cases.where('position <= ?', the_case.position).reject {|c| c.form_answer.nil?}
+
+    previous_results = []
+    previous_cases.each do |c|
+      previous_results << {'answers' => c.form_answer.answers, 'images' => c.images}
+    end
+
+    return previous_results
+  end
   
   def generate_form_fields_hash
     begin

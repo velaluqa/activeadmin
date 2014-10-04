@@ -121,7 +121,7 @@ ActiveAdmin.register FormAnswer do
       end
       if(form_answer.case.flag == :reader_testing)
         row 'Reader Testing Judgement' do
-          if(FormAnswersController.new.run_form_judgement_function(form_answer) == true)
+          if(form_answer.run_form_judgement_function() == true)
             status_tag('Passed', :ok)
           else
             status_tag('Failed', :error)
