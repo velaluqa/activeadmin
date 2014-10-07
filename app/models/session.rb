@@ -158,7 +158,7 @@ class Session < ActiveRecord::Base
 
     c = self.cases.where(:state => Case::state_sym_to_int(:unread), :flag => Case::flag_sym_to_int(flag)).where('position >= ?', min_position).reject {|c| not c.form_answer.nil? }.reject {|c| not c.assigned_reader.nil? and c.assigned_reader != reader }.first
     return nil if c.nil?
-    c.state = :in_progress
+    c.state = :in_progress unless c.is_adjudication_background_case
     c.save
 
     return c

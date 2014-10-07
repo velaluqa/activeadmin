@@ -46,7 +46,7 @@ class SessionsController < ApplicationController
 
     if(@reopened_cases.empty?)
       last_reader_testing_result = current_user.test_results_for_session(@session).last
-      if(config['reader_testing'] and (last_reader_testing_result.nil? or last_reader_testing_result.submitted_at < Time.now - config['reader_testing']['interval']) and session[:reader_testing_performed] != true)
+      if(config['reader_testing'] and (last_reader_testing_result.nil? or last_reader_testing_result.submitted_at < Time.now - config['reader_testing']['interval'] or last_reader_testing_result.run_form_judgement_function() != true) and session[:reader_testing_performed] != true)
         cases << create_reader_test_case(config, (last_reader_testing_result.nil? ? nil : last_reader_testing_result.reader_testing_config_index))
         count -= 1
         session[:reader_testing_performed] = true

@@ -105,7 +105,7 @@ class FormAnswersController < ApplicationController
     @case.save
     
     if(@case.flag == :reader_testing)
-      if(run_form_judgement_function(answer) == true)
+      if(answer.run_form_judgement_function() == true)
         render :json => {:success => true}
       else
         render :json => {:success => false, :error => "You failed the reader testing.", :error_code => 3}, :status => :bad_request
@@ -113,48 +113,5 @@ class FormAnswersController < ApplicationController
     else
       render :json => {:success => true}
     end
-  end
-
-  def run_form_judgement_function(form_answer)
-    return false if form_answer.form.nil?
-    source = form_answer.form.components_at_version(form_answer.form_versions[form_answer.form.id])[:validators].first
-    return false if source.nil?
-
-    session_config = form_answer.session.configuration_at_version(form_answer.form_versions['session'])
-    return false if (session_config.nil? or session_config['reader_testing'].nil?)
-
-    # load utility libraries for usage in judgement functions via the sprockets environment
-    underscore_source = Rails.application.assets.find_asset('underscore.js').source
-    value_at_path_source = Rails.application.assets.find_asset('value_at_path.js').source
-
-    js_context = ExecJS.compile(underscore_source+value_at_path_source+source)
-
-    results_list = construct_results_list(form_answer.case)
-    pp results_list
-    
-    judgement_function = if(session_config['reader_testing']['configs'].nil?)
-                           session_config['reader_testing']['judgement_function']                           
-                         else
-                           config = (form_answer.reader_testing_config_index.nil? ? session_config['reader_testing']['configs'][0] : session_config['reader_testing']['configs'][form_answer.reader_testing_config_index])
-                           config['judgement_function'] unless config.nil?
-                         end
-    return false if judgement_function.nil?
-
-    result = js_context.call(judgement_function, results_list)
-
-    return result
-  end
-  
-  protected
-  
-  def construct_results_list(the_case)
-    previous_cases = the_case.patient.cases.where('position <= ?', the_case.position).reject {|c| c.form_answer.nil?}
-
-    previous_results = []
-    previous_cases.each do |c|
-      previous_results << {'answers' => c.form_answer.answers, 'images' => c.images}
-    end
-
-    return previous_results
   end
 end
