@@ -594,13 +594,19 @@ ActiveAdmin.register Case do
           row['id'] = c.id if(row_spec['include_id'] == true)
           
           row_spec['values'].each do |name, path|
+            resolve_randomised_value = false
             if(path =~ /^_TEXT\[(.*)\]$/)
               value = $1
             else
+              if(path =~ /^_RESOLVE\[(.*)\]$/)
+                path = $1
+                resolve_randomised_value = true
+              end
+
               value = KeyPathAccessor::access_by_path(answers, path)
 
               value = value.join(';') if value.is_a?(Array)
-              if(not c.form_answer.adjudication_randomisation.blank? and is_adjudication_case)
+              if(not c.form_answer.adjudication_randomisation.blank? and is_adjudication_case and resolve_randomised_value)
                 value = c.form_answer.resolve_randomisation(value, c.form_answer.adjudication_randomisation)
               end
             end
