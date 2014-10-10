@@ -172,6 +172,22 @@ module FormsHelper
     return [answers, cases, values]
   end
 
+  def answer_specs_for_repeatable(cases, keys, form_answer_field_maps, repeatable_spec)
+    answer_specs = cases.each_with_index.map do |c, i|
+      if form_answer_field_maps[c.id].nil?
+        nil
+      elsif repeatable_spec[:prefixes][c.case_type].nil?
+        nil
+      elsif answer_keys[i].nil?
+        nil
+      else
+        form_answer_field_maps[c.id][1][repeatable_spec[:prefixes][c.case_type]][answer_keys[i]]
+      end
+    end
+
+    return answer_specs
+  end
+
   def results_table_format_answer(answer, answer_spec)
     if answer_spec.nil?
       format_fixed_value(answer)
