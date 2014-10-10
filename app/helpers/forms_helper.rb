@@ -178,10 +178,10 @@ module FormsHelper
         nil
       elsif repeatable_spec[:prefixes][c.case_type].nil?
         nil
-      elsif answer_keys[i].nil?
+      elsif keys[i].nil?
         nil
       else
-        form_answer_field_maps[c.id][1][repeatable_spec[:prefixes][c.case_type]][answer_keys[i]]
+        form_answer_field_maps[c.id][1][repeatable_spec[:prefixes][c.case_type]][keys[i]]
       end
     end
 
