@@ -15,7 +15,7 @@
     - if repeatable.nil?
       - answer_specs = answer_cases.each_with_index.map{|c, i| form_answer_field_maps[c.id].nil? ? nil : form_answer_field_maps[c.id][0][answer_keys[i]]}
     - else
-      - answer_specs = answer_cases.each_with_index.map{|c, i| form_answer_field_maps[c.id].nil? ? nil : form_answer_field_maps[c.id][1][repeatable[:prefixes][c.case_type]][answer_keys[i]]}
+      - answer_specs = answer_specs_for_repeatable(answer_cases, answer_keys, form_answer_field_maps, repeatable)
     %td
       - answers.each_with_index do |answer, i|
         - answer_spec = answer_specs[i]
