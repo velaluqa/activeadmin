@@ -88,38 +88,18 @@ class SessionsController < ApplicationController
       end
     end
 
-    # if(config['type'] == 'adjudication' and config['adjudication'] and config['adjudication']['show_all_base_cases'])
-
-    #   cases.each do |c|
-    #     session[:last_subject_id] ||= c.patient.subject_id
-    #     session[:last_images_folder] ||= 0
-
-    #     (session[:last_images_folder]..c.images.to_i).each do |images_i|
-
-    #     end
-    #   end
-    # end
-
     passive_cases = passive_cases_for_case_list(cases)
 
     case_hashes = cases.map do |c|
       case_hash = c.to_hash.merge({:passive_cases => passive_cases[c.id]})
       if(config['type'] == 'adjudication' and c.case_data and c.case_data.adjudication_data)
-        adjudication_assignment = c.case_data.adjudication_data['assignment']
+        adjudication_annotation_sets = prepare_adjudication_annotation_sets(c, config)
+        case_hash.merge!({:adjudication_annotation_sets => adjudication_annotation_sets}) unless adjudication_annotation_sets.nil?
 
-        adjudication_annotation_sets = []
-
-        config['adjudication']['sessions'].each_with_index do |session_id, index|
-          base_session = Session.find(session_id)
-
-          annotated_images_root = (base_session.state == :testing and base_session.locked_configuration['annotated_images_root_validation']) ? base_session.locked_configuration['annotated_images_root_validation'] : base_session.locked_configuration['annotated_images_root']
-          assignment = adjudication_assignment[index].to_i - 1
-
-          annotation_set = {:path => annotated_images_root + '/' + c.images_folder, :color => config['adjudication']['colors'][assignment], :name => "Reader #{assignment+1}: "}
-
-          adjudication_annotation_sets << annotation_set
+        case_hash[:passive_cases].each do |pc|
+          pc_adjudication_annotation_sets = prepare_adjudication_annotation_sets(Case.find(pc[:id]), config)
+          pc.merge!({:adjudication_annotation_sets => pc_adjudication_annotation_sets}) unless pc_adjudication_annotation_sets.nil?
         end
-        case_hash.merge!({:adjudication_annotation_sets => adjudication_annotation_sets})
       end
 
       case_hash
@@ -132,6 +112,27 @@ class SessionsController < ApplicationController
   end
 
   protected
+
+  def prepare_adjudication_annotation_sets(c, config)
+    return nil unless (c.case_data and c.case_data.adjudication_data)
+
+    adjudication_assignment = c.case_data.adjudication_data['assignment']
+
+    adjudication_annotation_sets = []
+
+    config['adjudication']['sessions'].each_with_index do |session_id, index|
+      base_session = Session.find(session_id)
+
+      annotated_images_root = (base_session.state == :testing and base_session.locked_configuration['annotated_images_root_validation']) ? base_session.locked_configuration['annotated_images_root_validation'] : base_session.locked_configuration['annotated_images_root']
+      assignment = adjudication_assignment[index].to_i - 1
+
+      annotation_set = {:path => annotated_images_root + '/' + c.images_folder, :color => config['adjudication']['colors'][assignment], :name => "Reader #{assignment+1}: "}
+
+      adjudication_annotation_sets << annotation_set
+    end
+
+    return adjudication_annotation_sets
+  end
 
   def create_reader_test_case(config, last_config_index)
     reader_testing_configs = config['reader_testing']['configs']
