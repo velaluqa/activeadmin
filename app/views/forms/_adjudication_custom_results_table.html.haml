@@ -38,7 +38,7 @@
       - elsif row_spec['repeatable']
         - prefixes = row_spec['repeatable']['prefixes']
         - rows = row_spec['repeatable']['rows']
-        - repeatable_size = cases.map{|cs| cs.map{|c| if (c.form_answer and c.form_answer.answers) then c.form_answer.answers[prefixes[c.case_type]].nil? ? 0 : c.form_answer.answers[prefixes[c.case_type]].size else 0 end}.max }.max
+        - repeatable_size = cases.map{|cs| cs.map{|c| if (c.form_answer and c.form_answer.answers) then c.form_answer.answers[prefixes[c.case_type]].nil? ? 0 : (c.form_answer.answers[prefixes[c.case_type]].size || 0) else 0 end}.max }.max
         - repeatable_size ||= 0
         - repeatable_size.times do |repeatable_index|
           - row_spec['repeatable']['rows'].each_with_index do |repeatable_row_spec, repeatable_row_index|
