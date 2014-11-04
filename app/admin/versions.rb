@@ -212,7 +212,7 @@ ActiveAdmin.register Version do
 
     if(commit.nil? or commit.type != :commit)
       flash[:error] = 'No such commit exists'
-      redirect_to git_commits_admin_versions_path
+      redirect_to :back
       return
     end
 

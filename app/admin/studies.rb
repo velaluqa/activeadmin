@@ -52,7 +52,7 @@ ActiveAdmin.register Study do
     session[:selected_study_id] = @study.id
     session[:selected_study_name] = @study.name
 
-    redirect_to(admin_studies_path, :notice => "Study #{@study.name} was selected for this session.")
+    redirect_to :back, :notice => "Study #{@study.name} was selected for this session."
   end
   action_item :only => :show do
     link_to('Select for Session', select_for_session_admin_study_path(resource))
@@ -68,11 +68,11 @@ ActiveAdmin.register Study do
   collection_action :deselect_study, :method => :get do
     if(session[:selected_study_id].nil?)
       flash[:error] = 'No study selected for current session.'
-      redirect_to(admin_studies_path)
+      redirect_to :back
     else
       session[:selected_study_id] = nil
       session[:selected_study_name] = nil
-      redirect_to(admin_studies_path, :notice => 'The study was deselected for the current session.')
+      redirect_to :back, :notice => 'The study was deselected for the current session.'
     end
   end
   action_item :only => :index do
