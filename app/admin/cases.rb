@@ -381,7 +381,7 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
   end
   batch_action :mark_as_validation do |selection|
     Case.find(selection).each do |c|
@@ -392,7 +392,7 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
   end
 
   batch_action :mark_as_background do |selection|
@@ -404,7 +404,7 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
   end
   batch_action :mark_as_not_background do |selection|
     Case.find(selection).each do |c|
@@ -415,7 +415,7 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
   end
 
   batch_action :mark_as_no_export do |selection|
@@ -442,7 +442,11 @@ ActiveAdmin.register Case do
   collection_action :batch_export, :method => :post do
     if(params[:export_specification].nil? or params[:export_specification].tempfile.nil?)
       flash[:error] = 'You need to supply an export specification.'
-      redirect_to :action => :index
+      if(params[:return_url].blank?)
+        redirect_to :action => :index
+      else
+        redirect_to params[:return_url]
+      end
       return
     end
 
@@ -578,7 +582,7 @@ ActiveAdmin.register Case do
 
   batch_action :export do |selection|
     @page_title = 'Export'
-    render 'admin/cases/export_settings', :locals => {:selection => selection}
+    render 'admin/cases/export_settings', :locals => {:selection => selection, :return_url => request.referer}
   end
 
   batch_action :cancel, :confirm => 'Canceling these Cases will set them as "unread" again. Make sure that no Reader is currently working on this session!' do |selection|
@@ -662,7 +666,7 @@ ActiveAdmin.register Case do
       end
     end
 
-    @return_url = params[:return_url]
+    @return_url = (params[:return_url].blank? ? request.referer : params[:return_url])
     @page_title = 'Assign Reader'    
   end
   batch_action :batch_assign_reader do |selection|
