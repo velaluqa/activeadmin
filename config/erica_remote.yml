@@ -1,0 +1,6 @@
+erica_remote:
+  enabled: true
+  logo: sirflox.png
+  style: sirflox
+  features:
+    domino: false
