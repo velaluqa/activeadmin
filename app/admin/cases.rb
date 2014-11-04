@@ -173,9 +173,9 @@ ActiveAdmin.register Case do
     column :reader do |c|
       if(c.form_answer.nil?)
         if(c.assigned_reader.nil?)
-          link_to('Assign Reader', assign_reader_form_admin_cases_path(:return_url => request.fullpath, :selection => [c.id]))
+          link_to('Assign Reader', assign_reader_form_admin_cases_path(:selection => [c.id]))
         else
-          ('Assigned to: '+link_to(c.assigned_reader.name, admin_user_path(c.assigned_reader)) + link_to(icon(:pen), assign_reader_form_admin_cases_path(:return_url => request.fullpath, :selection => [c.id]), :class => 'member_link')).html_safe
+          ('Assigned to: '+link_to(c.assigned_reader.name, admin_user_path(c.assigned_reader)) + link_to(icon(:pen), assign_reader_form_admin_cases_path(:selection => [c.id]), :class => 'member_link')).html_safe
         end
       else
         link_to(c.form_answer.user.name, admin_user_path(c.form_answer.user))
@@ -193,9 +193,9 @@ ActiveAdmin.register Case do
     end
     column :comment, :sortable => :comment do |c|
       if(c.comment.blank?)
-        link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
+        link_to('Add Comment', edit_comment_form_admin_case_path(c))
       else
-        (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
+        (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c), :class => 'member_link')).html_safe
       end
     end
    
@@ -271,9 +271,9 @@ ActiveAdmin.register Case do
       end
       row :comment do
         if(c.comment.blank?)
-          link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
+          link_to('Add Comment', edit_comment_form_admin_case_path(c))
         else
-          (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
+          (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c), :class => 'member_link')).html_safe
         end
       end
       row :case_data_raw do
@@ -343,7 +343,7 @@ ActiveAdmin.register Case do
   filter :case_type
   filter :flag, :as => :check_boxes, :collection => Case::FLAG_SYMS.each_with_index.map {|flag, i| [flag, i]}
   filter :state, :as => :check_boxes, :collection => Case::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
-  filter :is_adjudication_background_case
+  filter :is_adjudication_background_case, :as => :select
   filter :assigned_reader, :as => :select
   filter :exported_at, :label => 'Last Export'
   filter :no_export, :as => :select
@@ -407,14 +407,14 @@ ActiveAdmin.register Case do
         session = c.session
       elsif session != c.session
         flash[:error] = 'All cases for a move must belong to the same session.'
-        redirect_to action: :index
+        redirect_to :back
         return
       end
     end
     authorize! :manage, session
 
     @page_title = 'Move selected Cases'
-    render 'admin/cases/move_settings', :locals => {:selection => selection, :cases => session.cases.where('id NOT IN (?)', selection).order(:position)}
+    render 'admin/cases/move_settings', :locals => {:return_url => request.referer, :selection => selection, :cases => session.cases.where('id NOT IN (?)', selection).order(:position)}
   end
   collection_action :batch_move, :method => :post do
     # identify starting position
@@ -442,7 +442,11 @@ ActiveAdmin.register Case do
     end
 
     flash[:notice] = "#{moved_cases.size} cases moved to after #{insert_after_case.name}"
-    redirect_to :action => :index
+    if(params[:return_url].blank?)
+      redirect_to :action => :index
+    else
+      redirect_to params[:return_url]
+    end
   end
 
   batch_action :mark_as_regular do |selection|
@@ -454,7 +458,7 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
   end
   batch_action :mark_as_validation do |selection|
     Case.find(selection).each do |c|
@@ -465,7 +469,7 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
   end
 
   batch_action :mark_as_background do |selection|
@@ -477,7 +481,7 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
   end
   batch_action :mark_as_not_background do |selection|
     Case.find(selection).each do |c|
@@ -488,7 +492,7 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
   end
 
   batch_action :mark_as_no_export do |selection|
@@ -515,7 +519,11 @@ ActiveAdmin.register Case do
   collection_action :batch_export, :method => :post do
     if(params[:export_specification].nil? or params[:export_specification].tempfile.nil?)
       flash[:error] = 'You need to supply an export specification.'
-      redirect_to :action => :index
+      if(params[:return_url].blank?)
+        redirect_to :action => :index
+      else
+        redirect_to params[:return_url]
+      end
       return
     end
 
@@ -709,7 +717,7 @@ ActiveAdmin.register Case do
 
   batch_action :export do |selection|
     @page_title = 'Export'
-    render 'admin/cases/export_settings', :locals => {:selection => selection}
+    render 'admin/cases/export_settings', :locals => {:selection => selection, :return_url => request.referer}
   end
 
   batch_action :cancel, :confirm => 'Canceling these Cases will set them as "unread" again. Make sure that no Reader is currently working on this session!' do |selection|
@@ -770,7 +778,7 @@ ActiveAdmin.register Case do
     @case = Case.find(params[:id])
     authorize! :manage, @case
 
-    @return_url = params[:return_url]
+    @return_url = request.referer
     @page_title = 'Edit Comment'    
   end
 
@@ -793,7 +801,7 @@ ActiveAdmin.register Case do
   collection_action :assign_reader_form, :method => :get do
     if(params[:selection].blank?)
       flash[:error] = 'You must select at least on case.'
-      redirect_to (paramſ[:return_url].blank? ? :back : params[:return_url])
+      redirect_to :back
       return
     end
 
@@ -807,12 +815,12 @@ ActiveAdmin.register Case do
       session_id ||= c.session_id
       if(session_id != c.session_id)
         flash[:error] = 'All cases must be from the same session.'
-        redirect_to (paramſ[:return_url].blank? ? :back : params[:return_url])
+        redirect_to :back
         return
       end
     end
 
-    @return_url = params[:return_url]
+    @return_url = (params[:return_url].blank? ? request.referer : params[:return_url])
     @page_title = 'Assign Reader'    
   end
   batch_action :batch_assign_reader do |selection|
