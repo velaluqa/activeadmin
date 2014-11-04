@@ -407,14 +407,14 @@ ActiveAdmin.register Case do
         session = c.session
       elsif session != c.session
         flash[:error] = 'All cases for a move must belong to the same session.'
-        redirect_to action: :index
+        redirect_to :back
         return
       end
     end
     authorize! :manage, session
 
     @page_title = 'Move selected Cases'
-    render 'admin/cases/move_settings', :locals => {:selection => selection, :cases => session.cases.where('id NOT IN (?)', selection).order(:position)}
+    render 'admin/cases/move_settings', :locals => {:return_url => request.referer, :selection => selection, :cases => session.cases.where('id NOT IN (?)', selection).order(:position)}
   end
   collection_action :batch_move, :method => :post do
     # identify starting position
@@ -442,7 +442,11 @@ ActiveAdmin.register Case do
     end
 
     flash[:notice] = "#{moved_cases.size} cases moved to after #{insert_after_case.name}"
-    redirect_to :action => :index
+    if(params[:return_url].blank?)
+      redirect_to :action => :index
+    else
+      redirect_to params[:return_url]
+    end
   end
 
   batch_action :mark_as_regular do |selection|
