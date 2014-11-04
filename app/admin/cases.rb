@@ -154,6 +154,13 @@ ActiveAdmin.register Case do
         status_tag('Postponed', :warning)
       end
     end
+    column 'Background', :sortable => :is_adjudication_background_case do |c|
+      if c.is_adjudication_background_case
+        status_tag('Yes', :error)
+      else
+        status_tag('No', :ok)
+      end
+    end
     column :reader do |c|
       if(c.form_answer.nil?)
         if(c.assigned_reader.nil?)
@@ -198,6 +205,13 @@ ActiveAdmin.register Case do
           status_tag('Validation', :warning)
         when :reader_testing
           status_tag('Reader Testing', :warning)
+        end
+      end
+      row 'Background' do
+        if c.is_adjudication_background_case
+          status_tag('Yes', :error)
+        else
+          status_tag('No', :ok)
         end
       end
       row :state do
@@ -252,6 +266,7 @@ ActiveAdmin.register Case do
     column :case_type
     column :flag
     column :state
+    column :is_adjudication_background_case
     column :exported_at
     column(:assigned_reader) {|c| (c.assigned_reader.nil? ? nil : c.assigned_reader.username)}
     column(:reader) {|c| (c.form_answer.nil? or c.form_answer.user.nil?) ? '' : c.form_answer.user.name }
@@ -268,6 +283,7 @@ ActiveAdmin.register Case do
   filter :case_type
   filter :flag, :as => :check_boxes, :collection => Case::FLAG_SYMS.each_with_index.map {|flag, i| [flag, i]}
   filter :state, :as => :check_boxes, :collection => Case::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
+  filter :is_adjudication_background_case, :as => :select
   filter :assigned_reader, :as => :select
   filter :exported_at, :label => 'Last Export'
   filter :no_export, :as => :select
@@ -306,6 +322,56 @@ ActiveAdmin.register Case do
     end
   end 
 
+  batch_action :move do |selection|
+    session = nil
+    selection.each do |case_id|
+      c = Case.find(case_id)
+      if session.nil?
+        session = c.session
+      elsif session != c.session
+        flash[:error] = 'All cases for a move must belong to the same session.'
+        redirect_to :back
+        return
+      end
+    end
+    authorize! :manage, session
+
+    @page_title = 'Move selected Cases'
+    render 'admin/cases/move_settings', :locals => {:return_url => request.referer, :selection => selection, :cases => session.cases.where('id NOT IN (?)', selection).order(:position)}
+  end
+  collection_action :batch_move, :method => :post do
+    # identify starting position
+    insert_after_case = Case.find(params[:new_position])
+    pp insert_after_case
+    authorize! :manage, insert_after_case.session
+
+    moved_cases = Case.find(params[:cases].split(' ')).sort {|a,b| a.position <=> b.position}
+    pp moved_cases
+    later_cases = insert_after_case.session.cases.where('id NOT IN (?) and position > ?', params[:cases].split(' '), insert_after_case.position).order(:position)
+    pp later_cases
+
+    next_position = insert_after_case.position + 1
+    next_free_position = insert_after_case.session.next_position
+    (moved_cases + later_cases).each do |c|
+      c.position = next_free_position
+      c.save
+      next_free_position += 1
+    end
+    next_position = insert_after_case.position + 1
+    (moved_cases + later_cases).each do |c|
+      c.position = next_position
+      c.save
+      next_position += 1
+    end
+
+    flash[:notice] = "#{moved_cases.size} cases moved to after #{insert_after_case.name}"
+    if(params[:return_url].blank?)
+      redirect_to :action => :index
+    else
+      redirect_to params[:return_url]
+    end
+  end
+
   batch_action :mark_as_regular do |selection|
     Case.find(selection).each do |c|
       authorize! :manage, c
@@ -315,7 +381,7 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
   end
   batch_action :mark_as_validation do |selection|
     Case.find(selection).each do |c|
@@ -326,7 +392,30 @@ ActiveAdmin.register Case do
       c.save
     end
 
-    redirect_to :action => :index
+    redirect_to :back
+  end
+
+  batch_action :mark_as_background do |selection|
+    Case.find(selection).each do |c|
+      authorize! :manage, c
+      next unless (c.state == :unread and c.form_answer.nil?)
+
+      c.is_adjudication_background_case = true
+      c.save
+    end
+
+    redirect_to :back
+  end
+  batch_action :mark_as_not_background do |selection|
+    Case.find(selection).each do |c|
+      authorize! :manage, c
+      next unless (c.state == :unread and c.form_answer.nil?)
+
+      c.is_adjudication_background_case = false
+      c.save
+    end
+
+    redirect_to :back
   end
 
   batch_action :mark_as_no_export do |selection|
@@ -353,7 +442,11 @@ ActiveAdmin.register Case do
   collection_action :batch_export, :method => :post do
     if(params[:export_specification].nil? or params[:export_specification].tempfile.nil?)
       flash[:error] = 'You need to supply an export specification.'
-      redirect_to :action => :index
+      if(params[:return_url].blank?)
+        redirect_to :action => :index
+      else
+        redirect_to params[:return_url]
+      end
       return
     end
 
@@ -489,7 +582,7 @@ ActiveAdmin.register Case do
 
   batch_action :export do |selection|
     @page_title = 'Export'
-    render 'admin/cases/export_settings', :locals => {:selection => selection}
+    render 'admin/cases/export_settings', :locals => {:selection => selection, :return_url => request.referer}
   end
 
   batch_action :cancel, :confirm => 'Canceling these Cases will set them as "unread" again. Make sure that no Reader is currently working on this session!' do |selection|
@@ -573,7 +666,7 @@ ActiveAdmin.register Case do
       end
     end
 
-    @return_url = params[:return_url]
+    @return_url = (params[:return_url].blank? ? request.referer : params[:return_url])
     @page_title = 'Assign Reader'    
   end
   batch_action :batch_assign_reader do |selection|

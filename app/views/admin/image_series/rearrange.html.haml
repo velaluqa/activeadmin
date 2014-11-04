@@ -10,4 +10,5 @@
     = form_tag(store_rearranged_images_admin_image_series_index_path, :method => :post, :id => 'save_form') do
       -#%button#add_series_btn{:type => 'button'} Add Series
       = hidden_field_tag('assignment', nil)
+      = hidden_field_tag('return_url', @return_url)
       = submit_tag('Save')

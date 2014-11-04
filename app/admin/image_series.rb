@@ -631,7 +631,11 @@ ActiveAdmin.register ImageSeries do
     rescue JSON::JSONError => e
       Rails.logger.warn 'Failed to parse JSON coming from iamge series rearrange: '+e.message
       flash[:error] = 'Failed to save new assignment: '+e.message
-      redirect_to :action => :index
+      if(params[:return_url].blank?)
+        redirect_to :action => :index
+      else
+        redirect_to params[:return_url]
+      end
       return
     end
 
@@ -652,7 +656,11 @@ ActiveAdmin.register ImageSeries do
       end
     end
 
-    redirect_to({:action => :index}, :notice => 'The images were successfully reassigned.')
+    if(params[:return_url].blank?)
+      redirect_to({:action => :index}, :notice => 'The images were successfully reassigned.')
+    else
+      redirect_to(params[:return_url], :notice => 'The images were successfully reassigned.')
+    end
   end
   batch_action :rearrange, :label => 'Rearrange Images of ' do |selection|
     @tree_data = build_image_series_tree_data(ImageSeries.find(selection))
@@ -674,6 +682,7 @@ ActiveAdmin.register ImageSeries do
       next
     end
 
+    @return_url = request.referer
     render 'admin/image_series/rearrange'
   end
 

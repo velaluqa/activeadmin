@@ -137,7 +137,11 @@ ActiveAdmin.register Patient do
   collection_action :batch_export_for_ericav1, :method => :post do
     if(params[:export_folder].blank?)
       flash[:error] = 'You have to specify an export folder.'
-      redirect_to admin_patients_path
+      if(params[:return_url].blank?)
+        redirect_to admin_patients_path
+      else
+        redirect_to params[:return_url]
+      end
       return
     end
 
@@ -148,14 +152,14 @@ ActiveAdmin.register Patient do
   end
   member_action :export_for_ericav1, :method => :get do    
     @page_title = 'Export for ERICAv1'
-    render 'admin/patients/export_for_ericav1_form', :locals => {:selection => [resource.id.to_s]}
+    render 'admin/patients/export_for_ericav1_form', :locals => {:selection => [resource.id.to_s], :return_url => request.referer}
   end
   action_item :only => :show do
     link_to('Export for ERICAv1', export_for_ericav1_admin_patient_path(resource))
   end
   batch_action :export_for_ericav1 do |selection|
     @page_title = 'Export for ERICAv1'
-    render 'admin/patients/export_for_ericav1_form', :locals => {:selection => selection}
+    render 'admin/patients/export_for_ericav1_form', :locals => {:selection => selection, :return_url => request.referer}
   end
 
   member_action :reorder_visits, :method => :post do
