@@ -283,7 +283,7 @@ ActiveAdmin.register Case do
   filter :case_type
   filter :flag, :as => :check_boxes, :collection => Case::FLAG_SYMS.each_with_index.map {|flag, i| [flag, i]}
   filter :state, :as => :check_boxes, :collection => Case::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
-  filter :is_adjudication_background_case
+  filter :is_adjudication_background_case, :as => :select
   filter :assigned_reader, :as => :select
   filter :exported_at, :label => 'Last Export'
   filter :no_export, :as => :select
