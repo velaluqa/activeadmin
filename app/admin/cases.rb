@@ -173,9 +173,9 @@ ActiveAdmin.register Case do
     column :reader do |c|
       if(c.form_answer.nil?)
         if(c.assigned_reader.nil?)
-          link_to('Assign Reader', assign_reader_form_admin_cases_path(:return_url => request.fullpath, :selection => [c.id]))
+          link_to('Assign Reader', assign_reader_form_admin_cases_path(:selection => [c.id]))
         else
-          ('Assigned to: '+link_to(c.assigned_reader.name, admin_user_path(c.assigned_reader)) + link_to(icon(:pen), assign_reader_form_admin_cases_path(:return_url => request.fullpath, :selection => [c.id]), :class => 'member_link')).html_safe
+          ('Assigned to: '+link_to(c.assigned_reader.name, admin_user_path(c.assigned_reader)) + link_to(icon(:pen), assign_reader_form_admin_cases_path(:selection => [c.id]), :class => 'member_link')).html_safe
         end
       else
         link_to(c.form_answer.user.name, admin_user_path(c.form_answer.user))
@@ -193,9 +193,9 @@ ActiveAdmin.register Case do
     end
     column :comment, :sortable => :comment do |c|
       if(c.comment.blank?)
-        link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
+        link_to('Add Comment', edit_comment_form_admin_case_path(c))
       else
-        (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
+        (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c), :class => 'member_link')).html_safe
       end
     end
    
@@ -271,9 +271,9 @@ ActiveAdmin.register Case do
       end
       row :comment do
         if(c.comment.blank?)
-          link_to('Add Comment', edit_comment_form_admin_case_path(c, :return_url => request.fullpath))
+          link_to('Add Comment', edit_comment_form_admin_case_path(c))
         else
-          (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c, :return_url => request.fullpath), :class => 'member_link')).html_safe
+          (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c), :class => 'member_link')).html_safe
         end
       end
       row :case_data_raw do
@@ -770,7 +770,7 @@ ActiveAdmin.register Case do
     @case = Case.find(params[:id])
     authorize! :manage, @case
 
-    @return_url = params[:return_url]
+    @return_url = request.referer
     @page_title = 'Edit Comment'    
   end
 
@@ -793,7 +793,7 @@ ActiveAdmin.register Case do
   collection_action :assign_reader_form, :method => :get do
     if(params[:selection].blank?)
       flash[:error] = 'You must select at least on case.'
-      redirect_to (paramſ[:return_url].blank? ? :back : params[:return_url])
+      redirect_to :back
       return
     end
 
@@ -807,12 +807,12 @@ ActiveAdmin.register Case do
       session_id ||= c.session_id
       if(session_id != c.session_id)
         flash[:error] = 'All cases must be from the same session.'
-        redirect_to (paramſ[:return_url].blank? ? :back : params[:return_url])
+        redirect_to :back
         return
       end
     end
 
-    @return_url = params[:return_url]
+    @return_url = request.referer
     @page_title = 'Assign Reader'    
   end
   batch_action :batch_assign_reader do |selection|
