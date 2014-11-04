@@ -2,6 +2,7 @@
   - pp selection
   - puts selection.class
   = hidden_field_tag('patients', selection)
+  = hidden_field_tag('return_url', return_url)
   = field_set_tag('<span>Export Settings</span>'.html_safe, :class => 'inputs') do
     %ol
       %li.input.string
@@ -15,4 +16,4 @@
         = submit_tag('Export')
       %li.cancel
         = link_to('Cancel', admin_patients_path)
-        
+
