@@ -7,6 +7,13 @@
 // For example, to change the sidebar width:
 // $sidebar-width: 242px;
 
+  $primary-color: #000080;
+  $text-color: #000047;
+  $link-color: #00008f;
+  $table-stripe-color: lighten($primary-color, 70%);
+  $table-selected-color: #91FF91;
+  $error-color: #932419;
+
 // Active Admin's got SASS!
 @import "active_admin/mixins";
 @import "active_admin/base";
