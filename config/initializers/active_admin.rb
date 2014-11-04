@@ -26,6 +26,9 @@ ActiveAdmin.setup do |config|
   # Note: Recommended image height is 21px to properly fit in the header
   #
   # config.site_title_image = "/images/logo.png"
+  if(Rails.application.config.is_erica_remote and Rails.application.config.erica_remote['logo'])
+    config.site_title_image = 'client_logos/' + Rails.application.config.erica_remote['logo']
+  end
 
   # == Default Namespace
   #
