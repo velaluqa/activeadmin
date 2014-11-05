@@ -7,6 +7,17 @@
   %tbody
     - changeset.each do |field, values|
       %tr
-        %td= item.class.human_attribute_name(field)
-        %td= values[0]
+        %td
+          - if item
+            %p= simple_format(item.class.human_attribute_name(field))
+            %p= '(' + field + ')'
+          - else
+            %p= field
+        %td
+          - if(field == 'state' and item and item.class and item.class.respond_to?(:int_to_state_sym))
+            = item.class.int_to_state_sym(values[0].to_i).to_s
+          - elsif(field == 'flag' and item and item.class and item.class.respond_to?(:int_to_flag_sym))
+            = item.class.int_to_flag_sym(values[0].to_i).to_s
+          - else
+            = values[0]
         %td= values[1]

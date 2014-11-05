@@ -37,6 +37,9 @@ class Session < ActiveRecord::Base
   def self.state_sym_to_int(sym)
     return Session::STATE_SYMS.index(sym)
   end
+  def self.int_to_state_sym(i)
+    return Session::STATE_SYMS[i]
+  end
   def state
     return -1 if read_attribute(:state).nil?
     return Session::STATE_SYMS[read_attribute(:state)]
@@ -249,6 +252,40 @@ class Session < ActiveRecord::Base
     :regular
   end
 
+  def self.classify_audit_trail_event(c)
+    if(c.include?('state'))
+      case [int_to_state_sym(c['state'][0].to_i), c['state'][1]]
+      when [:building, :testing]
+        :testing_start
+      when [:testing, :production]
+        :production_start
+      when [:production, :closed]
+        :session_closed
+      when [:closed, :production]
+        :session_reopened
+      when [:production, :testing]
+        :production_abort
+      when [:testing, :building]
+        :testing_abort
+      else
+        :state_change
+      end
+    elsif(c.keys == ['name'])
+      :name_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :testing_start then ['Testing started', :ok]
+           when :production_start then ['Production started', :ok]
+           when :session_closed then ['Session closed', :warning]
+           when :session_reopened then ['Session reopened', :warning]
+           when :production_abort then ['Production aborted', :error]
+           when :testing_abort then ['Testing aborted', :warning]
+           when :state_change then ['State Change', :warning]
+           when :name_change then ['Name Change', :ok]
+           end
+  end
 
   protected
 
