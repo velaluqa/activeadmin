@@ -6,7 +6,7 @@ ActiveAdmin.register Version do
   actions :index, :show
 
   filter :created_at
-  filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Patient', 'Role', 'Session', 'Study' , 'User', 'Center', 'ImageSeries', 'Image', 'Patient', 'Visit'].sort
+  filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Role', 'Session', 'Study' , 'User', 'Center', 'ImageSeries', 'Image', 'Patient', 'Visit'].sort
   filter :whodunnit, :label => 'User', :as => :select, :collection => proc { User.all }
   filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
@@ -73,6 +73,10 @@ ActiveAdmin.register Version do
       c = version.changeset
 
       event_symbol = version.event
+      if(event_symbol == 'update' and c.keys == ['domino_unid'])
+        return :domino_unid_change
+      end
+
       begin
         item_class = version.item_type.constantize
         if item_class.respond_to?(:classify_audit_trail_event)
@@ -84,11 +88,12 @@ ActiveAdmin.register Version do
       return event_symbol
     end
     def self.event_title_and_severity(item_type, event_symbol)
-      if(['create', 'update', 'destroy'].include?(event_symbol))
+      if(['create', 'update', 'destroy', :domino_unid_change].include?(event_symbol))
          return case event_symbol
                 when 'create' then ['Create', nil]
                 when 'update' then ['Update', :warning]
                 when 'destroy' then ['Destroy', :error]
+                when :domino_unid_change then ['Domino UNID Change', :ok]
                 end
       end
 
