@@ -73,60 +73,47 @@ ActiveAdmin.register Version do
       pp version.changeset
       c = version.changeset
 
-      case version.item_type
-      when 'User'
-        if(c.include?('sign_in_count') and
-           c['sign_in_count'][1] == c['sign_in_count'][0]+1
-           )
-          return :sign_in
-        elsif(c.include?('encrypted_password') and
-              c.include?('password_changed_at'))
-          return :password_change
-        elsif(c.include?('failed_attempts'))
-          if(c['failed_attempts'][1] > c['failed_attempts'][0])
-            if(c.include?('locked_at') and not c['locked_at'][1].blank?)
-               return :user_locked
-            else
-              return :failed_login
-            end
-          elsif(c['failed_attempts'][1] == 0 and c.include?('locked_at') and c['locked_at'][1].blank?)
-            return :user_unlocked
-          end
-        elsif(c.include?('private_key') and c.include?('public_key'))
-          return :key_change
-        end
-      when 'Case'
-        if(c.include?('state'))
-          case c['state']
-          when [Case::state_sym_to_int(:unread), :in_progress], [Case::state_sym_to_int(:reopened), :reopened_in_progress]
-            return :case_reservation
-          when [Case::state_sym_to_int(:in_progress), :unread], [Case::state_sym_to_int(:reopened_in_progress), :reopened]
-            return :case_cancelation
-          when [Case::state_sym_to_int(:in_progress), :read], [Case::state_sym_to_int(:reopened_in_progress), :read]
-            return :case_completion
-          when [Case::state_sym_to_int(:read), :reopened]
-            return :case_reopened
-          end
-        end
+      event_symbol = case version.item_type
+             when 'User'
+               User::classify_audit_trail_event(c)
+             when 'Case'
+               if(c.include?('state'))
+                 case c['state']
+                 when [Case::state_sym_to_int(:unread), :in_progress], [Case::state_sym_to_int(:reopened), :reopened_in_progress]
+                   :case_reservation
+                 when [Case::state_sym_to_int(:in_progress), :unread], [Case::state_sym_to_int(:reopened_in_progress), :reopened]
+                   :case_cancelation
+                 when [Case::state_sym_to_int(:in_progress), :read], [Case::state_sym_to_int(:reopened_in_progress), :read]
+                   :case_completion
+                 when [Case::state_sym_to_int(:read), :reopened]
+                   :case_reopened
+                 end
+               end
+                     end
+
+      event_symbol ||= version.event
+
+      return event_symbol
+    end
+    def self.event_title_and_severity(item_type, event_symbol)
+      if(['create', 'update', 'destroy'].include?(event_symbol))
+         return case event_symbol
+                when 'create' then ['Create', :ok]
+                when 'update' then ['Update', :warning]
+                when 'destroy' then ['Destroy', :error]
+                end
       end
 
-      return version.event
-    end
-    def self.event_title_and_severity(event)
-      return case event
-             when 'create' then ['Create', :ok]
-             when 'update' then ['Update', :warning]
-             when 'destroy' then ['Destroy', :error]
-             when :sign_in then ['Sign-In', :ok]
-             when :password_change then ['Password Change', :warning]
-             when :failed_login then ['Failed Sign-In attempt', :warning]
-             when :user_locked then ['User locked', :error]
-             when :user_unlocked then ['User unlocked', :warning]
-             when :key_change then ['Keypair Change', :warning]
-             when :case_reservation then ['Case Reservation', :warning]
-             when :case_cancelation then ['Case Cancelation', :error]
-             when :case_completion then ['Case Completion', :ok]
-             when :case_reopened then ['Case Reopened', :error]
+      return case item_type
+             when 'User'
+               User::audit_trail_event_title_and_severity(event_symbol)
+             else
+               case event_symbol
+               when :case_reservation then ['Case Reservation', :warning]
+               when :case_cancelation then ['Case Cancelation', :error]
+               when :case_completion then ['Case Completion', :ok]
+               when :case_reopened then ['Case Reopened', :error]
+               end
              end
     end
 
@@ -167,7 +154,7 @@ ActiveAdmin.register Version do
     end
     column :event do |version|
       event = Admin::VersionsController.classify_event(version)
-      event_title, event_severity = Admin::VersionsController.event_title_and_severity(event)
+      event_title, event_severity = Admin::VersionsController.event_title_and_severity(version.item_type, event)
       status_tag(event_title, event_severity)
     end
     column :user, :sortable => :whodunnit do |version|
@@ -190,7 +177,7 @@ ActiveAdmin.register Version do
       end
       row :event do
         event = Admin::VersionsController.classify_event(version)
-        event_title, event_severity = Admin::VersionsController.event_title_and_severity(event)
+        event_title, event_severity = Admin::VersionsController.event_title_and_severity(version.item_type, event)
         status_tag(event_title, event_severity)
       end
       row :user do

@@ -106,4 +106,43 @@ class User < ActiveRecord::Base
   end
   def signature_password_confirmation=(p)
   end
+
+  def self.classify_audit_trail_event(c)
+    if(c.include?('sign_in_count') and
+       c['sign_in_count'][1] == c['sign_in_count'][0]+1
+      )
+      return :sign_in
+    elsif(c.keys == ['remember_created_at'])
+      return :remember_token_updated
+    elsif(c.include?('encrypted_password') and
+          c.include?('password_changed_at'))
+      return :password_change
+    elsif(c.include?('failed_attempts'))
+      if(c['failed_attempts'][1] > c['failed_attempts'][0])
+        if(c.include?('locked_at') and not c['locked_at'][1].blank?)
+          return :user_locked
+        else
+          return :failed_login
+        end
+      elsif(c['failed_attempts'][1] == 0 and c.include?('locked_at') and c['locked_at'][1].blank?)
+        return :user_unlocked
+      elsif(c['failed_attempts'][1] == 0)
+        return :failed_attempts_reset
+      end
+    elsif(c.include?('private_key') and c.include?('public_key'))
+      return :key_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :sign_in then ['Sign-In', :ok]
+           when :password_change then ['Password Change', :warning]
+           when :failed_login then ['Failed Sign-In attempt', :warning]
+           when :user_locked then ['User locked', :error]
+           when :user_unlocked then ['User unlocked', :warning]
+           when :failed_attempts_reset then ['Failed Sign-In attempts reset', :ok]
+           when :remember_token_updated then ['Remember Token Update', :ok]
+           when :key_change then ['Keypair Change', :warning]
+           end
+  end
 end
