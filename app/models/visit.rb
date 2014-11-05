@@ -56,6 +56,9 @@ class Visit < ActiveRecord::Base
   def self.state_sym_to_int(sym)
     return Visit::STATE_SYMS.index(sym)
   end
+  def self.int_to_state_sym(sym)
+    return Visit::STATE_SYMS[sym]
+  end
   def state
     return -1 if read_attribute(:state).nil?
     return Visit::STATE_SYMS[read_attribute(:state)]
@@ -73,6 +76,9 @@ class Visit < ActiveRecord::Base
   end
   def self.mqc_state_sym_to_int(sym)
     return Visit::MQC_STATE_SYMS.index(sym)
+  end
+  def self.int_to_mqc_state_sym(sym)
+    return Visit::MQC_STATE_SYMS[sym]
   end
   def mqc_state
     return -1 if read_attribute(:state).nil?
@@ -493,6 +499,62 @@ class Visit < ActiveRecord::Base
     end
     
     return mqc_spec
+  end
+
+  def self.classify_audit_trail_event(c)
+    # ignore Domino UNID changes that happened along with a property change
+    c.delete('domino_unid')
+
+    if(c.keys == ['visit_number'])
+      :visit_number_change
+    elsif(c.keys == ['patient_id'])
+      :patient_change
+    elsif(c.keys == ['description'])
+      :description_change
+    elsif(c.keys == ['visit_type'])
+      :visit_type_change
+    elsif(c.keys == ['state'])
+      # handle obsolete mqc states in state
+      case c['state'][1]
+      when :mqc_passed
+        :mqc_passed
+      when :mqc_issues
+        :mqc_issues
+      else
+        :state_change
+      end
+    elsif(c.include?('mqc_state') and (c.keys - ['mqc_state', 'mqc_date', 'mqc_user_id']).empty?)
+      case [int_to_mqc_state_sym(c['mqc_state'][0].to_i), c['mqc_state'][1]]
+      when [:passed, :pending], [:issues, :pending] then :mqc_reset
+      when [:pending, :passed] then :mqc_passed
+      when [:pending, :issues] then :mqc_issues
+      when [:issues, :passed] then :mqc_passed
+      when [:passed, :issues] then :mqc_issues
+      else :mqc_state_change
+      end
+    elsif(c.include?('mqc_user_id') and c.include?('mqc_date') and c.keys.length == 2 and
+          c['mqc_user_id'][1].blank? and c['mqc_date'][1].blank?)
+      :mqc_reset
+    elsif(c.include?('state') and c.include?('mqc_date') and (2..3).include?(c.keys.length))
+      case c['state'][1]
+      when :mqc_passed then :mqc_passed
+      when :mqc_issues then :mqc_issues
+      end
+    end
+  end
+
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :visit_number_change then ['Visit Number Change', :ok]
+           when :patient_change then ['Patient Change', :warning]
+           when :description_change then ['Description Change', :ok]
+           when :visit_type_change then ['Visit Type Change', :warning]
+           when :state_change then ['State Change', :warning]
+           when :mqc_reset then ['mQC Reset', :warning]
+           when :mqc_passed then ['mQC performed, passed', :ok]
+           when :mqc_issues then ['mQC performed, issues', :warning]
+           when :mqc_state_change then ['mQC State Change', :warning]
+           end
   end
 
   protected
