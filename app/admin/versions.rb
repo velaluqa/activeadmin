@@ -6,7 +6,7 @@ ActiveAdmin.register Version do
   actions :index, :show
 
   filter :created_at
-  filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Patient', 'Role', 'Session', 'Study' , 'User', 'Center', 'ImageSeries', 'Image', 'Patient', 'Visit']
+  filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Patient', 'Role', 'Session', 'Study' , 'User', 'Center', 'ImageSeries', 'Image', 'Patient', 'Visit'].sort
   filter :whodunnit, :label => 'User', :as => :select, :collection => proc { User.all }
   filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
