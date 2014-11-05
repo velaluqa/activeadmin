@@ -7,6 +7,6 @@
   %tbody
     - changeset.each do |field, values|
       %tr
-        %td= item.class.human_attribute_name(field)
+        %td= simple_format(item.class.human_attribute_name(field) + "\n(" + field + ')')
         %td= values[0]
         %td= values[1]
