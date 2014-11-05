@@ -28,6 +28,9 @@ class Form < ActiveRecord::Base
   def self.state_sym_to_int(sym)
     return Form::STATE_SYMS.index(sym)
   end
+  def self.int_to_state_sym(sym)
+    return Form::STATE_SYMS[sym]
+  end
   def state
     return -1 if read_attribute(:state).nil?
     return Form::STATE_SYMS[read_attribute(:state)]
@@ -291,5 +294,28 @@ class Form < ActiveRecord::Base
 
   def include_subforms
     nil
+  end
+
+  def self.classify_audit_trail_event(c)
+    if(c.include?('state'))
+      case [int_to_state_sym(c['state'][0].to_i), c['state'][1]]
+      when [:draft, :final] then :finalised
+      when [:final, :draft] then :reopened
+      else :state_change
+      end
+    elsif(c.keys == ['name'])
+      :name_change
+    elsif(c.keys == ['description'])
+      :description_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :finalised then ['Finalised', :ok]
+           when :reopened then ['Reopened', :warning]
+           when :state_change then ['State Change', :warning]
+           when :name_change then ['Name Change', :warning]
+           when :description_change then ['Description Change', :ok]
+           end
   end
 end

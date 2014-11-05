@@ -185,4 +185,15 @@ class Study < ActiveRecord::Base
       true      
     end
   end
+
+  def self.classify_audit_trail_event(c)
+    if(c.keys == ['name'])
+      :name_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :name_change then ['Name Change', :ok]
+           end
+  end
 end

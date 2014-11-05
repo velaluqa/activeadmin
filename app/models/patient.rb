@@ -127,4 +127,14 @@ class Patient < ActiveRecord::Base
     return true
   end
 
+  def self.classify_audit_trail_event(c)
+    if(c.keys == ['subject_id'])
+      :name_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :name_change then ['Subject ID Change', :warning]
+           end
+  end
 end
