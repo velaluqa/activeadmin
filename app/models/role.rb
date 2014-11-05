@@ -25,6 +25,10 @@ class Role < ActiveRecord::Base
     end
   end
 
+  def name
+    return "#{role_name} on '#{subject.name}'"
+  end
+
   def self.role_sym_to_int(sym)
     return Role::ROLE_SYMS.index(sym)
   end
