@@ -30,7 +30,16 @@ class Role < ActiveRecord::Base
   end
 
   def name
-    return "#{role_name} on '#{subject.name}'"
+    return "#{role_name} on '#{subject_name}'"
+  end
+  def subject_name
+    if(subject.nil?)
+      'System'
+    elsif(subject.respond_to?(:name))
+      subject.name
+    else
+      subject.to_s
+    end
   end
 
   def self.role_sym_to_int(sym)
