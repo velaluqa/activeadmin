@@ -35,6 +35,9 @@ class ImageSeries < ActiveRecord::Base
   def self.state_sym_to_int(sym)
     return ImageSeries::STATE_SYMS.index(sym)
   end
+  def self.int_to_state_sym(sym)
+    return ImageSeries::STATE_SYMS[sym]
+  end
   def state
     return -1 if read_attribute(:state).nil?
     return ImageSeries::STATE_SYMS[read_attribute(:state)]
@@ -334,4 +337,50 @@ class ImageSeries < ActiveRecord::Base
   #   * for all required series to which we are assigned:
   #     * unassign this image series from required series in current visit: current_visit.change_required_series_assignment({currently_assigned_required_series_name => nil})
 
+  def self.classify_audit_trail_event(c)
+    # ignore Domino UNID changes that happened along with a property change
+    c.delete('domino_unid')
+
+    if(c.keys == ['name'])
+      :name_change
+    elsif(c.keys == ['comment'])
+      :comment_change
+    elsif(c.keys == ['center_id'])
+      :center_change
+    elsif(c.keys == ['imaging_date'])
+      :imaging_date_change
+    elsif(c.keys == ['series_number'])
+      :series_number_change
+    elsif(c.keys == ['visit_id'])
+      :visit_assignment_change
+    elsif(c.keys == ['patient_id'])
+      :patient_change
+    elsif(c.include?('state'))
+      case [int_to_state_sym(c['state'][0].to_i), c['state'][1]]
+      when [:imported, :visit_assigned], [:not_required, :visit_assigned] then :visit_assigned
+      when [:visit_assigned, :required_series_assigned], [:not_required, :required_series_assigned] then :required_series_assigned
+      when [:required_series_assigned, :visit_assigned] then :required_series_unassigned
+      when [:visit_assigned, :imported], [:required_series_assigned, :imported] then :visit_unassigned
+      when [:imported, :not_required], [:visit_assigned, :not_required], [:required_series_assigned, :not_required] then :marked_not_required
+      when [:not_required, :imported] then :unmarked_not_required
+      end
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :name_change then ['Name Change', :warning]
+           when :comment_change then ['Comment Change', :warning]
+           when :center_change then ['Center Change', :warning]
+           when :visit_assigned then ['Assigned to visit', :ok]
+           when :visit_unassigned then ['Visit assignment removed', :warning]
+           when :required_series_assigned then ['Assigned as required series', :ok]
+           when :required_series_unassigned then ['Required series assignment removed', :warning]
+           when :visit_assignment_change then ['Visit assignment changed', :ok]
+           when :marked_not_required then ['Marked as not required', :warning]
+           when :unmarked_not_required then ['Not required flag revoked', :warning]
+           when :imaging_date_change then ['Imaging Date Change', :ok]
+           when :series_number_change then ['Series Number Change', :ok]
+           when :patient_change then ['Patient Change', :warning]
+           end
+  end
 end
