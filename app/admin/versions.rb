@@ -6,7 +6,7 @@ ActiveAdmin.register Version do
   actions :index, :show
 
   filter :created_at
-  filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Patient', 'Role', 'Session', 'Study' , 'User', 'Center', 'ImageSeries', 'Image', 'Patient', 'Visit']
+  filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Role', 'Session', 'Study' , 'User', 'Center', 'ImageSeries', 'Image', 'Patient', 'Visit'].sort
   filter :whodunnit, :label => 'User', :as => :select, :collection => proc { User.all }
   filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
@@ -70,33 +70,47 @@ ActiveAdmin.register Version do
 
     def self.classify_event(version)
       return version.event if version.changeset.nil?
+      c = version.changeset
 
-      case version.item_type
-      when 'User'
-        if(version.changeset.include?('sign_in_count') and
-           version.changeset['sign_in_count'][1] == version.changeset['sign_in_count'][0]+1
-           )
-          return 'sign_in'
-        elsif(version.changeset.include?('encrypted_password') and
-              version.changeset.include?('password_changed_at'))
-          return 'password_change'
-        end
-      when 'Case'
-        if(version.changeset.include?('state'))
-          case version.changeset['state']
-          when [Case::state_sym_to_int(:unread), :in_progress], [Case::state_sym_to_int(:reopened), :reopened_in_progress]
-            return 'case_reservation'
-          when [Case::state_sym_to_int(:in_progress), :unread], [Case::state_sym_to_int(:reopened_in_progress), :reopened]
-            return 'case_cancelation'
-          when [Case::state_sym_to_int(:in_progress), :read], [Case::state_sym_to_int(:reopened_in_progress), :read]
-            return 'case_completion'
-          when [Case::state_sym_to_int(:read), :reopened]
-            return 'case_reopened'
-          end
-        end
+      event_symbol = version.event
+      if(event_symbol == 'update' and c.keys == ['domino_unid'])
+        return :domino_unid_change
       end
 
-      return version.event
+      begin
+        item_class = version.item_type.constantize
+        if item_class.respond_to?(:classify_audit_trail_event)
+          event_symbol = item_class::classify_audit_trail_event(c) || event_symbol
+        end
+      rescue NameError
+      end
+
+      return event_symbol
+    end
+    def self.event_title_and_severity(item_type, event_symbol)
+      if(['create', 'update', 'destroy', :domino_unid_change].include?(event_symbol))
+         return case event_symbol
+                when 'create' then ['Create', nil]
+                when 'update' then ['Update', :warning]
+                when 'destroy' then ['Destroy', :error]
+                when :domino_unid_change then ['Domino UNID Change', :ok]
+                end
+      end
+
+      title = event_symbol.to_s.humanize
+      severity = :warning
+      begin
+        item_class = item_type.constantize
+        if item_class.respond_to?(:audit_trail_event_title_and_severity)
+          proper_title, proper_severity = item_class::audit_trail_event_title_and_severity(event_symbol)
+          title = proper_title || title
+          severity = proper_severity || severity
+        end
+      rescue NameError => e
+        pp e
+      end
+
+      return [title, severity]
     end
 
     def audit_trail_resource
@@ -135,26 +149,9 @@ ActiveAdmin.register Version do
       auto_link(version.item)
     end
     column :event do |version|
-      case Admin::VersionsController.classify_event(version)
-      when 'create'
-        status_tag('Create', :ok)
-      when 'update'
-        status_tag('Update', :warning)
-      when 'destroy'
-        status_tag('Destroy', :error)
-      when 'sign_in'
-        status_tag('Sign-In', :ok)
-      when 'password_change'
-        status_tag('Password Change', :warning)
-      when 'case_reservation'
-        status_tag('Case Reservation', :warning)
-      when 'case_cancelation'
-        status_tag('Case Cancelation', :error)
-      when 'case_completion'
-        status_tag('Case Completion', :ok)
-      when 'case_reopened'
-        status_tag('Case Reopened', :error)
-      end
+      event = Admin::VersionsController.classify_event(version)
+      event_title, event_severity = Admin::VersionsController.event_title_and_severity(version.item_type, event)
+      status_tag(event_title, event_severity)
     end
     column :user, :sortable => :whodunnit do |version|
       if version.whodunnit.blank?
@@ -175,26 +172,9 @@ ActiveAdmin.register Version do
         auto_link(version.item)
       end
       row :event do
-        case Admin::VersionsController.classify_event(version)
-        when 'create'
-          status_tag('Create', :ok)
-        when 'update'
-          status_tag('Update', :warning)
-        when 'destroy'
-          status_tag('Destroy', :error)
-        when 'sign_in'
-          status_tag('Sign-In', :ok)
-        when 'password_change'
-          status_tag('Password Change', :warning)
-        when 'case_reservation'
-          status_tag('Case Reservation', :warning)
-        when 'case_cancelation'
-          status_tag('Case Cancelation', :error)
-        when 'case_completion'
-          status_tag('Case Completion', :ok)
-        when 'case_reopened'
-          status_tag('Case Reopened', :error)
-        end
+        event = Admin::VersionsController.classify_event(version)
+        event_title, event_severity = Admin::VersionsController.event_title_and_severity(version.item_type, event)
+        status_tag(event_title, event_severity)
       end
       row :user do
         if version.whodunnit.blank?

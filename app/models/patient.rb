@@ -127,4 +127,20 @@ class Patient < ActiveRecord::Base
     return true
   end
 
+  def self.classify_audit_trail_event(c)
+    # ignore Domino UNID changes that happened along with a property change
+    c.delete('domino_unid')
+
+    if(c.keys == ['subject_id'])
+      :name_change
+    elsif(c.keys == ['center_id'])
+      :center_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :name_change then ['Subject ID Change', :warning]
+           when :center_change then ['Center Change', :warning]
+           end
+  end
 end

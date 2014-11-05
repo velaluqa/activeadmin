@@ -40,6 +40,9 @@ class Study < ActiveRecord::Base
   def self.state_sym_to_int(sym)
     return Study::STATE_SYMS.index(sym)
   end
+  def self.int_to_state_sym(sym)
+    return Study::STATE_SYMS[sym]
+  end
   def state
     return -1 if read_attribute(:state).nil?
     return Study::STATE_SYMS[read_attribute(:state)]
@@ -184,5 +187,28 @@ class Study < ActiveRecord::Base
       self.notes_links_base_uri = new_notes_links_base_uri.to_s
       true      
     end
+  end
+
+  def self.classify_audit_trail_event(c)
+    if(c.keys == ['name'])
+      :name_change
+    elsif(c.include?('state'))
+      case [int_to_state_sym(c['state'][0].to_i), c['state'][1]]
+      when [:building, :production] then :production_start
+      when [:production, :building] then :production_abort
+      else :state_change
+      end
+    elsif((c.keys - ['domino_db_url', 'domino_server_name', 'notes_links_base_uri']).empty?)
+      return :domino_settings_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :production_start then ['Production started', :ok]
+           when :production_abort then ['Production aborted', :error]
+           when :state_change then ['State Change', :warning]
+           when :name_change then ['Name Change', :ok]
+           when :domino_settings_change then ['Domino Settings Change', :ok]
+           end
   end
 end

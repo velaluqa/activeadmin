@@ -90,7 +90,18 @@ class Image < ActiveRecord::Base
 
     return [dicom_meta_header, dicom_metadata]
   end
-  
+
+  def self.classify_audit_trail_event(c)
+    if(c.keys == ['image_series_id'])
+      :image_series_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :image_series_change then ['Image Series Change', :ok]
+           end
+  end
+
   protected
   
   def dicom_metadata_xml

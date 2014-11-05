@@ -37,6 +37,9 @@ class Case < ActiveRecord::Base
   def self.state_sym_to_int(sym)
     return Case::STATE_SYMS.index(sym)
   end
+  def self.int_to_state_sym(sym)
+    return Case::STATE_SYMS[sym]
+  end
   def state
     return -1 if read_attribute(:state).nil?
     return Case::STATE_SYMS[read_attribute(:state)]
@@ -57,6 +60,9 @@ class Case < ActiveRecord::Base
 
   def self.flag_sym_to_int(sym)
     return Case::FLAG_SYMS.index(sym)
+  end
+  def self.int_to_flag_sym(sym)
+    return Case::FLAG_SYMS[sym]
   end
   def flag
     return -1 if read_attribute(:flag).nil?
@@ -170,5 +176,101 @@ class Case < ActiveRecord::Base
     end
 
     return rows.size
+  end
+
+  def self.classify_audit_trail_event(c)
+    if(c.include?('state'))
+      case [int_to_state_sym(c['state'][0]), c['state'][1]]
+      when [:unread, :in_progress], [:reopened, :reopened_in_progress]
+        :reservation
+      when [:in_progress, :unread], [:reopened_in_progress, :reopened]
+        :cancelation
+      when [:in_progress, :read], [:reopened_in_progress, :read]
+        :completion
+      when [:read, :reopened]
+        :reopened
+      when [:reopened, :read]
+        :reopen_closed
+      when [:unread, :postponed]
+        :postponed
+      when [:postponed, :unread]
+        :unpostponed
+      when [:read, :unread]
+        :obsoleted
+      when [:unread, :read]
+        :unobsoleted
+      else :state_change
+      end
+    elsif(c.include?('flag'))
+      case c['flag'][1]
+      when :regular then :flag_regular
+      when :validation then :flag_validation
+      when :reader_testing then :flag_reader_testing
+      end
+    elsif(c.include?('no_export'))
+      if(c['no_export'][1])
+        :no_export_set
+      else
+        :no_export_unset
+      end
+    elsif(c.include?('is_adjudication_background_case'))
+      if(c['is_adjudication_background_case'][1])
+        :adjudication_background_set
+      else
+        :adjudication_background_unset
+      end
+    elsif(c.keys == ['assigned_reader_id'])
+      if(c['assigned_reader_id'][1].blank?)
+        :reader_unassigned
+      elsif(c['assigned_reader_id'][0].blank?)
+        :reader_assigned
+      else
+        :reader_changed
+      end
+    elsif(c.include?('current_reader_id') and c.include?('assigned_reader_id') and c.keys.length == 2)
+      :automatic_reader_assignment
+    elsif(c.keys == ['position'])
+      :position_change
+    elsif(c.keys == ['comment'])
+      :comment_change
+    elsif(c.keys == ['current_reader_id'])
+      :current_reader_change
+    elsif(c.keys == ['exported_at'])
+      :export
+    elsif(c.keys == ['images'])
+      :images_change
+    elsif(c.keys == ['case_type'])
+      :case_type_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :reservation then ['Case Reservation', :warning]
+           when :cancelation then ['Case Cancelation', :error]
+           when :completion then ['Case Completion', :ok]
+           when :reopened then ['Case reopened', :error]
+           when :reopen_closed then ['Reopened case closed', :ok]
+           when :obsoleted then ['Form Answer marked obsolete', :error]
+           when :unobsoleted then ['Form Answer "unobsoleted"', :error]
+           when :postponed then ['Case postponed', :warning]
+           when :unpostponed then ['Case unpostponed', :warning]
+           when :state_change then ['State Change', :warning]
+           when :no_export_set then ['No Export flag set', :ok]
+           when :no_export_unset then ['No Export flag unset', :ok]
+           when :adjudication_background_set then ['Adjudication Background flag set', :ok]
+           when :adjudication_background_unset then ['Adjudication Background flag unset', :ok]
+           when :flag_regular then ['Marked as regular case', :warning]
+           when :flag_validation then ['Marked as validation case', :warning]
+           when :flag_reader_testing then ['Marked as reader testing case', :warning]
+           when :reader_unassigned then ['Reader unassigned', :ok]
+           when :reader_assigned then ['Reader assigned', :ok]
+           when :reader_changed then ['Assigned reader changed', :ok]
+           when :automatic_reader_assignment then ['Automatic reader assignment', :ok]
+           when :position_change then ['Position Change', :ok]
+           when :current_reader_change then ['Current Reader Change (Case Reservation)', :ok]
+           when :export then ['Export', :ok]
+           when :images_change then ['Images/Visit Change', :error]
+           when :case_type_change then ['Case Type Change', :error]
+           end
   end
 end

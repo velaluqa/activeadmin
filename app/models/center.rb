@@ -69,6 +69,26 @@ class Center < ActiveRecord::Base
     self.ensure_domino_document_exists
   end
 
+  def self.classify_audit_trail_event(c)
+    # ignore Domino UNID changes that happened along with a property change
+    c.delete('domino_unid')
+
+    if(c.keys == ['name'])
+      :name_change
+    elsif(c.keys == ['study_id'])
+      :study_change
+    elsif(c.keys == ['code'])
+      :code_change
+    end
+  end
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :name_change then ['Name Change', :ok]
+           when :study_change then ['Study Change', :warning]
+           when :code_change then ['Center Code Change', :warning]
+           end
+  end
+
   protected
   
   def ensure_study_is_unchanged
