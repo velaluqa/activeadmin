@@ -39,51 +39,42 @@ ActiveAdmin.register Version do
 
     def self.classify_event(version)
       return version.event if version.changeset.nil?
-      pp version.changeset
       c = version.changeset
 
-      event_symbol = case version.item_type
-             when 'User'
-               User::classify_audit_trail_event(c)
-             when 'Case'
-               if(c.include?('state'))
-                 case c['state']
-                 when [Case::state_sym_to_int(:unread), :in_progress], [Case::state_sym_to_int(:reopened), :reopened_in_progress]
-                   :case_reservation
-                 when [Case::state_sym_to_int(:in_progress), :unread], [Case::state_sym_to_int(:reopened_in_progress), :reopened]
-                   :case_cancelation
-                 when [Case::state_sym_to_int(:in_progress), :read], [Case::state_sym_to_int(:reopened_in_progress), :read]
-                   :case_completion
-                 when [Case::state_sym_to_int(:read), :reopened]
-                   :case_reopened
-                 end
-               end
-                     end
-
-      event_symbol ||= version.event
+      event_symbol = version.event
+      begin
+        item_class = version.item_type.constantize
+        if item_class.respond_to?(:classify_audit_trail_event)
+          event_symbol = item_class::classify_audit_trail_event(c) || event_symbol
+        end
+      rescue NameError
+      end
 
       return event_symbol
     end
     def self.event_title_and_severity(item_type, event_symbol)
       if(['create', 'update', 'destroy'].include?(event_symbol))
          return case event_symbol
-                when 'create' then ['Create', :ok]
+                when 'create' then ['Create', nil]
                 when 'update' then ['Update', :warning]
                 when 'destroy' then ['Destroy', :error]
                 end
       end
 
-      return case item_type
-             when 'User'
-               User::audit_trail_event_title_and_severity(event_symbol)
-             else
-               case event_symbol
-               when :case_reservation then ['Case Reservation', :warning]
-               when :case_cancelation then ['Case Cancelation', :error]
-               when :case_completion then ['Case Completion', :ok]
-               when :case_reopened then ['Case Reopened', :error]
-               end
-             end
+      title = event_symbol.to_s.humanize
+      severity = :warning
+      begin
+        item_class = item_type.constantize
+        if item_class.respond_to?(:audit_trail_event_title_and_severity)
+          proper_title, proper_severity = item_class::audit_trail_event_title_and_severity(event_symbol)
+          title = proper_title || title
+          severity = proper_severity || severity
+        end
+      rescue NameError => e
+        pp e
+      end
+
+      return [title, severity]
     end
 
     def audit_trail_resource
