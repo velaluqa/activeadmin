@@ -41,6 +41,53 @@ ActiveAdmin.register MongoidHistoryTracker do
       end.accessible_by(current_ability)
     end
 
+    def self.resource_name_for_tracker(tracker)
+      unless(tracker.association_chain.blank? or tracker.association_chain[0]['name'].blank? or tracker.association_chain[0]['id'].blank?)
+        tracker.association_chain[0]['name']
+      else
+        nil
+      end
+    end
+    def self.classify_event(tracker)
+      return tracker.action if tracker.tracked_changes.blank?
+      c = tracker.tracked_changes
+
+      event_symbol = tracker.action
+      begin
+        item_class = resource_name_for_tracker(tracker).constantize
+        if item_class.respond_to?(:classify_mongoid_tracker_event)
+          event_symbol = item_class::classify_mongoid_tracker_event(c) || event_symbol
+        end
+      rescue NameError
+      end
+
+      return event_symbol
+    end
+    def self.event_title_and_severity(item_type, event_symbol)
+      if(['create', 'update', 'destroy'].include?(event_symbol))
+         return case event_symbol
+                when 'create' then ['Create', nil]
+                when 'update' then ['Update', :warning]
+                when 'destroy' then ['Destroy', :error]
+                end
+      end
+
+      title = event_symbol.to_s.humanize
+      severity = :warning
+      begin
+        item_class = item_type.constantize
+        if item_class.respond_to?(:mongoid_tracker_event_title_and_severity)
+          proper_title, proper_severity = item_class::mongoid_tracker_event_title_and_severity(event_symbol)
+          title = proper_title || title
+          severity = proper_severity || severity
+        end
+      rescue NameError => e
+        pp e
+      end
+
+      return [title, severity]
+    end
+
     def audit_trail_resource
       return nil if(params[:audit_trail_view_type].blank? or params[:audit_trail_view_id].blank?)
 
@@ -69,8 +116,53 @@ ActiveAdmin.register MongoidHistoryTracker do
     selectable_column
     column 'Timestamp', :created_at, :sortable => :created_at
     column 'Resource' do |tracker|
-      unless(tracker.association_chain.blank? or tracker.association_chain[0]['name'].blank? or tracker.association_chain[0]['id'].blank?)
-        case tracker.association_chain[0]['name']
+      case Admin::MongoidHistoryTrackersController.resource_name_for_tracker(tracker)
+      when 'FormAnswer'
+        form_answer = FormAnswer.where(:id => tracker.association_chain[0]['id']).first
+        if(form_answer.nil?)
+          'Form Answer '+tracker.association_chain[0]['id'].to_s
+        else
+          ('Form Answer '+link_to(form_answer.id, admin_form_answer_path(form_answer))).html_safe
+        end
+      when 'CaseData'
+        case_data = CaseData.where(:id => tracker.association_chain[0]['id']).first
+        if(case_data.nil? or case_data.case.nil?)
+          'Case Data '+tracker.association_chain[0]['id'].to_s
+        else
+          ('Case Data for '+link_to(case_data.case.name, admin_case_path(case_data.case))).html_safe
+        end
+      when 'PatientData'
+        patient_data = PatientData.where(:id => tracker.association_chain[0]['id']).first
+        if(patient_data.nil? or patient_data.patient.nil?)
+          'Patient Data '+tracker.association_chain[0]['id'].to_s
+        else
+          ('Patient Data for '+link_to(patient_data.patient.name.to_s, admin_patient_path(patient_data.patient))).html_safe
+        end
+      else
+        nil
+      end
+    end
+    column 'Event', :sortable => :action do |tracker|
+      event = Admin::MongoidHistoryTrackersController.classify_event(tracker)
+      event_title, event_severity = Admin::MongoidHistoryTrackersController.event_title_and_severity(Admin::MongoidHistoryTrackersController.resource_name_for_tracker(tracker), event)
+      status_tag(event_title, event_severity)
+    end
+    column 'User', :sortable => :modifier_id do |tracker|
+      if tracker.modifier.blank?
+        'System'
+      else
+        auto_link(tracker.modifier)
+      end
+    end
+
+    default_actions
+  end
+
+  show do |tracker|
+    attributes_table do
+      row :created_at
+      row 'Resource' do
+        case Admin::MongoidHistoryTrackersController.resource_name_for_tracker(tracker)
         when 'FormAnswer'
           form_answer = FormAnswer.where(:id => tracker.association_chain[0]['id']).first
           if(form_answer.nil?)
@@ -96,69 +188,12 @@ ActiveAdmin.register MongoidHistoryTracker do
           nil
         end
       end
-    end
-    column 'Event', :sortable => :action do |tracker|
-      case tracker.action
-      when 'create'
-        status_tag('Create', :ok)
-      when 'update'
-        status_tag('Update', :warning)
-      when 'destroy'
-        status_tag('Destroy', :error)
-      end      
-    end
-    column 'User', :sortable => :modifier_id do |tracker|
-      if tracker.modifier.blank?
-        'System'
-      else
-        auto_link(tracker.modifier)
-      end
-    end
-
-    default_actions
-  end
-
-  show do |tracker|
-    attributes_table do
-      row :created_at
-      row 'Resource' do
-        unless(tracker.association_chain.blank? or tracker.association_chain[0]['name'].blank? or tracker.association_chain[0]['id'].blank?)
-          case tracker.association_chain[0]['name']
-          when 'FormAnswer'
-            form_answer = FormAnswer.where(:id => tracker.association_chain[0]['id']).first
-            if(form_answer.nil?)
-              'Form Answer '+tracker.association_chain[0]['id'].to_s
-            else
-              ('Form Answer '+link_to(form_answer.id, admin_form_answer_path(form_answer))).html_safe
-            end
-          when 'CaseData'
-            case_data = CaseData.where(:id => tracker.association_chain[0]['id']).first
-            if(case_data.nil? or case_data.case.nil?)
-              'Case Data '+tracker.association_chain[0]['id'].to_s
-            else
-              ('Case Data for '+link_to(case_data.case.name, admin_case_path(case_data.case))).html_safe
-            end
-          when 'PatientData'
-            patient_data = PatientData.where(:id => tracker.association_chain[0]['id']).first
-            if(patient_data.nil? or patient_data.patient.nil?)
-              'Patient Data '+tracker.association_chain[0]['id'].to_s
-            else
-              ('Patient Data for '+link_to(patient_data.patient.name.to_s, admin_patient_path(patient_data.patient))).html_safe
-            end
-          else
-            nil
-          end
-        end
-      end
       row 'Event' do
-        case tracker.action
-        when 'create'
-          status_tag('Create', :ok)
-        when 'update'
-          status_tag('Update', :warning)
-        when 'destroy'
-          status_tag('Destroy', :error)
-        end      
+        pp tracker.tracked_changes
+        event = Admin::MongoidHistoryTrackersController.classify_event(tracker)
+
+        event_title, event_severity = Admin::MongoidHistoryTrackersController.event_title_and_severity(Admin::MongoidHistoryTrackersController.resource_name_for_tracker(tracker), event)
+        status_tag(event_title, event_severity)
       end
       row 'User' do
         if tracker.modifier.blank?
