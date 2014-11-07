@@ -250,7 +250,6 @@ ActiveAdmin.register MongoidHistoryTracker do
         end
       end
       row 'Event' do
-        pp tracker.tracked_changes
         event = Admin::MongoidHistoryTrackersController.classify_event(tracker)
 
         event_title, event_severity = Admin::MongoidHistoryTrackersController.event_title_and_severity(Admin::MongoidHistoryTrackersController.resource_name_for_tracker(tracker), event)
