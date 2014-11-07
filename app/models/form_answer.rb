@@ -271,12 +271,23 @@ class FormAnswer
       else
         :unobsoleted
       end
+    elsif((c.keys - ['answers', 'answers_signature', 'annotated_images', 'annotated_images_signature', 'submitted_at', 'signature_public_key_id', 'adjudication_randomisation']).empty?)
+      if(c.include?('annotated_images'))
+        :reanswered
+      else
+        :data_cleaning
+      end
+    elsif(c.keys == ['versions'])
+      :answer_versioning
     end
   end
   def self.mongoid_tracker_event_title_and_severity(event_symbol)
     return case event_symbol
            when :obsoleted then ['Obsoleted', :error]
            when :unobsoleted then ['Unobsoleted', :error]
+           when :data_cleaning then ['Data cleaning', :error]
+           when :answer_versioning then ['Answer versioning', :warning]
+           when :reanswered then ['Reanswering by reader', :warning]
            end
   end
   
