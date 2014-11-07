@@ -19,14 +19,14 @@
         - else
           %td
             - if(values[:from].is_a?(Array) or values[:from].is_a?(Hash))
-              = CodeRay.scan(values[:from].to_yaml.gsub(/---\n/, '').gsub(/!ruby\/hash:ActiveSupport::HashWithIndifferentAccess/, ''), :yaml).div(:css => :class).html_safe
+              = CodeRay.scan(values[:from].to_yaml.gsub(/^--- *\n?/, '').gsub(/!ruby\/hash:ActiveSupport::HashWithIndifferentAccess/, ''), :yaml).div(:css => :class).html_safe
             - elsif(field.include?('signature'))
               = truncate(values[:from], omission: '... (truncated)')
             - else
               = values[:from]
           %td
             - if(values[:to].is_a?(Array) or values[:to].is_a?(Hash))
-              = CodeRay.scan(values[:to].to_yaml.gsub(/---\n/, '').gsub(/!ruby\/hash:ActiveSupport::HashWithIndifferentAccess/, ''), :yaml).div(:css => :class).html_safe
+              = CodeRay.scan(values[:to].to_yaml.gsub(/^--- *\n?/, '').gsub(/!ruby\/hash:ActiveSupport::HashWithIndifferentAccess/, ''), :yaml).div(:css => :class).html_safe
             - elsif(field.include?('signature'))
               = truncate(values[:to], omission: '... (truncated)')
             - else
