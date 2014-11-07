@@ -13,14 +13,22 @@
             %p= '(' + field + ')'
           - else
             %p= field
-        %td
-          - if(values[:from].is_a?(Array) or values[:from].is_a?(Hash))
-            = CodeRay.scan(JSON::pretty_generate(values[:from]), :json).div(:css => :class).html_safe
-          - else
-            = values[:from]
-        %td
-          - if(values[:to].is_a?(Array) or values[:to].is_a?(Hash))
-            = CodeRay.scan(JSON::pretty_generate(values[:to]), :json).div(:css => :class).html_safe
-          - else
-            = values[:to]
+        - if((values[:from].is_a?(Hash) and values[:to].is_a?(Hash)) or (values[:from].is_a?(Array) and values[:to].is_a?(Array)))
+          %td{colspan: 2}
+            = mongoid_history_tracker_diff(values)
+        - else
+          %td
+            - if(values[:from].is_a?(Array) or values[:from].is_a?(Hash))
+              = CodeRay.scan(values[:from].to_yaml.gsub(/---\n/, '').gsub(/!ruby\/hash:ActiveSupport::HashWithIndifferentAccess/, ''), :yaml).div(:css => :class).html_safe
+            - elsif(field.include?('signature'))
+              = truncate(values[:from], omission: '... (truncated)')
+            - else
+              = values[:from]
+          %td
+            - if(values[:to].is_a?(Array) or values[:to].is_a?(Hash))
+              = CodeRay.scan(values[:to].to_yaml.gsub(/---\n/, '').gsub(/!ruby\/hash:ActiveSupport::HashWithIndifferentAccess/, ''), :yaml).div(:css => :class).html_safe
+            - elsif(field.include?('signature'))
+              = truncate(values[:to], omission: '... (truncated)')
+            - else
+              = values[:to]
 
