@@ -263,6 +263,22 @@ class FormAnswer
     
     return nil
   end
+
+  def self.classify_mongoid_tracker_event(c)
+    if(c.keys == ['is_obsolete'])
+      if(c['is_obsolete']['to'])
+        :obsoleted
+      else
+        :unobsoleted
+      end
+    end
+  end
+  def self.mongoid_tracker_event_title_and_severity(event_symbol)
+    return case event_symbol
+           when :obsoleted then ['Obsoleted', :error]
+           when :unobsoleted then ['Unobsoleted', :error]
+           end
+  end
   
   private
   def construct_results_list(the_case)
