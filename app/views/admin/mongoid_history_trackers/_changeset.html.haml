@@ -7,7 +7,12 @@
   %tbody
     - changeset.each do |field, values|
       %tr
-        %td= item.class.human_attribute_name(field)
+        %td
+          - if item
+            %p= simple_format(item.class.human_attribute_name(field))
+            %p= '(' + field + ')'
+          - else
+            %p= field
         %td
           - if(values[:from].is_a?(Array) or values[:from].is_a?(Hash))
             = CodeRay.scan(JSON::pretty_generate(values[:from]), :json).div(:css => :class).html_safe
