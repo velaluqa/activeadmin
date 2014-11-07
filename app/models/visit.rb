@@ -550,10 +550,10 @@ class Visit < ActiveRecord::Base
            when :description_change then ['Description Change', :ok]
            when :visit_type_change then ['Visit Type Change', :warning]
            when :state_change then ['State Change', :warning]
-           when :mqc_reset then ['mQC Reset', :warning]
-           when :mqc_passed then ['mQC performed, passed', :ok]
-           when :mqc_issues then ['mQC performed, issues', :warning]
-           when :mqc_state_change then ['mQC State Change', :warning]
+           when :mqc_reset then ['MQC Reset', :warning]
+           when :mqc_passed then ['MQC performed, passed', :ok]
+           when :mqc_issues then ['MQC performed, issues', :warning]
+           when :mqc_state_change then ['MQC State Change', :warning]
            end
   end
 

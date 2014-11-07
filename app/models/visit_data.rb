@@ -81,8 +81,8 @@ class VisitData
     return case event_symbol
            when :rs_domino_unid_change then ['RS Domino UNID Change', :ok]
            when :rs_assignment_change then ['RS Assignment Change', :warning]
-           when :rs_tqc_performed then ['RS tQC performed', :ok]
-           when :mqc_performed then ['mQC performed', :ok]
+           when :rs_tqc_performed then ['RS TQC performed', :ok]
+           when :mqc_performed then ['MQC performed', :ok]
            end
   end
 end
