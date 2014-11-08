@@ -13,6 +13,52 @@ namespace :erica do
       ActiveRecord::Base.connection.execute(sql)
     end
   end
+  def sqlite3_insert_select(target_db, target_table, query)
+    sql = "INSERT INTO #{target_db}.\"#{target_table}\" #{query};"
+    puts sql
+    ActiveRecord::Base.connection.execute(sql)
+  end
+  def sqlite3_archive(archive_db_pathname, archive_db_name, study)
+    ActiveRecord::Base.connection.execute("ATTACH DATABASE '#{archive_db_pathname.to_s}' AS #{archive_db_name};")
+
+    ['studies', 'centers', 'patients', 'visits', 'image_series', 'images', 'versions'].each do |table|
+      sqlite3_create_table_like(table, archive_db_name)
+    end
+
+    sqlite3_insert_select(archive_db_name, 'studies', "SELECT * FROM studies WHERE id = #{study.id}")
+
+    sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Study' AND item_id = #{study.id}")
+
+    sqlite3_insert_select(archive_db_name, 'centers', "SELECT * FROM centers WHERE study_id = #{study.id}")
+    study.centers.each do |center|
+      sqlite3_insert_select(archive_db_name, 'patients', "SELECT * FROM patients WHERE center_id = #{center.id}")
+
+      sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Center' AND item_id = #{center.id}")
+
+      center.patients.each do |patient|
+        sqlite3_insert_select(archive_db_name, 'image_series', "SELECT * FROM image_series WHERE patient_id = #{patient.id}")
+        sqlite3_insert_select(archive_db_name, 'visits', "SELECT * FROM visits WHERE patient_id = #{patient.id}")
+
+        sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Patient' AND item_id = #{patient.id}")
+
+        patient.image_series.each do |is|
+          sqlite3_insert_select(archive_db_name, 'images', "SELECT * FROM images WHERE image_series_id = #{is.id}")
+
+          sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'ImageSeries' AND item_id = #{is.id}")
+
+          is.images.each do |image|
+            sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Image' AND item_id = #{image.id}")
+          end
+        end
+
+        patient.visits.each do |visit|
+          sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Visit' AND item_id = #{visit.id}")
+        end
+      end
+    end
+
+    ActiveRecord::Base.connection.execute("DETACH DATABASE #{archive_db_name};")
+  end
   
   desc 'Archive a study and all its contents, removing them from ERICAv2.'
   task :archive_study, [:study_id, :archive_path] => [:environment] do |t, args|
@@ -48,16 +94,11 @@ namespace :erica do
       puts "FOUND: #{study.inspect}"
     end
 
-    # WARNING: SQLite specific code, only for development/testing
-    sqlite_db_pathname = archive_pathname.join('database.sqlite3')
+    archive_sqlite3_db_pathname = archive_pathname.join('database.sqlite3')
     archive_db_name = 'archive_db'
-    ActiveRecord::Base.connection.execute("ATTACH DATABASE '#{sqlite_db_pathname.to_s}' AS #{archive_db_name};")
 
-    ['studies', 'centers', 'patients', 'visits', 'image_series', 'images', 'versions'].each do |table|
-      sqlite3_create_table_like(table, archive_db_name)
-    end
+    sqlite3_archive(archive_sqlite3_db_pathname, archive_db_name, study)
 
-    ActiveRecord::Base.connection.execute("DETACH DATABASE archive_db;")
-    puts "Created archive db at #{sqlite_db_pathname.to_s}"
+    puts "Created archive db at #{archive_sqlite3_db_pathname.to_s}"
   end
 end
