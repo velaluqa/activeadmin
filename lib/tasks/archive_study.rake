@@ -62,6 +62,16 @@ namespace :erica do
 
     ActiveRecord::Base.connection.execute("DETACH DATABASE #{archive_db_name};")
   end
+  def mongodb_export_documents(collection, id_field, ids, outfile)
+    ids_string = '[' + ids.map {|id| id.to_s}.join(', ') + ']'
+    document_query = "{#{id_field}: { $in: #{ids_string} } }"
+    puts document_query
+
+    mongoexport_call = "mongoexport --db study_server_v2_development --collection #{collection} --query '#{document_query}' --out '#{outfile}' --jsonArray"
+
+    puts 'EXECUTING: ' + mongoexport_call
+    system(mongoexport_call)
+  end
   
   desc 'Archive a study and all its contents, removing them from ERICAv2.'
   task :archive_study, [:study_id, :archive_path] => [:environment] do |t, args|
@@ -96,6 +106,21 @@ namespace :erica do
     else
       puts "FOUND: #{study.inspect}"
     end
+
+    puts "Exporting MongoDB documents"
+    archive_mongodb_pathname = archive_pathname.join('mongodb')
+    archive_mongodb_pathname.mkdir
+
+    [
+      {collection: 'visit_data', id_field: 'visit_id', ids: study.visits.map{|v| v.id}},
+      {collection: 'image_series_data', id_field: 'image_series_id', ids: study.image_series.map{|is| is.id}},
+      {collection: 'patient_data', id_field: 'patient_id', ids: study.patients.map{|p| p.id}}
+    ].each do |export_spec|
+      outfile_pathname = archive_mongodb_pathname.join(export_spec[:collection] + '.json')
+      mongodb_export_documents(export_spec[:collection], export_spec[:id_field], export_spec[:ids], outfile_pathname.to_s)
+    end
+
+    next
 
     archive_sqlite3_db_pathname = archive_pathname.join('database.sqlite3')
     archive_db_name = 'archive_db'
