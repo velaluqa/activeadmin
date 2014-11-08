@@ -111,6 +111,39 @@ namespace :erica do
     archive_mongodb_pathname = archive_pathname.join('mongodb')
     archive_mongodb_pathname.mkdir
 
+    mongoid_history_trackers_pathname = archive_mongodb_pathname.join('mongoid_history_tracker.json')
+    study.visits.each do |visit|
+      next if visit.visit_data.nil?
+
+      visit_data_id = visit.visit_data.id
+      document_query = "{ association_chain: { $elemMatch: { name: \"VisitData\", id: ObjectId(\"#{visit_data_id}\") }}}"
+
+      mongoexport_call = "mongoexport --db study_server_v2_development --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
+      puts 'EXECUTING: ' + mongoexport_call
+      system(mongoexport_call)
+    end
+    study.patients.each do |patient|
+      next if patient.patient_data.nil?
+
+      data_id = patient.patient_data.id
+      document_query = "{ association_chain: { $elemMatch: { name: \"PatientData\", id: ObjectId(\"#{data_id}\") }}}"
+
+      mongoexport_call = "mongoexport --db study_server_v2_development --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
+      puts 'EXECUTING: ' + mongoexport_call
+      system(mongoexport_call)
+    end
+    study.image_series.each do |is|
+      next if is.image_series_data.nil?
+
+      data_id = is.image_series_data.id
+      document_query = "{ association_chain: { $elemMatch: { name: \"ImageSeriesData\", id: ObjectId(\"#{data_id}\") }}}"
+
+      mongoexport_call = "mongoexport --db study_server_v2_development --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
+      puts 'EXECUTING: ' + mongoexport_call
+      system(mongoexport_call)
+    end
+    next
+
     [
       {collection: 'visit_data', id_field: 'visit_id', ids: study.visits.map{|v| v.id}},
       {collection: 'image_series_data', id_field: 'image_series_id', ids: study.image_series.map{|is| is.id}},
