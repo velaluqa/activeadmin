@@ -21,9 +21,12 @@ namespace :erica do
   def sqlite3_archive(archive_db_pathname, archive_db_name, study)
     ActiveRecord::Base.connection.execute("ATTACH DATABASE '#{archive_db_pathname.to_s}' AS #{archive_db_name};")
 
-    ['studies', 'centers', 'patients', 'visits', 'image_series', 'images', 'versions'].each do |table|
+    ['users', 'public_keys', 'studies', 'centers', 'patients', 'visits', 'image_series', 'images', 'versions'].each do |table|
       sqlite3_create_table_like(table, archive_db_name)
     end
+
+    sqlite3_insert_select(archive_db_name, 'users', "SELECT * FROM users")
+    sqlite3_insert_select(archive_db_name, 'public_keys', "SELECT * FROM public_keys")
 
     sqlite3_insert_select(archive_db_name, 'studies', "SELECT * FROM studies WHERE id = #{study.id}")
 
