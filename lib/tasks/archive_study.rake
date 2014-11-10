@@ -18,6 +18,13 @@ namespace :erica do
   # - Config files (incl. git)
   # - Image Storage
 
+  # Export procedure for PostgreSQL:
+  # 1. create new database to hold archive
+  # 2. create table schema in archive db (CREATE TABLE .. LIKE .. INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES)
+  # 3. copy data (INSERT INTO .. SELECT, same as sqlite)
+  # 4. pg_dump archive db
+  # 5. drop archive db
+
   def system_or_die(command)
     unless(system(command))
       raise 'Failed to execute shell command: "' + command + "\"\nWARNING: THE ARCHIVE IS INCOMPLETE!"
