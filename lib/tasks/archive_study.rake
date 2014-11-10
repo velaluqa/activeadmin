@@ -1,10 +1,58 @@
 namespace :erica do
 
+  # to be archived:
+  # - MongoDB:
+  #   - ImageSeriesData
+  #   - VisitData
+  #   - PatientData
+  #   - MongoidHistoryTrackers for the above
+  # - RDBMS:
+  #   - Study
+  #   - Centers
+  #   - Patients
+  #   - ImageSeries
+  #   - Images
+  #   - Visits
+  #   - Versions for the above
+  #   - Users, PublicKeys
+  # - Config files (incl. git)
+  # - Image Storage
+
   def system_or_die(command)
     unless(system(command))
       raise 'Failed to execute shell command: "' + command + "\"\nWARNING: THE ARCHIVE IS INCOMPLETE!"
     end
   end
+  def rsync_or_die(command)
+    sync_command = 'rsync -av ' + command
+    verify_command = 'rsync -a --stats -n ' + command
+
+    puts 'RSYNC: ' + sync_command
+    system_or_die(sync_command)
+
+    puts 'RSYNC VERIFY: ' + verify_command
+    rsync_output = %x{#{verify_command}}
+
+    unsynced_file_count = 0
+    rsync_output.lines.each do |line|
+      puts line
+      if line =~ /^Number of created files: ([0-9]+)/
+        unsynced_file_count += $1.to_i
+        puts unsynced_file_count
+      elsif line =~ /^Number of deleted files: ([0-9]+)/
+        unsynced_file_count += $1.to_i
+        puts unsynced_file_count
+      elsif line =~ /^Number of regular files transferred: ([0-9]+)/
+        unsynced_file_count += $1.to_i
+        puts unsynced_file_count
+      end
+    end
+
+    if(unsynced_file_count > 0)
+      raise "Failed to rsync image storage, #{unsynced_file_count} files remain unsynced.\nWARNING: THE ARCHIVE IS INCOMPLETE!"
+    end
+  end
+
   def sqlite3_create_table_like(source, target_db)
     create_table_sql = ActiveRecord::Base.connection.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='#{source}';").first['sql']
     index_sqls = ActiveRecord::Base.connection.execute("SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='#{source}';").map {|e| e['sql']}
@@ -118,13 +166,24 @@ namespace :erica do
       puts "FOUND: #{study.inspect}"
     end
 
-    puts "Exporting configuration files"
+    puts "Archiving image storage"
+    image_archive_pathname = archive_pathname.join('image_storage')
+    image_archive_pathname.mkdir
+    study_image_storage_path = study.absolute_image_storage_path
+    study_image_storage_path.chomp!('/')
+
+    image_archive_path_string = image_archive_pathname.to_s
+    image_archive_path_string += '/' unless image_archive_path_string.end_with?('/')
+
+    rsync_or_die(study_image_storage_path + ' ' + image_archive_path_string)
+
+    puts "Archiving configuration files"
     data_archive_pathname = archive_pathname.join('data.tar.gz')
     data_tar_command = "tar --exclude=#{Rails.application.config.image_storage_root} --exclude=#{Rails.application.config.image_export_root} -c \"#{Rails.application.config.data_directory}\" | gzip -9 > \"#{data_archive_pathname.to_s}\""
     puts 'EXECUTING: ' + data_tar_command
     system_or_die(data_tar_command)
 
-    puts "Exporting MongoDB documents"
+    puts "Archiving MongoDB documents"
     archive_mongodb_pathname = archive_pathname.join('mongodb')
     archive_mongodb_pathname.mkdir
 
