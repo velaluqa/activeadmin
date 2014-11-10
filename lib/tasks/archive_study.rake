@@ -1,5 +1,10 @@
 namespace :erica do
 
+  def system_or_die(command)
+    unless(system(command))
+      raise 'Failed to execute shell command: "' + command + "\"\nWARNING: THE ARCHIVE IS INCOMPLETE!"
+    end
+  end
   def sqlite3_create_table_like(source, target_db)
     create_table_sql = ActiveRecord::Base.connection.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='#{source}';").first['sql']
     index_sqls = ActiveRecord::Base.connection.execute("SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='#{source}';").map {|e| e['sql']}
@@ -66,7 +71,7 @@ namespace :erica do
     mongoexport_call = "mongoexport #{host} --collection #{collection} --query '#{query}' >> '#{outfile}'"
 
     puts 'EXECUTING: ' + mongoexport_call
-    system(mongoexport_call)
+    system_or_die(mongoexport_call)
   end
   def mongodb_export_documents(collection, id_field, ids, outfile, host)
     ids_string = '[' + ids.map {|id| id.to_s}.join(', ') + ']'
