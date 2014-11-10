@@ -144,6 +144,26 @@ namespace :erica do
       next
     end
 
+    print "Search study with id #{study_id}..."
+    study = Study.where(id: study_id.to_i).first
+    if study.nil?
+      puts 'NOT FOUND'
+      next
+    else
+      puts "FOUND: #{study.inspect}"
+    end
+
+    puts "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    puts "WARNING: THIS WILL ARCHIVE ALL DATA FOR STUDY '#{study.name}', INCLUDING DATABASE ENTRIES, AUDIT TRAIL ENTRIES, IMAGES AND CONFIGURATION."
+    puts "WARNING: THE DATA WILL BE DELETED FROM THE PRODUCTION DATABASE. THIS PROCESS IS NOT EASILY REVERSIBLE!"
+    puts "WARNING: TO CONFIRM THAT YOU WANT TO START THIS PROCESS, PLEASE RECONFIRM THE STUDY NAME BELOW, EXACTLY AS IT APPEARS ABOVE."
+    print "WARNING: STUDY NAME> "
+    study_name_confirmation = STDIN.gets.chomp("\n")
+    if(study_name_confirmation != study.name)
+      puts "PROCESS ABORTED!"
+      next
+    end
+
     archive_pathname = Pathname.new(archive_path)
     if(archive_pathname.file?)
       puts 'The given archive path is a file, please specify a directory'
@@ -155,15 +175,6 @@ namespace :erica do
         puts "Failed to create directory at the given archive destination path: #{e.message}"
         next
       end
-    end
-
-    print "Search study with id #{study_id}..."
-    study = Study.where(id: study_id.to_i).first
-    if study.nil?
-      puts 'NOT FOUND'
-      next      
-    else
-      puts "FOUND: #{study.inspect}"
     end
 
     puts "Archiving image storage"
