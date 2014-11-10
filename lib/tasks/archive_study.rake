@@ -62,15 +62,18 @@ namespace :erica do
 
     ActiveRecord::Base.connection.execute("DETACH DATABASE #{archive_db_name};")
   end
+  def mongodb_export(host, collection, query, outfile)
+    mongoexport_call = "mongoexport #{host} --collection #{collection} --query '#{query}' >> '#{outfile}'"
+
+    puts 'EXECUTING: ' + mongoexport_call
+    system(mongoexport_call)
+  end
   def mongodb_export_documents(collection, id_field, ids, outfile, host)
     ids_string = '[' + ids.map {|id| id.to_s}.join(', ') + ']'
     document_query = "{#{id_field}: { $in: #{ids_string} } }"
     puts document_query
 
-    mongoexport_call = "mongoexport #{host} --collection #{collection} --query '#{document_query}' --out '#{outfile}' --jsonArray"
-
-    puts 'EXECUTING: ' + mongoexport_call
-    system(mongoexport_call)
+    mongodb_export(host, collection, document_query, outfile)
   end
   
   desc 'Archive a study and all its contents, removing them from ERICAv2.'
@@ -115,35 +118,17 @@ namespace :erica do
     archive_mongodb_pathname.mkdir
 
     mongoid_history_trackers_pathname = archive_mongodb_pathname.join('mongoid_history_tracker.json')
-    study.visits.each do |visit|
-      next if visit.visit_data.nil?
+    [
+      {name: 'VisitData', data_ids: study.visits.map {|v| v.visit_data.nil? ? nil : v.visit_data.id}},
+      {name: 'PatientData', data_ids: study.patients.map {|p| p.patient_data.nil? ? nil : p.patient_data.id}},
+      {name: 'ImageSeriesData', data_ids: study.image_series.map {|is| is.image_series_data.nil? ? nil : is.image_series_data.id}},
+    ].each do |spec|
+      spec[:data_ids].each do |id|
+        next if id.nil?
 
-      visit_data_id = visit.visit_data.id
-      document_query = "{ association_chain: { $elemMatch: { name: \"VisitData\", id: ObjectId(\"#{visit_data_id}\") }}}"
-
-      mongoexport_call = "mongoexport #{mongoexport_host_string} --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
-      puts 'EXECUTING: ' + mongoexport_call
-      system(mongoexport_call)
-    end
-    study.patients.each do |patient|
-      next if patient.patient_data.nil?
-
-      data_id = patient.patient_data.id
-      document_query = "{ association_chain: { $elemMatch: { name: \"PatientData\", id: ObjectId(\"#{data_id}\") }}}"
-
-      mongoexport_call = "mongoexport #{mongoexport_host_string} --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
-      puts 'EXECUTING: ' + mongoexport_call
-      system(mongoexport_call)
-    end
-    study.image_series.each do |is|
-      next if is.image_series_data.nil?
-
-      data_id = is.image_series_data.id
-      document_query = "{ association_chain: { $elemMatch: { name: \"ImageSeriesData\", id: ObjectId(\"#{data_id}\") }}}"
-
-      mongoexport_call = "mongoexport #{mongoexport_host_string} --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
-      puts 'EXECUTING: ' + mongoexport_call
-      system(mongoexport_call)
+        query = "{ association_chain: { $elemMatch: { name: \"#{spec[:name]}\", id: ObjectId(\"#{id}\") }}}"
+        mongodb_export(mongoexport_host_string, 'mongoid_history_trackers', query, mongoid_history_trackers_pathname.to_s)
+      end
     end
 
     [
