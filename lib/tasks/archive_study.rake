@@ -118,6 +118,12 @@ namespace :erica do
       puts "FOUND: #{study.inspect}"
     end
 
+    puts "Exporting configuration files"
+    data_archive_pathname = archive_pathname.join('data.tar.gz')
+    data_tar_command = "tar --exclude=#{Rails.application.config.image_storage_root} --exclude=#{Rails.application.config.image_export_root} -c \"#{Rails.application.config.data_directory}\" | gzip -9 > \"#{data_archive_pathname.to_s}\""
+    puts 'EXECUTING: ' + data_tar_command
+    system_or_die(data_tar_command)
+
     puts "Exporting MongoDB documents"
     archive_mongodb_pathname = archive_pathname.join('mongodb')
     archive_mongodb_pathname.mkdir
@@ -144,8 +150,6 @@ namespace :erica do
       outfile_pathname = archive_mongodb_pathname.join(export_spec[:collection] + '.json')
       mongodb_export_documents(export_spec[:collection], export_spec[:id_field], export_spec[:ids], outfile_pathname.to_s, mongoexport_host_string)
     end
-
-    next
 
     archive_sqlite3_db_pathname = archive_pathname.join('database.sqlite3')
     archive_db_name = 'archive_db'
