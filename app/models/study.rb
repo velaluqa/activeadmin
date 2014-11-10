@@ -65,6 +65,9 @@ class Study < ActiveRecord::Base
   def image_storage_path
     self.id.to_s
   end
+  def absolute_image_storage_path
+    Rails.application.config.image_storage_root + '/' + self.image_storage_path
+  end
 
   def config_file_path
     Rails.application.config.study_configs_directory + "/#{id}.yml"
