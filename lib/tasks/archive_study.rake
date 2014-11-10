@@ -62,12 +62,12 @@ namespace :erica do
 
     ActiveRecord::Base.connection.execute("DETACH DATABASE #{archive_db_name};")
   end
-  def mongodb_export_documents(collection, id_field, ids, outfile)
+  def mongodb_export_documents(collection, id_field, ids, outfile, host)
     ids_string = '[' + ids.map {|id| id.to_s}.join(', ') + ']'
     document_query = "{#{id_field}: { $in: #{ids_string} } }"
     puts document_query
 
-    mongoexport_call = "mongoexport --db study_server_v2_development --collection #{collection} --query '#{document_query}' --out '#{outfile}' --jsonArray"
+    mongoexport_call = "mongoexport #{host} --collection #{collection} --query '#{document_query}' --out '#{outfile}' --jsonArray"
 
     puts 'EXECUTING: ' + mongoexport_call
     system(mongoexport_call)
@@ -75,6 +75,9 @@ namespace :erica do
   
   desc 'Archive a study and all its contents, removing them from ERICAv2.'
   task :archive_study, [:study_id, :archive_path] => [:environment] do |t, args|
+    mongodb_server = Mongoid.configure.sessions[:default]
+    mongoexport_host_string = "--db #{mongodb_server[:database]} --host #{mongodb_server[:hosts].first}"
+
     study_id = args[:study_id]
     archive_path = args[:archive_path]
     if(study_id.blank?)
@@ -118,7 +121,7 @@ namespace :erica do
       visit_data_id = visit.visit_data.id
       document_query = "{ association_chain: { $elemMatch: { name: \"VisitData\", id: ObjectId(\"#{visit_data_id}\") }}}"
 
-      mongoexport_call = "mongoexport --db study_server_v2_development --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
+      mongoexport_call = "mongoexport #{mongoexport_host_string} --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
       puts 'EXECUTING: ' + mongoexport_call
       system(mongoexport_call)
     end
@@ -128,7 +131,7 @@ namespace :erica do
       data_id = patient.patient_data.id
       document_query = "{ association_chain: { $elemMatch: { name: \"PatientData\", id: ObjectId(\"#{data_id}\") }}}"
 
-      mongoexport_call = "mongoexport --db study_server_v2_development --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
+      mongoexport_call = "mongoexport #{mongoexport_host_string} --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
       puts 'EXECUTING: ' + mongoexport_call
       system(mongoexport_call)
     end
@@ -138,11 +141,10 @@ namespace :erica do
       data_id = is.image_series_data.id
       document_query = "{ association_chain: { $elemMatch: { name: \"ImageSeriesData\", id: ObjectId(\"#{data_id}\") }}}"
 
-      mongoexport_call = "mongoexport --db study_server_v2_development --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
+      mongoexport_call = "mongoexport #{mongoexport_host_string} --collection mongoid_history_trackers --query '#{document_query}' >> #{mongoid_history_trackers_pathname.to_s}"
       puts 'EXECUTING: ' + mongoexport_call
       system(mongoexport_call)
     end
-    next
 
     [
       {collection: 'visit_data', id_field: 'visit_id', ids: study.visits.map{|v| v.id}},
@@ -150,7 +152,7 @@ namespace :erica do
       {collection: 'patient_data', id_field: 'patient_id', ids: study.patients.map{|p| p.id}}
     ].each do |export_spec|
       outfile_pathname = archive_mongodb_pathname.join(export_spec[:collection] + '.json')
-      mongodb_export_documents(export_spec[:collection], export_spec[:id_field], export_spec[:ids], outfile_pathname.to_s)
+      mongodb_export_documents(export_spec[:collection], export_spec[:id_field], export_spec[:ids], outfile_pathname.to_s, mongoexport_host_string)
     end
 
     next
