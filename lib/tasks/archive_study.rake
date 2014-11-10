@@ -216,5 +216,52 @@ namespace :erica do
     sqlite3_archive(archive_sqlite3_db_pathname, archive_db_name, study)
 
     puts "Created archive db at #{archive_sqlite3_db_pathname.to_s}"
+
+    print 'Finished creating archive, removing study from ERICAv2 now...'
+    result = true
+    PaperTrail.enabled = false
+    Mongoid::History.disable do
+      result = ActiveRecord::Base.transaction do
+
+        study.image_series.each do |image_series|
+          image_series.images.each do |image|
+            Version.where('item_type = "Image" AND item_id = ?', image.id).delete_all
+          end
+
+          Version.where('item_type = "ImageSeries" AND item_id = ?', image_series.id).delete_all
+          image_series.image_series_data.history_tracks.delete_all if(image_series.image_series_data)
+        end
+
+        study.visits.each do |visit|
+          Version.where('item_type = "Visit" AND item_id = ?', visit.id).delete_all
+          visit.visit_data.history_tracks.delete_all if(visit.visit_data)
+        end
+
+        study.patients.each do |patient|
+          Version.where('item_type = "Patient" AND item_id = ?', patient.id).delete_all
+          patient.patient_data.history_tracks.delete_all if(patient.patient_data)
+          patient.destroy
+        end
+
+        study.reload
+        study.centers.each do |center|
+          center.reload
+          Version.where('item_type = "Center" AND item_id = ?', center.id).delete_all
+          center.destroy
+        end
+
+        study.reload
+        Version.where('item_type = "Study" AND item_id = ?', study.id).delete_all
+        study.destroy
+
+      end
+    end
+    PaperTrail.enabled = true
+
+    if(result == false)
+      puts 'FAILED: some records might not have been deleted'
+    else
+      puts 'DONE'
+    end
   end
 end
