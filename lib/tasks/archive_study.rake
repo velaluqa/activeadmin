@@ -25,6 +25,8 @@ namespace :erica do
   # 4. pg_dump archive db
   # 5. drop archive db
 
+  SQL_TABLES_TO_ARCHIVE = ['users', 'public_keys', 'studies', 'centers', 'patients', 'visits', 'image_series', 'images', 'versions']
+
   def system_or_die(command)
     unless(system(command))
       raise 'Failed to execute shell command: "' + command + "\"\nWARNING: THE ARCHIVE IS INCOMPLETE!"
@@ -60,6 +62,24 @@ namespace :erica do
     end
   end
 
+  def postgresql_create_database(name)
+    ActiveRecord::Base.connection.execute("CREATE SCHEMA #{name};")
+  end
+  def postgresql_drop_database(name)
+    ActiveRecord::Base.connection.execute("DROP SCHEMA #{name} CASCADE;")
+  end
+  def postgresql_create_table_like(source, target_db)
+    create_table_sql = "CREATE TABLE #{target_db}.\"#{source}\" (LIKE \"#{source}\" INCLUDING ALL);"
+    puts 'EXECUTING: ' + create_table_sql
+    ActiveRecord::Base.connection.execute(create_table_sql)
+  end
+  def postgresql_dump_database(rails_db_name, db_name, archive_dump_pathname)
+    dump_command = "pg_dump -Ox -n '#{db_name}' '#{rails_db_name}' | gzip -9 > '#{archive_dump_pathname.to_s}'"
+
+    puts 'EXECUTING: ' + dump_command
+    system_or_die(dump_command)
+  end
+
   def sqlite3_create_table_like(source, target_db)
     create_table_sql = ActiveRecord::Base.connection.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='#{source}';").first['sql']
     index_sqls = ActiveRecord::Base.connection.execute("SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='#{source}';").map {|e| e['sql']}
@@ -73,55 +93,74 @@ namespace :erica do
       ActiveRecord::Base.connection.execute(sql)
     end
   end
-  def sqlite3_insert_select(target_db, target_table, query)
+
+  def sql_insert_select(target_db, target_table, query)
     sql = "INSERT INTO #{target_db}.\"#{target_table}\" #{query};"
     puts sql
     ActiveRecord::Base.connection.execute(sql)
   end
-  def sqlite3_archive(archive_db_pathname, archive_db_name, study)
-    ActiveRecord::Base.connection.execute("ATTACH DATABASE '#{archive_db_pathname.to_s}' AS #{archive_db_name};")
+  def sql_archive(archive_db_name, study)
+    sql_insert_select(archive_db_name, 'users', "SELECT * FROM users")
+    sql_insert_select(archive_db_name, 'public_keys', "SELECT * FROM public_keys")
 
-    ['users', 'public_keys', 'studies', 'centers', 'patients', 'visits', 'image_series', 'images', 'versions'].each do |table|
-      sqlite3_create_table_like(table, archive_db_name)
-    end
+    sql_insert_select(archive_db_name, 'studies', "SELECT * FROM studies WHERE id = #{study.id}")
 
-    sqlite3_insert_select(archive_db_name, 'users', "SELECT * FROM users")
-    sqlite3_insert_select(archive_db_name, 'public_keys', "SELECT * FROM public_keys")
+    sql_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Study' AND item_id = #{study.id}")
 
-    sqlite3_insert_select(archive_db_name, 'studies', "SELECT * FROM studies WHERE id = #{study.id}")
-
-    sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Study' AND item_id = #{study.id}")
-
-    sqlite3_insert_select(archive_db_name, 'centers', "SELECT * FROM centers WHERE study_id = #{study.id}")
+    sql_insert_select(archive_db_name, 'centers', "SELECT * FROM centers WHERE study_id = #{study.id}")
     study.centers.each do |center|
-      sqlite3_insert_select(archive_db_name, 'patients', "SELECT * FROM patients WHERE center_id = #{center.id}")
+      sql_insert_select(archive_db_name, 'patients', "SELECT * FROM patients WHERE center_id = #{center.id}")
 
-      sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Center' AND item_id = #{center.id}")
+      sql_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Center' AND item_id = #{center.id}")
 
       center.patients.each do |patient|
-        sqlite3_insert_select(archive_db_name, 'image_series', "SELECT * FROM image_series WHERE patient_id = #{patient.id}")
-        sqlite3_insert_select(archive_db_name, 'visits', "SELECT * FROM visits WHERE patient_id = #{patient.id}")
+        sql_insert_select(archive_db_name, 'image_series', "SELECT * FROM image_series WHERE patient_id = #{patient.id}")
+        sql_insert_select(archive_db_name, 'visits', "SELECT * FROM visits WHERE patient_id = #{patient.id}")
 
-        sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Patient' AND item_id = #{patient.id}")
+        sql_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Patient' AND item_id = #{patient.id}")
 
         patient.image_series.each do |is|
-          sqlite3_insert_select(archive_db_name, 'images', "SELECT * FROM images WHERE image_series_id = #{is.id}")
+          sql_insert_select(archive_db_name, 'images', "SELECT * FROM images WHERE image_series_id = #{is.id}")
 
-          sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'ImageSeries' AND item_id = #{is.id}")
+          sql_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'ImageSeries' AND item_id = #{is.id}")
 
           is.images.each do |image|
-            sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Image' AND item_id = #{image.id}")
+            sql_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Image' AND item_id = #{image.id}")
           end
         end
 
         patient.visits.each do |visit|
-          sqlite3_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Visit' AND item_id = #{visit.id}")
+          sql_insert_select(archive_db_name, 'versions', "SELECT * FROM versions WHERE item_type = 'Visit' AND item_id = #{visit.id}")
         end
       end
     end
+  end
+
+  def sqlite3_archive(archive_db_pathname, archive_db_name, study)
+    ActiveRecord::Base.connection.execute("ATTACH DATABASE '#{archive_db_pathname.to_s}' AS #{archive_db_name};")
+
+    SQL_TABLES_TO_ARCHIVE.each do |table|
+      sqlite3_create_table_like(table, archive_db_name)
+    end
+
+    sql_archive(archive_db_name, study)
 
     ActiveRecord::Base.connection.execute("DETACH DATABASE #{archive_db_name};")
   end
+  def postgresql_archive(archive_dump_pathname, archive_db_name, study)
+    postgresql_create_database(archive_db_name)
+
+    SQL_TABLES_TO_ARCHIVE.each do |table|
+      postgresql_create_table_like(table, archive_db_name)
+    end
+
+    sql_archive(archive_db_name, study)
+
+    postgresql_dump_database(Rails.configuration.database_configuration[Rails.env]['database'], archive_db_name, archive_dump_pathname)
+
+    postgresql_drop_database(archive_db_name)
+  end
+
   def mongodb_export(host, collection, query, outfile)
     mongoexport_call = "mongoexport #{host} --collection #{collection} --query '#{query}' >> '#{outfile}'"
 
@@ -149,6 +188,10 @@ namespace :erica do
     elsif(archive_path.blank?)
       puts 'No archive destination path given'
       next
+    end
+
+    unless(['PostgreSQL', 'SQLite'].include?(ActiveRecord::Base.connection.adapter_name))
+      raise "Unhandled RDBMS adapter: #{ActiveRecord::Base.connection.adapter_name}. This script only supports PostgreSQL and SQLite!"
     end
 
     print "Search study with id #{study_id}..."
@@ -228,12 +271,25 @@ namespace :erica do
       mongodb_export_documents(export_spec[:collection], export_spec[:id_field], export_spec[:ids], outfile_pathname.to_s, mongoexport_host_string)
     end
 
-    archive_sqlite3_db_pathname = archive_pathname.join('database.sqlite3')
-    archive_db_name = 'archive_db'
 
-    sqlite3_archive(archive_sqlite3_db_pathname, archive_db_name, study)
+    case ActiveRecord::Base.connection.adapter_name
+    when 'PostgreSQL'
+      archive_db_name = 'archive_db_' + Time.now.strftime('%Y%m%d%H%M%S')
+      archive_postgresql_dump_pathname = archive_pathname.join('database.sql.gz')
 
-    puts "Created archive db at #{archive_sqlite3_db_pathname.to_s}"
+      postgresql_archive(archive_postgresql_dump_pathname, archive_db_name, study)
+
+      puts "Created archive SQL dump at #{archive_postgresql_dump_pathname.to_s}"
+    when 'SQLite'
+      archive_db_name = 'archive_db'
+      archive_sqlite3_db_pathname = archive_pathname.join('database.sqlite3')
+
+      sqlite3_archive(archive_sqlite3_db_pathname, archive_db_name, study)
+
+      puts "Created archive db at #{archive_sqlite3_db_pathname.to_s}"
+    else
+      raise "Unhandled RDBMS adapter: #{ActiveRecord::Base.connection.adapter_name}. This script only supports PostgreSQL and SQLite!"
+    end
 
     print 'Finished creating archive, removing study from ERICAv2 now...'
     result = true
@@ -243,20 +299,20 @@ namespace :erica do
 
         study.image_series.each do |image_series|
           image_series.images.each do |image|
-            Version.where('item_type = "Image" AND item_id = ?', image.id).delete_all
+            Version.where('item_type = \'Image\' AND item_id = ?', image.id).delete_all
           end
 
-          Version.where('item_type = "ImageSeries" AND item_id = ?', image_series.id).delete_all
+          Version.where('item_type = \'ImageSeries\' AND item_id = ?', image_series.id).delete_all
           image_series.image_series_data.history_tracks.delete_all if(image_series.image_series_data)
         end
 
         study.visits.each do |visit|
-          Version.where('item_type = "Visit" AND item_id = ?', visit.id).delete_all
+          Version.where('item_type = \'Visit\' AND item_id = ?', visit.id).delete_all
           visit.visit_data.history_tracks.delete_all if(visit.visit_data)
         end
 
         study.patients.each do |patient|
-          Version.where('item_type = "Patient" AND item_id = ?', patient.id).delete_all
+          Version.where('item_type = \'Patient\' AND item_id = ?', patient.id).delete_all
           patient.patient_data.history_tracks.delete_all if(patient.patient_data)
           patient.destroy
         end
@@ -264,12 +320,12 @@ namespace :erica do
         study.reload
         study.centers.each do |center|
           center.reload
-          Version.where('item_type = "Center" AND item_id = ?', center.id).delete_all
+          Version.where('item_type = \'Center\' AND item_id = ?', center.id).delete_all
           center.destroy
         end
 
         study.reload
-        Version.where('item_type = "Study" AND item_id = ?', study.id).delete_all
+        Version.where('item_type = \'Study\' AND item_id = ?', study.id).delete_all
         study.destroy
 
       end
