@@ -13,7 +13,15 @@ ActiveAdmin.setup do |config|
   # Set the title that is displayed on the main layout
   # for each of the active admin pages.
   #
-  config.site_title = "pharmtrace ERICA"
+  if(Rails.application.config.is_erica_remote)
+    if(Rails.application.config.erica_remote['sponsor'].blank?)
+      config.site_title = "pharmtrace ERICA Remote"
+    else
+      config.site_title = "pharmtrace ERICA Remote :: #{Rails.application.config.erica_remote['sponsor']}"
+    end
+  else
+    config.site_title = "pharmtrace ERICA"
+  end
 
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.
