@@ -13,6 +13,7 @@ ActiveAdmin.register Session do
   scope :closed
 
   menu false if Rails.application.config.is_erica_remote
+  config.comments = false
 
   controller do
     load_and_authorize_resource :except => :index

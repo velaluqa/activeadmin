@@ -2,6 +2,7 @@ ActiveAdmin.register MongoidHistoryTracker do
   before_filter { @skip_sidebar = true }
 
   menu false
+  config.comments = false
 
   actions :index, :show
 

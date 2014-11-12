@@ -1,5 +1,6 @@
 ActiveAdmin.register PublicKey do
   menu false
+  config.comments = false
 
   actions :index, :show
 

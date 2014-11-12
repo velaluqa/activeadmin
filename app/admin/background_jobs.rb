@@ -3,6 +3,7 @@ ActiveAdmin.register BackgroundJob do
 
   menu priority: 22
   config.filters = false
+  config.comments = false
   actions :index, :show, :destroy
 
   scope :all, :default => true

@@ -1,4 +1,5 @@
 ActiveAdmin.register Role do
+  config.comments = false
 
   controller do
     load_and_authorize_resource :except => :index
