@@ -96,6 +96,7 @@ ActiveAdmin.register Study do
         render 'admin/shared/config_table', :current => current, :locked => locked
       end
     end
+    active_admin_comments
   end
   
   form do |f|
