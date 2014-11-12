@@ -10,6 +10,8 @@ ActiveAdmin.register Form do
   scope :draft
   scope :final
 
+  menu false if Rails.application.config.is_erica_remote
+
   controller do
     load_and_authorize_resource :except => :index
     skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :download_configuration_at_version, :download_current_custom_validators, :download_locked_custom_validators, :download_custom_validators_at_version, :copy, :copy_form]

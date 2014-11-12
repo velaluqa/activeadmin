@@ -7,6 +7,8 @@ ActiveAdmin.register FormAnswer do
 
   config.per_page = 100
 
+  menu false if Rails.application.config.is_erica_remote
+
   controller do
     helper :forms
 

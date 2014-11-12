@@ -13,6 +13,8 @@ ActiveAdmin.register Case do
 
   config.per_page = 100
 
+  menu false if Rails.application.config.is_erica_remote
+
   controller do
     load_and_authorize_resource :except => :index
 

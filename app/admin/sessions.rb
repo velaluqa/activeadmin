@@ -12,6 +12,8 @@ ActiveAdmin.register Session do
   scope :production
   scope :closed
 
+  menu false if Rails.application.config.is_erica_remote
+
   controller do
     load_and_authorize_resource :except => :index
     skip_load_and_authorize_resource :only => [:download_current_configuration, :download_locked_configuration, :download_configuration_at_version, :switch_state, :deep_clone_form, :deep_clone]
