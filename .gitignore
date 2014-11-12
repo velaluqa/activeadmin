@@ -18,6 +18,7 @@
 /config/database.yml
 /config/mongoid.yml
 /config/goodimage_migration.yml
+/config/erica_remote.yml
 
 # Ignore gems installed in deployment mode
 /vendor/bundle
