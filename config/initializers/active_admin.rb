@@ -2,9 +2,15 @@ require 'aa_footer'
 require 'aa_site_title'
 require 'aa_viewer_cart_mixin'
 require 'aa_erica_comment'
+require 'aa_comment_paper_trail_patch'
 
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICACommentMixin::DSL)
+
+if(Rails.application.config.is_erica_remote)
+  ActiveAdmin::Comment
+  ActiveAdmin::Comment.send(:include, ActiveAdminCommentPaperTrailPatch)
+end
 
 ActiveAdmin.setup do |config|
 
