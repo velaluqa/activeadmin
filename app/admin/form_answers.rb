@@ -1,13 +1,15 @@
 require 'key_path_accessor'
 
 ActiveAdmin.register FormAnswer do
+
+  menu if: proc { can? :read, FormAnswer }
+
   before_filter { @skip_sidebar = true }
 
   actions :index, :show, :destroy #TEMP
 
   config.per_page = 100
 
-  menu false if Rails.application.config.is_erica_remote
   config.comments = false
 
   controller do

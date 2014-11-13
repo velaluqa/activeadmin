@@ -3,6 +3,8 @@ require 'schema_validation'
 
 ActiveAdmin.register Study do
 
+  menu if: proc { can? :read, Study }
+
   scope :all, :default => true
   scope :building
   scope :production
@@ -96,7 +98,7 @@ ActiveAdmin.register Study do
         render 'admin/shared/config_table', :current => current, :locked => locked
       end
     end
-    active_admin_comments
+    active_admin_comments if can? :read, ActiveAdmin::Comment
   end
   
   form do |f|

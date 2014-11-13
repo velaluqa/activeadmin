@@ -1,4 +1,6 @@
 ActiveAdmin.register User do
+  menu if: proc { can? :read, User }
+
   config.comments = false
 
   controller do

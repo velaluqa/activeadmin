@@ -4,6 +4,8 @@ require 'config_display_filters'
 
 ActiveAdmin.register Session do
 
+  menu if: proc { can? :read, Session }
+
   config.clear_action_items! # get rid of the default action items, since we have to handle 'edit' and 'delete' on a case-by-case basis
 
   scope :all, :default => true
@@ -12,7 +14,6 @@ ActiveAdmin.register Session do
   scope :production
   scope :closed
 
-  menu false if Rails.application.config.is_erica_remote
   config.comments = false
 
   controller do

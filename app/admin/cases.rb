@@ -8,12 +8,13 @@ require 'set'
 
 ActiveAdmin.register Case do
 
+  menu if: proc { can? :read, Case }
+
   actions :index, :show, :edit, :update, :destroy
   config.clear_action_items! # get rid of the default action items, since we have to handle 'delete' on a case-by-case basis
 
   config.per_page = 100
 
-  menu false if Rails.application.config.is_erica_remote
   config.comments = false
 
   controller do

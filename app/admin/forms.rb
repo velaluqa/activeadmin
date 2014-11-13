@@ -4,13 +4,14 @@ require 'git_config_repository'
 
 ActiveAdmin.register Form do
 
+  menu if: proc { can? :read, FormAnswer }
+
   config.clear_action_items! # get rid of the default action items, since we have to handle 'edit' and 'delete' on a case-by-case basis
 
   scope :all, :default => true
   scope :draft
   scope :final
 
-  menu false if Rails.application.config.is_erica_remote
   config.comments = false
 
   controller do
