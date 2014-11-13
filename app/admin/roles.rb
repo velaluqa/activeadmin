@@ -1,4 +1,6 @@
 ActiveAdmin.register Role do
+  menu if: proc { can? :read, Role }
+
   config.comments = false
 
   controller do
@@ -10,6 +12,14 @@ ActiveAdmin.register Role do
 
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
+    end
+
+    def update
+      # this verifies that the constraints on role creation/update on ERICA Remote admins are enforced
+      updated_role = Role.new(params[:role])
+      authorize! :update, updated_role
+
+      update!
     end
   end
 
@@ -50,6 +60,12 @@ ActiveAdmin.register Role do
     subjects = [["System", nil]] + Session.all.map{|s| ["Session: #{s.name}", "session_#{s.id}"]} + Study.all.map{|s| ["Study: #{s.name}", "study_#{s.id}"]}
     roles = {}
     Role::ROLE_SYMS.each_with_index do |role_sym, index|
+      if(Rails.application.config.is_erica_remote)
+        next unless role_sym.to_s.start_with?('remote_')
+      else
+        next if role_sym.to_s.start_with?('remote_')
+      end
+
       roles[Role::ROLE_NAMES[index]] = role_sym
     end
 

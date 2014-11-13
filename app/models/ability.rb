@@ -12,10 +12,38 @@ class Ability
 
     # ERICA Remote
     if Rails.application.config.is_erica_remote
-      can [:read, :create], ActiveAdmin::Comment
-      can [:update, :destroy], ActiveAdmin::Comment do |comment|
-        comment.author_id == user.id and comment.author_type == 'User'
+      if user.is_erica_remote_admin?
+        can :manage, ActiveAdmin::Comment
+        can :read, [Study, Center, Patient, Visit, ImageSeries, Image, Version, User, Role, PublicKey]
+        can :create, User
+        can :new, Role
+        can :create, Role do |role|
+          role.user and role.user.is_erica_remote_user? and role.erica_remote_role?
+        end
+        can [:update, :destroy], Role do |role|
+          role.erica_remote_role? and not (role.user and role.user.id == user.id and role.role == :remote_manage)
+        end
+        can [:update, :destroy], User do |user|
+          user.is_erica_remote_user?
+        end
+      else
+        can :read, [Study, Center, Patient, Visit, ImageSeries, Image]
+
+        if(user.has_system_role?(:remote_comments))
+          can [:read, :create], ActiveAdmin::Comment
+          can [:update, :destroy], ActiveAdmin::Comment do |comment|
+            comment.author_id == user.id and comment.author_type == 'User'
+          end
+        end
+
+        can :read, Version if(user.has_system_role?(:remote_audit))
+
+        can :download, Image if(user.has_system_role?(:remote_images))
+
+        can :read_qc, Visit if(user.has_system_role?(:remote_qc))
       end
+
+      return
     end
     
     # App Admin

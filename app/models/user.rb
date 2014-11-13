@@ -53,8 +53,14 @@ class User < ActiveRecord::Base
   def is_app_admin?
     has_system_role?(:manage)
   end
+  def is_erica_remote_admin?
+    has_system_role?(:remote_manage)
+  end
   def has_system_role?(role_sym)
     !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(role_sym) }).nil?)
+  end
+  def is_erica_remote_user?
+    roles.all? {|role| role.erica_remote_role? }
   end
 
   def test_results_for_session(session)

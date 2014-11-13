@@ -28,6 +28,9 @@ class Role < ActiveRecord::Base
   def system_role?
     subject_type == nil and subject_id == nil
   end
+  def erica_remote_role?
+    [:remote_manage, :remote_comments, :remote_images, :remote_keywords, :remote_audit, :remote_qc].include?(self.role)
+  end
 
   def self.role_sym_to_int(sym)
     return Role::ROLE_SYMS.index(sym)
