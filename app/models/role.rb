@@ -7,8 +7,8 @@ class Role < ActiveRecord::Base
   belongs_to :user
   belongs_to :subject, :polymorphic => true  
 
-  ROLE_SYMS = [:manage, :image_import, :image_manage, :medical_qc, :audit, :readonly]
-  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager', 'Medical QC', 'Audit', 'Read-only']
+  ROLE_SYMS = [:manage, :image_import, :image_manage, :medical_qc, :audit, :readonly, :remote_manage, :remote_comments, :remote_images, :remote_keywords, :remote_audit, :remote_qc]
+  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager', 'Medical QC', 'Audit', 'Read-only', 'ERICA Remote Manager', 'Remote - Access Comments', 'Remote - Download Images', 'Remote - Set Keywords', 'Remote - Audit', 'Remote - QC access']
 
   before_save :fix_subject
 
@@ -31,6 +31,9 @@ class Role < ActiveRecord::Base
 
   def self.role_sym_to_int(sym)
     return Role::ROLE_SYMS.index(sym)
+  end
+  def self.role_sym_to_role_name(sym)
+    return ROLE_NAMES[Role::ROLE_SYMS.index(sym)]
   end
 
   def role_name
