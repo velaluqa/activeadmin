@@ -7,7 +7,20 @@ ActiveAdmin.register Version do
   actions :index, :show
 
   filter :created_at
-  filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Patient', 'Role', 'Session', 'Study' , 'User', 'Center', 'ImageSeries', 'Image', 'Patient', 'Visit']
+  filter :item_type, :as => :select, :collection => {'Case' => 'Case',
+                                                     'Form' => 'Form',
+                                                     'Patient' => 'Patient',
+                                                     'Role' => 'Role',
+                                                     'Session' => 'Session',
+                                                     'Study' => 'Study',
+                                                     'User' => 'User',
+                                                     'Center' => 'Center',
+                                                     'ImageSeries' => 'ImageSeries',
+                                                     'Image' => 'Image',
+                                                     'Patient' => 'Patient',
+                                                     'Visit' => 'Visit',
+                                                     'Comment' => 'ActiveAdmin::Comment',
+                                                    }
   filter :whodunnit, :label => 'User', :as => :select, :collection => proc { User.all }
   filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
@@ -131,7 +144,12 @@ ActiveAdmin.register Version do
   index do
     selectable_column
     column 'Timestamp', :created_at
-    column :item_type
+    column :item_type, sortable: :item_type do |version|
+      case version.item_type
+      when 'ActiveAdmin::Comment' then 'Comment'
+      else version.item_type
+      end
+    end
     column :item do |version|
       auto_link(version.item)
     end
@@ -171,7 +189,12 @@ ActiveAdmin.register Version do
   show do |version|
     attributes_table do
       row :created_at
-      row :item_type
+      row :item_type do
+        case version.item_type
+        when 'ActiveAdmin::Comment' then 'Comment'
+        else version.item_type
+        end
+      end
       row :item do
         auto_link(version.item)
       end
