@@ -98,7 +98,7 @@ ActiveAdmin.register Study do
         render 'admin/shared/config_table', :current => current, :locked => locked
       end
     end
-    active_admin_comments if can? :read, ActiveAdmin::Comment
+    active_admin_comments if can? :remote_comment, study
   end
   
   form do |f|
