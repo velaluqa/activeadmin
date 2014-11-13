@@ -12,9 +12,17 @@ class Ability
 
     # ERICA Remote
     if Rails.application.config.is_erica_remote
+      if user.is_app_admin?
+        can :manage, :system
+        can :manage, User
+        can :manage, Role
+        can :manage, PublicKey
+        can :manage, Study
+      end
+
+      # handle :remote_manage
       if user.is_erica_remote_admin?
-        can :manage, ActiveAdmin::Comment
-        can :read, [Study, Center, Patient, Visit, ImageSeries, Image, Version, User, Role, PublicKey]
+        can :read, [User, Role, PublicKey]
         can :create, User
         can :new, Role
         can :create, Role do |role|
@@ -23,25 +31,74 @@ class Ability
         can [:update, :destroy], Role do |role|
           role.erica_remote_role? and not (role.user and role.user.id == user.id and role.role == :remote_manage)
         end
-        can [:update, :destroy], User do |user|
-          user.is_erica_remote_user?
+        can [:update, :destroy], User do |user_to_edit|
+          user_to_edit.is_erica_remote_user?
         end
-      else
-        can :read, [Study, Center, Patient, Visit, ImageSeries, Image]
-
-        if(user.has_system_role?(:remote_comments))
-          can [:read, :create], ActiveAdmin::Comment
-          can [:update, :destroy], ActiveAdmin::Comment do |comment|
-            comment.author_id == user.id and comment.author_type == 'User'
-          end
-        end
-
-        can :read, Version if(user.has_system_role?(:remote_audit))
-
-        can :download, Image if(user.has_system_role?(:remote_images))
-
-        can :read_qc, Visit if(user.has_system_role?(:remote_qc))
       end
+
+      # handle :remote_read
+      if(user.has_system_role?(:remote_read))
+        can :read, [Study, Center, Patient, Visit, ImageSeries, Image]
+      elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_read)).empty?)
+        can :read, Study, ['id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id] do |study|
+          !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_read)}).nil?
+        end
+        can :read, Center, ['centers.study_id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id] do |center|
+          can? :read, center.study
+        end
+        can :read, Patient, Patient.includes(:center).where('centers.study_id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id) do |patient|
+          can? :read, patient.study
+        end
+        can :read, Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id) do |visit|
+          can? :read, visit.study
+        end
+        can :read, ImageSeries, ImageSeries.includes(:patient => :center).where('centers.study_id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id) do |image_series|
+          can? :read, iamge_series.study
+        end
+        can :read, Image, Image.includes(:image_series => {:patient => :center}).where('centers.study_id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id) do |image|
+          can? :read, iamge.study
+        end
+      end
+
+      # handle :remote_comment
+      can :remote_comment, Study do |study|
+        user.has_system_role?(:remote_comment) or (
+          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_comment)}).nil?
+        )
+      end
+      can :remote_comment, [Center, Patient, Visit, ImageSeries, Image] do |resource|
+        can? :remote_comment, resource.study
+      end
+
+      if(user.has_system_role?(:remote_comments))
+        can [:read, :create], ActiveAdmin::Comment do |comment|
+          can? :remote_comment, comment.resource
+        end
+        can [:update, :destroy], ActiveAdmin::Comment do |comment|
+          can? :remote_comment, comment.resource and comment.author_id == user.id and comment.author_type == 'User'
+        end
+      end
+
+      # handle :remote_audit
+      can :read, Version if(user.has_system_role?(:remote_audit))
+
+      # handle :remote_images
+      can :download, Image if(user.has_system_role?(:remote_images))
+
+      # handle :remote_qc
+      if(user.has_system_role?(:remote_qc))
+        can :read_qc, Study
+        can :read_qc, Visit
+      else
+        can :read_qc, Study do |study|
+          !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_qc)}).nil?
+        end
+        can :read_qc, Visit do |visit|
+          can? :read_qc, visit.study
+        end
+      end
+
+      # TODO: handle :remote_keywords
 
       return
     end
@@ -219,4 +276,6 @@ class Ability
   STUDY_AUDIT_ROLES_SUBQUERY = '(SELECT roles.subject_id FROM roles WHERE roles.subject_type LIKE \'Study\' AND (roles.role = 4 OR roles.role = 5) AND roles.user_id = ?)'
   SESSION_AUDIT_ROLES_SUBQUERY = 'SELECT roles.subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE \'Session\' AND (roles.role = 4 OR roles.role = 5) AND roles.user_id = ?'
   SESSION_STUDY_AUDIT_ROLES_SUBQUERY = '(SELECT sessions.id FROM sessions WHERE sessions.study_id IN (SELECT roles.subject_id FROM roles INNER JOIN studies ON roles.subject_id = studies.id WHERE roles.subject_type LIKE \'Study\' AND (roles.role = 4 OR roles.role = 5) AND roles.user_id = ?) UNION ALL '+SESSION_AUDIT_ROLES_SUBQUERY+')'
+
+  STUDY_REMOTE_ROLES_SUBQUERY = '(SELECT roles.subject_id FROM roles WHERE roles.subject_type LIKE \'Study\' AND roles.role = ? AND roles.user_id = ?)'
 end
