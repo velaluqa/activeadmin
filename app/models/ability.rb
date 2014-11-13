@@ -9,6 +9,14 @@ class Ability
     can [:read, :destroy], BackgroundJob do |job|
       job.user_id == user.id
     end
+
+    # ERICA Remote
+    if Rails.application.config.is_erica_remote
+      can [:read, :create], ActiveAdmin::Comment
+      can [:update, :destroy], ActiveAdmin::Comment do |comment|
+        comment.author_id == user.id and comment.author_type == 'User'
+      end
+    end
     
     # App Admin
     if user.is_app_admin?
