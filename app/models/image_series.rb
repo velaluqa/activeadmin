@@ -41,7 +41,11 @@ class ImageSeries < ActiveRecord::Base
   end
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = ImageSeries::STATE_SYMS.index(sym)
+    if sym.is_a? Fixnum
+      index = sym
+    else
+      index = ImageSeries::STATE_SYMS.index(sym)
+    end
     
     if index.nil?
       throw "Unsupported state"
