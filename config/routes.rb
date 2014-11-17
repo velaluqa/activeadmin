@@ -12,6 +12,10 @@ end
 StudyServer::Application.routes.draw do
   ActiveAdmin.routes(self)
 
+  if(Rails.application.config.is_erica_remote)
+    post '/erica_remote/push', to: 'erica_remote#push'
+  end
+
   resources :forms, :only => [:show] do
     member do
       get 'previous_results'
