@@ -89,7 +89,7 @@ class Ability
       if(user.has_system_role?(:remote_qc))
         can :read_qc, Study
         can :read_qc, Visit
-      else
+      elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_qc)).empty?)
         can :read_qc, Study do |study|
           !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_qc)}).nil?
         end
