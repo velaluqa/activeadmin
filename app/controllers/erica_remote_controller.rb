@@ -64,6 +64,20 @@ class EricaRemoteController < ApplicationController
 
     render nothing: true
   end
+
+  def paths
+    unless(Study.exists?(params[:study_id]))
+      render nothing: true, status: :not_found
+      return
+    end
+
+    study = Study.find(params[:study_id])
+
+    configs_path = Rails.root.join(Rails.application.config.data_directory).to_s
+    image_storage_path = Rails.root.join(study.absolute_image_storage_path).to_s
+
+    render json: {configs: configs_path, images: image_storage_path}
+  end
   
   protected
 

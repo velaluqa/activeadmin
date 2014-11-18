@@ -1,6 +1,18 @@
 class ERICARemoteSyncWorker
   include Sidekiq::Worker
 
+  def system_or_die(command)
+    unless(system(command))
+      raise 'Failed to execute shell command: "' + command + '"'
+    end
+  end
+  def rsync_or_die(source, destination, use_ssh = false)
+    sync_command = "rsync -av #{use_ssh ? '-essh' : ''} '#{source}' '#{destination}'"
+
+    puts 'EXECUTING: ' + sync_command
+    system_or_die(sync_command)
+  end
+
   def gzip(data)
     io = StringIO.new('w')
 
@@ -53,22 +65,66 @@ class ERICARemoteSyncWorker
     Net::HTTP.start(uri.host, uri.port) do |http|
       push_request = Net::HTTP::Post.new(uri.path, {'X-ERICA-Signature' => Base64.strict_encode64(signature), 'Content-Encoding' => 'gzip', 'Content-Type' => 'text/yaml'})
       push_request.body = data
-      
+
       response = http.request(push_request)
-      # TODO: error handling     
-      pp response
+
+      unless response.code.to_i == 200
+        raise "Failed to push records to ERICA Remote at #{uri.to_s}: #{response.message}"
+      end
+    end
+  end
+
+  def retrieve_paths(uri, study_id)
+    pp uri.query
+    query = URI.decode_www_form(uri.query || '')
+    query << ['study_id', study_id.to_s]
+    uri.query = URI.encode_www_form(query)
+
+    response = Net::HTTP.get_response(uri)
+
+    case response
+    when Net::HTTPSuccess
+      JSON::parse(response.body)
+    else
+      raise "Failed to retrieve path information for study #{study_id} from ERICA Remote at #{uri.to_s}: #{response.message}"
     end
   end
   
-  def perform(job_id, study_id, erica_remote_url)
+  def perform(job_id, study_id, erica_remote_url, rsync_host = nil)
     job = BackgroundJob.find(job_id)
 
     erica_remote_uri = URI::join(erica_remote_url, 'erica_remote/push')
-    
+    erica_remote_paths_uri = URI::join(erica_remote_url, 'erica_remote/paths')
+
     study = Study.find(study_id)
 
     records_signature, gzipped_records = sign_and_gzip_records(compile_records(study))
     push_records(erica_remote_uri, gzipped_records, records_signature)
+
+    config_paths = [
+      Rails.root.join(Rails.application.config.data_directory, '.git').to_s.chomp('/'),
+      Rails.root.join(Rails.application.config.study_configs_directory).to_s.chomp('/'),
+      Rails.root.join(Rails.application.config.form_configs_directory).to_s.chomp('/'),
+      Rails.root.join(Rails.application.config.session_configs_directory).to_s.chomp('/'),
+    ]
+    local_paths = {
+      'configs' => config_paths.join('\' \''),
+      'images' => Rails.root.join(study.absolute_image_storage_path).to_s,
+    }
+
+    remote_paths = retrieve_paths(erica_remote_paths_uri, study_id)
+    unless(rsync_host.blank?)
+      remote_paths['configs'] = rsync_host + ':' + remote_paths['configs']
+      remote_paths['images'] = rsync_host + ':' + remote_paths['images']
+    end
+
+    local_paths['images'] += '/' unless local_paths['images'].end_with?('/')
+
+    remote_paths['configs'] += '/' unless remote_paths['configs'].end_with?('/')
+    remote_paths['images'] = remote_paths['images'].chomp('/')
+
+    rsync_or_die(local_paths['configs'], remote_paths['configs'], !(rsync_host.blank?))
+    rsync_or_die(local_paths['images'], remote_paths['images'], !(rsync_host.blank?))
 
     job.finish_successfully({})
   end

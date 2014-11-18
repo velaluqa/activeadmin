@@ -14,6 +14,7 @@ StudyServer::Application.routes.draw do
 
   if(Rails.application.config.is_erica_remote)
     post '/erica_remote/push', to: 'erica_remote#push'
+    get '/erica_remote/paths', to: 'erica_remote#paths'
   end
 
   resources :forms, :only => [:show] do

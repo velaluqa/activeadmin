@@ -1,9 +1,10 @@
 namespace :erica do
 
   desc 'Start an ERICA Remote sync job'
-  task :sync_study_to_remote, [:study_id, :remote_url] => [:environment] do |t, args|
+  task :sync_study_to_remote, [:study_id, :remote_url, :remote_host] => [:environment] do |t, args|
     study_id = args[:study_id]
     remote_url = args[:remote_url]
+    remote_host = args[:remote_host]
     if(study_id.blank?)
       puts 'No study id given'
       next
@@ -14,7 +15,7 @@ namespace :erica do
 
     background_job = BackgroundJob.create(:name => "Sync study #{study_id} to #{remote_url}", :user_id => User.where(:username => 'profmaad').first.id)
 
-    ERICARemoteSyncWorker.new.perform(background_job.id.to_s, study_id, remote_url)
+    ERICARemoteSyncWorker.new.perform(background_job.id.to_s, study_id, remote_url, remote_host)
 
     background_job.reload
     pp background_job
