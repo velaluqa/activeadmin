@@ -117,3 +117,6 @@ gem 'dicom'
 
 # MongoDB audit trail
 gem 'mongoid-history'
+
+# Zip file creation for image download in ERICA Remote
+gem 'rubyzip'
