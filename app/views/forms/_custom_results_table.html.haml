@@ -37,7 +37,7 @@
       - elsif row_spec['repeatable']
         - prefixes = row_spec['repeatable']['prefixes']
         - rows = row_spec['repeatable']['rows']
-        - max_case = cases.max{|c| c.form_answer.answers[prefixes[c.case_type]].nil? ? 0 : c.form_answer.answers[prefixes[c.case_type]].size}
+        - max_case = cases.max_by{|c| c.form_answer.answers[prefixes[c.case_type]].nil? ? 0 : c.form_answer.answers[prefixes[c.case_type]].size}
         - if max_case.nil?
           - repeatable_size = 0
         - else
