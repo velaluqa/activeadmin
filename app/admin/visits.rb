@@ -93,25 +93,37 @@ ActiveAdmin.register Visit do
     column :description
     column :visit_type
     column :visit_date
-    column :state, :sortable => :state do |visit|
-      case(visit.state)
-      when :incomplete_na then status_tag('Incomplete, not available')
-      when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
-      when :incomplete_queried then status_tag('Incomplete, queried', :warning)
-      when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
-      when :complete_tqc_issues then stauts_tag('Complete, tQC finished, not all series passed', :error)
+    if(can? :read_qc, Visit or (not Rails.application.config.is_erica_remote))
+      column :state, :sortable => :state do |visit|
+        next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
+
+        case(visit.state)
+        when :incomplete_na then status_tag('Incomplete, not available')
+        when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
+        when :incomplete_queried then status_tag('Incomplete, queried', :warning)
+        when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
+        when :complete_tqc_issues then stauts_tag('Complete, tQC finished, not all series passed', :error)
+        end
       end
-    end
-    column 'mQC State', :mqc_state, :sortable => :mqc_state do |visit|
-      case(visit.mqc_state)
-      when :pending then status_tag('Pending')
-      when :issues then status_tag('Performed, issues present', :error)
-      when :passed then status_tag('Performed, passed', :ok)
+      column 'mQC State', :mqc_state, :sortable => :mqc_state do |visit|
+        next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
+
+        case(visit.mqc_state)
+        when :pending then status_tag('Pending')
+        when :issues then status_tag('Performed, issues present', :error)
+        when :passed then status_tag('Performed, passed', :ok)
+        end
       end
-    end
-    column 'mQC Date', :mqc_date
-    column 'mQC User', :mqc_user, :sortable => :mqc_user_id do |visit|
-      link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user)) unless visit.mqc_user.nil?
+      column 'mQC Date', :mqc_date do |visit|
+        next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
+
+        pretty_format(visit.mqc_date)
+      end
+      column 'mQC User', :mqc_user, :sortable => :mqc_user_id do |visit|
+        next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
+
+        link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user)) unless visit.mqc_user.nil?
+      end
     end
     
     default_actions
@@ -126,25 +138,27 @@ ActiveAdmin.register Visit do
       row :description
       row :visit_type
       row :visit_date
-      row :state do
-        case(visit.state)
-        when :incomplete_na then status_tag('Incomplete, not available')
-        when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
-        when :incomplete_queried then status_tag('Incomplete, queried', :warning)
-        when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
-        when :complete_tqc_issues then stauts_tag('Complete, tQC finished, not all series passed', :error)
+      if(can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
+        row :state do
+          case(visit.state)
+          when :incomplete_na then status_tag('Incomplete, not available')
+          when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
+          when :incomplete_queried then status_tag('Incomplete, queried', :warning)
+          when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
+          when :complete_tqc_issues then stauts_tag('Complete, tQC finished, not all series passed', :error)
+          end
         end
-      end
-      row 'mQC State' do
-        case(visit.mqc_state)
-        when :pending then status_tag('Pending')
-        when :issues then status_tag('Performed, issues present', :error)
-        when :passed then status_tag('Performed, passed', :ok)
+        row 'mQC State' do
+          case(visit.mqc_state)
+          when :pending then status_tag('Pending')
+          when :issues then status_tag('Performed, issues present', :error)
+          when :passed then status_tag('Performed, passed', :ok)
+          end
         end
-      end
-      if(visit.mqc_version)
-        row 'mQC Configuration' do
-          link_to('Download', download_configuration_at_version_admin_study_path(visit.study, config_version: visit.mqc_version))
+        if(visit.mqc_version)
+          row 'mQC Configuration' do
+            link_to('Download', download_configuration_at_version_admin_study_path(visit.study, config_version: visit.mqc_version))
+          end
         end
       end
       domino_link_row(visit)
@@ -177,7 +191,7 @@ ActiveAdmin.register Visit do
         end
       end
     end
-    render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series => required_series_objects} unless required_series_objects.empty?
+    render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series => required_series_objects, :qc_result_access => (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))} unless required_series_objects.empty?
   end
 
   form do |f|
@@ -210,9 +224,9 @@ ActiveAdmin.register Visit do
     column :created_at
     column :updated_at
     column :description
-    column :state
-    column :mqc_date
-    column :mqc_state
+    column('State') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.state : ''}
+    column('Mqc Date') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.mqc_date : ''}
+    column('Mqc State') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.mqc_state : ''}
     column('Patient') {|v| v.patient.nil? ? '' : v.patient.name}
     column('Visit Date') {|v| v.visit_date}
   end
