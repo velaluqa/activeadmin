@@ -13,7 +13,7 @@ namespace :erica do
       next
     end
 
-    background_job = BackgroundJob.create(:name => "Sync study #{study_id} to #{remote_url}", :user_id => User.where(:username => 'rprofmaad').first.id)
+    background_job = BackgroundJob.create(:name => "Sync study #{study_id} to #{remote_url}", :user_id => User.where(:username => 'profmaad').first.id)
 
     ERICARemoteSyncWorker.new.perform(background_job.id.to_s, study_id, remote_url, remote_host)
 
