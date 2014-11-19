@@ -7,8 +7,8 @@ class Role < ActiveRecord::Base
   belongs_to :user
   belongs_to :subject, :polymorphic => true  
 
-  ROLE_SYMS = [:manage, :image_import, :image_manage, :medical_qc, :audit, :readonly, :remote_manage, :remote_read, :remote_comments, :remote_images, :remote_keywords, :remote_audit, :remote_qc]
-  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager', 'Medical QC', 'Audit', 'Read-only', 'ERICA Remote Manager', 'Remote - Read Access', 'Remote - Comments Access', 'Remote - Download Images', 'Remote - Set Keywords', 'Remote - Audit', 'Remote - QC Access']
+  ROLE_SYMS = [:manage, :image_import, :image_manage, :medical_qc, :audit, :readonly, :remote_manage, :remote_read, :remote_comments, :remote_images, :remote_keywords, :remote_audit, :remote_qc, :remote_status_files]
+  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager', 'Medical QC', 'Audit', 'Read-only', 'ERICA Remote Manager', 'Remote - Read Access', 'Remote - Comments Access', 'Remote - Download Images', 'Remote - Set Keywords', 'Remote - Audit', 'Remote - QC Access', 'Remote - Status File Access']
 
   before_save :fix_subject
 
@@ -29,7 +29,7 @@ class Role < ActiveRecord::Base
     subject_type == nil and subject_id == nil
   end
   def erica_remote_role?
-    [:remote_manage, :remote_read, :remote_comments, :remote_images, :remote_keywords, :remote_audit, :remote_qc].include?(self.role)
+    [:remote_manage, :remote_read, :remote_comments, :remote_images, :remote_keywords, :remote_audit, :remote_qc, :remote_status_files].include?(self.role)
   end
 
   def self.role_sym_to_int(sym)
