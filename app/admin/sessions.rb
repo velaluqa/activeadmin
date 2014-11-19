@@ -66,13 +66,7 @@ ActiveAdmin.register Session do
       end
     end
 
-    customizable_default_actions do |session|
-      except = []
-      except << :destroy unless can? :destroy, session
-      except << :edit unless can? :edit, session
-      
-      except
-    end
+    customizable_default_actions(current_ability)
   end
 
   show do |session|

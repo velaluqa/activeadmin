@@ -188,7 +188,7 @@ ActiveAdmin.register Case do
     end
     comment_column(:comment, 'Comment')
    
-    customizable_default_actions do |resource|
+    customizable_default_actions(current_ability) do |resource|
       (resource.state == :unread and resource.form_answer.nil?) ? [] : [:edit, :destroy]
     end
   end

@@ -37,7 +37,7 @@ ActiveAdmin.register Role do
       role.role_name
     end
 
-    default_actions
+    customizable_default_actions(current_ability)
   end
 
   show do |role|

@@ -48,7 +48,9 @@ ActiveAdmin.register BackgroundJob do
     end
     column :completed_at
 
-    default_actions
+    customizable_default_actions(current_ability) do |background_job|
+      background_job.finished? ? [] : [:destroy]
+    end
   end
 
   show do |background_job|

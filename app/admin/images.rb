@@ -43,7 +43,7 @@ ActiveAdmin.register Image do
       end      
     end
     
-    default_actions
+    customizable_default_actions(current_ability)
   end
 
   show do |image|

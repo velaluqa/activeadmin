@@ -70,13 +70,7 @@ ActiveAdmin.register Form do
       end
     end
 
-    customizable_default_actions do |form|
-      except = []
-      except << :destroy unless can? :destroy, form
-      except << :edit unless can? :edit, form
-      
-      except
-    end
+    customizable_default_actions(current_ability)
   end
 
   show do |form|

@@ -47,7 +47,7 @@ ActiveAdmin.register Study do
       link_to('Select', select_for_session_admin_study_path(study))
     end
     
-    default_actions
+    customizable_default_actions(current_ability)
   end
 
   show do |study|

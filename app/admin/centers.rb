@@ -35,7 +35,7 @@ ActiveAdmin.register Center do
     column :code
     column :name
     
-    customizable_default_actions do |resource|
+    customizable_default_actions(current_ability) do |resource|
       resource.patients.empty? ? [] : [:destroy]
     end
   end

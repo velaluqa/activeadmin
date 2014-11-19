@@ -205,7 +205,7 @@ ActiveAdmin.register ImageSeries do
       result.html_safe
     end
     
-    default_actions
+    customizable_default_actions(current_ability)
   end
 
   show do |image_series|

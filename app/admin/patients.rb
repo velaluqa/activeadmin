@@ -90,7 +90,7 @@ ActiveAdmin.register Patient do
     column :center, :sortable => 'centers.code'
     column :subject_id
     
-    customizable_default_actions do |resource|
+    customizable_default_actions(current_ability) do |resource|
       (resource.cases.empty? and resource.form_answers.empty?) ? [] : [:destroy]
     end
   end

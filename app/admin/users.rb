@@ -55,7 +55,8 @@ ActiveAdmin.register User do
         status_tag('Unlocked', :ok)
       end
     end
-    default_actions
+
+    customizable_default_actions(current_ability)
   end
 
   show do |user|

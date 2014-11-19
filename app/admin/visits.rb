@@ -128,7 +128,7 @@ ActiveAdmin.register Visit do
       end
     end
     
-    default_actions
+    customizable_default_actions(current_ability)
   end
 
   show do |visit|
