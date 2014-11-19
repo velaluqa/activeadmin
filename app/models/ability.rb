@@ -53,10 +53,10 @@ class Ability
           can? :read, visit.study
         end
         can :read, ImageSeries, ImageSeries.includes(:patient => :center).where('centers.study_id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id) do |image_series|
-          can? :read, iamge_series.study
+          can? :read, image_series.study
         end
         can :read, Image, Image.includes(:image_series => {:patient => :center}).where('centers.study_id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id) do |image|
-          can? :read, iamge.study
+          can? :read, image.study
         end
       end
 
