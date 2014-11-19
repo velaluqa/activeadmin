@@ -166,6 +166,9 @@ GEM
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
     kgio (2.8.0)
+    kiqstand (1.0.0)
+      mongoid (~> 3.0)
+      moped (~> 1.2)
     kwalify (0.7.2)
     less (2.3.2)
       commonjs (~> 0.2.6)
@@ -314,6 +317,7 @@ DEPENDENCIES
   haml
   haml-rails
   jquery-rails
+  kiqstand
   kwalify
   less-rails
   libv8 (~> 3.11.8)
