@@ -20,6 +20,12 @@ ActiveAdmin.register Study do
     def scoped_collection
       end_of_association_chain.accessible_by(current_ability)
     end
+
+    def index
+      authorize! :download_status_files, Study if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+
+      index!
+    end
   end
 
   index do

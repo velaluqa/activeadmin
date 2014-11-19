@@ -102,6 +102,8 @@ ActiveAdmin.register ImageSeries do
     end
 
     def index
+      authorize! :download_status_files, ImageSeries if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+
       session[:current_images_filter] = nil if(params[:clear_filter] == 'true')
 
       if(params[:q] and params[:q][:visit_id_in] == [""])

@@ -23,6 +23,12 @@ ActiveAdmin.register Image do
         end_of_association_chain.accessible_by(current_ability).includes(:image_series => {:patient => :center}).where('centers.study_id' => session[:selected_study_id])
       end
     end
+
+    def index
+      authorize! :download_status_files, Image if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+
+      index!
+    end
   end
 
   index do

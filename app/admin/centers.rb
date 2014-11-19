@@ -21,6 +21,12 @@ ActiveAdmin.register Center do
         end_of_association_chain.accessible_by(current_ability).where(:study_id => session[:selected_study_id])
       end
     end
+
+    def index
+      authorize! :download_status_files, Center if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+
+      index!
+    end
   end
 
   index do
