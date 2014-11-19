@@ -2,14 +2,14 @@ require 'domino_integration_client'
 
 module DominoDocument
   def self.included(base)
-    if(base.respond_to?(:after_commit) and base.respond_to?(:after_destroy))
+    if(not Rails.application.config.is_erica_remote and base.respond_to?(:after_commit) and base.respond_to?(:after_destroy))
       base.after_commit :schedule_domino_sync
       base.after_destroy :schedule_domino_document_trashing
     end
   end
 
   def domino_integration_enabled?
-    (not self.study.nil? and self.study.domino_integration_enabled?)
+    (not Rails.application.config.is_erica_remote and not self.study.nil? and self.study.domino_integration_enabled?)
   end
 
   def lotus_notes_url
