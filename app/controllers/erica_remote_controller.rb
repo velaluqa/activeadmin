@@ -14,9 +14,10 @@ class EricaRemoteController < ApplicationController
 
   def push
     signature = Base64.strict_decode64(request.headers['X-ERICA-Signature'])
+    timestamp = request.headers['X-ERICA-Timestamp']
     records_yaml = gunzip(request.body)
 
-    if(!verify_signature(signature, records_yaml))
+    if(!verify_signature(signature, timestamp, records_yaml))
       render nothing: true, status: :unauthorized
       return
     end
@@ -81,11 +82,15 @@ class EricaRemoteController < ApplicationController
   
   protected
 
-  def verify_signature(signature, data)
+  def verify_signature(signature, timestamp, data)
+    # we check wether the timestamp is within 1 hour (60*60 seconds) of now, in either direction
+    # this effectively gives you a one hour window for replay attacks, given that the clocks are synched
+    return false if (Time.now.to_i - timestamp.to_i).abs > 60*60
+
     key_path = Rails.root.join(Rails.application.config.erica_remote_verification_key)
     key = OpenSSL::PKey::RSA.new(File.read(key_path))
 
-    return key.verify(OpenSSL::Digest::SHA512.new, signature, data)
+    return key.verify(OpenSSL::Digest::SHA512.new, signature, data + timestamp)
   end
 
   def gunzip(body_io)

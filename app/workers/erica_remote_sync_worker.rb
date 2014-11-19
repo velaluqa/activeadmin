@@ -27,10 +27,12 @@ class ERICARemoteSyncWorker
     key_path = Rails.root.join(Rails.application.config.erica_remote_signing_key)
     key = OpenSSL::PKey::RSA.new(File.read(key_path))
 
-    signature = key.sign(OpenSSL::Digest::SHA512.new, data)
+    timestamp = Time.now.to_i.to_s
+
+    signature = key.sign(OpenSSL::Digest::SHA512.new, data + timestamp)
     pp OpenSSL.errors
 
-    return signature
+    return [signature, timestamp]
   end
 
   def compile_records(study)
@@ -54,16 +56,16 @@ class ERICARemoteSyncWorker
   def sign_and_gzip_records(records)
     yaml = records.to_yaml
 
-    signature = sign_data(yaml)
+    signature, timestamp = sign_data(yaml)
 
     gzipped = gzip(yaml)
 
-    return [signature, gzipped]
+    return [signature, timestamp, gzipped]
   end
 
-  def push_records(uri, data, signature)
+  def push_records(uri, data, signature, timestamp)
     Net::HTTP.start(uri.host, uri.port) do |http|
-      push_request = Net::HTTP::Post.new(uri.path, {'X-ERICA-Signature' => Base64.strict_encode64(signature), 'Content-Encoding' => 'gzip', 'Content-Type' => 'text/yaml'})
+      push_request = Net::HTTP::Post.new(uri.path, {'X-ERICA-Signature' => Base64.strict_encode64(signature), 'X-ERICA-Timestamp' => timestamp, 'Content-Encoding' => 'gzip', 'Content-Type' => 'text/yaml'})
       push_request.body = data
 
       response = http.request(push_request)
@@ -75,7 +77,6 @@ class ERICARemoteSyncWorker
   end
 
   def retrieve_paths(uri, study_id)
-    pp uri.query
     query = URI.decode_www_form(uri.query || '')
     query << ['study_id', study_id.to_s]
     uri.query = URI.encode_www_form(query)
@@ -98,8 +99,8 @@ class ERICARemoteSyncWorker
 
     study = Study.find(study_id)
 
-    records_signature, gzipped_records = sign_and_gzip_records(compile_records(study))
-    push_records(erica_remote_uri, gzipped_records, records_signature)
+    records_signature, signature_timestamp, gzipped_records = sign_and_gzip_records(compile_records(study))
+    push_records(erica_remote_uri, gzipped_records, records_signature, signature_timestamp)
 
     config_paths = [
       Rails.root.join(Rails.application.config.data_directory, '.git').to_s.chomp('/'),
