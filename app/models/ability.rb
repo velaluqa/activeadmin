@@ -110,6 +110,18 @@ class Ability
         end
       end
 
+      # handle :remote_status_files
+      if(user.has_system_role?(:remote_status_files))
+        can :download_status_files, [Study, Center, Patient, Visit, ImageSeries, Image]
+      # elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_status_files)).empty?)
+      #   can :download_status_files, Study do |study|
+      #     !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_status_files)}).nil?
+      #   end
+      #   can :download_status_files, [Center, Patient, Visit, ImageSeries, Image] do |resource|
+      #     can? :download_status_files, resource.study
+      #   end
+      end
+
       # TODO: handle :remote_keywords
 
       return
