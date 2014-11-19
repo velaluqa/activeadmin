@@ -22,6 +22,14 @@ class BackgroundJob
 
   before_destroy do
     return false unless self.finished?
+
+    if(self.results and self.results['zipfile'])
+      begin
+        File.delete(self.results['zipfile'])
+      rescue => e
+        logger.warn e
+      end
+    end
   end
 
   def user
