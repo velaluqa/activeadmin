@@ -559,7 +559,27 @@ ActiveAdmin.register Visit do
   action_item :only => [:show, :mqc_form, :mqc_results] do
     link_to('Viewer (RS)', all_required_series_viewer_admin_visit_path(resource))
   end
-  
+
+  controller do
+    def start_download_images(visit_id)
+      visit = Visit.find(visit_id)
+      authorize! :download_images, visit
+
+      background_job = BackgroundJob.create(:name => "Download images for visit #{visit.name}", :user_id => current_user.id)
+
+      DownloadImagesWorker.perform_async(background_job.id.to_s, 'Visit', visit_id)
+
+      return background_job
+    end
+  end
+  member_action :download_images, :method => :get do
+    background_job = start_download_images(params[:id])
+    redirect_to admin_background_job_path(background_job), :notice => 'Your download will be available shortly. Please refresh this page to see whether it is available yet.'
+  end
+  action_item :only => :show do
+    link_to('Download images', download_images_admin_visit_path(resource)) if can? :download_images, resource
+  end
+
   viewer_cartable(:visit)
 
   action_item :only => :show do

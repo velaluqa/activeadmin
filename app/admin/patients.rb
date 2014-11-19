@@ -132,6 +132,25 @@ ActiveAdmin.register Patient do
 
       return background_job
     end
+
+    def start_download_images(patient_id)
+      patient = Patient.find(patient_id)
+      authorize! :download_images, patient
+
+      background_job = BackgroundJob.create(:name => "Download images for patient #{patient.name}", :user_id => current_user.id)
+
+      DownloadImagesWorker.perform_async(background_job.id.to_s, 'Patient', patient_id)
+
+      return background_job
+    end
+  end
+
+  member_action :download_images, :method => :get do
+    background_job = start_download_images(params[:id])
+    redirect_to admin_background_job_path(background_job), :notice => 'Your download will be available shortly. Please refresh this page to see whether it is available yet.'
+  end
+  action_item :only => :show do
+    link_to('Download images', download_images_admin_patient_path(resource)) if can? :download_images, resource
   end
 
   collection_action :batch_export_for_ericav1, :method => :post do
