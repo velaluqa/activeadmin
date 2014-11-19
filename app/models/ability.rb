@@ -6,7 +6,7 @@ class Ability
     
     return if user.roles.empty?
     
-    can [:read, :destroy], BackgroundJob do |job|
+    can [:read, :batch_action, :download_zip, :destroy], BackgroundJob do |job|
       job.user_id == user.id
     end
 
@@ -83,7 +83,19 @@ class Ability
       can :read, Version if(user.has_system_role?(:remote_audit))
 
       # handle :remote_images
-      can :download, Image if(user.has_system_role?(:remote_images))
+      if(user.has_system_role?(:remote_images))
+        can :download_images, [Study, Patient, Visit]
+      elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_images)).empty?)
+        can :download_images, Study do |study|
+          !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_images)}).nil?
+        end
+        can :download_images, Patient do |patient|
+          can? :download_images, patient.study
+        end
+        can :download_images, Visit do |visit|
+          can? :download_images, visit.study
+        end
+      end
 
       # handle :remote_qc
       if(user.has_system_role?(:remote_qc))
