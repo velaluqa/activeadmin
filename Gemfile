@@ -122,3 +122,6 @@ gem 'mongoid-history'
 
 # Zip file creation for image download in ERICA Remote
 gem 'rubyzip'
+
+# Resource tagging in ERICA Remote
+gem 'acts-as-taggable-on'
