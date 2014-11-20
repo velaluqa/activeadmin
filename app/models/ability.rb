@@ -60,10 +60,10 @@ class Ability
         end
       end
 
-      # handle :remote_comment
+      # handle :remote_comments
       can :remote_comment, Study do |study|
-        user.has_system_role?(:remote_comment) or (
-          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_comment)}).nil?
+        user.has_system_role?(:remote_comments) or !(
+          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_comments)}).nil?
         )
       end
       can :remote_comment, [Center, Patient, Visit, ImageSeries, Image] do |resource|
@@ -125,12 +125,14 @@ class Ability
       # handle :remote_keywords
       remote_keywords_actions = [:edit_keywords, :edit_erica_keywords_form, :edit_erica_keywords, :autocomplete_tags]
       can remote_keywords_actions, Study do |study|
-        user.has_system_role?(:remote_keywords) or (
+        user.has_system_role?(:remote_keywords) or !(
           study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_keywords)}).nil?
         )
       end
-      can remote_keywords_actions, [Center, Patient, Visit, ImageSeries] do |resource|
-        can? :edit_keywords, resource.study
+      unless(user.roles.where(role: Role.role_sym_to_int(:remote_qc)).empty?)
+        can remote_keywords_actions, [Center, Patient, Visit, ImageSeries] do |resource|
+          can? :edit_keywords, resource.study
+        end
       end
 
       return
