@@ -8,3 +8,4 @@
 //= require cases_advanced_filters
 //= require aa_advanced_filters
 //= require tree.jquery
+//= require aa_erica_keywords
