@@ -122,7 +122,16 @@ class Ability
       #   end
       end
 
-      # TODO: handle :remote_keywords
+      # handle :remote_keywords
+      remote_keywords_actions = [:edit_keywords, :edit_erica_keywords_form, :edit_erica_keywords, :autocomplete_tags]
+      can remote_keywords_actions, Study do |study|
+        user.has_system_role?(:remote_keywords) or (
+          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_keywords)}).nil?
+        )
+      end
+      can remote_keywords_actions, [Center, Patient, Visit, ImageSeries] do |resource|
+        can? :edit_keywords, resource.study
+      end
 
       return
     end
