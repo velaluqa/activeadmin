@@ -1,5 +1,6 @@
 require 'aa_domino'
 require 'aa_erica_comment'
+require 'aa_erica_keywords'
 
 ActiveAdmin.register ImageSeries do
 
@@ -192,7 +193,8 @@ ActiveAdmin.register ImageSeries do
       end
     end
     comment_column(:comment, 'Comment')
-    
+    keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+
     column 'View (in)' do |image_series|
       result = ''
 
@@ -236,6 +238,7 @@ ActiveAdmin.register ImageSeries do
         end
       end
       comment_row(image_series, :comment, 'Comment')
+      keywords_row(image_series, :tags, 'Keywords') if Rails.application.config.is_erica_remote
       row 'Required Series' do
         assigned_required_series = image_series.assigned_required_series
         if(assigned_required_series.empty?)
@@ -302,6 +305,7 @@ ActiveAdmin.register ImageSeries do
   filter :imaging_date
   filter :created_at, :label => 'Import Date'
   filter :comment
+  keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   member_action :viewer, :method => :get do
     @image_series = ImageSeries.find(params[:id])
@@ -690,6 +694,7 @@ ActiveAdmin.register ImageSeries do
 
   viewer_cartable(:image_series)
   erica_commentable(:comment, 'Comment')
+  erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image_series', :audit_trail_view_id => resource.id))

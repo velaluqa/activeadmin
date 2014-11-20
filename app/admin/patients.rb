@@ -1,5 +1,6 @@
 require 'aa_customizable_default_actions'
 require 'aa_domino'
+require 'aa_erica_keywords'
 
 ActiveAdmin.register Patient do
 
@@ -89,6 +90,7 @@ ActiveAdmin.register Patient do
     selectable_column
     column :center, :sortable => 'centers.code'
     column :subject_id
+    keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
     
     customizable_default_actions(current_ability) do |resource|
       (resource.cases.empty? and resource.form_answers.empty?) ? [] : [:destroy]
@@ -101,6 +103,7 @@ ActiveAdmin.register Patient do
       row :subject_id
       domino_link_row(patient)
       row :image_storage_path
+      keywords_row(patient, :tags, 'Keywords') if Rails.application.config.is_erica_remote
       row :patient_data_raw do
         CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
       end
@@ -121,6 +124,7 @@ ActiveAdmin.register Patient do
   # filters
   filter :center, :collection => []
   filter :subject_id, :label => 'Subject ID'
+  keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id))
@@ -220,4 +224,5 @@ ActiveAdmin.register Patient do
   end
 
   viewer_cartable(:patient)
+  erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 end

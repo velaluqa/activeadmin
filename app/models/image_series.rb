@@ -4,6 +4,7 @@ class ImageSeries < ActiveRecord::Base
   include DominoDocument
 
   has_paper_trail
+  acts_as_taggable
 
   attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number, :state, :comment
   attr_accessible :visit, :patient
