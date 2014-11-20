@@ -69,6 +69,8 @@ ActiveAdmin.register Study do
       row :state do
         study.state.to_s.camelize + (study.locked_version.nil? ? '' : " (Version: #{study.locked_version})")
       end
+      # TODO: check for define keyword role instead
+      keywords_row(study, :tags, 'Allowed Keywords')
 
       if study.has_configuration?
         row :configuration_validation do
@@ -289,4 +291,5 @@ ActiveAdmin.register Study do
   end
 
   viewer_cartable(:study)
+  erica_keywordable(:tags, 'Allowed Keywords')
 end

@@ -21,10 +21,10 @@ module ActiveAdmin
     end
 
     class AttributesTable
-      def keywords_row(resource, context, label)
+      def keywords_row(resource, context, label, can_edit = nil)
         label ||= context.to_s.humanize
 
-        can_edit = can? :edit_keywords, resource
+        can_edit ||= can? :edit_keywords, resource
 
         row label do
           if(resource.tags_on(context).empty?)
@@ -50,7 +50,15 @@ module ActiveAdmin
           @resource = resource_class.find(params[:id])
           authorize! :edit_keywords, @resource
 
-          @resource.set_tag_list_on(context, params[:keywords])
+          # verify keywords are valid for this study
+          unless(@resource.kind_of?(Study))
+            new_keywords = ActsAsTaggableOn::DefaultParser.new(params[:keywords]).parse
+            new_keywords = new_keywords & @resource.study.tag_list_on(context)
+          else
+            new_keywords = params[:keywords]
+          end
+
+          @resource.set_tag_list_on(context, new_keywords)
           @resource.save
 
           if(params[:return_url].blank?)

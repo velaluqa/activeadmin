@@ -5,7 +5,7 @@ class Visit < ActiveRecord::Base
   include DominoDocument
 
   has_paper_trail
-  acts_as_taggable if Rails.application.config.is_erica_remote
+  acts_as_taggable
 
   attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid
   attr_accessible :patient

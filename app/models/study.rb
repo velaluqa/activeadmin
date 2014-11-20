@@ -5,6 +5,7 @@ require 'domino_integration_client'
 
 class Study < ActiveRecord::Base
   has_paper_trail
+  acts_as_taggable
 
   attr_accessible :name, :locked_version, :domino_db_url, :domino_server_name, :notes_links_base_uri, :state
 
