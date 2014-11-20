@@ -165,10 +165,10 @@ ActiveAdmin.register Visit do
           end
         end
       end
+      keywords_row(visit, :tags, 'Keywords')
       domino_link_row(visit)
       row :image_storage_path
     end
-    keywords_row(visit, :tags, 'Keywords')
 
     required_series_objects = visit.required_series_objects
     unless(params[:order].blank?)
