@@ -11,7 +11,7 @@ module ActiveAdmin
           if(resource.tags_on(context).empty?)
             link_to('Add '+label, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath)) if can_edit
           else
-            tag_list = resource.tag_list_on(context).join(', ')
+            tag_list = resource.tag_list_on(context).map {|t| link_to(t, action: :index, q: {context.to_s.singularize + '_taggings_tag_name_eq' => t})}.join(', ')
             tag_list += link_to(icon(:pen), url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link') if can_edit
 
             tag_list.html_safe
@@ -30,7 +30,7 @@ module ActiveAdmin
           if(resource.tags_on(context).empty?)
             link_to('Add '+label, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath)) if can_edit
           else
-            tag_list = resource.tag_list_on(context).join(', ')
+            tag_list = resource.tag_list_on(context).map {|t| link_to(t, action: :index, q: {context.to_s.singularize + '_taggings_tag_name_eq' => t})}.join(', ')
             tag_list += link_to(icon(:pen), url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link') if can_edit
 
             tag_list.html_safe
