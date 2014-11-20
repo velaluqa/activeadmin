@@ -1,4 +1,5 @@
 require 'aa_domino'
+require 'aa_erica_keywords'
 
 ActiveAdmin.register Visit do
 
@@ -127,6 +128,7 @@ ActiveAdmin.register Visit do
         link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user)) unless visit.mqc_user.nil?
       end
     end
+    keywords_column(:tags, 'Keywords')
     
     customizable_default_actions(current_ability)
   end
@@ -166,6 +168,7 @@ ActiveAdmin.register Visit do
       domino_link_row(visit)
       row :image_storage_path
     end
+    keywords_row(visit, :tags, 'Keywords')
 
     required_series_objects = visit.required_series_objects
     unless(params[:order].blank?)
@@ -583,6 +586,7 @@ ActiveAdmin.register Visit do
   end
 
   viewer_cartable(:visit)
+  erica_keywordable(:tags, 'Keywords')
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'visit', :audit_trail_view_id => resource.id))
