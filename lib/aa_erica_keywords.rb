@@ -41,6 +41,19 @@ module ActiveAdmin
 
   end
 
+  module Filters
+    module DSL
+      def keywords_filter(context, label)
+        label ||= context.to_s.humanize
+
+        field_name = context.to_s.singularize + '_taggings_tag_name'
+        filter field_name.to_sym, label: label, as: :select, collection: ActsAsTaggableOn::Tag.pluck(:name), input_html: {
+                 class: 'tagfilter',
+               }
+      end
+    end
+  end
+
   module ERICAKeywordsMixin
     module DSL
       def erica_keywordable(context, label)

@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    $('.tagfilter').each(function() {
+	$(this).select2();
+    });
     $('.tagselect').each(function() {
         var placeholder = $(this).data('placeholder');
         var url = $(this).data('url');

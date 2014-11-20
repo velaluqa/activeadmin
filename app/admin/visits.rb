@@ -38,7 +38,7 @@ ActiveAdmin.register Visit do
       authorize! :download_status_files, Visit if(Rails.application.config.is_erica_remote and not params[:format].blank?)
 
       session[:current_images_filter] = nil if(params[:clear_filter] == 'true')
-      
+
       if(params[:q] and params[:q][:patient_id_in] == [""])
         params[:q].delete(:patient_id_in)
 
@@ -128,7 +128,7 @@ ActiveAdmin.register Visit do
         link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user)) unless visit.mqc_user.nil?
       end
     end
-    keywords_column(:tags, 'Keywords')
+    keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
     
     customizable_default_actions(current_ability)
   end
@@ -165,7 +165,7 @@ ActiveAdmin.register Visit do
           end
         end
       end
-      keywords_row(visit, :tags, 'Keywords')
+      keywords_row(visit, :tags, 'Keywords') if Rails.application.config.is_erica_remote
       domino_link_row(visit)
       row :image_storage_path
     end
@@ -241,6 +241,7 @@ ActiveAdmin.register Visit do
   filter :visit_number
   filter :description
   filter :visit_type
+  keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   member_action :assign_required_series, :method => :post do
     @visit = Visit.find(params[:id])
@@ -586,7 +587,7 @@ ActiveAdmin.register Visit do
   end
 
   viewer_cartable(:visit)
-  erica_keywordable(:tags, 'Keywords')
+  erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'visit', :audit_trail_view_id => resource.id))
