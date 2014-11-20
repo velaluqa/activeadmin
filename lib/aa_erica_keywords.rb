@@ -24,7 +24,7 @@ module ActiveAdmin
       def keywords_row(resource, context, label, can_edit = nil)
         label ||= context.to_s.humanize
 
-        can_edit ||= can? :edit_keywords, resource
+        can_edit = can? :edit_keywords, resource if can_edit.nil?
 
         row label do
           if(resource.tags_on(context).empty?)
@@ -55,6 +55,7 @@ module ActiveAdmin
             new_keywords = ActsAsTaggableOn::DefaultParser.new(params[:keywords]).parse
             new_keywords = new_keywords & @resource.study.tag_list_on(context)
           else
+            authorize! :define_keywords, @resource
             new_keywords = params[:keywords]
           end
 
