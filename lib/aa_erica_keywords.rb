@@ -6,10 +6,15 @@ module ActiveAdmin
         label ||= context.to_s.humanize
 
         column label do |resource|
+          can_edit = can? :edit_keywords, resource
+
           if(resource.tags_on(context).empty?)
-            link_to('Add '+label, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath))
+            link_to('Add '+label, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath)) if can_edit
           else
-            (resource.tag_list_on(context).join(', ') + link_to(icon(:pen), url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link')).html_safe
+            tag_list = resource.tag_list_on(context).join(', ')
+            tag_list += link_to(icon(:pen), url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link') if can_edit
+
+            tag_list.html_safe
           end
         end
       end
@@ -19,11 +24,16 @@ module ActiveAdmin
       def keywords_row(resource, context, label)
         label ||= context.to_s.humanize
 
+        can_edit = can? :edit_keywords, resource
+
         row label do
           if(resource.tags_on(context).empty?)
-            link_to('Add '+label, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath))
+            link_to('Add '+label, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath)) if can_edit
           else
-            (resource.tag_list_on(context).join(', ') + link_to(icon(:pen), url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link')).html_safe
+            tag_list = resource.tag_list_on(context).join(', ')
+            tag_list += link_to(icon(:pen), url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link') if can_edit
+
+            tag_list.html_safe
           end
         end
       end
