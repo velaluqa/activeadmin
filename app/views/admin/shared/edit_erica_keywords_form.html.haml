@@ -1,9 +1,10 @@
 = form_tag(url_for(:action => :edit_erica_keywords, :return_url => @return_url), method: :post, multipart: true, class: 'formtastic form') do
+  - study = @resource.kind_of?(Study) ? @resource : @resource.study
   = field_set_tag(('<span>Edit '+@label+'</span>').html_safe, class: 'inputs') do
     %ol
       %li.input.text
         = label_tag('keywords', @label)
-        = text_field_tag('keywords', @resource.tag_list_on(@context).join(', '), data: {placeholder: 'Enter keywords', saved: @resource.tags_on(@context).map {|t| {id: t.name, name: t.name}}.to_json, url: autocomplete_tags_admin_study_path(@resource.study)}, class: 'tagselect')
+        = text_field_tag('keywords', @resource.tag_list_on(@context).join(', '), data: {placeholder: 'Enter keywords', saved: @resource.tags_on(@context).map {|t| {id: t.name, name: t.name}}.to_json, url: autocomplete_tags_admin_study_path(study, context: @context), allownew: (study == @resource)}, class: 'tagselect')
 
   = field_set_tag(nil, class: 'actions') do
     %ol

@@ -281,7 +281,7 @@ ActiveAdmin.register Study do
     study = Study.find(params[:id])
     authorize! :edit_keywords, study
 
-    tags = ActsAsTaggableOn::Tag.where('name LIKE ?', "#{params[:q]}%").order(:name)
+    tags = study.tags_on(params[:context]).where('name LIKE ?', params[:q] + '%').order(:name)
 
     respond_to do |format|
       format.json { render json: tags.map {|t| {id: t.name, name: t.name} } }
