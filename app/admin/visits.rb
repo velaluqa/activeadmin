@@ -15,7 +15,7 @@ ActiveAdmin.register Visit do
     def max_csv_records
       1_000_000
     end
-    
+
     def scoped_collection
       if(session[:selected_study_id].nil?)
         end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)
@@ -56,10 +56,10 @@ ActiveAdmin.register Visit do
       end
       session[:current_images_filter] = params[:q][:patient_id_in] unless params[:q].nil? or params[:q][:patient_id_in].nil?
 
-      if(params[:q] and params[:q][:patient_id_in].respond_to?(:each)) 
+      if(params[:q] and params[:q][:patient_id_in].respond_to?(:each))
         patient_id_in = []
 
-        params[:q][:patient_id_in].each do |id|         
+        params[:q][:patient_id_in].each do |id|
           if(id =~ /^center_([0-9]*)/)
             params[:q][:patient_center_id_in] ||= []
             params[:q][:patient_center_id_in] << $1
@@ -130,7 +130,7 @@ ActiveAdmin.register Visit do
       end
     end
     keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
-    
+
     customizable_default_actions(current_ability)
   end
 
@@ -177,12 +177,12 @@ ActiveAdmin.register Visit do
 
       unless(split_position.nil?)
         key, direction = params[:order][0..split_position-1], params[:order][split_position+1..-1]
-        
+
         if(['name', 'image_series_id', 'tqc_date', 'tqc_user_id', 'tqc_state'].include?(key))
           required_series_objects.sort! do |a, b|
             a_val = a.instance_variable_get('@'+key)
             b_val = b.instance_variable_get('@'+key)
-            
+
             if(a_val.nil? and b_val.nil?)
               0
             elsif(a_val.nil?)
@@ -198,6 +198,7 @@ ActiveAdmin.register Visit do
       end
     end
     render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series => required_series_objects, :qc_result_access => (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))} unless required_series_objects.empty?
+    active_admin_comments if can? :remote_comment, visit
   end
 
   form do |f|
@@ -369,7 +370,7 @@ ActiveAdmin.register Visit do
       dicom_tqc_spec['actual_value'] = (@dicom_metadata[dicom_tqc_spec['dicom_tag']].nil? ? nil : @dicom_metadata[dicom_tqc_spec['dicom_tag']][:value])
       dicom_tqc_spec['result'] = perform_dicom_tqc_check(dicom_tqc_spec['expected'], dicom_tqc_spec['actual_value'])
     end
-    
+
     @page_title = "Perform tQC for #{@required_series.name}"
     render 'admin/visits/tqc_form'
   end
@@ -467,7 +468,7 @@ ActiveAdmin.register Visit do
   member_action :edit_state_form, :method => :get do
     @visit = Visit.find(params[:id])
     authorize! :manage, @visit
-    
+
     @states = [['Incomplete, not available', :incomplete_na], ['Complete, tQC of all series passed', :complete_tqc_passed], ['Incomplete, queried', :incomplete_queried], ['Complete, tQC not finished', :complete_tqc_pending], ['Complete, tQC finished, not all series passed', :complete_tqc_issues]]
 
     @return_url = params[:return_url] || admin_visit_path(@visit)
@@ -484,7 +485,7 @@ ActiveAdmin.register Visit do
       actual_as_numeric = begin Float(actual) rescue nil end
 
       result = false
-      if(expected.is_a?(Array))        
+      if(expected.is_a?(Array))
         expected.each do |allowed_value|
           if(allowed_value.is_a?(Numeric) and not actual_as_numeric.nil?)
             if(allowed_value == actual_as_numeric)
@@ -509,7 +510,7 @@ ActiveAdmin.register Visit do
           result = false
         end
       end
-      
+
       return result
     end
   end

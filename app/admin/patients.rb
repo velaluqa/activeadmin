@@ -39,7 +39,7 @@ ActiveAdmin.register Patient do
       authorize! :download_status_files, Patient if(Rails.application.config.is_erica_remote and not params[:format].blank?)
 
       session[:current_images_filter] = nil if(params[:clear_filter] == 'true')
-      
+
       if(params[:q] and params[:q][:center_id_in] == [""])
         params[:q].delete(:center_id_in)
 
@@ -55,10 +55,10 @@ ActiveAdmin.register Patient do
       end
       session[:current_images_filter] = params[:q][:center_id_in] unless params[:q].nil? or params[:q][:center_id_in].nil?
 
-      if(params[:q] and params[:q][:center_id_in].respond_to?(:each)) 
+      if(params[:q] and params[:q][:center_id_in].respond_to?(:each))
         center_id_in = []
 
-        params[:q][:center_id_in].each do |id|         
+        params[:q][:center_id_in].each do |id|
           if(id =~ /^center_([0-9]*)/)
             center_id_in ||= []
             center_id_in << $1
@@ -92,7 +92,7 @@ ActiveAdmin.register Patient do
     column :center, :sortable => 'centers.code'
     column :subject_id
     keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
-    
+
     customizable_default_actions(current_ability) do |resource|
       (resource.cases.empty? and resource.form_answers.empty?) ? [] : [:destroy]
     end
@@ -109,6 +109,7 @@ ActiveAdmin.register Patient do
         CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
       end
     end
+    active_admin_comments if can? :remote_comment, patient
   end
 
   form do |f|
@@ -176,7 +177,7 @@ ActiveAdmin.register Patient do
     background_job = export_patients_for_ericav1(params[:export_folder], patient_ids)
     redirect_to admin_background_job_path(background_job), :notice => 'The export was started successfully.'
   end
-  member_action :export_for_ericav1, :method => :get do    
+  member_action :export_for_ericav1, :method => :get do
     @page_title = 'Export for ERICAv1'
     render 'admin/patients/export_for_ericav1_form', :locals => {:selection => [resource.id.to_s], :return_url => request.referer}
   end
@@ -192,7 +193,7 @@ ActiveAdmin.register Patient do
     @patient = Patient.find(params[:id])
 
     new_visits_list = params[:new_visits_list].split(',')
-    
+
     visits = new_visits_list.map {|v| Visit.find(v.to_i)}
 
     available_visit_numbers = visits.map {|v| v.visit_number}.sort
@@ -205,7 +206,7 @@ ActiveAdmin.register Patient do
         v.save
         next_free_visit_number += 1
       end
- 
+
       visits.each do |v|
         v.visit_number = available_visit_numbers.shift
         v.save
