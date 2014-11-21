@@ -77,6 +77,6 @@ ActiveAdmin.register Image do
   end
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end
