@@ -40,8 +40,8 @@ ActiveAdmin.register Version do
         end_of_association_chain.where('(item_type LIKE \'Patient\' and item_id = :patient_id) or
        (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.patient_id = :patient_id)) or
        (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) or
-       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE (image_series.visit_id IN (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) OR (image_series.visit_id IS NULL AND image_series.patient_id = :patient_id))) or
-       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE (image_series.visit_id IN (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) OR (image_series.visit_id IS NULL AND image_series.patient_id = :patient_id))))
+       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)) or
+       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)))
 ', {:patient_id => params[:audit_trail_view_id].to_i})
       when 'form'
         end_of_association_chain.where('item_type LIKE \'Form\' and item_id = ?', params[:audit_trail_view_id].to_i)
@@ -61,8 +61,8 @@ ActiveAdmin.register Version do
        (item_type LIKE \'Center\' and item_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)) or
        (item_type LIKE \'Patient\' and item_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))) or
        (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))) or
-       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE (image_series.visit_id = (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))))) or (image_series.visit_id IS NULL and image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))))) or
-       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE (image_series.visit_id = (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))))) or (image_series.visit_id IS NULL and image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))))))',
+       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))) or
+       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))))',
                                        {:study_id => params[:audit_trail_view_id].to_i})
       when 'image'
         end_of_association_chain.where('item_type LIKE \'Image\' and item_id = ?', params[:audit_trail_view_id].to_i)
@@ -75,8 +75,8 @@ ActiveAdmin.register Version do
        (item_type LIKE \'Patient\' and item_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)) or
        (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) or
        (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) or
-       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE (image_series.visit_id = (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)))) or (image_series.visit_id IS NULL and image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)))) or
-       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE (image_series.visit_id = (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)))) or (image_series.visit_id IS NULL and image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)))))', {:center_id => params[:audit_trail_view_id].to_i})
+       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) or
+       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))))', {:center_id => params[:audit_trail_view_id].to_i})
       else
         end_of_association_chain
       end.accessible_by(current_ability)
