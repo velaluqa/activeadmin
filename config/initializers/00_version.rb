@@ -1,1 +1,1 @@
-StudyServer::Application.config.erica_version = [2,13,1]
+StudyServer::Application.config.erica_version = [2,14,0]
