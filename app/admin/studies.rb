@@ -198,7 +198,7 @@ ActiveAdmin.register Study do
   end
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'study', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'study', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 
   member_action :select_for_session, :method => :get do
