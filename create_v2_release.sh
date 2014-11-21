@@ -8,7 +8,7 @@ RELEASE_BRANCH="release-$VERSION_STRING"
 
 git checkout -b "$RELEASE_BRANCH" develop
 
-echo "StudyServer::Application.config.erica_version = [$MAJOR,$MINOR,$PATCH]" > config/initializers/version.rb
+echo "StudyServer::Application.config.erica_version = [$MAJOR,$MINOR,$PATCH]" > config/initializers/00_version.rb
 git commit -am "Bump version to $VERSION_STRING"
 
 git checkout v2-master
