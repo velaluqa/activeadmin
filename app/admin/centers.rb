@@ -70,14 +70,10 @@ ActiveAdmin.register Center do
   filter :code
   keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-  action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id))
-  end
-
   viewer_cartable(:center)
   erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end
