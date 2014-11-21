@@ -128,7 +128,7 @@ ActiveAdmin.register Patient do
   keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 
   controller do
@@ -181,9 +181,9 @@ ActiveAdmin.register Patient do
     render 'admin/patients/export_for_ericav1_form', :locals => {:selection => [resource.id.to_s], :return_url => request.referer}
   end
   action_item :only => :show do
-    link_to('Export for ERICAv1', export_for_ericav1_admin_patient_path(resource))
+    link_to('Export for ERICAv1', export_for_ericav1_admin_patient_path(resource)) if can? :manage, resource
   end
-  batch_action :export_for_ericav1 do |selection|
+  batch_action :export_for_ericav1, if: proc {can? :manage, Patient} do |selection|
     @page_title = 'Export for ERICAv1'
     render 'admin/patients/export_for_ericav1_form', :locals => {:selection => selection, :return_url => request.referer}
   end
@@ -221,7 +221,7 @@ ActiveAdmin.register Patient do
     @visits = @patient.visits
   end
   action_item :only => :show do
-    link_to('Reorder Visits', reorder_visits_form_admin_patient_path(resource)) unless resource.visits.empty?
+    link_to('Reorder Visits', reorder_visits_form_admin_patient_path(resource)) unless(resource.visits.empty? or cannot? :manage, resource)
   end
 
   viewer_cartable(:patient)
