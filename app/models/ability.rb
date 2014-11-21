@@ -1,11 +1,11 @@
 class Ability
-  include CanCan::Ability  
-  
+  include CanCan::Ability
+
   def initialize(user)
     return if user.nil? # guest users have no access whatsoever
-    
+
     return if user.roles.empty?
-    
+
     can [:read, :batch_action, :download_zip, :destroy], BackgroundJob do |job|
       job.user_id == user.id
     end
@@ -70,13 +70,14 @@ class Ability
         can? :remote_comment, resource.study
       end
 
-      if(user.has_system_role?(:remote_comments))
-        can [:read, :create], ActiveAdmin::Comment do |comment|
-          can? :remote_comment, comment.resource
-        end
-        can [:update, :destroy], ActiveAdmin::Comment do |comment|
-          can? :remote_comment, comment.resource and comment.author_id == user.id and comment.author_type == 'User'
-        end
+      can :read, ActiveAdmin::Comment do |comment|
+        can? :read, comment.resource
+      end
+      can :create, ActiveAdmin::Comment do |comment|
+        can? :remote_comment, comment.resource
+      end
+      can [:update, :destroy], ActiveAdmin::Comment do |comment|
+        can? :remote_comment, comment.resource and comment.author_id == user.id and comment.author_type == 'User'
       end
 
       # handle :remote_audit
@@ -142,7 +143,7 @@ class Ability
 
       return
     end
-    
+
     # App Admin
     if user.is_app_admin?
       can :manage, :system
@@ -207,7 +208,7 @@ class Ability
       elsif(user.has_system_role?(:image_import))
         can :mqc, Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |visit|
           can? :mqc, visit.study
-        end      
+        end
       end
     end
 
@@ -220,11 +221,11 @@ class Ability
     can :manage, Case, ['cases.session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |c|
       can? :manage, c.session
     end
-    # possible record query for mongoid: 
+    # possible record query for mongoid:
     # CaseData.in(case_id: Case.where('session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id).map{|c| c.id})
     # we don't need that though, since there is no index for case/patient data anyway and we can define the actual rights via the block
     can :manage, CaseData do |cd|
-      can? :manage, cd.case      
+      can? :manage, cd.case
     end
 
     can :read, FormAnswer, FormAnswer.in(session_id: Session.where('id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id).map{|s| s.id}) do |form_answer|
@@ -291,7 +292,7 @@ class Ability
       can? :read, c.session
     end
     can :read, CaseData do |cd|
-      can? :read, cd.case      
+      can? :read, cd.case
     end
     can :read, Form, ['forms.session_id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |form|
       can? :read, form.session
@@ -306,7 +307,7 @@ class Ability
   def self.can_manage_template_forms?(user)
     user.is_app_admin?
   end
-  
+
   protected
   SESSION_ROLES_SUBQUERY = 'SELECT roles.subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE \'Session\' AND roles.role = 0 AND roles.user_id = ?'
   SESSION_STUDY_ROLES_SUBQUERY = '(SELECT sessions.id FROM sessions WHERE sessions.study_id IN (SELECT roles.subject_id FROM roles INNER JOIN studies ON roles.subject_id = studies.id WHERE roles.subject_type LIKE \'Study\' AND roles.role = 0 AND roles.user_id = ?) UNION ALL '+SESSION_ROLES_SUBQUERY+')'
