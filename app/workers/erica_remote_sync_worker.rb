@@ -36,11 +36,10 @@ class ERICARemoteSyncWorker
   end
 
   def compile_records(study)
-    records = {users: [], active_record: [], mongoid: []}
+    records = {study: study, users: [], active_record: [], mongoid: []}
 
     records[:users] += User.all
 
-    records[:active_record] += [study]
     records[:active_record] += study.centers
     records[:active_record] += study.patients
     records[:active_record] += study.visits

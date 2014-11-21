@@ -19,6 +19,7 @@ namespace :erica do
 
     background_job.reload
     pp background_job
+    background_job.destroy
   end
 
   desc 'Download images as zip'

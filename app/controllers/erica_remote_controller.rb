@@ -1,3 +1,4 @@
+# coding: utf-8
 class EricaRemoteController < ApplicationController
   before_filter :skip_trackable # do not track requests to the WADO API as logins/logouts, because every single request would be counted as one login
 
@@ -27,20 +28,42 @@ class EricaRemoteController < ApplicationController
 
     PaperTrail.enabled = false
     Mongoid::History.disable do
+      study = records[:study]
+      ids = {centers: study.center_ids,
+             patients: study.patient_ids,
+             visits: study.visit_ids,
+             image_series: study.image_series_ids,
+             images: study.image_series.map{|is| is.image_ids}.flatten,
+            }
+
+      if(Study.exists?(study.id))
+        # we aways recreate all MongoDB entries, to be sure to keep them in sync
+
+        study.image_series.each do |image_series|
+          image_series.image_series_data.destroy if image_series.image_series_data
+        end
+        study.visits.each do |visit|
+          visit.visit_data.destroy if visit.visit_data
+        end
+        study.patients.each do |patient|
+          patient.patient_data.destroy if patient.patient_data
+        end
+      end
+
       records[:users].each do |record|
         record.locked_at = Time.now
 
         if(record.class.exists?(record.id))
           attributes = record.attributes
           attributes.delete(:id)
-          
+
           existing_record = record.class.find(record.id)
           existing_record.assign_attributes(attributes, without_protection: true)
           existing_record.save!(validate: false)
         else
           record.instance_variable_set("@new_record", true)
           record.save!(validate: false)
-        end        
+        end
       end
 
       records[:mongoid].each do |record|
@@ -48,18 +71,32 @@ class EricaRemoteController < ApplicationController
       end
 
       records[:active_record].each do |record|
+        case record
+        when Center then ids[:centers].delete(record.id)
+        when Patient then ids[:patients].delete(record.id)
+        when Visit then ids[:visits].delete(record.id)
+        when ImageSeries then ids[:image_series].delete(record.id)
+        when Image then ids[:images].delete(record.id)
+        end
+
         if(record.class.exists?(record.id))
           attributes = record.attributes
           attributes.delete(:id)
-          
+
           existing_record = record.class.find(record.id)
           existing_record.assign_attributes(attributes, without_protection: true)
           existing_record.save
         else
           record.instance_variable_set("@new_record", true)
           record.save
-        end        
-      end      
+        end
+      end
+
+      Image.destroy(ids[:images])
+      ImageSeries.destroy(ids[:image_series])
+      Visit.destroy(ids[:visits])
+      Patient.destroy(ids[:patients])
+      Center.destroy(ids[:centers])
     end
     PaperTrail.enabled = true
 
@@ -79,7 +116,7 @@ class EricaRemoteController < ApplicationController
 
     render json: {configs: configs_path, images: image_storage_path}
   end
-  
+
   protected
 
   def verify_signature(signature, timestamp, data)
