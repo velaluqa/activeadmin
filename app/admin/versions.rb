@@ -3,6 +3,7 @@ require 'git_config_repository'
 ActiveAdmin.register Version do
   menu :label => 'Audit Trail', :priority => 99, :if => proc{ can?(:read, Version) }
   config.comments = false
+  config.batch_actions = false
 
   actions :index, :show
 
@@ -280,15 +281,15 @@ ActiveAdmin.register Version do
   end
 
   action_item :only => :index do
-    link_to 'Configuration Changes', git_commits_admin_versions_path
+    link_to 'Configuration Changes', git_commits_admin_versions_path if can? :git_commits, Version
   end
   action_item :only => :git_commits do
-    link_to 'Versions', admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]}))
+    link_to 'Versions', admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :read, Version
   end
   action_item :only => :show_git_commit do
-    link_to 'Back', git_commits_admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]}))
+    link_to 'Back', git_commits_admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :git_commits, Version
   end
   action_item :only => [:index, :git_commits] do
-    link_to 'MongoDB', admin_mongoid_history_trackers_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]}))
+    link_to 'MongoDB', admin_mongoid_history_trackers_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :read, MongoidHistoryTracker
   end
 end
