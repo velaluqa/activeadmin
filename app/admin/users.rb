@@ -159,7 +159,7 @@ ActiveAdmin.register User do
   end
 
   action_item :only => :show do
-    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will invalidate all past signatures by this user. Are you sure you want to do this?'
+    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will invalidate all past signatures by this user. Are you sure you want to do this?' if can? :manage, resource
   end
 
   member_action :unlock, :method => :get do
@@ -174,6 +174,6 @@ ActiveAdmin.register User do
   end
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'user', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'user', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end
