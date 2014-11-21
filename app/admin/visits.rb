@@ -275,7 +275,7 @@ ActiveAdmin.register Visit do
     render 'admin/visits/assign_required_series'
   end
   action_item :only => :show do
-    link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource))
+    link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource)) if(can? :mqc, resource or can? :manage, resource)
   end
 
   member_action :tqc_results, :method => :get do
@@ -376,7 +376,11 @@ ActiveAdmin.register Visit do
 
   member_action :mqc_results, :method => :get do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    if(Rails.application.config.is_erica_remote)
+      authorize! :read_qc, @visit
+    else
+      authorize! :mqc, @visit unless can? :manage, @visit
+    end
 
     visit_data = @visit.visit_data
     mqc_version = (visit_data.nil? ? @visit.study.locked_version : visit_data.mqc_version)
@@ -438,10 +442,13 @@ ActiveAdmin.register Visit do
     render 'admin/visits/mqc_form'
   end
   action_item :only => :show do
-    link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(resource.state))
+    link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(resource.state) and (can? :mqc, resource or can? :manage, resource))
   end
   action_item :only => :show do
-    link_to('mQC Results', mqc_results_admin_visit_path(resource)) unless(resource.mqc_state == :pending)
+    link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.mqc_state != :pending and (
+                                                                            (Rails.application.config.is_erica_remote and can? :read_qc, resource) or
+                                                                            (can? :mqc, resource or can? :manage, resource))
+                                                                         )
   end
 
   member_action :edit_state, :method => :post do
@@ -591,6 +598,6 @@ ActiveAdmin.register Visit do
   erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'visit', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'visit', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end
