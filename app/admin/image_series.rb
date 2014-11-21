@@ -389,6 +389,7 @@ ActiveAdmin.register ImageSeries do
   end
   batch_action :mark_not_relevant, :confirm => 'This will mark all selected image series as not relevant. Are you sure?' do |selection|
     ImageSeries.find(selection).each do |i_s|
+      next unless can? :manage, i_s
       next if (i_s.state != :visit_assigned or i_s.visit.nil?)
 
       i_s.state = :not_required
@@ -496,6 +497,7 @@ ActiveAdmin.register ImageSeries do
         return
       end
 
+      authorize! :create, Visit
       visit = Visit.create(:patient => image_series.first.patient, :visit_number => params[:visit][:visit_number], :visit_type => params[:visit][:visit_type], :description => params[:visit][:description])
     else
       visit = Visit.find(params[:visit_id])
