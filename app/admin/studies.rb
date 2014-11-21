@@ -4,6 +4,7 @@ require 'schema_validation'
 ActiveAdmin.register Study do
 
   menu if: proc { can? :read, Study }
+  actions :index, :show if Rails.application.config.is_erica_remote
 
   scope :all, :default => true
   scope :building

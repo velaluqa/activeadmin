@@ -5,6 +5,7 @@ require 'aa_erica_keywords'
 ActiveAdmin.register ImageSeries do
 
   menu if: proc { can? :read, ImageSeries }
+  actions :index, :show if Rails.application.config.is_erica_remote
 
   scope :all, :default => true
   scope :not_assigned

@@ -4,6 +4,7 @@ require 'aa_erica_keywords'
 ActiveAdmin.register Visit do
 
   menu if: proc { can? :read, Visit }
+  actions :index, :show if Rails.application.config.is_erica_remote
 
   config.per_page = 100
 

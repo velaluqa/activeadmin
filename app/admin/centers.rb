@@ -5,6 +5,7 @@ require 'aa_erica_keywords'
 ActiveAdmin.register Center do
 
   menu if: proc { can? :read, Center }
+  actions :index, :show if Rails.application.config.is_erica_remote
 
   config.sort_order = 'code_asc'
 

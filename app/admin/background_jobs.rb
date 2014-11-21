@@ -103,8 +103,8 @@ ActiveAdmin.register BackgroundJob do
 
   member_action :download_zip, method: :get do
     background_job = BackgroundJob.find(params[:id])
-
     authorize! :read, background_job
+
     unless(background_job.results and background_job.results['zipfile'])
       redirect_to :back, alert: 'No download available'
       return
