@@ -136,7 +136,8 @@ ActiveAdmin.setup do |config|
   #   config.namespace :without_comments do |without_comments|
   #     without_comments.allow_comments = false
   #   end
-  config.allow_comments = true
+  # Enable comments only in ERICA Remote
+  config.allow_comments = Rails.application.config.is_erica_remote
 
 
   # == Batch Actions
@@ -182,4 +183,3 @@ ActiveAdmin.setup do |config|
   config.view_factory.footer = PharmTraceERICAFooter
   config.view_factory.site_title = PharmTraceERICASiteTitle
 end
-
