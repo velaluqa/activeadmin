@@ -19,6 +19,7 @@
 /config/mongoid.yml
 /config/goodimage_migration.yml
 /config/erica_remote.yml
+/config/erica_remotes.yml
 /config/*.pem
 
 # Ignore gems installed in deployment mode
