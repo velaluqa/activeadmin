@@ -4,7 +4,7 @@ require 'git_config_repository'
 
 ActiveAdmin.register Form do
 
-  menu if: proc { can? :read, FormAnswer }
+  menu if: proc { can? :read, Form }
 
   config.clear_action_items! # get rid of the default action items, since we have to handle 'edit' and 'delete' on a case-by-case basis
 
@@ -82,33 +82,33 @@ ActiveAdmin.register Form do
       end
       row :session
       if form.has_configuration?
-        row :configuration_validation do        
+        row :configuration_validation do
           render 'admin/shared/schema_validation_results', :errors => form.validate
         end
       end
       row :configuration do
         current = {}
         if form.has_configuration?
-          current_config = form.current_configuration 
+          current_config = form.current_configuration
           if current_config.nil?
             current[:configuration] = :invalid
           else
             current[:configuration] = CodeRay.scan(JSON::pretty_generate(current_config), :json).div(:css => :class).html_safe
           end
-          
+
           current[:download_link] = download_current_configuration_admin_form_path(form)
         end
         locked = nil
         unless form.locked_version.nil?
           locked = {}
-    
+
           locked_config = form.locked_configuration
           if locked_config.nil?
             locked[:configuration] = :invalid
           else
             locked[:configuration] = CodeRay.scan(JSON::pretty_generate(locked_config), :json).div(:css => :class).html_safe
           end
-          
+
           locked[:download_link] = download_locked_configuration_admin_form_path(form)
         end
 
@@ -122,16 +122,16 @@ ActiveAdmin.register Form do
         if not (current_components.nil? or current_components[:validators].nil? or current_components[:validators].empty?)
           current[:configuration] = CodeRay.scan(current_components[:validators][0], :javascript).div(:css => :class).html_safe
           current[:download_link] = download_current_custom_validators_admin_form_path(form)
-        end          
+        end
 
         locked = nil
         unless form.locked_version.nil?
           locked = {}
-    
+
           if not (locked_components.nil? or locked_components[:validators].nil? or locked_components[:validators].empty?)
             locked[:configuration] = CodeRay.scan(locked_components[:validators][0], :javascript).div(:css => :class).html_safe
           end
-          
+
           locked[:download_link] = download_locked_custom_validators_admin_form_path(form)
         end
 
@@ -173,7 +173,7 @@ ActiveAdmin.register Form do
               resource_path(resource),
               :method => :delete, :data => {:confirm => I18n.t('active_admin.delete_confirmation')})
     end
-  end 
+  end
 
   member_action :download_current_configuration do
     @form = Form.find(params[:id])
@@ -259,12 +259,12 @@ ActiveAdmin.register Form do
     unless(params[:form].nil? or (params[:form][:validators].nil? or params[:form][:validators].tempfile.nil?))
       repo.update_config_file(@form.relative_validator_file_path, params[:form][:validators].tempfile, current_user, "New custom validations for form #{@form.id}")
     end
-        
+
     redirect_to({:action => :show}, :notice => "Configuration successfully uploaded")
   end
   member_action :upload_config_form, :method => :get do
     @form = Form.find(params[:id])
-    
+
     @page_title = "Upload new configuration"
     render 'admin/forms/upload_config', :locals => { :url => upload_config_admin_form_path}
   end
@@ -275,7 +275,7 @@ ActiveAdmin.register Form do
   member_action :lock do
     @form = Form.find(params[:id])
     if @form.nil? or @form.session.nil?
-      flash[:error] = 'Template forms can not be locked/unlocked!'      
+      flash[:error] = 'Template forms can not be locked/unlocked!'
       redirect_to :action => :show
       return
     end
@@ -300,7 +300,7 @@ ActiveAdmin.register Form do
   member_action :unlock do
     @form = Form.find(params[:id])
     if @form.nil? or @form.session.nil?
-      flash[:error] = 'Template forms can not be locked/unlocked!'      
+      flash[:error] = 'Template forms can not be locked/unlocked!'
       redirect_to :action => :show
       return
     end
@@ -344,24 +344,24 @@ ActiveAdmin.register Form do
       @form.included_forms.each do |included_form_name|
         included_form = Form.where(:name => included_form_name, :session_id => @form.session_id).first
         next if included_form.nil?
-        
+
         copy_to_session(included_form, @session)
         subform_copy_count += 1
       end
     end
-    
+
     redirect_to(admin_form_path(copied_form), :notice => (subform_copy_count > 0 ? "Form and #{subform_copy_count} included forms copied" : 'Form copied'))
   end
   member_action :copy_form do
     @form = Form.find(params[:id])
     authorize! :read, @form
-    
+
     @page_title = "Copy Form to Session"
   end
   action_item :only => :show do
     link_to 'Copy', copy_form_admin_form_path(resource)
   end
-  
+
   action_item :only => :show do
     next if resource.session.nil? # template forms can not be finalised
     next unless can? :manage, resource
@@ -379,7 +379,7 @@ ActiveAdmin.register Form do
   action_item :only => :show do
     link_to 'Preview with Annotations', preview_form_path(resource, :show_internal_annotations => true), :target => '_blank' if resource.has_configuration? and can? :read, resource
   end
-  
+
   action_item :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'form', :audit_trail_view_id => resource.id))
   end
