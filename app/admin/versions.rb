@@ -20,8 +20,7 @@ ActiveAdmin.register Version do
                                                      'Image' => 'Image',
                                                      'Patient' => 'Patient',
                                                      'Visit' => 'Visit',
-                                                     'Comment' => 'ActiveAdmin::Comment',
-                                                    }
+                                                    }.merge(Rails.application.config.is_erica_remote ? {'Comment' => 'ActiveAdmin::Comment'} : {})
   filter :whodunnit, :label => 'User', :as => :select, :collection => proc { User.all }
   filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
@@ -58,7 +57,7 @@ ActiveAdmin.register Version do
         end_of_association_chain.where('(item_type LIKE \'Study\' and item_id = :study_id) or
        (item_type LIKE \'Session\' and item_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id)) or
        (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or
-       (item_type LIKE \'Form\' and item_id IN (SELECT id FROM forms WHERE forms.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or 
+       (item_type LIKE \'Form\' and item_id IN (SELECT id FROM forms WHERE forms.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or
        (item_type LIKE \'Center\' and item_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)) or
        (item_type LIKE \'Patient\' and item_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))) or
        (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))) or
@@ -262,7 +261,7 @@ ActiveAdmin.register Version do
 
   collection_action :show_git_commit, :method => :get do
     oid = params[:oid]
-    
+
     repo = GitConfigRepository.new
     begin
       commit = repo.lookup(oid)
