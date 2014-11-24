@@ -1,5 +1,6 @@
 require 'git_config_repository'
 require 'schema_validation'
+require 'aa_erica_keywords'
 
 ActiveAdmin.register Study do
 
@@ -47,7 +48,7 @@ ActiveAdmin.register Study do
     column 'Select for Session' do |study|
       link_to('Select', select_for_session_admin_study_path(study))
     end
-    
+
     customizable_default_actions(current_ability)
   end
 
@@ -70,7 +71,7 @@ ActiveAdmin.register Study do
       row :state do
         study.state.to_s.camelize + (study.locked_version.nil? ? '' : " (Version: #{study.locked_version})")
       end
-      keywords_row(study, :tags, 'Allowed Keywords', can?(:define_keywords, study))
+      keywords_row(study, :tags, 'Allowed Keywords', can?(:define_keywords, study)) if Rails.application.config.is_erica_remote
 
       if study.has_configuration?
         row :configuration_validation do
@@ -80,26 +81,26 @@ ActiveAdmin.register Study do
       row :configuration do
         current = {}
         if study.has_configuration?
-          current_config = study.current_configuration 
+          current_config = study.current_configuration
           if(current_config.nil? or not current_config.is_a?(Hash))
             current[:configuration] = :invalid
           else
             current[:configuration] = CodeRay.scan(JSON::pretty_generate(current_config), :json).div(:css => :class).html_safe
           end
-          
+
           current[:download_link] = download_current_configuration_admin_study_path(study)
         end
         locked = nil
         unless study.locked_version.nil?
           locked = {}
-    
+
           locked_config = study.locked_configuration
           if locked_config.nil?
             locked[:configuration] = :invalid
           else
             locked[:configuration] = CodeRay.scan(JSON::pretty_generate(locked_config), :json).div(:css => :class).html_safe
           end
-          
+
           locked[:download_link] = download_locked_configuration_admin_study_path(study)
         end
 
@@ -108,7 +109,7 @@ ActiveAdmin.register Study do
     end
     active_admin_comments if can? :remote_comment, study
   end
-  
+
   form do |f|
     f.inputs 'Details' do
       f.input :name, :required => true
@@ -133,7 +134,7 @@ ActiveAdmin.register Study do
     data = GitConfigRepository.new.data_at_version(@study.relative_config_file_path, nil)
     send_data data, :filename => "study_#{@study.id}_current.yml" unless data.nil?
   end
-  member_action :download_locked_configuration do    
+  member_action :download_locked_configuration do
     @study = Study.find(params[:id])
     authorize! :read, @study
 
@@ -180,16 +181,16 @@ ActiveAdmin.register Study do
           nullified_visits += 1
         end
       end
-      
+
       repo = GitConfigRepository.new
       repo.update_config_file(@study.relative_config_file_path, params[:study][:file].tempfile, current_user, "New configuration file for study #{@study.id}")
-        
+
       redirect_to({:action => :show}, :notice => 'Configuration successfully uploaded.' + (nullified_visits == 0 ? '' : " #{nullified_visits} visits had their visit type reset, because their former visit type no longer exists."))
     end
   end
   member_action :upload_config_form, :method => :get do
     @study = Study.find(params[:id])
-    
+
     @page_title = "Upload new configuration"
     render 'admin/studies/upload_config', :locals => { :url => upload_config_admin_study_path}
   end
@@ -203,7 +204,7 @@ ActiveAdmin.register Study do
 
   member_action :select_for_session, :method => :get do
     @study = Study.find(params[:id])
-    
+
     session[:selected_study_id] = @study.id
     session[:selected_study_name] = @study.name
 
@@ -291,5 +292,5 @@ ActiveAdmin.register Study do
   end
 
   viewer_cartable(:study)
-  erica_keywordable(:tags, 'Allowed Keywords')
+  erica_keywordable(:tags, 'Allowed Keywords') if Rails.application.config.is_erica_remote
 end
