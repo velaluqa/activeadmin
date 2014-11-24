@@ -54,6 +54,7 @@ class BackgroundJob
   def finish_successfully(results)
     self.finish
 
+    self.successful = true
     self.results = results
 
     self.save
