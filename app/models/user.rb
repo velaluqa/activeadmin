@@ -60,7 +60,8 @@ class User < ActiveRecord::Base
     !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(role_sym) }).nil?)
   end
   def is_erica_remote_user?
-    roles.all? {|role| role.erica_remote_role? }
+    # TODO: this is filthy, dirty hack territory...
+    self.id >= 1000 and roles.all? {|role| role.erica_remote_role? }
   end
 
   def test_results_for_session(session)
