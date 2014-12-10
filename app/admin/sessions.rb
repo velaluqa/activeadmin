@@ -4,6 +4,8 @@ require 'config_display_filters'
 
 ActiveAdmin.register Session do
 
+  menu if: proc { can? :read, Session }
+
   config.clear_action_items! # get rid of the default action items, since we have to handle 'edit' and 'delete' on a case-by-case basis
 
   scope :all, :default => true
@@ -11,6 +13,8 @@ ActiveAdmin.register Session do
   scope :testing
   scope :production
   scope :closed
+
+  config.comments = false
 
   controller do
     load_and_authorize_resource :except => :index
@@ -62,13 +66,7 @@ ActiveAdmin.register Session do
       end
     end
 
-    customizable_default_actions do |session|
-      except = []
-      except << :destroy unless can? :destroy, session
-      except << :edit unless can? :edit, session
-      
-      except
-    end
+    customizable_default_actions(current_ability)
   end
 
   show do |session|

@@ -111,9 +111,17 @@ group :development do
   gem 'slim', '>= 1.1.0'
   gem 'sinatra', '>= 1.3.0', :require => nil
 end
+# Sidekiq middleware to ensure proper behaviour of mongoid connections in sidekiq workers
+gem 'kiqstand'
 
 # Ruby DICOM lib
 gem 'dicom'
 
 # MongoDB audit trail
 gem 'mongoid-history'
+
+# Zip file creation for image download in ERICA Remote
+gem 'rubyzip'
+
+# Resource tagging in ERICA Remote
+gem 'acts-as-taggable-on'

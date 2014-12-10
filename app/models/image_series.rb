@@ -4,6 +4,7 @@ class ImageSeries < ActiveRecord::Base
   include DominoDocument
 
   has_paper_trail
+  acts_as_taggable
 
   attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number, :state, :comment
   attr_accessible :visit, :patient
@@ -44,7 +45,11 @@ class ImageSeries < ActiveRecord::Base
   end
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = ImageSeries::STATE_SYMS.index(sym)
+    if sym.is_a? Fixnum
+      index = sym
+    else
+      index = ImageSeries::STATE_SYMS.index(sym)
+    end
     
     if index.nil?
       throw "Unsupported state"

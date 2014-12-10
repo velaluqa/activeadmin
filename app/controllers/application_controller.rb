@@ -23,6 +23,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { redirect_to admin_dashboard_path, :alert => exception.message }
       format.json { render :json => {:error_code => -1, :error => exception.message} }
+      format.all { redirect_to admin_dashboard_path, :alert => exception.message }
     end
   end
 

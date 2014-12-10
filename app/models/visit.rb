@@ -5,6 +5,7 @@ class Visit < ActiveRecord::Base
   include DominoDocument
 
   has_paper_trail
+  acts_as_taggable
 
   attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid
   attr_accessible :patient
@@ -65,7 +66,11 @@ class Visit < ActiveRecord::Base
   end
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = Visit::STATE_SYMS.index(sym)
+    if sym.is_a? Fixnum
+      index = sym
+    else
+      index = Visit::STATE_SYMS.index(sym)
+    end
 
     if index.nil?
       throw "Unsupported state"
@@ -86,7 +91,11 @@ class Visit < ActiveRecord::Base
   end
   def mqc_state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = Visit::MQC_STATE_SYMS.index(sym)
+    if sym.is_a? Fixnum
+      index = sym
+    else
+      index = Visit::MQC_STATE_SYMS.index(sym)
+    end
 
     if index.nil?
       throw "Unsupported mQC state"

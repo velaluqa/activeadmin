@@ -46,7 +46,11 @@ class Case < ActiveRecord::Base
   end
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = Case::STATE_SYMS.index(sym)
+    if sym.is_a? Fixnum
+      index = sym
+    else
+      index = Case::STATE_SYMS.index(sym)
+    end
 
     if index.nil?
       throw "Unsupported state"
@@ -70,7 +74,11 @@ class Case < ActiveRecord::Base
   end
   def flag=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = Case::FLAG_SYMS.index(sym)
+    if sym.is_a? Fixnum
+      index = sym
+    else
+      index = Case::FLAG_SYMS.index(sym)
+    end
 
     if index.nil?
       throw "Unsupported flag"

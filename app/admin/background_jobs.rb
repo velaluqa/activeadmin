@@ -3,6 +3,7 @@ ActiveAdmin.register BackgroundJob do
 
   menu priority: 22
   config.filters = false
+  config.comments = false
   actions :index, :show, :destroy
 
   scope :all, :default => true
@@ -47,7 +48,9 @@ ActiveAdmin.register BackgroundJob do
     end
     column :completed_at
 
-    default_actions
+    customizable_default_actions(current_ability) do |background_job|
+      background_job.finished? ? [] : [:destroy]
+    end
   end
 
   show do |background_job|
@@ -68,20 +71,49 @@ ActiveAdmin.register BackgroundJob do
       row :updated_at
       row :completed_at
     end
-    
-    unless(background_job.results.blank?)
-      panel 'Results' do
+
+    if(background_job.results and background_job.results['zipfile'])
+      panel 'Download' do
         div(:class => 'attributes_table') do
           table(:border => 0, :cellspacing => 0, :cellpadding => 0) do
-            background_job.results.each do |label, value|
-              tr do
-                th { label }
-                td { simple_format(value) }
+            tr do
+              th { 'Zip file' }
+              td { link_to('Download', download_zip_admin_background_job_path(resource)) }
+            end
+          end
+        end
+      end
+    else
+      unless(background_job.results.blank?)
+        panel 'Results' do
+          div(:class => 'attributes_table') do
+            table(:border => 0, :cellspacing => 0, :cellpadding => 0) do
+              background_job.results.each do |label, value|
+                tr do
+                  th { label }
+                  td { simple_format(value) }
+                end
               end
             end
           end
         end
       end
     end
+  end
+
+  member_action :download_zip, method: :get do
+    background_job = BackgroundJob.find(params[:id])
+    authorize! :read, background_job
+
+    unless(background_job.results and background_job.results['zipfile'])
+      redirect_to :back, alert: 'No download available'
+      return
+    end
+    unless(File.readable?(background_job.results['zipfile']))
+      redirect_to :back, alert: 'File not found'
+      return
+    end
+
+    send_file background_job.results['zipfile'], type: 'application/zip'
   end
 end
