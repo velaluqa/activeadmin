@@ -17,3 +17,7 @@ rescue Errno::ENOENT => e
   Rails.application.config.erica_remote = nil
   Rails.application.config.is_erica_remote = false
 end
+
+if(Rails.application.config.is_erica_remote)
+  FileUtils.mkpath(Rails.root.join(Rails.application.config.image_storage_root))
+end
