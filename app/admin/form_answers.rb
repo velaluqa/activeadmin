@@ -1,11 +1,16 @@
 require 'key_path_accessor'
 
 ActiveAdmin.register FormAnswer do
+
+  menu if: proc { can? :read, FormAnswer }
+
   before_filter { @skip_sidebar = true }
 
   actions :index, :show, :destroy #TEMP
 
   config.per_page = 100
+
+  config.comments = false
 
   controller do
     helper :forms

@@ -3,7 +3,11 @@ require 'rexml/document'
 ActiveAdmin.register Image do
 
   menu false
-  actions :index, :show, :destroy
+  if Rails.application.config.is_erica_remote
+    actions :index, :show
+  else
+    actions :index, :show, :destroy
+  end
   config.filters = false
 
   config.per_page = 100
@@ -23,6 +27,12 @@ ActiveAdmin.register Image do
         end_of_association_chain.accessible_by(current_ability).includes(:image_series => {:patient => :center}).where('centers.study_id' => session[:selected_study_id])
       end
     end
+
+    def index
+      authorize! :download_status_files, Image if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+
+      index!
+    end
   end
 
   index do
@@ -37,7 +47,7 @@ ActiveAdmin.register Image do
       end      
     end
     
-    default_actions
+    customizable_default_actions(current_ability)
   end
 
   show do |image|
@@ -67,6 +77,6 @@ ActiveAdmin.register Image do
   end
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

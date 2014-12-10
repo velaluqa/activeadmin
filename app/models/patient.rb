@@ -4,6 +4,7 @@ class Patient < ActiveRecord::Base
   include DominoDocument
 
   has_paper_trail
+  acts_as_taggable
 
   attr_accessible :center, :subject_id, :domino_unid
   attr_accessible :center_id

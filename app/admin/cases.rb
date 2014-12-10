@@ -8,10 +8,14 @@ require 'set'
 
 ActiveAdmin.register Case do
 
+  menu if: proc { can? :read, Case }
+
   actions :index, :show, :edit, :update, :destroy
   config.clear_action_items! # get rid of the default action items, since we have to handle 'delete' on a case-by-case basis
 
   config.per_page = 100
+
+  config.comments = false
 
   controller do
     load_and_authorize_resource :except => :index
@@ -184,7 +188,7 @@ ActiveAdmin.register Case do
     end
     comment_column(:comment, 'Comment')
    
-    customizable_default_actions do |resource|
+    customizable_default_actions(current_ability) do |resource|
       (resource.state == :unread and resource.form_answer.nil?) ? [] : [:edit, :destroy]
     end
   end

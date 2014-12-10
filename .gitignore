@@ -18,6 +18,9 @@
 /config/database.yml
 /config/mongoid.yml
 /config/goodimage_migration.yml
+/config/erica_remote.yml
+/config/erica_remotes.yml
+/config/*.pem
 
 # Ignore gems installed in deployment mode
 /vendor/bundle
@@ -38,3 +41,7 @@
 
 # Ignore annoying Mac OS X files
 .DS_Store
+
+# Ignore ERICA Remote client configuration
+app/assets/stylesheets/client_styles/*
+app/assets/images/client_logos/*

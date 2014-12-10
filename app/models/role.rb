@@ -7,8 +7,8 @@ class Role < ActiveRecord::Base
   belongs_to :user
   belongs_to :subject, :polymorphic => true  
 
-  ROLE_SYMS = [:manage, :image_import, :image_manage, :medical_qc, :audit, :readonly]
-  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager', 'Medical QC', 'Audit', 'Read-only']
+  ROLE_SYMS = [:manage, :image_import, :image_manage, :medical_qc, :audit, :readonly, :remote_manage, :remote_read, :remote_comments, :remote_images, :remote_keywords, :remote_audit, :remote_qc, :remote_status_files, :remote_define_keywords]
+  ROLE_NAMES = ['Manager', 'Image Import', 'Image Manager', 'Medical QC', 'Audit', 'Read-only', 'ERICA Remote Manager', 'Remote - Read Access', 'Remote - Comments Access', 'Remote - Download Images', 'Remote - Set Keywords', 'Remote - Audit', 'Remote - QC Access', 'Remote - Status File Access', 'Remote - Define Keywords']
 
   before_save :fix_subject
 
@@ -28,6 +28,9 @@ class Role < ActiveRecord::Base
   def system_role?
     subject_type == nil and subject_id == nil
   end
+  def erica_remote_role?
+    [:remote_manage, :remote_read, :remote_comments, :remote_images, :remote_keywords, :remote_audit, :remote_qc, :remote_status_files, :remote_define_keywords].include?(self.role)
+  end
 
   def name
     return "#{role_name} on '#{subject_name}'"
@@ -44,6 +47,9 @@ class Role < ActiveRecord::Base
 
   def self.role_sym_to_int(sym)
     return Role::ROLE_SYMS.index(sym)
+  end
+  def self.role_sym_to_role_name(sym)
+    return ROLE_NAMES[Role::ROLE_SYMS.index(sym)]
   end
 
   def role_name

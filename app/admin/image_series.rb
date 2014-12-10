@@ -1,9 +1,11 @@
 require 'aa_domino'
 require 'aa_erica_comment'
+require 'aa_erica_keywords'
 
 ActiveAdmin.register ImageSeries do
 
   menu if: proc { can? :read, ImageSeries }
+  actions :index, :show if Rails.application.config.is_erica_remote
 
   scope :all, :default => true
   scope :not_assigned
@@ -36,14 +38,14 @@ ActiveAdmin.register ImageSeries do
         params[:image_series].delete(:force_update)
         return update!
       end
-      
+
       if(params[:image_series][:visit_id].to_i != image_series.visit_id and params[:image_series][:force_update] != 'true')
         if(original_visit and new_visit and original_visit.visit_type != new_visit.visit_type)
           flash[:error] = 'The new visit has a different visit type than the current visit. Therefore, this image series will lose all its assignments to required series of the current visit, including all tQC results. If you want to continue, press "Update" again.'
           redirect_to edit_admin_image_series_path(image_series, :force_update => true, :visit_id => params[:image_series][:visit_id])
           return
         end
-        
+
         unless(new_visit.nil?)
           new_visit_assignment_map = new_visit.assigned_required_series_id_map
           already_assigned_required_series_names = []
@@ -84,7 +86,7 @@ ActiveAdmin.register ImageSeries do
           end
         end
       end
-      
+
       update!
       puts 'YEEEHAAAA!!!'
     end
@@ -92,7 +94,7 @@ ActiveAdmin.register ImageSeries do
     def generate_selected_filters
       selected_filters = []
 
-      
+
       selected_filters += Visit.accessible_by(current_ability).where(:id => params[:q][:visit_id_in]).map {|visit| {:id => 'visit_'+visit.id.to_s, :text => visit.name, :type => 'visit'} } unless(params[:q][:visit_id_in].nil?)
       selected_filters += Patient.accessible_by(current_ability).where(:id => params[:q][:patient_id_in]).map {|patient| {:id => 'patient_'+patient.id.to_s, :text => patient.name, :type => 'patient'} } unless(params[:q][:patient_id_in].nil?)
       selected_filters += Center.accessible_by(current_ability).where(:id => params[:q][:patient_center_id_in]).map {|center| {:id => 'center_'+center.id.to_s, :text => center.code + ' - ' + center.name, :type => 'center'} } unless(params[:q][:patient_center_id_in].nil?)
@@ -102,6 +104,8 @@ ActiveAdmin.register ImageSeries do
     end
 
     def index
+      authorize! :download_status_files, ImageSeries if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+
       session[:current_images_filter] = nil if(params[:clear_filter] == 'true')
 
       if(params[:q] and params[:q][:visit_id_in] == [""])
@@ -120,10 +124,10 @@ ActiveAdmin.register ImageSeries do
       end
       session[:current_images_filter] = params[:q][:visit_id_in] unless params[:q].nil? or params[:q][:visit_id_in].nil?
 
-      if(params[:q] and params[:q][:visit_id_in].respond_to?(:each)) 
+      if(params[:q] and params[:q][:visit_id_in].respond_to?(:each))
         visit_id_in = []
 
-        params[:q][:visit_id_in].each do |id|         
+        params[:q][:visit_id_in].each do |id|
           if(id =~ /^center_([0-9]*)/)
             params[:q][:patient_center_id_in] ||= []
             params[:q][:patient_center_id_in] << $1
@@ -190,20 +194,21 @@ ActiveAdmin.register ImageSeries do
       end
     end
     comment_column(:comment, 'Comment')
-    
+    keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+
     column 'View (in)' do |image_series|
       result = ''
 
       result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'), :class => 'member_link')
       result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank')
-      result += link_to('Domino', image_series.lotus_notes_url, :class => 'member_link') unless image_series.domino_unid.nil? or image_series.lotus_notes_url.nil?
-      result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
-      result += link_to('Assign RS', assign_required_series_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') unless image_series.visit_id.nil?
-      
+      result += link_to('Domino', image_series.lotus_notes_url, :class => 'member_link') unless(image_series.domino_unid.nil? or image_series.lotus_notes_url.nil? or Rails.application.config.is_erica_remote)
+      result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') if can? :manage, image_series
+      result += link_to('Assign RS', assign_required_series_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') unless(image_series.visit_id.nil? or cannot? :manage, image_series)
+
       result.html_safe
     end
-    
-    default_actions
+
+    customizable_default_actions(current_ability)
   end
 
   show do |image_series|
@@ -234,6 +239,7 @@ ActiveAdmin.register ImageSeries do
         end
       end
       comment_row(image_series, :comment, 'Comment')
+      keywords_row(image_series, :tags, 'Keywords') if Rails.application.config.is_erica_remote
       row 'Required Series' do
         assigned_required_series = image_series.assigned_required_series
         if(assigned_required_series.empty?)
@@ -258,6 +264,7 @@ ActiveAdmin.register ImageSeries do
 
       render :partial => 'admin/image_series/properties_table', :locals => { :spec => properties_spec, :values => image_series.image_series_data.properties}
     end
+    active_admin_comments if can? :remote_comment, image_series
   end
 
   form do |f|
@@ -300,6 +307,7 @@ ActiveAdmin.register ImageSeries do
   filter :imaging_date
   filter :created_at, :label => 'Import Date'
   filter :comment
+  keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   member_action :viewer, :method => :get do
     @image_series = ImageSeries.find(params[:id])
@@ -344,7 +352,7 @@ ActiveAdmin.register ImageSeries do
   end
   member_action :edit_properties_form, :method => :get do
     @image_series = ImageSeries.find(params[:id])
-    
+
     if(@image_series.study.nil? or not @image_series.study.locked_semantically_valid?)
       flash[:error] = 'Properties can only be edited once a valid study configuration was uploaded and locked.'
       redirect_to({:action => :show})
@@ -360,7 +368,7 @@ ActiveAdmin.register ImageSeries do
     render 'admin/image_series/edit_properties'
   end
   action_item :only => :show do
-    link_to('Edit Properties', edit_properties_form_admin_image_series_path(resource))
+    link_to('Edit Properties', edit_properties_form_admin_image_series_path(resource)) if can? :manage, resource
   end
 
   member_action :mark_not_relevant, :method => :get do
@@ -378,14 +386,15 @@ ActiveAdmin.register ImageSeries do
     redirect_to({:action => :show}, :notice => 'Series marked as not relevant for read.')
   end
   action_item :only => :show do
-    link_to('Mark not relevant', mark_not_relevant_admin_image_series_path(resource)) unless (resource.state != :visit_assigned or resource.visit.nil?)
+    link_to('Mark not relevant', mark_not_relevant_admin_image_series_path(resource)) unless (resource.state != :visit_assigned or resource.visit.nil? or cannot? :manage, resource)
   end
-  batch_action :mark_not_relevant, :confirm => 'This will mark all selected image series as not relevant. Are you sure?' do |selection|
+  batch_action :mark_not_relevant, :confirm => 'This will mark all selected image series as not relevant. Are you sure?', :if => proc {can? :manage, ImageSeries} do |selection|
     ImageSeries.find(selection).each do |i_s|
+      next unless can? :manage, i_s
       next if (i_s.state != :visit_assigned or i_s.visit.nil?)
 
       i_s.state = :not_required
-      i_s.save      
+      i_s.save
     end
 
     redirect_to(:back, :notice => 'Selected image series were marked as not relevant for read.')
@@ -430,7 +439,7 @@ ActiveAdmin.register ImageSeries do
     image_series.each do |i_s|
       authorize! :manage, i_s
       next unless i_s.visit_id.nil?
-      
+
       i_s.patient = patient
       unless(i_s.series_number.blank? or i_s.patient.image_series.where(:series_number => i_s.series_number).empty?)
         i_s.series_number = nil
@@ -440,10 +449,10 @@ ActiveAdmin.register ImageSeries do
 
     redirect_to params[:return_url], :notice => 'The image series were assigned to the patient.'
   end
-  batch_action :assign_to_patient, :confirm => 'This will modify all selected image series. Are you sure?'  do |selection|
+  batch_action :assign_to_patient, :confirm => 'This will modify all selected image series. Are you sure?', :if => proc {can? :manage, ImageSeries}  do |selection|
     failure = false
     study_id = nil
-    
+
     ImageSeries.find(selection).each do |image_series|
       study_id = image_series.study.id if study_id.nil?
 
@@ -451,7 +460,7 @@ ActiveAdmin.register ImageSeries do
         flash[:error] = 'Not all selected image series belong to the same study. Batch assignment can only be used for series of the same study.'
         redirect_to :back
         failure = true
-        break      
+        break
       elsif(image_series.visit_id != nil)
         flash[:error] = 'Not all selected image series are currently unassigned. Batch assignment can only be used for series which are not currently assigned to a visit.'
         redirect_to :back
@@ -489,6 +498,7 @@ ActiveAdmin.register ImageSeries do
         return
       end
 
+      authorize! :create, Visit
       visit = Visit.create(:patient => image_series.first.patient, :visit_number => params[:visit][:visit_number], :visit_type => params[:visit][:visit_type], :description => params[:visit][:description])
     else
       visit = Visit.find(params[:visit_id])
@@ -498,26 +508,26 @@ ActiveAdmin.register ImageSeries do
     image_series.each do |i_s|
       authorize! :manage, i_s
       next unless i_s.visit_id.nil?
-      
+
       i_s.visit = visit
       i_s.save
     end
 
     redirect_to params[:return_url], :notice => 'The image series were assigned to the visit.'
   end
-  batch_action :assign_to_visit, :confirm => 'This will modify all selected image series. Are you sure?'  do |selection|
+  batch_action :assign_to_visit, :confirm => 'This will modify all selected image series. Are you sure?', :if => proc {can? :manage, ImageSeries} do |selection|
     patient_id = nil
     visits = []
     visit_types = []
     failure = false
-    
+
     ImageSeries.find(selection).each do |image_series|
       if patient_id.nil?
         patient_id = image_series.patient_id
         visits = image_series.patient.visits
         visit_types = (image_series.study ? image_series.study.visit_types : [])
       end
-      
+
       if(image_series.patient_id != patient_id)
         flash[:error] = 'Not all selected image series belong to the same patient. Batch assignment can only be used for series from one patient which are not currently assigned to a visit.'
         redirect_to :back
@@ -618,7 +628,7 @@ ActiveAdmin.register ImageSeries do
         children = i_s.images.map do |image|
           {'label' => view_context.link_to(image.id.to_s, admin_image_path(image), :target => '_blank').html_safe, 'id' => 'image_'+image.id.to_s, 'type' => 'image'}
         end
-        
+
         {'label' => view_context.link_to(i_s.imaging_date.to_s + ' - ' +i_s.name, admin_image_series_path(i_s), :target => '_blank').html_safe, 'id' => 'image_series_'+i_s.id.to_s, 'children' => children, 'type' => 'image_series'}
       end
 
@@ -652,7 +662,7 @@ ActiveAdmin.register ImageSeries do
           image = Image.find($1)
           image.image_series_id = image_series_id
           image.save
-        end        
+        end
       end
     end
 
@@ -662,7 +672,7 @@ ActiveAdmin.register ImageSeries do
       redirect_to(params[:return_url], :notice => 'The images were successfully reassigned.')
     end
   end
-  batch_action :rearrange, :label => 'Rearrange Images of ' do |selection|
+  batch_action :rearrange, :label => 'Rearrange Images of ', :if => proc {can? :manage, ImageSeries} do |selection|
     @tree_data = build_image_series_tree_data(ImageSeries.find(selection))
 
     patient_id = nil
@@ -688,8 +698,9 @@ ActiveAdmin.register ImageSeries do
 
   viewer_cartable(:image_series)
   erica_commentable(:comment, 'Comment')
+  erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image_series', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image_series', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

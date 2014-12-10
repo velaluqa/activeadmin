@@ -1,9 +1,11 @@
 require 'aa_customizable_default_actions'
 require 'aa_domino'
+require 'aa_erica_keywords'
 
 ActiveAdmin.register Patient do
 
   menu if: proc { can? :read, Patient }
+  actions :index, :show if Rails.application.config.is_erica_remote
 
   config.per_page = 100
   config.sort_order = 'centers.code_asc'
@@ -34,8 +36,10 @@ ActiveAdmin.register Patient do
     end
 
     def index
+      authorize! :download_status_files, Patient if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+
       session[:current_images_filter] = nil if(params[:clear_filter] == 'true')
-      
+
       if(params[:q] and params[:q][:center_id_in] == [""])
         params[:q].delete(:center_id_in)
 
@@ -51,10 +55,10 @@ ActiveAdmin.register Patient do
       end
       session[:current_images_filter] = params[:q][:center_id_in] unless params[:q].nil? or params[:q][:center_id_in].nil?
 
-      if(params[:q] and params[:q][:center_id_in].respond_to?(:each)) 
+      if(params[:q] and params[:q][:center_id_in].respond_to?(:each))
         center_id_in = []
 
-        params[:q][:center_id_in].each do |id|         
+        params[:q][:center_id_in].each do |id|
           if(id =~ /^center_([0-9]*)/)
             center_id_in ||= []
             center_id_in << $1
@@ -87,8 +91,9 @@ ActiveAdmin.register Patient do
     selectable_column
     column :center, :sortable => 'centers.code'
     column :subject_id
-    
-    customizable_default_actions do |resource|
+    keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+
+    customizable_default_actions(current_ability) do |resource|
       (resource.cases.empty? and resource.form_answers.empty?) ? [] : [:destroy]
     end
   end
@@ -99,10 +104,12 @@ ActiveAdmin.register Patient do
       row :subject_id
       domino_link_row(patient)
       row :image_storage_path
+      keywords_row(patient, :tags, 'Keywords') if Rails.application.config.is_erica_remote
       row :patient_data_raw do
         CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
       end
     end
+    active_admin_comments if can? :remote_comment, patient
   end
 
   form do |f|
@@ -119,9 +126,10 @@ ActiveAdmin.register Patient do
   # filters
   filter :center, :collection => []
   filter :subject_id, :label => 'Subject ID'
+  keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 
   controller do
@@ -132,6 +140,25 @@ ActiveAdmin.register Patient do
 
       return background_job
     end
+
+    def start_download_images(patient_id)
+      patient = Patient.find(patient_id)
+      authorize! :download_images, patient
+
+      background_job = BackgroundJob.create(:name => "Download images for patient #{patient.name}", :user_id => current_user.id)
+
+      DownloadImagesWorker.perform_async(background_job.id.to_s, 'Patient', patient_id)
+
+      return background_job
+    end
+  end
+
+  member_action :download_images, :method => :get do
+    background_job = start_download_images(params[:id])
+    redirect_to admin_background_job_path(background_job), :notice => 'Your download will be available shortly. Please refresh this page to see whether it is available yet.'
+  end
+  action_item :only => :show do
+    link_to('Download images', download_images_admin_patient_path(resource)) if can? :download_images, resource
   end
 
   collection_action :batch_export_for_ericav1, :method => :post do
@@ -150,14 +177,14 @@ ActiveAdmin.register Patient do
     background_job = export_patients_for_ericav1(params[:export_folder], patient_ids)
     redirect_to admin_background_job_path(background_job), :notice => 'The export was started successfully.'
   end
-  member_action :export_for_ericav1, :method => :get do    
+  member_action :export_for_ericav1, :method => :get do
     @page_title = 'Export for ERICAv1'
     render 'admin/patients/export_for_ericav1_form', :locals => {:selection => [resource.id.to_s], :return_url => request.referer}
   end
   action_item :only => :show do
-    link_to('Export for ERICAv1', export_for_ericav1_admin_patient_path(resource))
+    link_to('Export for ERICAv1', export_for_ericav1_admin_patient_path(resource)) if can? :manage, resource
   end
-  batch_action :export_for_ericav1 do |selection|
+  batch_action :export_for_ericav1, if: proc {can? :manage, Patient} do |selection|
     @page_title = 'Export for ERICAv1'
     render 'admin/patients/export_for_ericav1_form', :locals => {:selection => selection, :return_url => request.referer}
   end
@@ -166,7 +193,7 @@ ActiveAdmin.register Patient do
     @patient = Patient.find(params[:id])
 
     new_visits_list = params[:new_visits_list].split(',')
-    
+
     visits = new_visits_list.map {|v| Visit.find(v.to_i)}
 
     available_visit_numbers = visits.map {|v| v.visit_number}.sort
@@ -179,7 +206,7 @@ ActiveAdmin.register Patient do
         v.save
         next_free_visit_number += 1
       end
- 
+
       visits.each do |v|
         v.visit_number = available_visit_numbers.shift
         v.save
@@ -195,8 +222,9 @@ ActiveAdmin.register Patient do
     @visits = @patient.visits
   end
   action_item :only => :show do
-    link_to('Reorder Visits', reorder_visits_form_admin_patient_path(resource)) unless resource.visits.empty?
+    link_to('Reorder Visits', reorder_visits_form_admin_patient_path(resource)) unless(resource.visits.empty? or cannot? :manage, resource)
   end
 
   viewer_cartable(:patient)
+  erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 end

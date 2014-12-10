@@ -1,12 +1,27 @@
 require 'git_config_repository'
 
 ActiveAdmin.register Version do
-  menu :label => 'Audit Trail', :priority => 99, :if => proc{ can?(:manage, Version) }
+  menu :label => 'Audit Trail', :priority => 99, :if => proc{ can?(:read, Version) }
+  config.comments = false
+  config.batch_actions = false
 
   actions :index, :show
 
   filter :created_at
-  filter :item_type, :as => :select, :collection => ['Case', 'Form', 'Role', 'Session', 'Study' , 'User', 'Center', 'ImageSeries', 'Image', 'Patient', 'Visit'].sort
+
+  filter :item_type, :as => :select, :collection => {'Case' => 'Case',
+                                                     'Center' => 'Center',
+                                                     'Form' => 'Form',
+                                                     'Image' => 'Image',
+                                                     'ImageSeries' => 'ImageSeries',
+                                                     'Patient' => 'Patient',
+                                                     'Role' => 'Role',
+                                                     'Session' => 'Session',
+                                                     'Study' => 'Study',
+                                                     'User' => 'User',
+                                                     'Visit' => 'Visit',
+                                                    }.merge(Rails.application.config.is_erica_remote ? {'Comment' => 'ActiveAdmin::Comment'} : {}).sort
+
   filter :whodunnit, :label => 'User', :as => :select, :collection => proc { User.all }
   filter :event, :as => :check_boxes, :collection => ['create', 'update', 'destroy']
 
@@ -26,8 +41,8 @@ ActiveAdmin.register Version do
         end_of_association_chain.where('(item_type LIKE \'Patient\' and item_id = :patient_id) or
        (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.patient_id = :patient_id)) or
        (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) or
-       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE (image_series.visit_id IN (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) OR (image_series.visit_id IS NULL AND image_series.patient_id = :patient_id))) or
-       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE (image_series.visit_id IN (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) OR (image_series.visit_id IS NULL AND image_series.patient_id = :patient_id))))
+       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)) or
+       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)))
 ', {:patient_id => params[:audit_trail_view_id].to_i})
       when 'form'
         end_of_association_chain.where('item_type LIKE \'Form\' and item_id = ?', params[:audit_trail_view_id].to_i)
@@ -43,12 +58,12 @@ ActiveAdmin.register Version do
         end_of_association_chain.where('(item_type LIKE \'Study\' and item_id = :study_id) or
        (item_type LIKE \'Session\' and item_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id)) or
        (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or
-       (item_type LIKE \'Form\' and item_id IN (SELECT id FROM forms WHERE forms.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or 
+       (item_type LIKE \'Form\' and item_id IN (SELECT id FROM forms WHERE forms.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or
        (item_type LIKE \'Center\' and item_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)) or
        (item_type LIKE \'Patient\' and item_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))) or
        (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))) or
-       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE (image_series.visit_id = (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))))) or (image_series.visit_id IS NULL and image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))))) or
-       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE (image_series.visit_id = (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))))) or (image_series.visit_id IS NULL and image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))))))',
+       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))) or
+       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))))',
                                        {:study_id => params[:audit_trail_view_id].to_i})
       when 'image'
         end_of_association_chain.where('item_type LIKE \'Image\' and item_id = ?', params[:audit_trail_view_id].to_i)
@@ -61,8 +76,8 @@ ActiveAdmin.register Version do
        (item_type LIKE \'Patient\' and item_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)) or
        (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) or
        (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) or
-       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE (image_series.visit_id = (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)))) or (image_series.visit_id IS NULL and image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)))) or
-       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE (image_series.visit_id = (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)))) or (image_series.visit_id IS NULL and image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)))))', {:center_id => params[:audit_trail_view_id].to_i})
+       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) or
+       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))))', {:center_id => params[:audit_trail_view_id].to_i})
       else
         end_of_association_chain
       end.accessible_by(current_ability)
@@ -144,7 +159,12 @@ ActiveAdmin.register Version do
   index do
     selectable_column
     column 'Timestamp', :created_at
-    column :item_type
+    column :item_type, sortable: :item_type do |version|
+      case version.item_type
+      when 'ActiveAdmin::Comment' then 'Comment'
+      else version.item_type
+      end
+    end
     column :item do |version|
       auto_link(version.item)
     end
@@ -167,7 +187,12 @@ ActiveAdmin.register Version do
   show do |version|
     attributes_table do
       row :created_at
-      row :item_type
+      row :item_type do
+        case version.item_type
+        when 'ActiveAdmin::Comment' then 'Comment'
+        else version.item_type
+        end
+      end
       row :item do
         auto_link(version.item)
       end
@@ -217,7 +242,7 @@ ActiveAdmin.register Version do
 
   collection_action :show_git_commit, :method => :get do
     oid = params[:oid]
-    
+
     repo = GitConfigRepository.new
     begin
       commit = repo.lookup(oid)
@@ -236,15 +261,15 @@ ActiveAdmin.register Version do
   end
 
   action_item :only => :index do
-    link_to 'Configuration Changes', git_commits_admin_versions_path
+    link_to 'Configuration Changes', git_commits_admin_versions_path if can? :git_commits, Version
   end
   action_item :only => :git_commits do
-    link_to 'Versions', admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]}))
+    link_to 'Versions', admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :read, Version
   end
   action_item :only => :show_git_commit do
-    link_to 'Back', git_commits_admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]}))
+    link_to 'Back', git_commits_admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :git_commits, Version
   end
   action_item :only => [:index, :git_commits] do
-    link_to 'MongoDB', admin_mongoid_history_trackers_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]}))
+    link_to 'MongoDB', admin_mongoid_history_trackers_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :read, MongoidHistoryTracker
   end
 end

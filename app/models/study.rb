@@ -5,6 +5,7 @@ require 'domino_integration_client'
 
 class Study < ActiveRecord::Base
   has_paper_trail
+  acts_as_taggable
 
   attr_accessible :name, :locked_version, :domino_db_url, :domino_server_name, :notes_links_base_uri, :state
 
@@ -49,7 +50,11 @@ class Study < ActiveRecord::Base
   end
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = Study::STATE_SYMS.index(sym)
+    if sym.is_a? Fixnum
+      index = sym
+    else
+      index = Study::STATE_SYMS.index(sym)
+    end
 
     if index.nil?
       throw "Unsupported state"

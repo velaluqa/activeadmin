@@ -1,8 +1,8 @@
 module ActiveAdmin
   module Views
     class IndexAsTable
-      
-      def customizable_default_actions(&block)
+
+      def customizable_default_actions(ability = nil, &block)
         column '' do |resource|
           # most of this is copied from activeadmin/lib/active_admin/views/index_as_table.rb#default_actions
           # since we can't customize its behaviour
@@ -11,6 +11,13 @@ module ActiveAdmin
           else
             except = []
           end
+
+          if ability
+            except << :show unless ability.can? :read, resource
+            except << :edit unless ability.can? :edit, resource
+            except << :destroy unless ability.can? :destroy, resource
+          end
+
           links = ''.html_safe
           if controller.action_methods.include?('show') and not except.include?(:show)
             links << link_to(I18n.t('active_admin.view'), resource_path(resource), :class => "member_link view_link")

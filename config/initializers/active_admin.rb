@@ -2,9 +2,17 @@ require 'aa_footer'
 require 'aa_site_title'
 require 'aa_viewer_cart_mixin'
 require 'aa_erica_comment'
+require 'aa_erica_keywords'
+require 'aa_comment_paper_trail_patch'
 
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICACommentMixin::DSL)
+ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICAKeywordsMixin::DSL)
+
+if(Rails.application.config.is_erica_remote)
+  ActiveAdmin::Comment
+  ActiveAdmin::Comment.send(:include, ActiveAdminCommentPaperTrailPatch)
+end
 
 ActiveAdmin.setup do |config|
 
@@ -13,7 +21,15 @@ ActiveAdmin.setup do |config|
   # Set the title that is displayed on the main layout
   # for each of the active admin pages.
   #
-  config.site_title = "pharmtrace ERICA"
+  if(Rails.application.config.is_erica_remote)
+    if(Rails.application.config.erica_remote['sponsor'].blank?)
+      config.site_title = "pharmtrace ERICA Remote"
+    else
+      config.site_title = "pharmtrace ERICA Remote :: #{Rails.application.config.erica_remote['sponsor']}"
+    end
+  else
+    config.site_title = "pharmtrace ERICA"
+  end
 
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.
@@ -26,6 +42,9 @@ ActiveAdmin.setup do |config|
   # Note: Recommended image height is 21px to properly fit in the header
   #
   # config.site_title_image = "/images/logo.png"
+  if(Rails.application.config.is_erica_remote and Rails.application.config.erica_remote['logo'])
+    config.site_title_image = 'client_logos/' + Rails.application.config.erica_remote['logo']
+  end
 
   # == Default Namespace
   #
@@ -117,6 +136,8 @@ ActiveAdmin.setup do |config|
   #   config.namespace :without_comments do |without_comments|
   #     without_comments.allow_comments = false
   #   end
+  # Enable comments only in ERICA Remote
+  config.allow_comments = Rails.application.config.is_erica_remote
 
 
   # == Batch Actions
@@ -162,4 +183,3 @@ ActiveAdmin.setup do |config|
   config.view_factory.footer = PharmTraceERICAFooter
   config.view_factory.site_title = PharmTraceERICASiteTitle
 end
-

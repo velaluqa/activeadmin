@@ -6,6 +6,10 @@ StudyServer::Application.configure do
   # since you don't have to restart the web server when you make code changes.
   config.cache_classes = false
 
+  # Disable asset caches
+  config.assets.cache_store = :null_store  # Disables the Asset cache
+  config.sass.cache = false  # Disable the SASS compiler cache
+
   # Log error messages when you accidentally call methods on nil.
   config.whiny_nils = true
 
@@ -63,6 +67,9 @@ StudyServer::Application.configure do
   config.domino_integration_username = 'erica'
   config.domino_integration_password = 'test'
   config.domino_integration_readonly = false
+
+  config.erica_remote_signing_key = 'config/erica_remote.pem'
+  config.erica_remote_verification_key = 'config/erica_remote_verification.pem'
 
   config.airbrake_api_key = '75336396cd50acb145d5a78eaca49a57'
 end

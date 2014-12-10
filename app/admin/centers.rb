@@ -1,9 +1,11 @@
 require 'aa_customizable_default_actions'
 require 'aa_domino'
+require 'aa_erica_keywords'
 
 ActiveAdmin.register Center do
 
   menu if: proc { can? :read, Center }
+  actions :index, :show if Rails.application.config.is_erica_remote
 
   config.sort_order = 'code_asc'
 
@@ -21,6 +23,12 @@ ActiveAdmin.register Center do
         end_of_association_chain.accessible_by(current_ability).where(:study_id => session[:selected_study_id])
       end
     end
+
+    def index
+      authorize! :download_status_files, Center if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+
+      index!
+    end
   end
 
   index do
@@ -28,8 +36,9 @@ ActiveAdmin.register Center do
     column :study, :sortable => :study_id
     column :code
     column :name
-    
-    customizable_default_actions do |resource|
+    keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+
+    customizable_default_actions(current_ability) do |resource|
       resource.patients.empty? ? [] : [:destroy]
     end
   end
@@ -41,7 +50,9 @@ ActiveAdmin.register Center do
       row :name
       domino_link_row(center)
       row :image_storage_path
+      keywords_row(center, :tags, 'Keywords') if Rails.application.config.is_erica_remote
     end
+    active_admin_comments if can? :remote_comment, center
   end
 
   form do |f|
@@ -58,14 +69,12 @@ ActiveAdmin.register Center do
   filter :study, :collection => proc { session[:selected_study_id].nil? ? Study.accessible_by(current_ability) : Study.where(:id => session[:selected_study_id]).accessible_by(current_ability) }
   filter :name
   filter :code
-
-  action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id))
-  end
+  keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   viewer_cartable(:center)
+  erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
   action_item :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id))
+    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end
