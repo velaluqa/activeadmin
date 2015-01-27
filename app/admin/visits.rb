@@ -96,7 +96,7 @@ ActiveAdmin.register Visit do
     column :visit_number
     column :description
     column :visit_type
-    column :visit_date
+    column :visit_date, sortable: false
     if(can? :read_qc, Visit or (not Rails.application.config.is_erica_remote))
       column :state, :sortable => :state do |visit|
         next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
