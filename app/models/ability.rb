@@ -1,5 +1,5 @@
 class Ability
-  include CanCan::Ability  
+  include CanCan::Ability
 
   def initialize(user)
     return if user.nil? # guest users have no access whatsoever
@@ -52,11 +52,11 @@ class Ability
     can :manage, Case, ['cases.session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |c|
       can? :manage, c.session
     end
-    # possible record query for mongoid: 
+    # possible record query for mongoid:
     # CaseData.in(case_id: Case.where('session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id).map{|c| c.id})
     # we don't need that though, since there is no index for case/patient data anyway and we can define the actual rights via the block
     can :manage, CaseData do |cd|
-      can? :manage, cd.case      
+      can? :manage, cd.case
     end
 
     can :read, FormAnswer, FormAnswer.in(session_id: Session.where('id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id).map{|s| s.id}) do |form_answer|
@@ -94,7 +94,7 @@ class Ability
       can? :read, c.session
     end
     can :read, CaseData do |cd|
-      can? :read, cd.case      
+      can? :read, cd.case
     end
     can :read, Form, ['forms.session_id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |form|
       can? :read, form.session
@@ -112,7 +112,7 @@ class Ability
   def self.can_manage_template_forms?(user)
     user.is_app_admin?
   end
-  
+
   protected
   APP_ADMIN_SUBQUERY = 'EXISTS(SELECT id FROM roles WHERE subject_type IS NULL and subject_id IS NULL AND role = 0 AND user_id = ?)'
   SESSION_ROLES_SUBQUERY = 'SELECT roles.subject_id FROM roles INNER JOIN sessions ON roles.subject_id = sessions.id WHERE roles.subject_type LIKE \'Session\' AND roles.role = 0 AND roles.user_id = ?'

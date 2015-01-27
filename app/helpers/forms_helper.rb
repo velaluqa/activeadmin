@@ -13,7 +13,7 @@ module FormsHelper
     field['validations'].each do |validation|
       message = validation.delete('message')
       next if validation.size != 1
-      
+
       type, value = validation.first
 
       attributes["data-validation-#{type}-message"] = message unless message.nil?
@@ -94,7 +94,7 @@ module FormsHelper
       if merge and columns.last.last.patient_id == c.patient_id and columns.last.last.images == c.images
         columns.last << c
       else
-       columns << [c]        
+       columns << [c]
       end
     end
 
@@ -105,7 +105,7 @@ module FormsHelper
     answer = nil
     the_case = nil
     the_value = nil
-    column.each do |c|      
+    column.each do |c|
       value = (row_spec['value'].nil? ? row_spec['values'][c.case_type] : row_spec['value'])
 
       unless value.nil?
@@ -137,7 +137,7 @@ module FormsHelper
     if value.start_with?('patient[') or value.start_with?('case[')
       answer = KeyPathAccessor::access_by_path(the_case.data_hash, value)
     elsif(the_case.form_answer)
-      answer = KeyPathAccessor::access_by_path(the_case.form_answer.answers, value)      
+      answer = KeyPathAccessor::access_by_path(the_case.form_answer.answers, value)
     else
       answer = nil
     end
@@ -150,7 +150,7 @@ module FormsHelper
     cases = []
     values = []
     column.each do |c|
-      value = (row_spec['value'].nil? ? row_spec['values'][c.case_type] : row_spec['value'])
+      value = c.nil? ? nil : (row_spec['value'].nil? ? row_spec['values'][c.case_type] : row_spec['value'])
 
       unless value.nil?
         unless repeatable.nil?
@@ -199,5 +199,19 @@ module FormsHelper
   def value_for_reopened_case(field, reopened_case)
     return nil if (reopened_case.form_answer.nil? or reopened_case.form_answer.answers.nil?)
     KeyPathAccessor::access_by_path(reopened_case.form_answer.answers, field['id'])
+  end
+
+  def max_number_of_repeatable_items(cases)
+    column_sizes = cases.map do |cs|
+      let max_of_cases = cs.map do |c|
+        if (c.form_answer and c.form_answer.answers) then
+          c.form_answer.answers[prefixes[c.case_type]].nil? ? 0 : (c.form_answer.answers[prefixes[c.case_type]].size || 0)
+        else 0
+        end
+      end
+
+      max_of_cases.empty? ? 0 : max_of_cases.max
+    end
+    column_sizes.empty? ? 0 : max_of_cases.max
   end
 end
