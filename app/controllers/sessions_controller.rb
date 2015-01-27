@@ -5,16 +5,16 @@ class SessionsController < ApplicationController
 
   def show
     config = @session.locked_configuration
-    
+
     if config.nil?
       result = { :error_code => 1, :error => "Session is not configured"}
     else
       result = {:session => @session, :configuration => config}
     end
-    
+
     respond_to do |format|
       format.json { render :json => result }
-    end      
+    end
   end
 
   def list
@@ -73,13 +73,15 @@ class SessionsController < ApplicationController
           c.assigned_reader = current_user
           c.save
         end
-        
+
         c.save
       end
 
       session[:min_reserved_case_position] = cases.last.position+1 unless cases.empty?
     else
       @reopened_cases.each do |c|
+        break if cases.size > count
+
         c.state = :reopened_in_progress
         c.current_reader = current_user
         c.save
@@ -108,7 +110,7 @@ class SessionsController < ApplicationController
 
     respond_to do |format|
       format.json { render :json => {:cases => case_hashes} }
-    end    
+    end
   end
 
   protected
@@ -166,7 +168,7 @@ class SessionsController < ApplicationController
       return false
     end
 
-    authorize_user_for_session    
+    authorize_user_for_session
     check_for_reopened_cases
   end
   def check_for_reopened_cases
@@ -178,7 +180,7 @@ class SessionsController < ApplicationController
   def passive_cases_for_case_list(case_list)
     imported = []
     passive_cases = {}
-    
+
     case_list.each do |c|
       previous_cases = c.patient.cases.where('position < ?', c.position)
 
@@ -192,7 +194,7 @@ class SessionsController < ApplicationController
         passive_cases[c.id] << pc.to_hash
       end
     end
-    
+
     return passive_cases
   end
 end

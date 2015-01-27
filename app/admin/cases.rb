@@ -25,7 +25,7 @@ ActiveAdmin.register Case do
 
       studies.map do |study|
         sessions = study.sessions.accessible_by(current_ability)
-        
+
         sessions_optgroups = sessions.map do |session|
           patients = session.patients.accessible_by(current_ability)
 
@@ -74,10 +74,10 @@ ActiveAdmin.register Case do
         params[:q][:patient_id_in] = params[:q][:patient_id_in][0].split(',')
       end
 
-      if(params[:q] and params[:q][:patient_id_in].respond_to?(:each)) 
+      if(params[:q] and params[:q][:patient_id_in].respond_to?(:each))
         patient_id_in = []
 
-        params[:q][:patient_id_in].each do |id|         
+        params[:q][:patient_id_in].each do |id|
           if(id =~ /^session_([0-9]*)/)
             params[:q][:session_id_in] ||= []
             params[:q][:session_id_in] << $1
@@ -106,7 +106,7 @@ ActiveAdmin.register Case do
         redirect_to :action => :show
         return
       end
-      
+
       authorize! :manage, c
       update!
     end
@@ -119,7 +119,7 @@ ActiveAdmin.register Case do
     patients_options_map = controller.generate_patients_options_map(patients_select2_data)
     render :partial => 'admin/cases/advanced_filter_data', :locals => {:patients_select2_data => patients_select2_data, :patients_options_map => patients_options_map, :selected_patients => controller.generate_selected_patients}
   end
-  
+
   index do
     selectable_column
     column :id
@@ -198,7 +198,7 @@ ActiveAdmin.register Case do
         (c.comment + link_to(icon(:pen), edit_comment_form_admin_case_path(c), :class => 'member_link')).html_safe
       end
     end
-   
+
     customizable_default_actions do |resource|
       (resource.state == :unread and resource.form_answer.nil?) ? [] : [:edit, :destroy]
     end
@@ -291,7 +291,7 @@ ActiveAdmin.register Case do
       f.input :flag, :as => :radio, :collection => {'Regular' => :regular, 'Validation' => :validation}
       f.input :comment
     end
-    
+
     f.buttons
   end
 
@@ -332,7 +332,7 @@ ActiveAdmin.register Case do
     column(:reader) {|c| (c.form_answer.nil? or c.form_answer.user.nil?) ? '' : c.form_answer.user.name }
     column(:submitted_at) {|c| c.form_answer.nil? ? '' : c.form_answer.submitted_at }
     column :comment
-    column :created_at    
+    column :created_at
   end
 
   # filters
@@ -361,7 +361,7 @@ ActiveAdmin.register Case do
     @case.state = :reopened
     @case.save
 
-    redirect_to({:action => :show}, :notice => 'Case is reopened and the answers can now be ammended via the Reader Client.')
+    redirect_to({:action => :show}, :notice => 'Case is reopened and the answers can now be amended via the Reader Client.')
   end
   action_item :only => :show do
     link_to('Reopen', reopen_admin_case_path(resource)) if (resource.state == :read and resource.form_answer)
@@ -397,7 +397,7 @@ ActiveAdmin.register Case do
               resource_path(resource),
               :method => :delete, :data => {:confirm => I18n.t('active_admin.delete_confirmation')})
     end
-  end 
+  end
 
   batch_action :move do |selection|
     session = nil
@@ -600,7 +600,7 @@ ActiveAdmin.register Case do
 
           # we can't use uppercase ID because of: http://support.microsoft.com/kb/215591
           row['id'] = c.id if(row_spec['include_id'] == true)
-          
+
           row_spec['values'].each do |name, path|
             resolve_randomised_value = false
             if(path =~ /^_TEXT\[(.*)\]$/)
@@ -618,7 +618,7 @@ ActiveAdmin.register Case do
                 value = c.form_answer.resolve_randomisation(value, c.form_answer.adjudication_randomisation)
               end
             end
-            
+
             # sanitise data to not cause problems when importing into excel etc.
             if value.respond_to?(:gsub!)
               value.gsub!(/\r\n/, '-')
@@ -703,7 +703,7 @@ ActiveAdmin.register Case do
               row[column_names[i]]
             end
           end
-          
+
           csv_table << CSV::Row.new(column_names, row_data, false)
         end
       end
@@ -779,7 +779,7 @@ ActiveAdmin.register Case do
     authorize! :manage, @case
 
     @return_url = request.referer
-    @page_title = 'Edit Comment'    
+    @page_title = 'Edit Comment'
   end
 
   collection_action :assign_reader, :method => :post do
@@ -821,7 +821,7 @@ ActiveAdmin.register Case do
     end
 
     @return_url = (params[:return_url].blank? ? request.referer : params[:return_url])
-    @page_title = 'Assign Reader'    
+    @page_title = 'Assign Reader'
   end
   batch_action :batch_assign_reader do |selection|
     redirect_to assign_reader_form_admin_cases_path(:selection => selection, :return_url => request.referer)
