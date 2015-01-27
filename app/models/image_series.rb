@@ -13,7 +13,7 @@ class ImageSeries < ActiveRecord::Base
   belongs_to :patient
   has_many :images, :dependent => :destroy
   has_one :image_series_data
-  
+
   #validates_uniqueness_of :series_number, :scope => :patient_id
   validates_presence_of :name, :patient_id, :imaging_date
 
@@ -29,7 +29,7 @@ class ImageSeries < ActiveRecord::Base
 
   before_destroy do
     ImageSeriesData.destroy_all(:image_series_id => self.id)
-  end  
+  end
 
   STATE_SYMS = [:imported, :visit_assigned, :required_series_assigned, :not_required]
 
@@ -50,12 +50,12 @@ class ImageSeries < ActiveRecord::Base
     else
       index = ImageSeries::STATE_SYMS.index(sym)
     end
-    
+
     if index.nil?
       throw "Unsupported state"
       return
     end
-    
+
     write_attribute(:state, index)
   end
 
@@ -82,8 +82,8 @@ class ImageSeries < ActiveRecord::Base
                          Visit.find(self.previous_changes[:visit_id][0])
                        end
 
-      
-      if(previous_visit.nil?)      
+
+      if(previous_visit.nil?)
         previous_patient.image_storage_path + '/__unassigned/' + self.id.to_s
       else
         previous_visit.image_storage_path + '/' + self.id.to_s
@@ -129,7 +129,7 @@ class ImageSeries < ActiveRecord::Base
       'VisitNo' => (self.visit.nil? ? nil : self.visit.visit_number),
       'DateImaging' => {'data' => imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'}, # this is utterly ridiculous: sending the date in the corrent format (%Y-%m-%d) leads switched month/day for days where this can work (1-12). sending a completely broken format leads to correct parses... *doublefacepalm*
       'SeriesDescription' => self.name,
-      'AssignedTo' => self.assigned_required_series.join("\n"),      
+      'AssignedTo' => (self.assigned_required_series.nil? ? nil : self.assigned_required_series.join("\n")),
     }
 
     properties.merge!(self.dicom_metadata_to_domino)
@@ -150,7 +150,7 @@ class ImageSeries < ActiveRecord::Base
       self.visit.reload
       self.visit.domino_sync
 
-      assigned_required_series_names = self.assigned_required_series || []      
+      assigned_required_series_names = self.assigned_required_series || []
       assigned_required_series_names.each do |as_name|
         RequiredSeries.new(self.visit, as_name).domino_sync
       end
@@ -176,12 +176,12 @@ class ImageSeries < ActiveRecord::Base
   def change_required_series_assignment(new_assignment)
     return if self.visit.nil?
     changes = {}
-    
+
     current_assignment = self.assigned_required_series
-    
+
     pp current_assignment
     pp new_assignment
-    
+
     (current_assignment-new_assignment).each do |unassigned_required_series|
       changes[unassigned_required_series] = nil
     end
@@ -198,24 +198,24 @@ class ImageSeries < ActiveRecord::Base
 
     unless(images.empty?)
       image = self.sample_image
-      
+
       unless image.nil?
         dicom_meta_header, dicom_metadata = image.dicom_metadata
-        
+
         if(study_config and study.semantically_valid?)
           dicom_tag_names = []
           dicom_values = []
           study_config['domino_integration']['dicom_tags'].each_with_index do |tag, i|
             dicom_values << (dicom_metadata[tag['tag']].nil? ? 'N/A' : dicom_metadata[tag['tag']][:value]).to_s
             dicom_tag_names << tag['label'].to_s
-          end          
+          end
 
           result['DICOMTagNames'] = dicom_tag_names.join("\n")
           result['DICOMValues'] = dicom_values.join("\n")
         end
       end
     end
-    
+
     return result
   end
 
@@ -256,7 +256,7 @@ class ImageSeries < ActiveRecord::Base
                     end
                   when 'select'
                     property['values'][raw_value].nil? ? raw_value : property['values'][raw_value]
-                  else 
+                  else
                     raw_value
                   end
           value = 'Not set' if value.blank?
