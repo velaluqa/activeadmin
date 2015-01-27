@@ -31,7 +31,7 @@ ActiveAdmin.register MongoidHistoryTracker do
 
         end_of_association_chain.or({:'association_chain.name' => 'PatientData', :'association_chain.id'.in => PatientData.where(:patient_id => params[:audit_trail_view_id].to_i).map {|pd| pd.id}},
                                     {:'association_chain.name' => 'VisitData', :'association_chain.id'.in => visit_data_ids},
-                                    {:'association_chain.name' => 'ImageSeriesData', :'association_chain.id'.in => image_series_data_ids})                                    
+                                    {:'association_chain.name' => 'ImageSeriesData', :'association_chain.id'.in => image_series_data_ids})
       when 'form_answer'
         end_of_association_chain.where('association_chain' => {'name' => 'FormAnswer', 'id' => Moped::BSON::ObjectId.from_string(params[:audit_trail_view_id])})
       when 'center'
@@ -43,7 +43,7 @@ ActiveAdmin.register MongoidHistoryTracker do
 
         end_of_association_chain.or({:'association_chain.name' => 'PatientData', :'association_chain.id'.in => patient_data_ids},
                                     {:'association_chain.name' => 'VisitData', :'association_chain.id'.in => visit_data_ids},
-                                    {:'association_chain.name' => 'ImageSeriesData', :'association_chain.id'.in => image_series_data_ids})                                    
+                                    {:'association_chain.name' => 'ImageSeriesData', :'association_chain.id'.in => image_series_data_ids})
       when 'session'
         case_data_ids = CaseData.in(:case_id => Case.where(:session_id => params[:audit_trail_view_id].to_i).map {|c| c.id}).map {|cd| cd.id}
         form_answer_ids = FormAnswer.where(:session_id => params[:audit_trail_view_id].to_i).map {|fa| fa.id}
@@ -144,7 +144,7 @@ ActiveAdmin.register MongoidHistoryTracker do
 
   action_item :only => :index do
     resource = controller.audit_trail_resource
-    status_tag(params[:audit_trail_view_type] + ': ' + (resource.respond_to?(:name) ? resource.name : '<'+resource.id+'>'), :error, :class => 'audit_trail_indicator') unless resource.nil?
+    status_tag(params[:audit_trail_view_type] + ': ' + (resource.respond_to?(:name) ? resource.name : '<'+resource.id.to_s+'>'), :error, :class => 'audit_trail_indicator') unless resource.nil?
   end
 
   index do

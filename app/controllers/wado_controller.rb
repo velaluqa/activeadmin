@@ -3,7 +3,7 @@ class WadoController < ApplicationController
   before_filter :skip_trackable # do not track requests to the WADO API as logins/logouts, because every single request would be counted as one login
   before_filter :authenticate_user!
   before_filter :authorize_user!
-  
+
   before_filter :check_request_type
 
   before_filter :read_wado_parameters
@@ -17,13 +17,15 @@ class WadoController < ApplicationController
     if(@wado_request[:chosen_content_type] == 'application/dicom')
       begin
         converted_image = image_to_transfer_syntax(@wado_request[:transfer_syntax])
-        if(converted_image.nil?)
+        if(converted_image == :not_found)
+          return head :not_found
+        elsif(converted_image.nil?)
           return head :not_implemented
         else
           send_file converted_image.path, :status => :ok, :type => 'application/dicom'
         end
       ensure
-        converted_image.close unless converted_image.nil?
+        converted_image.close if converted_image.respond_to?(:close)
       end
     elsif(@wado_request[:chosen_content_type].start_with?('image/'))
       image_bitmap_data = image_to_bitmap
@@ -42,7 +44,7 @@ class WadoController < ApplicationController
   def authorize_user!
     authorize! :read, Image
   end
-  
+
   def skip_trackable
     request.env['devise.skip_trackable'] = true
   end
@@ -68,7 +70,7 @@ class WadoController < ApplicationController
     @wado_request[:content_type] ||= 'image/jpeg'
     @wado_request[:charset] = params[:charset]
     @wado_request[:charset] = @wado_request[:charset].split(',') unless @wado_request[:charset].nil?
-    
+
     @wado_request[:anonymize] = params[:anonymize] == 'yes'
     @wado_request[:annotations] = params[:annotation]
     @wado_request[:annotations] = @wado_request[:annotations].split(',') unless @wado_request[:annotations].nil?
@@ -87,14 +89,14 @@ class WadoController < ApplicationController
 
     @wado_request[:frame_number] = params[:frameNumber]
     @wado_request[:frame_number] = @wado_request[:frame_number].to_i unless @wado_request[:frame_number].nil?
-    
+
     @wado_request[:image_quality] = params[:imageQuality]
     @wado_request[:image_quality] = @wado_request[:image_quality].to_i unless @wado_request[:image_quality].nil?
 
     @wado_request[:presentation_uid] = params[:presentationUID]
     @wado_request[:presentation_series_uid] = params[:presentationSeriesUID]
 
-    @wado_request[:transfer_syntax] = params[:transferSyntax]    
+    @wado_request[:transfer_syntax] = params[:transferSyntax]
 
     pp @wado_request
   end
@@ -126,7 +128,7 @@ class WadoController < ApplicationController
       end
     end
 
-    @wado_request[:chosen_content_type] ||= 'image/jpeg' 
+    @wado_request[:chosen_content_type] ||= 'image/jpeg'
   end
 
   def find_image
@@ -144,7 +146,13 @@ class WadoController < ApplicationController
   end
 
   def image_to_transfer_syntax(transfer_syntax)
-    return File.new(@image.absolute_image_storage_path)
+    # We disabled transer syntax conversion for performance reasons. This is immensely hacky, but oh well...
+    return begin
+             File.new(@image.absolute_image_storage_path)
+           rescue Errno::ENOENT => e
+             Rails.logger.warn "WADO file not found: #{@image.absolute_image_storage_path}"
+             :not_found
+           end
 
     return nil unless [:explicit_vr_little_endian, :explicit_vr_big_endian, :implicit_vr_little_endian].include?(transfer_syntax)
 
@@ -155,7 +163,7 @@ class WadoController < ApplicationController
                              else ''
                              end
 
-    
+
     tempfile = Tempfile.new(["#{@image.id}_converted", '.dcm'])
 
     `#{Rails.application.config.dcmconv} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'`
@@ -165,7 +173,7 @@ class WadoController < ApplicationController
 
   def image_to_bitmap
     return nil unless (['image/jpeg', 'image/png', 'image/tiff'].include?(@wado_request[:chosen_content_type]))
-     
+
     dicom_meta_header, dicom_metadata = @image.dicom_metadata
     return nil if (dicom_metadata['0028,0010'].nil? || dicom_metadata['0028,0011'].nil?)
     original_rows = dicom_metadata['0028,0010'][:value].to_i
@@ -203,10 +211,10 @@ class WadoController < ApplicationController
       width = right-left
       height = bottom-top
 
-      
+
       clip_option = "+C #{left} #{top} #{width} #{height}" if(width > 0 and height > 0)
     end
-    
+
     # apply window
     window_option = ''
     if(@wado_request[:window_width] and @wado_request[:window_center])
