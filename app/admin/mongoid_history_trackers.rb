@@ -109,7 +109,7 @@ ActiveAdmin.register MongoidHistoryTracker do
 
   action_item :only => :index do
     resource = controller.audit_trail_resource
-    status_tag(params[:audit_trail_view_type] + ': ' + (resource.respond_to?(:name) ? resource.name : '<'+resource.id+'>'), :error, :class => 'audit_trail_indicator') unless resource.nil?
+    status_tag(params[:audit_trail_view_type] + ': ' + (resource.respond_to?(:name) ? resource.name : '<'+resource.id.to_s+'>'), :error, :class => 'audit_trail_indicator') unless resource.nil?
   end
 
   index do
