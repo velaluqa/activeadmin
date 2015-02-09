@@ -85,3 +85,5 @@ gem 'mongoid-history'
 
 # ActiveAdmin XLSX export option
 gem 'activeadmin-axlsx'
+
+gem 'andand'
