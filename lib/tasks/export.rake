@@ -10,13 +10,10 @@ end
 
 def extract_image_paths(images)
   return [] unless images
-  images.map do |_, val|
-    if val.is_a?(Hash)
-      val.keys
-    else
-      val.map { |v| v['path'] }
-    end
-  end.flatten
+  images.keys
+rescue StandardError => e
+  puts "Error retrieving image ids #{images.inspect}"
+  puts e, e.backtrace
 end
 
 def ensure_time(submitted_at)
@@ -104,7 +101,7 @@ namespace :export do
             submitted_at = ensure_time(new['submitted_at'])
             csv << [
               answer.case_id,
-              answer.case.andand.patient.andand.id,
+              answer.case.andand.patient.andand.subject_id,
               answer.case.andand.case_type,
               extract_image_paths(new['annotated_images']).to_json,
               key,
