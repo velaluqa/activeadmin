@@ -26,29 +26,39 @@ rescue StandardError => e
   e.backtrace
 end
 
+def generic_filename(options)
+  filename = "./form_answers_"
+  filename << "case_#{options.case_id}_" if options.case_id
+  filename << "session_#{options.session_id}_" if options.session_id
+  filename << "patient_#{options.patient_id}_" if options.patient_id
+  filename << "#{DateTime.now.strftime('%Y-%m-%d_%H%M')}.csv"
+end
+
 namespace :export do
   task form_answers: :environment do |a, b|
-    case_id    = ENV['case'].andand.to_i
-    session_id = ENV['session'].andand.to_i
-    patient_id = ENV['patient'].andand.to_i
-    show_first_versions = ENV['show_first_versions'] == 'true'
-    filename = ENV['filename'] || "./#{DateTime.now.strftime('%Y-%m-%d_%H%M')}.csv"
+    options = OpenStruct.new(
+      case_id:             ENV['case'].andand.to_i,
+      session_id:          ENV['session'].andand.to_i,
+      patient_id:          ENV['patient'].andand.to_i,
+      show_first_versions: ENV['show_first_versions'] == 'true',
+      filename:            ENV['filename']
+    )
+    options.filename ||= generic_filename(options)
 
-    CSV.open(filename, 'w') do |csv|
+    CSV.open(options.filename, 'w') do |csv|
       csv << [
-        'case_id', 'patient_number', 'case_type', 'annotated_images',
-        'field_key', 'field_label', 'previous_answer', 'new_answer',
-        'submit_date', 'submit_time', 'username'
+        'case_id', 'patient_number', 'case_type', 'case_images',
+        'annotated_images', 'field_key', 'field_label',
+        'previous_answer', 'new_answer', 'submit_date', 'submit_time',
+        'username'
       ]
 
-      answers = if case_id
-                  FormAnswer.where(case_id: case_id)
-                elsif session_id
-                  session = Session.where(id: session_id)
-                  session.form_answers
-                elsif patient_id
-                  patient = Patient.where(id: patient_id)
-                  patient.form_answers
+      answers = if options.case_id
+                  FormAnswer.where(case_id: options.case_id)
+                elsif options.session_id
+                  FormAnswer.where(session_id: options.session_id)
+                elsif options.patient_id
+                  FormAnswer.where(patient_id: options.patient_id)
                 else
                   FormAnswer.all
                 end
@@ -61,7 +71,7 @@ namespace :export do
                    form_config, _, _ = answer.form.andand.full_configuration_at_versions(answer.form_versions)
                    Hash[form_config.map { |conf| [conf['id'], conf['label']] }]
                  rescue StandardError => e
-                   puts "\nError retreiving form for form_answer #{answer._id}"
+                   puts "\nError retreiving form configuration for form_answer #{answer._id}"
                    puts " - Form-ID: #{answer.form_id}"
                    puts " - Form-Versions: #{answer.form_versions.to_json}"
                    {}
@@ -94,7 +104,7 @@ namespace :export do
 
           new_answers.keys.each do |key|
             # Skip first assignments if not set otherwise via ENV.
-            next if pre_answers.nil? && !show_first_versions
+            next if pre_answers.nil? && !options.show_first_versions
             # Skip values, that are the same.
             next if pre_answers && pre_answers[key] == new_answers[key]
 
@@ -103,6 +113,7 @@ namespace :export do
               answer.case_id,
               answer.case.andand.patient.andand.subject_id,
               answer.case.andand.case_type,
+              answer.case.andand.images,
               extract_image_paths(new['annotated_images']).to_json,
               key,
               labels[key] || key,
@@ -116,6 +127,6 @@ namespace :export do
         end
       end
     end
-    puts "\nFinished writing to #{filename}."
+    puts "\nFinished writing to #{options.filename}."
   end
 end
