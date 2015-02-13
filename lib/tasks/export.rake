@@ -55,11 +55,9 @@ namespace :export do
       answers = if options.case_id
                   FormAnswer.where(case_id: options.case_id)
                 elsif options.session_id
-                  session = Session.where(id: options.session_id)
-                  session.form_answers
+                  FormAnswer.where(session_id: options.session_id)
                 elsif options.patient_id
-                  patient = Patient.where(id: options.patient_id)
-                  patient.form_answers
+                  FormAnswer.where(patient_id: options.patient_id)
                 else
                   FormAnswer.all
                 end
