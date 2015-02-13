@@ -34,6 +34,22 @@ def generic_filename(options)
   filename << "#{DateTime.now.strftime('%Y-%m-%d_%H%M')}.csv"
 end
 
+def extract_diffs(path, old, new)
+  diff = []
+  if new.is_a?(Array)
+    new.each_with_index do |_, i|
+      diff.push *extract_diffs("#{path}.#{i}", old.andand[i], new[i])
+    end
+  elsif new.is_a?(Hash)
+    new.keys.sort.each do |key|
+      diff.push *extract_diffs("#{path}.#{key}", old.andand[key], new.andand[key])
+    end
+  else
+    diff << [path, old, new]
+  end
+  diff
+end
+
 namespace :export do
   task form_answers: :environment do |a, b|
     options = OpenStruct.new(
@@ -48,7 +64,7 @@ namespace :export do
     CSV.open(options.filename, 'w') do |csv|
       csv << [
         'case_id', 'patient_number', 'case_type', 'case_images',
-        'annotated_images', 'field_key', 'field_label',
+        'annotated_images', 'field_label', 'field_path',
         'previous_answer', 'new_answer', 'submit_date', 'submit_time',
         'username'
       ]
@@ -103,26 +119,30 @@ namespace :export do
           next unless new && new_answers
 
           new_answers.keys.each do |key|
-            # Skip first assignments if not set otherwise via ENV.
-            next if pre_answers.nil? && !options.show_first_versions
-            # Skip values, that are the same.
-            next if pre_answers && pre_answers[key] == new_answers[key]
-
             submitted_at = ensure_time(new['submitted_at'])
-            csv << [
-              answer.case_id,
-              answer.case.andand.patient.andand.subject_id,
-              answer.case.andand.case_type,
-              answer.case.andand.images,
-              extract_image_paths(new['annotated_images']).to_json,
-              key,
-              labels[key] || key,
-              (pre.nil? ? 'n/A' : pre_answers[key].to_json),
-              new_answers[key].to_json,
-              submitted_at && submitted_at.strftime('%Y-%m-%d'),
-              submitted_at && submitted_at.strftime('%H:%M:%S'),
-              find_username_by_public_key(new['signature_public_key_id'])
-            ]
+
+            diffs = extract_diffs(key, pre_answers.andand[key], new_answers[key])
+            diffs.each do |(path, old_value, new_value)|
+              # Skip first assignments if not set otherwise via ENV.
+              next if old_value.nil? && !options.show_first_versions
+              # Skip values, that are the same.
+              next if old_value && old_value == new_value
+
+              csv << [
+                answer.case_id,
+                answer.case.andand.patient.andand.subject_id,
+                answer.case.andand.case_type,
+                answer.case.andand.images,
+                extract_image_paths(new['annotated_images']).to_json,
+                labels[key] || key,
+                path,
+                old_value || 'n/A',
+                new_value,
+                submitted_at && submitted_at.strftime('%Y-%m-%d'),
+                submitted_at && submitted_at.strftime('%H:%M:%S'),
+                find_username_by_public_key(new['signature_public_key_id'])
+              ]
+            end
           end
         end
       end
