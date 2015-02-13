@@ -1,7 +1,0 @@
-- include: test_form_reader
-- include: test_form_tumour
-  repeat:
-    min: 1
-    max: 5
-    prefix: tumours
-    label: Tumour

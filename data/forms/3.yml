@@ -1,7 +1,0 @@
-- id: waver
-  type: bool
-  label: I sell my soul to you.
-  description: Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt. Franz jagt im komplett verwahrlosten Taxi quer durch Bayern. Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. Vogel
-  validations:
-    - required: true
-      message: No soul selling, no money!
