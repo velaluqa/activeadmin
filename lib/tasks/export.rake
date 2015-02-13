@@ -47,9 +47,10 @@ namespace :export do
 
     CSV.open(options.filename, 'w') do |csv|
       csv << [
-        'case_id', 'patient_number', 'case_type', 'annotated_images',
-        'field_key', 'field_label', 'previous_answer', 'new_answer',
-        'submit_date', 'submit_time', 'username'
+        'case_id', 'patient_number', 'case_type', 'case_images',
+        'annotated_images', 'field_key', 'field_label',
+        'previous_answer', 'new_answer', 'submit_date', 'submit_time',
+        'username'
       ]
 
       answers = if options.case_id
@@ -112,6 +113,7 @@ namespace :export do
               answer.case_id,
               answer.case.andand.patient.andand.subject_id,
               answer.case.andand.case_type,
+              answer.case.andand.images,
               extract_image_paths(new['annotated_images']).to_json,
               key,
               labels[key] || key,
