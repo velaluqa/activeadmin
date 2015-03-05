@@ -109,7 +109,7 @@ ActiveAdmin.register Patient do
         CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
       end
     end
-    active_admin_comments if can? :remote_comment, patient
+    active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, patient)
   end
 
   form do |f|
