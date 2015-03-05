@@ -31,7 +31,7 @@ ActiveAdmin.register Case do
     def generate_patients_options
       Study.all.map do |study|
         centers = study.centers.accessible_by(current_ability)
-        
+
         centers_optgroups = centers.map do |center|
           patients = center.patients.accessible_by(current_ability)
 
@@ -79,10 +79,10 @@ ActiveAdmin.register Case do
         params[:q][:patient_id_in] = params[:q][:patient_id_in][0].split(',')
       end
 
-      if(params[:q] and params[:q][:patient_id_in].respond_to?(:each)) 
+      if(params[:q] and params[:q][:patient_id_in].respond_to?(:each))
         patient_id_in = []
 
-        params[:q][:patient_id_in].each do |id|         
+        params[:q][:patient_id_in].each do |id|
           if(id =~ /^center_([0-9]*)/)
             params[:q][:patient_center_id_in] ||= []
             params[:q][:patient_center_id_in] << $1
@@ -108,7 +108,7 @@ ActiveAdmin.register Case do
         redirect_to :action => :show
         return
       end
-      
+
       authorize! :manage, c
       update!
     end
@@ -121,7 +121,7 @@ ActiveAdmin.register Case do
     patients_options_map = controller.generate_patients_options_map(patients_select2_data)
     render :partial => 'admin/cases/advanced_filter_data', :locals => {:patients_select2_data => patients_select2_data, :patients_options_map => patients_options_map, :selected_patients => controller.generate_selected_patients}
   end
-  
+
   index do
     selectable_column
     column :id
@@ -187,7 +187,7 @@ ActiveAdmin.register Case do
       end
     end
     comment_column(:comment, 'Comment')
-   
+
     customizable_default_actions(current_ability) do |resource|
       (resource.state == :unread and resource.form_answer.nil?) ? [] : [:edit, :destroy]
     end
@@ -256,7 +256,7 @@ ActiveAdmin.register Case do
       f.input :flag, :as => :radio, :collection => {'Regular' => :regular, 'Validation' => :validation}
       f.input :comment
     end
-    
+
     f.buttons
   end
 
@@ -324,7 +324,7 @@ ActiveAdmin.register Case do
               resource_path(resource),
               :method => :delete, :data => {:confirm => I18n.t('active_admin.delete_confirmation')})
     end
-  end 
+  end
 
   batch_action :move do |selection|
     session = nil
@@ -468,7 +468,7 @@ ActiveAdmin.register Case do
 
     return unless @errors.empty?
 
-    case_ids = params[:cases].split(' ')      
+    case_ids = params[:cases].split(' ')
     begin
       cases = Case.find(case_ids)
     rescue ActiveRecord::RecordNotFound => e
@@ -519,7 +519,7 @@ ActiveAdmin.register Case do
           answers['_REPEAT'] = repeat_array[r].merge({'_ID' => (r+1), '_REPEATABLE_ID' => row_spec['repeat']}) unless repeat_array.nil?
 
           row['ID'] = c.id if(row_spec['include_id'] == true)
-          
+
           row_spec['values'].each do |name, path|
             if(path =~ /^_TEXT\[(.*)\]$/)
               value = $1
@@ -528,7 +528,7 @@ ActiveAdmin.register Case do
 
               value = value.join(',') if value.is_a?(Array)
             end
-            
+
             row[name] = value
           end
 
@@ -574,7 +574,7 @@ ActiveAdmin.register Case do
           row_data = Array.new(column_names.size) do |i|
             row[column_names[i]]
           end
-          
+
           csv_table << CSV::Row.new(column_names, row_data, false)
         end
       end
@@ -671,7 +671,7 @@ ActiveAdmin.register Case do
     end
 
     @return_url = (params[:return_url].blank? ? request.referer : params[:return_url])
-    @page_title = 'Assign Reader'    
+    @page_title = 'Assign Reader'
   end
   batch_action :batch_assign_reader do |selection|
     redirect_to assign_reader_form_admin_cases_path(:selection => selection, :return_url => request.referer)
