@@ -264,7 +264,7 @@ ActiveAdmin.register ImageSeries do
 
       render :partial => 'admin/image_series/properties_table', :locals => { :spec => properties_spec, :values => image_series.image_series_data.properties}
     end
-    active_admin_comments if can? :remote_comment, image_series
+    active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, image_series)
   end
 
   form do |f|
