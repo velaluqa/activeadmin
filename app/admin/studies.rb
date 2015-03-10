@@ -157,7 +157,7 @@ ActiveAdmin.register Study do
       redirect_to({:action => :show})
     else
       current_config = @study.current_configuration
-      old_visit_types = (current_config.nil? or current_config['visit_types'].nil? ? [] : current_config['visit_types'].keys)
+      old_visit_types = ((current_config.nil? || current_config['visit_types'].nil?) ? [] : current_config['visit_types'].keys)
 
       begin
         new_config = YAML.load_file(params[:study][:file].tempfile)
