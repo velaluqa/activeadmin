@@ -1,9 +1,0 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
-
-one:
-  reference-id: MyString
-  description: MyText
-
-two:
-  reference-id: MyString
-  description: MyText
