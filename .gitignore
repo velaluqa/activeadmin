@@ -45,3 +45,6 @@
 # Ignore ERICA Remote client configuration
 app/assets/stylesheets/client_styles/*
 app/assets/images/client_logos/*
+/doc/*.html
+/doc/*.pdf
+/doc/*.tex
