@@ -1,0 +1,421 @@
+#+LATEX_CLASS: velaluqa-report
+#+OPTIONS:   H:5 num:t toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t
+#+TITLE: ERICAv2 - Audit Trail Event Classification (v3.0.4)
+* General
+** Event Classification
+
+The general classification checks the =event= field and the
+=changeset= of the version.
+
+| *fields in changeset* | *version event* | *previous value* | *new value* | *returned event symbol* |
+|-----------------------+-----------------+------------------+-------------+-------------------------|
+| =['domino_unid']=     | =update=        | /any/            | /any/       | =:domino_unid_change=   |
+
+** Event Title & Severity
+
+For display ERICA defines =title= and =severity= either globally or
+for each resource type (e.g. Case, Center etc.).
+
+The =severity= defines how to color the badge in the table view.
+
+| *event symbol*        | *returned title*     | *returned severity* |
+|-----------------------+----------------------+---------------------|
+| =create=              | 'Create'             | =nil=               |
+| =update=              | 'Update'             | =:warning=          |
+| =destroy=             | 'Destroy'            | =:error=            |
+| =:domino_unid_change= | 'Domino UNID Change' | =:ok=               |
+
+* Resource Types
+
+If the =event= does not match any of the globally defined event
+symbols the audit trail will look up the classification by resource
+type.
+
+If the specified resource type does not have any classification
+information for the given event, the audit trail uses a =#humanize=
+version (each word capitalized, split by a space character) of the
+event symbol as title and =:warning= as severity.
+
+** Case
+*** Case Event Classification
+
+The first row match specifies the returned event symbol used for the given version changeset.
+
+| *fields in changeset*                         | *previous value*        | *new value*             | *returned event symbol*          |
+|-----------------------------------------------+-------------------------+-------------------------+----------------------------------|
+| =['state', ...]=                              | =:unread=               | =:in_progress=          | =:reservation=                   |
+| =['state', ...]=                              | =:reopened=             | =:reopened_in_progress= | =:reservation=                   |
+| =['state', ...]=                              | =:in_progress=          | =:unread=               | =:cancelation=                   |
+| =['state', ...]=                              | =:reopened_in_progress= | =:reopened=             | =:cancelation=                   |
+| =['state', ...]=                              | =:in_progress=          | =:read=                 | =:completion=                    |
+| =['state', ...]=                              | =:reopened_in_progress= | =:read=                 | =:completion=                    |
+| =['state', ...]=                              | =:read=                 | =:reopened=             | =:reopened=                      |
+| =['state', ...]=                              | =:reopened=             | =:read=                 | =:reopen_closed=                 |
+| =['state', ...]=                              | =:unread=               | =:postponed=            | =:postponed=                     |
+| =['state', ...]=                              | =:postponed=            | =:unread=               | =:unpostponed=                   |
+| =['state', ...]=                              | =:read=                 | =:unread=               | =:obsoleted=                     |
+| =['state', ...]=                              | =:unread=               | =:read=                 | =:unobsoleted=                   |
+| =['state', ...]=                              | /any/                   | /any/                   | =:state_change=                  |
+| =['flag', ...]=                               | /any/                   | =:regular=              | =:flag_regular=                  |
+| =['flag', ...]=                               | /any/                   | =:validation=           | =:flag_validation=               |
+| =['flag', ...]=                               | /any/                   | =:reader_testing=       | =:flag_reader_testing=           |
+| =['no_export', ...]=                          | /any/                   | =true=                  | =:no_export_set=                 |
+| =['no_export', ...]=                          | /any/                   | =false=                 | =:no_export_unset=               |
+| =['is_adjudication_background_case', ...]=    | /any/                   | =true=                  | =:adjudication_background_set=   |
+| =['is_adjudication_background_case', ...]=    | /any/                   | =false=                 | =:adjudication_background_unset= |
+| =['assigned_reader_id']=                      | /not blank/             | /blank/                 | =:reader_unassigned=             |
+| =['assigned_reader_id']=                      | /blank/                 | /not blank/             | =:reader_assigned=               |
+| =['assigned_reader_id']=                      | /not blank/             | /not blank/             | =:reader_changed=                |
+| =['current_reader_id', 'assigned_reader_id']= | /any/                   | /any/                   | =:automatic_reader_assignment=   |
+| =['position']=                                | /any/                   | /any/                   | =:position_change=               |
+| =['comment']=                                 | /any/                   | /any/                   | =:comment_change=                |
+| =['current_reader_id']=                       | /any/                   | /any/                   | =:current_reader_change=         |
+| =['exported_at']=                             | /any/                   | /any/                   | =:export=                        |
+| =['images']=                                  | /any/                   | /any/                   | =:images_change=                 |
+| =['case_type']=                               | /any/                   | /any/                   | =:case_type_change=              |
+
+*** Case Event Title & Severity
+
+| *event symbol*                   | *returned title*                           | *returned severity* |
+|----------------------------------+--------------------------------------------+---------------------|
+| =:reservation=                   | 'Case Reservation'                         | =:warning=          |
+| =:cancelation=                   | 'Case Cancelation'                         | =:error=            |
+| =:completion=                    | 'Case Completion'                          | =:ok=               |
+| =:reopened=                      | 'Case reopened'                            | =:error=            |
+| =:reopen_closed=                 | 'Reopened case closed'                     | =:ok=               |
+| =:obsoleted=                     | 'Form Answer marked obsolete'              | =:error=            |
+| =:unobsoleted=                   | 'Form Answer "unobsoleted"'                | =:error=            |
+| =:postponed=                     | 'Case postponed'                           | =:warning=          |
+| =:unpostponed=                   | 'Case unpostponed'                         | =:warning=          |
+| =:state_change=                  | 'State Change'                             | =:warning=          |
+| =:no_export_set=                 | 'No Export flag set'                       | =:ok=               |
+| =:no_export_unset=               | 'No Export flag unset'                     | =:ok=               |
+| =:adjudication_background_set=   | 'Adjudication Background flag set'         | =:ok=               |
+| =:adjudication_background_unset= | 'Adjudication Background flag unset'       | =:ok=               |
+| =:flag_regular=                  | 'Marked as regular case'                   | =:warning=          |
+| =:flag_validation=               | 'Marked as validation case'                | =:warning=          |
+| =:flag_reader_testing=           | 'Marked as reader testing case'            | =:warning=          |
+| =:reader_unassigned=             | 'Reader unassigned'                        | =:ok=               |
+| =:reader_assigned=               | 'Reader assigned'                          | =:ok=               |
+| =:reader_changed=                | 'Assigned reader changed'                  | =:ok=               |
+| =:automatic_reader_assignment=   | 'Automatic reader assignment'              | =:ok=               |
+| =:position_change=               | 'Position Change'                          | =:ok=               |
+| =:current_reader_change=         | 'Current Reader Change (Case Reservation)' | =:ok=               |
+| =:export=                        | 'Export'                                   | =:ok=               |
+| =:images_change=                 | 'Images/Visit Change'                      | =:error=            |
+| =:case_type_change=              | 'Case Type Change'                         | =:error=            |
+
+** Center
+*** Center Event Classification
+
+| *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
+|-----------------------+------------------+-------------+-------------------------|
+| =['name']=            | /any/            | /any/       | =:name_change=          |
+| =['study_id']=        | /any/            | /any/       | =:study_change=         |
+| =['code']=            | /any/            | /any/       | =:code_change=          |
+
+*** Center Event Title & Severity
+
+| *event symbol*  | *returned title*     | *returned severity* |
+|-----------------+----------------------+---------------------|
+| =:name_change=  | 'Name Change'        | =:ok=               |
+| =:study_change= | 'Study Change'       | =:warning=          |
+| =:code_change=  | 'Center Code Change' | =:warning=          |
+
+** Form
+*** Form Event Classification
+
+| *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
+|-----------------------+------------------+-------------+-------------------------|
+| =['state', ...]=      | :draft           | :final      | =:finalised=            |
+| =['state', ...]=      | :final           | :draft      | =:reopened=             |
+| =['name']=            | /any/            | /any/       | =:name_change=          |
+| =['description']=     | /any/            | /any/       | =:description_change=   |
+
+*** Form Event Title & Severity
+
+| *event symbol*        | *returned title*     | *returned severity* |
+|-----------------------+----------------------+---------------------|
+| =:name_change=        | 'Name Change'        | =:ok=               |
+| =:study_change=       | 'Study Change'       | =:warning=          |
+| =:code_change=        | 'Center Code Change' | =:warning=          |
+| =:finalised=          | 'Finalised'          | =:ok=               |
+| =:reopened=           | 'Reopened'           | =:warning=          |
+| =:state_change=       | 'State Change'       | =:warning=          |
+| =:name_change=        | 'Name Change'        | =:warning=          |
+| =:description_change= | 'Description Change' | =:ok=               |
+
+** FormAnswer
+*** FormAnswer Event Classification
+
+| *fields in changeset*                                                                                                                                                                | *previous value* | *new value* | *returned event symbol* |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------+-------------+-------------------------|
+| =['is_obsolete']=                                                                                                                                                                    | /any/            | true        | =:obsoleted=            |
+| =['is_obsolete']=                                                                                                                                                                    | /any/            | false       | =:unobsoleted=          |
+| =Any of 'user_id', 'session_id', 'case_id', 'form_id', 'form_version', 'form_versions', 'is_test_data', 'versions', 'reader_testing_config_index' and ['annotated_images', ...]=     | /any/            | /any/       | =:reanswered=           |
+| =Any of 'user_id', 'session_id', 'case_id', 'form_id', 'form_version', 'form_versions', 'is_test_data', 'versions', 'reader_testing_config_index' and not ['annotated_images', ...]= | /any/            | /any/       | =:data_cleaning=        |
+| =['versions']=                                                                                                                                                                       | /any/            | /any/       | =:answer_versioning=    |
+
+*** FormAnswer Event Title & Severity
+
+| *event symbol*       | *returned title*        | *returned severity* |
+|----------------------+-------------------------+---------------------|
+| =:obsoleted=         | 'Obsoleted'             | =:error=            |
+| =:unobsoleted=       | 'Unobsoleted'           | =:error=            |
+| =:data_cleaning=     | 'Data cleaning'         | =:error=            |
+| =:answer_versioning= | 'Answer versioning'     | =:warning=          |
+| =:reanswered=        | 'Reanswering by reader' | =:warning=          |
+
+** Image
+*** Image Event Classification
+
+| *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
+|-----------------------+------------------+-------------+-------------------------|
+| =['image_series_id']= | /any/            | /any/       | =:image_series_change=  |
+
+*** Image Event Title & Severity
+
+| *event symbol*         | *returned title*      | *returned severity* |
+|------------------------+-----------------------+---------------------|
+| =:image_series_change= | 'Image Series Change' | =:ok=               |
+
+** ImageSeries
+*** ImageSeries Event Classification
+
+| *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
+|-----------------------+------------------+-------------+-------------------------|
+| =['image_series_id']= | /any/            | /any/       | =:image_series_change=  |
+
+*** ImageSeries Event Title & Severity
+
+| *event symbol*         | *returned title*      | *returned severity* |
+|------------------------+-----------------------+---------------------|
+| =:image_series_change= | 'Image Series Change' | =:ok=               |
+
+** ImageSeriesData
+*** ImageSeriesData Event Classification
+
+| *fields in changeset* | *previous value*            | *new value*                 | *returned event symbol*       |
+|-----------------------+-----------------------------+-----------------------------+-------------------------------|
+| =['name']=            | /any/                       | /any/                       | :name_change                  |
+| =['comment']=         | /any/                       | /any/                       | :comment_change               |
+| =['center_id']=       | /any/                       | /any/                       | :center_change                |
+| =['imaging_date']=    | /any/                       | /any/                       | :imaging_date_change          |
+| =['series_number']=   | /any/                       | /any/                       | :series_number_change         |
+| =['visit_id']=        | /any/                       | /any/                       | :visit_assignment_change      |
+| =['patient_id']=      | /any/                       | /any/                       | :patient_change               |
+| =['state', ...]=      | =:imported=                 | =:visit_assigned=           | =:visit_assigned=             |
+| =['state', ...]=      | =:not_required=             | =:visit_assigned=           | =:visit_assigned=             |
+| =['state', ...]=      | =:visit_assigned=           | =:required_series_assigned= | =:required_series_assigned=   |
+| =['state', ...]=      | =:not_required=             | =:required_series_assigned= | =:required_series_assigned=   |
+| =['state', ...]=      | =:required_series_assigned= | =:visit_assigned=           | =:required_series_unassigned= |
+| =['state', ...]=      | =:visit_assigned=           | =:imported=                 | =:visit_unassigned=           |
+| =['state', ...]=      | =:required_series_assigned= | =:imported=                 | =:visit_unassigned=           |
+| =['state', ...]=      | =:imported=                 | =:not_required=             | =:marked_not_required=        |
+| =['state', ...]=      | =:visit_assigned=           | =:not_required=             | =:marked_not_required=        |
+| =['state', ...]=      | =:required_series_assigned= | =:not_required=             | =:marked_not_required=        |
+| =['state', ...]=      | =:not_required=             | =:imported=                 | =:unmarked_not_required=      |
+
+*** ImageSeriesData Event Title & Severity
+
+| *event symbol*                | *returned title*                     | *returned severity* |
+|-------------------------------+--------------------------------------+---------------------|
+| =:name_change=                | 'Name Change'                        | =:warning=          |
+| =:comment_change=             | 'Comment Change'                     | =:warning=          |
+| =:center_change=              | 'Center Change'                      | =:warning=          |
+| =:visit_assigned=             | 'Assigned to visit'                  | =:ok=               |
+| =:visit_unassigned=           | 'Visit assignment removed'           | =:warning=          |
+| =:required_series_assigned=   | 'Assigned as required series'        | =:ok=               |
+| =:required_series_unassigned= | 'Required series assignment removed' | =:warning=          |
+| =:visit_assignment_change=    | 'Visit assignment changed'           | =:ok=               |
+| =:marked_not_required=        | 'Marked as not required'             | =:warning=          |
+| =:unmarked_not_required=      | 'Not required flag revoked'          | =:warning=          |
+| =:imaging_date_change=        | 'Imaging Date Change'                | =:ok=               |
+| =:series_number_change=       | 'Series Number Change'               | =:ok=               |
+| =:patient_change=             | 'Patient Change'                     | =:warning=          |
+
+** Patient
+*** Patient Event Classification
+
+| *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
+|-----------------------+------------------+-------------+-------------------------|
+| =['subject_id']=      | /any/            | /any/       | :name_change            |
+| =['center_id']=       | /any/            | /any/       | :center_change          |
+
+*** Patient Event Title & Severity
+
+| *event symbol*   | *returned title*    | *returned severity* |
+|------------------+---------------------+---------------------|
+| =:name_change=   | 'Subject ID Change' | =:warning=          |
+| =:center_change= | 'Center Change'     | =:warning=          |
+
+** PatientData
+*** PatientData Event Classification
+
+| *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
+|-----------------------+------------------+-------------+-------------------------|
+| =['data']=            | /any/            | /any/       | :data_change            |
+| =['export_history']=  | /any/            | /any/       | :export_to_ericav1      |
+
+*** PatientData Event Title & Severity
+
+| *event symbol*       | *returned title*      | *returned severity* |
+|----------------------+-----------------------+---------------------|
+| =:data_change=       | 'Patient Data Change' | =:ok=               |
+| =:export_to_ericav1= | 'Export to ERICAV1'   | =:ok=               |
+** Session
+*** Session Event Classification
+
+| *fields in changeset* | *previous value* | *new value*   | *returned event symbol* |
+|-----------------------+------------------+---------------+-------------------------|
+| =['state', ...]       | =:building=      | =:testing=    | =:testing_start=        |
+| =['state', ...]       | =:testing=       | =:production= | =:production_start=     |
+| =['state', ...]       | =:production=    | =:closed=     | =:session_closed=       |
+| =['state', ...]       | =:closed=        | =:production= | =:session_reopened=     |
+| =['state', ...]       | =:production=    | =:testing=    | =:production_abort=     |
+| =['state', ...]       | =:testing=       | =:building=   | =:testing_abort=        |
+| =['state', ...]       | /any/            | /any/         | =:state_change=         |
+| =['name']=            | /any/            | /any/         | =:name_change=          |
+
+*** Session Event Title & Severity
+
+| *event symbol*      | *returned title*     | *returned severity* |
+|---------------------+----------------------+---------------------|
+| =:testing_start=    | 'Testing started'    | =:ok=               |
+| =:production_start= | 'Production started' | =:ok=               |
+| =:session_closed=   | 'Session closed'     | =:warning=          |
+| =:session_reopened= | 'Session reopened'   | =:warning=          |
+| =:production_abort= | 'Production aborted' | =:error=            |
+| =:testing_abort=    | 'Testing aborted'    | =:warning=          |
+| =:state_change=     | 'State Change'       | =:warning=          |
+| =:name_change=      | 'Name Change'        | =:ok=               |
+** Study
+*** Study Event Classification
+
+| *fields in changeset*                                                        | *previous value* | *new value*   | *returned event symbol* |
+|------------------------------------------------------------------------------+------------------+---------------+-------------------------|
+| =['name']=                                                                   | /any/            | /any/         | :name_change            |
+| =['state', ...]=                                                             | =:building=      | =:production= | :production_start       |
+| =['state', ...]=                                                             | =:production=    | =:building=   | :production_abort       |
+| =['state', ...]=                                                             | /any/            | /any/         | :state_change           |
+| Other than =['domino_db_url', 'domino_server_name', 'notes_links_base_uri']= | /any/            | /any/         | :domino_settings_change |
+
+*** Study Event Title & Severity
+
+| *event symbol*            | *returned title*         | *returned severity* |
+|---------------------------+--------------------------+---------------------|
+| =:production_start=       | 'Production started'     | =:ok=               |
+| =:production_abort=       | 'Production aborted'     | =:error=            |
+| =:state_change=           | 'State Change'           | =:warning=          |
+| =:name_change=            | 'Name Change'            | =:ok=               |
+| =:domino_settings_change= | 'Domino Settings Change' | =:ok=               |
+** User
+*** User Event Classification
+
+| *fields in changeset / condition*                    | *previous value* | *new value* | *returned event symbol* |
+|------------------------------------------------------+------------------+-------------+-------------------------|
+| =['sign_in_count']=                                  | x                | x+1         | :sign_in                |
+| =['remember_created_at']=                            | /any/            | /any/       | :remember_token_updated |
+| =['encrypted_password', 'password_changed_at', ...]= | /any/            | /any/       | :password_change        |
+|------------------------------------------------------+------------------+-------------+-------------------------|
+| keys = =['failed_attempts', ...]=                    |                  |             |                         |
+| && 'failed_attempts' increased                       |                  |             |                         |
+| && 'locked_at' was set                               | /any/            | /any/       | :user_locked            |
+|------------------------------------------------------+------------------+-------------+-------------------------|
+| keys = =['failed_attempts', ...]=                    |                  |             |                         |
+| && 'failed_attempts' increased                       |                  |             |                         |
+| && 'locked_at' not set                               | /any/            | /any/       | :failed_login           |
+|------------------------------------------------------+------------------+-------------+-------------------------|
+| keys = =['failed_attempts', ...]=                    |                  |             |                         |
+| && 'failed_attempts' stayed the same                 |                  |             |                         |
+| && 'locked_at' was reset                             | /any/            | /any/       | :user_unlocked          |
+|------------------------------------------------------+------------------+-------------+-------------------------|
+| keys = =['failed_attempts', ...]=                    |                  |             |                         |
+| && 'failed_attempts' stayed the same                 |                  |             |                         |
+| && 'locked_at' was reset                             | /any/            | /any/       | :failed_attempts_reset  |
+|------------------------------------------------------+------------------+-------------+-------------------------|
+| =['private_key', 'public_key', ...]=                 | /any/            | /any/       | :key_change             |
+
+*** User Event Title & Severity
+
+| *event symbol*            | *returned title*                | *returned severity* |
+|---------------------------+---------------------------------+---------------------|
+| =:sign_in=                | 'Sign-In'                       | =:ok=               |
+| =:password_change=        | 'Password Change'               | =:warning=          |
+| =:failed_login=           | 'Failed Sign-In attempt'        | =:warning=          |
+| =:user_locked=            | 'User locked'                   | =:error=            |
+| =:user_unlocked=          | 'User unlocked'                 | =:warning=          |
+| =:failed_attempts_reset=  | 'Failed Sign-In attempts reset' | =:ok=               |
+| =:remember_token_updated= | 'Remember Token Update'         | =:ok=               |
+| =:key_change=             | 'Keypair Change'                | =:warning=          |
+
+** Visit
+*** Visit Event Classification
+
+| *fields in changeset*                                                   | *previous value* | *new value*     | *returned event symbol* |
+|-------------------------------------------------------------------------+------------------+-----------------+-------------------------|
+| =['visit_number']=                                                      | /any/            | /any/           | =:visit_number_change=  |
+| =['patient_id']=                                                        | /any/            | /any/           | =:patient_change=       |
+| =['description']=                                                       | /any/            | /any/           | =:description_change=   |
+| =['visit_type']=                                                        | /any/            | /any/           | =:visit_type_change=    |
+| =['state']=                                                             | /any/            | =:mqc_passed=   | =:mqc_passed=           |
+| =['state']=                                                             | /any/            | =:mqc_issues=   | =:mqc_issues=           |
+| =['state']=                                                             | /any/            | =:state_change= | =:state_change=         |
+| =['mqc_state', ...]= without =['mqc_state', 'mqc_date', 'mqc_user_id']= | =:passed=        | =:pending=      | =:mqc_reset=            |
+| =['mqc_state', ...]= without =['mqc_state', 'mqc_date', 'mqc_user_id']= | =:issues=        | =:pending=      | =:mqc_reset=            |
+| =['mqc_state', ...]= without =['mqc_state', 'mqc_date', 'mqc_user_id']= | =:pending=       | =:passed=       | =:mqc_passed=           |
+| =['mqc_state', ...]= without =['mqc_state', 'mqc_date', 'mqc_user_id']= | =:pending=       | =:issues=       | =:mqc_issues=           |
+| =['mqc_state', ...]= without =['mqc_state', 'mqc_date', 'mqc_user_id']= | =:issues=        | =:passed=       | =:mqc_passed=           |
+| =['mqc_state', ...]= without =['mqc_state', 'mqc_date', 'mqc_user_id']= | =:passed=        | =:issues=       | =:mqc_issues=           |
+| =['mqc_state', ...]= without =['mqc_state', 'mqc_date', 'mqc_user_id']= | /any/            | /any/           | =:mqc_state_change=     |
+|-------------------------------------------------------------------------+------------------+-----------------+-------------------------|
+| =['mqc_user_id',=                                                       | /blank/          | /any/           |                         |
+| ='mqc_date']=                                                           | /blank/          | /any/           | =mqc_reset=             |
+|-------------------------------------------------------------------------+------------------+-----------------+-------------------------|
+| =['state', 'mqc_date', ...]=                                            | /any/            | =:mqc_passed=   | =:mqc_passed=           |
+| =['state', 'mqc_date', ...]=                                            | /any/            | =:mqc_issues=   | =:mqc_issues=           |
+
+*** Visit Event Title & Severity
+
+| *event symbol*         | *returned title*      | *returned severity* |
+|------------------------+-----------------------+---------------------|
+| =:visit_number_change= | 'Visit Number Change' | =:ok=               |
+| =:patient_change=      | 'Patient Change'      | =:warning=          |
+| =:description_change=  | 'Description Change'  | =:ok=               |
+| =:visit_type_change=   | 'Visit Type Change'   | =:warning=          |
+| =:state_change=        | 'State Change'        | =:warning=          |
+| =:mqc_reset=           | 'MQC Reset'           | =:warning=          |
+| =:mqc_passed=          | 'MQC performed        | =passed', :ok=      |
+| =:mqc_issues=          | 'MQC performed        | =issues', :warning= |
+| =:mqc_state_change=    | 'MQC State Change'    | =:warning=          |
+
+** VisitData
+*** VisitData Event Classification
+
+- If the keys set equals =['required_series']=
+  - and the diffs of all required series contains at most =['domino_unid']=
+    - then the event symbol is =:rs_domino_unid_change=.
+  - and the diffs of all required series is a subset of or equal to
+    =['domino_unid', 'tqc_state', 'tqc_results', 'tqc_date',
+    'tqc_version', 'tqc_user_id', 'tqc_comment']=
+    - then the event symbol is =:rs_tqc_performed=.
+- If the keys set is a subset of or equal to =['required_series', 'assigned_image_series_index']=
+  - and the diffs of all required series is a subset of or equal to
+    =['domino_unid', 'image_series_id', 'tqc_state', 'tqc_results',
+    'tqc_date', 'tqc_version', 'tqc_user_id', 'tqc_comment']= and the
+    diffs keys do either not contain any of =['tqc_results', 'tqc_date',
+    'tqc_version', 'tqc_user_id', 'tqc_comment']= or all new values
+    for one of =['tqc_results', 'tqc_date', 'tqc_version',
+    'tqc_user_id', 'tqc_comment']= is =nil=
+    - then the event symbol is =:rs_assignment_change=
+- If the keys set equals as subset of =['mqc_version', 'mqc_results',
+  'mqc_comment']= then the event symbol is =:mqc_performed=
+
+*** VisitData Event Title & Severity
+
+| *event symbol*            | *returned title*         | *returned severity* |
+|---------------------------+--------------------------+---------------------|
+| =:rs_domino_unid_change=  | 'RS Domino UNID Change'  | =:ok=               |
+| =:rs_assignment_change=   | 'RS Assignment Change'   | =:warning=          |
+| =:rs_tqc_performed=       | 'RS TQC performed'       | =:ok=               |
+| =:mqc_performed=          | 'MQC performed'          | =:ok=               |
