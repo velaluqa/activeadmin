@@ -147,8 +147,19 @@ group :development, :test do
 
   # Rubocop ensures the ruby style guide.
   gem 'rubocop'
+  gem 'rubocop-checkstyle_formatter', require: false
+
   gem 'rails_best_practices'
+  # gem 'rails_best_practices-formatter'
+
+  gem 'flog'
+  gem 'flay'
+  gem 'reek'
+
   gem 'simplecov', require: false
+  gem 'simplecov-cobertura', require: false
+  gem 'simplecov-json', require: false
+  gem 'simplecov-rcov', require: false
   gem 'rubycritic', require: false
 end
 
@@ -158,10 +169,11 @@ group :test do
 
   gem 'rspec'
   gem 'rspec-rails'
-  gem 'ci_reporter_rspec'
+  gem 'yarjuf'
 
   gem 'capybara'
-  gem 'capybara-webkit'
+  gem 'poltergeist'
+
   gem 'cucumber', require: false
   gem 'cucumber-rails', require: false
 

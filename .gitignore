@@ -48,3 +48,4 @@ app/assets/images/client_logos/*
 /doc/*.html
 /doc/*.pdf
 /doc/*.tex
+/coverage/
