@@ -29,25 +29,29 @@ class EricaRemoteController < ApplicationController
     PaperTrail.enabled = false
     Mongoid::History.disable do
       study = records[:study]
-      ids = {centers: study.center_ids,
-             patients: study.patient_ids,
-             visits: study.visit_ids,
-             image_series: study.image_series_ids,
-             images: study.image_series.map{|is| is.image_ids}.flatten,
-            }
 
-      if(Study.exists?(study.id))
-        # we aways recreate all MongoDB entries, to be sure to keep them in sync
+      unless Study.exists?(study.id)
+        study.instance_variable_set('@new_record', true)
+        study.save!(validate: false)
+      end
 
-        study.image_series.each do |image_series|
-          image_series.image_series_data.destroy if image_series.image_series_data
-        end
-        study.visits.each do |visit|
-          visit.visit_data.destroy if visit.visit_data
-        end
-        study.patients.each do |patient|
-          patient.patient_data.destroy if patient.patient_data
-        end
+      ids = {
+        centers: study.center_ids,
+        patients: study.patient_ids,
+        visits: study.visit_ids,
+        image_series: study.image_series_ids,
+        images: study.image_series.map(&:image_ids).flatten
+      }
+
+      # we aways recreate all MongoDB entries, to be sure to keep them in sync
+      study.image_series.each do |image_series|
+        image_series.image_series_data.destroy if image_series.image_series_data
+      end
+      study.visits.each do |visit|
+        visit.visit_data.destroy if visit.visit_data
+      end
+      study.patients.each do |patient|
+        patient.patient_data.destroy if patient.patient_data
       end
 
       records[:users].each do |record|
