@@ -29,46 +29,51 @@ class EricaRemoteController < ApplicationController
     PaperTrail.enabled = false
     Mongoid::History.disable do
       study = records[:study]
-      ids = {centers: study.center_ids,
-             patients: study.patient_ids,
-             visits: study.visit_ids,
-             image_series: study.image_series_ids,
-             images: study.image_series.map{|is| is.image_ids}.flatten,
-            }
 
-      if(Study.exists?(study.id))
-        # we aways recreate all MongoDB entries, to be sure to keep them in sync
+      unless Study.exists?(study.id)
+        study.instance_variable_set('@new_record', true)
+        study.save!(validate: false)
+      end
 
-        study.image_series.each do |image_series|
-          image_series.image_series_data.destroy if image_series.image_series_data
-        end
-        study.visits.each do |visit|
-          visit.visit_data.destroy if visit.visit_data
-        end
-        study.patients.each do |patient|
-          patient.patient_data.destroy if patient.patient_data
-        end
+      ids = {
+        centers: study.center_ids,
+        patients: study.patient_ids,
+        visits: study.visit_ids,
+        image_series: study.image_series_ids,
+        images: study.image_series.map(&:image_ids).flatten
+      }
+
+      # we aways recreate all MongoDB entries, to be sure to keep them in sync
+      study.image_series.each do |image_series|
+        image_series.image_series_data.destroy if image_series.image_series_data
+      end
+      study.visits.each do |visit|
+        visit.visit_data.destroy if visit.visit_data
+      end
+      study.patients.each do |patient|
+        patient.patient_data.destroy if patient.patient_data
       end
 
       records[:users].each do |record|
         record.locked_at = Time.now
 
-        if(record.class.exists?(record.id))
+        if record.class.exists?(record.id)
           attributes = record.attributes
           attributes.delete(:id)
 
           existing_record = record.class.find(record.id)
-          existing_record.assign_attributes(attributes, without_protection: true)
+          existing_record.assign_attributes(
+            attributes,
+            without_protection: true
+          )
           existing_record.save!(validate: false)
         else
-          record.instance_variable_set("@new_record", true)
+          record.instance_variable_set('@new_record', true)
           record.save!(validate: false)
         end
       end
 
-      records[:mongoid].each do |record|
-        record.upsert
-      end
+      records[:mongoid].each(&:upsert)
 
       records[:active_record].each do |record|
         case record
@@ -79,15 +84,18 @@ class EricaRemoteController < ApplicationController
         when Image then ids[:images].delete(record.id)
         end
 
-        if(record.class.exists?(record.id))
+        if record.class.exists?(record.id)
           attributes = record.attributes
           attributes.delete(:id)
 
           existing_record = record.class.find(record.id)
-          existing_record.assign_attributes(attributes, without_protection: true)
+          existing_record.assign_attributes(
+            attributes,
+            without_protection: true
+          )
           existing_record.save
         else
-          record.instance_variable_set("@new_record", true)
+          record.instance_variable_set('@new_record', true)
           record.save
         end
       end
@@ -104,7 +112,9 @@ class EricaRemoteController < ApplicationController
   end
 
   def paths
-    unless(Study.exists?(params[:study_id]))
+    # TODO: Use ApplicationController rescue from error on
+    # ActiveRecord::NotFound exception to clean up controllers.
+    unless Study.exists?(params[:study_id])
       render nothing: true, status: :not_found
       return
     end
@@ -120,19 +130,20 @@ class EricaRemoteController < ApplicationController
   protected
 
   def verify_signature(signature, timestamp, data)
-    # we check wether the timestamp is within 1 hour (60*60 seconds) of now, in either direction
-    # this effectively gives you a one hour window for replay attacks, given that the clocks are synched
-    return false if (Time.now.to_i - timestamp.to_i).abs > 60*60
+    # We check wether the timestamp is within 1 hour (60*60 seconds)
+    # of now, in either direction this effectively gives you a one
+    # hour window for replay attacks, given that the clocks are
+    # synched.
+    return false if (Time.now.to_i - timestamp.to_i).abs > 60 * 60
 
     key_path = Rails.root.join(Rails.application.config.erica_remote_verification_key)
     key = OpenSSL::PKey::RSA.new(File.read(key_path))
 
-    return key.verify(OpenSSL::Digest::SHA512.new, signature, data + timestamp)
+    key.verify(OpenSSL::Digest::SHA512.new, signature, data + timestamp)
   end
 
   def gunzip(body_io)
-    gzipper = Zlib::GzipReader.new(body_io)
-    return gzipper.read
+    Zlib::GzipReader.new(body_io).read
   end
 
   def skip_trackable

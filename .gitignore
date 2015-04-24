@@ -20,7 +20,7 @@
 /config/goodimage_migration.yml
 /config/erica_remote.yml
 /config/erica_remotes.yml
-/config/*.pem
+!/config/*_development.pem
 
 # Ignore gems installed in deployment mode
 /vendor/bundle
@@ -45,3 +45,6 @@
 # Ignore ERICA Remote client configuration
 app/assets/stylesheets/client_styles/*
 app/assets/images/client_logos/*
+/doc/*.html
+/doc/*.pdf
+/doc/*.tex

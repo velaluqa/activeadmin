@@ -57,7 +57,7 @@ StudyServer::Application.configure do
 
   config.image_storage_root = config.data_directory + '/images'
   config.image_export_root = config.data_directory + '/images_export'
-  
+
   config.dcm2xml = '/usr/bin/dcm2xml'
   config.dcmconv = '/usr/bin/dcmconv'
   config.dcmj2pnm = '/usr/bin/dcmj2pnm'
@@ -68,8 +68,8 @@ StudyServer::Application.configure do
   config.domino_integration_password = 'test'
   config.domino_integration_readonly = false
 
-  config.erica_remote_signing_key = 'config/erica_remote.pem'
-  config.erica_remote_verification_key = 'config/erica_remote_verification.pem'
+  config.erica_remote_signing_key = 'config/erica_remote_signing_development.pem'
+  config.erica_remote_verification_key = 'config/erica_remote_verification_development.pem'
 
   config.airbrake_api_key = '75336396cd50acb145d5a78eaca49a57'
 end
