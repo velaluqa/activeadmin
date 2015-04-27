@@ -89,7 +89,7 @@ class ERICARemoteSyncWorker
       raise "Failed to retrieve path information for study #{study_id} from ERICA Remote at #{uri.to_s}: #{response.message}"
     end
   end
-  
+
   def perform(job_id, study_id, erica_remote_url, rsync_host = nil)
     job = BackgroundJob.find(job_id)
 
@@ -127,5 +127,7 @@ class ERICARemoteSyncWorker
     rsync_or_die(local_paths['images'], remote_paths['images'], !(rsync_host.blank?))
 
     job.finish_successfully({})
+  rescue StandardError => e
+    job.finish_successfully({ preemptively: true })
   end
 end

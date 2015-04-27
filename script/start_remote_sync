@@ -1,0 +1,6 @@
+#!/bin/bash --login
+
+bundle exec rake erica:sync_all_erica_remotes 2>&1 >> log/erica_remote_sync.log &
+mkdir -p tmp/pids
+echo $! > tmp/pids/erica_remote_sync.pid
+exit
