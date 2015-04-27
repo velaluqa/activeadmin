@@ -1,0 +1,7 @@
+#!/bin/bash --login
+
+TASK_PID=$(cat tmp/pids/erica_remote_sync.pid)
+CPIDS=$(pgrep -P $TASK_PID)
+(sleep 33 && kill -KILL $CPIDS &)
+kill -TERM $CPIDS
+exit

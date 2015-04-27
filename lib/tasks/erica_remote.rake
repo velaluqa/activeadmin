@@ -66,6 +66,9 @@ namespace :erica do
 
   desc 'Start a full ERICA Remote sync'
   task :sync_all_erica_remotes, [:config_file] => [:environment] do |t, args|
+    time = DateTime.now.strftime('%A, %d %b %Y %l:%M %p')
+    puts "Starting full ERICA remote sync (#{time})"
+
     config_path = Rails.root.join(args[:config_file] || DEFAULT_CONFIG_FILE)
 
     config = load_sync_config(config_path)
@@ -98,6 +101,9 @@ namespace :erica do
 
       puts "#{async ? 'STARTED' : 'DONE'}: #{background_job.inspect}"
     end
+
+    time = DateTime.now.strftime('%A, %d %b %Y %l:%M %p')
+    puts "Full ERICA remote sync stopped. (#{time})"
   end
 
   desc 'Download images as zip'
