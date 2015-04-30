@@ -1,9 +1,9 @@
 class ImagesSearchController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:search]
 
-  def search
-    authorize! :image_manage, :system unless can? :mqc, Visit
+  before_filter :authenticate_user!
 
+  def search
     term = params[:term]
     selected_study_id = session[:selected_study_id]
     if(term.length < 3)
