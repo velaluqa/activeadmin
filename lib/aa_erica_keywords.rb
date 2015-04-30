@@ -48,8 +48,18 @@ module ActiveAdmin
 
         field_name = context.to_s.singularize + '_taggings_tag_name'
         filter field_name.to_sym, label: label, as: :select, collection: ActsAsTaggableOn::Tag.pluck(:name), input_html: {
-                 class: 'tagfilter',
+                 class: 'tagfilter'
                }
+      rescue StandardError => e
+        # TODO: Clean up this mess! We actually have to check, whether
+        # we are in a migration or not. Or maybe if the current
+        # migration is later than the one that introduced the tags
+        # package.
+        if e.message =~ /relation "tags" does not exist/
+          puts 'ActsAsTaggable not yet migrated. Not loading keyword_filters.'
+        else
+          raise e
+        end
       end
     end
   end
