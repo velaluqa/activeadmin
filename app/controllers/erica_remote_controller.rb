@@ -123,8 +123,13 @@ class EricaRemoteController < ApplicationController
 
     configs_path = Rails.root.join(Rails.application.config.data_directory).to_s
     image_storage_path = Rails.root.join(study.absolute_image_storage_path).to_s
+    remote_temp_path = Rails.root.join('tmp', 'remote').to_s
 
-    render json: {configs: configs_path, images: image_storage_path}
+    render json: {
+      configs: configs_path,
+      images: image_storage_path,
+      remote_temp: remote_temp_path
+    }
   end
 
   protected
