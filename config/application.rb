@@ -15,6 +15,12 @@ module StudyServer
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
 
+    config.generators do |g|
+      g.test_framework :rspec, fixture: true
+      g.fixture_replacement :factory_girl, dir: 'spec/factories'
+      g.template_engine :haml
+    end
+
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W(#{config.root}/app/workers)
 
