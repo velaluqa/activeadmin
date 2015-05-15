@@ -160,5 +160,5 @@ begin
     end
   end
 rescue LoadError => e
-  puts "GoodImage migration not available because of missing dependencies: #{e.message}"
+  # puts "GoodImage migration not available because of missing dependencies: #{e.message}"
 end
