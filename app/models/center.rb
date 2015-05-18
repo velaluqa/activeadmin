@@ -12,6 +12,10 @@ class Center < ActiveRecord::Base
   belongs_to :study
   has_many :patients
 
+  scope :by_study_ids, lambda { |*ids|
+    joins(:study).where(studies: { id: Array[ids].flatten })
+  }
+
   validates_uniqueness_of :name, :scope => :study_id
   validates_uniqueness_of :code, :scope => :study_id
   validates_presence_of :name, :code, :study_id

@@ -19,6 +19,11 @@ class ImageSeries < ActiveRecord::Base
 
   scope :not_assigned, where(:visit_id => nil)
 
+  scope :by_study_ids, lambda { |*ids|
+    joins(visit: { patient: { center: :study } })
+      .where(studies: { id: Array[ids].flatten })
+  }
+
   before_save :ensure_study_is_unchanged
   before_save :ensure_visit_is_for_patient
   before_save :update_state

@@ -23,6 +23,8 @@ class Study < ActiveRecord::Base
   scope :building, where(state: 0)
   scope :production, where(state: 1)
 
+  scope :by_ids, ->(*ids) { where(id: Array[ids].flatten) }
+
   before_destroy do
     unless(sessions.empty? and centers.empty?)
       errors.add :base, 'You cannot delete a study that still has sessions or centers associated with it.'
