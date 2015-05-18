@@ -2,7 +2,7 @@ require 'remote/remote'
 
 RSpec.describe Remote do
   before :each do
-    stub_request(:get, 'http://localhost:3001/remote/paths.json')
+    stub_request(:get, 'http://localhost:3001/erica_remote/paths.json')
       .to_return(
         body: {
           root: '/srv/ERICA/server',

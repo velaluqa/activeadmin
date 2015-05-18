@@ -22,7 +22,8 @@ class Remote
   end
 
   def fetch_paths
-    response = Net::HTTP.get_response URI.join(url, '/remote/paths.json')
+    uri = URI.join(url, '/erica_remote/paths.json')
+    response = Net::HTTP.get_response(uri)
     case response
     when Net::HTTPSuccess then JSON.parse(response.body)
     else
