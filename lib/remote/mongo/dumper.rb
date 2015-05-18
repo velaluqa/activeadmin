@@ -44,20 +44,15 @@ module Mongo
         rename_dir(options) if options[:dir]
       end
 
-      def dump_collections(options = {})
-        fail 'Missing \'collection\' option' unless options[:collections]
-        collections = options.delete(:collections)
-        collections.each do |collection|
-          dump_collection(collection, options)
-        end
-      end
-
-      def dump_collection(collection, options = {})
-        dump(options.merge(collection: collection))
-      end
-
       def dump(options = {})
-        mongodump(options)
+        if options.key?(:collections)
+          collections = Array[options.delete(:collections)]
+          collections.each do |collection|
+            mongodump(options.merge(collection: collection))
+          end
+        else
+          mongodump(options)
+        end
       end
     end
   end
