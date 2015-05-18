@@ -171,6 +171,8 @@ group :test do
   gem 'rspec-rails'
   gem 'yarjuf'
 
+  gem 'webmock'
+
   gem 'capybara'
   gem 'poltergeist'
 
