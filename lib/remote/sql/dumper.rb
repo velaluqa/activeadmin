@@ -1,6 +1,6 @@
 require 'remote/sql/column'
 
-module Sql
+class Sql
   class Dumper
     attr_accessor :relation, :table_name, :columns
 
@@ -14,7 +14,7 @@ module Sql
 
       @table_name = @relation.table_name
       @columns = @relation.columns.clone
-      @columns.map! { |column| SqlColumn.new(table_name, column) }
+      @columns.map! { |column| Sql::Column.new(table_name, column) }
       @columns.sort_by!(&:name)
     end
 

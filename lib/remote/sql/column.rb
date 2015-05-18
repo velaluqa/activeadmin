@@ -1,4 +1,4 @@
-module Sql
+class Sql
   class Column
     attr_accessor :table_name, :name, :type, :limit, :nullable
     alias_method :nullable?, :nullable

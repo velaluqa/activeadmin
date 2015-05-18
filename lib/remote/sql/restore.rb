@@ -1,4 +1,4 @@
-module Sql
+class Sql
   class Restore
     class << self
       PSQL_ARGS = %w(host port dbname username file)
