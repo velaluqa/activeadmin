@@ -1,4 +1,4 @@
-module Mongo
+class Mongo
   class Restore
     class << self
       MONGORESTORE_ARGS = %w(host port db username password drop)
