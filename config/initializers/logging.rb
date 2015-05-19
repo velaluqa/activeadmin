@@ -6,7 +6,12 @@ module Logging
     attr_writer :logger
 
     def logger
-      @logger ||= Logger.new($stdout)
+      @logger ||=
+        begin
+          logger = Logger.new($stdout)
+          logger.formatter = Logger::Formatter.new
+          logger
+        end
     end
   end
 
