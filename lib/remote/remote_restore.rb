@@ -2,6 +2,7 @@ require 'remote/sql/restore'
 require 'remote/mongo/restore'
 
 class RemoteRestore
+  include FileUtils::Verbose
   include Logging
 
   attr_reader :export_id, :working_dir, :archive_file, :export_dir
@@ -26,5 +27,14 @@ class RemoteRestore
   def restore_mongo(dir = 'mongo_dump')
     logger.info("restoring mongodump from #{export_dir.join(dir).relative_path_from(Rails.root)}")
     Mongo::Restore.from_dir(export_dir.join(dir))
+  end
+
+  def restore_configs
+    logger.info("restoring form configs to #{ERICA.form_config_path.relative_path_from(Rails.root)}")
+    cp_r(export_dir.join('forms'), ERICA.form_config_path, :force)
+    logger.info("restoring session configs to #{ERICA.session_config_path.relative_path_from(Rails.root)}")
+    cp_r(export_dir.join('sessions'), ERICA.session_config_path, :force)
+    logger.info("restoring study configs to #{ERICA.study_config_path.relative_path_from(Rails.root)}")
+    cp_r(export_dir.join('studies'), ERICA.study_config_path, :force)
   end
 end
