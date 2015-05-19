@@ -38,6 +38,10 @@ class ImageSeries < ActiveRecord::Base
 
   STATE_SYMS = [:imported, :visit_assigned, :required_series_assigned, :not_required]
 
+  def state_index
+    read_attribute(:state)
+  end
+
   def self.state_sym_to_int(sym)
     return ImageSeries::STATE_SYMS.index(sym)
   end
