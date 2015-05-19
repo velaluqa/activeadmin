@@ -14,6 +14,29 @@ class Remote
     root.join('tmp', 'remote_sync')
   end
 
+  def exec(command)
+    if host !~ /^localhost|127\.0\.0\.1$/
+      bash_command = "bash --login -c #{command.to_s.inspect}"
+      system("ssh #{host} #{bash_command.inspect}")
+    else
+      system(command.to_s)
+    end
+  end
+
+  def mkdir_p(target)
+    exec("mkdir -p #{Shellwords.escape(target.to_s)}")
+  end
+
+  def rsync_to(source, target)
+    if host !~ /^localhost|127\.0\.0\.1$/
+      puts("rsync -avz #{Shellwords.escape(source.to_s)} #{host}:#{Shellwords.escape(target.to_s)}")
+      system("rsync -avz #{Shellwords.escape(source.to_s)} #{host}:#{Shellwords.escape(target.to_s)}")
+    else
+      puts("rsync -avz #{Shellwords.escape(source.to_s)} #{Shellwords.escape(target.to_s)}")
+      system("rsync -avz #{Shellwords.escape(source.to_s)} #{Shellwords.escape(target.to_s)}")
+    end
+  end
+
   private
 
   def retrieve_paths
