@@ -100,4 +100,19 @@ describe ERICA do
       expect(ERICA.image_storage_path).to eq Pathname.new('/srv/data/images')
     end
   end
+
+  describe '::config_paths' do
+    it 'returns configured paths' do
+      expect(Rails.application.config).to(receive(:form_configs_directory).and_return('/srv/data/forms'))
+      expect(Rails.application.config).to(receive(:session_configs_directory).and_return('/srv/data/sessions'))
+      expect(Rails.application.config).to(receive(:study_configs_directory).and_return('/srv/data/studies'))
+
+      expect(ERICA.config_paths.map(&:to_s))
+        .to match_array [
+          '/srv/data/forms',
+          '/srv/data/sessions',
+          '/srv/data/studies'
+        ]
+    end
+  end
 end

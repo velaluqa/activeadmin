@@ -29,5 +29,9 @@ class ERICA
     def image_storage_path
       Rails.root + Pathname.new(Rails.application.config.image_storage_root)
     end
+
+    def config_paths
+      [form_config_path, session_config_path, study_config_path]
+    end
   end
 end
