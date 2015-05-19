@@ -1,11 +1,12 @@
 class Remote
-  attr_reader :url, :host
+  attr_reader :url, :host, :study_ids
   attr_reader :root, :data_dir, :form_config_dir, :session_config_dir,
               :study_config_dir, :image_storage_dir
 
   def initialize(options = {})
-    @url  = options.fetch(:url)
-    @host = options.fetch(:host)
+    @url       = options.fetch(:url)
+    @host      = options.fetch(:host)
+    @study_ids = options.fetch(:study_ids)
     retrieve_paths
   end
 
