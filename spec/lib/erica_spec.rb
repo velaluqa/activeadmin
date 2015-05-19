@@ -27,7 +27,7 @@ describe ERICA do
     end
   end
 
-  describe 'data_path' do
+  describe '::data_path' do
     it 'returns relative paths correctly' do
       expect(Rails.application.config)
         .to receive(:data_directory).and_return('data')
@@ -41,7 +41,7 @@ describe ERICA do
     end
   end
 
-  describe 'form_config_path' do
+  describe '::form_config_path' do
     it 'returns relative paths correctly' do
       expect(Rails.application.config)
         .to receive(:form_configs_directory)
@@ -57,7 +57,7 @@ describe ERICA do
     end
   end
 
-  describe 'session_config_path' do
+  describe '::session_config_path' do
     it 'returns relative paths correctly' do
       expect(Rails.application.config)
         .to receive(:session_configs_directory)
@@ -73,7 +73,7 @@ describe ERICA do
     end
   end
 
-  describe 'study_config_path' do
+  describe '::study_config_path' do
     it 'returns relative paths correctly' do
       expect(Rails.application.config)
         .to receive(:study_configs_directory).and_return('data/studies')
@@ -87,7 +87,7 @@ describe ERICA do
     end
   end
 
-  describe 'image_storage_path' do
+  describe '::image_storage_path' do
     it 'returns relative paths correctly' do
       expect(Rails.application.config)
         .to receive(:image_storage_root).and_return('data/images')
