@@ -1,23 +1,21 @@
 require 'yaml'
 
-erica_remote_config_path = Rails.root + 'config/erica_remote.yml'
+erica_remote_config_path = Rails.root.join('config', 'erica_remote.yml')
 begin
-  erica_remote_config = YAML::load_file(erica_remote_config_path)
+  erica_remote_config = YAML.load_file(erica_remote_config_path)
+  puts "Loading ERICA remote config found at '#{erica_remote_config_path}'"
   pp erica_remote_config
 
-  if(erica_remote_config['erica_remote'] and erica_remote_config['erica_remote']['enabled'])
+  if erica_remote_config['erica_remote'].andand['enabled']
     Rails.application.config.erica_remote = erica_remote_config['erica_remote']
     Rails.application.config.is_erica_remote = true
   else
     Rails.application.config.erica_remote = nil
     Rails.application.config.is_erica_remote = false
   end
-rescue Errno::ENOENT => e
-  puts "No ERICA remote config file found at '#{erica_remote_config_path}', not loading ERICA remote"
+rescue Errno::ENOENT
   Rails.application.config.erica_remote = nil
   Rails.application.config.is_erica_remote = false
 end
 
-if(Rails.application.config.is_erica_remote)
-  FileUtils.mkpath(Rails.root.join(Rails.application.config.image_storage_root))
-end
+FileUtils.mkpath(ERICA.image_storage_path) if ERICA.remote?
