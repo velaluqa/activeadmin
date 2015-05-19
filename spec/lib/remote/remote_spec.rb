@@ -19,6 +19,13 @@ RSpec.describe Remote do
     )
   end
 
+  describe '#working_dir' do
+    it 'returns the working dir of the remote sync' do
+      expect(@remote.working_dir.to_s)
+        .to eq '/srv/ERICA/server/tmp/remote_sync'
+    end
+  end
+
   describe 'loading remote paths' do
     describe '#root' do
       it 'returns the correct Pathname' do

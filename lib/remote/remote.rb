@@ -9,6 +9,10 @@ class Remote
     retrieve_paths
   end
 
+  def working_dir
+    root.join('tmp', 'remote_sync')
+  end
+
   private
 
   def retrieve_paths
