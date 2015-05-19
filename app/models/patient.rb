@@ -20,8 +20,8 @@ class Patient < ActiveRecord::Base
   validates_presence_of :subject_id
 
   scope :by_study_ids, lambda { |*ids|
-    joins(center: :study)
-      .where(studies: { id: Array[ids].flatten })
+    joins(:center)
+      .where(centers: { study_id: Array[ids].flatten })
   }
 
   before_destroy do

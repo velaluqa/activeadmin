@@ -9,8 +9,8 @@ class Image < ActiveRecord::Base
   validates_presence_of :image_series_id
 
   scope :by_study_ids, lambda { |*ids|
-    joins(image_series: { visit: { patient: { center: :study } } })
-      .where(studies: { id: Array[ids].flatten })
+    joins(image_series: { patient: :center })
+      .where(centers: { study_id: Array[ids].flatten })
   }
 
   def study
