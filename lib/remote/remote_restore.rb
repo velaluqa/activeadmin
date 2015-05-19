@@ -2,29 +2,29 @@ require 'remote/sql/restore'
 require 'remote/mongo/restore'
 
 class RemoteRestore
-  attr_reader :export_id
+  include Logging
+
+  attr_reader :export_id, :working_dir, :archive_file, :export_dir
 
   def initialize(export_id)
     @export_id = export_id
-  end
-
-  def log(message)
-    puts "#{DateTime.now} - #{message}"
+    @working_dir = Rails.root.join('tmp', 'remote_sync')
+    @archive_file = working_dir.join("#{export_id}.tar.lrz")
+    @export_dir = working_dir.join(export_id)
   end
 
   def extract_archive!
-    log("extracting #{export_id}.tar.lrz")
-    system("cd #{Rails.root.join('tmp')}; lrzuntar #{export_id}.tar.lrz")
+    logger.info("extracting #{archive_file.relative_path_from(Rails.root)}")
+    system("cd #{Shellwords.escape(working_dir.to_s)}; lrzuntar #{Shellwords.escape(archive_file.to_s)}")
   end
 
   def restore_sql(filename)
-    log("restoring sql file #{export_id}/#{filename}")
-    remote_tmp = Rails.root.join('tmp', export_id)
-    Sql::Restore.from_file(remote_tmp.join(filename))
+    logger.info("restoring sql file #{export_dir.join(filename).relative_path_from(Rails.root)}")
+    Sql::Restore.from_file(export_dir.join(filename))
   end
 
   def restore_mongo(dir = 'mongo_dump')
-    log("restoring mongodump from #{export_id}/#{dir}")
-    Mongo::Restore.from_dir(Rails.root.join('tmp', export_id, dir))
+    logger.info("restoring mongodump from #{export_dir.join(dir).relative_path_from(Rails.root)}")
+    Mongo::Restore.from_dir(export_dir.join(dir))
   end
 end
