@@ -46,7 +46,7 @@ class Mongo
 
       def dump(options = {})
         if options.key?(:collections)
-          collections = Array[options.delete(:collections)]
+          collections = Array[options.delete(:collections)].flatten
           collections.each do |collection|
             mongodump(options.merge(collection: collection))
           end
