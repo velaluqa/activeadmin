@@ -1,4 +1,50 @@
 namespace :erica do
+  namespace :remote do
+    def load_sync_config(config_path)
+      YAML.load_file(config_path.to_s)
+    rescue Errno::ENOENT => e
+      puts "Config file at #{config_path.to_s} could not be accessed: #{e.message}"
+    rescue SyntaxError => e
+      puts "Config file is not valid YAML: #{e.message}"
+    rescue e
+      puts "Failed to load config file at #{config_path.to_s}: #{e.message}"
+    end
+
+    desc 'Restore from ERICA remote temp data'
+    task :restore, [:export_id] => :environment do |task, args|
+      fail 'Only available on ERICA remote installation' unless Rails.application.config.is_erica_remote
+      export_id = args[:export_id]
+      job = BackgroundJob.create(name: "Restore from #{export_id}.tar.lrz")
+
+      if ENV['ASYNC'] =~ /^false|no$/
+        ERICARemoteRestoreWorker.new.perform(job.id.to_s, export_id)
+      else
+        ERICARemoteRestoreWorker.perform_async(job.id.to_s, export_id)
+      end
+    end
+
+    desc 'Sync to all ERICA remotes (in erica_remotes.yml)'
+    task :sync_all do
+      fail 'Only available on ERICA store installation' if Rails.application.config.is_erica_remote
+
+      remotes = load_sync_config('config/erica_remotes.yml')
+      sync_options = { export_id: Date.today.strftime('%') }
+      remotes.each do |remote|
+        DatastoreSync.perform(sync_options.merge(remote: remote))
+      end
+      remotes.each do |remote|
+        ImagesSync.perform(sync_options.merge(remote: remote))
+      end
+    end
+
+    desc 'Sync to a specific remote'
+    task :sync_remote do
+      fail 'Only available on ERICA store installation' if Rails.application.config.is_erica_remote
+
+      DatastoreSync.perform(remote)
+      ImagesSync.perform(remote)
+    end
+  end
 
   DEFAULT_CONFIG_FILE = 'config/erica_remotes.yml'
 
@@ -12,27 +58,10 @@ namespace :erica do
     end
   end
 
-  def load_sync_config(config_path)
-    begin
-      config = YAML::load_file(config_path.to_s)
-    rescue Errno::ENOENT => e
-      puts "Config file at #{config_path.to_s} could not be accessed: #{e.message}"
-      return nil
-    rescue SyntaxError => e
-      puts "Config file is not valid YAML: #{e.message}"
-      return nil
-    rescue e
-      puts "Failed to load config file at #{config_path.to_s}: #{e.message}"
-      return nil
-    end
-
-    return config
-  end
-
   def sync_study(user_id, study_id, remote_url, remote_host, async = false)
     background_job = BackgroundJob.create(:name => "Sync study #{study_id} to #{remote_url}", :user_id => user_id)
 
-    if(async)
+    if async
       ERICARemoteSyncWorker.perform_async(background_job.id.to_s, study_id, remote_url, remote_host)
     else
       ERICARemoteSyncWorker.new.perform(background_job.id.to_s, study_id, remote_url, remote_host)
