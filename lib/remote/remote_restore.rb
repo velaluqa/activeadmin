@@ -31,10 +31,10 @@ class RemoteRestore
 
   def restore_configs
     logger.info("restoring form configs to #{ERICA.form_config_path.relative_path_from(Rails.root)}")
-    cp_r(export_dir.join('forms'), ERICA.form_config_path, :force)
+    system("rsync -avz #{Shellwords.escape(export_dir.join('forms').to_s)}/ #{Shellwords.escape(ERICA.form_config_path.to_s)}")
     logger.info("restoring session configs to #{ERICA.session_config_path.relative_path_from(Rails.root)}")
-    cp_r(export_dir.join('sessions'), ERICA.session_config_path, :force)
+    system("rsync -avz #{Shellwords.escape(export_dir.join('sessions').to_s)}/ #{Shellwords.escape(ERICA.session_config_path.to_s)}")
     logger.info("restoring study configs to #{ERICA.study_config_path.relative_path_from(Rails.root)}")
-    cp_r(export_dir.join('studies'), ERICA.study_config_path, :force)
+    system("rsync -avz #{Shellwords.escape(export_dir.join('studies').to_s)}/ #{Shellwords.escape(ERICA.study_config_path.to_s)}")
   end
 end
