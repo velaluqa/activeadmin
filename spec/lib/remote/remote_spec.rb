@@ -15,7 +15,8 @@ RSpec.describe Remote do
       )
     @remote = Remote.new(
       url: 'http://localhost:3001',
-      host: 'root@10.0.0.1'
+      host: 'root@10.0.0.1',
+      study_ids: ['2']
     )
   end
 
