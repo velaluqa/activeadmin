@@ -56,23 +56,25 @@ class Remote
     end
 
     def compress_dump
-      logger.info "Compressing tarball #{archive_file.relative_path_from(Rails.root)}"
+      logger.info "compressing tarball #{archive_file.relative_path_from(Rails.root)}"
       system("cd #{Shellwords.escape(working_dir.to_s)}; lrztar -q -f -o #{Shellwords.escape(archive_file.to_s)} #{Shellwords.escape(export_id)}")
     end
 
     def transfer_archive
-      logger.info 'Transferring tarball to ERICA remote Server'
-      system("mkdir -p #{Shellwords.escape(remote.working_dir.to_s)}")
-      system("rsync -az #{Shellwords.escape(archive_file.to_s)} #{Shellwords.escape(remote.working_dir.join('').to_s)}")
+      logger.info 'transferring tarball to ERICA remote Server'
+
+      remote.mkdir_p(remote.working_dir)
+      remote.rsync_to(archive_file, remote.working_dir)
     end
 
     def trigger_remote_restore
-      logger.info 'Triggering restore job on ERICA remote server'
-      system("cd #{remote.root}; ASYNC=no RAILS_ENV=#{Rails.env} bundle exec rake erica:remote:restore[#{export_id}]")
+      logger.info 'triggering restore job on ERICA remote server'
+      remote.exec("cd #{remote.root}; ASYNC=no RAILS_ENV=#{Rails.env} bundle exec rake erica:remote:restore[#{export_id}]")
     end
 
     def cleanup
-      # delete dump folder only keep archive
+      logger.info 'cleaning up workspace'
+      rm_rf(export_dir)
     end
   end
 end
