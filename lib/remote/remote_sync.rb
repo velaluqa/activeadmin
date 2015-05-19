@@ -1,0 +1,2 @@
+class RemoteSync
+end
