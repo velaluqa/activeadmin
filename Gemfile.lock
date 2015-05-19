@@ -96,6 +96,7 @@ GEM
       activesupport
       builder
       json
+    andand (1.3.3)
     annotate (2.6.5)
       activerecord (>= 2.3.0)
       rake (>= 0.8.7)
@@ -569,6 +570,7 @@ DEPENDENCIES
   activeadmin-mongoid!
   acts-as-taggable-on
   airbrake
+  andand
   annotate
   bcrypt-ruby (~> 3.0.0)
   better_errors

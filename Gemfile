@@ -116,6 +116,8 @@ gem 'acts-as-taggable-on'
 
 gem 'ruby-progressbar'
 
+gem 'andand'
+
 # For the Sidekiq monitoring interface
 gem 'slim', '>= 1.1.0'
 gem 'sinatra', '>= 1.3.0', :require => nil
