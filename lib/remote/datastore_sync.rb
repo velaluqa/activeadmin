@@ -9,13 +9,14 @@ class Remote
 
     attr_reader :export_id, :working_dir, :export_dir, :archive_file, :remote
 
-    def self.perform(options = {})
-      DatastoreSync.new(options).perform!
+    def self.perform(remote, options = {})
+      DatastoreSync.new(remote, options).perform!
     end
 
-    def initialize(options = {})
-      @export_id    = options.fetch(:export_id)
-      @remote       = Remote.new(options.fetch(:remote))
+    def initialize(remote, options = {})
+      @remote       = Remote.new(remote)
+      @export_id    =
+        options[:export_id] || "#{Date.today.strftime('%Y-%m-%d')}-#{remote.name}"
       @working_dir  =
         Pathname.new(options[:working_dir] || Rails.root.join('tmp', 'remote_sync'))
       @export_dir   = working_dir.join(export_id)
@@ -36,7 +37,6 @@ class Remote
     end
 
     def dump_datastore
-      # dump SQL
       Sql.dump_upserts(export_dir.join('1_users.sql'))        {        User }
       Sql.dump_upserts(export_dir.join('2_studies.sql'))      {       Study.by_ids(remote.study_ids) }
       Sql.dump_upserts(export_dir.join('3_centers.sql'))      {      Center.by_study_ids(remote.study_ids) }
@@ -45,7 +45,6 @@ class Remote
       Sql.dump_upserts(export_dir.join('6_image_series.sql')) { ImageSeries.by_study_ids(remote.study_ids) }
       Sql.dump_upserts(export_dir.join('7_images.sql'))       {       Image.by_study_ids(remote.study_ids) }
 
-      # dump mongodb
       Mongo.dump(
         collections: %w(patient_data visit_data image_series_data),
         out: export_dir,
