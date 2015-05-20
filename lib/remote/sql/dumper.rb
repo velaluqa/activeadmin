@@ -7,10 +7,10 @@ class Sql
     def initialize(relation, options = {})
       @relation = relation
 
-      @insert_columns = options[:insert_columns]
-      @update_columns = options[:update_columns]
-      @ignore_insert_columns = options[:ignore_insert_columns]
-      @ignore_update_columns = options[:ignore_update_columns]
+      @insert_columns = Array(options[:insert_columns]).flatten
+      @update_columns = Array(options[:update_columns]).flatten
+      @ignore_insert_columns = Array(options[:ignore_insert_columns]).flatten
+      @ignore_update_columns = Array(options[:ignore_update_columns]).flatten
 
       @table_name = @relation.table_name
       @columns = @relation.columns.clone
@@ -19,11 +19,17 @@ class Sql
     end
 
     def update_columns
-      @update_columns || columns
+      cols = columns.map(&:name).map(&:to_s)
+      cols &= @update_columns unless @update_columns.empty?
+      cols -= @ignore_update_columns unless @ignore_update_columns.empty?
+      columns.select { |col| cols.include?(col.name.to_s) }
     end
 
     def insert_columns
-      @insert_columns || columns
+      cols = columns.map(&:name).map(&:to_s)
+      cols &= @insert_columns unless @insert_columns.empty?
+      cols -= @ignore_insert_columns unless @ignore_insert_columns.empty?
+      columns.select { |col| cols.include?(col.name.to_s) }
     end
 
     def new_values_select
