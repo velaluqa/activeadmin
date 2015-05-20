@@ -118,6 +118,9 @@ gem 'ruby-progressbar'
 
 gem 'andand'
 
+# Facets provides many helpers that are missing from the ruby standard library.
+gem 'facets', require: false
+
 # For the Sidekiq monitoring interface
 gem 'slim', '>= 1.1.0'
 gem 'sinatra', '>= 1.3.0', :require => nil

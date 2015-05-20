@@ -199,6 +199,7 @@ GEM
     erubis (2.7.0)
     execjs (1.4.0)
       multi_json (~> 1.0)
+    facets (3.0.0)
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
     faker (1.4.3)
@@ -591,6 +592,7 @@ DEPENDENCIES
   dicom
   diffy
   execjs
+  facets
   factory_girl
   faker
   flay

@@ -1,5 +1,10 @@
 require File.expand_path('../boot', __FILE__)
 
+# Require standard library extensions before anything rails specific,
+# so that ActiveSupport has the last word in terms of method
+# definitions.
+require 'facets/enumerable/mash'
+
 require 'rails/all'
 
 if defined?(Bundler)
