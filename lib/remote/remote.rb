@@ -3,20 +3,11 @@ class Remote
   attr_reader :root, :data_dir, :form_config_dir, :session_config_dir,
               :study_config_dir, :image_storage_dir
 
-  def initialize(options = {})
-    case options
-    when Remote
-      @name      = options.name
-      @url       = options.url
-      @host      = options.host
-      @study_ids = options.study_ids
-    when Hash
-      options.symbolize_keys!
-      @name      = options.fetch(:name)
-      @url       = options.fetch(:url)
-      @host      = options.fetch(:host)
-      @study_ids = options.fetch(:study_ids).map(&:to_s)
-    else fail 'Given remote options are not allowed.'
+  def initialize(arg = {})
+    case arg
+    when Remote then load_remote(arg)
+    when Hash   then load_hash(arg)
+    else fail 'Given remote argument is not allowed.'
     end
     retrieve_paths
   end
@@ -40,15 +31,28 @@ class Remote
 
   def rsync_to(source, target)
     if host !~ /^localhost|127\.0\.0\.1$/
-      puts("rsync -avz #{Shellwords.escape(source.to_s)} #{host}:#{Shellwords.escape(target.to_s)}")
       system("rsync -avz #{Shellwords.escape(source.to_s)} #{host}:#{Shellwords.escape(target.to_s)}")
     else
-      puts("rsync -avz #{Shellwords.escape(source.to_s)} #{Shellwords.escape(target.to_s)}")
       system("rsync -avz #{Shellwords.escape(source.to_s)} #{Shellwords.escape(target.to_s)}")
     end
   end
 
   private
+
+  def load_remote(remote)
+    @name      = remote.name
+    @url       = remote.url
+    @host      = remote.host
+    @study_ids = remote.study_ids
+  end
+
+  def load_hash(hash)
+    hash.symbolize_keys!
+    @name      = hash.fetch(:name)
+    @url       = hash.fetch(:url)
+    @host      = hash.fetch(:host)
+    @study_ids = hash.fetch(:study_ids).map(&:to_s)
+  end
 
   def retrieve_paths
     paths               = fetch_paths
