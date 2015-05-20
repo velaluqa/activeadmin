@@ -1,12 +1,23 @@
 class Remote
-  attr_reader :url, :host, :study_ids
+  attr_reader :name, :url, :host, :study_ids
   attr_reader :root, :data_dir, :form_config_dir, :session_config_dir,
               :study_config_dir, :image_storage_dir
 
   def initialize(options = {})
-    @url       = options.fetch(:url)
-    @host      = options.fetch(:host)
-    @study_ids = options.fetch(:study_ids)
+    case options
+    when Remote
+      @name      = options.name
+      @url       = options.url
+      @host      = options.host
+      @study_ids = options.study_ids
+    when Hash
+      options.symbolize_keys!
+      @name      = options.fetch(:name)
+      @url       = options.fetch(:url)
+      @host      = options.fetch(:host)
+      @study_ids = options.fetch(:study_ids).map(&:to_s)
+    else fail 'Given remote options are not allowed.'
+    end
     retrieve_paths
   end
 
