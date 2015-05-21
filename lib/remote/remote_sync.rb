@@ -16,7 +16,7 @@ class RemoteSync
   end
 
   def perform
-    # remotes.each { |remote| Remote::DatastoreSync.perform(remote) }
+    remotes.each { |remote| Remote::DatastoreSync.perform(remote) }
     remotes.each { |remote| Remote::ImageSync.perform(remote) }
   end
 
