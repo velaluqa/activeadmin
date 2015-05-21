@@ -3,12 +3,13 @@ class Sql
     attr_accessor :table_name, :name, :type, :limit, :nullable
     alias_method :nullable?, :nullable
 
-    def initialize(table_name, pg_column)
+    def initialize(table_name, pg_column, options = {})
       @table_name = table_name
       @name = pg_column.name
       @type = pg_column.type
       @limit = pg_column.limit
       @nullable = pg_column.null
+      @override = options[:override]
     end
 
     def to_s
@@ -31,7 +32,8 @@ class Sql
     end
 
     def with_ref(options = {})
-      %("#{options[:ref] || table_name}".#{self})
+      column = options[:column] ? "\"#{options[:column]}\"" : to_s
+      %("#{options[:ref] || table_name}".#{column})
     end
 
     def with_reftype(options = {})
@@ -54,8 +56,26 @@ class Sql
       end
     end
 
+    def format_override(options = {})
+      case @override
+      when String then
+        return "format('%L', '')" if @override.blank?
+
+        vars = @override.scan(/{{:([^}]+)}}/).flatten
+        format = "format('%L', format('#{@override.gsub(/{{:([^}]+)}}/, '%s')}', "
+        format << vars.map { |var| with_ref(options.merge(column: var)) }.join(', ')
+        format << '))'
+        format
+      when :nil then "format('%L', NULL)"
+      end
+    end
+
     def select(options = {})
-      catch_null(options) { format(options) }
+      if @override
+        format_override(options)
+      else
+        catch_null(options) { format(options) }
+      end
     end
   end
 end

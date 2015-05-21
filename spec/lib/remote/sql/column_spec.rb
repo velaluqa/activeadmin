@@ -1,6 +1,66 @@
 require 'remote/sql/column'
 
 RSpec.describe Sql::Column do
+  describe 'with interpolating string override' do
+    before :each do
+      @column = Sql::Column.new(
+        'table',
+        OpenStruct.new(
+          name: :nullable_column,
+          type: :string,
+          null: true,
+          limit: nil),
+        override: 'user{{:id}}'
+      )
+    end
+
+    describe '#format_override' do
+      it 'returns the overriden format' do
+        expect(@column.format_override).to eq %(format('%L', format('user%s', "table"."id")))
+      end
+    end
+  end
+
+  describe 'with interpolating string override' do
+    before :each do
+      @column = Sql::Column.new(
+        'table',
+        OpenStruct.new(
+          name: :nullable_column,
+          type: :string,
+          null: true,
+          limit: nil),
+        override: ''
+      )
+    end
+
+    describe '#format_override' do
+      it 'returns the overriden format' do
+        expect(@column.format_override).to eq %(format('%L', ''))
+      end
+    end
+  end
+
+  describe 'with null override' do
+    before :each do
+      @column = Sql::Column.new(
+        'table',
+        OpenStruct.new(
+          name: :nullable_column,
+          type: :string,
+          null: true,
+          limit: nil),
+        override: :nil
+      )
+    end
+
+    describe '#format_override' do
+      it 'returns the overriden format' do
+        expect(@column.format_override).to eq "format('%L', NULL)"
+      end
+    end
+  end
+
   describe 'which is nullable' do
     before :each do
       @column = Sql::Column.new('table', OpenStruct.new(name: :nullable_column, type: :string, null: true, limit: nil))

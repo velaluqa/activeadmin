@@ -14,10 +14,21 @@ class Sql
 
       @table_name = @relation.table_name
       @columns = @relation.columns.clone
-      @columns.map! { |column| Sql::Column.new(table_name, column) }
+      unless Array(options[:columns]).flatten.empty?
+        @columns.select! { |col| options[:columns].include?(col.name.to_s) }
+      end
+      @columns.map! do |column|
+        Sql::Column.new(
+          table_name,
+          column,
+          override: options[:override_values]
+            .andand.stringify_keys
+            .andand[column.name])
+      end
       @columns.sort_by!(&:name)
     end
 
+    # Columns used when updating an existing dataset.
     def update_columns
       cols = columns.map(&:name).map(&:to_s)
       cols &= @update_columns unless @update_columns.empty?
@@ -25,6 +36,7 @@ class Sql
       columns.select { |col| cols.include?(col.name.to_s) }
     end
 
+    # Columns used when inserting a new dataset.
     def insert_columns
       cols = columns.map(&:name).map(&:to_s)
       cols &= @insert_columns unless @insert_columns.empty?
