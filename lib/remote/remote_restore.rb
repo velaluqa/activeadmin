@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'remote/sql/restore'
 require 'remote/mongo/restore'
 
@@ -15,26 +16,61 @@ class RemoteRestore
   end
 
   def extract_archive!
-    logger.info("extracting #{archive_file.relative_path_from(Rails.root)}")
-    system("cd #{Shellwords.escape(working_dir.to_s)}; lrzuntar #{Shellwords.escape(archive_file.to_s)}")
+    state_file = export_dir.join('.extracted')
+    if state_file.exist?
+      logger.info("already extracted #{relative(archive_file)} to #{relative(export_dir)}, skipping")
+    else
+      logger.info("extracting #{relative(archive_file)}")
+      system("cd #{working_dir.shellescape}; lrzuntar #{archive_file.shellescape}")
+      state_file.touch
+    end
   end
 
   def restore_sql(filename)
-    logger.info("restoring sql file #{export_dir.join(filename).relative_path_from(Rails.root)}")
-    Sql::Restore.from_file(export_dir.join(filename))
+    sql_file = export_dir.join(filename)
+    state_file = export_dir.join(".#{filename}.restored")
+    if state_file.exist?
+      logger.info("already restored sql file #{relative(sql_file)}, skipping")
+    else
+      logger.info("restoring sql file #{relative(sql_file)}")
+      Sql::Restore.from_file(sql_file)
+      state_file.touch
+    end
   end
 
   def restore_mongo(dir = 'mongo_dump')
-    logger.info("restoring mongodump from #{export_dir.join(dir).relative_path_from(Rails.root)}")
-    Mongo::Restore.from_dir(export_dir.join(dir))
+    state_file = export_dir.join(".#{dir}.restored")
+    mongo_dir = export_dir.join(dir)
+    if state_file.exist?
+      logger.info("already restored mongodump from #{relative(mongo_dir)}, skipping")
+    else
+      logger.info("restoring mongodump from #{relative(mongo_dir)}")
+      Mongo::Restore.from_dir(mongo_dir)
+      state_file.touch
+    end
+  end
+
+  def restore_config_dir(dir, target)
+    source = export_dir.join(dir)
+    state_file = export_dir.join(".#{dir}.restored")
+    if state_file.exist?
+      logger.info("already restored #{dir.singularize} configs to #{relative(target)}, skipping")
+    else
+      logger.info("restoring #{dir.singularize} configs to #{relative(target)}")
+      system("rsync -avz #{source.shellescape}/ #{target.shellescape}")
+      state_file.touch
+    end
   end
 
   def restore_configs
-    logger.info("restoring form configs to #{ERICA.form_config_path.relative_path_from(Rails.root)}")
-    system("rsync -avz #{Shellwords.escape(export_dir.join('forms').to_s)}/ #{Shellwords.escape(ERICA.form_config_path.to_s)}")
-    logger.info("restoring session configs to #{ERICA.session_config_path.relative_path_from(Rails.root)}")
-    system("rsync -avz #{Shellwords.escape(export_dir.join('sessions').to_s)}/ #{Shellwords.escape(ERICA.session_config_path.to_s)}")
-    logger.info("restoring study configs to #{ERICA.study_config_path.relative_path_from(Rails.root)}")
-    system("rsync -avz #{Shellwords.escape(export_dir.join('studies').to_s)}/ #{Shellwords.escape(ERICA.study_config_path.to_s)}")
+    restore_config_dir('forms', ERICA.form_config_path)
+    restore_config_dir('sessions', ERICA.form_config_path)
+    restore_config_dir('studies', ERICA.form_config_path)
+  end
+
+  private
+
+  def relative(pathname)
+    pathname.relative_path_from(Rails.root)
   end
 end
