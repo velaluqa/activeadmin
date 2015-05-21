@@ -16,11 +16,21 @@ namespace :erica do
       end
     end
 
-    desc 'Sync to all ERICA remotes (in erica_remotes.yml)'
-    task sync_all: :environment do
+    desc 'Sync datastore and images to all ERICA remotes (in erica_remotes.yml)'
+    task sync: ['erica:remote:sync_datastores', 'erica:remote:sync_images']
+
+    desc 'Sync images to all ERICA remotes (in erica_remotes.yml)'
+    task sync_datastores: :environment do
       fail 'Only available on ERICA store installation' if ERICA.remote?
       require 'remote/remote_sync'
-      RemoteSync.perform('config/erica_remotes.yml')
+      RemoteSync.perform_datastore_sync('config/erica_remotes.yml')
+    end
+
+    desc 'Sync images to all ERICA remotes (in erica_remotes.yml)'
+    task sync_images: :environment do
+      fail 'Only available on ERICA store installation' if ERICA.remote?
+      require 'remote/remote_sync'
+      RemoteSync.perform_image_sync('config/erica_remotes.yml')
     end
   end
 
@@ -37,7 +47,7 @@ namespace :erica do
     end
 
     unless(['Patient', 'Visit'].include?(resource_type))
-      puts "Invalid resurce type #{resource_type} given. Valid resource types are: Patient, Visit"
+      puts "Invalid resource type #{resource_type} given. Valid resource types are: Patient, Visit"
       next_series_number
     end
 

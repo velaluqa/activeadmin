@@ -15,14 +15,21 @@ class RemoteSync
     fail "Duplicate remote names found: #{dups}" unless dups.empty?
   end
 
-  def perform
+  def perform_datastore_sync
     remotes.each { |remote| Remote::DatastoreSync.perform(remote) }
+  end
+
+  def perform_image_sync
     remotes.each { |remote| Remote::ImageSync.perform(remote) }
   end
 
   class << self
-    def perform(config_file)
-      RemoteSync.new(config_file).perform
+    def perform_datastore_sync(config_file)
+      RemoteSync.new(config_file).perform_datastore_sync
+    end
+
+    def perform_image_sync(config_file)
+      RemoteSync.new(config_file).perform_image_sync
     end
   end
 
