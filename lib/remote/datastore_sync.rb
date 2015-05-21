@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'remote/remote'
 require 'remote/mongo'
 require 'remote/sql'
@@ -36,8 +37,36 @@ class Remote
       mkdir_p(export_dir)
     end
 
+    def dumped_datastore?
+      export_dir.join('.state.dumped').exist?
+    end
+
     def dump_datastore
-      Sql.dump_upserts(export_dir.join('1_users.sql'))        {        User }
+      if dumped_datastore? || compressed_dump?
+        logger. info "already dumped datastore for #{export_id}, skipping"
+        return
+      end
+
+      user_options = {
+        username: 'user{{:id}}',
+        name: 'user{{:id}}',
+        encrypted_password: '',
+        private_key: :nil,
+        public_key: :nil,
+        current_sign_in_at: :nil,
+        current_sign_in_ip: :nil,
+        authentication_token: :nil,
+        last_sign_in_at: :nil,
+        last_sign_in_ip: :nil,
+        locked_at: :nil,
+        password_changed_at: :nil,
+        remember_created_at: :nil,
+        reset_password_sent_at: :nil,
+        reset_password_token: :nil,
+        sign_in_count: :nil,
+        unlock_token: :nil
+      }
+      Sql.dump_upserts(export_dir.join('1_users.sql'), override_values: user_options) { User }
       Sql.dump_upserts(export_dir.join('2_studies.sql'))      {       Study.by_ids(remote.study_ids) }
       Sql.dump_upserts(export_dir.join('3_centers.sql'))      {      Center.by_study_ids(remote.study_ids) }
       Sql.dump_upserts(export_dir.join('4_patients.sql'))     {     Patient.by_study_ids(remote.study_ids) }
@@ -52,28 +81,51 @@ class Remote
       )
 
       cp_r(ERICA.config_paths, export_dir)
+
+      export_dir.join('.state.dumped').touch
+    end
+
+    def compressed_dump?
+      archive_file.exist?
     end
 
     def compress_dump
-      logger.info "compressing tarball #{archive_file.relative_path_from(Rails.root)}"
-      system("cd #{Shellwords.escape(working_dir.to_s)}; lrztar -q -f -o #{Shellwords.escape(archive_file.to_s)} #{Shellwords.escape(export_id)}")
+      if compressed_dump?
+        logger.info "already compressed dump to #{relative(archive_file)}"
+      else
+        logger.info "compressing tarball #{relative(archive_file)}"
+        system("cd #{working_dir.shellescape}; lrztar -q -f -o #{archive_file.shellescape} #{export_id.shellescape}")
+      end
+    end
+
+    def transferred_archive?
+      remote.file_exists?(remote.working_dir.join(archive_file.basename))
     end
 
     def transfer_archive
-      logger.info 'transferring tarball to ERICA remote Server'
-
-      remote.mkdir_p(remote.working_dir)
-      remote.rsync_to(archive_file, remote.working_dir)
+      if transferred_archive?
+        logger.info "already transferred archive to #{remote.working_dir.join(archive_file.basename)}"
+      else
+        logger.info 'transferring tarball to ERICA remote Server'
+        remote.mkdir_p(remote.working_dir)
+        remote.rsync_to(archive_file, remote.working_dir)
+      end
     end
 
     def trigger_remote_restore
       logger.info 'triggering restore job on ERICA remote server'
-      remote.exec("cd #{remote.root}; ASYNC=no RAILS_ENV=#{Rails.env} bundle exec rake erica:remote:restore[#{export_id}]")
+      remote.exec("cd #{remote.root.shellescape}; ASYNC=no RAILS_ENV=#{Rails.env} bundle exec rake erica:remote:restore[#{export_id}]")
     end
 
     def cleanup
       logger.info 'cleaning up workspace'
       rm_rf(export_dir)
+    end
+
+    private
+
+    def relative(pathname)
+      pathname.relative_path_from(Rails.root)
     end
   end
 end

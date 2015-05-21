@@ -25,6 +25,10 @@ class Remote
     end
   end
 
+  def file_exists?(path)
+    exec("test -f #{path.shellescape}")
+  end
+
   def mkdir_p(target)
     exec("mkdir -p #{Shellwords.escape(target.to_s)}")
   end
