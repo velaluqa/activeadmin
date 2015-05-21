@@ -1,10 +1,13 @@
 namespace :erica do
   namespace :remote do
     desc 'Restore from ERICA remote temp data'
-    task :restore, [:export_id] => :environment do |task, args|
+    task :restore, [:export_id] => :environment do |_, args|
       fail 'Only available on ERICA remote installation' unless ERICA.remote?
       export_id = args[:export_id]
-      job = BackgroundJob.create(name: "Restore from #{export_id}.tar.lrz")
+
+      job = BackgroundJob.where(name: "restore-#{export_id}.tar.lrz", completed: false).first
+      fail 'A restore job is already running! Aborting' if job
+      job = BackgroundJob.create(name: "restore-#{export_id}.tar.lrz")
 
       if ENV['ASYNC'] =~ /^false|no$/
         ERICARemoteRestoreWorker.new.perform(job.id.to_s, export_id)
