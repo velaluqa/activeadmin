@@ -19,7 +19,7 @@ class Remote
   def exec(command)
     unless localhost?
       bash_command = "bash --login -c #{command.to_s.inspect}"
-      command = "ssh #{host} #{bash_command.inspect}"
+      command = "ssh #{host} -t #{bash_command.inspect}"
     end
     system(command.to_s)
   end
@@ -27,7 +27,7 @@ class Remote
   def exec_or_die(command)
     unless localhost?
       bash_command = "bash --login -c #{command.to_s.inspect}"
-      command = "ssh #{host} #{bash_command.inspect}"
+      command = "ssh #{host} -t #{bash_command.inspect}"
     end
     system_or_die(command.to_s)
   end
