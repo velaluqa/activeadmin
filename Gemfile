@@ -27,7 +27,6 @@ group :assets do
   gem 'twitter-bootstrap-rails'
   gem 'bootstrap-datepicker-rails'
 
-
   gem 'uglifier', '>= 1.0.3'
 end
 
@@ -117,6 +116,10 @@ gem 'acts-as-taggable-on'
 
 gem 'ruby-progressbar'
 
+# For the Sidekiq monitoring interface
+gem 'slim', '>= 1.1.0'
+gem 'sinatra', '>= 1.3.0', :require => nil
+
 group :development do
   # Annotate models, routes, fixtures with describing comments.
   gem 'annotate'
@@ -133,9 +136,6 @@ group :development do
   # Gems for prettier errors in development
   gem 'better_errors'
   gem 'binding_of_caller'
-  # For the Sidekiq monitoring interface
-  gem 'slim', '>= 1.1.0'
-  gem 'sinatra', '>= 1.3.0', :require => nil
 end
 
 group :development, :test do
