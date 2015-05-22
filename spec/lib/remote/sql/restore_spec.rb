@@ -28,7 +28,7 @@ RSpec.describe Sql::Restore do
   describe 'psql' do
     it 'runs the correct command' do
       expect(Sql::Restore)
-        .to receive(:system)
+        .to receive(:system_or_die)
         .with satisfy { |v|
           expect(v).to start_with('PGPASSWORD=testpassword\%\&\$ psql')
           expect(v).to include('--dbname=erica_remote_test')
@@ -41,7 +41,7 @@ RSpec.describe Sql::Restore do
 
     it 'takes additional options' do
       expect(Sql::Restore)
-        .to receive(:system)
+        .to receive(:system_or_die)
         .with satisfy { |v|
           expect(v).to include('--file=abc')
         }

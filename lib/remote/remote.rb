@@ -17,12 +17,19 @@ class Remote
   end
 
   def exec(command)
-    if host !~ /^localhost|127\.0\.0\.1$/
+    unless localhost?
       bash_command = "bash --login -c #{command.to_s.inspect}"
-      system("ssh #{host} #{bash_command.inspect}")
-    else
-      system(command.to_s)
+      command = "ssh #{host} #{bash_command.inspect}"
     end
+    system(command.to_s)
+  end
+
+  def exec_or_die(command)
+    unless localhost?
+      bash_command = "bash --login -c #{command.to_s.inspect}"
+      command = "ssh #{host} #{bash_command.inspect}"
+    end
+    system_or_die(command.to_s)
   end
 
   def file_exists?(path)
@@ -30,18 +37,19 @@ class Remote
   end
 
   def mkdir_p(target)
-    exec("mkdir -p #{Shellwords.escape(target.to_s)}")
+    exec_or_die("mkdir -p #{target.shellescape}")
   end
 
   def rsync_to(source, target)
-    if host !~ /^localhost|127\.0\.0\.1$/
-      system("rsync -avz #{Shellwords.escape(source.to_s)} #{host}:#{Shellwords.escape(target.to_s)}")
-    else
-      system("rsync -avz #{Shellwords.escape(source.to_s)} #{Shellwords.escape(target.to_s)}")
-    end
+    target = "#{host}:#{target}" unless localhost?
+    system_or_die("rsync -avz #{source.shellescape} #{target.shellescape}")
   end
 
   private
+
+  def localhost?
+    host =~ /^localhost|127\.0\.0\.1$/
+  end
 
   def load_remote(remote)
     @name      = remote.name

@@ -94,7 +94,7 @@ RSpec.describe Mongo::Restore do
 
     it 'runs the correct command' do
       expect(Mongo::Restore)
-        .to receive(:system)
+        .to receive(:system_or_die)
         .with satisfy { |v|
           expect(v).to match(/^mongorestore/)
           expect(v).to include '--db=erica_store_test'

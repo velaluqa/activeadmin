@@ -94,7 +94,7 @@ class Remote
         logger.info "already compressed dump to #{relative(archive_file)}"
       else
         logger.info "compressing tarball #{relative(archive_file)}"
-        system("cd #{working_dir.shellescape}; lrztar -q -f -o #{archive_file.shellescape} #{export_id.shellescape}")
+        system_or_die("cd #{working_dir.shellescape}; lrztar -q -f -o #{archive_file.shellescape} #{export_id.shellescape}")
       end
     end
 

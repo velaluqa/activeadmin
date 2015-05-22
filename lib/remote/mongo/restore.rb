@@ -23,7 +23,7 @@ class Mongo
         key, value = args.flatten
         return unless value
         return "--#{key}" if value.is_a?(TrueClass)
-        "--#{key}=#{Shellwords.escape(value.to_s)}"
+        "--#{key}=#{value.to_s.shellescape}"
       end
 
       def arguments(options = {})
@@ -36,7 +36,7 @@ class Mongo
 
       def from_dir(dir, options = {})
         options = { drop: true }.merge(options)
-        system("mongorestore #{arguments(options).join(' ')} #{Shellwords.escape(dir.to_s)}")
+        system_or_die("mongorestore #{arguments(options).join(' ')} #{dir.shellescape}")
       end
     end
   end

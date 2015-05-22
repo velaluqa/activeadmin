@@ -21,7 +21,7 @@ class RemoteRestore
       logger.info("already extracted #{relative(archive_file)} to #{relative(export_dir)}, skipping")
     else
       logger.info("extracting #{relative(archive_file)}")
-      system("cd #{working_dir.shellescape}; lrzuntar #{archive_file.shellescape}")
+      system_or_die("cd #{working_dir.shellescape}; lrzuntar #{archive_file.shellescape}")
       state_file.touch
     end
   end
@@ -57,7 +57,7 @@ class RemoteRestore
       logger.info("already restored #{dir.singularize} configs to #{relative(target)}, skipping")
     else
       logger.info("restoring #{dir.singularize} configs to #{relative(target)}")
-      system("rsync -avz #{source.shellescape}/ #{target.shellescape}")
+      system_or_die("rsync -avz #{source.shellescape}/ #{target.shellescape}")
       state_file.touch
     end
   end

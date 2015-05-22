@@ -28,19 +28,20 @@ class Mongo
         mongo_options
           .merge(options.stringify_keys)
           .pick(MONGODUMP_ARGS)
-          .map { |key, val| "--#{key}=#{Shellwords.escape(val.to_s)}" }
+          .map(&method(:format_argument))
+          .compact
       end
 
       def rename_dir(options = {})
         fail 'No renaming target given' unless options[:dir]
         source = File.join(options[:out].to_s || '.', mongo_options['db'], '')
         target = File.join(options[:out].to_s || '.', options[:dir], '')
-        system("rsync --remove-source-files -a #{Shellwords.escape(source)} #{Shellwords.escape(target)}")
-        system("rmdir #{Shellwords.escape(source)}")
+        system_or_die("rsync --remove-source-files -a #{source.shellescape} #{target.shellescape}")
+        system_or_die("rmdir #{source.shellescape}")
       end
 
       def mongodump(options = {})
-        system("mongodump #{arguments(options).join(' ')}")
+        system_or_die("mongodump #{arguments(options).join(' ')}")
         rename_dir(options) if options[:dir]
       end
 

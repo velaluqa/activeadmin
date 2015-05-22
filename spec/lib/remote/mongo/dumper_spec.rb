@@ -69,7 +69,7 @@ RSpec.describe Mongo::Dumper do
 
     it 'runs the correct command' do
       expect(Mongo::Dumper)
-        .to receive(:system)
+        .to receive(:system_or_die)
         .with satisfy { |v|
           expect(v).to match /^mongodump/
           expect(v).to include '--db=erica_store_test'

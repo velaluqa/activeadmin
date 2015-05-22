@@ -17,7 +17,7 @@ class Sql
 
       def psql_args(options = {})
         options = psql_options(options)
-        options.map { |key, val| "--#{key}=#{Shellwords.escape(val.to_s)}" }
+        options.map { |key, val| "--#{key}=#{val.to_s.shellescape}" }
       end
 
       def psql_password
@@ -26,11 +26,11 @@ class Sql
 
       def psql_password_env
         return '' unless psql_password
-        "PGPASSWORD=#{Shellwords.escape(psql_password)} "
+        "PGPASSWORD=#{psql_password.shellescape} "
       end
 
       def psql(options = {})
-        system("#{psql_password_env}psql #{psql_args(options).join(' ')}")
+        system_or_die("#{psql_password_env}psql #{psql_args(options).join(' ')}")
       end
 
       def from_file(filename)
