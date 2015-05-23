@@ -53,7 +53,7 @@ class Sql
       query = @relation
               .select(new_values_select)
               .order("\"#{table_name}\".\"id\"")
-      ActiveRecord::Base.connection.select_values(query).join(",\n")
+      ActiveRecord::Base.connection.select_values(query)
     end
 
     def update_setters
@@ -63,10 +63,12 @@ class Sql
     end
 
     def dump_upserts(io)
-      io << <<SQL
+      io.puts 'BEGIN;'
+      new_values.each_slice(25_000) do |new_values|
+        io.puts <<SQL
 WITH "new_values" (#{columns.map(&:to_s).join(', ')}) as (
   values
-#{new_values}
+#{new_values.join(",\n")}
 ),
 "upsert" AS
 (
@@ -80,8 +82,10 @@ WITH "new_values" (#{columns.map(&:to_s).join(', ')}) as (
 INSERT INTO "#{table_name}" (#{insert_columns.map(&:to_s).join(', ')})
 SELECT #{insert_columns.map(&:with_type).join(', ')}
 FROM "new_values"
-WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id")
+WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
 SQL
+      end
+      io.puts 'COMMIT;'
     end
   end
 end

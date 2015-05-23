@@ -37,6 +37,7 @@ RSpec.describe Sql::Dumper do
         io = StringIO.new
         @dumper.dump_upserts(io)
         expect(io.string).to eq <<SQL
+BEGIN;
 WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at") as (
   values
 ('center1', '2015-05-07 12:25:00'::timestamp, 'ABC1', #{@center1.id}, 'center1', #{@study.id}, '2015-05-07 12:25:00'::timestamp),
@@ -60,7 +61,8 @@ WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id"
 INSERT INTO "centers" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at")
 SELECT "code"::varchar(255), "created_at"::timestamp, "domino_unid"::varchar(255), "id"::integer, "name"::varchar(255), "study_id"::integer, "updated_at"::timestamp
 FROM "new_values"
-WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id")
+WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
+COMMIT;
 SQL
       end
     end
@@ -98,6 +100,7 @@ SQL
         io = StringIO.new
         @dumper.dump_upserts(io)
         expect(io.string).to eq <<SQL
+BEGIN;
 WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at") as (
   values
 ('center#{@center1.id}', '2015-05-07 12:25:00'::timestamp, 'ABC1', #{@center1.id}, 'center1', #{@study.id}, '2015-05-07 12:25:00'::timestamp),
@@ -121,7 +124,8 @@ WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id"
 INSERT INTO "centers" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at")
 SELECT "code"::varchar(255), "created_at"::timestamp, "domino_unid"::varchar(255), "id"::integer, "name"::varchar(255), "study_id"::integer, "updated_at"::timestamp
 FROM "new_values"
-WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id")
+WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
+COMMIT;
 SQL
       end
     end
@@ -166,6 +170,7 @@ SQL
         io = StringIO.new
         @dumper.dump_upserts(io)
         expect(io.string).to eq <<SQL
+BEGIN;
 WITH "new_values" ("code", "created_at", "name") as (
   values
 ('center1', '2015-05-07 12:25:00'::timestamp, 'center1'),
@@ -185,7 +190,8 @@ WITH "new_values" ("code", "created_at", "name") as (
 INSERT INTO "centers" ("code", "created_at", "name")
 SELECT "code"::varchar(255), "created_at"::timestamp, "name"::varchar(255)
 FROM "new_values"
-WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id")
+WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
+COMMIT;
 SQL
       end
     end
@@ -230,6 +236,7 @@ SQL
         io = StringIO.new
         @dumper.dump_upserts(io)
         expect(io.string).to eq <<SQL
+BEGIN;
 WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at") as (
   values
 ('center1', '2015-05-07 12:25:00'::timestamp, 'ABC1', #{@center1.id}, 'center1', #{@study.id}, '2015-05-07 12:25:00'::timestamp),
@@ -252,7 +259,8 @@ WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id"
 INSERT INTO "centers" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at")
 SELECT "code"::varchar(255), "created_at"::timestamp, "domino_unid"::varchar(255), "id"::integer, "name"::varchar(255), "study_id"::integer, "updated_at"::timestamp
 FROM "new_values"
-WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id")
+WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
+COMMIT;
 SQL
       end
     end
