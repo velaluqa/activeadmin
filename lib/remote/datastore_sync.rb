@@ -16,8 +16,8 @@ class Remote
 
     def initialize(remote, options = {})
       @remote       = Remote.new(remote)
-      @export_id    =
-        options[:export_id] || "#{Date.today.strftime('%Y-%m-%d')}-#{remote.name}"
+      prefix = options[:export_id_prefix] || Date.today.strftime('%Y-%m-%d')
+      @export_id    = options[:export_id] || "#{prefix}-#{remote.name}"
       @working_dir  =
         Pathname.new(options[:working_dir] || Rails.root.join('tmp', 'remote_sync'))
       @export_dir   = working_dir.join(export_id)
