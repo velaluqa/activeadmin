@@ -36,17 +36,20 @@ namespace :erica do
     end
 
     desc 'Start and keep running the sync process for the day until stopped.'
-    task :sync_daemon do
+    task sync_daemon: :environment do
+      include Logging
       # The sync is kept running until SIGTERM is received.
       # Unsually that should be done via start-stop-daemon, which also
       # gathers log output and daemonizes the process.
       keep_running = true
       Signal.trap('TERM') do
+        logger.info 'Stopping remote synchronization.'
         keep_running = false
         Process.kill 'INT', -Process.getpgrp
         exit 1
       end
 
+      logger.info 'Starting remote synchronization supervisor'
       while keep_running
         begin
           yesterday      = Date.yesterday.to_datetime.new_offset(DateTime.now.offset) - DateTime.now.offset
