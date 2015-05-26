@@ -17,6 +17,11 @@ class Visit < ActiveRecord::Base
   has_one :visit_data
   belongs_to :mqc_user, :class_name => 'User'
 
+  scope :by_study_ids, lambda { |*ids|
+    joins(patient: { center: :study })
+      .where(studies: { id: Array[ids].flatten })
+  }
+
   validates_uniqueness_of :visit_number, :scope => :patient_id
   validates_presence_of :visit_number, :patient_id
 

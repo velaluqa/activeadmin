@@ -19,6 +19,11 @@ class ImageSeries < ActiveRecord::Base
 
   scope :not_assigned, where(:visit_id => nil)
 
+  scope :by_study_ids, lambda { |*ids|
+    joins(patient: :center)
+      .where(centers: { study_id: Array[ids].flatten })
+  }
+
   before_save :ensure_study_is_unchanged
   before_save :ensure_visit_is_for_patient
   before_save :update_state
@@ -32,6 +37,10 @@ class ImageSeries < ActiveRecord::Base
   end
 
   STATE_SYMS = [:imported, :visit_assigned, :required_series_assigned, :not_required]
+
+  def state_index
+    read_attribute(:state)
+  end
 
   def self.state_sym_to_int(sym)
     return ImageSeries::STATE_SYMS.index(sym)

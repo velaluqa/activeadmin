@@ -17,11 +17,14 @@ class Study < ActiveRecord::Base
   has_many :patients, :through => :centers
   has_many :visits, :through => :patients
   has_many :image_series, :through => :patients
+  has_many :images, :through => :image_series
 
   validates_presence_of :name
 
   scope :building, where(state: 0)
   scope :production, where(state: 1)
+
+  scope :by_ids, ->(*ids) { where(id: Array[ids].flatten) }
 
   before_destroy do
     unless(sessions.empty? and centers.empty?)

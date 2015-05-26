@@ -27,7 +27,6 @@ group :assets do
   gem 'twitter-bootstrap-rails'
   gem 'bootstrap-datepicker-rails'
 
-
   gem 'uglifier', '>= 1.0.3'
 end
 
@@ -98,19 +97,8 @@ gem 'rest-client'
 # the gem on rubygems.org is not up-to-date, so we use the code from github directly
 gem 'dentaku', :github => 'rubysolo/dentaku', :branch => 'master'
 
-# gems for prettier errors in development
-group :development do
-  gem 'better_errors'
-  gem 'binding_of_caller'
-end
-
 # Sidekiq is used for asynchronous job execution, i.e. DICOM searches, exports, ...
 gem 'sidekiq'
-group :development do
-  # for the Sidekiq monitoring interface
-  gem 'slim', '>= 1.1.0'
-  gem 'sinatra', '>= 1.3.0', :require => nil
-end
 # Sidekiq middleware to ensure proper behaviour of mongoid connections in sidekiq workers
 gem 'kiqstand'
 
@@ -125,3 +113,79 @@ gem 'rubyzip'
 
 # Resource tagging in ERICA Remote
 gem 'acts-as-taggable-on'
+
+gem 'ruby-progressbar'
+
+gem 'andand'
+
+# Facets provides many helpers that are missing from the ruby standard library.
+gem 'facets', require: false
+
+# For the Sidekiq monitoring interface
+gem 'slim', '>= 1.1.0'
+gem 'sinatra', '>= 1.3.0', :require => nil
+
+group :development do
+  # Annotate models, routes, fixtures with describing comments.
+  gem 'annotate'
+  # Hint opimization opportunities while developing.
+  gem 'bullet'
+  # Chrome extension to get meta info for the current request.
+  gem 'meta_request'
+  # Generate UML diagrams for the database.
+  gem 'railroady'
+  # Hints missing indexes.
+  # TODO: needs Ruby >= 2.0.0
+  # gem 'lol_dba'
+
+  # Gems for prettier errors in development
+  gem 'better_errors'
+  gem 'binding_of_caller'
+end
+
+group :development, :test do
+  gem 'zeus'
+
+  # Ruby console tool and additional extensions
+  gem 'pry'
+  gem 'jazz_hands'
+
+  # Rubocop ensures the ruby style guide.
+  gem 'rubocop'
+  gem 'rubocop-checkstyle_formatter', require: false
+
+  gem 'rails_best_practices'
+  # gem 'rails_best_practices-formatter'
+
+  gem 'flog'
+  gem 'flay'
+  gem 'reek'
+
+  gem 'simplecov', require: false
+  gem 'simplecov-cobertura', require: false
+  gem 'simplecov-json', require: false
+  gem 'simplecov-rcov', require: false
+  gem 'rubycritic', require: false
+end
+
+group :test do
+  gem 'factory_girl'
+  gem 'faker'
+
+  gem 'rspec'
+  gem 'rspec-rails'
+  gem 'yarjuf'
+
+  gem 'webmock'
+
+  gem 'capybara'
+  gem 'poltergeist'
+
+  gem 'cucumber', require: false
+  gem 'cucumber-rails', require: false
+
+  gem 'guard', '>= 2.0.0'
+  gem 'guard-cucumber'
+  gem 'guard-rspec'
+  gem 'database_cleaner'
+end

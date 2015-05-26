@@ -112,19 +112,21 @@ class EricaRemoteController < ApplicationController
   end
 
   def paths
-    # TODO: Use ApplicationController rescue from error on
-    # ActiveRecord::NotFound exception to clean up controllers.
-    unless Study.exists?(params[:study_id])
-      render nothing: true, status: :not_found
-      return
-    end
+    # TODO: Refactor this information into an ERICA object.
+    data_directory            = (Rails.root + Pathname.new(Rails.application.config.data_directory)).to_s
+    form_config_directory     = (Rails.root + Pathname.new(Rails.application.config.form_configs_directory)).to_s
+    session_config_directory  = (Rails.root + Pathname.new(Rails.application.config.session_configs_directory)).to_s
+    study_config_directory    = (Rails.root + Pathname.new(Rails.application.config.study_configs_directory)).to_s
+    image_storage_directory   = (Rails.root + Pathname.new(Rails.application.config.image_storage_root)).to_s
 
-    study = Study.find(params[:study_id])
-
-    configs_path = Rails.root.join(Rails.application.config.data_directory).to_s
-    image_storage_path = Rails.root.join(study.absolute_image_storage_path).to_s
-
-    render json: {configs: configs_path, images: image_storage_path}
+    render json: {
+      root: Rails.root.to_s,
+      data_directory: data_directory,
+      form_config_directory: form_config_directory,
+      session_config_directory: session_config_directory,
+      study_config_directory: study_config_directory,
+      image_storage_directory: image_storage_directory
+    }
   end
 
   protected
