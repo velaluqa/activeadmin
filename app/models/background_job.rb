@@ -21,23 +21,19 @@ class BackgroundJob
   scope :running, where(completed: false)
 
   before_destroy do
-    return false unless self.finished?
+    return false unless finished?
 
-    if(self.results and self.results['zipfile'])
-      begin
-        File.delete(self.results['zipfile'])
-      rescue => e
-        logger.warn e
-      end
+    begin
+      File.delete(results['zipfile']) if results.andand['zipfile']
+    rescue => error
+      logger.warn(error)
     end
   end
 
   def user
-    begin
-      return User.find(read_attribute(:user_id))
-    rescue ActiveRecord::RecordNotFound
-      return nil
-    end
+    User.find(read_attribute(:user_id))
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   def user=(user)
@@ -45,31 +41,34 @@ class BackgroundJob
   end
 
   def finished?
-    self.completed
+    completed
   end
+
   def failed?
-    self.finished? and self.successful == false
+    finished? && !successful
   end
 
   def finish_successfully(results)
-    self.finish
+    finish
 
     self.successful = true
     self.results = results
 
-    self.save
+    save
   end
+
   def fail(error_message)
-    self.finish
+    finish
 
     self.successful = false
     self.error_message = error_message
 
-    self.save
+    save
   end
+
   def set_progress(current, total)
-    self.progress = current.to_f/total.to_f
-    self.save
+    self.progress = current.to_f / total.to_f
+    save
   end
 
   protected

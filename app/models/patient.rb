@@ -18,7 +18,12 @@ class Patient < ActiveRecord::Base
 
   validates_uniqueness_of :subject_id, :scope => :center_id
   validates_presence_of :subject_id
-  
+
+  scope :by_study_ids, lambda { |*ids|
+    joins(:center)
+      .where(centers: { study_id: Array[ids].flatten })
+  }
+
   before_destroy do
     unless cases.empty? and form_answers.empty?
       errors.add :base, 'You cannot delete a patient which has cases or form answers associated.' 

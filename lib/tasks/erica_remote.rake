@@ -1,110 +1,87 @@
 namespace :erica do
+  namespace :remote do
+    desc 'Restore from ERICA remote temp data'
+    task :restore, [:export_id] => :environment do |_, args|
+      fail 'Only available on ERICA remote installation' unless ERICA.remote?
+      export_id = args[:export_id]
 
-  DEFAULT_CONFIG_FILE = 'config/erica_remotes.yml'
+      name = "restore-#{export_id}.tar.lrz"
+      job = BackgroundJob.where(name: name, completed: false).first
+      fail 'A restore job is already running! Aborting' if job
+      job = BackgroundJob.create(name: name)
 
-  def get_sync_user_id(config)
-    if (config and not config['sync_user_id'].blank?)
-      config['sync_user_id']
-    elsif User.first
-      User.first.id
-    else
-      1
-    end
-  end
-
-  def load_sync_config(config_path)
-    begin
-      config = YAML::load_file(config_path.to_s)
-    rescue Errno::ENOENT => e
-      puts "Config file at #{config_path.to_s} could not be accessed: #{e.message}"
-      return nil
-    rescue SyntaxError => e
-      puts "Config file is not valid YAML: #{e.message}"
-      return nil
-    rescue e
-      puts "Failed to load config file at #{config_path.to_s}: #{e.message}"
-      return nil
+      if ENV['ASYNC'] =~ /^false|no$/
+        ERICARemoteRestoreWorker.new.perform(job.id.to_s, export_id)
+      else
+        ERICARemoteRestoreWorker.perform_async(job.id.to_s, export_id)
+      end
     end
 
-    return config
-  end
+    desc 'Sync datastore and images to all ERICA remotes (in erica_remotes.yml)'
+    task sync: ['erica:remote:sync_datastores', 'erica:remote:sync_images']
 
-  def sync_study(user_id, study_id, remote_url, remote_host, async = false)
-    background_job = BackgroundJob.create(:name => "Sync study #{study_id} to #{remote_url}", :user_id => user_id)
-
-    if(async)
-      ERICARemoteSyncWorker.perform_async(background_job.id.to_s, study_id, remote_url, remote_host)
-    else
-      ERICARemoteSyncWorker.new.perform(background_job.id.to_s, study_id, remote_url, remote_host)
+    desc 'Sync images to all ERICA remotes (in erica_remotes.yml)'
+    task :sync_datastores, [:prefix] =>  :environment do |_, args|
+      fail 'Only available on ERICA store installation' if ERICA.remote?
+      require 'remote/remote_sync'
+      RemoteSync.perform_datastore_sync('config/erica_remotes.yml',
+                                        export_id_prefix: args[:prefix])
     end
 
-    background_job
-  end
-
-  desc 'Start an ERICA Remote sync job'
-  task :sync_study_to_remote, [:study_id, :remote_url, :remote_host, :config_file] => [:environment] do |t, args|
-    study_id = args[:study_id]
-    remote_url = args[:remote_url]
-    remote_host = args[:remote_host]
-    if(study_id.blank?)
-      puts 'No study id given'
-      next
-    elsif(remote_url.blank?)
-      puts 'No remote url given'
-      next
+    desc 'Sync images to all ERICA remotes (in erica_remotes.yml)'
+    task sync_images: :environment do
+      fail 'Only available on ERICA store installation' if ERICA.remote?
+      require 'remote/remote_sync'
+      RemoteSync.perform_image_sync('config/erica_remotes.yml')
     end
 
-    config_path = Rails.root.join(args[:config_file] || DEFAULT_CONFIG_FILE)
-    config = load_sync_config(config_path)
-
-    sync_user_id = get_sync_user_id(config)
-
-    background_job = sync_study(sync_user_id, study_id, remote_url, remote_host, false)
-    background_job.reload
-    pp background_job
-  end
-
-  desc 'Start a full ERICA Remote sync'
-  task :sync_all_erica_remotes, [:config_file] => [:environment] do |t, args|
-    time = DateTime.now.strftime('%A, %d %b %Y %l:%M %p')
-    puts "Starting full ERICA remote sync (#{time})"
-
-    config_path = Rails.root.join(args[:config_file] || DEFAULT_CONFIG_FILE)
-
-    config = load_sync_config(config_path)
-    if(config.nil? or config['remotes'].nil?)
-      puts 'No valid config, exiting'
-      next
-    end
-
-    sync_user_id = get_sync_user_id(config)
-    async = config['async'] || false
-
-    config['remotes'].each_with_index do |remote, i|
-      study_id = remote['study_id']
-      remote_url = remote['remote_url']
-      if(study_id.blank?)
-        puts "Remote #{i} has no study_id, skipping"
-        next
-      elsif(remote_url.blank?)
-        puts "Remote #{i} has no remote_url, skipping"
-        next
-      elsif(not Study.exists?(study_id.to_i))
-        puts "Remote #{i} study (#{study_id}) doesn't exist, skipping"
-        next
+    desc 'Start and keep running the sync process for the day until stopped.'
+    task sync_daemon: :environment do
+      include Logging
+      # The sync is kept running until SIGTERM is received.
+      # Unsually that should be done via start-stop-daemon, which also
+      # gathers log output and daemonizes the process.
+      keep_running = true
+      Signal.trap('TERM') do
+        logger.info 'Stopping remote synchronization.'
+        keep_running = false
+        Process.kill 'INT', -Process.getpgrp
+        exit 1
       end
 
-      puts "Syncing remote #{i}: #{study_id} -> #{remote_url} #{remote['remote_host'].blank? ? '' : '(@'+remote['remote_host']+')'}"
+      logger.info 'Starting remote synchronization supervisor'
+      while keep_running
+        begin
+          yesterday      = Date.yesterday.to_datetime.new_offset(DateTime.now.offset) - DateTime.now.offset
+          today          = Date.today.to_datetime.new_offset(DateTime.now.offset) - DateTime.now.offset
+          today_noon     = today + 12.hours
+          tomorrow       = today + 1.day + 12.hours
 
-      background_job = sync_study(sync_user_id, study_id.to_i, remote_url, remote['remote_host'], async)
-      background_job.reload unless async
+          now            = DateTime.now
 
-      puts "#{async ? 'STARTED' : 'DONE'}: #{background_job.inspect}"
+          prefix =
+            if today < now && now <= today_noon
+              yesterday.strftime('%Y-%m-%d')
+            elsif today_noon < now && now <= tomorrow
+              today.strftime('%Y-%m-%d')
+            end
+
+          Rake::Task['erica:remote:sync_datastores'].invoke(prefix)
+          Rake::Task['erica:remote:sync_images'].invoke
+        rescue => e
+          puts "Synchronization stopped untimely: #{e}"
+          puts e.backtrace
+          Airbrake.notify(e)
+          if keep_running
+            puts 'Retry in 30 seconds'
+            sleep 30
+          end
+        end
+      end
     end
-
-    time = DateTime.now.strftime('%A, %d %b %Y %l:%M %p')
-    puts "Full ERICA remote sync stopped. (#{time})"
   end
+
+  DEFAULT_CONFIG_FILE = 'config/erica_remotes.yml'
 
   desc 'Download images as zip'
   task :download_images, [:resource_type, :resource_id] => [:environment] do |t, args|
@@ -117,7 +94,7 @@ namespace :erica do
     end
 
     unless(['Patient', 'Visit'].include?(resource_type))
-      puts "Invalid resurce type #{resource_type} given. Valid resource types are: Patient, Visit"
+      puts "Invalid resource type #{resource_type} given. Valid resource types are: Patient, Visit"
       next_series_number
     end
 
