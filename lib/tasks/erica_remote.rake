@@ -49,7 +49,7 @@ namespace :erica do
         exit 1
       end
 
-      logger.info 'Starting remote synchronization supervisor'
+      logger.info "Starting remote synchronization supervisor (#{Rails.env})"
       while keep_running
         begin
           yesterday      = Date.yesterday.to_datetime.new_offset(DateTime.now.offset) - DateTime.now.offset
