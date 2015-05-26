@@ -5,9 +5,10 @@ namespace :erica do
       fail 'Only available on ERICA remote installation' unless ERICA.remote?
       export_id = args[:export_id]
 
-      job = BackgroundJob.where(name: "restore-#{export_id}.tar.lrz", completed: false).first
+      name = "restore-#{export_id}.tar.lrz"
+      job = BackgroundJob.where(name: name, completed: false).first
       fail 'A restore job is already running! Aborting' if job
-      job = BackgroundJob.create(name: "restore-#{export_id}.tar.lrz")
+      job = BackgroundJob.create(name: name)
 
       if ENV['ASYNC'] =~ /^false|no$/
         ERICARemoteRestoreWorker.new.perform(job.id.to_s, export_id)
@@ -20,10 +21,11 @@ namespace :erica do
     task sync: ['erica:remote:sync_datastores', 'erica:remote:sync_images']
 
     desc 'Sync images to all ERICA remotes (in erica_remotes.yml)'
-    task sync_datastores: :environment do
+    task :sync_datastores, [:prefix] =>  :environment do |_, args|
       fail 'Only available on ERICA store installation' if ERICA.remote?
       require 'remote/remote_sync'
-      RemoteSync.perform_datastore_sync('config/erica_remotes.yml')
+      RemoteSync.perform_datastore_sync('config/erica_remotes.yml',
+                                        export_id_prefix: args[:prefix])
     end
 
     desc 'Sync images to all ERICA remotes (in erica_remotes.yml)'
@@ -31,6 +33,48 @@ namespace :erica do
       fail 'Only available on ERICA store installation' if ERICA.remote?
       require 'remote/remote_sync'
       RemoteSync.perform_image_sync('config/erica_remotes.yml')
+    end
+
+    desc 'Start and keep running the sync process for the day until stopped.'
+    task :sync_daemon do
+      # The sync is kept running until SIGTERM is received.
+      # Unsually that should be done via start-stop-daemon, which also
+      # gathers log output and daemonizes the process.
+      keep_running = true
+      Signal.trap('TERM') do
+        keep_running = false
+        Process.kill 'INT', -Process.getpgrp
+        exit 1
+      end
+
+      while keep_running
+        begin
+          yesterday      = Date.yesterday.to_datetime.new_offset(DateTime.now.offset) - DateTime.now.offset
+          today          = Date.today.to_datetime.new_offset(DateTime.now.offset) - DateTime.now.offset
+          today_noon     = today + 12.hours
+          tomorrow       = today + 1.day + 12.hours
+
+          now            = DateTime.now
+
+          prefix =
+            if today < now && now <= today_noon
+              yesterday.strftime('%Y-%m-%d')
+            elsif today_noon < now && now <= tomorrow
+              today.strftime('%Y-%m-%d')
+            end
+
+          Rake::Task['erica:remote:sync_datastores'].invoke(prefix)
+          Rake::Task['erica:remote:sync_images'].invoke
+        rescue => e
+          puts "Synchronization stopped untimely: #{e}"
+          puts e.backtrace
+          Airbrake.notify(e)
+          if keep_running
+            puts 'Retry in 30 seconds'
+            sleep 30
+          end
+        end
+      end
     end
   end
 
