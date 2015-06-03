@@ -1,7 +1,17 @@
-#+LATEX_CLASS: velaluqa-report
+#+SETUPFILE: theme-readtheorg.setup
 #+OPTIONS:   H:5 num:t toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t
-#+TITLE: ERICAv2 - Audit Trail Event Classification (v3.0.4)
+#+TITLE: Audit Trail Event Classification
 * General
+
+If the =event= does not match any of the globally defined event
+symbols the audit trail will look up the classification by resource
+type.
+
+If the specified resource type does not have any classification
+information for the given event, the audit trail uses a =#humanize=
+version (each word capitalized, split by a space character) of the
+event symbol as title and =:warning= as severity.
+
 ** Event Classification
 
 The general classification checks the =event= field and the
@@ -25,19 +35,8 @@ The =severity= defines how to color the badge in the table view.
 | =destroy=             | 'Destroy'            | =:error=            |
 | =:domino_unid_change= | 'Domino UNID Change' | =:ok=               |
 
-* Resource Types
-
-If the =event= does not match any of the globally defined event
-symbols the audit trail will look up the classification by resource
-type.
-
-If the specified resource type does not have any classification
-information for the given event, the audit trail uses a =#humanize=
-version (each word capitalized, split by a space character) of the
-event symbol as title and =:warning= as severity.
-
-** Case
-*** Case Event Classification
+* Case
+** Case Event Classification
 
 The first row match specifies the returned event symbol used for the given version changeset.
 
@@ -74,7 +73,7 @@ The first row match specifies the returned event symbol used for the given versi
 | =['images']=                                  | /any/                   | /any/                   | =:images_change=                 |
 | =['case_type']=                               | /any/                   | /any/                   | =:case_type_change=              |
 
-*** Case Event Title & Severity
+** Case Event Title & Severity
 
 | *event symbol*                   | *returned title*                           | *returned severity* |
 |----------------------------------+--------------------------------------------+---------------------|
@@ -105,8 +104,8 @@ The first row match specifies the returned event symbol used for the given versi
 | =:images_change=                 | 'Images/Visit Change'                      | =:error=            |
 | =:case_type_change=              | 'Case Type Change'                         | =:error=            |
 
-** Center
-*** Center Event Classification
+* Center
+** Center Event Classification
 
 | *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
 |-----------------------+------------------+-------------+-------------------------|
@@ -114,7 +113,7 @@ The first row match specifies the returned event symbol used for the given versi
 | =['study_id']=        | /any/            | /any/       | =:study_change=         |
 | =['code']=            | /any/            | /any/       | =:code_change=          |
 
-*** Center Event Title & Severity
+** Center Event Title & Severity
 
 | *event symbol*  | *returned title*     | *returned severity* |
 |-----------------+----------------------+---------------------|
@@ -122,8 +121,8 @@ The first row match specifies the returned event symbol used for the given versi
 | =:study_change= | 'Study Change'       | =:warning=          |
 | =:code_change=  | 'Center Code Change' | =:warning=          |
 
-** Form
-*** Form Event Classification
+* Form
+** Form Event Classification
 
 | *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
 |-----------------------+------------------+-------------+-------------------------|
@@ -132,7 +131,7 @@ The first row match specifies the returned event symbol used for the given versi
 | =['name']=            | /any/            | /any/       | =:name_change=          |
 | =['description']=     | /any/            | /any/       | =:description_change=   |
 
-*** Form Event Title & Severity
+** Form Event Title & Severity
 
 | *event symbol*        | *returned title*     | *returned severity* |
 |-----------------------+----------------------+---------------------|
@@ -145,8 +144,8 @@ The first row match specifies the returned event symbol used for the given versi
 | =:name_change=        | 'Name Change'        | =:warning=          |
 | =:description_change= | 'Description Change' | =:ok=               |
 
-** FormAnswer
-*** FormAnswer Event Classification
+* FormAnswer
+** FormAnswer Event Classification
 
 | *fields in changeset*                                                                                                                                                                | *previous value* | *new value* | *returned event symbol* |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------+-------------+-------------------------|
@@ -156,7 +155,7 @@ The first row match specifies the returned event symbol used for the given versi
 | =Any of 'user_id', 'session_id', 'case_id', 'form_id', 'form_version', 'form_versions', 'is_test_data', 'versions', 'reader_testing_config_index' and not ['annotated_images', ...]= | /any/            | /any/       | =:data_cleaning=        |
 | =['versions']=                                                                                                                                                                       | /any/            | /any/       | =:answer_versioning=    |
 
-*** FormAnswer Event Title & Severity
+** FormAnswer Event Title & Severity
 
 | *event symbol*       | *returned title*        | *returned severity* |
 |----------------------+-------------------------+---------------------|
@@ -166,34 +165,34 @@ The first row match specifies the returned event symbol used for the given versi
 | =:answer_versioning= | 'Answer versioning'     | =:warning=          |
 | =:reanswered=        | 'Reanswering by reader' | =:warning=          |
 
-** Image
-*** Image Event Classification
+* Image
+** Image Event Classification
 
 | *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
 |-----------------------+------------------+-------------+-------------------------|
 | =['image_series_id']= | /any/            | /any/       | =:image_series_change=  |
 
-*** Image Event Title & Severity
+** Image Event Title & Severity
 
 | *event symbol*         | *returned title*      | *returned severity* |
 |------------------------+-----------------------+---------------------|
 | =:image_series_change= | 'Image Series Change' | =:ok=               |
 
-** ImageSeries
-*** ImageSeries Event Classification
+* ImageSeries
+** ImageSeries Event Classification
 
 | *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
 |-----------------------+------------------+-------------+-------------------------|
 | =['image_series_id']= | /any/            | /any/       | =:image_series_change=  |
 
-*** ImageSeries Event Title & Severity
+** ImageSeries Event Title & Severity
 
 | *event symbol*         | *returned title*      | *returned severity* |
 |------------------------+-----------------------+---------------------|
 | =:image_series_change= | 'Image Series Change' | =:ok=               |
 
-** ImageSeriesData
-*** ImageSeriesData Event Classification
+* ImageSeriesData
+** ImageSeriesData Event Classification
 
 | *fields in changeset* | *previous value*            | *new value*                 | *returned event symbol*       |
 |-----------------------+-----------------------------+-----------------------------+-------------------------------|
@@ -216,7 +215,7 @@ The first row match specifies the returned event symbol used for the given versi
 | =['state', ...]=      | =:required_series_assigned= | =:not_required=             | =:marked_not_required=        |
 | =['state', ...]=      | =:not_required=             | =:imported=                 | =:unmarked_not_required=      |
 
-*** ImageSeriesData Event Title & Severity
+** ImageSeriesData Event Title & Severity
 
 | *event symbol*                | *returned title*                     | *returned severity* |
 |-------------------------------+--------------------------------------+---------------------|
@@ -234,37 +233,37 @@ The first row match specifies the returned event symbol used for the given versi
 | =:series_number_change=       | 'Series Number Change'               | =:ok=               |
 | =:patient_change=             | 'Patient Change'                     | =:warning=          |
 
-** Patient
-*** Patient Event Classification
+* Patient
+** Patient Event Classification
 
 | *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
 |-----------------------+------------------+-------------+-------------------------|
 | =['subject_id']=      | /any/            | /any/       | :name_change            |
 | =['center_id']=       | /any/            | /any/       | :center_change          |
 
-*** Patient Event Title & Severity
+** Patient Event Title & Severity
 
 | *event symbol*   | *returned title*    | *returned severity* |
 |------------------+---------------------+---------------------|
 | =:name_change=   | 'Subject ID Change' | =:warning=          |
 | =:center_change= | 'Center Change'     | =:warning=          |
 
-** PatientData
-*** PatientData Event Classification
+* PatientData
+** PatientData Event Classification
 
 | *fields in changeset* | *previous value* | *new value* | *returned event symbol* |
 |-----------------------+------------------+-------------+-------------------------|
 | =['data']=            | /any/            | /any/       | :data_change            |
 | =['export_history']=  | /any/            | /any/       | :export_to_ericav1      |
 
-*** PatientData Event Title & Severity
+** PatientData Event Title & Severity
 
 | *event symbol*       | *returned title*      | *returned severity* |
 |----------------------+-----------------------+---------------------|
 | =:data_change=       | 'Patient Data Change' | =:ok=               |
 | =:export_to_ericav1= | 'Export to ERICAV1'   | =:ok=               |
-** Session
-*** Session Event Classification
+* Session
+** Session Event Classification
 
 | *fields in changeset* | *previous value* | *new value*   | *returned event symbol* |
 |-----------------------+------------------+---------------+-------------------------|
@@ -277,7 +276,7 @@ The first row match specifies the returned event symbol used for the given versi
 | =['state', ...]       | /any/            | /any/         | =:state_change=         |
 | =['name']=            | /any/            | /any/         | =:name_change=          |
 
-*** Session Event Title & Severity
+** Session Event Title & Severity
 
 | *event symbol*      | *returned title*     | *returned severity* |
 |---------------------+----------------------+---------------------|
@@ -289,8 +288,8 @@ The first row match specifies the returned event symbol used for the given versi
 | =:testing_abort=    | 'Testing aborted'    | =:warning=          |
 | =:state_change=     | 'State Change'       | =:warning=          |
 | =:name_change=      | 'Name Change'        | =:ok=               |
-** Study
-*** Study Event Classification
+* Study
+** Study Event Classification
 
 | *fields in changeset*                                                        | *previous value* | *new value*   | *returned event symbol* |
 |------------------------------------------------------------------------------+------------------+---------------+-------------------------|
@@ -300,7 +299,7 @@ The first row match specifies the returned event symbol used for the given versi
 | =['state', ...]=                                                             | /any/            | /any/         | :state_change           |
 | Other than =['domino_db_url', 'domino_server_name', 'notes_links_base_uri']= | /any/            | /any/         | :domino_settings_change |
 
-*** Study Event Title & Severity
+** Study Event Title & Severity
 
 | *event symbol*            | *returned title*         | *returned severity* |
 |---------------------------+--------------------------+---------------------|
@@ -309,8 +308,8 @@ The first row match specifies the returned event symbol used for the given versi
 | =:state_change=           | 'State Change'           | =:warning=          |
 | =:name_change=            | 'Name Change'            | =:ok=               |
 | =:domino_settings_change= | 'Domino Settings Change' | =:ok=               |
-** User
-*** User Event Classification
+* User
+** User Event Classification
 
 | *fields in changeset / condition*                    | *previous value* | *new value* | *returned event symbol* |
 |------------------------------------------------------+------------------+-------------+-------------------------|
@@ -336,7 +335,7 @@ The first row match specifies the returned event symbol used for the given versi
 |------------------------------------------------------+------------------+-------------+-------------------------|
 | =['private_key', 'public_key', ...]=                 | /any/            | /any/       | :key_change             |
 
-*** User Event Title & Severity
+** User Event Title & Severity
 
 | *event symbol*            | *returned title*                | *returned severity* |
 |---------------------------+---------------------------------+---------------------|
@@ -349,8 +348,8 @@ The first row match specifies the returned event symbol used for the given versi
 | =:remember_token_updated= | 'Remember Token Update'         | =:ok=               |
 | =:key_change=             | 'Keypair Change'                | =:warning=          |
 
-** Visit
-*** Visit Event Classification
+* Visit
+** Visit Event Classification
 
 | *fields in changeset*                                                   | *previous value* | *new value*     | *returned event symbol* |
 |-------------------------------------------------------------------------+------------------+-----------------+-------------------------|
@@ -375,7 +374,7 @@ The first row match specifies the returned event symbol used for the given versi
 | =['state', 'mqc_date', ...]=                                            | /any/            | =:mqc_passed=   | =:mqc_passed=           |
 | =['state', 'mqc_date', ...]=                                            | /any/            | =:mqc_issues=   | =:mqc_issues=           |
 
-*** Visit Event Title & Severity
+** Visit Event Title & Severity
 
 | *event symbol*         | *returned title*      | *returned severity* |
 |------------------------+-----------------------+---------------------|
@@ -389,8 +388,8 @@ The first row match specifies the returned event symbol used for the given versi
 | =:mqc_issues=          | 'MQC performed        | =issues', :warning= |
 | =:mqc_state_change=    | 'MQC State Change'    | =:warning=          |
 
-** VisitData
-*** VisitData Event Classification
+* VisitData
+** VisitData Event Classification
 
 - If the keys set equals =['required_series']=
   - and the diffs of all required series contains at most =['domino_unid']=
@@ -411,7 +410,7 @@ The first row match specifies the returned event symbol used for the given versi
 - If the keys set equals as subset of =['mqc_version', 'mqc_results',
   'mqc_comment']= then the event symbol is =:mqc_performed=
 
-*** VisitData Event Title & Severity
+** VisitData Event Title & Severity
 
 | *event symbol*            | *returned title*         | *returned severity* |
 |---------------------------+--------------------------+---------------------|

@@ -1,0 +1,277 @@
+#+SETUPFILE: theme-readtheorg.setup
+#+TITLE: ERICA Basics
+
+This document explains the basics about the ERICA Store/Remote system.
+
+Other documents:
+
+- [[file:erica_store.org][ERICA Store document]]
+- [[file:erica_remote.org][ERICA Remote document]]
+- [[file:audit_trail_classification.org][Audit Trail Classification]]
+
+* Server Setup
+
+** Nginx
+
+The webserver [[http://nginx.org][nginx]] is installed via the Ubuntu package repositories.
+
+Its configuration is at =/etc/nginx/=, the custom configuration for the server is at =/etc/nginx/sites-available/=.
+
+#+BEGIN_SRC sh
+apt-get install nginx
+#+END_SRC
+
+An example configuration for ERICA Remote might be configured to serve
+on the HTTPS port 443. It proxies all requests to the unicorn, which
+is the Rails application server.
+
+#+BEGIN_SRC conf
+upstream unicorn {
+  server unix:/tmp/unicorn.erica_remote.sock fail_timeout=0;
+}
+
+server {
+  listen         80;
+  server_name    sirtex-images.pharmtrace.com;
+  return         301 https://$server_name$request_uri;
+}
+
+server {
+  listen              443 ssl;
+  server_name         sirtex-images.pharmtrace.com;
+  root                /srv/ERICA/remote/public;
+
+  ssl_certificate     /srv/certificates/sirtex-images.pharmtrace.com.chained.crt;
+  ssl_certificate_key /srv/certificates/sirtex-images.pharmtrace.com.key;
+  ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers         HIGH:!aNULL:!MD5;
+
+  location ^~ /assets/ {
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+  }
+
+  try_files $uri/index.html $uri @unicorn;
+  location @unicorn {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_pass http://unicorn;
+    proxy_read_timeout 6000;
+  }
+
+  error_page 500 502 503 504 /500.html;
+  client_max_body_size 4G;
+  keepalive_timeout 10;
+}
+#+END_SRC
+
+** PostgreSQL
+
+The relational database [[http://www.postgresql.org/][PostgreSQL]] is installed via the Ubuntu package
+repositories. No custom configuration was created, the data is stored
+in the default Ubuntu location.
+
+#+BEGIN_SRC sh
+sudo apt-get install postgresql postgresql-contrib libpq-dev
+#+END_SRC
+
+When everything is installed log into the database console as
+administrator (typically the =postgres= user).
+
+First create an =erica= user with a given password. The user should be
+a normal user and should not be able to create databases or users.
+
+#+BEGIN_SRC sh
+sudo -u postgres createuser -D -R -W erica
+#+END_SRC
+
+Create a production database e.g. =erica_remote_production= and
+grant all priviledges for the =erica_remote_production= to this user.
+
+#+BEGIN_SRC sh
+sudo -u postgres createdb -O erica erica_remote_production
+#+END_SRC
+
+The server is accessed via UNIX domain sockets by the Rails App.
+It serves as the main database for the application.
+
+** MongoDB
+
+The document-oriented database [[http://www.mongodb.org/][MongoDB]] is installed via the Ubuntu
+package repositories. No custom configuration was created, the data is
+stored in the default Ubuntu location.
+
+For up-to-date information on how to install the latest MongoDB
+version keep an eye on the [[http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/][official MongoDB website]]. It should work
+like this:
+
+Import the MongoDB public key.
+
+#+BEGIN_SRC sh
+$ sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+#+END_SRC
+
+Generate a file with the MongoDB repository URL.
+
+#+BEGIN_SRC sh
+$ echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
+#+END_SRC
+
+Refresh the local database with the packages and install the latest
+version of MongoDB.
+
+#+BEGIN_SRC sh
+sudo apt-get install mongodb-org
+#+END_SRC
+
+When installing everything on the same server we can use the default
+configuration. MongoDB listens only on localhost by default, no
+authentication is currently enabled (the default setup).
+
+The server is accessed via a TCP socket by the Rails App, it serves as
+storage for the form answers as well as supplemental case and patient
+data.
+
+** Ruby
+
+The Ruby Programming Language is installed via the Ubuntu package
+repositories at version 1.9.3.
+
+#+BEGIN_SRC sh
+sudo apt-get install ruby
+#+END_SRC
+
+It is used to run the Rails App.
+
+In addition to the main language interpreter, the rubygems package
+management system is installed and was itself used to install Bundler.
+Bundler is a tool to manage an up-to-date bundle of all the
+application dependencies.
+
+** ERICA Rails Application
+
+The ERICA Rails application is typically installed to
+=/srv/ERICA/server=. Make sure the path exists and clone the =master=
+branch into this directory.
+
+#+BEGIN_SRC sh
+mkdir -p /srv/ERICA
+git clone --branch master https://git.velalu.qa/pharmtrace/erica-store server
+#+END_SRC
+
+After the code was cloned, change into this directory and install all
+application dependencies for production via Bundler.
+
+#+BEGIN_SRC sh
+bundle install --binstubs --deployment --without test development
+#+END_SRC
+
+#+BEGIN_NOTE
+Installing all application dependencies from scratch can take several
+minutes.
+#+END_NOTE
+
+** (Optional) Configure ERICA Remote
+
+For ERICA Remote configuration please look at the
+[[file:erica_remote.org][ERICA Remote document]].
+
+* Update Server & ERICA
+** Update Server
+
+Server updates are typically done via =apt-get=.
+
+To update to the latest versions of all installed packages use:
+
+#+BEGIN_SRC sh
+sudo apt-get upgrade
+#+END_SRC
+
+To perform a full dist-upgrade use.
+
+#+BEGIN_SRC sh
+sudo apt-get dist-upgrade
+#+END_SRC
+
+#+BEGIN_WARNING
+A =dist-upgrade= updates the whole distribution to the latest version.
+This may introduce package deprecations or bugs due to missing or
+swapped packages. Thus this should always be done with care and enough
+time at hand.
+#+END_WARNING
+
+** Update ERICA Software
+
+If the current check-out is on the =master= branch, then a simple pull
+is enough to get the latest changes. Afterwards we need to update the
+dependency bundle, recompile the web assets and restart the server.
+
+#+BEGIN_SRC sh
+# update the current checkout
+git pull
+# update dependency bundle
+bundle install --binstubs --deployment --without test development
+# migrate the database to the latest version
+RAILS_ENV=production bundle exec rake db:migrate
+# recompile web assets (images, stylesheets etc.)
+RAILS_ENV=production bundle exec rake assets:precompile
+# restart the application server
+service unicorn restart
+#+END_SRC
+
+* Common Administration Tasks
+
+** Restart Application Server
+
+ERICA uses [[http://unicorn.bogomips.org/][Unicorn]] as application server. To restart unicorn use:
+
+#+BEGIN_SRC sh
+service unicorn restart
+#+END_SRC
+
+** Change Assets
+
+When you change asses like images, stylesheets or javascript files,
+you have to recompile the assets to be served correctly by the web
+server and restart the application server, so ERICA knows where to
+find the compiled assets.
+
+#+BEGIN_SRC sh
+bundle exec rake assets:precompile RAILS_ENV=production
+service unicorn restart
+#+END_SRC
+
+** Create an Administrator
+
+Use the rake task @erica:create_appadmin@ with the desired username as
+argument:
+
+#+BEGIN_SRC sh
+RAILS_ENV=production bundle exec rake erica:create_appadmin[username]
+#+END_SRC
+
+** Managing Sidekiq
+Starting sidekiq can be done manually, when inside the ERICA root
+directory (e.g. =/srv/ERICA/server=).
+
+#+BEGIN_SRC sh
+RAILS_ENV=production bundle exec sidekiq -d -L /srv/ERICA/server/log/sidekiq.0.log -P /srv/ERICA/server/tmp/pids/sidekiq.pid
+#+END_SRC
+
+** Backup Application Data
+
+In order to do a backup of the application data, the following backup procedures should be used:
+
+1. Stop the unicorn servers
+
+   =service unicorn stop=
+
+2. Follow the PostgreSQL backup procedures
+   http://www.postgresql.org/docs/9.1/static/backup.html
+
+3. Follow the MongoDB backup procedures:
+   http://docs.mongodb.org/manual/administration/backups/
+
+4. Backup the form and session configuration data at =/srv/ERICA/server/data/=

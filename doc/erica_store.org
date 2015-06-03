@@ -1,0 +1,104 @@
+#+SETUPFILE: theme-readtheorg.setup
+#+TITLE: ERICA Store
+* Remote Synchronization
+
+The ERICA Remote synchronisation consists of two parts. The datastore
+sync and the images sync.
+
+#+BEGIN_SRC dot :file images/erica-remote-sync.png :cmdline -Kdot -Tpng
+digraph {
+  subgraph {
+    datastores [label="Datastore Sync"];
+    images [label="Images Sync"];
+    datastores -> datastores [label="For each Remote"];
+    datastores -> images [label="Datastore Sync finished"];
+    images -> images [label="For each Remote"];
+  }
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:images/erica-remote-sync.png]]
+
+First all datastores will be sync for all remotes. Syncing one
+datastore is idempotent for a given day, meaning that it can restarted
+multiple times and leads to the same results.
+
+When all datastores were synced successfully the image sync is invoked
+for each remote.
+
+** Configuration
+
+The ERICA remote synchronization is configured via
+=config/erica_remotes.yml= and should be created on the ERICA store
+system.
+
+#+BEGIN_SRC yaml
+remotes:
+  - name: sirflox
+    url: 'http://178.63.44.84'
+    host: 'root@178.63.44.84'
+    study_ids:
+      - 2
+      - 1
+#+END_SRC
+
+The remotes list defines all remotes that the configured ERICA store
+system is able to sync to. Each remote object needs a =name=, =url=,
+=host= and a list of =study_ids=.
+
+#+BEGIN_NOTE
+The order of the Remotes is also the order used by the sync.
+So if the list of remotes in =erica_remotes.yml= is [#2, #3, #1], then
+Remote #2 will be synced first, followed by Remote #3 etc.
+#+END_NOTE
+
+** Manual Synchronization
+
+You can invoke the synchronization via multiple Rake tasks:
+
+- =RAILS_ENV=production bundle exec rake erica:remote:sync=
+
+  Synchronize all datastores and remotes as described above.
+- =RAILS_ENV=production bundle exec rake erica:remote:sync_datastores=
+
+  Synchronize only the datastores for the configured remotes.
+- =RAILS_ENV=production bundle exec rake erica:remote:sync_images=
+
+  Synchronize only the images for the configured remotes.
+
+** Nightly/Recurring Synchronization
+
+For recurring synchronizations you should use the
+=erica:remote:sync_daemon= task. It retries if an error happens while
+executing. This is important for network connection problems or the
+obligatory IP change of certain internet providers.
+
+#+BEGIN_SRC dot :file images/erica-remote-sync-daemon.png :cmdline -Kdot -Tpng
+digraph {
+  subgraph clusterA {
+    style=filled;
+    color=lightblue;
+    label="Catch errors and retry";
+    datastores [label="Datastore Sync"];
+    images [label="Images Sync"];
+  }
+  datastores -> datastores [label="For each Remote"];
+  datastores -> images [label="Datastore Sync finished"];
+  images -> images [label="For each Remote"];
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:images/erica-remote-sync-daemon.png]]
+
+Furthermore it supports being exited externally, by using the scripts
+=script/start_remote_sync= and =script/stop_remote_sync= in the ERICA
+Store directory.
+
+The nightly synchronisation is set up via cronjobs.
+
+#+BEGIN_SRC crontab
+0 22 * * * /bin/bash --login -c 'cd /srv/ERICA/server/; PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games RAILS_ENV=production ./script/start_remote_sync'
+0  6 * * * /bin/bash --login -c 'cd /srv/ERICA/server/; PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games RAILS_ENV=production ./script/stop_remote_sync'
+#+END_SRC

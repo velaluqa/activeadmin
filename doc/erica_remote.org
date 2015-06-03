@@ -1,0 +1,85 @@
+#+SETUPFILE: theme-readtheorg.setup
+#+TITLE: ERICA Remote
+* Server Setup
+
+Setting up an ERICA remote instance is almost the same as setting up
+an ERICA store instance. For a detailed explanation have a look at the
+[[file:erica.org][ERICA basics]].
+
+** Setup
+
+There is one important additional step after this setup, if the system
+is to be used as ERICA remote.
+
+Login to the PostgreSQL database for ERICAremote and execute the
+following two commands.
+
+#+BEGIN_SRC sql
+SELECT setval('roles_id_seq', 1000);
+SELECT setval('users_id_seq', 1000);
+#+END_SRC
+
+This has to be done, so that synced users and roles are not
+overwritten by ERICA remote and vice versa.
+
+** Configuration
+
+The ERICA application server looks for =config/erica_remote.yml=.
+
+#+LABEL: config/erica_remote.yml
+#+BEGIN_SRC yaml
+erica_remote:
+  enabled: true
+  sponsor: SIRFLOX
+  logo: sirflox.png
+  style: sirflox
+#+END_SRC
+
+When it exists and =enabled= is =true=, then the server boots in ERICA
+remote mode.
+The =sponsor= setting sets the name of the sponsor for this instance. It is shown in page titles and the header.
+The =logo= and =style= settings specify the filename for the logo image and the CSS stylesheet to use.
+Logos are stored under =app/assets/images/client_logos/=, style sheets under =app/assets/stylesheets/client_styles/=.
+The =filename= for the logo should include the file type, the
+=filename= for the stylesheet *should not*.
+Client style sheets are processed with the regular Rails asset pipeline, and can thus be regular CSS or SASS stylesheets.
+
+When using SASS, the following variables for ActiveAdmin can be used to easily affect the overall style in an ActiveAdmin-supported way:
+
+#+BEGIN_SRC scss
+// Colors
+$primary-color: #5E6469;
+$secondary-color: #f0f0f0;
+$text-color: #323537;
+$link-color: #38678b;
+$section-header-text-color: $primary-color;
+$current-menu-item-background: lighten($primary-color, 12%);
+$hover-menu-item-background: lighten($primary-color, 12%);
+$table-stripe-color: lighten($primary-color, 57%);
+$table-selected-color: #d9e4ec;
+$error-color: #932419;
+
+// Sizes
+$horizontal-page-margin: 30px;
+$sidebar-width: 270px;
+$cell-padding: 5px 10px 3px 10px;
+$cell-horizontal-padding: 12px;
+$section-padding: 15px;
+$text-input-horizontal-padding: 10px;
+#+END_SRC
+
+* Permissions
+
+ERICA remote uses a different permissions/role model than ERICA store.
+
+The following roles exist in ERICA remote:
+
+| =remote_manage=          | Manage an ERICAremote instance, add users, give permissions, ...                                                                                                                           |
+| =remote_read=            | Read-only access to an ERICAremote instance. Can read all ERICA resources (see exceptions noted in other roles), but can't manage the system or modify anything.                           |
+| =remote_comments=        | Can create comments on ERICA resources                                                                                                                                                     |
+| =remote_images=          | Can download image series                                                                                                                                                                  |
+| =remote_keywords=        | Can assign keywords/tags to ERICA resources. The valid keywords are defined by study and this role can't change the allowed keywords for a study.                                          |
+| =remote_define_keywords= | Change the keywords that can be used for a study.                                                                                                                                          |
+| =remote_audit=           | Can read audit trail for ERICAremote. Please note that the audit trail isn't synched over from ERICAstore, so this audit trail will only contain changes made on the ERICAremote instance. |
+| =remote_qc=              | Can read the QC information for visits.                                                                                                                                                    |
+| =remote_status_files=    | Can download status files (CSV at the bottom of index pages, etc)                                                                                                                          |
