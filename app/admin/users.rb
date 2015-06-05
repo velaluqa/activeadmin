@@ -130,12 +130,12 @@ ActiveAdmin.register User do
 
   member_action :download_public_key do
     @user = User.find(params[:id])
-    
+
     send_data @user.public_key, :filename => "#{@user.username}.pub" unless @user.public_key.nil?
   end
   member_action :download_private_key do
     @user = User.find(params[:id])
-    
+
     send_data @user.private_key, :filename => "#{@user.username}.key" unless @user.private_key.nil?
   end
 
@@ -159,7 +159,7 @@ ActiveAdmin.register User do
   end
 
   action_item :only => :show do
-    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will invalidate all past signatures by this user. Are you sure you want to do this?' if can? :manage, resource
+    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will disable the old signature of this user. Are you sure you want to do this?' if can? :manage, resource
   end
 
   member_action :unlock, :method => :get do
