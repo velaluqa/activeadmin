@@ -5,7 +5,7 @@ require 'aa_erica_keywords'
 ActiveAdmin.register Study do
 
   menu if: proc { can? :read, Study }
-  actions :index, :show if Rails.application.config.is_erica_remote
+  actions :index, :show if ERICA.remote?
 
   scope :all, :default => true
   scope :building
@@ -13,7 +13,7 @@ ActiveAdmin.register Study do
 
   controller do
     load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:lock, :unlock]
+    skip_load_and_authorize_resource :only => [:lock, :unlock, :select_for_session]
 
     def max_csv_records
       1_000_000
@@ -24,7 +24,9 @@ ActiveAdmin.register Study do
     end
 
     def index
-      authorize! :download_status_files, Study if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+      if ERICA.remote? && !params[:format].blank?
+        authorize! :download_status_files, Study
+      end
 
       index!
     end
@@ -46,7 +48,11 @@ ActiveAdmin.register Study do
       study.state.to_s.camelize
     end
     column 'Select for Session' do |study|
-      link_to('Select', select_for_session_admin_study_path(study))
+      if can? :read, study
+        link_to('Select', select_for_session_admin_study_path(study))
+      else
+        'n/A'
+      end
     end
 
     customizable_default_actions(current_ability)
@@ -204,6 +210,7 @@ ActiveAdmin.register Study do
 
   member_action :select_for_session, :method => :get do
     @study = Study.find(params[:id])
+    authorize! :read, @study
 
     session[:selected_study_id] = @study.id
     session[:selected_study_name] = @study.name
