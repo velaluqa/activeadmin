@@ -172,6 +172,8 @@ group :development, :test do
   gem 'simplecov-rcov', require: false
 
   gem 'yard'
+
+  gem 'gitdeploy', git: 'ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git', branch: :master
 end
 
 group :test do
