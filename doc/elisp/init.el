@@ -1,0 +1,21 @@
+(let (load-directory (file-name-directory load-file-name))
+  (setq org-ditaa-eps-jar-path (expand-file-name "ditaa0_9.eps.jar" load-directory))
+  (setq org-ditaa-jar-path (expand-file-name "ditaa0_9.jar" load-directory)))
+
+(org-babel-do-load-languages
+ (quote org-babel-load-languages)
+ '((emacs-lisp . t)
+   (dot . t)
+   (ditaa . t)
+   (R . t)
+   (python . t)
+   (ruby . t)
+   (gnuplot . t)
+   (clojure . t)
+   (sh . t)
+   (ledger . t)
+   (org . t)
+   (plantuml . t)
+   (latex . t)))
+
+(setq org-confirm-babel-evaluate nil)

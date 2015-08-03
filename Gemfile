@@ -157,6 +157,11 @@ group :development, :test do
   gem 'rails_best_practices'
   # gem 'rails_best_practices-formatter'
 
+  # Rails Security metrics
+  gem 'brakeman'
+
+  # Checks the code climate/code smells
+  gem 'rubycritic', require: false
   gem 'flog'
   gem 'flay'
   gem 'reek'
@@ -165,7 +170,8 @@ group :development, :test do
   gem 'simplecov-cobertura', require: false
   gem 'simplecov-json', require: false
   gem 'simplecov-rcov', require: false
-  gem 'rubycritic', require: false
+
+  gem 'yard'
 end
 
 group :test do

@@ -1,34 +1,54 @@
 namespace :ci do
   task :prepare do
     mkdir_p 'tmp/ci'
+    mkdir_p 'reports'
   end
 
-  task rspec: ['ci:prepare'] do
-    sh 'COVERAGE=true bundle exec rspec --require spec_helper -f JUnit -o tmp/ci/rspec_report.xml'
+  namespace :test do
+    task units: ['ci:prepare'] do
+      sh 'COVERAGE=true bundle exec rspec --require spec_helper -f html -o reports/unit.html -f JUnit -o tmp/ci/rspec_report.xml || true'
+    end
+
+    task features: ['ci:prepare'] do
+      sh 'COVERAGE=true bundle exec cucumber --format html --out reports/features.html --format json --out tmp/ci/cucumber_report.json || true'
+    end
   end
 
-  task cucumber: ['ci:prepare'] do
-    sh 'COVERAGE=true bundle exec cucumber --format json --out tmp/ci/cucumber_report.json'
+  task :code_climate do
+    sh 'bundle exec rubycritic app lib config/initializers --path reports/code_climate || true'
   end
 
-  task :rubycritic do
-    sh 'bundle exec rubycritic app lib  --path tmp/ci/code_smell_report'
+  task :code_style do
+    sh 'bundle exec rubocop --require rubocop/formatter/checkstyle_formatter --rails --fail-level F --format offenses --format RuboCop::Formatter::CheckstyleFormatter --out tmp/ci/rubocop_report.xml --format html --out reports/code_style.html || true'
   end
 
   task :rails_best_practices do
-    sh 'bundle exec rails_best_practices -f html --with-textmate --output-file tmp/ci/rails_best_practices_report.html .; exit 0'
+    sh 'bundle exec rails_best_practices -f html --with-textmate --output-file reports/rails_best_practices.html . || true'
   end
 
-  task :ruby_style_guide do
-    sh 'bundle exec rubocop -f html > tmp/ci/ruby_style_guide_report.html .; exit 0'
+  task :rails_security do
+    sh 'bundle exec brakeman --format html --output reports/rails_security.html || true'
+  end
+
+  task :manual do
+    Dir['doc/**/*.org'].each do |path|
+      sh "emacs -q --batch --load doc/elisp/init.el #{path} -f org-html-export-to-html"
+    end
+  end
+
+  task :docs do
+    sh 'bundle exec yard -o reports/doc'
   end
 end
 
 task ci: [
   'ci:prepare',
-  'ci:rspec',
-  'ci:cucumber',
-  'ci:rubycritic',
+  'ci:test:units',
+  'ci:test:features',
+  'ci:code_climate',
+  'ci:code_style',
   'ci:rails_best_practices',
-  'ci:ruby_style_guide'
+  'ci:rails_security',
+  'ci:rails_manual',
+  'ci:rails_docs'
 ]

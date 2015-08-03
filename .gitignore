@@ -50,3 +50,5 @@ app/assets/images/client_logos/*
 /doc/*.tex
 /coverage/
 /reports/
+/.yardoc/
+/doc/*~
