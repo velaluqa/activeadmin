@@ -158,7 +158,7 @@ group :development, :test do
   # gem 'rails_best_practices-formatter'
 
   # Rails Security metrics
-  gem 'brakeman'
+  gem 'brakeman', require: false
 
   # Checks the code climate/code smells
   gem 'rubycritic', require: false
@@ -171,9 +171,9 @@ group :development, :test do
   gem 'simplecov-json', require: false
   gem 'simplecov-rcov', require: false
 
-  gem 'yard'
+  gem 'yard', require: false
 
-  gem 'gitdeploy', git: 'ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git', branch: :master
+  gem 'gitdeploy', git: 'ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git', branch: :master, require: false
 end
 
 group :test do
