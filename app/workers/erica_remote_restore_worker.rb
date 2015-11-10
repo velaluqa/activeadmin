@@ -22,6 +22,8 @@ class ERICARemoteRestoreWorker
 
     remote.restore_configs
 
+    remote.cleanup
+
     job.finish_successfully({})
   rescue => error
     job.fail(error.message)
