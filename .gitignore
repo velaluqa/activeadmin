@@ -51,3 +51,5 @@ app/assets/images/client_logos/*
 /reports/
 /.yardoc/
 /doc/*~
+/.ruby-gemset
+/.ruby-version
