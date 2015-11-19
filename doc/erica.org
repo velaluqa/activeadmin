@@ -1,5 +1,6 @@
 #+SETUPFILE: theme-readtheorg.setup
 #+TITLE: ERICA Basics
+#+AUTHOR: Arthur Andersen
 
 This document explains the basics about the ERICA Store/Remote system.
 

@@ -1,5 +1,7 @@
 #+SETUPFILE: theme-readtheorg.setup
 #+TITLE: ERICA Remote
+#+AUTHOR: Arthur Andersen
+
 * Server Setup
 
 Setting up an ERICA remote instance is almost the same as setting up

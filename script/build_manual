@@ -1,0 +1,9 @@
+#!/bin/bash
+docker build -t pharmtrace_erica_docs ./doc
+for file in $(ls ./doc | grep "\.org$"); do
+    echo "Building ${file} ..."
+    docker run -it -v "`pwd`:/workspace" pharmtrace_erica_docs emacs --batch --load doc/elisp/init.el doc/$file -f org-html-export-to-html
+done
+mkdir -p ./reports/manual
+cp ./doc/*.html ./reports/manual/
+cp -rf ./doc/css ./doc/fonts ./doc/images ./doc/js ./reports/manual/
