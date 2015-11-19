@@ -150,6 +150,9 @@ GEM
     bullet (4.14.4)
       activesupport (>= 3.0.0)
       uniform_notifier (>= 1.6.0)
+    byebug (2.7.0)
+      columnize (~> 0.3)
+      debugger-linecache (~> 1.2)
     callsite (0.0.11)
     cancan (1.6.9)
     capybara (2.4.4)
@@ -180,8 +183,6 @@ GEM
       adamantium (~> 0.2.0)
       equalizer (~> 0.0.9)
     connection_pool (1.1.0)
-    coolline (0.5.0)
-      unicode_utils (~> 1.4)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     cucumber (1.3.19)
@@ -198,12 +199,7 @@ GEM
       rails (>= 3, < 5)
     database_cleaner (1.4.1)
     debug_inspector (0.0.2)
-    debugger (1.6.8)
-      columnize (>= 0.3.1)
-      debugger-linecache (~> 1.2.0)
-      debugger-ruby_core_source (~> 1.3.5)
     debugger-linecache (1.2.0)
-    debugger-ruby_core_source (1.3.7)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     devise (2.2.3)
@@ -283,18 +279,6 @@ GEM
     inherited_resources (1.4.1)
       has_scope (~> 0.6.0.rc)
       responders (~> 1.0.0.rc)
-    jazz_hands (0.5.2)
-      awesome_print (~> 1.2)
-      coolline (>= 0.4.2)
-      hirb (~> 0.7.1)
-      pry (~> 0.9.12)
-      pry-debugger (~> 0.2.2)
-      pry-doc (~> 0.4.6)
-      pry-git (~> 0.2.3)
-      pry-rails (~> 0.3.2)
-      pry-remote (>= 0.1.7)
-      pry-stack_explorer (~> 0.4.9)
-      railties (>= 3.0, < 5.0)
     journey (1.0.4)
     jquery-rails (2.2.1)
       railties (>= 3.0, < 5.0)
@@ -391,9 +375,9 @@ GEM
       coderay (~> 1.0)
       method_source (~> 0.8)
       slop (~> 3.4)
-    pry-debugger (0.2.3)
-      debugger (~> 1.3)
-      pry (>= 0.9.10, < 0.11.0)
+    pry-byebug (1.3.2)
+      byebug (~> 2.7)
+      pry (~> 0.9.12)
     pry-doc (0.4.6)
       pry (>= 0.9)
       yard (>= 0.8)
@@ -572,7 +556,6 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.1)
-    unicode_utils (1.4.0)
     unicorn (4.6.2)
       kgio (~> 2.6)
       rack
@@ -620,6 +603,7 @@ DEPENDENCIES
   airbrake
   andand
   annotate
+  awesome_print
   bcrypt-ruby (~> 3.0.0)
   better_errors
   binding_of_caller
@@ -634,7 +618,6 @@ DEPENDENCIES
   cucumber
   cucumber-rails
   database_cleaner
-  debugger
   dentaku!
   devise
   dicom
@@ -651,7 +634,7 @@ DEPENDENCIES
   guard-rspec
   haml
   haml-rails
-  jazz_hands
+  hirb
   jquery-rails
   kiqstand
   kwalify
@@ -664,6 +647,12 @@ DEPENDENCIES
   pg
   poltergeist
   pry
+  pry-byebug
+  pry-doc
+  pry-git
+  pry-rails
+  pry-remote
+  pry-stack_explorer
   railroady
   rails (= 3.2.13)
   rails_best_practices
@@ -695,3 +684,6 @@ DEPENDENCIES
   yard
   yarjuf
   zeus
+
+BUNDLED WITH
+   1.10.6

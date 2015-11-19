@@ -55,9 +55,6 @@ gem 'unicorn'
 # Deploy with Capistrano
 # gem 'capistrano'
 
-# To use debugger
-gem 'debugger'
-
 # authentication/authorization
 gem 'devise'
 gem 'cancan'
@@ -153,7 +150,14 @@ group :development, :test do
 
   # Ruby console tool and additional extensions
   gem 'pry'
-  gem 'jazz_hands'
+  gem 'pry-rails'
+  gem 'pry-doc'
+  gem 'pry-git'
+  gem 'pry-stack_explorer'
+  gem 'pry-remote'
+  gem 'pry-byebug'
+  gem 'hirb'
+  gem 'awesome_print'
 
   # Rubocop ensures the ruby style guide.
   gem 'rubocop'
