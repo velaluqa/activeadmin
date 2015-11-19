@@ -9,8 +9,9 @@ deployments:
     links:
       "Manual": "{{url}}/reports/manual/erica.html"
       "Documentation": "{{url}}/reports/doc/index.html"
-      "Unit Test Results": "{{url}}/reports/unit.html"
-      "Requirement Test Results": "{{url}}/reports/features.html"
+      "QA: Unit Tests": "{{url}}/reports/unit.html"
+      "QA: Requirement Tests": "{{url}}/reports/features.html"
+      "QA: Test Coverage": "{{url}}/reports/coverage/index.html"
       "Report: Code Climate": "{{url}}/reports/code_climate/overview.html"
       "Report: Code Style Violations": "{{url}}/reports/code_style.html"
       "Report: Rails Security": "{{url}}/reports/rails_security.html"
