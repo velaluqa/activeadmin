@@ -41,28 +41,17 @@ namespace :ci do
   ]
 
   namespace :generate do
-    task :manual do
-      Dir['doc/**/*.org'].each do |path|
-        sh "emacs -q --batch --load doc/elisp/init.el #{path} -f org-html-export-to-html"
-      end
-    end
-
     task :docs do
       sh 'bundle exec yard -o reports/doc'
     end
   end
 
-  task generate: ['ci:generate:manual', 'ci:generate:docs']
+  task generate: ['ci:generate:docs']
 end
 
 task ci: [
   'ci:prepare',
-  'ci:test:units',
-  'ci:test:features',
-  'ci:code_climate',
-  'ci:code_style',
-  'ci:rails_best_practices',
-  'ci:rails_security',
-  'ci:rails_manual',
-  'ci:rails_docs'
+  'ci:test',
+  'ci:report',
+  'ci:generate:docs'
 ]
