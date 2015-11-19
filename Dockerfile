@@ -3,13 +3,23 @@ MAINTAINER aandersen@velalu.qa
 
 ENV APP_HOME /app
 
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs
+# Install distribution dependencies
+RUN apt-get update -qq && \
+    apt-get install -y \
+    build-essential \
+    libpq-dev \
+    nodejs \
+    libmagickwand-dev \
+    imagemagick \
+    zlib1g-dev \
+    locales
 
-# Install RMagick
-# RUN apt-get install -y libmagickwand-dev imagemagick
-
-# Install Nokogiri
-# RUN apt-get install -y zlib1g-dev
+# Set the locale
+RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && \
+    locale-gen
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
 
 # Configure the velaluqa repository keys to allow the use of private
 # repositories for the application dependencies.
