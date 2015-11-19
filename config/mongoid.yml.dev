@@ -1,0 +1,22 @@
+development:
+  sessions:
+    default:
+      database: erica_store_development
+      hosts:
+        - mongo:27017
+      options:
+  options:
+
+test: &test
+  sessions:
+    default:
+      database: erica_store_test
+      hosts:
+        - mongo:27017
+      options:
+        consistency: :strong
+        max_retries: 1
+        retry_interval: 0
+
+cucumber:
+  <<: *test

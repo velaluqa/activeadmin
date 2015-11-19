@@ -1,0 +1,7 @@
+remotes:
+  - name: 'siflox'
+    url: 'http://localhost:3001'
+    host: 'localhost'
+    study_ids:
+      - 7
+      - 8
