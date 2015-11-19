@@ -6,9 +6,8 @@ deployments:
     gitlab: velaluqa
     sources:
       - ./reports
-      - ./doc
     links:
-      "Manual": "{{url}}/doc/erica.html"
+      "Manual": "{{url}}/reports/manual/erica.html"
       "Documentation": "{{url}}/reports/doc/index.html"
       "Unit Test Results": "{{url}}/reports/unit.html"
       "Requirement Test Results": "{{url}}/reports/features.html"
