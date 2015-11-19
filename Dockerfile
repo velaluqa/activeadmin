@@ -40,5 +40,3 @@ RUN gem install bundler && \
 
 # Add the application code.
 ADD . /app
-
-ENTRYPOINT ['bundle', 'exec']
