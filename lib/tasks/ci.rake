@@ -2,6 +2,7 @@ namespace :ci do
   task :prepare do
     mkdir_p 'tmp/ci'
     mkdir_p 'reports'
+    sh "rm -rf reports/*"
   end
 
   namespace :test do
