@@ -1,17 +1,16 @@
 namespace :ci do
   task :prepare do
-    mkdir_p 'tmp/ci'
     mkdir_p 'reports'
     sh "rm -rf reports/*"
   end
 
   namespace :test do
     task units: ['ci:prepare'] do
-      sh 'COVERAGE=true bundle exec rspec --require spec_helper -f html -o reports/unit.html -f JUnit -o tmp/ci/rspec_report.xml'
+      sh 'COVERAGE=true bundle exec rspec --require spec_helper -f html -o reports/unit.html -f JUnit -o reports/rspec_report.xml'
     end
 
     task features: ['ci:prepare'] do
-      sh 'COVERAGE=true bundle exec cucumber --format html --out reports/features.html --format json --out tmp/ci/cucumber_report.json'
+      sh 'COVERAGE=true bundle exec cucumber --format html --out reports/features.html --format json --out reports/cucumber_report.json'
     end
   end
   task test: ['ci:test:units', 'ci:test:features']
@@ -22,7 +21,7 @@ namespace :ci do
     end
 
     task :code_style do
-      sh 'bundle exec rubocop --require rubocop/formatter/checkstyle_formatter --rails --fail-level F --format offenses --format RuboCop::Formatter::CheckstyleFormatter --out tmp/ci/rubocop_report.xml --format html --out reports/code_style.html || true'
+      sh 'bundle exec rubocop --require rubocop/formatter/checkstyle_formatter --rails --fail-level F --format offenses --format RuboCop::Formatter::CheckstyleFormatter --out reports/rubocop_report.xml --format html --out reports/code_style.html || true'
     end
 
     task :rails_best_practices do
