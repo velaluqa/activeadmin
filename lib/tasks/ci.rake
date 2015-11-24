@@ -47,11 +47,16 @@ namespace :ci do
   end
 
   task generate: ['ci:generate:docs']
+
+  task :cleanup do
+    sh 'mv -f ./coverage ./reports'
+  end
 end
 
 task ci: [
   'ci:prepare',
   'ci:test',
   'ci:report',
-  'ci:generate:docs'
+  'ci:generate:docs',
+  'ci:cleanup'
 ]
