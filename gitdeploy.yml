@@ -1,5 +1,5 @@
 customer: pharmtrace
-project: erica_store_v2
+project: ericastore
 deployments:
   - type: demo
     branch: develop|feature-.*|subfeature-.*
