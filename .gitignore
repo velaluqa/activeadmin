@@ -48,7 +48,6 @@ app/assets/images/client_logos/*
 /doc/*.pdf
 /doc/*.tex
 /coverage/
-/reports/
 /.yardoc/
 /doc/*~
 /.ruby-gemset
