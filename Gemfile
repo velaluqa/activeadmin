@@ -187,6 +187,11 @@ group :development, :test do
   gem 'yard', require: false
 
   gem 'gitdeploy', git: 'ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git', branch: :master, require: false
+
+  # Bundler-audit helps finding gems that need to be patched for
+  # security. Also it provides recommendations for certain
+  # dependencies.
+  gem 'bundler-audit'
 end
 
 group :test do
