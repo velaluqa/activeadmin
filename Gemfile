@@ -10,12 +10,14 @@ gem 'rails', '3.2.13'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'sqlite3'
+gem 'sqlite3', '~> 1.3.11'
 gem 'pg'
 
 # MongoDB
 gem 'mongoid', '~> 3.0.0'
 gem 'bson_ext'
+
+gem 'json', '~> 1.8.3'
 
 # HAML templating engine
 # needs to be added explicitely, otherwise it might not register itself as a templating engine in Rails
@@ -50,7 +52,9 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 # gem 'jbuilder'
 
 # Use unicorn as the app server
-gem 'unicorn'
+gem 'kgio', '~> 2.10.0'
+gem 'raindrops', '~> 0.16.0'
+gem 'unicorn', '~> 5.1.0'
 
 # Deploy with Capistrano
 # gem 'capistrano'
@@ -205,4 +209,6 @@ group :test do
   gem 'guard-cucumber'
   gem 'guard-rspec'
   gem 'database_cleaner'
+
+  gem 'test-unit'
 end
