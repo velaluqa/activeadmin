@@ -30,7 +30,7 @@ class Case < ActiveRecord::Base
   end
 
   # so we always get results sorted by position, not by row id
-  default_scope order('position ASC')
+  default_scope -> { order('position ASC') }
 
   STATE_SYMS = [:unread, :in_progress, :read, :reopened, :reopened_in_progress, :postponed]
 

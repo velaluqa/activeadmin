@@ -17,7 +17,7 @@ class ImageSeries < ActiveRecord::Base
   #validates_uniqueness_of :series_number, :scope => :patient_id
   validates_presence_of :name, :patient_id, :imaging_date
 
-  scope :not_assigned, where(:visit_id => nil)
+  scope :not_assigned, -> { where(:visit_id => nil) }
 
   scope :by_study_ids, lambda { |*ids|
     joins(patient: :center)

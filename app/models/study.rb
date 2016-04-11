@@ -21,8 +21,8 @@ class Study < ActiveRecord::Base
 
   validates_presence_of :name
 
-  scope :building, where(state: 0)
-  scope :production, where(state: 1)
+  scope :building, -> { where(state: 0) }
+  scope :production, -> { where(state: 1) }
 
   scope :by_ids, ->(*ids) { where(id: Array[ids].flatten) }
 

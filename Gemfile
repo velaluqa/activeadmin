@@ -5,7 +5,18 @@ end
 
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.13'
+gem 'rails', '4.2.6'
+gem 'railties', '4.2.6'
+
+# With Rails 4.0 some gems were extracted into separate gems, which
+# need to be installed separately. Some gems are deprecated and we
+# should make sure to remove the dependency within our app.
+# TODO: Remove deprecated Rails functionality for Rails 4.0
+gem 'protected_attributes' # https://github.com/rails/protected_attributes
+gem 'activeresource' # https://github.com/rails/activeresource
+gem 'actionpack-action_caching' # https://github.com/rails/actionpack-action_caching
+gem 'activerecord-session_store' # https://github.com/rails/activerecord-session_store
+gem 'rails-observers' # https://github.com/rails/rails-observers
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -14,25 +25,24 @@ gem 'sqlite3', '~> 1.3.11'
 gem 'pg'
 
 # MongoDB
-gem 'mongoid', '~> 3.0.0'
-gem 'bson_ext'
+gem 'mongoid', '~> 5.1.2'
 
 gem 'json', '~> 1.8.3'
 
 # HAML templating engine
 # needs to be added explicitely, otherwise it might not register itself as a templating engine in Rails
-gem 'haml'
+gem 'haml', '~> 4.0.7'
 
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
+  gem 'sass-rails',   '~> 5.0.4'
+  gem 'coffee-rails', '~> 4.1.1'
 
-  gem 'haml-rails'
-  gem 'less-rails'
+  gem 'haml-rails', '~> 0.9.0'
+  gem 'less-rails', '~> 2.7.1'
   gem 'twitter-bootstrap-rails'
-  gem 'bootstrap-datepicker-rails'
+  gem 'bootstrap-datepicker-rails', '~> 1.6.0.1'
 
   gem 'uglifier', '>= 1.0.3'
 end
@@ -43,7 +53,7 @@ gem 'libv8', '~> 3.11.8'
 gem 'therubyracer', :platforms => :ruby
 gem 'execjs'
 
-gem 'jquery-rails'
+gem 'jquery-rails', '~> 3.1.4'
 
 # To use ActiveModel has_secure_password
 gem 'bcrypt-ruby', '~> 3.0.0'
@@ -60,25 +70,25 @@ gem 'unicorn', '~> 5.1.0'
 # gem 'capistrano'
 
 # authentication/authorization
-gem 'devise'
+gem 'devise', '~> 3.5'
 gem 'cancan'
 
 # audit trail
-gem 'paper_trail', '~>2'
+gem 'paper_trail', '~> 4.1.0'
 
 # ActiveAdmin
-gem 'activeadmin', '~>0.5.1', :github => 'profmaad/active_admin', :branch => 'v0.5.1-checkboxtoggler_fix'
-gem 'activeadmin-mongoid', :github => 'profmaad/activeadmin-mongoid', :branch => 'master'
-gem 'activeadmin-cancan'
+gem 'activeadmin', '1.0.0.pre2'
+gem 'activeadmin-mongoid', github: 'elia/activeadmin-mongoid', branch: 'rails4-mongoid5'
+gem 'activeadmin-cancan', github: 'velaluqa/activeadmin-cancan', branch: 'master'
 
 # CodeRay for rendering yaml/json data
 gem 'coderay'
 
 # Rugged for Git-based config versioning
-gem 'rugged', :github => 'libgit2/rugged', :branch => 'development', :submodules => true
+gem 'rugged', '~> 0.24.0'
 
 # Airbrake Exception notifier
-gem 'airbrake'
+gem 'airbrake', require: false
 
 # Kwalify schema validator
 gem 'kwalify'
@@ -87,7 +97,7 @@ gem 'kwalify'
 gem 'diffy'
 
 # select2 gem for integration with asset pipeline
-gem 'select2-rails', :github => 'profmaad/select2-rails', :branch => 'master'
+gem 'select2-rails', '~> 4.0.1'
 
 # rest-client gem to access Domino Data Services REST API
 gem 'rest-client'
@@ -101,18 +111,16 @@ gem 'rest-client'
 
 # used for DICOM based checks in tQC (ability to specify simple formulas)
 # the gem on rubygems.org is not up-to-date, so we use the code from github directly
-gem 'dentaku', :github => 'rubysolo/dentaku', :branch => 'master'
+gem 'dentaku', '~> 2.0.7'
 
 # Sidekiq is used for asynchronous job execution, i.e. DICOM searches, exports, ...
 gem 'sidekiq'
-# Sidekiq middleware to ensure proper behaviour of mongoid connections in sidekiq workers
-gem 'kiqstand'
 
 # Ruby DICOM lib
 gem 'dicom'
 
 # MongoDB audit trail
-gem 'mongoid-history'
+gem 'mongoid-history', '~> 0.5.0'
 
 # Zip file creation for image download in ERICA Remote
 gem 'rubyzip'
@@ -137,7 +145,7 @@ group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
   # Chrome extension to get meta info for the current request.
-  gem 'meta_request'
+  gem 'meta_request', '~> 0.4.0'
   # Generate UML diagrams for the database.
   gem 'railroady'
   # Hints missing indexes.
@@ -198,9 +206,9 @@ group :test do
   gem 'factory_girl'
   gem 'faker'
 
-  gem 'rspec'
-  gem 'rspec-rails'
-  gem 'yarjuf'
+  gem 'rspec', '~> 3.4.0'
+  gem 'rspec-rails', '~> 3.4.2'
+  gem 'yarjuf', '~> 2.0.0'
 
   gem 'webmock'
 
@@ -210,7 +218,7 @@ group :test do
   gem 'cucumber', require: false
   gem 'cucumber-rails', require: false
 
-  gem 'guard', '>= 2.0.0'
+  gem 'guard', '~> 2.13.0'
   gem 'guard-cucumber'
   gem 'guard-rspec'
   gem 'database_cleaner'

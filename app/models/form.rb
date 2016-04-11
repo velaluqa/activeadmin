@@ -7,14 +7,14 @@ class Form < ActiveRecord::Base
   attr_accessible :description, :name, :session_id, :session, :state, :locked_version
 
   validates :name, :presence => true
-  validates :name, :format => { :with => /^[a-zA-Z0-9_]+$/, :message => 'Only letters A-Z, numbers and \'_\' allowed' }
+  validates :name, :format => { :with => /\A[a-zA-Z0-9_]+\z/, :message => 'Only letters A-Z, numbers and \'_\' allowed' }
   validates_uniqueness_of :name, :scope => :session_id  
 
   belongs_to :session
   has_many :form_answers
 
-  scope :draft, where(:state => 0)
-  scope :final, where(:state => 1)
+  scope :draft, -> { where(:state => 0) }
+  scope :final, -> { where(:state => 1) }
 
   before_destroy do
     unless self.form_answers.empty?

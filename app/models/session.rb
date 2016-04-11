@@ -17,11 +17,11 @@ class Session < ActiveRecord::Base
   has_and_belongs_to_many :readers, :class_name => 'User', :join_table => 'readers_sessions'
   has_and_belongs_to_many :validators, :class_name => 'User', :join_table => 'validators_sessions'
 
-  scope :blind_readable_by_user, lambda { |user| user.blind_readable_sessions.includes(:study) }
-  scope :building, where(:state => 0)
-  scope :testing, where(:state => 1)
-  scope :production, where(:state => 2)
-  scope :closed, where(:state => 3)
+  scope :blind_readable_by_user, ->(user) { user.blind_readable_sessions.includes(:study) }
+  scope :building, -> { where(:state => 0) }
+  scope :testing, -> { where(:state => 1) }
+  scope :production, -> { where(:state => 2) }
+  scope :closed, -> { where(:state => 3) }
 
   before_destroy do
     unless form_answers.empty? and patients.empty? and forms.empty? and cases.empty?

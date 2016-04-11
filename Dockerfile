@@ -12,7 +12,8 @@ RUN apt-get update -qq && \
     libmagickwand-dev \
     imagemagick \
     zlib1g-dev \
-    locales
+    locales \
+    cmake
 
 # Set the locale
 RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && \

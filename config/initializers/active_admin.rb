@@ -127,17 +127,18 @@ ActiveAdmin.setup do |config|
   # Admin comments are enabled by default.
   #
   # Default:
-  # config.allow_comments = true
+  # config.comments = true
   #
   # You can turn them on and off for any given namespace by using a
   # namespace config block.
   #
   # Eg:
   #   config.namespace :without_comments do |without_comments|
-  #     without_comments.allow_comments = false
+  #     without_comments.comments = false
   #   end
+  #
   # Enable comments only in ERICA Remote
-  config.allow_comments = Rails.application.config.is_erica_remote
+  config.comments = ERICA.remote?
 
 
   # == Batch Actions

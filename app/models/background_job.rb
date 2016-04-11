@@ -17,8 +17,8 @@ class BackgroundJob
   index user_id: 1
   index completed: 1
 
-  scope :completed, where(completed: true)
-  scope :running, where(completed: false)
+  scope :completed, -> { where(completed: true) }
+  scope :running, -> { where(completed: false) }
 
   before_destroy do
     return false unless finished?
