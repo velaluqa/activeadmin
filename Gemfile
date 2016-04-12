@@ -33,19 +33,17 @@ gem 'json', '~> 1.8.3'
 # needs to be added explicitely, otherwise it might not register itself as a templating engine in Rails
 gem 'haml', '~> 4.0.7'
 
-# Gems used only for assets and not required
-# in production environments by default.
-group :assets do
-  gem 'sass-rails',   '~> 5.0.4'
-  gem 'coffee-rails', '~> 4.1.1'
+# Gems used for assets
+gem 'sass-rails',   '~> 5.0.4'
+gem 'coffee-rails', '~> 4.1.1'
 
-  gem 'haml-rails', '~> 0.9.0'
-  gem 'less-rails', '~> 2.7.1'
-  gem 'twitter-bootstrap-rails'
-  gem 'bootstrap-datepicker-rails', '~> 1.6.0.1'
+gem 'haml-rails', '~> 0.9.0'
+gem 'less-rails', '~> 2.7.1'
 
-  gem 'uglifier', '>= 1.0.3'
-end
+gem 'twitter-bootstrap-rails'
+gem 'bootstrap-datepicker-rails', '~> 1.6.0.1'
+
+gem 'uglifier', '>= 1.0.3'
 
 # we need these even in production, for server-side judgement functions
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
