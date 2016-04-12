@@ -200,6 +200,8 @@ GEM
       responders
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
+    devise-token_authenticatable (0.4.6)
+      devise (>= 3.5.2, < 4.0.0)
     dicom (0.9.6)
     diff-lcs (1.2.5)
     diffy (3.1.0)
@@ -638,7 +640,8 @@ DEPENDENCIES
   cucumber-rails
   database_cleaner
   dentaku (~> 2.0.7)
-  devise (~> 3.5)
+  devise (~> 3.5.2)
+  devise-token_authenticatable (~> 0.4.6)
   dicom
   diffy
   execjs

@@ -70,7 +70,8 @@ gem 'unicorn', '~> 5.1.0'
 # gem 'capistrano'
 
 # authentication/authorization
-gem 'devise', '~> 3.5'
+gem 'devise', '~> 3.5.2'
+gem 'devise-token_authenticatable', '~> 0.4.6'
 gem 'cancan'
 
 # audit trail
