@@ -4,8 +4,10 @@
       %h2.form-signin-heading
         pharmtrace ERICA
 
-      = f.text_field(:username, :class => 'input-block-level', :placeholder => 'Username')
-      = f.password_field(:password, :class => 'input-block-level', :placeholder => 'Password')
+      = f.label(:username, :class => 'sr-only')
+      = f.text_field(:username, :class => 'form-control', :placeholder => 'Username')
+      = f.label(:password, :class => 'sr-only')
+      = f.password_field(:password, :class => 'form-control', :placeholder => 'Password')
 
       %div#submit_box
         - if devise_mapping.rememberable? and false
@@ -14,5 +16,5 @@
             Remember me
         - else
           = f.hidden_field(:remember_me, :value => false)
-        
-        .pull-right= f.submit("Sign in", :class => 'btn btn-primary btn-large')
+
+        .pull-right= f.submit("Sign in", :class => 'btn btn-lg btn-primary btn-block')
