@@ -94,7 +94,7 @@ StudyServer::Application.routes.draw do
     end
   end
 
-  match 'wado' => 'wado#wado'
+  get 'wado' => 'wado#wado'
 
   authenticate :user, ->(u) { u.is_app_admin? } do
     require 'sidekiq/web'
