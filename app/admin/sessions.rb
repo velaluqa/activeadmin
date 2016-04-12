@@ -167,18 +167,18 @@ ActiveAdmin.register Session do
   filter :name
   filter :state, :as => :check_boxes, :collection => Session::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
 
-    # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
-  action_item :except => [:new, :show] do
+  # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
+  action_item :edit, :except => [:new, :show] do
     if controller.action_methods.include?('new') and can? :manage, Session
       link_to(I18n.t('active_admin.new_model', :model => active_admin_config.resource_label), new_resource_path)
     end
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     if controller.action_methods.include?('edit') and can? :edit, resource
       link_to(I18n.t('active_admin.edit_model', :model => active_admin_config.resource_label), edit_resource_path(resource))
     end
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     if controller.action_methods.include?('destroy') and can? :destroy, resource
       link_to(I18n.t('active_admin.delete_model', :model => active_admin_config.resource_label),
               resource_path(resource),
@@ -256,7 +256,7 @@ ActiveAdmin.register Session do
 
     @page_title = "Import Case List from CSV"
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Import Case List from CSV', import_case_list_csv_form_admin_session_path(session) if can? :manage, session
   end
   
@@ -272,7 +272,7 @@ ActiveAdmin.register Session do
 
     @page_title = "Import Patient Data from CSV"
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Import Patient Data from CSV', import_patient_data_csv_form_admin_session_path(session) if can? :manage, session
   end
 
@@ -331,7 +331,7 @@ ActiveAdmin.register Session do
     @page_title = "Upload new configuration"
     render 'admin/sessions/upload_config', :locals => { :url => upload_config_admin_session_path}
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Upload configuration', upload_config_form_admin_session_path(session) if can? :manage, session
   end
 
@@ -454,7 +454,7 @@ ActiveAdmin.register Session do
     switch_session_state(params[:id], params[:new_state].to_sym)
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     next unless can? :manage, resource
     case resource.state
     when :building
@@ -465,7 +465,7 @@ ActiveAdmin.register Session do
       link_to 'Close Session', switch_state_admin_session_path(resource, {:new_state => :closed}) if can? :manage, resource
     end
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     case resource.state
     when :testing
       link_to 'Abort Testing', switch_state_admin_session_path(resource, {:new_state => :building}) if can? :manage, resource
@@ -585,19 +585,19 @@ ActiveAdmin.register Session do
     @cases_counts = cases_counts(@sessions)
     @reader_cases = reader_cases(@sessions)
   end
-  action_item :only => :index do
+  action_item :edit, :only => :index do
     link_to 'Summary', summary_report_admin_sessions_path
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Summary', session_summary_report_admin_session_path(session)
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Config Summary', config_summary_report_admin_session_path(session)
   end
-  action_item :only => :config_summary_report do
+  action_item :edit, :only => :config_summary_report do
     link_to 'Validation Cases', config_summary_report_admin_session_path(session, :case_flag => 'validation') unless params[:case_flag] == 'validation'
   end
-  action_item :only => :config_summary_report do
+  action_item :edit, :only => :config_summary_report do
     link_to 'Regular Cases', config_summary_report_admin_session_path(session, :case_flag => 'regular') if params[:case_flag] == 'validation'
   end
 
@@ -627,11 +627,11 @@ ActiveAdmin.register Session do
 
     @page_title = 'Clone Session'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Clone', deep_clone_form_admin_session_path(resource)) if can? :read, resource
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'session', :audit_trail_view_id => resource.id))
   end
 

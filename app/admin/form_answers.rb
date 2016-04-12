@@ -193,7 +193,7 @@ ActiveAdmin.register FormAnswer do
     @page_title = 'Data Cleaning Tool - ' + @field_id
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_mongoid_history_trackers_path(:audit_trail_view_type => 'form_answer', :audit_trail_view_id => resource.id))
   end
 end

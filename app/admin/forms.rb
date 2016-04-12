@@ -157,17 +157,17 @@ ActiveAdmin.register Form do
   filter :state, :as => :check_boxes, :collection => Form::STATE_SYMS.each_with_index.map {|state, i| [state, i]}
 
   # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
-  action_item :except => [:new, :show] do
+  action_item :edit, :except => [:new, :show] do
     if controller.action_methods.include?('new')
       link_to(I18n.t('active_admin.new_model', :model => active_admin_config.resource_label), new_resource_path)
     end
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     if controller.action_methods.include?('edit') and can? :edit, resource
       link_to(I18n.t('active_admin.edit_model', :model => active_admin_config.resource_label), edit_resource_path(resource))
     end
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     if controller.action_methods.include?('destroy') and can? :destroy, resource
       link_to(I18n.t('active_admin.delete_model', :model => active_admin_config.resource_label),
               resource_path(resource),
@@ -268,7 +268,7 @@ ActiveAdmin.register Form do
     @page_title = "Upload new configuration"
     render 'admin/forms/upload_config', :locals => { :url => upload_config_admin_form_path}
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Upload configuration', upload_config_form_admin_form_path(resource)
   end
 
@@ -358,11 +358,11 @@ ActiveAdmin.register Form do
 
     @page_title = "Copy Form to Session"
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Copy', copy_form_admin_form_path(resource)
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     next if resource.session.nil? # template forms can not be finalised
     next unless can? :manage, resource
 
@@ -373,14 +373,14 @@ ActiveAdmin.register Form do
     end
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Preview', preview_form_path(resource), :target => '_blank' if resource.has_configuration? and can? :read, resource
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Preview with Annotations', preview_form_path(resource, :show_internal_annotations => true), :target => '_blank' if resource.has_configuration? and can? :read, resource
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'form', :audit_trail_view_id => resource.id))
   end
 end

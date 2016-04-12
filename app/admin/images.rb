@@ -72,11 +72,11 @@ ActiveAdmin.register Image do
     @dicom_meta_header, @dicom_metadata = @image.dicom_metadata_as_arrays
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('DICOM Metadata', dicom_metadata_admin_image_path(resource)) if resource.file_is_present?
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

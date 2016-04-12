@@ -151,7 +151,7 @@ ActiveAdmin.register Version do
     end
   end
 
-  action_item :only => :index do
+  action_item :edit, :only => :index do
     resource = controller.audit_trail_resource
     status_tag(params[:audit_trail_view_type] + ': ' + (resource.respond_to?(:name) ? resource.name : '<'+resource.id.to_s+'>'), :error, :class => 'audit_trail_indicator') unless resource.nil?
   end
@@ -260,16 +260,16 @@ ActiveAdmin.register Version do
     render 'admin/versions/show_git_commit', :locals => {:commit => GitConfigCommit.new(commit), :repo => repo}
   end
 
-  action_item :only => :index do
+  action_item :edit, :only => :index do
     link_to 'Configuration Changes', git_commits_admin_versions_path if can? :git_commits, Version
   end
-  action_item :only => :git_commits do
+  action_item :edit, :only => :git_commits do
     link_to 'Versions', admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :read, Version
   end
-  action_item :only => :show_git_commit do
+  action_item :edit, :only => :show_git_commit do
     link_to 'Back', git_commits_admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :git_commits, Version
   end
-  action_item :only => [:index, :git_commits] do
+  action_item :edit, :only => [:index, :git_commits] do
     link_to 'MongoDB', admin_mongoid_history_trackers_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :read, MongoidHistoryTracker
   end
 end

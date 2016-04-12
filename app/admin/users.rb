@@ -158,7 +158,7 @@ ActiveAdmin.register User do
     render 'admin/users/generate_keypair'
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will disable the old signature of this user. Are you sure you want to do this?' if can? :manage, resource
   end
 
@@ -169,11 +169,11 @@ ActiveAdmin.register User do
     redirect_to({:action => :show}, :notice => 'User unlocked!')
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Unlock', unlock_admin_user_path(resource) if(can? :manage, :system and resource.access_locked?)
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'user', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

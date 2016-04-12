@@ -307,17 +307,17 @@ ActiveAdmin.register Case do
 
     redirect_to({:action => :show}, :notice => 'Case is reopened and the answers can now be ammended via the Reader Client.')
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Reopen', reopen_admin_case_path(resource)) if (resource.state == :read and resource.form_answer)
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
     if controller.action_methods.include?('edit') and resource.state == :unread and resource.form_answer.nil?
       link_to(I18n.t('active_admin.edit_model', :model => active_admin_config.resource_label), edit_resource_path(resource))
     end
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     # copied from activeadmin/lib/active_admin/resource/action_items.rb#add_default_action_items
     if controller.action_methods.include?('destroy') and resource.state == :unread and resource.form_answer.nil?
       link_to(I18n.t('active_admin.delete_model', :model => active_admin_config.resource_label),
@@ -677,7 +677,7 @@ ActiveAdmin.register Case do
     redirect_to assign_reader_form_admin_cases_path(:selection => selection, :return_url => request.referer)
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'case', :audit_trail_view_id => resource.id))
   end
 end

@@ -200,11 +200,11 @@ ActiveAdmin.register Study do
     @page_title = "Upload new configuration"
     render 'admin/studies/upload_config', :locals => { :url => upload_config_admin_study_path}
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Upload configuration', upload_config_form_admin_study_path(study) if can? :manage, study
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'study', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 
@@ -217,7 +217,7 @@ ActiveAdmin.register Study do
 
     redirect_to :back, :notice => "Study #{@study.name} was selected for this session."
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Select for Session', select_for_session_admin_study_path(resource))
   end
   collection_action :selected_study, :method => :get do
@@ -238,7 +238,7 @@ ActiveAdmin.register Study do
       redirect_to :back, :notice => 'The study was deselected for the current session.'
     end
   end
-  action_item :only => :index do
+  action_item :edit, :only => :index do
     link_to('Deselect Study', deselect_study_admin_studies_path) unless session[:selected_study_id].nil?
   end
 
@@ -277,7 +277,7 @@ ActiveAdmin.register Study do
 
     redirect_to({:action => :show}, :notice => 'Form unlocked')
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     next unless can? :manage, study
 
     if resource.state == :building

@@ -128,7 +128,7 @@ ActiveAdmin.register Patient do
   filter :subject_id, :label => 'Subject ID'
   keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 
@@ -157,7 +157,7 @@ ActiveAdmin.register Patient do
     background_job = start_download_images(params[:id])
     redirect_to admin_background_job_path(background_job), :notice => 'Your download will be available shortly. Please refresh this page to see whether it is available yet.'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Download images', download_images_admin_patient_path(resource)) if can? :download_images, resource
   end
 
@@ -181,7 +181,7 @@ ActiveAdmin.register Patient do
     @page_title = 'Export for ERICAv1'
     render 'admin/patients/export_for_ericav1_form', :locals => {:selection => [resource.id.to_s], :return_url => request.referer}
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Export for ERICAv1', export_for_ericav1_admin_patient_path(resource)) if can? :manage, resource
   end
   batch_action :export_for_ericav1, if: proc {can? :manage, Patient} do |selection|
@@ -221,7 +221,7 @@ ActiveAdmin.register Patient do
     @page_title = 'Reorder Visits'
     @visits = @patient.visits
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Reorder Visits', reorder_visits_form_admin_patient_path(resource)) unless(resource.visits.empty? or cannot? :manage, resource)
   end
 

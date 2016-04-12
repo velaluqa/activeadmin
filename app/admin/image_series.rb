@@ -367,7 +367,7 @@ ActiveAdmin.register ImageSeries do
     @page_title = 'Edit Properties'
     render 'admin/image_series/edit_properties'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Edit Properties', edit_properties_form_admin_image_series_path(resource)) if can? :manage, resource
   end
 
@@ -385,7 +385,7 @@ ActiveAdmin.register ImageSeries do
 
     redirect_to({:action => :show}, :notice => 'Series marked as not relevant for read.')
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Mark not relevant', mark_not_relevant_admin_image_series_path(resource)) unless (resource.state != :visit_assigned or resource.visit.nil? or cannot? :manage, resource)
   end
   batch_action :mark_not_relevant, :confirm => 'This will mark all selected image series as not relevant. Are you sure?', :if => proc {can? :manage, ImageSeries} do |selection|
@@ -415,7 +415,7 @@ ActiveAdmin.register ImageSeries do
 
     render 'admin/images/dicom_metadata'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(resource)) unless resource.images.empty?
   end
 
@@ -700,7 +700,7 @@ ActiveAdmin.register ImageSeries do
   erica_commentable(:comment, 'Comment')
   erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image_series', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end
