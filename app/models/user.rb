@@ -57,7 +57,11 @@ class User < ActiveRecord::Base
     has_system_role?(:remote_manage)
   end
   def has_system_role?(role_sym)
-    !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(role_sym) }).nil?)
+    roles
+      .where(:subject_type => nil,
+             :subject_id => nil,
+             :role => Role::role_sym_to_int(role_sym))
+      .exists?
   end
   def is_erica_remote_user?
     # TODO: this is filthy, dirty hack territory...
