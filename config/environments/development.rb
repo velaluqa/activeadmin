@@ -16,6 +16,10 @@ StudyServer::Application.configure do
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
+  # When running Rails in Docker the better_error pages are not shown,
+  # since the requests are not local. So we have to define trusted ips.
+  BetterErrors::Middleware.allow_ip! ENV['TRUSTED_IP'] if ENV['TRUSTED_IP']
+
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 
