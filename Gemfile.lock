@@ -635,7 +635,7 @@ DEPENDENCIES
   diffy
   execjs
   facets
-  factory_girl
+  factory_girl (~> 4.7.0)
   faker
   flay
   flog
