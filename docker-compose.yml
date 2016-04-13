@@ -7,6 +7,7 @@ redis:
 dev:
   build: .
   command: zeus start
+  tty: true
   volumes:
     - .:/app
     - ./config/database.yml.dev:/app/config/database.yml
