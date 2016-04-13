@@ -4,7 +4,7 @@ module Mongo
       MONGODUMP_ARGS = %w(host port db username password collection out)
 
       def mongoid_configuration
-        conf = Rails.configuration.mongoid.sessions['default']
+        conf = Rails.configuration.mongoid.clients['default']
         fail 'No such mongoid configuration' if conf.nil?
         conf
       end

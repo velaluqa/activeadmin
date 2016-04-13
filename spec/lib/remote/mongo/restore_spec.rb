@@ -3,7 +3,7 @@ require 'remote/mongo/restore'
 RSpec.describe Mongo::Restore do
   describe '#mongodump_options' do
     it 'splits the host string into host and port' do
-      expect(Rails.configuration.mongoid.sessions['default'])
+      expect(Rails.configuration.mongoid.clients['default'])
         .to receive(:clone).and_return(
           'database' => 'erica_store_test',
           'hosts'    => ['localhost:27017'],
@@ -21,7 +21,7 @@ RSpec.describe Mongo::Restore do
     end
 
     it 'fails for more than one host' do
-      expect(Rails.configuration.mongoid.sessions['default'])
+      expect(Rails.configuration.mongoid.clients['default'])
         .to receive(:clone).and_return(
           'database' => 'erica_store_test',
           'hosts'    => ['localhost:27017', 'localhost:27018'],
@@ -62,7 +62,7 @@ RSpec.describe Mongo::Restore do
 
   describe '#arguments' do
     it 'picks only allowed option keys' do
-      expect(Rails.configuration.mongoid.sessions['default'])
+      expect(Rails.configuration.mongoid.clients['default'])
         .to receive(:clone).and_return(
           'database' => 'erica_store_test',
           'hosts'    => ['localhost:27017'],
@@ -83,7 +83,7 @@ RSpec.describe Mongo::Restore do
 
   describe 'dump' do
     before :each do
-      expect(Rails.configuration.mongoid.sessions['default'])
+      expect(Rails.configuration.mongoid.clients['default'])
         .to receive(:clone).and_return(
           'database' => 'erica_store_test',
           'hosts'    => ['localhost:27017'],
