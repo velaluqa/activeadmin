@@ -9,16 +9,6 @@ GIT
       rails (~> 4.0)
 
 GIT
-  remote: git://github.com/velaluqa/activeadmin-cancan.git
-  revision: f03a8b21daaf6e6ba9669b4069468dcd4d0534d2
-  branch: master
-  specs:
-    activeadmin-cancan (0.1.4)
-      activeadmin (>= 0.4.0)
-      cancan (>= 1.6.2)
-      rails (>= 3.0)
-
-GIT
   remote: ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git
   revision: 68dff41fedc7667ab1bd8d1ec74b90fe0ed5a2ac
   branch: master
@@ -142,7 +132,7 @@ GEM
       thor (~> 0.18)
     byebug (8.2.4)
     callsite (0.0.11)
-    cancan (1.6.10)
+    cancancan (1.13.1)
     capybara (2.7.0)
       addressable
       mime-types (>= 1.16)
@@ -616,7 +606,6 @@ PLATFORMS
 DEPENDENCIES
   actionpack-action_caching
   activeadmin (= 1.0.0.pre2)
-  activeadmin-cancan!
   activeadmin-mongoid!
   activerecord-session_store
   activeresource
@@ -632,7 +621,7 @@ DEPENDENCIES
   brakeman
   bullet
   bundler-audit
-  cancan
+  cancancan (~> 1.13.1)
   capybara
   coderay
   coffee-rails (~> 4.1.1)

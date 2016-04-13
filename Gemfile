@@ -70,7 +70,7 @@ gem 'unicorn', '~> 5.1.0'
 # authentication/authorization
 gem 'devise', '~> 3.5.2'
 gem 'devise-token_authenticatable', '~> 0.4.6'
-gem 'cancan'
+gem 'cancancan', '~> 1.13.1'
 
 # audit trail
 gem 'paper_trail', '~> 4.1.0'
@@ -78,7 +78,6 @@ gem 'paper_trail', '~> 4.1.0'
 # ActiveAdmin
 gem 'activeadmin', '1.0.0.pre2'
 gem 'activeadmin-mongoid', github: 'elia/activeadmin-mongoid', branch: 'rails4-mongoid5'
-gem 'activeadmin-cancan', github: 'velaluqa/activeadmin-cancan', branch: 'master'
 
 # CodeRay for rendering yaml/json data
 gem 'coderay'
