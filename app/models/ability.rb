@@ -6,6 +6,8 @@ class Ability
 
     return if user.roles.empty?
 
+    can :read, ActiveAdmin::Page, name: 'Dashboard', namespace_name: 'admin'
+
     can [:read, :batch_action, :download_zip, :destroy], BackgroundJob do |job|
       job.user_id == user.id
     end
