@@ -675,6 +675,7 @@ DEPENDENCIES
   reek
   rest-client
   rspec (~> 3.4.0)
+  rspec-mocks (~> 3.4.1)
   rspec-rails (~> 3.4.2)
   rubocop
   rubocop-checkstyle_formatter

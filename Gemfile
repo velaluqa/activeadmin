@@ -205,6 +205,7 @@ group :test do
   gem 'faker'
 
   gem 'rspec', '~> 3.4.0'
+  gem 'rspec-mocks', '~> 3.4.1'
   gem 'rspec-rails', '~> 3.4.2'
   gem 'yarjuf', '~> 2.0.0'
 
