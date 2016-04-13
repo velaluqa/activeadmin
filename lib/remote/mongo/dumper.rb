@@ -1,4 +1,4 @@
-class Mongo
+module Mongo
   class Dumper
     class << self
       MONGODUMP_ARGS = %w(host port db username password collection out)
