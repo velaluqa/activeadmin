@@ -15,14 +15,10 @@ module ControllerMacros
       ability = Object.new
       ability.extend(CanCan::Ability)
       ability.instance_eval(&block) if block_given?
-      expect(@controller.send(:active_admin_authorization))
-        .to receive(:cancan_ability)
-             .at_least(:once)
-             .and_return(ability)
-      expect(@controller)
-        .to receive(:current_ability)
-             .at_least(:once)
-             .and_return(ability)
+      allow(@controller.send(:active_admin_authorization))
+        .to receive(:cancan_ability).and_return(ability)
+      allow(@controller)
+        .to receive(:current_ability).and_return(ability)
     end
 
     after(:each) do
