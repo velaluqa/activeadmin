@@ -29,4 +29,30 @@ RSpec.describe Admin::StudiesController, type: :controller do
       end
     end
   end
+
+  describe '#new' do
+    describe 'for authorized user' do
+      login_user_with_abilities do
+        can :read, Study
+        can :create, Study
+      end
+
+      it 'succeeds' do
+        response = get :new
+        expect(response).to be_success
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    describe 'for unauthorized user' do
+      login_user_with_abilities do
+        can :read, Study
+      end
+
+      it 'denies access' do
+        response = get :new
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end
