@@ -150,6 +150,8 @@ ActiveAdmin.register Study do
   member_action :upload_config, :method => :post do
     @study = Study.find(params[:id])
 
+    authorize!(:upload_config, @study)
+
     if(params[:study].nil? or params[:study][:file].nil? or params[:study][:file].tempfile.nil?)
       flash[:error] = "You must specify a configuration file to upload"
       redirect_to({:action => :show})
@@ -188,6 +190,8 @@ ActiveAdmin.register Study do
   end
   member_action :upload_config_form, :method => :get do
     @study = Study.find(params[:id])
+
+    authorize!(:upload_config, @study)
 
     @page_title = "Upload new configuration"
     render 'admin/studies/upload_config', :locals => { :url => upload_config_admin_study_path}
