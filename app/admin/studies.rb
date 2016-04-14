@@ -16,10 +16,6 @@ ActiveAdmin.register Study do
       1_000_000
     end
 
-    def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
-    end
-
     def index
       if ERICA.remote? && !params[:format].blank?
         authorize! :download_status_files, Study
