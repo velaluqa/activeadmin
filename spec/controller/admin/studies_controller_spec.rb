@@ -95,4 +95,39 @@ RSpec.describe Admin::StudiesController, type: :controller do
       end
     end
   end
+
+  describe '#create' do
+    describe 'without current user' do
+      subject { post(:create, study: {}) }
+      it { expect(subject.status).to eq 302 }
+      it { expect(subject).to redirect_to('/users/sign_in') }
+    end
+
+    describe 'for authorized user' do
+      login_user_with_abilities do
+        can :read, Study
+        can :create, Study
+      end
+
+      it 'succeeds' do
+        response = post(:create, study: {
+                          name: 'My New Study',
+                          domino_db_url: '',
+                          domino_server_name: ''
+                        })
+        expect(response).to redirect_to(%r{/admin/studies/\d+})
+      end
+    end
+
+    describe 'for unauthorized user' do
+      login_user_with_abilities do
+        can :read, Study
+      end
+
+      it 'denies access' do
+        response = post(:create, study: {})
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end
