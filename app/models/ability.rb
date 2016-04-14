@@ -43,7 +43,7 @@ class Ability
         can :read, [Study, Center, Patient, Visit, ImageSeries, Image]
       elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_read)).empty?)
         can :read, Study, ['id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id] do |study|
-          !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_read)}).nil?
+          study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_read)).exist?
         end
         can :read, Center, ['centers.study_id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id] do |center|
           can? :read, center.study
@@ -64,9 +64,7 @@ class Ability
 
       # handle :remote_comments
       can :remote_comment, Study do |study|
-        user.has_system_role?(:remote_comments) or !(
-          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_comments)}).nil?
-        )
+        user.has_system_role?(:remote_comments) or study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_comments)).exists?
       end
       can :remote_comment, [Center, Patient, Visit, ImageSeries, Image] do |resource|
         can? :remote_comment, resource.study
@@ -90,7 +88,7 @@ class Ability
         can :download_images, [Study, Patient, Visit]
       elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_images)).empty?)
         can :download_images, Study do |study|
-          !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_images)}).nil?
+          study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_images)).exists?
         end
         can :download_images, Patient do |patient|
           can? :download_images, patient.study
@@ -106,7 +104,7 @@ class Ability
         can :read_qc, Visit
       elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_qc)).empty?)
         can :read_qc, Study do |study|
-          !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_qc)}).nil?
+          study.roles.first(:user_id => user.id, :role => Role.role_sym_to_int(:remote_qc)).exists?
         end
         can :read_qc, Visit do |visit|
           can? :read_qc, visit.study
@@ -118,7 +116,7 @@ class Ability
         can :download_status_files, [Study, Center, Patient, Visit, ImageSeries, Image]
       # elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_status_files)).empty?)
       #   can :download_status_files, Study do |study|
-      #     !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_status_files)}).nil?
+      #     study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_status_files)).exists?
       #   end
       #   can :download_status_files, [Center, Patient, Visit, ImageSeries, Image] do |resource|
       #     can? :download_status_files, resource.study
@@ -128,14 +126,12 @@ class Ability
       # handle :remote_keywords and :remote_define_keywords
       remote_keywords_actions = [:edit_keywords, :edit_erica_keywords_form, :edit_erica_keywords, :autocomplete_tags]
       can (remote_keywords_actions + [:define_keywords]), Study do |study|
-        user.has_system_role?(:remote_define_keywords) or !(
-          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_define_keywords)}).nil?
-        )
+        user.has_system_role?(:remote_define_keywords) ||
+          study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_define_keywords)).exists?
       end
       can [:edit_keywords, :autocomplete_tags], Study do |study|
-        user.has_system_role?(:remote_keywords) or !(
-          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_keywords)}).nil?
-        )
+        user.has_system_role?(:remote_keywords) ||
+          study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_keywords)).exists?
       end
       unless(user.roles.where(role: Role.role_sym_to_int(:remote_keywords)).empty?)
         can remote_keywords_actions, [Center, Patient, Visit, ImageSeries] do |resource|
@@ -195,7 +191,7 @@ class Ability
     # we have to do this in this slightly awkward fassion to allow fetching visit records for any combination of image uploader/manager and mqc role
     unless(user.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)).empty?)
       can :mqc, Study, Study.where('id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |study|
-        !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)}).nil?
+        study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)).exists?
       end
       if(not (user.has_system_role?(:image_import) or user.has_system_role?(:image_manage) or user.is_app_admin?))
         can [:read, :mqc], Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |visit|
@@ -216,8 +212,8 @@ class Ability
 
     # Session Admin
     can :manage, Session, ['sessions.id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |session|
-      !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?) or
-        (session.study and !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?))
+      session.roles.where(:user_id => user.id, :role => Role::role_sym_to_int(:manage)).exists? ||
+        (session.study && session.study.roles.where(:user_id => user.id, :role => Role::role_sym_to_int(:manage)).exists?)
     end
 
     can :manage, Case, ['cases.session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |c|
@@ -258,7 +254,7 @@ class Ability
     end
 
     can :read, Study, ['id IN '+STUDY_AUDIT_ROLES_SUBQUERY, user.id] do |study|
-      !study.roles.first(:conditions => { :user_id => user.id, :role => [Role.role_sym_to_int(:audit), Role.role_sym_to_int(:readonly)]}).nil?
+      study.roles.where(:user_id => user.id, :role => [Role.role_sym_to_int(:audit), Role.role_sym_to_int(:readonly)]).exists?
     end
     unless(self.can? :read, Center)
       can :read, Center, ['centers.study_id IN '+STUDY_AUDIT_ROLES_SUBQUERY, user.id] do |center|
@@ -287,8 +283,8 @@ class Ability
     end
 
     can :read, Session, ['sessions.id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |session|
-      !(session.roles.first(:conditions => { :user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]}).nil?) or
-        (session.study and !(session.study.roles.first(:conditions => { :user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]}).nil?))
+      session.roles.where(:user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]).exists? ||
+        (session.study && session.study.roles.where(:user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]).exists?)
     end
     can :read, Case, ['cases.session_id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |c|
       can? :read, c.session
