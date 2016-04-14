@@ -130,4 +130,39 @@ RSpec.describe Admin::StudiesController, type: :controller do
       end
     end
   end
+
+  describe '#destroy' do
+    before(:each) do
+      @study = create(:study)
+    end
+
+    describe 'without current user' do
+      subject { post(:destroy, id: @study.id) }
+      it { expect(subject.status).to eq 302 }
+      it { expect(subject).to redirect_to('/users/sign_in') }
+    end
+
+    describe 'for authorized user' do
+      login_user_with_abilities do
+        can :read, Study
+        can :destroy, Study
+      end
+
+      it 'succeeds' do
+        response = post(:destroy, id: @study.id)
+        expect(response).to redirect_to('/admin/studies')
+      end
+    end
+
+    describe 'for unauthorized user' do
+      login_user_with_abilities do
+        can :read, Study
+      end
+
+      it 'denies access' do
+        response = post(:destroy, id: @study.id)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end
