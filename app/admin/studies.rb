@@ -4,7 +4,6 @@ require 'aa_erica_keywords'
 
 ActiveAdmin.register Study do
 
-  menu if: proc { can? :read, Study }
   actions :index, :show if ERICA.remote?
 
   scope :all, :default => true
