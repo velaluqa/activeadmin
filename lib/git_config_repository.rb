@@ -27,7 +27,7 @@ class GitConfigRepository
   end
 
   def current_version
-    @repo.head.resolve.target
+    @repo.head.resolve.target.oid
   end
 
   def walker_for_version(version)
