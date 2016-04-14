@@ -55,3 +55,4 @@ app/assets/images/client_logos/*
 /doc/images/erica-remote-sync-daemon.png
 /doc/images/erica-remote-sync.png
 reports
+/spec/data/
