@@ -1,1 +1,2 @@
-Version = PaperTrail::Version
+class Version < PaperTrail::Version
+end
