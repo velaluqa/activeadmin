@@ -38,7 +38,7 @@ StudyServer::Application.configure do
   # config.action_view.raise_on_missing_translations = true
 
   # custom app config
-  config.data_directory = 'data'
+  config.data_directory = 'spec/data'
 
   config.form_configs_subdirectory = 'forms'
   config.session_configs_subdirectory = 'sessions'
