@@ -156,7 +156,7 @@ ActiveAdmin.register User do
   end
 
   member_action :unlock, :method => :get do
-    authorize! :manage, :system
+    authorize!(:lock, resource)
 
     resource.unlock_access! if resource.access_locked?
     redirect_to({:action => :show}, :notice => 'User unlocked!')
