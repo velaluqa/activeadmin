@@ -165,4 +165,48 @@ RSpec.describe Admin::StudiesController, type: :controller do
       end
     end
   end
+
+  describe '#upload_config' do
+    before(:each) do
+      @study = create(:study)
+    end
+
+    let(:file) do
+      fixture_file_upload('spec/files/study_configuration_valid.yml', 'text/yml')
+    end
+
+    describe 'without current user' do
+      let(:response) do
+        post(:upload_config, id: @study.id, study: { file: file })
+      end
+
+      it { expect(response).to have_http_status(:found) }
+      it { expect(response).to redirect_to('/users/sign_in') }
+    end
+
+    describe 'for authorized user' do
+      login_user_with_abilities do
+        can :read, Study
+        can :manage, Study
+      end
+
+      let(:response) do
+        post(:upload_config, id: @study.id, study: { file: file })
+      end
+
+      it { expect(response).to redirect_to(%r{/admin/studies/\d+}) }
+    end
+
+    describe 'for unauthorized user' do
+      login_user_with_abilities do
+        can :read, Study
+      end
+
+      let(:response) do
+        post(:upload_config, id: @study.id, study: { file: file })
+      end
+
+      it { expect(response).to have_http_status(:forbidden) }
+    end
+  end
 end
