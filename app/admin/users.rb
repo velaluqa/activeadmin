@@ -101,21 +101,20 @@ ActiveAdmin.register User do
   end
 
   form do |f|
-    f.inputs 'User Information' do
-      f.input :username
-      f.input :name
-      if(current_user.is_app_admin? or not f.object.persisted?)
-        f.input :password
-        f.input :password_confirmation
+    inputs 'User Information' do
+      input :username
+      input :name
+      if current_user.is_app_admin? || !object.persisted?
+        input :password
+        input :password_confirmation
       end
-      unless f.object.persisted?
-        f.input :signature_password, :required => true
-        f.input :signature_password_confirmation, :required => true
+      unless object.persisted?
+        input :signature_password, :required => true
+        input :signature_password_confirmation, :required => true
       end
-      f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
 
-    f.buttons
+    actions
   end
 
   # filters
