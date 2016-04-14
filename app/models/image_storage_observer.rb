@@ -1,3 +1,5 @@
+# TODO: Move functionality into ActiveSupport::Concerns or work with
+# Trailblazer to enhance the applications architecture.
 class ImageStorageObserver < ActiveRecord::Observer
   observe :study, :center, :patient, :visit, :image_series, :image
 
@@ -19,15 +21,18 @@ class ImageStorageObserver < ActiveRecord::Observer
 
     #puts "AFTER COMMIT HOOK FOR"
     #pp model
-    if model.send(:transaction_include_action?, :create)
+    # TODO: Refactor! The protected function should not be called!
+    if model.send(:transaction_include_any_action?, [:create])
       #puts "CREATE-------------------"
       create_image_storage_path(model)
     end
-    if model.send(:transaction_include_action?, :update)
+    # TODO: Refactor! The protected function should not be called!
+    if model.send(:transaction_include_any_action?, [:update])
       #puts "UPDATE-------------------"
       move_image_storage_path(model)
     end
-    if model.send(:transaction_include_action?, :destroy)
+    # TODO: Refactor! The protected function should not be called!
+    if model.send(:transaction_include_any_action?, [:destroy])
       #puts "DESTROY-------------------"
       remove_image_storage_path(model)
     end
