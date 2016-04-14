@@ -12,9 +12,6 @@ ActiveAdmin.register Study do
   scope :production
 
   controller do
-    load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:lock, :unlock, :select_for_session]
-
     def max_csv_records
       1_000_000
     end
