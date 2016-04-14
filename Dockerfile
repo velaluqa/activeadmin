@@ -13,7 +13,8 @@ RUN apt-get update -qq && \
     imagemagick \
     zlib1g-dev \
     locales \
-    cmake
+    cmake \
+    postgresql-client
 
 # Set the locale
 RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && \
