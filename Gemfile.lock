@@ -445,6 +445,8 @@ GEM
     rb-inotify (0.9.7)
       ffi (>= 0.5.0)
     redis (3.2.2)
+    redis-namespace (1.5.2)
+      redis (~> 3.0, >= 3.0.4)
     reek (3.11)
       codeclimate-engine-rb (~> 0.3.1)
       parser (~> 2.3, >= 2.3.0.6)
@@ -672,6 +674,7 @@ DEPENDENCIES
   rails_best_practices
   railties (= 4.2.6)
   raindrops (~> 0.16.0)
+  redis-namespace
   reek
   rest-client
   rspec (~> 3.4.0)
