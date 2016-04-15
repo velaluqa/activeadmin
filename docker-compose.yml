@@ -6,7 +6,7 @@ redis:
   image: redis
 dev:
   build: .
-  command: zeus start
+  command: rails s -b 0.0.0.0
   tty: true
   volumes:
     - .:/app
