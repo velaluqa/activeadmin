@@ -18,8 +18,6 @@ class ERICARemoteRestoreWorker
     remote.restore_sql('6_image_series.sql')
     remote.restore_sql('7_images.sql')
 
-    remote.restore_mongo
-
     remote.restore_configs
 
     remote.cleanup
