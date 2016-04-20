@@ -10,7 +10,8 @@ class Visit < ActiveRecord::Base
   attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid
   attr_accessible :patient
   attr_accessible :mqc_date, :mqc_user_id, :mqc_state
-  attr_accessible :mqc_user
+  attr_accessible :assigned_image_series_index, :required_series
+  attr_accessible :mqc_user, :mqc_results
   
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
