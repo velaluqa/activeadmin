@@ -200,10 +200,12 @@ group :development, :test do
   gem 'bundler-audit'
 end
 
-group :test do
-  gem 'factory_girl', '~> 4.7.0'
+group :development, :test do
   gem 'faker'
+  gem 'factory_girl_rails', '~> 4.7.0'
+end
 
+group :test do
   gem 'rspec', '~> 3.4.0'
   gem 'rspec-mocks', '~> 3.4.1'
   gem 'rspec-rails', '~> 3.4.2'
