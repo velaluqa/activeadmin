@@ -13,7 +13,6 @@ StudyServer::Application.routes.draw do
   ActiveAdmin.routes(self)
 
   if ERICA.remote?
-    post '/erica_remote/push', to: 'erica_remote#push'
     get '/erica_remote/paths', to: 'erica_remote#paths'
   end
 
