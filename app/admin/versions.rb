@@ -181,7 +181,7 @@ ActiveAdmin.register Version do
       end
     end
 
-    default_actions
+    actions
   end
 
   show do |version|
@@ -268,8 +268,5 @@ ActiveAdmin.register Version do
   end
   action_item :edit, :only => :show_git_commit do
     link_to 'Back', git_commits_admin_versions_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :git_commits, Version
-  end
-  action_item :edit, :only => [:index, :git_commits] do
-    link_to 'MongoDB', admin_mongoid_history_trackers_path({}.merge(params[:audit_trail_view_id].blank? ? {} : {:audit_trail_view_id => params[:audit_trail_view_id]}).merge(params[:audit_trail_view_type].blank? ? {} : {:audit_trail_view_type => params[:audit_trail_view_type]})) if can? :read, MongoidHistoryTracker
   end
 end
