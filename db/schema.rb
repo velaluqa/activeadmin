@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160419081900) do
+ActiveRecord::Schema.define(version: 20160420130426) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -107,8 +107,10 @@ ActiveRecord::Schema.define(version: 20160419081900) do
     t.date     "imaging_date"
     t.string   "domino_unid"
     t.integer  "series_number"
-    t.integer  "state",         default: 0
+    t.integer  "state",              default: 0
     t.string   "comment"
+    t.jsonb    "properties",         default: {}, null: false
+    t.string   "properties_version"
   end
 
   add_index "image_series", ["patient_id", "series_number"], name: "index_image_series_on_patient_id_and_series_number", unique: true, using: :btree

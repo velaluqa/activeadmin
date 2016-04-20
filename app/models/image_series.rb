@@ -7,7 +7,7 @@ class ImageSeries < ActiveRecord::Base
   acts_as_taggable
 
   attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number, :state, :comment
-  attr_accessible :visit, :patient
+  attr_accessible :visit, :patient, :properties, :properties_version
 
   belongs_to :visit
   belongs_to :patient
