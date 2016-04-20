@@ -360,23 +360,27 @@ class ImageSeries < ActiveRecord::Base
       when [:imported, :not_required], [:visit_assigned, :not_required], [:required_series_assigned, :not_required] then :marked_not_required
       when [:not_required, :imported] then :unmarked_not_required
       end
+    elsif (c.keys - %w(properties properties_version)).empty?
+      :properties_change
     end
   end
+
   def self.audit_trail_event_title_and_severity(event_symbol)
-    return case event_symbol
-           when :name_change then ['Name Change', :warning]
-           when :comment_change then ['Comment Change', :warning]
-           when :center_change then ['Center Change', :warning]
-           when :visit_assigned then ['Assigned to visit', :ok]
-           when :visit_unassigned then ['Visit assignment removed', :warning]
-           when :required_series_assigned then ['Assigned as required series', :ok]
-           when :required_series_unassigned then ['Required series assignment removed', :warning]
-           when :visit_assignment_change then ['Visit assignment changed', :ok]
-           when :marked_not_required then ['Marked as not required', :warning]
-           when :unmarked_not_required then ['Not required flag revoked', :warning]
-           when :imaging_date_change then ['Imaging Date Change', :ok]
-           when :series_number_change then ['Series Number Change', :ok]
-           when :patient_change then ['Patient Change', :warning]
-           end
+    case event_symbol
+    when :name_change then ['Name Change', :warning]
+    when :comment_change then ['Comment Change', :warning]
+    when :center_change then ['Center Change', :warning]
+    when :visit_assigned then ['Assigned to visit', :ok]
+    when :visit_unassigned then ['Visit assignment removed', :warning]
+    when :required_series_assigned then ['Assigned as required series', :ok]
+    when :required_series_unassigned then ['Required series assignment removed', :warning]
+    when :visit_assignment_change then ['Visit assignment changed', :ok]
+    when :marked_not_required then ['Marked as not required', :warning]
+    when :unmarked_not_required then ['Not required flag revoked', :warning]
+    when :imaging_date_change then ['Imaging Date Change', :ok]
+    when :series_number_change then ['Series Number Change', :ok]
+    when :patient_change then ['Patient Change', :warning]
+    when :properties_change then ['Properties Change', :ok]
+    end
   end
 end

@@ -25,17 +25,5 @@ module Legacy
     def image_series=(image_series)
       write_attribute(:image_series_id, image_series.id)
     end
-
-    def self.classify_mongoid_tracker_event(c)
-      if((c.keys - ['properties', 'properties_version']).empty?)
-        :properties_change
-      end
-    end
-
-    def self.mongoid_tracker_event_title_and_severity(event_symbol)
-      case event_symbol
-      when :properties_change then ['Properties Change', :ok]
-      end
-    end
   end
 end
