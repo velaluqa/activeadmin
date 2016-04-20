@@ -77,7 +77,6 @@ gem 'paper_trail', '~> 4.1.0'
 
 # ActiveAdmin
 gem 'activeadmin', '1.0.0.pre2'
-gem 'activeadmin-mongoid', github: 'elia/activeadmin-mongoid', branch: 'rails4-mongoid5'
 
 # CodeRay for rendering yaml/json data
 gem 'coderay'
