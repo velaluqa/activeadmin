@@ -146,7 +146,6 @@ class Ability
     if user.is_app_admin?
       can :manage, :system
       can :manage, Version
-      can :manage, MongoidHistoryTracker
       can :manage, User
       can :manage, Role
       can :manage, PublicKey
@@ -211,7 +210,6 @@ class Ability
       can :read, Version
       can :git_commits, Version
       can :show_git_commit, Version
-      can :read, MongoidHistoryTracker
     end
 
     can :read, Study, ['id IN '+STUDY_AUDIT_ROLES_SUBQUERY, user.id] do |study|
