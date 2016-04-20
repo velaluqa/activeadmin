@@ -9,12 +9,9 @@ namespace :erica do
     puts visits.count
 
     visits.each do |visit|
-      visit_data = visit.visit_data
-      visit_data.assigned_image_series_index = {}
-      visit_data.required_series = {}
-      visit_data.save
-
-      visit.visit_type = nil
+      visit.assigned_image_series_index = {}
+      visit.required_series = {}
+s      visit.visit_type = nil
       visit.save
     end
   end

@@ -62,7 +62,7 @@ ActiveAdmin.register ImageSeries do
       end
       params[:image_series].delete(:force_update)
 
-      original_required_series = (original_visit.nil? or original_visit.visit_data.nil? ? nil : original_visit.visit_data.required_series)
+      original_required_series = original_visit.andand.required_series
 
       original_visit_assignment_changes = {}
       new_visit_assignment_changes = {}
