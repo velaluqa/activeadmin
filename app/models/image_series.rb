@@ -12,7 +12,6 @@ class ImageSeries < ActiveRecord::Base
   belongs_to :visit
   belongs_to :patient
   has_many :images, :dependent => :destroy
-  has_one :image_series_data
 
   #validates_uniqueness_of :series_number, :scope => :patient_id
   validates_presence_of :name, :patient_id, :imaging_date
@@ -29,12 +28,6 @@ class ImageSeries < ActiveRecord::Base
   before_save :update_state
 
   #before_validation :assign_series_number
-
-  after_create :ensure_image_series_data_exists
-
-  before_destroy do
-    ImageSeriesData.destroy_all(:image_series_id => self.id)
-  end
 
   STATE_SYMS = [:imported, :visit_assigned, :required_series_assigned, :not_required]
 
@@ -74,10 +67,6 @@ class ImageSeries < ActiveRecord::Base
     else
       self.patient.study
     end
-  end
-
-  def image_series_data
-    ImageSeriesData.where(:image_series_id => read_attribute(:id)).first
   end
 
   def previous_image_storage_path
@@ -166,12 +155,6 @@ class ImageSeries < ActiveRecord::Base
     end
   end
 
-  def ensure_image_series_data_exists
-    if(self.image_series_data.nil?)
-      ImageSeriesData.create(:image_series_id => self.id)
-    end
-  end
-
   def assigned_required_series
     return [] if self.visit.nil?
 
@@ -231,29 +214,28 @@ class ImageSeries < ActiveRecord::Base
   protected
 
   def properties_to_domino
-    image_series_data = self.image_series_data
-    properties_version = if(image_series_data.nil? and self.study.nil?)
+    properties_version = if study.nil?
                            nil
-                         elsif(image_series_data.nil? or image_series_data.properties_version.blank?)
-                           self.study.locked_version
+                         elsif properties_version.blank?
+                           study.locked_version
                          else
-                           image_series_data.properties_version
+                           properties_version
                          end
-    study_config = (self.study.nil? or image_series_data.nil? ? nil : self.study.configuration_at_version(properties_version))
+    study_config = study.andand.configuration_at_version(properties_version)
     result = {}
 
-    if(study_config and study.semantically_valid_at_version?(properties_version) and image_series_data and image_series_data.properties)
+    if study_config && study.semantically_valid_at_version?(properties_version) && properties
       properties_spec = study_config['image_series_properties']
       property_names = []
       property_values = []
 
       processed_properties = []
 
-      unless(properties_spec.nil?)
+      unless properties_spec.nil?
         properties_spec.each do |property|
           property_names << property['label']
 
-          raw_value = image_series_data.properties[property['id']]
+          raw_value = properties[property['id']]
           value = case property['type']
                   when 'string'
                     raw_value
@@ -275,7 +257,7 @@ class ImageSeries < ActiveRecord::Base
         end
       end
 
-      image_series_data.properties.each do |id, value|
+      properties.each do |id, value|
         next if processed_properties.include?(id)
         property_names << id.to_s
         property_values << (value.blank? ? 'Not set' : value.to_s)

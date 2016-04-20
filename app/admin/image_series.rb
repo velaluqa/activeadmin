@@ -257,12 +257,16 @@ ActiveAdmin.register ImageSeries do
       end
     end
 
-    properties_version = (image_series.image_series_data.nil? ? nil : image_series.image_series_data.properties_version) || (image_series.study.nil? ? nil : image_series.study.locked_version)
-    study_config = (image_series.study.nil? ? nil : image_series.study.configuration_at_version(properties_version))
-    if(image_series.study and study_config and image_series.study.semantically_valid_at_version?(properties_version) and image_series.image_series_data and image_series.image_series_data.properties)
+    properties_version = image_series.properties_version || image_series.study.andand.locked_version
+    study_config = image_series.study.andand.configuration_at_version(properties_version)
+    if image_series.study && study_config && image_series.study.semantically_valid_at_version?(properties_version) && image_series.properties
       properties_spec = study_config['image_series_properties']
 
-      render :partial => 'admin/image_series/properties_table', :locals => { :spec => properties_spec, :values => image_series.image_series_data.properties}
+      render :partial => 'admin/image_series/properties_table',
+             :locals => {
+               :spec => properties_spec,
+               :values => image_series.properties
+             }
     end
     active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, image_series)
   end
@@ -327,12 +331,10 @@ ActiveAdmin.register ImageSeries do
       redirect_to({:action => :show})
     end
 
-    @image_series.ensure_image_series_data_exists
-    image_series_data = @image_series.image_series_data
-
     study_config = @image_series.study.locked_configuration
     properties_spec = study_config['image_series_properties']
-    image_series_data.properties = {} if image_series_data.properties.nil?
+
+    @image_series.properties = {} if properties.nil?
 
     properties_spec.each do |property_spec|
       new_value = params[:properties][property_spec['id']]
@@ -342,10 +344,10 @@ ActiveAdmin.register ImageSeries do
         new_value = (new_value == '1')
       end
 
-      image_series_data.properties[property_spec['id']] = new_value
+      @image_series.properties[property_spec['id']] = new_value
     end
-    image_series_data.properties_version = @image_series.study.locked_version
-    image_series_data.save
+    @image_series.properties_version = @image_series.study.locked_version
+    @image_series.save
     @image_series.schedule_domino_sync
 
     redirect_to({:action => :show}, :notice => 'Properties successfully updated.')
@@ -362,7 +364,7 @@ ActiveAdmin.register ImageSeries do
     study_config = @image_series.study.locked_configuration
     @properties_spec = study_config['image_series_properties']
 
-    @properties = (@image_series.image_series_data.nil? ? {} : @image_series.image_series_data.properties)
+    @properties = @image_series.properties
 
     @page_title = 'Edit Properties'
     render 'admin/image_series/edit_properties'
