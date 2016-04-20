@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160418161502) do
+ActiveRecord::Schema.define(version: 20160418161530) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,24 @@ ActiveRecord::Schema.define(version: 20160418161502) do
   add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
+
+  create_table "background_jobs", force: :cascade do |t|
+    t.string   "legacy_id"
+    t.integer  "user_id"
+    t.boolean  "completed",     default: false, null: false
+    t.float    "progress",      default: 0.0,   null: false
+    t.datetime "completed_at"
+    t.boolean  "successful"
+    t.text     "error_message"
+    t.jsonb    "results",       default: {},    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "background_jobs", ["completed"], name: "index_background_jobs_on_completed", using: :btree
+  add_index "background_jobs", ["legacy_id"], name: "index_background_jobs_on_legacy_id", using: :btree
+  add_index "background_jobs", ["results"], name: "index_background_jobs_on_results", using: :gin
+  add_index "background_jobs", ["user_id"], name: "index_background_jobs_on_user_id", using: :btree
 
   create_table "cases", force: :cascade do |t|
     t.integer  "position"
