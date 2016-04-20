@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160418161530) do
+ActiveRecord::Schema.define(version: 20160419081900) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -131,6 +131,8 @@ ActiveRecord::Schema.define(version: 20160418161530) do
     t.datetime "updated_at"
     t.integer  "center_id"
     t.string   "domino_unid"
+    t.jsonb    "data",           default: {}, null: false
+    t.jsonb    "export_history", default: [], null: false
   end
 
   add_index "patients", ["center_id"], name: "index_patients_on_center_id", using: :btree

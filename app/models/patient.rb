@@ -7,7 +7,7 @@ class Patient < ActiveRecord::Base
   acts_as_taggable
 
   attr_accessible :center, :subject_id, :domino_unid
-  attr_accessible :center_id
+  attr_accessible :center_id, :data, :export_history
 
   belongs_to :center
   has_many :visits, :dependent => :destroy
