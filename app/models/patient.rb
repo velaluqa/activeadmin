@@ -12,7 +12,6 @@ class Patient < ActiveRecord::Base
   belongs_to :center
   has_many :visits, :dependent => :destroy
   has_many :image_series, :dependent => :destroy
-  has_one :patient_data
 
   validates_uniqueness_of :subject_id, :scope => :center_id
   validates_presence_of :subject_id
@@ -27,8 +26,6 @@ class Patient < ActiveRecord::Base
       errors.add :base, 'You cannot delete a patient which has cases or form answers associated.' 
       return false
     end
-
-    PatientData.destroy_all(:patient_id => self.id)
   end
 
   before_save :ensure_study_is_unchanged
@@ -52,10 +49,6 @@ class Patient < ActiveRecord::Base
     else
       center.code + subject_id
     end
-  end
-
-  def patient_data
-    PatientData.where(:patient_id => read_attribute(:id)).first
   end
 
   def next_series_number
