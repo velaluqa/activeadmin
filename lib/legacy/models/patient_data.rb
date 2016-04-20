@@ -24,19 +24,5 @@ module Legacy
     def patient=(patient)
       write_attribute(:patient_id, patient.id)
     end
-
-    def self.classify_mongoid_tracker_event(c)
-      if(c.keys == ['data'])
-        :data_change
-      elsif(c.keys == ['export_history'])
-        :export_to_ericav1
-      end
-    end
-    def self.mongoid_tracker_event_title_and_severity(event_symbol)
-      return case event_symbol
-             when :data_change then ['Patient Data Change', :ok]
-             when :export_to_ericav1 then ['Export to ERICAV1', :ok]
-             end
-    end
   end
 end

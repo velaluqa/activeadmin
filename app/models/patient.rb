@@ -128,16 +128,23 @@ class Patient < ActiveRecord::Base
     # ignore Domino UNID changes that happened along with a property change
     c.delete('domino_unid')
 
-    if(c.keys == ['subject_id'])
+    if c.keys == ['subject_id']
       :name_change
-    elsif(c.keys == ['center_id'])
+    elsif c.keys == ['center_id']
       :center_change
+    elsif c.keys == ['data']
+      :data_change
+    elsif c.keys == ['export_history']
+      :export_to_ericav1
     end
   end
+
   def self.audit_trail_event_title_and_severity(event_symbol)
-    return case event_symbol
-           when :name_change then ['Subject ID Change', :warning]
-           when :center_change then ['Center Change', :warning]
-           end
+    case event_symbol
+    when :name_change then ['Subject ID Change', :warning]
+    when :center_change then ['Center Change', :warning]
+    when :data_change then ['Patient Data Change', :ok]
+    when :export_to_ericav1 then ['Export to ERICAV1', :ok]
+    end
   end
 end
