@@ -10,8 +10,6 @@ class Patient < ActiveRecord::Base
   attr_accessible :center_id
 
   belongs_to :center
-  has_many :form_answers
-  has_many :cases
   has_many :visits, :dependent => :destroy
   has_many :image_series, :dependent => :destroy
   has_one :patient_data

@@ -16,36 +16,12 @@ StudyServer::Application.routes.draw do
     get '/erica_remote/paths', to: 'erica_remote#paths'
   end
 
-  resources :forms, only: [:show] do
-    member do
-      get 'previous_results'
-      get 'preview'
-    end
-  end
-  resources :form_answers, only: [:create]
-
-  resources :sessions, only: [:show] do
-    collection do
-      get 'list'
-    end
-    member do
-      get 'reserve_cases'
-    end
-  end
-
-  resources :cases, only: [] do
-    member do
-      get 'cancel_read'
-    end
-  end
-
   devise_for :users, controllers: { sessions: 'users/sessions' }
   devise_scope :user do
     post 'users/authenticate', to: 'users/sessions#authenticate_user'
     get 'users/change_password', to: 'users#change_password'
     patch 'users/update_password', to: 'users#update_password'
     get 'users/uploader_rights', to: 'users#uploader_rights'
-    get 'users/cancel_current_cases', to: 'users#cancel_current_cases'
   end
 
   resources :studies, only: [:index] do

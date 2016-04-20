@@ -1,7 +1,0 @@
-= semantic_form_for :user, :url => url, :method => :post do |f|
-  = f.inputs 'Select User' do
-    = f.input :user, :collection => User.all, :as => :select
-
-  = f.actions do
-    = f.action :submit, :as => :input
-    = f.action :cancel, :as => :link, :wrapper_html => {:class => 'cancel'}

@@ -1,7 +1,0 @@
-panel 'Export Errors' do
-  ul do
-    assigns[:errors].each do |e|
-      li { e }
-    end
-  end
-end

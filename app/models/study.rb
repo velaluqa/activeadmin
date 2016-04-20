@@ -9,8 +9,6 @@ class Study < ActiveRecord::Base
 
   attr_accessible :name, :locked_version, :domino_db_url, :domino_server_name, :notes_links_base_uri, :state
 
-  has_many :sessions
-
   has_many :roles, :as => :subject
 
   has_many :centers
@@ -27,8 +25,8 @@ class Study < ActiveRecord::Base
   scope :by_ids, ->(*ids) { where(id: Array[ids].flatten) }
 
   before_destroy do
-    unless(sessions.empty? and centers.empty?)
-      errors.add :base, 'You cannot delete a study that still has sessions or centers associated with it.'
+    unless centers.empty?
+      errors.add :base, 'You cannot delete a study that still has centers associated with it.'
       return false
     end
   end

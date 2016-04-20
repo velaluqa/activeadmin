@@ -93,9 +93,7 @@ ActiveAdmin.register Patient do
     column :subject_id
     keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-    customizable_default_actions(current_ability) do |resource|
-      (resource.cases.empty? and resource.form_answers.empty?) ? [] : [:destroy]
-    end
+    customizable_default_actions(current_ability)
   end
 
   show do |patient|

@@ -156,10 +156,6 @@ class Ability
       can :read, Visit
       can :read, ImageSeries
       can :read, Image
-      can [:create, :read, :edit, :destroy], Session
-      can :manage, Form, ['forms.session_id IS NULL'] do |form|
-        form.is_template?
-      end
     else
       can :read, PublicKey, ['public_keys.user_id = ?', user.id] do |public_key|
         public_key.user == user
@@ -210,41 +206,6 @@ class Ability
       end
     end
 
-    # Session Admin
-    can :manage, Session, ['sessions.id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |session|
-      session.roles.where(:user_id => user.id, :role => Role::role_sym_to_int(:manage)).exists? ||
-        (session.study && session.study.roles.where(:user_id => user.id, :role => Role::role_sym_to_int(:manage)).exists?)
-    end
-
-    can :manage, Case, ['cases.session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |c|
-      can? :manage, c.session
-    end
-    # possible record query for mongoid:
-    # CaseData.in(case_id: Case.where('session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id).map{|c| c.id})
-    # we don't need that though, since there is no index for case/patient data anyway and we can define the actual rights via the block
-    can :manage, CaseData do |cd|
-      can? :manage, cd.case
-    end
-
-    can :read, FormAnswer, FormAnswer.in(session_id: Session.where('id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id).map{|s| s.id}) do |form_answer|
-      can? :read, form_answer.session
-    end
-    can :manage, FormAnswer, FormAnswer.in(session_id: Session.where('id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id).map{|s| s.id}) do |form_answer|
-      can? :manage, form_answer.session
-    end
-
-    can :create, Form
-    can :read, Form, ['forms.session_id IS NULL'] do |form|
-      form.is_template?
-    end
-    can :manage, Form, ['forms.session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |form|
-      can? :manage, form.session
-    end
-
-    can :manage, PatientData do |pd|
-      can? :manage, pd.patient
-    end
-
     # Audit role
     unless user.is_app_admin?
       can :read, Version
@@ -282,23 +243,6 @@ class Ability
       end
     end
 
-    can :read, Session, ['sessions.id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |session|
-      session.roles.where(:user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]).exists? ||
-        (session.study && session.study.roles.where(:user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]).exists?)
-    end
-    can :read, Case, ['cases.session_id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |c|
-      can? :read, c.session
-    end
-    can :read, CaseData do |cd|
-      can? :read, cd.case
-    end
-    can :read, Form, ['forms.session_id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |form|
-      can? :read, form.session
-    end
-
-    can :read, PatientData do |pd|
-      can? :read, pd.patient
-    end
   end
 
   # this is somewhat of a hack so we can check whether a user can create/edit a template form without actually having a template form object
