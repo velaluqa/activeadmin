@@ -15,6 +15,7 @@ class Patient < ActiveRecord::Base
 
   validates_uniqueness_of :subject_id, :scope => :center_id
   validates_presence_of :subject_id
+  validates_presence_of :center_id
 
   scope :by_study_ids, lambda { |*ids|
     joins(:center)

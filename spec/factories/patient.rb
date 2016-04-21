@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :patient do
+    center
     sequence(:subject_id)
     sequence(:images_folder)
     sequence(:domino_unid) do |n|
