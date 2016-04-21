@@ -5,6 +5,9 @@ class BackgroundJob < ActiveRecord::Base
 
   before_destroy :remove_zipfile
 
+  scope :completed, -> { where(completed: true) }
+  scope :running, -> { where(completed: false) }
+
   ##
   # Find out whether this job has finished.
   #
