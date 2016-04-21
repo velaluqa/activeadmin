@@ -1,14 +1,4 @@
 GIT
-  remote: git://github.com/elia/activeadmin-mongoid.git
-  revision: 3ff2ade41f1a73c29644ef4e331a4a490f8ba222
-  branch: rails4-mongoid5
-  specs:
-    activeadmin-mongoid (0.2.1)
-      activeadmin (>= 0.6.1, < 2)
-      mongoid (~> 5.0)
-      rails (~> 4.0)
-
-GIT
   remote: ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git
   revision: 68dff41fedc7667ab1bd8d1ec74b90fe0ed5a2ac
   branch: master
@@ -611,7 +601,6 @@ PLATFORMS
 DEPENDENCIES
   actionpack-action_caching
   activeadmin (= 1.0.0.pre2)
-  activeadmin-mongoid!
   activerecord-session_store
   activeresource
   acts-as-taggable-on

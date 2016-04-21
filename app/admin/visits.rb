@@ -270,7 +270,7 @@ ActiveAdmin.register Visit do
       redirect_to :back
       return
     end
-    @current_assignment = (@visit.visit_data.nil? ? {} : @visit.assigned_required_series_id_map)
+    @current_assignment = @visit.assigned_required_series_id_map
 
     @page_title = 'Assign image series as required series'
     render 'admin/visits/assign_required_series'
@@ -383,8 +383,7 @@ ActiveAdmin.register Visit do
       authorize! :mqc, @visit unless can? :manage, @visit
     end
 
-    visit_data = @visit.visit_data
-    mqc_version = (visit_data.nil? ? @visit.study.locked_version : visit_data.mqc_version)
+    mqc_version = @visit.mqc_version
     @mqc_spec = @visit.mqc_spec_with_results_at_version(mqc_version)
     if(@mqc_spec.nil?)
       flash[:error] = 'Viewing mQC results requires a valid study config containing mQC specifications for this visits visit type and existing mQC results.'
@@ -436,8 +435,6 @@ ActiveAdmin.register Visit do
       redirect_to :action => :show
       return
     end
-    @visit.ensure_visit_data_exists
-    @visit_data = @visit.visit_data
 
     @page_title = "Perform mQC"
     render 'admin/visits/mqc_form'

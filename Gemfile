@@ -24,8 +24,10 @@ gem 'rails-observers' # https://github.com/rails/rails-observers
 gem 'sqlite3', '~> 1.3.11'
 gem 'pg'
 
-# MongoDB
+# MongoDB & MongoDB history for audit trail
+# TODO: Remove Mongoid when all systems are migrated successfully.
 gem 'mongoid', '~> 5.1.2'
+gem 'mongoid-history', '~> 0.5.0'
 
 gem 'json', '~> 1.8.3'
 
@@ -77,7 +79,6 @@ gem 'paper_trail', '~> 4.1.0'
 
 # ActiveAdmin
 gem 'activeadmin', '1.0.0.pre2'
-gem 'activeadmin-mongoid', github: 'elia/activeadmin-mongoid', branch: 'rails4-mongoid5'
 
 # CodeRay for rendering yaml/json data
 gem 'coderay'
@@ -116,9 +117,6 @@ gem 'sidekiq'
 
 # Ruby DICOM lib
 gem 'dicom'
-
-# MongoDB audit trail
-gem 'mongoid-history', '~> 0.5.0'
 
 # Zip file creation for image download in ERICA Remote
 gem 'rubyzip'

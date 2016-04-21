@@ -22,9 +22,8 @@ class RequiredSeries
     @visit = visit
     @name = name
 
-    visit.ensure_visit_data_exists
-    data = visit.visit_data['required_series'][name]
-    unless(data.nil?)
+    data = visit.required_series[name]
+    if data
       @image_series_id = data['image_series_id']
       @tqc_results = data['tqc_results']
       @tqc_comment = data['tqc_comment']
@@ -158,16 +157,15 @@ class RequiredSeries
   end
 
   def domino_unid=(new_unid)
-    visit_data = visit.visit_data
-    unless(visit_data.nil? or visit_data.required_series.nil?)
-      visit_data.required_series[self.name] ||= {}
-      visit_data.required_series[self.name]['domino_unid'] = new_unid
-
-      visit_data.save
+    if visit.required_series
+      visit.required_series[name] ||= {}
+      visit.required_series[name]['domino_unid'] = new_unid
+      visit.save
     end
   end
+
   def domino_sync
-    self.ensure_domino_document_exists
+    ensure_domino_document_exists
   end
 
   protected

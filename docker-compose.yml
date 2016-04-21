@@ -11,7 +11,6 @@ dev:
   volumes:
     - .:/app
     - ./config/database.yml.dev:/app/config/database.yml
-    - ./config/mongoid.yml.dev:/app/config/mongoid.yml
     - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
   ports:
     - 3000:3000

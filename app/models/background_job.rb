@@ -1,54 +1,33 @@
-class BackgroundJob
-  include Mongoid::Document
-  include Mongoid::Timestamps
+##
+# A simple model to hold information about background jobs.
+class BackgroundJob < ActiveRecord::Base
+  belongs_to :user
 
-  field :user_id, type: Integer
+  before_destroy :remove_zipfile
 
-  field :completed, type: Boolean, default: false
-  field :progress, type: Float, default: 0.0
-  field :name, type: String
-  field :completed_at, type: Time
-
-  field :successful, type: Boolean
-  field :error_message, type: String
-
-  field :results, type: Hash
-
-  index user_id: 1
-  index completed: 1
-
-  scope :completed, -> { where(completed: true) }
-  scope :running, -> { where(completed: false) }
-
-  before_destroy do
-    return false unless finished?
-
-    begin
-      File.delete(results['zipfile']) if results.andand['zipfile']
-    rescue => error
-      logger.warn(error)
-    end
-  end
-
-  def user
-    User.find(read_attribute(:user_id))
-  rescue ActiveRecord::RecordNotFound
-    nil
-  end
-
-  def user=(user)
-    write_attribute(:user_id, user.id)
-  end
-
+  ##
+  # Find out whether this job has finished.
+  #
+  # @returns [Boolean] whether this job has finished
+  #
+  # TODO: Refactor to use `completed_at` as indicator for completed jobs.
   def finished?
     completed
   end
 
+  ##
+  # Find out whether this job has failed.
+  #
+  # @returns [Boolean] whether this job has failed
   def failed?
-    finished? && !successful
+    completed && !successful
   end
 
-  def finish_successfully(results)
+  ##
+  # Save this BackgroundJob as successful.
+  #
+  # @param [Hash] optional results hash
+  def finish_successfully(results = {})
     finish
 
     self.successful = true
@@ -57,6 +36,10 @@ class BackgroundJob
     save
   end
 
+  ##
+  # Save this BackgroundJob as failed.
+  #
+  # @param [String] the error message
   def fail(error_message)
     finish
 
@@ -66,6 +49,11 @@ class BackgroundJob
     save
   end
 
+  ##
+  # Save this BackgroundJob's progress.
+  #
+  # @param [Integer] the current amount done
+  # @param [Integer] the amount for completion
   def set_progress(current, total)
     self.progress = current.to_f / total.to_f
     save
@@ -73,10 +61,28 @@ class BackgroundJob
 
   protected
 
+  ##
+  # Update this job as completed.
+  #
+  # TODO: Refactor to use `completed_at` as sole completion
+  # indicator.
+  #
+  # @param [Boolean] whether to save the model (default: false)
   def finish(save = false)
     self.completed = true
     self.completed_at = Time.now
 
     self.save if save
+  end
+
+  ##
+  # If the job is finished and it has a zipfile referenced in its
+  # `results` remove the file upon deletion of the resource.
+  def remove_zipfile
+    return false unless finished?
+
+    File.delete(results['zipfile']) if results.andand['zipfile']
+  rescue => error
+    logger.warn(error)
   end
 end

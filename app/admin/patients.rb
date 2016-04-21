@@ -104,7 +104,7 @@ ActiveAdmin.register Patient do
       row :image_storage_path
       keywords_row(patient, :tags, 'Keywords') if Rails.application.config.is_erica_remote
       row :patient_data_raw do
-        CodeRay.scan(JSON::pretty_generate(patient.patient_data.data), :json).div(:css => :class).html_safe unless patient.patient_data.nil?
+        CodeRay.scan(JSON::pretty_generate(patient.data || {}), :json).div(:css => :class).html_safe
       end
     end
     active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, patient)

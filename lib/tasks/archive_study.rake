@@ -1,11 +1,6 @@
 namespace :erica do
 
   # to be archived:
-  # - MongoDB:
-  #   - ImageSeriesData
-  #   - VisitData
-  #   - PatientData
-  #   - MongoidHistoryTrackers for the above
   # - RDBMS:
   #   - Study
   #   - Centers
@@ -160,26 +155,9 @@ namespace :erica do
 
     postgresql_drop_database(archive_db_name)
   end
-
-  def mongodb_export(host, collection, query, outfile)
-    mongoexport_call = "mongoexport #{host} --collection #{collection} --query '#{query}' >> '#{outfile}'"
-
-    puts 'EXECUTING: ' + mongoexport_call
-    system_or_die(mongoexport_call)
-  end
-  def mongodb_export_documents(collection, id_field, ids, outfile, host)
-    ids_string = '[' + ids.map {|id| id.to_s}.join(', ') + ']'
-    document_query = "{#{id_field}: { $in: #{ids_string} } }"
-    puts document_query
-
-    mongodb_export(host, collection, document_query, outfile)
-  end
   
   desc 'Archive a study and all its contents, removing them from ERICAv2.'
   task :archive_study, [:study_id, :archive_path] => [:environment] do |t, args|
-    mongodb_server = Mongoid.configure.sessions[:default]
-    mongoexport_host_string = "--db #{mongodb_server[:database]} --host #{mongodb_server[:hosts].first}"
-
     study_id = args[:study_id]
     archive_path = args[:archive_path]
     if(study_id.blank?)
@@ -244,34 +222,6 @@ namespace :erica do
     puts 'EXECUTING: ' + data_tar_command
     system_or_die(data_tar_command)
 
-    puts "Archiving MongoDB documents"
-    archive_mongodb_pathname = archive_pathname.join('mongodb')
-    archive_mongodb_pathname.mkdir
-
-    mongoid_history_trackers_pathname = archive_mongodb_pathname.join('mongoid_history_tracker.json')
-    [
-      {name: 'VisitData', data_ids: study.visits.map {|v| v.visit_data.nil? ? nil : v.visit_data.id}},
-      {name: 'PatientData', data_ids: study.patients.map {|p| p.patient_data.nil? ? nil : p.patient_data.id}},
-      {name: 'ImageSeriesData', data_ids: study.image_series.map {|is| is.image_series_data.nil? ? nil : is.image_series_data.id}},
-    ].each do |spec|
-      spec[:data_ids].each do |id|
-        next if id.nil?
-
-        query = "{ association_chain: { $elemMatch: { name: \"#{spec[:name]}\", id: ObjectId(\"#{id}\") }}}"
-        mongodb_export(mongoexport_host_string, 'mongoid_history_trackers', query, mongoid_history_trackers_pathname.to_s)
-      end
-    end
-
-    [
-      {collection: 'visit_data', id_field: 'visit_id', ids: study.visits.map{|v| v.id}},
-      {collection: 'image_series_data', id_field: 'image_series_id', ids: study.image_series.map{|is| is.id}},
-      {collection: 'patient_data', id_field: 'patient_id', ids: study.patients.map{|p| p.id}}
-    ].each do |export_spec|
-      outfile_pathname = archive_mongodb_pathname.join(export_spec[:collection] + '.json')
-      mongodb_export_documents(export_spec[:collection], export_spec[:id_field], export_spec[:ids], outfile_pathname.to_s, mongoexport_host_string)
-    end
-
-
     case ActiveRecord::Base.connection.adapter_name
     when 'PostgreSQL'
       archive_db_name = 'archive_db_' + Time.now.strftime('%Y%m%d%H%M%S')
@@ -294,41 +244,36 @@ namespace :erica do
     print 'Finished creating archive, removing study from ERICAv2 now...'
     result = true
     PaperTrail.enabled = false
-    Mongoid::History.disable do
-      result = ActiveRecord::Base.transaction do
+    result = ActiveRecord::Base.transaction do
 
-        study.image_series.each do |image_series|
-          image_series.images.each do |image|
-            Version.where('item_type = \'Image\' AND item_id = ?', image.id).delete_all
-          end
-
-          Version.where('item_type = \'ImageSeries\' AND item_id = ?', image_series.id).delete_all
-          image_series.image_series_data.history_tracks.delete_all if(image_series.image_series_data)
+      study.image_series.each do |image_series|
+        image_series.images.each do |image|
+          Version.where('item_type = \'Image\' AND item_id = ?', image.id).delete_all
         end
 
-        study.visits.each do |visit|
-          Version.where('item_type = \'Visit\' AND item_id = ?', visit.id).delete_all
-          visit.visit_data.history_tracks.delete_all if(visit.visit_data)
-        end
-
-        study.patients.each do |patient|
-          Version.where('item_type = \'Patient\' AND item_id = ?', patient.id).delete_all
-          patient.patient_data.history_tracks.delete_all if(patient.patient_data)
-          patient.destroy
-        end
-
-        study.reload
-        study.centers.each do |center|
-          center.reload
-          Version.where('item_type = \'Center\' AND item_id = ?', center.id).delete_all
-          center.destroy
-        end
-
-        study.reload
-        Version.where('item_type = \'Study\' AND item_id = ?', study.id).delete_all
-        study.destroy
-
+        Version.where('item_type = \'ImageSeries\' AND item_id = ?', image_series.id).delete_all
       end
+
+      study.visits.each do |visit|
+        Version.where('item_type = \'Visit\' AND item_id = ?', visit.id).delete_all
+      end
+
+      study.patients.each do |patient|
+        Version.where('item_type = \'Patient\' AND item_id = ?', patient.id).delete_all
+        patient.destroy
+      end
+
+      study.reload
+      study.centers.each do |center|
+        center.reload
+        Version.where('item_type = \'Center\' AND item_id = ?', center.id).delete_all
+        center.destroy
+      end
+
+      study.reload
+      Version.where('item_type = \'Study\' AND item_id = ?', study.id).delete_all
+      study.destroy
+
     end
     PaperTrail.enabled = true
 
