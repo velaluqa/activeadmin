@@ -8,7 +8,7 @@ class Ability
 
     can :read, ActiveAdmin::Page, name: 'Dashboard', namespace_name: 'admin'
 
-    can [:read, :batch_action, :download_zip, :destroy], BackgroundJob do |job|
+    can [:read, :batch_action, :download_zip, :destroy], BackgroundJob, ['user_id = ?', user.id] do |job|
       job.user_id == user.id
     end
 
