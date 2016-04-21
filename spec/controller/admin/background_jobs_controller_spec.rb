@@ -69,10 +69,7 @@ RSpec.describe Admin::BackgroundJobsController, type: :controller do
     end
 
     describe 'without current user' do
-      subject {
-        request.env["HTTP_REFERER"] = "/"
-        post(:destroy, id: @background_job.id)
-      }
+      subject { post(:destroy, id: @background_job.id) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
