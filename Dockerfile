@@ -14,7 +14,8 @@ RUN apt-get update -qq && \
     zlib1g-dev \
     locales \
     cmake \
-    postgresql-client
+    postgresql-client \
+    dcmtk
 
 # Set the locale
 RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && \
