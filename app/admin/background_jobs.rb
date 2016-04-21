@@ -17,10 +17,6 @@ ActiveAdmin.register BackgroundJob do
       1_000_000
     end
 
-    def scoped_collection
-      end_of_association_chain.where(user_id: current_user.id)
-    end
-
     def destroy
       if(not BackgroundJob.find(params[:id]).finished?)
         flash[:error] = 'Running jobs cannot be deleted!'
