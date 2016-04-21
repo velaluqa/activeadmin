@@ -11,8 +11,6 @@ ActiveAdmin.register BackgroundJob do
   scope :running
 
   controller do
-    load_and_authorize_resource :except => :index
-
     def max_csv_records
       1_000_000
     end
