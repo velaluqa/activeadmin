@@ -11,7 +11,8 @@ module ControllerMacros
   def login_user_with_abilities(&block)
     before(:each) do
       @request.env['devise.mapping'] = Devise.mappings[:user]
-      sign_in FactoryGirl.create(:user, :changed_password)
+      @current_user = FactoryGirl.create(:user, :changed_password)
+      sign_in @current_user
       ability = Object.new
       ability.extend(CanCan::Ability)
       ability.instance_eval(&block) if block_given?
