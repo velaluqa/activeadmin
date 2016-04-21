@@ -13,18 +13,15 @@ ActiveAdmin.register Image do
   config.per_page = 100
 
   controller do
-    load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:dicom_metadata]
-
     def max_csv_records
       1_000_000
     end
 
     def scoped_collection
       if(session[:selected_study_id].nil?)
-        end_of_association_chain.accessible_by(current_ability)
+        end_of_association_chain
       else
-        end_of_association_chain.accessible_by(current_ability).includes(:image_series => {:patient => :center}).where('centers.study_id' => session[:selected_study_id])
+        end_of_association_chain.includes(:image_series => {:patient => :center}).where('centers.study_id' => session[:selected_study_id])
       end
     end
 
