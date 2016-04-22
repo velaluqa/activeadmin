@@ -1,5 +1,7 @@
 FactoryGirl.define do
   factory :role do
-    role 0
+    user
+    role :manage
+    subject_type 'System'
   end
 end
