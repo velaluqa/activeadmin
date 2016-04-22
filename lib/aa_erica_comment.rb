@@ -9,7 +9,7 @@ module ActiveAdmin
           if(resource[field].blank?)
             link_to('Add '+label, url_for(:action => :edit_erica_comment_form, :id => resource.id, :return_url => request.fullpath))
           else
-            (resource[field] + link_to(icon(:pen), url_for(:action => :edit_erica_comment_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link')).html_safe
+            (resource[field] + link_to(glyph(:pen), url_for(:action => :edit_erica_comment_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link')).html_safe
           end
         end
       end
@@ -23,7 +23,7 @@ module ActiveAdmin
           if(resource[field].blank?)
             link_to('Add '+label, url_for(:action => :edit_erica_comment_form, :return_url => request.fullpath))
           else
-            (resource[field] + link_to(icon(:pen), url_for(:action => :edit_erica_comment_form, :return_url => request.fullpath), :class => 'member_link')).html_safe
+            (resource[field] + link_to(glyph(:pen), url_for(:action => :edit_erica_comment_form, :return_url => request.fullpath), :class => 'member_link')).html_safe
           end
         end        
       end
