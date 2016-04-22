@@ -11,17 +11,15 @@ ActiveAdmin.register Patient do
   config.sort_order = 'centers.code_asc'
 
   controller do
-    load_and_authorize_resource :except => :index
-
     def max_csv_records
       1_000_000
     end
 
     def scoped_collection
       if(session[:selected_study_id].nil?)
-        end_of_association_chain.accessible_by(current_ability).includes(:center)
+        end_of_association_chain.includes(:center)
       else
-        end_of_association_chain.accessible_by(current_ability).includes(:center).where('centers.study_id' => session[:selected_study_id])
+        end_of_association_chain.includes(:center).where('centers.study_id' => session[:selected_study_id])
       end
     end
 
