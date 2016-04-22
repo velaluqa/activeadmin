@@ -154,8 +154,6 @@ group :development do
 end
 
 group :development, :test do
-  gem 'zeus'
-
   # Ruby console tool and additional extensions
   gem 'pry'
   gem 'pry-rails'
@@ -187,32 +185,25 @@ group :development, :test do
   gem 'simplecov-cobertura', require: false
   gem 'simplecov-json', require: false
   gem 'simplecov-rcov', require: false
-
   gem 'yard', require: false
 
   gem 'gitdeploy', git: 'ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git', branch: :master, require: false
 
-  # Bundler-audit helps finding gems that need to be patched for
-  # security. Also it provides recommendations for certain
-  # dependencies.
-  gem 'bundler-audit'
-end
-
-group :development, :test do
+  gem 'yarjuf', '~> 2.0.0'
+  gem 'webmock'
+  gem 'capybara'
+  gem 'poltergeist'
+  gem 'database_cleaner'
   gem 'faker'
   gem 'factory_girl_rails', '~> 4.7.0'
-end
 
-group :test do
+  gem 'spring'
+  gem 'spring-commands-rspec'
+  gem 'spring-commands-cucumber'
+
   gem 'rspec', '~> 3.4.0'
   gem 'rspec-mocks', '~> 3.4.1'
   gem 'rspec-rails', '~> 3.4.2'
-  gem 'yarjuf', '~> 2.0.0'
-
-  gem 'webmock'
-
-  gem 'capybara'
-  gem 'poltergeist'
 
   gem 'cucumber', require: false
   gem 'cucumber-rails', require: false
@@ -220,9 +211,12 @@ group :test do
   gem 'guard', '~> 2.13.0'
   gem 'guard-cucumber'
   gem 'guard-rspec'
-  gem 'database_cleaner'
 
   gem 'test-unit'
-
   gem 'redis-namespace'
+
+  # Bundler-audit helps finding gems that need to be patched for
+  # security. Also it provides recommendations for certain
+  # dependencies.
+  gem 'bundler-audit'
 end
