@@ -2,7 +2,7 @@ namespace = Rails.application.config.is_erica_remote ? 'erica_remote_' : 'erica_
 namespace += Rails.env
 
 Sidekiq.configure_server do |config|
-  config.redis = { :url => 'redis://127.0.0.1:6379/0', :namespace => namespace }
+  config.redis = { :url => "redis://#{ENV['REDIS_URL'] || 'redis'}:6379/0", :namespace => namespace }
 
   config.server_middleware do |chain|
     chain.add Kiqstand::Middleware
@@ -10,5 +10,5 @@ Sidekiq.configure_server do |config|
 end
 
 Sidekiq.configure_client do |config|
-  config.redis = { :url => 'redis://127.0.0.1:6379/0', :namespace => namespace }
+  config.redis = { :url => "redis://#{ENV['REDIS_URL'] || 'redis'}:6379/0", :namespace => namespace }
 end
