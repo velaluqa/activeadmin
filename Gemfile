@@ -145,8 +145,7 @@ group :development do
   # Generate UML diagrams for the database.
   gem 'railroady'
   # Hints missing indexes.
-  # TODO: needs Ruby >= 2.0.0
-  # gem 'lol_dba'
+  gem 'lol_dba'
 
   # Gems for prettier errors in development
   gem 'better_errors'
