@@ -3,13 +3,11 @@ require 'aa_erica_keywords'
 
 ActiveAdmin.register Visit do
 
-  menu if: proc { can? :read, Visit }
   actions :index, :show if Rails.application.config.is_erica_remote
 
   config.per_page = 100
 
   controller do
-    load_and_authorize_resource :except => :index
     skip_load_and_authorize_resource :only => [:assign_required_series, :assign_required_series_form, :tqc_results, :tqc, :tqc_form, :mqc_results, :mqc, :mqc_form, :required_series_viewer, :required_series_dicom_metadata, :all_required_series_viewer]
 
     def max_csv_records
@@ -18,9 +16,9 @@ ActiveAdmin.register Visit do
 
     def scoped_collection
       if(session[:selected_study_id].nil?)
-        end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)
+        end_of_association_chain.includes(:patient => :center)
       else
-        end_of_association_chain.accessible_by(current_ability).includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
+        end_of_association_chain.includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
       end
     end
 
@@ -218,10 +216,9 @@ ActiveAdmin.register Visit do
       unless(visit_types.nil?)
         f.input :visit_type, :collection => visit_types, :include_blank => false
       end
-      f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
 
-    f.buttons
+    f.actions
   end
 
   csv do
