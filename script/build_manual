@@ -1,0 +1,14 @@
+#!/bin/bash
+docker build -t emacs_docs ./doc
+for file in $(ls ./doc | grep "\.org$"); do
+    echo "Building ${file} ..."
+    if [[ "$JOB_NAME" != "" ]]; then
+        echo "${file} in workspace /zfs/docker/volumes/jenkins-$(hostname)-workspace/${JOB_NAME}"
+        docker run --rm -v "/zfs/docker/volumes/jenkins-$(hostname)-workspace/${JOB_NAME}/:/workspace" emacs_docs emacs --batch --load doc/elisp/init.el "doc/${file}" -f org-html-export-to-html
+    else
+        docker run --rm -v "`pwd`:/workspace" emacs_docs emacs --batch --load doc/elisp/init.el doc/$file -f org-html-export-to-html
+    fi
+done
+mkdir -p ./reports/manual
+mv -f ./doc/*.html ./reports/manual/
+cp -rf ./doc/css ./doc/fonts ./doc/images ./doc/js ./reports/manual/

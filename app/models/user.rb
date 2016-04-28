@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
   # :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, 
          :recoverable, :rememberable, :trackable, :validatable, :lockable,
-         :token_authenticatable, :token_authentication_key => 'authentication_token'
+         :token_authenticatable
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :username, :name, :password, :password_confirmation, :remember_me
@@ -17,13 +17,6 @@ class User < ActiveRecord::Base
 
   has_many :roles
   has_many :form_answers
-
-  has_many :sessions, :through => :roles, :source => :subject, :source_type => 'Session'
-  has_many :assigned_cases, :class_name => 'Case', :foreign_key => 'assigned_reader_id', :inverse_of => :assigned_reader, :dependent => :nullify
-  has_many :current_cases, :class_name => 'Case', :foreign_key => 'current_reader_id', :inverse_of => :current_reader, :dependent => :nullify
-
-  has_and_belongs_to_many :blind_readable_sessions, :class_name => 'Session', :join_table => 'readers_sessions'
-  has_and_belongs_to_many :validatable_sessions, :class_name => 'Session', :join_table => 'validators_sessions'
 
   has_many :public_keys
 
@@ -57,20 +50,15 @@ class User < ActiveRecord::Base
     has_system_role?(:remote_manage)
   end
   def has_system_role?(role_sym)
-    !(roles.first(:conditions => { :subject_type => nil, :subject_id => nil, :role => Role::role_sym_to_int(role_sym) }).nil?)
+    roles
+      .where(:subject_type => nil,
+             :subject_id => nil,
+             :role => Role::role_sym_to_int(role_sym))
+      .exists?
   end
   def is_erica_remote_user?
     # TODO: this is filthy, dirty hack territory...
     self.id >= 1000 and roles.all? {|role| role.erica_remote_role? }
-  end
-
-  def test_results_for_session(session)
-    test_results = []
-    session.form_answers.where(:user_id => self.id).sort(:submitted_at => 1).each do |form_answer|
-      test_results << form_answer if(form_answer.case and form_answer.case.flag == :reader_testing)
-    end
-
-    return test_results
   end
 
   def generate_keypair(private_key_password, save_to_db = true)

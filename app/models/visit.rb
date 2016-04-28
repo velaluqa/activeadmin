@@ -10,11 +10,11 @@ class Visit < ActiveRecord::Base
   attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid
   attr_accessible :patient
   attr_accessible :mqc_date, :mqc_user_id, :mqc_state
-  attr_accessible :mqc_user
+  attr_accessible :assigned_image_series_index, :required_series
+  attr_accessible :mqc_user, :mqc_results
   
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
-  has_one :visit_data
   belongs_to :mqc_user, :class_name => 'User'
 
   scope :by_study_ids, lambda { |*ids|
@@ -33,9 +33,6 @@ class Visit < ActiveRecord::Base
   end
 
   before_save :ensure_study_is_unchanged
-
-  after_create :ensure_visit_data_exists
-  before_destroy :destroy_visit_data
 
   def name
     if(patient.nil?)
@@ -110,12 +107,6 @@ class Visit < ActiveRecord::Base
     write_attribute(:mqc_state, index)
   end
 
-  def visit_data
-    VisitData.where(:visit_id => read_attribute(:id)).first    
-  end
-  def ensure_visit_data_exists
-    VisitData.create(:visit_id => self.id) if self.visit_data.nil?
-  end
 
   def current_required_series_specs
     return nil if(self.visit_type.nil? or self.study.nil? or not self.study.semantically_valid?)
@@ -146,10 +137,6 @@ class Visit < ActiveRecord::Base
     return nil if required_series_specs.nil?
     return required_series_specs.keys
   end
-  def required_series
-    self.ensure_visit_data_exists
-    return self.visit_data.required_series
-  end
   def required_series_objects
     required_series_names = self.required_series_names
     return [] if required_series_names.nil?
@@ -161,18 +148,14 @@ class Visit < ActiveRecord::Base
     return objects
   end
   def assigned_required_series(required_series_name)
-    self.ensure_visit_data_exists
-
     required_series = self.required_series(required_series_name)
-    return nil if(required_series.nil? or required_series['image_series_id'].nil?)
+    return nil unless required_series.andand['image_series_id']
 
-    return ImageSeries.find(required_series['image_series_id'])
+    ImageSeries.find(required_series['image_series_id'])
   end
   def assigned_required_series_id_map
-    self.ensure_visit_data_exists
-
     id_map = {}
-    self.visit_data.required_series.each do |required_series_name, required_series|
+    required_series.each do |required_series_name, required_series|
       id_map[required_series_name] = required_series['image_series_id']
     end
 
@@ -187,32 +170,30 @@ class Visit < ActiveRecord::Base
 
     return object_map
   end
+
   def remove_orphaned_required_series
-    current_required_series_names = self.required_series_names
+    current_required_series_names = required_series_names
     return if current_required_series_names.nil?
 
-    visit_data = self.visit_data
-    saved_required_series_names = (visit_data.nil? or visit_data.required_series.nil? ? [] : visit_data.required_series.keys)
+    saved_required_series_names = required_series.andand.keys || []
 
-    pp current_required_series_names
-    pp saved_required_series_names
     orphaned_required_series_names = (saved_required_series_names - current_required_series_names)
-    pp orphaned_required_series_names
-    unless(orphaned_required_series_names.empty?)
-      required_series = visit_data.required_series
+    unless orphaned_required_series_names.empty?
       changed_assignments = {}
 
       orphaned_required_series_names.each do |orphaned_required_series_name|
         RequiredSeries.new(self, orphaned_required_series_name).schedule_domino_document_trashing
 
         deleted_series = required_series.delete(orphaned_required_series_name)
-        changed_assignments[orphaned_required_series_name] = nil unless (deleted_series.nil? or deleted_series['image_series_id'].nil?)        
+        if deleted_series.andand['image_series_id']
+          changed_assignments[orphaned_required_series_name] = nil
+        end
       end
 
-      self.change_required_series_assignment(changed_assignments)
-      visit_data.required_series = required_series
-      visit_data.save
-      
+      change_required_series_assignment(changed_assignments, save: false)
+
+      save
+
       Rails.logger.info "Removed #{orphaned_required_series_names.size} orphaned required series from visit #{self.inspect}: #{orphaned_required_series_names.inspect}"
     end
   end
@@ -295,36 +276,35 @@ class Visit < ActiveRecord::Base
   end
 
   def rename_required_series(old_name, new_name)
-    visit_data = self.visit_data
-    return if visit_data.nil? or visit_data.required_series.nil?
+    return unless required_series
 
-    required_series_data = visit_data.required_series.delete(old_name)
-    unless(required_series_data.nil?)
-      visit_data.required_series[new_name] = required_series_data
-    end
+    # Rename in `required_series`
+    required_series_data = required_series.delete(old_name)
+    required_series[new_name] = required_series_data if required_series_data
 
-    unless(visit_data.assigned_image_series_index.nil?)
-      visit_data.assigned_image_series_index.each do |series_id, assignment|
-        if(assignment.include?(old_name))
-          assignment.delete(old_name)
-          assignment << new_name
-        end
+    # Rename in `assigned_image_series_index`
+    return if assigned_image_series_index.blank?
+    assigned_image_series_index.each do |series_id, assignment|
+      if assignment.include?(old_name)
+        assignment.delete(old_name)
+        assignment << new_name
       end
     end
     
     image_storage_root = Rails.application.config.image_storage_root
-    image_storage_root += '/' unless(image_storage_root.end_with?('/'))
-    FileUtils.mv(image_storage_root + self.required_series_image_storage_path(old_name), image_storage_root + self.required_series_image_storage_path(new_name)) if File.exists?(image_storage_root + self.required_series_image_storage_path(old_name))
+    image_storage_root += '/' unless(image_storage_root.end_with?('/')
+                                    )
+    if File.exists?(image_storage_root + self.required_series_image_storage_path(old_name))
+      FileUtils.mv(image_storage_root + self.required_series_image_storage_path(old_name), image_storage_root + self.required_series_image_storage_path(new_name))
+    end
 
-    visit_data.save
+    save
+
     RequiredSeries.new(self, new_name).schedule_domino_sync
   end
 
-  def change_required_series_assignment(changed_assignments)
-    self.ensure_visit_data_exists
-    visit_data = self.visit_data
-
-    assignment_index = visit_data.assigned_image_series_index
+  def change_required_series_assignment(changed_assignments, options = { save: true })
+    assignment_index = assigned_image_series_index
 
     old_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
 
@@ -336,20 +316,26 @@ class Visit < ActiveRecord::Base
     changed_assignments.each do |required_series_name, series_id|
       series_id = (series_id.blank? ? nil : series_id)
       old_series_id = nil
-      visit_data.required_series[required_series_name] = {} if visit_data.required_series[required_series_name].nil?
+      required_series[required_series_name] = {} unless required_series[required_series_name]
 
-      if(visit_data.required_series[required_series_name]['image_series_id'])
-        old_series_id = visit_data.required_series[required_series_name]['image_series_id'].to_s
-        
-        assignment_index[old_series_id].delete(required_series_name) unless(old_series_id.blank? or assignment_index[old_series_id].nil?)
+      if required_series[required_series_name]['image_series_id']
+        old_series_id = required_series[required_series_name]['image_series_id'].to_s
+
+        if !old_series_id.blank? && assignment_index[old_series_id]
+          assignment_index[old_series_id].delete(required_series_name)
+        end
       end
 
-      visit_data.required_series[required_series_name]['image_series_id'] = series_id
+      required_series[required_series_name]['image_series_id'] = series_id
 
-      assignment_index[series_id] = [] if (series_id and assignment_index[series_id].nil?)
-      assignment_index[series_id] << required_series_name unless(series_id.nil? or assignment_index[series_id].include?(required_series_name))
+      if series_id
+        assignment_index[series_id] ||= []
+        unless assignment_index[series_id].include?(required_series_name)
+          assignment_index[series_id] << required_series_name
+        end
+      end
 
-      if(visit_data.required_series[required_series_name]['image_series_id'].nil?)
+      if(required_series[required_series_name]['image_series_id'].nil?)
         FileUtils.rm(image_storage_root + self.required_series_image_storage_path(required_series_name), :force => true)
       else
         FileUtils.rm(image_storage_root + self.required_series_image_storage_path(required_series_name), :force => true)
@@ -357,12 +343,12 @@ class Visit < ActiveRecord::Base
       end
 
       if(old_series_id != series_id)
-        visit_data.required_series[required_series_name]['tqc_state'] = RequiredSeries.tqc_state_sym_to_int(:pending)
-        visit_data.required_series[required_series_name].delete('tqc_user_id')
-        visit_data.required_series[required_series_name].delete('tqc_date')
-        visit_data.required_series[required_series_name].delete('tqc_version')
-        visit_data.required_series[required_series_name].delete('tqc_results')
-        visit_data.required_series[required_series_name].delete('tqc_comment')
+        required_series[required_series_name]['tqc_state'] = RequiredSeries.tqc_state_sym_to_int(:pending)
+        required_series[required_series_name].delete('tqc_user_id')
+        required_series[required_series_name].delete('tqc_date')
+        required_series[required_series_name].delete('tqc_version')
+        required_series[required_series_name].delete('tqc_results')
+        required_series[required_series_name].delete('tqc_comment')
       end
 
       domino_sync_series_ids << old_series_id unless old_series_id.blank?
@@ -385,8 +371,9 @@ class Visit < ActiveRecord::Base
       end
     end
 
-    visit_data.reconstruct_assignment_index
-    visit_data.save
+    reconstruct_assignment_index
+
+    save if options[:save]
 
     schedule_required_series_domino_sync
 
@@ -396,20 +383,30 @@ class Visit < ActiveRecord::Base
     end
   end
 
+  def reconstruct_assignment_index
+    new_index = {}
+    
+    required_series.each do |rs_name, data|
+      next if data['image_series_id'].blank?
+
+      new_index[data['image_series_id']] ||= []
+      new_index[data['image_series_id']] << rs_name
+    end
+
+    self.assigned_image_series_index = new_index
+  end
+  
   def reset_tqc_result(required_series_name)
-    visit_data = self.visit_data
-    return if(visit_data.nil? or visit_data.required_series.nil? or visit_data.required_series[required_series_name].nil?)
+    return unless required_series.andand[required_series_name]
 
-    required_series = visit_data.required_series[required_series_name]
-    required_series['tqc_state'] = :pending
-    required_series.delete('tqc_user_id')
-    required_series.delete('tqc_date')
-    required_series.delete('tqc_version')
-    required_series.delete('tqc_results')
-    required_series.delete('tqc_comment')
+    required_series[required_series_name]['tqc_state'] = :pending
+    required_series[required_series_name].delete('tqc_user_id')
+    required_series[required_series_name].delete('tqc_date')
+    required_series[required_series_name].delete('tqc_version')
+    required_series[required_series_name].delete('tqc_results')
+    required_series[required_series_name].delete('tqc_comment')
 
-    visit_data.required_series[required_series_name] = required_series
-    visit_data.save
+    save
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
   end
@@ -425,7 +422,7 @@ class Visit < ActiveRecord::Base
       all_passed &&= (not result.nil? and result[spec['id']] == true)
     end
 
-    required_series = self.visit_data.required_series[required_series_name]
+    required_series = required_series[required_series_name]
     return 'No assignment for this required series exists.' if required_series.nil?
 
     required_series['tqc_state'] = RequiredSeries.tqc_state_sym_to_int((all_passed ? :passed : :issues))
@@ -435,9 +432,8 @@ class Visit < ActiveRecord::Base
     required_series['tqc_results'] = result
     required_series['tqc_comment'] = tqc_comment
 
-    visit_data = self.visit_data
-    visit_data.required_series[required_series_name] = required_series
-    visit_data.save
+    required_series[required_series_name] = required_series
+    save
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
     return true
@@ -451,37 +447,35 @@ class Visit < ActiveRecord::Base
       all_passed &&= (not result.nil? and result[spec['id']] == true)
     end
 
-    self.ensure_visit_data_exists
-    visit_data = self.visit_data
+    self.mqc_state = all_passed ? :passed : :issues
+    self.mqc_user_id = mqc_user.is_a?(User) ? mqc_user.id : mqc_user
+    self.mqc_date = mqc_date || Time.now
+    self.mqc_results = result
+    self.mqc_comment = mqc_comment
+    self.mqc_version = mqc_version || study.andand.locked_version
 
-    self.mqc_state = (all_passed ? :passed : :issues)
-    self.mqc_user_id = (mqc_user.is_a?(User) ? mqc_user.id : mqc_user)
-    self.mqc_date = (mqc_date.nil? ? Time.now : mqc_date)
-    visit_data.mqc_version = (mqc_version.nil? ? self.study.locked_version : mqc_version)
-    visit_data.mqc_results = result
-    visit_data.mqc_comment = mqc_comment
-
-    visit_data.save
     self.save
 
     return true
   end
 
+  ##
+  # If defined returns the mqc_version for this visit. Otherwise it
+  # returns the locked version for the associated study.
+  #
+  # @returns [String] The mqc version
   def mqc_version
-    if(self.visit_data and self.visit_data.mqc_version)
-      self.visit_data.mqc_version
-    elsif(self.study and self.study.locked_version)
-      self.study.locked_version
-    else
-      nil
-    end
+    read_attribute(:mqc_version) || study.andand.locked_version
   end
+
   def mqc_spec
     reutrn mqc_spec_at_version(self.mqc_version || self.study.locked_version)
   end
+
   def locked_mqc_spec
     return mqc_spec_at_version(self.study.locked_version)
   end
+
   def mqc_spec_at_version(version)
     config = study.configuration_at_version(version)
     return nil if config.nil? or config['visit_types'].nil? or config['visit_types'][self.visit_type].nil?
@@ -490,29 +484,26 @@ class Visit < ActiveRecord::Base
   end
 
   def locked_mqc_spec_with_results
-    mqc_spec = self.locked_mqc_spec
-    mqc_results = (self.visit_data.nil? ? nil : self.visit_data.mqc_results)
-    return nil if mqc_spec.nil? or mqc_results.blank?
+    return nil if locked_mqc_spec.nil? or mqc_results.blank?
 
-    mqc_spec.each do |question|
+    locked_mqc_spec.each do |question|
       question['answer'] = mqc_results[question['id']]
     end
-    
-    return mqc_spec
+
+    locked_mqc_spec
   end
   def locked_mqc_spec_with_results
     return mqc_spec_with_results_at_version(self.study.locked_version)
   end
   def mqc_spec_with_results_at_version(version)
-    mqc_spec = self.mqc_spec_at_version(version)
-    mqc_results = (self.visit_data.nil? ? nil : self.visit_data.mqc_results)
-    return nil if mqc_spec.nil? or mqc_results.blank?
+    mqc_spec_version = mqc_spec_at_version(version)
+    return nil if mqc_spec_version.nil? || mqc_results.blank?
 
-    mqc_spec.each do |question|
+    mqc_spec_version.each do |question|
       question['answer'] = mqc_results[question['id']]
     end
-    
-    return mqc_spec
+
+    mqc_spec_version
   end
 
   def self.classify_audit_trail_event(c)
@@ -554,60 +545,90 @@ class Visit < ActiveRecord::Base
       when :mqc_passed then :mqc_passed
       when :mqc_issues then :mqc_issues
       end
+    elsif c.include?('required_series')
+      diffs = {}
+      c['required_series'][1].each do |rs, to|
+        from = c['required_series'][0][rs] || {}
+        diff = to.diff(from)
+
+        diffs[rs] = diff
+      end
+
+      if(c.keys == ['required_series'])
+        if(diffs.all? {|rs, diff| (diff.keys - ['domino_unid']).empty?})
+          :rs_domino_unid_change
+        elsif(diffs.all? {|rs, diff| (diff.keys - ['domino_unid', 'tqc_state', 'tqc_results', 'tqc_date', 'tqc_version', 'tqc_user_id', 'tqc_comment']).empty?})
+          :rs_tqc_performed
+        end
+      elsif((c.keys - ['required_series', 'assigned_image_series_index']).empty?)
+        if(diffs.all? {|rs, diff|
+             (diff.keys - ['domino_unid', 'image_series_id', 'tqc_state', 'tqc_results', 'tqc_date', 'tqc_version', 'tqc_user_id', 'tqc_comment']).empty? and
+               ((diff.keys & ['tqc_results', 'tqc_date', 'tqc_version', 'tqc_user_id', 'tqc_comment']).empty? or
+                (
+                  (diff['tqc_state'].nil? or diff['tqc_state'] == 0) and
+                  c['required_series'][1][rs]['tqc_results'].nil? and
+                  c['required_series'][1][rs]['tqc_date'].nil? and
+                  c['required_series'][1][rs]['tqc_version'].nil? and
+                  c['required_series'][1][rs]['tqc_user_id'].nil? and
+                  c['required_series'][1][rs]['tqc_comment'].nil?
+                )
+               )
+           })
+          :rs_assignment_change
+        end
+      end
+    elsif (c.keys - %w{mqc_version mqc_results mqc_comment}).empty?
+      :mqc_performed
     end
   end
 
   def self.audit_trail_event_title_and_severity(event_symbol)
-    return case event_symbol
-           when :visit_number_change then ['Visit Number Change', :ok]
-           when :patient_change then ['Patient Change', :warning]
-           when :description_change then ['Description Change', :ok]
-           when :visit_type_change then ['Visit Type Change', :warning]
-           when :state_change then ['State Change', :warning]
-           when :mqc_reset then ['MQC Reset', :warning]
-           when :mqc_passed then ['MQC performed, passed', :ok]
-           when :mqc_issues then ['MQC performed, issues', :warning]
-           when :mqc_state_change then ['MQC State Change', :warning]
-           end
+    case event_symbol
+    when :visit_number_change then ['Visit Number Change', :ok]
+    when :patient_change then ['Patient Change', :warning]
+    when :description_change then ['Description Change', :ok]
+    when :visit_type_change then ['Visit Type Change', :warning]
+    when :state_change then ['State Change', :warning]
+    when :mqc_reset then ['MQC Reset', :warning]
+    when :mqc_passed then ['MQC performed, passed', :ok]
+    when :mqc_issues then ['MQC performed, issues', :warning]
+    when :mqc_state_change then ['MQC State Change', :warning]
+    when :rs_domino_unid_change then ['RS Domino UNID Change', :ok]
+    when :rs_assignment_change then ['RS Assignment Change', :warning]
+    when :rs_tqc_performed then ['RS TQC performed', :ok]
+    when :mqc_performed then ['MQC performed', :ok]
+    end
   end
 
   protected
 
   def reset_mqc
-    visit_data = self.visit_data
-    unless(visit_data.nil?)
-      visit_data.mqc_results = {}
-      visit_data.mqc_comment = nil
-      visit_data.mqc_version = nil
-
-      visit_data.save
-    end
-
     self.mqc_user_id = nil
     self.mqc_date = nil
     self.mqc_state = :pending
+    self.mqc_results = {}
+    self.mqc_comment = nil
+    self.mqc_version = nil
 
     self.save
   end
   def mqc_to_domino
-    self.ensure_visit_data_exists
-
     result = {}
 
     result['QCdate'] = {'data' => (self.mqc_date.nil? ? '01-01-0001' : self.mqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime'}
     result['QCperson'] = (self.mqc_user.nil? ? nil : self.mqc_user.name)
 
-    result['QCresult'] = case self.mqc_state
+    result['QCresult'] = case mqc_state
                          when :pending then 'Pending'
                          when :issues then 'Performed, issues present'
                          when :passed then 'Performed, no issues present'
                          end
 
-    result['QCcomment'] = self.visit_data.mqc_comment
+    result['QCcomment'] = mqc_comment
 
     criteria_names = []
     criteria_values = []
-    results = self.mqc_spec_with_results_at_version(self.visit_data.mqc_version)
+    results = self.mqc_spec_with_results_at_version(mqc_version)
     if(results.nil?)
       result['QCCriteriaNames'] = nil
       result['QCValues'] = nil
@@ -636,8 +657,4 @@ class Visit < ActiveRecord::Base
 
     return true
   end
-
-  def destroy_visit_data
-    VisitData.destroy_all(:visit_id => self.id)
-  end  
 end

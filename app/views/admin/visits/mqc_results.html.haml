@@ -22,7 +22,7 @@
             %td= link_to(@visit.mqc_user.name, admin_user_path(@visit.mqc_user)) unless @visit.mqc_user.nil?
           %tr
             %th Comment
-            %td= @visit.visit_data.mqc_comment unless @visit.visit_data.nil?
+            %td= @visit.mqc_comment
 
 .panel
   %h3 mQC Question

@@ -35,12 +35,17 @@ RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.include FactoryGirl::Syntax::Methods
+  config.include Devise::TestHelpers, type: :controller
+  config.extend ControllerMacros, type: :controller
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
     DatabaseCleaner.clean
     FactoryGirl.reload
-    FactoryGirl.lint
+    # FactoryGirl 4.7.0 seems to be incompatible with Rails 4.2 in
+    # terms of linting. Created an issue.
+    # https://github.com/thoughtbot/factory_girl/issues/902
+    # FactoryGirl.lint
   end
   config.before(:each) do
     DatabaseCleaner.start
@@ -79,4 +84,7 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/v/3-0/docs
   config.infer_spec_type_from_file_location!
+
+  # Ensure that spec tmp directory exists.
+  FileUtils.mkdir_p('spec/tmp')
 end

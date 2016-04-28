@@ -7,17 +7,16 @@ class ImageSeries < ActiveRecord::Base
   acts_as_taggable
 
   attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number, :state, :comment
-  attr_accessible :visit, :patient
+  attr_accessible :visit, :patient, :properties, :properties_version
 
   belongs_to :visit
   belongs_to :patient
   has_many :images, :dependent => :destroy
-  has_one :image_series_data
 
   #validates_uniqueness_of :series_number, :scope => :patient_id
   validates_presence_of :name, :patient_id, :imaging_date
 
-  scope :not_assigned, where(:visit_id => nil)
+  scope :not_assigned, -> { where(:visit_id => nil) }
 
   scope :by_study_ids, lambda { |*ids|
     joins(patient: :center)
@@ -29,12 +28,6 @@ class ImageSeries < ActiveRecord::Base
   before_save :update_state
 
   #before_validation :assign_series_number
-
-  after_create :ensure_image_series_data_exists
-
-  before_destroy do
-    ImageSeriesData.destroy_all(:image_series_id => self.id)
-  end
 
   STATE_SYMS = [:imported, :visit_assigned, :required_series_assigned, :not_required]
 
@@ -74,10 +67,6 @@ class ImageSeries < ActiveRecord::Base
     else
       self.patient.study
     end
-  end
-
-  def image_series_data
-    ImageSeriesData.where(:image_series_id => read_attribute(:id)).first
   end
 
   def previous_image_storage_path
@@ -166,22 +155,10 @@ class ImageSeries < ActiveRecord::Base
     end
   end
 
-  def ensure_image_series_data_exists
-    if(self.image_series_data.nil?)
-      ImageSeriesData.create(:image_series_id => self.id)
-    end
-  end
-
   def assigned_required_series
-    return [] if self.visit.nil?
-
-    self.visit.ensure_visit_data_exists
-    if(self.visit.visit_data.assigned_image_series_index and self.visit.visit_data.assigned_image_series_index[self.id.to_s])
-      return self.visit.visit_data.assigned_image_series_index[self.id.to_s]
-    end
-
-    return []
+    visit.andand.assigned_image_series_index.andand[id.to_s] || []
   end
+
   def change_required_series_assignment(new_assignment)
     return if self.visit.nil?
     changes = {}
@@ -231,29 +208,28 @@ class ImageSeries < ActiveRecord::Base
   protected
 
   def properties_to_domino
-    image_series_data = self.image_series_data
-    properties_version = if(image_series_data.nil? and self.study.nil?)
+    properties_version = if study.nil?
                            nil
-                         elsif(image_series_data.nil? or image_series_data.properties_version.blank?)
-                           self.study.locked_version
+                         elsif properties_version.blank?
+                           study.locked_version
                          else
-                           image_series_data.properties_version
+                           properties_version
                          end
-    study_config = (self.study.nil? or image_series_data.nil? ? nil : self.study.configuration_at_version(properties_version))
+    study_config = study.andand.configuration_at_version(properties_version)
     result = {}
 
-    if(study_config and study.semantically_valid_at_version?(properties_version) and image_series_data and image_series_data.properties)
+    if study_config && study.semantically_valid_at_version?(properties_version) && properties
       properties_spec = study_config['image_series_properties']
       property_names = []
       property_values = []
 
       processed_properties = []
 
-      unless(properties_spec.nil?)
+      unless properties_spec.nil?
         properties_spec.each do |property|
           property_names << property['label']
 
-          raw_value = image_series_data.properties[property['id']]
+          raw_value = properties[property['id']]
           value = case property['type']
                   when 'string'
                     raw_value
@@ -275,7 +251,7 @@ class ImageSeries < ActiveRecord::Base
         end
       end
 
-      image_series_data.properties.each do |id, value|
+      properties.each do |id, value|
         next if processed_properties.include?(id)
         property_names << id.to_s
         property_values << (value.blank? ? 'Not set' : value.to_s)
@@ -378,23 +354,27 @@ class ImageSeries < ActiveRecord::Base
       when [:imported, :not_required], [:visit_assigned, :not_required], [:required_series_assigned, :not_required] then :marked_not_required
       when [:not_required, :imported] then :unmarked_not_required
       end
+    elsif (c.keys - %w(properties properties_version)).empty?
+      :properties_change
     end
   end
+
   def self.audit_trail_event_title_and_severity(event_symbol)
-    return case event_symbol
-           when :name_change then ['Name Change', :warning]
-           when :comment_change then ['Comment Change', :warning]
-           when :center_change then ['Center Change', :warning]
-           when :visit_assigned then ['Assigned to visit', :ok]
-           when :visit_unassigned then ['Visit assignment removed', :warning]
-           when :required_series_assigned then ['Assigned as required series', :ok]
-           when :required_series_unassigned then ['Required series assignment removed', :warning]
-           when :visit_assignment_change then ['Visit assignment changed', :ok]
-           when :marked_not_required then ['Marked as not required', :warning]
-           when :unmarked_not_required then ['Not required flag revoked', :warning]
-           when :imaging_date_change then ['Imaging Date Change', :ok]
-           when :series_number_change then ['Series Number Change', :ok]
-           when :patient_change then ['Patient Change', :warning]
-           end
+    case event_symbol
+    when :name_change then ['Name Change', :warning]
+    when :comment_change then ['Comment Change', :warning]
+    when :center_change then ['Center Change', :warning]
+    when :visit_assigned then ['Assigned to visit', :ok]
+    when :visit_unassigned then ['Visit assignment removed', :warning]
+    when :required_series_assigned then ['Assigned as required series', :ok]
+    when :required_series_unassigned then ['Required series assignment removed', :warning]
+    when :visit_assignment_change then ['Visit assignment changed', :ok]
+    when :marked_not_required then ['Marked as not required', :warning]
+    when :unmarked_not_required then ['Not required flag revoked', :warning]
+    when :imaging_date_change then ['Imaging Date Change', :ok]
+    when :series_number_change then ['Series Number Change', :ok]
+    when :patient_change then ['Patient Change', :warning]
+    when :properties_change then ['Properties Change', :ok]
+    end
   end
 end

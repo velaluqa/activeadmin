@@ -3,8 +3,6 @@ require 'aa_erica_comment'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register ImageSeries do
-
-  menu if: proc { can? :read, ImageSeries }
   actions :index, :show if Rails.application.config.is_erica_remote
 
   scope :all, :default => true
@@ -13,18 +11,15 @@ ActiveAdmin.register ImageSeries do
   config.per_page = 100
 
   controller do
-    load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:viewer, :dicom_metadata]
-
     def max_csv_records
       1_000_000
     end
 
     def scoped_collection
       if(session[:selected_study_id].nil?)
-        end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)
+        end_of_association_chain.includes(:patient => :center)
       else
-        end_of_association_chain.accessible_by(current_ability).includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
+        end_of_association_chain.includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
       end
     end
 
@@ -62,7 +57,7 @@ ActiveAdmin.register ImageSeries do
       end
       params[:image_series].delete(:force_update)
 
-      original_required_series = (original_visit.nil? or original_visit.visit_data.nil? ? nil : original_visit.visit_data.required_series)
+      original_required_series = original_visit.andand.required_series
 
       original_visit_assignment_changes = {}
       new_visit_assignment_changes = {}
@@ -257,12 +252,16 @@ ActiveAdmin.register ImageSeries do
       end
     end
 
-    properties_version = (image_series.image_series_data.nil? ? nil : image_series.image_series_data.properties_version) || (image_series.study.nil? ? nil : image_series.study.locked_version)
-    study_config = (image_series.study.nil? ? nil : image_series.study.configuration_at_version(properties_version))
-    if(image_series.study and study_config and image_series.study.semantically_valid_at_version?(properties_version) and image_series.image_series_data and image_series.image_series_data.properties)
+    properties_version = image_series.properties_version || image_series.study.andand.locked_version
+    study_config = image_series.study.andand.configuration_at_version(properties_version)
+    if image_series.study && study_config && image_series.study.semantically_valid_at_version?(properties_version) && image_series.properties
       properties_spec = study_config['image_series_properties']
 
-      render :partial => 'admin/image_series/properties_table', :locals => { :spec => properties_spec, :values => image_series.image_series_data.properties}
+      render :partial => 'admin/image_series/properties_table',
+             :locals => {
+               :spec => properties_spec,
+               :values => image_series.properties
+             }
     end
     active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, image_series)
   end
@@ -327,12 +326,10 @@ ActiveAdmin.register ImageSeries do
       redirect_to({:action => :show})
     end
 
-    @image_series.ensure_image_series_data_exists
-    image_series_data = @image_series.image_series_data
-
     study_config = @image_series.study.locked_configuration
     properties_spec = study_config['image_series_properties']
-    image_series_data.properties = {} if image_series_data.properties.nil?
+
+    @image_series.properties = {} if properties.nil?
 
     properties_spec.each do |property_spec|
       new_value = params[:properties][property_spec['id']]
@@ -342,10 +339,10 @@ ActiveAdmin.register ImageSeries do
         new_value = (new_value == '1')
       end
 
-      image_series_data.properties[property_spec['id']] = new_value
+      @image_series.properties[property_spec['id']] = new_value
     end
-    image_series_data.properties_version = @image_series.study.locked_version
-    image_series_data.save
+    @image_series.properties_version = @image_series.study.locked_version
+    @image_series.save
     @image_series.schedule_domino_sync
 
     redirect_to({:action => :show}, :notice => 'Properties successfully updated.')
@@ -362,12 +359,12 @@ ActiveAdmin.register ImageSeries do
     study_config = @image_series.study.locked_configuration
     @properties_spec = study_config['image_series_properties']
 
-    @properties = (@image_series.image_series_data.nil? ? {} : @image_series.image_series_data.properties)
+    @properties = @image_series.properties
 
     @page_title = 'Edit Properties'
     render 'admin/image_series/edit_properties'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Edit Properties', edit_properties_form_admin_image_series_path(resource)) if can? :manage, resource
   end
 
@@ -385,7 +382,7 @@ ActiveAdmin.register ImageSeries do
 
     redirect_to({:action => :show}, :notice => 'Series marked as not relevant for read.')
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Mark not relevant', mark_not_relevant_admin_image_series_path(resource)) unless (resource.state != :visit_assigned or resource.visit.nil? or cannot? :manage, resource)
   end
   batch_action :mark_not_relevant, :confirm => 'This will mark all selected image series as not relevant. Are you sure?', :if => proc {can? :manage, ImageSeries} do |selection|
@@ -415,7 +412,7 @@ ActiveAdmin.register ImageSeries do
 
     render 'admin/images/dicom_metadata'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(resource)) unless resource.images.empty?
   end
 
@@ -700,7 +697,7 @@ ActiveAdmin.register ImageSeries do
   erica_commentable(:comment, 'Comment')
   erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image_series', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

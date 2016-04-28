@@ -1,4 +1,6 @@
 if Rails.env.production?
+  require 'airbrake'
+
   Airbrake.configure do |config|
     config.api_key = {
       project: 'pharmtrace-erica-store',

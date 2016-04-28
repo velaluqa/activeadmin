@@ -7,8 +7,8 @@ class PublicKey < ActiveRecord::Base
   validates :user_id, :public_key, :presence => true
   validates_uniqueness_of :active, :if => :active, :scope => :user_id
 
-  scope :active, where(:active => true)
-  scope :deactivated, where(:active => false)
+  scope :active, -> { where(:active => true) }
+  scope :deactivated, -> { where(:active => false) }
 
   def active?
     self.active

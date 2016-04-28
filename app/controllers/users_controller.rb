@@ -61,26 +61,6 @@ class UsersController < ActionController::Base
     end
   end
 
-  def cancel_current_cases
-    cases = @user.current_cases.reject {|c| c.state != :in_progress and c.state != :reopened_in_progress}
-
-    cases.each do |c|
-      case c.state
-      when :in_progress
-        c.state = :unread
-      when :reopened_in_progress
-        c.state = :reopened
-      end
-
-      c.current_reader = nil
-      c.save
-    end
-
-    respond_to do |format|
-      format.json { render :json => {:success => true } }
-    end
-  end
-  
   protected
   
   def set_user

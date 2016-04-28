@@ -1,17 +1,9 @@
 ActiveAdmin.register Role do
-  menu if: proc { can? :read, Role }
-
   config.comments = false
 
   controller do
-    load_and_authorize_resource :except => :index
-
     def max_csv_records
       1_000_000
-    end
-
-    def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
     end
 
     def update
@@ -57,7 +49,7 @@ ActiveAdmin.register Role do
   end
 
   form do |f|
-    subjects = [["System", nil]] + Session.all.map{|s| ["Session: #{s.name}", "session_#{s.id}"]} + Study.all.map{|s| ["Study: #{s.name}", "study_#{s.id}"]}
+    subjects = [["System", nil]] + Study.all.map{|s| ["Study: #{s.name}", "study_#{s.id}"]}
     roles = {}
     Role::ROLE_SYMS.each_with_index do |role_sym, index|
       if(Rails.application.config.is_erica_remote)
@@ -76,14 +68,14 @@ ActiveAdmin.register Role do
       f.input :role, :collection => roles, :as => :select, :include_blank => false, :hint => 'Please note that audit and read-only roles cannot be assigned system-wide and have to be assigned at a study or session level.'
     end
     
-    f.buttons
+    f.actions
   end
 
   # filters
   filter :user
   filter :role, :as => :check_boxes, :collection => Role::ROLE_SYMS.each_with_index.map {|role, i| [Role::role_sym_to_role_name(role), i]}
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'role', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

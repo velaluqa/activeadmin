@@ -1,19 +1,18 @@
 customer: pharmtrace
-project: erica_store_v2
+project: ericastore
 deployments:
   - type: demo
     branch: develop|feature-.*|subfeature-.*
     gitlab: velaluqa
-    sources:
-      - ./reports
-      - ./doc
+    sources: ./reports/
     links:
-      "Manual": "{{url}}/doc/erica.html"
-      "Documentation": "{{url}}/reports/doc/index.html"
-      "Unit Test Results": "{{url}}/reports/unit.html"
-      "Requirement Test Results": "{{url}}/reports/features.html"
-      "Report: Code Climate": "{{url}}/reports/code_climate/overview.html"
-      "Report: Code Style Violations": "{{url}}/reports/code_style.html"
-      "Report: Rails Security": "{{url}}/reports/rails_security.html"
-      "Report: Rails Best Practices": "{{url}}/reports/rails_best_practices.html"
-    destination: deployment@webhosting.vela:/srv/test
+      "Manual": "{{url}}/manual/erica.html"
+      "Documentation": "{{url}}/doc/index.html"
+      "QA: Unit Tests": "{{url}}/unit.html"
+      "QA: Requirement Tests": "{{url}}/features.html"
+      "QA: Test Coverage": "{{url}}/coverage/index.html"
+      "Report: Code Climate": "{{url}}/code_climate/overview.html"
+      "Report: Code Style Violations": "{{url}}/code_style.html"
+      "Report: Rails Security": "{{url}}/rails_security.html"
+      "Report: Rails Best Practices": "{{url}}/rails_best_practices.html"
+    destination: /gitdeploy

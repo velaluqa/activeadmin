@@ -1,5 +1,7 @@
 #+SETUPFILE: theme-readtheorg.setup
 #+TITLE: ERICA Store
+#+AUTHOR: Arthur Andersen
+
 * Remote Synchronization
 
 The ERICA Remote synchronisation consists of two parts. The datastore

@@ -7,17 +7,15 @@ class Patient < ActiveRecord::Base
   acts_as_taggable
 
   attr_accessible :center, :subject_id, :domino_unid
-  attr_accessible :center_id
+  attr_accessible :center_id, :data, :export_history
 
   belongs_to :center
-  has_many :form_answers
-  has_many :cases
   has_many :visits, :dependent => :destroy
   has_many :image_series, :dependent => :destroy
-  has_one :patient_data
 
   validates_uniqueness_of :subject_id, :scope => :center_id
   validates_presence_of :subject_id
+  validates_presence_of :center_id
 
   scope :by_study_ids, lambda { |*ids|
     joins(:center)
@@ -29,8 +27,6 @@ class Patient < ActiveRecord::Base
       errors.add :base, 'You cannot delete a patient which has cases or form answers associated.' 
       return false
     end
-
-    PatientData.destroy_all(:patient_id => self.id)
   end
 
   before_save :ensure_study_is_unchanged
@@ -54,10 +50,6 @@ class Patient < ActiveRecord::Base
     else
       center.code + subject_id
     end
-  end
-
-  def patient_data
-    PatientData.where(:patient_id => read_attribute(:id)).first
   end
 
   def next_series_number
@@ -137,16 +129,23 @@ class Patient < ActiveRecord::Base
     # ignore Domino UNID changes that happened along with a property change
     c.delete('domino_unid')
 
-    if(c.keys == ['subject_id'])
+    if c.keys == ['subject_id']
       :name_change
-    elsif(c.keys == ['center_id'])
+    elsif c.keys == ['center_id']
       :center_change
+    elsif c.keys == ['data']
+      :data_change
+    elsif c.keys == ['export_history']
+      :export_to_ericav1
     end
   end
+
   def self.audit_trail_event_title_and_severity(event_symbol)
-    return case event_symbol
-           when :name_change then ['Subject ID Change', :warning]
-           when :center_change then ['Center Change', :warning]
-           end
+    case event_symbol
+    when :name_change then ['Subject ID Change', :warning]
+    when :center_change then ['Center Change', :warning]
+    when :data_change then ['Patient Data Change', :ok]
+    when :export_to_ericav1 then ['Export to ERICAV1', :ok]
+    end
   end
 end

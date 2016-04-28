@@ -1,5 +1,5 @@
 Given(/^there is a monster$/) do
-  @test = FormAnswer.canonical_json_string("Hi")
+  @test = "Hi".inspect
 end
 
 When(/^I attack it$/) do

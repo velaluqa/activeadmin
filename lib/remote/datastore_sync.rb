@@ -74,12 +74,6 @@ class Remote
       Sql.dump_upserts(export_dir.join('6_image_series.sql')) { ImageSeries.by_study_ids(remote.study_ids) }
       Sql.dump_upserts(export_dir.join('7_images.sql'))       {       Image.by_study_ids(remote.study_ids) }
 
-      Mongo.dump(
-        collections: %w(patient_data visit_data image_series_data),
-        out: export_dir,
-        dir: 'mongo_dump'
-      )
-
       cp_r(ERICA.config_paths, export_dir)
 
       export_dir.join('.state.dumped').touch
@@ -120,6 +114,12 @@ class Remote
     def cleanup
       logger.info 'cleaning up workspace'
       rm_rf(export_dir)
+      puts "#{working_dir}/*-*-*-*"
+      Dir["#{working_dir}/*-*-*-*"].each do |path|
+        next unless path =~ /^(\d{4}-\d{2}-\d{2})/
+        next unless Date.parse($1) < 7.days.ago
+        puts "delete #{path}"
+      end
     end
 
     private

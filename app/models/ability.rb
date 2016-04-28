@@ -6,7 +6,10 @@ class Ability
 
     return if user.roles.empty?
 
-    can [:read, :batch_action, :download_zip, :destroy], BackgroundJob do |job|
+    can :read, ActiveAdmin::Page, name: 'Dashboard', namespace_name: 'admin'
+    can :manage, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
+
+    can [:read, :batch_action, :download_zip, :destroy], BackgroundJob, ['user_id = ?', user.id] do |job|
       job.user_id == user.id
     end
 
@@ -41,7 +44,7 @@ class Ability
         can :read, [Study, Center, Patient, Visit, ImageSeries, Image]
       elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_read)).empty?)
         can :read, Study, ['id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id] do |study|
-          !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_read)}).nil?
+          study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_read)).exist?
         end
         can :read, Center, ['centers.study_id IN '+STUDY_REMOTE_ROLES_SUBQUERY, Role.role_sym_to_int(:remote_read), user.id] do |center|
           can? :read, center.study
@@ -62,9 +65,7 @@ class Ability
 
       # handle :remote_comments
       can :remote_comment, Study do |study|
-        user.has_system_role?(:remote_comments) or !(
-          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_comments)}).nil?
-        )
+        user.has_system_role?(:remote_comments) or study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_comments)).exists?
       end
       can :remote_comment, [Center, Patient, Visit, ImageSeries, Image] do |resource|
         can? :remote_comment, resource.study
@@ -88,7 +89,7 @@ class Ability
         can :download_images, [Study, Patient, Visit]
       elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_images)).empty?)
         can :download_images, Study do |study|
-          !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_images)}).nil?
+          study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_images)).exists?
         end
         can :download_images, Patient do |patient|
           can? :download_images, patient.study
@@ -104,7 +105,7 @@ class Ability
         can :read_qc, Visit
       elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_qc)).empty?)
         can :read_qc, Study do |study|
-          !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_qc)}).nil?
+          study.roles.first(:user_id => user.id, :role => Role.role_sym_to_int(:remote_qc)).exists?
         end
         can :read_qc, Visit do |visit|
           can? :read_qc, visit.study
@@ -116,7 +117,7 @@ class Ability
         can :download_status_files, [Study, Center, Patient, Visit, ImageSeries, Image]
       # elsif(not user.roles.where(role: Role.role_sym_to_int(:remote_status_files)).empty?)
       #   can :download_status_files, Study do |study|
-      #     !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_status_files)}).nil?
+      #     study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_status_files)).exists?
       #   end
       #   can :download_status_files, [Center, Patient, Visit, ImageSeries, Image] do |resource|
       #     can? :download_status_files, resource.study
@@ -126,14 +127,12 @@ class Ability
       # handle :remote_keywords and :remote_define_keywords
       remote_keywords_actions = [:edit_keywords, :edit_erica_keywords_form, :edit_erica_keywords, :autocomplete_tags]
       can (remote_keywords_actions + [:define_keywords]), Study do |study|
-        user.has_system_role?(:remote_define_keywords) or !(
-          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_define_keywords)}).nil?
-        )
+        user.has_system_role?(:remote_define_keywords) ||
+          study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_define_keywords)).exists?
       end
       can [:edit_keywords, :autocomplete_tags], Study do |study|
-        user.has_system_role?(:remote_keywords) or !(
-          study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:remote_keywords)}).nil?
-        )
+        user.has_system_role?(:remote_keywords) ||
+          study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:remote_keywords)).exists?
       end
       unless(user.roles.where(role: Role.role_sym_to_int(:remote_keywords)).empty?)
         can remote_keywords_actions, [Center, Patient, Visit, ImageSeries] do |resource|
@@ -148,7 +147,6 @@ class Ability
     if user.is_app_admin?
       can :manage, :system
       can :manage, Version
-      can :manage, MongoidHistoryTracker
       can :manage, User
       can :manage, Role
       can :manage, PublicKey
@@ -158,10 +156,6 @@ class Ability
       can :read, Visit
       can :read, ImageSeries
       can :read, Image
-      can [:create, :read, :edit, :destroy], Session
-      can :manage, Form, ['forms.session_id IS NULL'] do |form|
-        form.is_template?
-      end
     else
       can :read, PublicKey, ['public_keys.user_id = ?', user.id] do |public_key|
         public_key.user == user
@@ -193,7 +187,7 @@ class Ability
     # we have to do this in this slightly awkward fassion to allow fetching visit records for any combination of image uploader/manager and mqc role
     unless(user.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)).empty?)
       can :mqc, Study, Study.where('id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |study|
-        !study.roles.first(:conditions => { :user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)}).nil?
+        study.roles.where(:user_id => user.id, :role => Role.role_sym_to_int(:medical_qc)).exists?
       end
       if(not (user.has_system_role?(:image_import) or user.has_system_role?(:image_manage) or user.is_app_admin?))
         can [:read, :mqc], Visit, Visit.includes(:patient => :center).where('centers.study_id IN '+MQC_STUDY_ROLES_SUBQUERY, user.id) do |visit|
@@ -212,51 +206,15 @@ class Ability
       end
     end
 
-    # Session Admin
-    can :manage, Session, ['sessions.id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |session|
-      !(session.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?) or
-        (session.study and !(session.study.roles.first(:conditions => { :user_id => user.id, :role => Role::role_sym_to_int(:manage)}).nil?))
-    end
-
-    can :manage, Case, ['cases.session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |c|
-      can? :manage, c.session
-    end
-    # possible record query for mongoid:
-    # CaseData.in(case_id: Case.where('session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id).map{|c| c.id})
-    # we don't need that though, since there is no index for case/patient data anyway and we can define the actual rights via the block
-    can :manage, CaseData do |cd|
-      can? :manage, cd.case
-    end
-
-    can :read, FormAnswer, FormAnswer.in(session_id: Session.where('id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id).map{|s| s.id}) do |form_answer|
-      can? :read, form_answer.session
-    end
-    can :manage, FormAnswer, FormAnswer.in(session_id: Session.where('id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id).map{|s| s.id}) do |form_answer|
-      can? :manage, form_answer.session
-    end
-
-    can :create, Form
-    can :read, Form, ['forms.session_id IS NULL'] do |form|
-      form.is_template?
-    end
-    can :manage, Form, ['forms.session_id IN '+SESSION_STUDY_ROLES_SUBQUERY, user.id, user.id] do |form|
-      can? :manage, form.session
-    end
-
-    can :manage, PatientData do |pd|
-      can? :manage, pd.patient
-    end
-
     # Audit role
     unless user.is_app_admin?
       can :read, Version
       can :git_commits, Version
       can :show_git_commit, Version
-      can :read, MongoidHistoryTracker
     end
 
     can :read, Study, ['id IN '+STUDY_AUDIT_ROLES_SUBQUERY, user.id] do |study|
-      !study.roles.first(:conditions => { :user_id => user.id, :role => [Role.role_sym_to_int(:audit), Role.role_sym_to_int(:readonly)]}).nil?
+      study.roles.where(:user_id => user.id, :role => [Role.role_sym_to_int(:audit), Role.role_sym_to_int(:readonly)]).exists?
     end
     unless(self.can? :read, Center)
       can :read, Center, ['centers.study_id IN '+STUDY_AUDIT_ROLES_SUBQUERY, user.id] do |center|
@@ -284,23 +242,6 @@ class Ability
       end
     end
 
-    can :read, Session, ['sessions.id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |session|
-      !(session.roles.first(:conditions => { :user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]}).nil?) or
-        (session.study and !(session.study.roles.first(:conditions => { :user_id => user.id, :role => [Role::role_sym_to_int(:audit), Role::role_sym_to_int(:readonly)]}).nil?))
-    end
-    can :read, Case, ['cases.session_id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |c|
-      can? :read, c.session
-    end
-    can :read, CaseData do |cd|
-      can? :read, cd.case
-    end
-    can :read, Form, ['forms.session_id IN '+SESSION_STUDY_AUDIT_ROLES_SUBQUERY, user.id, user.id] do |form|
-      can? :read, form.session
-    end
-
-    can :read, PatientData do |pd|
-      can? :read, pd.patient
-    end
   end
 
   # this is somewhat of a hack so we can check whether a user can create/edit a template form without actually having a template form object

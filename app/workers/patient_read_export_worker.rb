@@ -74,13 +74,12 @@ class PatientReadExportWorker
         export_log_entry[:visits] << visit_log_entry
       end
 
-      if(patient.patient_data.nil?)
-        PatientData.create(:patient_id => patient.id, :data => {}, :export_history => [export_log_entry])
+      if patient.export_history.is_a?(Array)
+        patient.export_history << export_log_entry
       else
-        patient_data = patient.patient_data
-        patient_data.export_history << export_log_entry
-        patient_data.save
+        patient.export_history = [export_log_entry]
       end
+      patient.save
 
       job.set_progress(index+1, patients.size)
     end

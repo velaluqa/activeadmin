@@ -4,7 +4,6 @@ require 'aa_erica_keywords'
 
 ActiveAdmin.register Study do
 
-  menu if: proc { can? :read, Study }
   actions :index, :show if ERICA.remote?
 
   scope :all, :default => true
@@ -12,15 +11,8 @@ ActiveAdmin.register Study do
   scope :production
 
   controller do
-    load_and_authorize_resource :except => :index
-    skip_load_and_authorize_resource :only => [:lock, :unlock, :select_for_session]
-
     def max_csv_records
       1_000_000
-    end
-
-    def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
     end
 
     def index
@@ -117,16 +109,16 @@ ActiveAdmin.register Study do
   end
 
   form do |f|
-    f.inputs 'Details' do
-      f.input :name, :required => true
+    inputs 'Details' do
+      input :name, :required => true
       if(!f.object.persisted? or current_user.is_app_admin?)
-        f.input :domino_db_url, :label => 'Domino DB URL', :required => false, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to data corruption unless the Domino DB was moved from the old URL to the new one.' : 'If left blank, Domino integration will not be enabled for this study. You can enable it later by changing this value.')
-        f.input :domino_server_name, :label => 'Domino Server Name', :required => false, :hint => 'Please enter the name of the Domino Server as seen in Lotus Notes (without the domain after the slash), for example \'pharmtrace-server\' instead of \'pharmtrace-server/pharmtrace\'. This is used to generate links that refer to the server name instead of its IP address. If left blank, the IP/hostname from the Domino DB URL will be used instead.'
+        input :domino_db_url, :label => 'Domino DB URL', :required => false, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to data corruption unless the Domino DB was moved from the old URL to the new one.' : 'If left blank, Domino integration will not be enabled for this study. You can enable it later by changing this value.')
+        input :domino_server_name, :label => 'Domino Server Name', :required => false, :hint => 'Please enter the name of the Domino Server as seen in Lotus Notes (without the domain after the slash), for example \'pharmtrace-server\' instead of \'pharmtrace-server/pharmtrace\'. This is used to generate links that refer to the server name instead of its IP address. If left blank, the IP/hostname from the Domino DB URL will be used instead.'
       end
-      f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
+      # f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
 
-    f.buttons
+    actions
   end
 
   # filters
@@ -157,6 +149,8 @@ ActiveAdmin.register Study do
   end
   member_action :upload_config, :method => :post do
     @study = Study.find(params[:id])
+
+    authorize!(:upload_config, @study)
 
     if(params[:study].nil? or params[:study][:file].nil? or params[:study][:file].tempfile.nil?)
       flash[:error] = "You must specify a configuration file to upload"
@@ -197,14 +191,16 @@ ActiveAdmin.register Study do
   member_action :upload_config_form, :method => :get do
     @study = Study.find(params[:id])
 
+    authorize!(:upload_config, @study)
+
     @page_title = "Upload new configuration"
     render 'admin/studies/upload_config', :locals => { :url => upload_config_admin_study_path}
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Upload configuration', upload_config_form_admin_study_path(study) if can? :manage, study
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'study', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 
@@ -217,7 +213,7 @@ ActiveAdmin.register Study do
 
     redirect_to :back, :notice => "Study #{@study.name} was selected for this session."
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Select for Session', select_for_session_admin_study_path(resource))
   end
   collection_action :selected_study, :method => :get do
@@ -238,7 +234,7 @@ ActiveAdmin.register Study do
       redirect_to :back, :notice => 'The study was deselected for the current session.'
     end
   end
-  action_item :only => :index do
+  action_item :edit, :only => :index do
     link_to('Deselect Study', deselect_study_admin_studies_path) unless session[:selected_study_id].nil?
   end
 
@@ -277,7 +273,7 @@ ActiveAdmin.register Study do
 
     redirect_to({:action => :show}, :notice => 'Form unlocked')
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     next unless can? :manage, study
 
     if resource.state == :building

@@ -3,13 +3,11 @@ require 'aa_erica_keywords'
 
 ActiveAdmin.register Visit do
 
-  menu if: proc { can? :read, Visit }
   actions :index, :show if Rails.application.config.is_erica_remote
 
   config.per_page = 100
 
   controller do
-    load_and_authorize_resource :except => :index
     skip_load_and_authorize_resource :only => [:assign_required_series, :assign_required_series_form, :tqc_results, :tqc, :tqc_form, :mqc_results, :mqc, :mqc_form, :required_series_viewer, :required_series_dicom_metadata, :all_required_series_viewer]
 
     def max_csv_records
@@ -18,9 +16,9 @@ ActiveAdmin.register Visit do
 
     def scoped_collection
       if(session[:selected_study_id].nil?)
-        end_of_association_chain.accessible_by(current_ability).includes(:patient => :center)
+        end_of_association_chain.includes(:patient => :center)
       else
-        end_of_association_chain.accessible_by(current_ability).includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
+        end_of_association_chain.includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
       end
     end
 
@@ -218,10 +216,9 @@ ActiveAdmin.register Visit do
       unless(visit_types.nil?)
         f.input :visit_type, :collection => visit_types, :include_blank => false
       end
-      f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
 
-    f.buttons
+    f.actions
   end
 
   csv do
@@ -270,12 +267,12 @@ ActiveAdmin.register Visit do
       redirect_to :back
       return
     end
-    @current_assignment = (@visit.visit_data.nil? ? {} : @visit.assigned_required_series_id_map)
+    @current_assignment = @visit.assigned_required_series_id_map
 
     @page_title = 'Assign image series as required series'
     render 'admin/visits/assign_required_series'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource)) if(can? :mqc, resource or can? :manage, resource)
   end
 
@@ -383,8 +380,7 @@ ActiveAdmin.register Visit do
       authorize! :mqc, @visit unless can? :manage, @visit
     end
 
-    visit_data = @visit.visit_data
-    mqc_version = (visit_data.nil? ? @visit.study.locked_version : visit_data.mqc_version)
+    mqc_version = @visit.mqc_version
     @mqc_spec = @visit.mqc_spec_with_results_at_version(mqc_version)
     if(@mqc_spec.nil?)
       flash[:error] = 'Viewing mQC results requires a valid study config containing mQC specifications for this visits visit type and existing mQC results.'
@@ -436,16 +432,14 @@ ActiveAdmin.register Visit do
       redirect_to :action => :show
       return
     end
-    @visit.ensure_visit_data_exists
-    @visit_data = @visit.visit_data
 
     @page_title = "Perform mQC"
     render 'admin/visits/mqc_form'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(resource.state) and (can? :mqc, resource or can? :manage, resource))
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.mqc_state != :pending and (
                                                                             (Rails.application.config.is_erica_remote and can? :read_qc, resource) or
                                                                             (can? :mqc, resource or can? :manage, resource))
@@ -474,7 +468,7 @@ ActiveAdmin.register Visit do
     @return_url = params[:return_url] || admin_visit_path(@visit)
     @page_title = 'Change Visit State'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Change State', edit_state_form_admin_visit_path(resource, :return_url => request.fullpath)) if can? :manage, resource
   end
 
@@ -555,10 +549,10 @@ ActiveAdmin.register Visit do
 
     redirect_to dicom_metadata_admin_image_series_path(@required_series.assigned_image_series)
   end
-  action_item :only => :tqc_form do
+  action_item :edit, :only => :tqc_form do
     link_to('Open Viewer', required_series_viewer_admin_visit_path(resource, :required_series_name => params[:required_series_name]), :target => '_blank') unless params[:required_series_name].nil?
   end
-  action_item :only => :tqc_form do
+  action_item :edit, :only => :tqc_form do
     link_to('DICOM Metadata', required_series_dicom_metadata_admin_visit_path(resource, :required_series_name => params[:required_series_name]), :target => '_blank') unless params[:required_series_name].nil?
   end
 
@@ -571,7 +565,7 @@ ActiveAdmin.register Visit do
 
     render 'admin/shared/weasis_webstart.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
   end
-  action_item :only => [:show, :mqc_form, :mqc_results] do
+  action_item :edit, :only => [:show, :mqc_form, :mqc_results] do
     link_to('Viewer (RS)', all_required_series_viewer_admin_visit_path(resource))
   end
 
@@ -591,14 +585,14 @@ ActiveAdmin.register Visit do
     background_job = start_download_images(params[:id])
     redirect_to admin_background_job_path(background_job), :notice => 'Your download will be available shortly. Please refresh this page to see whether it is available yet.'
   end
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Download images', download_images_admin_visit_path(resource)) if can? :download_images, resource
   end
 
   viewer_cartable(:visit)
   erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'visit', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

@@ -1,8 +1,0 @@
-= semantic_form_for @form, :url => url, :method => :post do |f|
-  = f.inputs 'Upload Configuration' do
-    = f.input :file, :label => 'Configuration File', :as => :file
-    = f.input :validators, :label => 'Custom Validators (JS)', :as => :file
-
-  = f.actions do
-    = f.action :submit, :as => :input
-    = f.action :cancel, :as => :link, :wrapper_html => {:class => 'cancel'}

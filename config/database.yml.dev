@@ -1,0 +1,15 @@
+development: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 30
+  timeout: 5000
+  host: postgres
+  username: postgres
+  database: erica_store_development
+
+test: &test
+  <<: *default
+  database: erica_store_test
+
+cucumber:
+  <<: *test

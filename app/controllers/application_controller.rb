@@ -18,15 +18,6 @@ class ApplicationController < ActionController::Base
     render 'exceptions/not_found', :layout => 'client_errors', :locals => { :messages => messages, :exception_name => 'Case not found'}
   end
 
-  rescue_from CanCan::AccessDenied do |exception|
-    Rails.logger.debug "Access denied for user #{(current_user.nil? ? 'None' : current_user.username)} on #{exception.action} #{exception.subject.inspect}"
-    respond_to do |format|
-      format.html { redirect_to admin_dashboard_path, :alert => exception.message }
-      format.json { render :json => {:error_code => -1, :error => exception.message} }
-      format.all { redirect_to admin_dashboard_path, :alert => exception.message }
-    end
-  end
-
   before_filter do
     if(current_user and
        (
@@ -62,8 +53,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def access_denied(args)
+    respond_to do |format|
+      format.html { render 'shared/forbidden', status: :forbidden, layout: 'active_admin' }
+      format.json { render json: { error_code: 403, error_message: "Forbidden" }, status: :forbidden  }
+    end
+  end
+  
   def current_ability
-    @current_ability ||= Ability.new(current_user)
+    @current_ability ||= ::Ability.new(current_user)
   end
 
   def after_sign_in_path_for(resource)

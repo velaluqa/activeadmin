@@ -1,6 +1,11 @@
 ActiveAdmin.register_page 'Image Hierarchy' do
-
-  menu :if => proc { can? :read, Study and can? :read, Center and can? :read, Patient and can? :read, Visit and can? :read, ImageSeries }
+  menu(if: lambda do
+    authorized?(:read, Study) &&
+      authorized?(:read, Center) &&
+      authorized?(:read, Patient) &&
+      authorized?(:read, Visit) &&
+      authorized?(:read, ImageSeries)
+  end)
 
   content do
     render 'content'
@@ -32,8 +37,17 @@ ActiveAdmin.register_page 'Image Hierarchy' do
                      else ''
                      end
     end
+
+    def authorize_access!
+      authorize!(:read, Study)
+      authorize!(:read, Center)
+      authorize!(:read, Patient)
+      authorize!(:read, Visit)
+      authorize!(:read, ImageSeries)
+    end
   end
 
+  # TODO: Refactor with jbuilder
   page_action :nodes, :method => :get do
     raw_node_id = params[:node]
 

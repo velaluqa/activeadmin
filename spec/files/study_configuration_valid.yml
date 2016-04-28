@@ -1,0 +1,83 @@
+domino_integration:
+  dicom_tags:
+    - tag: 0018,0050
+      label: Slice Thickness
+    - tag: 0008,0060
+      label: Modality
+    - tag: 0018,1210
+      label: Kernel
+image_series_properties:
+  - id: orientation
+    label: Orientation
+    type: select
+    values:
+      'axial': Axial
+      'coronal': Coronal
+      'sagittal': Sagittal
+      
+  - id: contrast
+    label: Contrast Phase
+    type: select
+    values:
+      'arterial': Arterial
+      'portal_venous': Portal-Venous
+      'enhanced_unspecified': Contrast enhanced (not specified)
+
+  - id: body_region
+    label: Body Region
+    type: select
+    values:
+      'thorax': Thorax
+      'abdomen': Abdomen
+      'body': Whole Body
+      'liver': Liver
+
+  - id: comment
+    label: Comment
+    type: string
+
+  - id: green_new
+    label: Is this an eco-friendly series according to the new 2014 ISO/IEC standards?
+    type: select
+    values:
+      'yes': 'Yes'
+      'no': 'No'
+      'maybe': Maybe
+      'dafuq': "WTF? Nobody told me about no new standards!"
+    
+visit_types:
+  baseline:
+    description: Foo bar!
+    required_series:
+      lung_post_contrast:
+        tqc: &tqcexample
+          - id: coverage
+            label: 'Is the entire region covered?'
+            type: bool            
+          - id: contrast_new
+            label: 'Correct contrast phase according to new standards?'
+            type: bool
+          - id: slice_thickness
+            label: 'Slice Thickness'
+            type: dicom
+            dicom_tag: 0018,0050
+            expected: ['foo', 'bar', 'fnord', 3.0]
+      liver_portal_venous:
+        tqc: *tqcexample
+      abdomen_venous:
+        tqc: *tqcexample
+      pelvis_venous:
+        tqc: *tqcexample
+    mqc:
+      - id: border
+        label: 'Is the border delineation appropriate?'
+        type: bool
+      - id: foobar
+        label: 'Is there any visible foobar?'
+        type: bool
+      - id: snafu
+        label: 'Is there any non-invisible SNAFU in the intermediate background?'
+        type: bool
+      - id: negative
+        label: "Isn\'t there not no stuff going on?"
+        type: bool

@@ -1,0 +1,6 @@
+data/**/*.dicom
+data/**/*.yml
+tmp/**/*
+spec/data/**/*.dicom
+spec/data/**/*.yml
+spec/tmp/**/*

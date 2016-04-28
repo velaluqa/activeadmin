@@ -19,15 +19,24 @@ end
 
 class GitConfigRepository
   def initialize
-    begin
-      @repo = Rugged::Repository.new(Rails.application.config.data_directory)
-    rescue Rugged::OSError, Rugged::RepositoryError
-      @repo = Rugged::Repository.init_at(Rails.application.config.data_directory, false)
-    end    
+    @repo = Rugged::Repository.new(Rails.application.config.data_directory)
+  rescue Rugged::OSError, Rugged::RepositoryError
+    @repo = Rugged::Repository.init_at(Rails.application.config.data_directory, false)
+  ensure
+    if @repo.empty?
+      options = {}
+      options[:author] = { :email => "erica@pharmtrace.com", :name => 'ERICA', :time => Time.now }
+      options[:committer] = { :email => "erica@pharmtrace.com", :name => 'ERICA', :time => Time.now }
+      options[:message] ||= "Initial commit"
+      options[:parents] = []
+      options[:update_ref] = 'HEAD'
+      options[:tree] = @repo.index.write_tree(@repo)
+      Rugged::Commit.create(@repo, options)
+    end
   end
 
   def current_version
-    @repo.head.resolve.target
+    @repo.head.resolve.target.oid
   end
 
   def walker_for_version(version)

@@ -68,6 +68,16 @@ class RemoteRestore
     restore_config_dir('studies', ERICA.study_config_path)
   end
 
+  def cleanup
+    puts "#{working_dir}/*-*-*-*"
+    Dir["#{working_dir}/*-*-*-*"].each do |path|
+      next unless path =~ /^(\d{4}-\d{2}-\d{2})/
+      path_date = Date.strptime($1, '%Y-%m-%d')
+      next unless path_date < (Date.today - 7)
+      puts "delete #{path}"
+    end
+  end
+
   private
 
   def relative(pathname)

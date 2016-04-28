@@ -4,14 +4,8 @@ ActiveAdmin.register User do
   config.comments = false
 
   controller do
-    load_and_authorize_resource :except => :index
-
     def max_csv_records
       1_000_000
-    end
-
-    def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
     end
 
     def create
@@ -107,21 +101,20 @@ ActiveAdmin.register User do
   end
 
   form do |f|
-    f.inputs 'User Information' do
-      f.input :username
-      f.input :name
-      if(current_user.is_app_admin? or not f.object.persisted?)
-        f.input :password
-        f.input :password_confirmation
+    inputs 'User Information' do
+      input :username
+      input :name
+      if current_user.is_app_admin? || !object.persisted?
+        input :password
+        input :password_confirmation
       end
-      unless f.object.persisted?
-        f.input :signature_password, :required => true
-        f.input :signature_password_confirmation, :required => true
+      unless object.persisted?
+        input :signature_password, :required => true
+        input :signature_password_confirmation, :required => true
       end
-      f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
 
-    f.buttons
+    actions
   end
 
   # filters
@@ -158,22 +151,22 @@ ActiveAdmin.register User do
     render 'admin/users/generate_keypair'
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will disable the old signature of this user. Are you sure you want to do this?' if can? :manage, resource
   end
 
   member_action :unlock, :method => :get do
-    authorize! :manage, :system
+    authorize!(:lock, resource)
 
     resource.unlock_access! if resource.access_locked?
     redirect_to({:action => :show}, :notice => 'User unlocked!')
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to 'Unlock', unlock_admin_user_path(resource) if(can? :manage, :system and resource.access_locked?)
   end
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'user', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

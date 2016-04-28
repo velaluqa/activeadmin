@@ -1,0 +1,24 @@
+mongo:
+  image: mongo
+postgres:
+  image: postgres
+redis:
+  image: redis
+dev:
+  build: .
+  command: rails s -b 0.0.0.0
+  tty: true
+  volumes:
+    - .:/app
+    - ./config/database.yml.dev:/app/config/database.yml
+    - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
+  ports:
+    - 3000:3000
+  environment:
+    - DB_USERNAME=postgres
+    - DB_PASSWORD=
+    - TRUSTED_IP=172.18.0.1
+  links:
+    - postgres
+    - mongo
+    - redis

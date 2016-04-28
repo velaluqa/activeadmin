@@ -47,11 +47,11 @@ WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id"
 (
   UPDATE "centers" "m"
   SET
-    "code" = "nv"."code"::varchar(255),
+    "code" = "nv"."code"::varchar(),
     "created_at" = "nv"."created_at"::timestamp,
-    "domino_unid" = "nv"."domino_unid"::varchar(255),
+    "domino_unid" = "nv"."domino_unid"::varchar(),
     "id" = "nv"."id"::integer,
-    "name" = "nv"."name"::varchar(255),
+    "name" = "nv"."name"::varchar(),
     "study_id" = "nv"."study_id"::integer,
     "updated_at" = "nv"."updated_at"::timestamp
   FROM "new_values" "nv"
@@ -59,7 +59,7 @@ WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id"
   RETURNING "m".*
 )
 INSERT INTO "centers" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at")
-SELECT "code"::varchar(255), "created_at"::timestamp, "domino_unid"::varchar(255), "id"::integer, "name"::varchar(255), "study_id"::integer, "updated_at"::timestamp
+SELECT "code"::varchar(), "created_at"::timestamp, "domino_unid"::varchar(), "id"::integer, "name"::varchar(), "study_id"::integer, "updated_at"::timestamp
 FROM "new_values"
 WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
 COMMIT;
@@ -110,11 +110,11 @@ WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id"
 (
   UPDATE "centers" "m"
   SET
-    "code" = "nv"."code"::varchar(255),
+    "code" = "nv"."code"::varchar(),
     "created_at" = "nv"."created_at"::timestamp,
-    "domino_unid" = "nv"."domino_unid"::varchar(255),
+    "domino_unid" = "nv"."domino_unid"::varchar(),
     "id" = "nv"."id"::integer,
-    "name" = "nv"."name"::varchar(255),
+    "name" = "nv"."name"::varchar(),
     "study_id" = "nv"."study_id"::integer,
     "updated_at" = "nv"."updated_at"::timestamp
   FROM "new_values" "nv"
@@ -122,7 +122,7 @@ WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id"
   RETURNING "m".*
 )
 INSERT INTO "centers" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at")
-SELECT "code"::varchar(255), "created_at"::timestamp, "domino_unid"::varchar(255), "id"::integer, "name"::varchar(255), "study_id"::integer, "updated_at"::timestamp
+SELECT "code"::varchar(), "created_at"::timestamp, "domino_unid"::varchar(), "id"::integer, "name"::varchar(), "study_id"::integer, "updated_at"::timestamp
 FROM "new_values"
 WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
 COMMIT;
@@ -180,15 +180,15 @@ WITH "new_values" ("code", "created_at", "name") as (
 (
   UPDATE "centers" "m"
   SET
-    "code" = "nv"."code"::varchar(255),
+    "code" = "nv"."code"::varchar(),
     "created_at" = "nv"."created_at"::timestamp,
-    "name" = "nv"."name"::varchar(255)
+    "name" = "nv"."name"::varchar()
   FROM "new_values" "nv"
   WHERE "m"."id" = "nv"."id"
   RETURNING "m".*
 )
 INSERT INTO "centers" ("code", "created_at", "name")
-SELECT "code"::varchar(255), "created_at"::timestamp, "name"::varchar(255)
+SELECT "code"::varchar(), "created_at"::timestamp, "name"::varchar()
 FROM "new_values"
 WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
 COMMIT;
@@ -246,10 +246,10 @@ WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id"
 (
   UPDATE "centers" "m"
   SET
-    "code" = "nv"."code"::varchar(255),
-    "domino_unid" = "nv"."domino_unid"::varchar(255),
+    "code" = "nv"."code"::varchar(),
+    "domino_unid" = "nv"."domino_unid"::varchar(),
     "id" = "nv"."id"::integer,
-    "name" = "nv"."name"::varchar(255),
+    "name" = "nv"."name"::varchar(),
     "study_id" = "nv"."study_id"::integer,
     "updated_at" = "nv"."updated_at"::timestamp
   FROM "new_values" "nv"
@@ -257,7 +257,7 @@ WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id"
   RETURNING "m".*
 )
 INSERT INTO "centers" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at")
-SELECT "code"::varchar(255), "created_at"::timestamp, "domino_unid"::varchar(255), "id"::integer, "name"::varchar(255), "study_id"::integer, "updated_at"::timestamp
+SELECT "code"::varchar(), "created_at"::timestamp, "domino_unid"::varchar(), "id"::integer, "name"::varchar(), "study_id"::integer, "updated_at"::timestamp
 FROM "new_values"
 WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
 COMMIT;

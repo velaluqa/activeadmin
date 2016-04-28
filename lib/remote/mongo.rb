@@ -1,7 +1,7 @@
 require 'remote/mongo/dumper'
 require 'remote/mongo/restore'
 
-class Mongo
+module Mongo
   class << self
     include Logging
 

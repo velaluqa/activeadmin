@@ -1,6 +1,8 @@
 #+SETUPFILE: theme-readtheorg.setup
 #+OPTIONS:   H:5 num:t toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t
 #+TITLE: Audit Trail Event Classification
+#+AUTHOR: Arthur Andersen
+
 * General
 
 If the =event= does not match any of the globally defined event

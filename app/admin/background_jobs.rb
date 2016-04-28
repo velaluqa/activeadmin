@@ -11,14 +11,8 @@ ActiveAdmin.register BackgroundJob do
   scope :running
 
   controller do
-    load_and_authorize_resource :except => :index
-
     def max_csv_records
       1_000_000
-    end
-
-    def scoped_collection
-      end_of_association_chain.where(user_id: current_user.id)
     end
 
     def destroy

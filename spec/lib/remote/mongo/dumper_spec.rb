@@ -3,7 +3,9 @@ require 'remote/mongo/dumper'
 RSpec.describe Mongo::Dumper do
   describe '#mongodump_options' do
     it 'splits the host string into host and port' do
-      expect(Rails.configuration.mongoid.sessions['default'])
+      allow(Rails.configuration.mongoid.clients)
+        .to receive(:[]).with('default').and_return({})
+      expect(Rails.configuration.mongoid.clients['default'])
         .to receive(:clone).and_return(
               'database' => 'erica_store_test',
               'hosts'    => ['localhost:27017'],
@@ -21,7 +23,9 @@ RSpec.describe Mongo::Dumper do
     end
 
     it 'fails for more than one host' do
-      expect(Rails.configuration.mongoid.sessions['default'])
+      allow(Rails.configuration.mongoid.clients)
+        .to receive(:[]).with('default').and_return({})
+      expect(Rails.configuration.mongoid.clients['default'])
         .to receive(:clone).and_return(
           'database' => 'erica_store_test',
           'hosts'    => [
@@ -38,7 +42,9 @@ RSpec.describe Mongo::Dumper do
 
   describe '#arguments' do
     it 'picks only allowed options' do
-      expect(Rails.configuration.mongoid.sessions['default'])
+      allow(Rails.configuration.mongoid.clients)
+        .to receive(:[]).with('default').and_return({})
+      expect(Rails.configuration.mongoid.clients['default'])
         .to receive(:clone).and_return(
           'database' => 'erica_store_test',
           'hosts'    => ['localhost:27017'],
@@ -58,7 +64,9 @@ RSpec.describe Mongo::Dumper do
 
   describe 'dump' do
     before :each do
-      expect(Rails.configuration.mongoid.sessions['default'])
+      allow(Rails.configuration.mongoid.clients)
+        .to receive(:[]).with('default').and_return({})
+      expect(Rails.configuration.mongoid.clients['default'])
         .to receive(:clone).and_return(
           'database' => 'erica_store_test',
           'hosts'    => ['localhost:27017'],

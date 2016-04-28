@@ -5,14 +5,12 @@ ActiveAdmin.register PublicKey do
   actions :index, :show
 
   controller do
-    load_and_authorize_resource :except => :index
-
     def max_csv_records
       1_000_000
     end
 
     def scoped_collection
-      end_of_association_chain.accessible_by(current_ability)
+      end_of_association_chain
     end
   end
 
@@ -30,7 +28,7 @@ ActiveAdmin.register PublicKey do
       link_to('Download', download_admin_public_key_path(public_key))
     end
 
-    default_actions
+    actions
   end
 
   show do |public_key|

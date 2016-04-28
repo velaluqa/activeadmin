@@ -4,7 +4,7 @@
     %ol
       - @mqc_spec.each do |spec|
         - field_name = 'mqc_result['+spec['id']+']'
-        - current_value = (@visit_data.mqc_results.nil? ? nil : @visit_data.mqc_results[spec['id']])
+        - current_value = @visit.mqc_results.andand[spec['id']]
         - case spec['type']
         - when 'bool'
           %li.input.select
@@ -17,7 +17,7 @@
     %ol
       %li.input.string
         = label_tag('mqc_comment', 'Comment', :id => 'mqc_comment_label')
-        = text_field_tag('mqc_comment', @visit_data.mqc_comment)
+        = text_field_tag('mqc_comment', @visit.mqc_comment)
         %p.inline-hints#mqc_comment_hint A comment is required if any of the above criteria were answered with 'Fail'
 
   = field_set_tag(nil, :class => 'actions') do

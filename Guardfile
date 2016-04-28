@@ -1,4 +1,4 @@
-guard 'rspec', cmd: 'zeus rspec' do
+guard 'rspec', cmd: 'spring rspec -r spec_helper' do
   watch(/^spec\/.+_spec\.rb$/)
   watch(%r{^spec\/factories\/.+\.rb$}) { 'spec' }
   watch(/^lib\/(.+)\.rb$/) { |m| "spec/lib/#{m[1]}_spec.rb" }
@@ -22,7 +22,7 @@ guard 'rspec', cmd: 'zeus rspec' do
   end
 end
 
-guard 'cucumber', command_prefix: 'zeus', bundler: false do
+guard 'cucumber', command_prefix: 'spring', bundler: false do
   watch(%r{^features/.+\.feature$})
   watch(%r{^features/support/.+$}) { 'features' }
   watch(%r{^features/step_definitions/(.+)_steps\.rb$}) do |m|

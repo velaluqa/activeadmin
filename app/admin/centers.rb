@@ -3,24 +3,20 @@ require 'aa_domino'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register Center do
-
-  menu if: proc { can? :read, Center }
   actions :index, :show if Rails.application.config.is_erica_remote
 
   config.sort_order = 'code_asc'
 
   controller do
-    load_and_authorize_resource :except => :index
-
     def max_csv_records
       1_000_000
     end
 
     def scoped_collection
       if(session[:selected_study_id].nil?)
-        end_of_association_chain.accessible_by(current_ability)
+        end_of_association_chain
       else
-        end_of_association_chain.accessible_by(current_ability).where(:study_id => session[:selected_study_id])
+        end_of_association_chain.where(:study_id => session[:selected_study_id])
       end
     end
 
@@ -74,7 +70,7 @@ ActiveAdmin.register Center do
   viewer_cartable(:center)
   erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-  action_item :only => :show do
+  action_item :edit, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

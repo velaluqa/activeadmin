@@ -1,8 +1,0 @@
-= semantic_form_for @cases.first, :url => assign_reader_admin_cases_path(:return_url => @return_url, :selection => @selection), :method => :post do |f|
-  = f.inputs 'Assign Reader' do
-    = f.input :assigned_reader, :as => :select, :collection => (@cases.first.session.readers + @cases.first.session.validators).uniq
-
-  = f.actions do
-    = f.action :submit, :as => :input
-    = f.action :cancel, :as => :link, :wrapper_html => {:class => 'cancel'}
-  
