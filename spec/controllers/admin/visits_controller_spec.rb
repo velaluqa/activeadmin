@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Admin::StudiesController, type: :controller do
+RSpec.describe Admin::VisitsController do
 
   describe '#index' do
     describe 'without current user' do
@@ -11,7 +11,7 @@ RSpec.describe Admin::StudiesController, type: :controller do
 
     describe 'for authorized user' do
       login_user_with_abilities do
-        can :read, Study
+        can :read, Visit
       end
 
       it 'succeeds' do
@@ -33,22 +33,22 @@ RSpec.describe Admin::StudiesController, type: :controller do
 
   describe '#show' do
     before(:each) do
-      @study = create(:study)
+      @visit = create(:visit)
     end
 
     describe 'without current user' do
-      subject { get(:show, id: @study.id) }
+      subject { get(:show, id: @visit.id) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
 
     describe 'for authorized user' do
       login_user_with_abilities do
-        can :read, Study
+        can :read, Visit
       end
 
       it 'succeeds' do
-        response = get(:show, id: @study.id)
+        response = get(:show, id: @visit.id)
         expect(response).to be_success
         expect(response).to have_http_status(200)
       end
@@ -58,7 +58,7 @@ RSpec.describe Admin::StudiesController, type: :controller do
       login_user_with_abilities
 
       it 'denies access' do
-        response = get(:show, id: @study.id)
+        response = get(:show, id: @visit.id)
         expect(response).to have_http_status(:forbidden)
       end
     end
@@ -73,8 +73,8 @@ RSpec.describe Admin::StudiesController, type: :controller do
 
     describe 'for authorized user' do
       login_user_with_abilities do
-        can :read, Study
-        can :create, Study
+        can :read, Visit
+        can :create, Visit
       end
 
       it 'succeeds' do
@@ -86,7 +86,7 @@ RSpec.describe Admin::StudiesController, type: :controller do
 
     describe 'for unauthorized user' do
       login_user_with_abilities do
-        can :read, Study
+        can :read, Visit
       end
 
       it 'denies access' do
@@ -98,34 +98,38 @@ RSpec.describe Admin::StudiesController, type: :controller do
 
   describe '#create' do
     describe 'without current user' do
-      subject { post(:create, study: {}) }
+      subject { post(:create, visit: {}) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
 
     describe 'for authorized user' do
       login_user_with_abilities do
-        can :read, Study
-        can :create, Study
+        can :read, Visit
+        can :create, Visit
+      end
+
+      before(:each) do
+        @patient = FactoryGirl.create(:patient)
       end
 
       it 'succeeds' do
-        response = post(:create, study: {
-                          name: 'My New Study',
-                          domino_db_url: '',
-                          domino_server_name: ''
+        response = post(:create, visit: {
+                          name: 'My New Visit',
+                          patient_id: @patient.id,
+                          visit_number: 1
                         })
-        expect(response).to redirect_to(%r{/admin/studies/\d+})
+        expect(response).to redirect_to(%r{/admin/visits/\d+})
       end
     end
 
     describe 'for unauthorized user' do
       login_user_with_abilities do
-        can :read, Study
+        can :read, Visit
       end
 
       it 'denies access' do
-        response = post(:create, study: {})
+        response = post(:create, visit: {})
         expect(response).to have_http_status(:forbidden)
       end
     end
@@ -133,80 +137,36 @@ RSpec.describe Admin::StudiesController, type: :controller do
 
   describe '#destroy' do
     before(:each) do
-      @study = create(:study)
+      @visit = create(:visit)
     end
 
     describe 'without current user' do
-      subject { post(:destroy, id: @study.id) }
+      subject { post(:destroy, id: @visit.id) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
 
     describe 'for authorized user' do
       login_user_with_abilities do
-        can :read, Study
-        can :destroy, Study
+        can :read, Visit
+        can :destroy, Visit
       end
 
       it 'succeeds' do
-        response = post(:destroy, id: @study.id)
-        expect(response).to redirect_to('/admin/studies')
+        response = post(:destroy, id: @visit.id)
+        expect(response).to redirect_to('/admin/visits')
       end
     end
 
     describe 'for unauthorized user' do
       login_user_with_abilities do
-        can :read, Study
+        can :read, Visit
       end
 
       it 'denies access' do
-        response = post(:destroy, id: @study.id)
+        response = post(:destroy, id: @visit.id)
         expect(response).to have_http_status(:forbidden)
       end
-    end
-  end
-
-  describe '#upload_config' do
-    before(:each) do
-      @study = create(:study)
-    end
-
-    let(:file) do
-      fixture_file_upload('spec/files/study_configuration_valid.yml', 'text/yml')
-    end
-
-    describe 'without current user' do
-      let(:response) do
-        post(:upload_config, id: @study.id, study: { file: file })
-      end
-
-      it { expect(response).to have_http_status(:found) }
-      it { expect(response).to redirect_to('/users/sign_in') }
-    end
-
-    describe 'for authorized user' do
-      login_user_with_abilities do
-        can :read, Study
-        can :manage, Study
-      end
-
-      let(:response) do
-        post(:upload_config, id: @study.id, study: { file: file })
-      end
-
-      it { expect(response).to redirect_to(%r{/admin/studies/\d+}) }
-    end
-
-    describe 'for unauthorized user' do
-      login_user_with_abilities do
-        can :read, Study
-      end
-
-      let(:response) do
-        post(:upload_config, id: @study.id, study: { file: file })
-      end
-
-      it { expect(response).to have_http_status(:forbidden) }
     end
   end
 end

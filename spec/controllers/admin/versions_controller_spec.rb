@@ -1,8 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Admin::PublicKeysController, type: :controller do
-  render_views
-
+RSpec.describe Admin::VersionsController do
   describe 'without current user' do
     subject { get :index }
     it { expect(subject.status).to eq 302 }
@@ -12,7 +10,7 @@ RSpec.describe Admin::PublicKeysController, type: :controller do
   describe '#index' do
     describe 'for authorized user' do
       login_user_with_abilities do
-        can :read, PublicKey
+        can :read, Version
       end
 
       it 'succeeds' do
@@ -34,22 +32,22 @@ RSpec.describe Admin::PublicKeysController, type: :controller do
 
   describe '#show' do
     before(:each) do
-      @public_key = create(:public_key)
+      @version = create(:version)
     end
 
     describe 'without current user' do
-      subject { get(:show, id: @public_key.id) }
+      subject { get(:show, id: @version.id) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
 
     describe 'for authorized user' do
       login_user_with_abilities do
-        can :read, PublicKey
+        can :read, Version
       end
 
       it 'succeeds' do
-        response = get(:show, id: @public_key.id)
+        response = get(:show, id: @version.id)
         expect(response).to be_success
         expect(response).to have_http_status(200)
       end
@@ -59,7 +57,7 @@ RSpec.describe Admin::PublicKeysController, type: :controller do
       login_user_with_abilities
 
       it 'denies access' do
-        response = get(:show, id: @public_key.id)
+        response = get(:show, id: @version.id)
         expect(response).to have_http_status(:forbidden)
       end
     end

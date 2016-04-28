@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Admin::RolesController, type: :controller do
+RSpec.describe Admin::RolesController do
 
   describe '#index' do
     describe 'without current user' do

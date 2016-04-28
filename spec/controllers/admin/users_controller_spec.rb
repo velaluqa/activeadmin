@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Admin::UsersController, type: :controller do
+RSpec.describe Admin::UsersController do
 
   describe '#index' do
     describe 'without current user' do

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Admin::ImageHierarchyController, type: :controller do
+RSpec.describe Admin::ImageHierarchyController do
   describe 'without current user' do
     subject { get :index }
     it { expect(subject.status).to eq 302 }

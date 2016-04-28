@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Admin::VersionsController, type: :controller do
+RSpec.describe Admin::CentersController do
   describe 'without current user' do
     subject { get :index }
     it { expect(subject.status).to eq 302 }
@@ -10,7 +10,7 @@ RSpec.describe Admin::VersionsController, type: :controller do
   describe '#index' do
     describe 'for authorized user' do
       login_user_with_abilities do
-        can :read, Version
+        can :read, Center
       end
 
       it 'succeeds' do
@@ -32,22 +32,22 @@ RSpec.describe Admin::VersionsController, type: :controller do
 
   describe '#show' do
     before(:each) do
-      @version = create(:version)
+      @center = create(:center)
     end
 
     describe 'without current user' do
-      subject { get(:show, id: @version.id) }
+      subject { get(:show, id: @center.id) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
 
     describe 'for authorized user' do
       login_user_with_abilities do
-        can :read, Version
+        can :read, Center
       end
 
       it 'succeeds' do
-        response = get(:show, id: @version.id)
+        response = get(:show, id: @center.id)
         expect(response).to be_success
         expect(response).to have_http_status(200)
       end
@@ -57,7 +57,7 @@ RSpec.describe Admin::VersionsController, type: :controller do
       login_user_with_abilities
 
       it 'denies access' do
-        response = get(:show, id: @version.id)
+        response = get(:show, id: @center.id)
         expect(response).to have_http_status(:forbidden)
       end
     end

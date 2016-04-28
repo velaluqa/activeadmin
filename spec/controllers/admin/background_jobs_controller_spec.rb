@@ -1,22 +1,21 @@
 require 'spec_helper'
 
-RSpec.describe Admin::ViewerCartController, type: :controller do
+RSpec.describe Admin::BackgroundJobsController do
   describe 'without current user' do
     subject { get :index }
     it { expect(subject.status).to eq 302 }
     it { expect(subject).to redirect_to('/users/sign_in') }
   end
 
-  render_views
-
   describe '#index' do
     describe 'for authorized user' do
       login_user_with_abilities do
-        can(:manage, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin')
+        can :read, BackgroundJob
       end
 
       it 'succeeds' do
         response = get :index
+        expect(response).to be_success
         expect(response).to have_http_status(200)
       end
     end
@@ -31,22 +30,26 @@ RSpec.describe Admin::ViewerCartController, type: :controller do
     end
   end
 
-  describe '#empty' do
+  describe '#show' do
+    before(:each) do
+      @background_job = create(:background_job)
+    end
+
     describe 'without current user' do
-      subject { get(:empty) }
+      subject { get(:show, id: @background_job.id) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
 
     describe 'for authorized user' do
       login_user_with_abilities do
-        can(:manage, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin')
+        can :read, BackgroundJob
       end
-      render_views
+
       it 'succeeds' do
-        @request.env['HTTP_REFERER'] = root_url
-        response = get(:empty)
-        expect(response).to redirect_to(root_url)
+        response = get(:show, id: @background_job.id)
+        expect(response).to be_success
+        expect(response).to have_http_status(200)
       end
     end
 
@@ -54,35 +57,42 @@ RSpec.describe Admin::ViewerCartController, type: :controller do
       login_user_with_abilities
 
       it 'denies access' do
-        response = get(:empty)
+        response = get(:show, id: @background_job.id)
         expect(response).to have_http_status(:forbidden)
       end
     end
   end
 
-  describe '#clear' do
+  describe '#destroy' do
+    before(:each) do
+      @background_job = create(:background_job, :complete)
+    end
+
     describe 'without current user' do
-      subject { get(:clear) }
+      subject { post(:destroy, id: @background_job.id) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
 
     describe 'for authorized user' do
       login_user_with_abilities do
-        can(:manage, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin')
+        can :read, BackgroundJob
+        can :destroy, BackgroundJob
       end
-      render_views
+
       it 'succeeds' do
-        response = get(:clear)
-        expect(response).to redirect_to('/admin/viewer_cart')
+        response = post(:destroy, id: @background_job.id)
+        expect(response).to redirect_to('/admin/background_jobs')
       end
     end
 
     describe 'for unauthorized user' do
-      login_user_with_abilities
+      login_user_with_abilities do
+        can :read, BackgroundJob
+      end
 
       it 'denies access' do
-        response = get(:clear)
+        response = post(:destroy, id: @background_job.id)
         expect(response).to have_http_status(:forbidden)
       end
     end
