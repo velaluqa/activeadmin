@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160428135724) do
+ActiveRecord::Schema.define(version: 20160428140540) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -171,17 +171,10 @@ ActiveRecord::Schema.define(version: 20160428135724) do
   add_index "readers_sessions", ["user_id", "session_id"], name: "index_readers_sessions_on_user_id_and_session_id", using: :btree
 
   create_table "roles", force: :cascade do |t|
-    t.integer  "subject_id"
-    t.string   "subject_type"
-    t.integer  "user_id"
-    t.integer  "role"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "title",      null: false
   end
-
-  add_index "roles", ["subject_id"], name: "index_roles_on_subject_id", using: :btree
-  add_index "roles", ["subject_type"], name: "index_roles_on_subject_type", using: :btree
-  add_index "roles", ["user_id"], name: "index_roles_on_user_id", using: :btree
 
   create_table "sessions", force: :cascade do |t|
     t.string   "name"

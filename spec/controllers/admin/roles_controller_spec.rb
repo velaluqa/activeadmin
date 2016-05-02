@@ -110,11 +110,7 @@ RSpec.describe Admin::RolesController do
       end
 
       it 'succeeds' do
-        response = post(:create, role: {
-                          name: 'My New Role',
-                          domino_db_url: '',
-                          domino_server_name: ''
-                        })
+        response = post(:create, role: { title: 'My New Role' })
         expect(response).to redirect_to(%r{/admin/roles/\d+})
       end
     end
