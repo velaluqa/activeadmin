@@ -39,19 +39,6 @@ class User < ActiveRecord::Base
     [:id]
   end
 
-  def is_app_admin?
-    has_system_role?(:manage)
-  end
-  def is_erica_remote_admin?
-    has_system_role?(:remote_manage)
-  end
-  def has_system_role?(role_sym)
-    roles
-      .where(:subject_type => nil,
-             :subject_id => nil,
-             :role => Role::role_sym_to_int(role_sym))
-      .exists?
-  end
   def is_erica_remote_user?
     # TODO: this is filthy, dirty hack territory...
     self.id >= 1000 and roles.all? {|role| role.erica_remote_role? }

@@ -104,7 +104,7 @@ ActiveAdmin.register User do
     inputs 'User Information' do
       input :username
       input :name
-      if current_user.is_app_admin? || !object.persisted?
+      if can?(:change_password, object) || !object.persisted?
         input :password
         input :password_confirmation
       end
