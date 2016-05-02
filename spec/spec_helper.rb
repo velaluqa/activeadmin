@@ -45,10 +45,7 @@ RSpec.configure do |config|
     DatabaseCleaner.clean_with(:truncation)
     DatabaseCleaner.clean
     FactoryGirl.reload
-    # FactoryGirl 4.7.0 seems to be incompatible with Rails 4.2 in
-    # terms of linting. Created an issue.
-    # https://github.com/thoughtbot/factory_girl/issues/902
-    # FactoryGirl.lint
+    FactoryGirl.lint
   end
   config.before(:each) do
     DatabaseCleaner.start
