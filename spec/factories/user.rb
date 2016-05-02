@@ -1,5 +1,9 @@
 FactoryGirl.define do
   factory :user do
+    transient do
+      with_user_roles([])
+    end
+
     username { Faker::Internet.user_name }
     password 'password'
 
@@ -7,17 +11,17 @@ FactoryGirl.define do
       password_changed_at DateTime.now
     end
 
-    trait :with_role do
-      transient do
-        role :manage
-        subject_type nil
-      end
-
-      after :create do |user, evaluator|
-        create :role,
-               role: evaluator.role,
-               user: user,
-               subject_type: evaluator.subject_type
+    before(:create) do |user, evaluator|
+      evaluator.with_user_roles.each do |role_obj|
+        case role_obj
+        when Array
+          role, scope = role_obj
+          user.user_roles << UserRole.new(role: role, scope_object: scope)
+        when Hash
+          user.user_roles << UserRole.new(role_obj)
+        else
+          user.user_roles << UserRole.new(role: role_obj)
+        end
       end
     end
   end
