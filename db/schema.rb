@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160420133845) do
+ActiveRecord::Schema.define(version: 20160428131743) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -138,6 +138,18 @@ ActiveRecord::Schema.define(version: 20160420133845) do
   end
 
   add_index "patients", ["center_id"], name: "index_patients_on_center_id", using: :btree
+
+  create_table "permissions", force: :cascade do |t|
+    t.integer  "role_id",    null: false
+    t.string   "activity",   null: false
+    t.string   "subject",    null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "permissions", ["activity"], name: "index_permissions_on_activity", using: :btree
+  add_index "permissions", ["role_id"], name: "index_permissions_on_role_id", using: :btree
+  add_index "permissions", ["subject"], name: "index_permissions_on_subject", using: :btree
 
   create_table "public_keys", force: :cascade do |t|
     t.integer  "user_id",        null: false
