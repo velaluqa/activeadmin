@@ -1,7 +1,11 @@
 postgres:
   image: postgres
+  ports:
+    - 5432:5432
 redis:
   image: redis
+  ports:
+    - 6379:6379
 dev:
   build: .
   command: rails s -b 0.0.0.0
