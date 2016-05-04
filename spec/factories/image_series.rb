@@ -1,8 +1,13 @@
 FactoryGirl.define do
   factory :image_series do
     sequence(:name) { |n| "image_series#{n}" }
-    visit
-    patient { |is| is.visit.patient }
+    patient do |is|
+      if is.visit
+        is.visit.patient
+      else
+        create(:patient)
+      end
+    end
     imaging_date { Date.today }
     sequence(:series_number)
     sequence(:domino_unid) do |n|
