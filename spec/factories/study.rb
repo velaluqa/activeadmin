@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :study do
-    name { Faker::Lorem.sentence(2, false, 0) }
+    sequence(:name) { |n| "Study #{n}" }
 
     trait :production do
       state Study.state_sym_to_int(:production)

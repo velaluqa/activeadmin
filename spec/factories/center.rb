@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :center do
-    name { Faker::Lorem.words(2).join(' ') }
+    sequence(:name) { |n| "Center #{n}" }
     sequence(:code)
     study
     sequence(:domino_unid) do |n|
