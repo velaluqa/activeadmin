@@ -67,10 +67,6 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource)
-    if(current_user and current_user.has_system_role?(:image_manage))
-      admin_studies_path
-    else
-      admin_root_path
-    end
+    admin_root_path
   end
 end
