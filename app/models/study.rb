@@ -24,6 +24,18 @@ class Study < ActiveRecord::Base
 
   scope :by_ids, ->(*ids) { where(id: Array[ids].flatten) }
 
+  include ScopablePermissions
+
+  def self.with_permissions
+    joins(<<JOIN)
+INNER JOIN user_roles ON
+  ((user_roles.scope_object_type = 'Study' AND user_roles.scope_object_id = studies.id)
+    OR user_roles.scope_object_id IS NULL)
+INNER JOIN roles ON user_roles.role_id = roles.id
+INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
+
   before_destroy do
     unless centers.empty?
       errors.add :base, 'You cannot delete a study that still has centers associated with it.'

@@ -22,6 +22,24 @@ class Patient < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
+  include ScopablePermissions
+
+  def self.with_permissions
+    joins(<<JOIN)
+INNER JOIN centers ON centers.id = patients.center_id
+INNER JOIN studies ON centers.study_id = studies.id
+INNER JOIN user_roles ON
+  (
+       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+    OR user_roles.scope_object_id IS NULL
+  )
+INNER JOIN roles ON user_roles.role_id = roles.id
+INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
+
   before_destroy do
     unless cases.empty? and form_answers.empty?
       errors.add :base, 'You cannot delete a patient which has cases or form answers associated.' 

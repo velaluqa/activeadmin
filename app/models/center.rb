@@ -16,6 +16,22 @@ class Center < ActiveRecord::Base
     where(study_id: Array[ids].flatten)
   }
 
+  include ScopablePermissions
+
+  def self.with_permissions
+    joins(<<JOIN)
+INNER JOIN studies ON centers.study_id = studies.id
+INNER JOIN user_roles ON
+  (
+       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+    OR user_roles.scope_object_id IS NULL
+  )
+INNER JOIN roles ON user_roles.role_id = roles.id
+INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
+
   validates_uniqueness_of :name, :scope => :study_id
   validates_uniqueness_of :code, :scope => :study_id
   validates_presence_of :name, :code, :study_id
