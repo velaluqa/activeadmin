@@ -1,3 +1,6 @@
+ignore %r{^data/}, %r{^spec/data}
+directories %w(app config lib spec features)
+
 guard 'rspec', cmd: 'spring rspec -r spec_helper' do
   watch(/^spec\/.+_spec\.rb$/)
   watch(%r{^spec\/factories\/.+\.rb$}) { 'spec' }
