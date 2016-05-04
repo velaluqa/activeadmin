@@ -22,10 +22,11 @@ guard 'rspec', cmd: 'spring rspec -r spec_helper' do
   end
 end
 
-guard 'cucumber', command_prefix: 'spring', bundler: false do
-  watch(%r{^features/.+\.feature$})
-  watch(%r{^features/support/.+$}) { 'features' }
-  watch(%r{^features/step_definitions/(.+)_steps\.rb$}) do |m|
-    Dir[File.join("**/#{m[1]}.feature")][0] || 'features'
-  end
-end
+# TODO: Add feature tests again, when we have some feature test
+# guard 'cucumber', command_prefix: 'spring', bundler: false do
+#   watch(%r{^features/.+\.feature$})
+#   watch(%r{^features/support/.+$}) { 'features' }
+#   watch(%r{^features/step_definitions/(.+)_steps\.rb$}) do |m|
+#     Dir[File.join("**/#{m[1]}.feature")][0] || 'features'
+#   end
+# end
