@@ -13,9 +13,12 @@ module ControllerMacros
       @request.env['devise.mapping'] = Devise.mappings[:user]
       @current_user = FactoryGirl.create(:user, :changed_password)
       sign_in @current_user
-      ability = Object.new
+
+      ability = Class.new { attr_accessor :current_user }.new
+      ability.current_user = @current_user
       ability.extend(CanCan::Ability)
       ability.instance_eval(&block) if block_given?
+
       allow(@controller.send(:active_admin_authorization))
         .to receive(:cancan_ability).and_return(ability)
       allow(@controller)
