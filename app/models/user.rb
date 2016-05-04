@@ -15,17 +15,13 @@ class User < ActiveRecord::Base
 
   validates :username, :uniqueness => true
 
-  has_many :roles
-  has_many :form_answers
+  has_many :user_roles, dependent: :destroy
+  has_many :permissions, through: :user_roles
 
   has_many :public_keys
 
   before_save :ensure_authentication_token
   before_save :reset_authentication_token_on_password_change
-
-  before_destroy do
-    self.roles.destroy_all
-  end
 
   def reset_authentication_token_on_password_change
     self.reset_authentication_token if self.encrypted_password_changed?
