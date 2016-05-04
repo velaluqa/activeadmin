@@ -1,8 +1,4 @@
 RSpec.describe BackgroundJob do
-  it 'has a valid factory' do
-    expect(create(:background_job)).to be_valid
-  end
-
   describe 'before destroy' do
     it 'removes zip files' do
       background_job = create(:background_job,

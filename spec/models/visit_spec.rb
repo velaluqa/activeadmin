@@ -1,8 +1,4 @@
 RSpec.describe Visit do
-  it 'has a valid factory' do
-    expect(create(:visit)).to be_valid
-  end
-
   describe 'scope #by_study_ids' do
     before :each do
       @study1     = create(:study)

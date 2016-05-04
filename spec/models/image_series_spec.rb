@@ -1,8 +1,4 @@
 RSpec.describe ImageSeries do
-  it 'has a valid factory' do
-    expect(create(:image_series)).to be_valid
-  end
-
   describe 'scope #by_study_ids' do
     before :each do
       @study1     = create(:study)
