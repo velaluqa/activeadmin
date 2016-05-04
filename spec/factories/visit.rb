@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :visit do
-    patient { create(:patient) }
+    patient
     sequence :visit_number
     sequence :visit_type
     sequence(:domino_unid) do |n|
