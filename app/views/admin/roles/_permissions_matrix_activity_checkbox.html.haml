@@ -1,0 +1,3 @@
+%span{ class: "activity #{activity}" }
+  = check_box_tag "role[abilities][]", ability, checked, id: ability, disabled: disabled, 'data-activity' => activity, 'data-subject' => subject
+  %label{ for: ability }= activity

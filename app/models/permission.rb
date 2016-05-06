@@ -23,8 +23,27 @@
 #     * **`subject`**
 #
 class Permission < ActiveRecord::Base
+  ABILITY_REGEX = /^(.+)_(#{Ability::ACTIVITIES.keys.map{|subject| subject.to_s.underscore}.join('|')})$/
+
   belongs_to :role
   has_many :users, through: :roles
+
+  # Initializes a new instance from a given ability string.
+  #
+  # @param [String] ability The ability in the form of
+  #   '[activity]_[subject]'
+  #
+  # @return [Permission] a newly initialized permission object
+  def self.from_ability(ability)
+    if (match = ABILITY_REGEX.match(ability))
+      Permission.new(
+        activity: match[1],
+        subject: match[2].classify.constantize
+      )
+    else
+      raise "Unable to match ability string #{ability}"
+    end
+  end
 
   # Get the activity as symbol.
   #
@@ -53,6 +72,14 @@ class Permission < ActiveRecord::Base
   # @param [Class<ActiveRecord::Base>, String] subject A cancan subject
   def subject=(subject)
     write_attribute(:subject, subject.to_s)
+  end
+
+  # Get the ability string.
+  #
+  # @return [String] The ability in the form of
+  #   '[activity]_[subject]'
+  def ability
+    "#{activity}_#{subject.to_s.underscore}"
   end
 
   def to_s

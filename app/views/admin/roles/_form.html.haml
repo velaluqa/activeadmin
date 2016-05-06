@@ -1,0 +1,7 @@
+= javascript_include_tag "role_form"
+= semantic_form_for [:admin, @role], builder: ActiveAdmin::FormBuilder do |f|
+  = f.inputs "Details" do
+    = f.input :title
+  = f.inputs "Permissions" do
+    = render partial: 'permissions_matrix', locals: { state: 'form', role: @role, disabled: false }
+  = f.actions
