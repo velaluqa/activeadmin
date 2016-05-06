@@ -43,7 +43,7 @@ class BackgroundJob < ActiveRecord::Base
   ##
   # Find out whether this job has finished.
   #
-  # @returns [Boolean] whether this job has finished
+  # @return [Boolean] whether this job has finished
   #
   # TODO: Refactor to use `completed_at` as indicator for completed jobs.
   def finished?
@@ -53,7 +53,7 @@ class BackgroundJob < ActiveRecord::Base
   ##
   # Find out whether this job has failed.
   #
-  # @returns [Boolean] whether this job has failed
+  # @return [Boolean] whether this job has failed
   def failed?
     completed && !successful
   end
@@ -61,7 +61,7 @@ class BackgroundJob < ActiveRecord::Base
   ##
   # Save this BackgroundJob as successful.
   #
-  # @param [Hash] optional results hash
+  # @param [Hash] results The results (default: {})
   def finish_successfully(results = {})
     finish
 
@@ -74,7 +74,7 @@ class BackgroundJob < ActiveRecord::Base
   ##
   # Save this BackgroundJob as failed.
   #
-  # @param [String] the error message
+  # @param [String] error_message the error message
   def fail(error_message)
     finish
 
@@ -87,8 +87,8 @@ class BackgroundJob < ActiveRecord::Base
   ##
   # Save this BackgroundJob's progress.
   #
-  # @param [Integer] the current amount done
-  # @param [Integer] the amount for completion
+  # @param [Integer] current amount done
+  # @param [Integer] total amount for completion
   def set_progress(current, total)
     self.progress = current.to_f / total.to_f
     save
@@ -102,7 +102,7 @@ class BackgroundJob < ActiveRecord::Base
   # TODO: Refactor to use `completed_at` as sole completion
   # indicator.
   #
-  # @param [Boolean] whether to save the model (default: false)
+  # @param [Boolean] save whether to save the model (default: false)
   def finish(save = false)
     self.completed = true
     self.completed_at = Time.now

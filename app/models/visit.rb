@@ -504,7 +504,7 @@ class Visit < ActiveRecord::Base
   # If defined returns the mqc_version for this visit. Otherwise it
   # returns the locked version for the associated study.
   #
-  # @returns [String] The mqc version
+  # @return [String] The mqc version
   def mqc_version
     read_attribute(:mqc_version) || study.andand.locked_version
   end
