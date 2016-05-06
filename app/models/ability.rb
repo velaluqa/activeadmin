@@ -20,9 +20,13 @@ class Ability
 
     can :read, ActiveAdmin::Page, name: 'Dashboard', namespace_name: 'admin'
 
-    define_system_wide_abilities
-    define_scopable_abilities
-    basic_abilities
+    if current_user.is_root_user?
+      can :manage, ACTIVITIES.keys
+    else
+      define_system_wide_abilities
+      define_scopable_abilities
+      basic_abilities
+    end
   end
 
   private

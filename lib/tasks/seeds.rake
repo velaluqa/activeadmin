@@ -1,5 +1,26 @@
 namespace :erica do
   namespace :seed do
+    desc 'Create an app administrator'
+    task :root_user, [:username] => [:environment] do |_, args|
+      if args[:username].blank?
+        puts 'No username given, aborting.'
+        next
+      end
+
+      user = User.where(username: args[:username]).first_or_initialize
+      if user.new_record?
+        puts "Creating application administrator '#{user.username}' with password 'change'."
+      else
+        puts "Account exists. Making sure '#{user.username}' is an unlocked application administrator with password 'change'."
+      end
+      user.is_root_user = true
+      user.locked_at = nil
+      user.password_changed_at = nil
+      user.password = 'change'
+      user.password_confirmation = 'change'
+      user.save
+    end
+
     task demo: :environment do
       def populate_study(options = {})
         center_count       = options[:centers] || 150

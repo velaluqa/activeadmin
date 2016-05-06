@@ -26,6 +26,8 @@ ERROR
       activities = extract_permissible_activities(options)
       user = options[:user] || raise("Missing 'user' option")
 
+      return all if user.is_root_user?
+
       with_permissions
         .where(permissions: { activity: activities, subject: to_s })
         .where('user_roles.user_id = ?', user.id)

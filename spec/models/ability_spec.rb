@@ -19,6 +19,19 @@ RSpec.describe Ability do
     @some_user     = create(:user)
   end
 
+  describe 'for application administrator' do
+    before(:each) do
+      @current_user = create(:user, is_root_user: true)
+      @ability = Ability.new(@current_user)
+    end
+
+    Ability::ACTIVITIES.keys.each do |model|
+      it "allows managing #{model}" do
+        expect(@ability.can?(:manage, model)).to be_truthy
+      end
+    end
+  end
+
   describe 'for user without permissions, it' do
     before(:each) do
       @public_key = create(:public_key)

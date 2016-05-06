@@ -14,6 +14,7 @@
 # **`encrypted_password`**      | `string`           | `default(""), not null`
 # **`failed_attempts`**         | `integer`          | `default(0)`
 # **`id`**                      | `integer`          | `not null, primary key`
+# **`is_root_user`**            | `boolean`          | `default(FALSE), not null`
 # **`last_sign_in_at`**         | `datetime`         |
 # **`last_sign_in_ip`**         | `string`           |
 # **`locked_at`**               | `datetime`         |
