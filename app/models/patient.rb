@@ -1,5 +1,28 @@
 require 'domino_document_mixin'
 
+# ## Schema Information
+#
+# Table name: `patients`
+#
+# ### Columns
+#
+# Name                  | Type               | Attributes
+# --------------------- | ------------------ | ---------------------------
+# **`center_id`**       | `integer`          |
+# **`created_at`**      | `datetime`         |
+# **`data`**            | `jsonb`            | `not null`
+# **`domino_unid`**     | `string`           |
+# **`export_history`**  | `jsonb`            | `not null`
+# **`id`**              | `integer`          | `not null, primary key`
+# **`images_folder`**   | `string`           |
+# **`subject_id`**      | `string`           |
+# **`updated_at`**      | `datetime`         |
+#
+# ### Indexes
+#
+# * `index_patients_on_center_id`:
+#     * **`center_id`**
+#
 class Patient < ActiveRecord::Base
   include DominoDocument
 

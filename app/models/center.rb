@@ -1,5 +1,29 @@
 require 'domino_document_mixin'
 
+# ## Schema Information
+#
+# Table name: `centers`
+#
+# ### Columns
+#
+# Name               | Type               | Attributes
+# ------------------ | ------------------ | ---------------------------
+# **`code`**         | `string`           |
+# **`created_at`**   | `datetime`         |
+# **`domino_unid`**  | `string`           |
+# **`id`**           | `integer`          | `not null, primary key`
+# **`name`**         | `string`           |
+# **`study_id`**     | `integer`          |
+# **`updated_at`**   | `datetime`         |
+#
+# ### Indexes
+#
+# * `index_centers_on_study_id`:
+#     * **`study_id`**
+# * `index_centers_on_study_id_and_code` (_unique_):
+#     * **`study_id`**
+#     * **`code`**
+#
 class Center < ActiveRecord::Base
   include DominoDocument
 

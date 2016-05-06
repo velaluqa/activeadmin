@@ -1,3 +1,27 @@
+# ## Schema Information
+#
+# Table name: `permissions`
+#
+# ### Columns
+#
+# Name              | Type               | Attributes
+# ----------------- | ------------------ | ---------------------------
+# **`activity`**    | `string`           | `not null`
+# **`created_at`**  | `datetime`         | `not null`
+# **`id`**          | `integer`          | `not null, primary key`
+# **`role_id`**     | `integer`          | `not null`
+# **`subject`**     | `string`           | `not null`
+# **`updated_at`**  | `datetime`         | `not null`
+#
+# ### Indexes
+#
+# * `index_permissions_on_activity`:
+#     * **`activity`**
+# * `index_permissions_on_role_id`:
+#     * **`role_id`**
+# * `index_permissions_on_subject`:
+#     * **`subject`**
+#
 class Permission < ActiveRecord::Base
   belongs_to :role
   has_many :users, through: :roles

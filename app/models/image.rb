@@ -1,3 +1,23 @@
+#
+#
+# ## Schema Information
+#
+# Table name: `images`
+#
+# ### Columns
+#
+# Name                   | Type               | Attributes
+# ---------------------- | ------------------ | ---------------------------
+# **`created_at`**       | `datetime`         |
+# **`id`**               | `integer`          | `not null, primary key`
+# **`image_series_id`**  | `integer`          |
+# **`updated_at`**       | `datetime`         |
+#
+# ### Indexes
+#
+# * `index_images_on_image_series_id`:
+#     * **`image_series_id`**
+#
 class Image < ActiveRecord::Base
   has_paper_trail
   

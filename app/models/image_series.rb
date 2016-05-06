@@ -1,5 +1,39 @@
 require 'domino_document_mixin'
 
+# ## Schema Information
+#
+# Table name: `image_series`
+#
+# ### Columns
+#
+# Name                      | Type               | Attributes
+# ------------------------- | ------------------ | ---------------------------
+# **`comment`**             | `string`           |
+# **`created_at`**          | `datetime`         |
+# **`domino_unid`**         | `string`           |
+# **`id`**                  | `integer`          | `not null, primary key`
+# **`imaging_date`**        | `date`             |
+# **`name`**                | `string`           |
+# **`patient_id`**          | `integer`          |
+# **`properties`**          | `jsonb`            | `not null`
+# **`properties_version`**  | `string`           |
+# **`series_number`**       | `integer`          |
+# **`state`**               | `integer`          | `default(0)`
+# **`updated_at`**          | `datetime`         |
+# **`visit_id`**            | `integer`          |
+#
+# ### Indexes
+#
+# * `index_image_series_on_patient_id`:
+#     * **`patient_id`**
+# * `index_image_series_on_patient_id_and_series_number` (_unique_):
+#     * **`patient_id`**
+#     * **`series_number`**
+# * `index_image_series_on_series_number`:
+#     * **`series_number`**
+# * `index_image_series_on_visit_id`:
+#     * **`visit_id`**
+#
 class ImageSeries < ActiveRecord::Base
   include DominoDocument
 

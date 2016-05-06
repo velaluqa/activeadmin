@@ -2,6 +2,20 @@
 # A role is a simple entity that defines a set of permissions.
 #
 # One `User` can have multiple `Roles` through `UserRoles`.
+#
+# ## Schema Information
+#
+# Table name: `roles`
+#
+# ### Columns
+#
+# Name              | Type               | Attributes
+# ----------------- | ------------------ | ---------------------------
+# **`created_at`**  | `datetime`         |
+# **`id`**          | `integer`          | `not null, primary key`
+# **`title`**       | `string`           | `not null`
+# **`updated_at`**  | `datetime`         |
+#
 class Role < ActiveRecord::Base
   has_paper_trail
 

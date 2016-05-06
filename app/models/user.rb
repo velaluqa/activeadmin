@@ -1,3 +1,43 @@
+# ## Schema Information
+#
+# Table name: `users`
+#
+# ### Columns
+#
+# Name                          | Type               | Attributes
+# ----------------------------- | ------------------ | ---------------------------
+# **`authentication_token`**    | `string`           |
+# **`created_at`**              | `datetime`         |
+# **`current_sign_in_at`**      | `datetime`         |
+# **`current_sign_in_ip`**      | `string`           |
+# **`email`**                   | `string`           | `default(""), not null`
+# **`encrypted_password`**      | `string`           | `default(""), not null`
+# **`failed_attempts`**         | `integer`          | `default(0)`
+# **`id`**                      | `integer`          | `not null, primary key`
+# **`last_sign_in_at`**         | `datetime`         |
+# **`last_sign_in_ip`**         | `string`           |
+# **`locked_at`**               | `datetime`         |
+# **`name`**                    | `string`           |
+# **`password_changed_at`**     | `datetime`         |
+# **`private_key`**             | `text`             |
+# **`public_key`**              | `text`             |
+# **`remember_created_at`**     | `datetime`         |
+# **`reset_password_sent_at`**  | `datetime`         |
+# **`reset_password_token`**    | `string`           |
+# **`sign_in_count`**           | `integer`          | `default(0)`
+# **`unlock_token`**            | `string`           |
+# **`updated_at`**              | `datetime`         |
+# **`username`**                | `string`           |
+#
+# ### Indexes
+#
+# * `index_users_on_authentication_token` (_unique_):
+#     * **`authentication_token`**
+# * `index_users_on_reset_password_token` (_unique_):
+#     * **`reset_password_token`**
+# * `index_users_on_username` (_unique_):
+#     * **`username`**
+#
 class User < ActiveRecord::Base
   has_paper_trail
 

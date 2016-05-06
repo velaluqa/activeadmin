@@ -3,6 +3,24 @@ require 'schema_validation'
 require 'uri'
 require 'domino_integration_client'
 
+# ## Schema Information
+#
+# Table name: `studies`
+#
+# ### Columns
+#
+# Name                        | Type               | Attributes
+# --------------------------- | ------------------ | ---------------------------
+# **`created_at`**            | `datetime`         |
+# **`domino_db_url`**         | `string`           |
+# **`domino_server_name`**    | `string`           |
+# **`id`**                    | `integer`          | `not null, primary key`
+# **`locked_version`**        | `string`           |
+# **`name`**                  | `string`           |
+# **`notes_links_base_uri`**  | `string`           |
+# **`state`**                 | `integer`          | `default(0)`
+# **`updated_at`**            | `datetime`         |
+#
 class Study < ActiveRecord::Base
   has_paper_trail
   acts_as_taggable

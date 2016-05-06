@@ -1,5 +1,37 @@
 ##
 # A simple model to hold information about background jobs.
+#
+# ## Schema Information
+#
+# Table name: `background_jobs`
+#
+# ### Columns
+#
+# Name                 | Type               | Attributes
+# -------------------- | ------------------ | ---------------------------
+# **`completed`**      | `boolean`          | `default(FALSE), not null`
+# **`completed_at`**   | `datetime`         |
+# **`created_at`**     | `datetime`         |
+# **`error_message`**  | `text`             |
+# **`id`**             | `integer`          | `not null, primary key`
+# **`legacy_id`**      | `string`           |
+# **`progress`**       | `float`            | `default(0.0), not null`
+# **`results`**        | `jsonb`            | `not null`
+# **`successful`**     | `boolean`          |
+# **`updated_at`**     | `datetime`         |
+# **`user_id`**        | `integer`          |
+#
+# ### Indexes
+#
+# * `index_background_jobs_on_completed`:
+#     * **`completed`**
+# * `index_background_jobs_on_legacy_id`:
+#     * **`legacy_id`**
+# * `index_background_jobs_on_results`:
+#     * **`results`**
+# * `index_background_jobs_on_user_id`:
+#     * **`user_id`**
+#
 class BackgroundJob < ActiveRecord::Base
   belongs_to :user
 
