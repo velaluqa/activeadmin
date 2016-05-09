@@ -68,6 +68,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :user_roles, allow_destroy: true
   attr_accessible :user_roles_attributes
 
+  has_many :roles, through: :user_roles
   has_many :permissions, through: :user_roles
 
   has_many :public_keys

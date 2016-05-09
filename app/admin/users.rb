@@ -29,7 +29,9 @@ ActiveAdmin.register User do
         status_tag('Unlocked', :ok)
       end
     end
-
+    column 'Roles' do |user|
+      link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
+    end
     customizable_default_actions(current_ability)
   end
 
@@ -77,6 +79,9 @@ ActiveAdmin.register User do
           link_to 'Download Private Key', download_private_key_admin_user_path(user)
         end
       end
+      row 'Roles' do |user|
+        link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
+      end
     end
   end
 
@@ -105,6 +110,7 @@ ActiveAdmin.register User do
   # filters
   filter :username
   filter :name
+  filter :roles
 
   member_action :download_public_key do
     @user = User.find(params[:id])

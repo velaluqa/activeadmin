@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'git_config_repository'
 require 'schema_validation'
 require 'uri'
@@ -186,6 +187,10 @@ JOIN
     self.notes_links_base_uri
   end
 
+  def to_s
+    "Study — #{name} (#{id})"
+  end
+  
   protected
 
   def run_schema_validation(config)
