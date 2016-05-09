@@ -65,6 +65,9 @@ class User < ActiveRecord::Base
   validates :signature_password, :confirmation => true, :length => { :minimum => 6 }, on: :create
 
   has_many :user_roles, dependent: :destroy
+  accepts_nested_attributes_for :user_roles, allow_destroy: true
+  attr_accessible :user_roles_attributes
+
   has_many :permissions, through: :user_roles
 
   has_many :public_keys
