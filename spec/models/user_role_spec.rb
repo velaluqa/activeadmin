@@ -13,4 +13,22 @@ RSpec.describe UserRole do
     @user_role.reload
     expect(@user_role.scope_object).to eq @study
   end
+
+  it 'validates uniqueness of user and role with scope' do
+    UserRole.create(user: @user, role: @role, scope_object: @study)
+    ur = UserRole.new(user: @user, role: @role, scope_object: @study)
+    expect(ur.valid?).to be_falsy
+  end
+
+  it 'validates uniqueness of user and role without scope' do
+    UserRole.create(user: @user, role: @role)
+    ur = UserRole.new(user: @user, role: @role)
+    expect(ur.valid?).to be_falsy
+  end
+
+  it 'validates uniqueness of user and role with mixed scope' do
+    UserRole.create(user: @user, role: @role)
+    ur = UserRole.new(user: @user, role: @role, scope_object: @study)
+    expect(ur.valid?).to be_truthy
+  end
 end
