@@ -7,26 +7,6 @@ ActiveAdmin.register User do
     def max_csv_records
       1_000_000
     end
-
-    def create
-      private_key_password = params[:user][:signature_password]
-      if(private_key_password != params[:user][:signature_password_confirmation])
-        flash[:error] = 'Signature password doesn\'t match confirmation'
-        redirect_to :back
-        return
-      elsif(private_key_password == params[:user][:password])
-        flash[:error] = 'Signature password must be different from login password'
-        redirect_to :back
-        return
-      elsif(private_key_password.length < 6)
-        flash[:error] = 'Signature password must be at least 6 characters'
-        redirect_to :back
-        return
-      end
-
-      create!
-      @user.generate_keypair(private_key_password, true)
-    end
   end
 
   index do
@@ -104,13 +84,13 @@ ActiveAdmin.register User do
     inputs 'User Information' do
       input :username
       input :name
-      if can?(:change_password, object) || !object.persisted?
-        input :password
+      if object.new_record? || can?(:change_password, object)
+        input :password, :required => object.new_record?
         input :password_confirmation
       end
-      unless object.persisted?
+      if object.new_record?
         input :signature_password, :required => true
-        input :signature_password_confirmation, :required => true
+        input :signature_password_confirmation
       end
     end
 

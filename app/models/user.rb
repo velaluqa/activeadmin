@@ -45,21 +45,31 @@ class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, 
-         :recoverable, :rememberable, :trackable, :validatable, :lockable,
+  devise :database_authenticatable,
+         :recoverable, :rememberable, :trackable, :lockable,
          :token_authenticatable
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :username, :name, :password, :password_confirmation, :remember_me
-  attr_accessible :public_key, :private_key
+  attr_accessible :username, :name, :password, :password_confirmation
+  attr_accessible :remember_me, :public_key, :private_key
   attr_accessible :password_changed_at
 
-  validates :username, :uniqueness => true
+  # Fake attributes for form fields and validation
+  attr_accessible :signature_password, :signature_password_confirmation
+  attr_accessor :signature_password, :signature_password_confirmation
+  
+  validates :username, :uniqueness => true, :presence => true
+  validates :name, :uniqueness => true, :presence => true
+  validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :create
+  validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :update, allow_blank: true
+  validates :signature_password, :confirmation => true, :length => { :minimum => 6 }, on: :create
 
   has_many :user_roles, dependent: :destroy
   has_many :permissions, through: :user_roles
 
   has_many :public_keys
+
+  after_create :create_keypair
 
   before_save :ensure_authentication_token
   before_save :reset_authentication_token_on_password_change
@@ -70,6 +80,10 @@ class User < ActiveRecord::Base
 
   def email_required?
     false
+  end
+
+  def create_keypair
+    generate_keypair(signature_password, true)
   end
 
   # hack to allow mongoid-history to store the modifier using an ActiveRecord model (this model)
@@ -111,19 +125,6 @@ class User < ActiveRecord::Base
     signature = private_key.sign(OpenSSL::Digest::RIPEMD160.new, data)
     pp OpenSSL.errors
     return signature
-  end
-
-  # fake attributes to enable us to use them in the create user form
-  attr_accessible :signature_password, :signature_password_confirmation
-  def signature_password
-    nil
-  end
-  def signature_password=(p)
-  end
-  def signature_password_confirmation
-    nil
-  end
-  def signature_password_confirmation=(p)
   end
 
   def self.classify_audit_trail_event(c)

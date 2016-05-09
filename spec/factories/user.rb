@@ -4,8 +4,10 @@ FactoryGirl.define do
       with_user_roles([])
     end
 
-    username { Faker::Internet.user_name }
+    name { Faker::Name.name }
+    username { |u| Faker::Internet.user_name(u.name, %w{. _ -}) }
     password 'password'
+    signature_password 'signature_password'
 
     trait :changed_password do
       password_changed_at DateTime.now
