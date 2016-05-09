@@ -10,6 +10,7 @@ class Ability
     ImageSeries => %i(manage read update create destroy),
     Image => %i(manage read update create destroy),
     User => %i(manage read update create destroy),
+    UserRole => %i(manage read update create destroy),
     PublicKey => %i(manage read update create destroy),
     Role => %i(manage read update create destroy),
     Visit => %i(manage read update create destroy)
