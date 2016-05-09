@@ -4,6 +4,8 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   #check_authorization
 
+  helper_method :current_ability
+  
   rescue_from Exceptions::FormNotFoundError do |exception|
     main_message = "The requested form '#{exception.form_name}'"
     main_message += " for case #{exception.case}" unless exception.case.nil?
