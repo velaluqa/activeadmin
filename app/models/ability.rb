@@ -4,22 +4,26 @@ class Ability
   attr_reader :current_user
 
   ACTIVITIES = {
+    BackgroundJob => %i(manage read update create destroy),
+    Sidekiq => %i(manage),
     Study  => %i(manage read update create destroy),
     Center => %i(manage read update create destroy),
     Patient => %i(manage read update create destroy),
-    ImageSeries => %i(manage read update create destroy),
+    ImageSeries => %i(manage read update create destroy upload assign_patient assign_visit),
     Image => %i(manage read update create destroy),
     User => %i(manage read update create destroy),
     UserRole => %i(manage read update create destroy),
     PublicKey => %i(manage read update create destroy),
     Role => %i(manage read update create destroy),
-    Visit => %i(manage read update create destroy)
+    Visit => %i(manage read update create destroy assign_required_series technical_qc medical_qc),
+    Version => %i(manage read update create destroy)
   }.freeze
 
   def initialize(current_user)
     @current_user = current_user
 
     can :read, ActiveAdmin::Page, name: 'Dashboard', namespace_name: 'admin'
+    can :read, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
 
     if current_user.is_root_user?
       can :manage, ACTIVITIES.keys
