@@ -50,8 +50,8 @@ RSpec.describe Ability do
 
   describe 'for user with system permissions only' do
     before(:each) do
-      @role1 = create(:role, with_permissions: { manage: Study })
-      @role2 = create(:role, with_permissions: { read: Image })
+      @role1 = create(:role, with_permissions: { Study => :manage })
+      @role2 = create(:role, with_permissions: { Image => :read })
       @current_user = create(:user, with_user_roles: [@role1, @role2])
       @ability = Ability.new(@current_user)
     end
@@ -91,8 +91,8 @@ RSpec.describe Ability do
 
   describe 'for user with scoped permissions only, it' do
     before(:each) do
-      @role1 = create(:role, with_permissions: { manage: Study })
-      @role2 = create(:role, with_permissions: { read: Image })
+      @role1 = create(:role, with_permissions: { Study => :manage })
+      @role2 = create(:role, with_permissions: { Image => :read })
       @current_user = create(:user, with_user_roles:
                                       [
                                         [@role1, @study1],
@@ -136,7 +136,9 @@ RSpec.describe Ability do
 
   describe 'for user with doubly scoped permissions, it' do
     before(:each) do
-      @role = create(:role, with_permissions: { manage: Study, read: Image })
+      @role = create(:role, with_permissions: {
+                       Study => :manage,
+                       Image => :read })
       @current_user = create(:user, with_user_roles:
                                       [
                                         [@role, @study1],
@@ -180,10 +182,10 @@ RSpec.describe Ability do
 
   describe 'for user with mixed permissions, it' do
     before(:each) do
-      @role1 = create(:role, with_permissions: { manage: [Study, Image] })
-      @role2 = create(:role, with_permissions: { read: [Study, Image] })
-      @role3 = create(:role, with_permissions: { read: Version })
-      @role4 = create(:role, with_permissions: { manage: User })
+      @role1 = create(:role, with_permissions: { [Study, Image] => :manage })
+      @role2 = create(:role, with_permissions: { [Study, Image] => :read })
+      @role3 = create(:role, with_permissions: { Version => :read })
+      @role4 = create(:role, with_permissions: { User => :manage })
       @current_user = create(:user, with_user_roles:
                                       [
                                         [@role1, @study1],
