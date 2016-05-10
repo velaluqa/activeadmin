@@ -1,8 +1,9 @@
 RSpec.describe Role do
   describe '#abilities' do
     before(:each) do
-      @role = create(:role, with_permissions: { read: [Study, Image],
-                                                manage: User })
+      @role = create(:role, with_permissions: {
+                       [Study, Image] => :read,
+                       User => :manage })
     end
 
     it 'returns the ability strings for each permissions' do
@@ -13,8 +14,8 @@ RSpec.describe Role do
   describe '#abilities=' do
     before(:each) do
       @role = create(:role, with_permissions: {
-                       read: Study,
-                       manage: User })
+                       Study => :read,
+                       User => :manage })
       @role.abilities = %w(manage_role manage_user)
     end
 
