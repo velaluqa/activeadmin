@@ -11,7 +11,7 @@ ActiveAdmin.register Role do
       link_to role.title, admin_role_path(role)
     end
     column 'Users' do |role|
-      link_to "#{role.users.count} Users", admin_users_path(q: { user_roles_role_id_eq: role.id })
+      link_to "#{role.users.distinct.count} Users", admin_users_path(q: { user_roles_role_id_eq: role.id })
     end
     customizable_default_actions(current_ability)
   end
@@ -23,7 +23,7 @@ ActiveAdmin.register Role do
       row :created_at
       row :updated_at
       row :users do
-        link_to "#{role.users.count} Users", admin_users_path(q: { user_roles_role_id_eq: role.id })
+        link_to "#{role.users.distinct.count} Users", admin_users_path(q: { user_roles_role_id_eq: role.id })
       end
     end
     panel 'Permissions', class: 'permissions' do

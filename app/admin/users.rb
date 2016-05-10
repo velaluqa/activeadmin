@@ -7,6 +7,11 @@ ActiveAdmin.register User do
     def max_csv_records
       1_000_000
     end
+
+
+    def scoped_collection
+      end_of_association_chain.distinct
+    end
   end
 
   index do
