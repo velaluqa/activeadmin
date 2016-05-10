@@ -90,6 +90,11 @@ class User < ActiveRecord::Base
     generate_keypair(signature_password, true)
   end
 
+  
+  def can?(activity, subject)
+    Ability.new(self).can?(activity, subject)
+  end
+  
   # hack to allow mongoid-history to store the modifier using an ActiveRecord model (this model)
   def self.using_object_ids?
     false

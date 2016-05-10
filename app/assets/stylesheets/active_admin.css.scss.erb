@@ -90,4 +90,19 @@
 	margin-right: 2px !important;
 }
 
+.sidekiq.frame {
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+
+body.admin_sidekiq #footer, body.admin_sidekiq #title_bar {
+  display: none;
+}
+
 @import "roles";

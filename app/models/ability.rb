@@ -32,6 +32,10 @@ class Ability
       define_scopable_abilities
       basic_abilities
     end
+
+    if can?(:manage, Sidekiq)
+      can :read, ActiveAdmin::Page, name: 'Sidekiq', namespace_name: 'admin'
+    end
   end
 
   private
