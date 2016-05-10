@@ -21,6 +21,61 @@ namespace :erica do
       user.save
     end
 
+    task roles: :environment do
+      # TODO: Add ERICA remote specific role permission seeds.
+      FactoryGirl.create(:role, title: 'Manager', with_permissions: {
+               BackgroundJob => :manage,
+               Sidekiq => :manage,
+               Study  => :manage,
+               Center => :manage,
+               Patient => :manage,
+               ImageSeries => :manage,
+               Image => :manage,
+               User => :manage,
+               UserRole => :manage,
+               PublicKey => :manage,
+               Role => :manage,
+               Visit => :manage,
+               Version => :manage
+             })
+      FactoryGirl.create(:role, title: 'Image Import', with_permissions: {
+               Study => %i(read),
+               Center => %i(read update create),
+               Patient => %i(read update create),
+               ImageSeries => %i(upload assign_patient assign_visit)
+             })
+      FactoryGirl.create(:role, title: 'Image Manager', with_permissions: {
+               Study => %i(read update create),
+               Center => %i(read update create),
+               Patient => %i(read update create),
+               ImageSeries => %i(upload assign_patient assign_visit),
+               Visit => %i(read assign_required_series technical_qc)
+             })
+      FactoryGirl.create(:role, title: 'Medical QC', with_permissions: {
+               Study => %i(read),
+               Center => %i(read),
+               Patient => %i(read),
+               Visit => %i(read assign_required_series technical_qc medical_qc)
+             })
+      FactoryGirl.create(:role, title: 'Audit', with_permissions: {
+               Study => :read,
+               Center => :read,
+               Patient => :read,
+               ImageSeries => :read,
+               Image => :read,
+               Visit => :read,
+               Version => :read
+             })
+      FactoryGirl.create(:role, title: 'Read-Only', with_permissions: {
+               Study => :read,
+               Center => :read,
+               Patient => :read,
+               ImageSeries => :read,
+               Image => :read,
+               Visit => :read
+             })
+    end
+
     task demo: :environment do
       def populate_study(options = {})
         center_count       = options[:centers] || 150
