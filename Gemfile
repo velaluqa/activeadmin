@@ -135,6 +135,10 @@ gem 'facets', require: false
 gem 'slim', '>= 1.1.0'
 gem 'sinatra', '>= 1.3.0', :require => nil
 
+# FactoryGirl is used in production to create seed data.
+gem 'faker'
+gem 'factory_girl_rails', '~> 4.7.0'
+
 group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
@@ -191,8 +195,6 @@ group :development, :test do
   gem 'capybara'
   gem 'poltergeist'
   gem 'database_cleaner'
-  gem 'faker'
-  gem 'factory_girl_rails', '~> 4.7.0'
 
   gem 'spring'
   gem 'spring-commands-rspec'

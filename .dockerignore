@@ -1,7 +1,6 @@
 data/**/*
 tmp/**/*
-spec
-features
+spec/data
 reports
 doc
 log/*.log
