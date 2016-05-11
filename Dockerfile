@@ -42,4 +42,4 @@ RUN gem install bundler && \
     bundle install --jobs 20 --retry 5
 
 # Add the application code.
-ADD . /app
+COPY . /app
