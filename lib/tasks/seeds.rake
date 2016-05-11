@@ -13,6 +13,7 @@ namespace :erica do
       else
         puts "Account exists. Making sure '#{user.username}' is an unlocked application administrator with password 'change'."
       end
+      user.name = args[:username]
       user.is_root_user = true
       user.locked_at = nil
       user.password_changed_at = nil
