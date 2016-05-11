@@ -7,6 +7,9 @@ development: &default
   username: postgres
   database: erica_store_development
 
+production:
+  <<: *default
+
 test: &test
   <<: *default
   database: erica_store_test
