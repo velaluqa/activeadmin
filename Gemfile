@@ -87,7 +87,7 @@ gem 'coderay'
 gem 'rugged', '~> 0.24.0'
 
 # Airbrake Exception notifier
-gem 'airbrake', require: false
+gem 'airbrake', '~> 4.3'
 
 # Kwalify schema validator
 gem 'kwalify'
