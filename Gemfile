@@ -139,6 +139,9 @@ gem 'sinatra', '>= 1.3.0', :require => nil
 gem 'faker'
 gem 'factory_girl_rails', '~> 4.7.0'
 
+# Awesome Print for pretty printing of Ruby Objects
+gem 'awesome_print'
+
 group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
@@ -164,7 +167,6 @@ group :development, :test do
   gem 'pry-remote'
   gem 'pry-byebug'
   gem 'hirb'
-  gem 'awesome_print'
 
   # Rubocop ensures the ruby style guide.
   gem 'rubocop'
