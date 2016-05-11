@@ -1,4 +1,9 @@
 data/**/*
 tmp/**/*
-spec/data/**/*
-spec/tmp/**/*
+spec
+features
+reports
+doc
+log/*.log
+images/
+.git
