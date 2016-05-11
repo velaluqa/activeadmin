@@ -18,7 +18,7 @@ namespace :erica do
       user.password_changed_at = nil
       user.password = 'change'
       user.password_confirmation = 'change'
-      user.save
+      user.save!
     end
 
     task roles: :environment do
