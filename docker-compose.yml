@@ -23,3 +23,21 @@ dev:
   links:
     - postgres
     - redis
+test:
+  build: .
+  command: guard
+  tty: true
+  volumes:
+    - .:/app
+    - ./config/database.yml.dev:/app/config/database.yml
+    - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
+  ports:
+    - 3000:3000
+  environment:
+    RAILS_ENV: test
+    DB_USERNAME: postgres
+    DB_PASSWORD:
+    TRUSTED_IP: 172.18.0.1
+  links:
+    - postgres
+    - redis
