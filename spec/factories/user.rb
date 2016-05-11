@@ -7,7 +7,6 @@ FactoryGirl.define do
     name { Faker::Name.name }
     username { |u| Faker::Internet.user_name(u.name, %w{. _ -}) }
     password 'password'
-    signature_password 'signature_password'
 
     trait :changed_password do
       password_changed_at DateTime.now

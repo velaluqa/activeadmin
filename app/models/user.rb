@@ -62,7 +62,7 @@ class User < ActiveRecord::Base
   validates :name, :uniqueness => true, :presence => true
   validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :create
   validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :update, allow_blank: true
-  validates :signature_password, :confirmation => true, :length => { :minimum => 6 }, on: :create
+  validates :signature_password, :confirmation => true, :length => { :minimum => 6 }, on: :create, allow_blank: true
 
   has_many :user_roles, dependent: :destroy
   accepts_nested_attributes_for :user_roles, allow_destroy: true
@@ -73,7 +73,7 @@ class User < ActiveRecord::Base
 
   has_many :public_keys
 
-  after_create :create_keypair
+  before_create :create_keypair
 
   before_save :ensure_authentication_token
   before_save :reset_authentication_token_on_password_change
@@ -87,9 +87,10 @@ class User < ActiveRecord::Base
   end
 
   def create_keypair
-    generate_keypair(signature_password, true)
-  end
+    return if signature_password.blank?
 
+    generate_keypair(signature_password, false)
+  end
   
   def can?(activity, subject)
     Ability.new(self).can?(activity, subject)
@@ -109,19 +110,17 @@ class User < ActiveRecord::Base
   end
 
   def generate_keypair(private_key_password, save_to_db = true)
-    new_private_key = OpenSSL::PKey::RSA.generate(4096) #HC
+    new_private_key = OpenSSL::PKey::RSA.generate(4096)
     new_public_key = new_private_key.public_key
 
     self.private_key = new_private_key.to_pem(OpenSSL::Cipher.new('DES-EDE3-CBC'), private_key_password)
     self.public_key = new_public_key.to_pem
-    
-    if(save_to_db)
-      transaction do
-        self.public_keys.active.last.deactivate unless self.public_keys.active.empty?
-        PublicKey.create(:user => self, :public_key => self.public_key, :active => true)
 
-        self.save!
-      end
+    transaction do
+      public_keys.active.each(&:deactivate)
+      public_keys << PublicKey.new(:public_key => public_key, :active => true)
+
+      save! if save_to_db
     end
   end
   def active_public_key
