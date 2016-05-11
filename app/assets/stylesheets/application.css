@@ -11,6 +11,7 @@
  *= require_self
  *= require bootstrap_and_overrides
  *= require form_answers
+ *= require roles
  *= require form-login
  *= require forms
  *= require navbar

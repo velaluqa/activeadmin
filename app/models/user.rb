@@ -1,31 +1,82 @@
+# ## Schema Information
+#
+# Table name: `users`
+#
+# ### Columns
+#
+# Name                          | Type               | Attributes
+# ----------------------------- | ------------------ | ---------------------------
+# **`authentication_token`**    | `string`           |
+# **`created_at`**              | `datetime`         |
+# **`current_sign_in_at`**      | `datetime`         |
+# **`current_sign_in_ip`**      | `string`           |
+# **`email`**                   | `string`           | `default(""), not null`
+# **`encrypted_password`**      | `string`           | `default(""), not null`
+# **`failed_attempts`**         | `integer`          | `default(0)`
+# **`id`**                      | `integer`          | `not null, primary key`
+# **`is_root_user`**            | `boolean`          | `default(FALSE), not null`
+# **`last_sign_in_at`**         | `datetime`         |
+# **`last_sign_in_ip`**         | `string`           |
+# **`locked_at`**               | `datetime`         |
+# **`name`**                    | `string`           |
+# **`password_changed_at`**     | `datetime`         |
+# **`private_key`**             | `text`             |
+# **`public_key`**              | `text`             |
+# **`remember_created_at`**     | `datetime`         |
+# **`reset_password_sent_at`**  | `datetime`         |
+# **`reset_password_token`**    | `string`           |
+# **`sign_in_count`**           | `integer`          | `default(0)`
+# **`unlock_token`**            | `string`           |
+# **`updated_at`**              | `datetime`         |
+# **`username`**                | `string`           |
+#
+# ### Indexes
+#
+# * `index_users_on_authentication_token` (_unique_):
+#     * **`authentication_token`**
+# * `index_users_on_reset_password_token` (_unique_):
+#     * **`reset_password_token`**
+# * `index_users_on_username` (_unique_):
+#     * **`username`**
+#
 class User < ActiveRecord::Base
   has_paper_trail
 
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, 
-         :recoverable, :rememberable, :trackable, :validatable, :lockable,
+  devise :database_authenticatable,
+         :recoverable, :rememberable, :trackable, :lockable,
          :token_authenticatable
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :username, :name, :password, :password_confirmation, :remember_me
-  attr_accessible :public_key, :private_key
+  attr_accessible :username, :name, :password, :password_confirmation
+  attr_accessible :remember_me, :public_key, :private_key
   attr_accessible :password_changed_at
 
-  validates :username, :uniqueness => true
+  # Fake attributes for form fields and validation
+  attr_accessible :signature_password, :signature_password_confirmation
+  attr_accessor :signature_password, :signature_password_confirmation
+  
+  validates :username, :uniqueness => true, :presence => true
+  validates :name, :uniqueness => true, :presence => true
+  validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :create
+  validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :update, allow_blank: true
+  validates :signature_password, :confirmation => true, :length => { :minimum => 6 }, on: :create
 
-  has_many :roles
-  has_many :form_answers
+  has_many :user_roles, dependent: :destroy
+  accepts_nested_attributes_for :user_roles, allow_destroy: true
+  attr_accessible :user_roles_attributes
+
+  has_many :roles, through: :user_roles
+  has_many :permissions, through: :user_roles
 
   has_many :public_keys
 
+  after_create :create_keypair
+
   before_save :ensure_authentication_token
   before_save :reset_authentication_token_on_password_change
-
-  before_destroy do
-    self.roles.destroy_all
-  end
 
   def reset_authentication_token_on_password_change
     self.reset_authentication_token if self.encrypted_password_changed?
@@ -35,6 +86,15 @@ class User < ActiveRecord::Base
     false
   end
 
+  def create_keypair
+    generate_keypair(signature_password, true)
+  end
+
+  
+  def can?(activity, subject)
+    Ability.new(self).can?(activity, subject)
+  end
+  
   # hack to allow mongoid-history to store the modifier using an ActiveRecord model (this model)
   def self.using_object_ids?
     false
@@ -43,19 +103,6 @@ class User < ActiveRecord::Base
     [:id]
   end
 
-  def is_app_admin?
-    has_system_role?(:manage)
-  end
-  def is_erica_remote_admin?
-    has_system_role?(:remote_manage)
-  end
-  def has_system_role?(role_sym)
-    roles
-      .where(:subject_type => nil,
-             :subject_id => nil,
-             :role => Role::role_sym_to_int(role_sym))
-      .exists?
-  end
   def is_erica_remote_user?
     # TODO: this is filthy, dirty hack territory...
     self.id >= 1000 and roles.all? {|role| role.erica_remote_role? }
@@ -87,19 +134,6 @@ class User < ActiveRecord::Base
     signature = private_key.sign(OpenSSL::Digest::RIPEMD160.new, data)
     pp OpenSSL.errors
     return signature
-  end
-
-  # fake attributes to enable us to use them in the create user form
-  attr_accessible :signature_password, :signature_password_confirmation
-  def signature_password
-    nil
-  end
-  def signature_password=(p)
-  end
-  def signature_password_confirmation
-    nil
-  end
-  def signature_password_confirmation=(p)
   end
 
   def self.classify_audit_trail_event(c)

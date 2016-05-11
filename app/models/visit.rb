@@ -1,6 +1,47 @@
 require 'domino_document_mixin'
 require 'git_config_repository'
 
+# ## Schema Information
+#
+# Table name: `visits`
+#
+# ### Columns
+#
+# Name                               | Type               | Attributes
+# ---------------------------------- | ------------------ | ---------------------------
+# **`assigned_image_series_index`**  | `jsonb`            | `not null`
+# **`created_at`**                   | `datetime`         |
+# **`description`**                  | `string`           |
+# **`domino_unid`**                  | `string`           |
+# **`id`**                           | `integer`          | `not null, primary key`
+# **`mqc_comment`**                  | `string`           |
+# **`mqc_date`**                     | `datetime`         |
+# **`mqc_results`**                  | `jsonb`            | `not null`
+# **`mqc_state`**                    | `integer`          | `default(0)`
+# **`mqc_user_id`**                  | `integer`          |
+# **`mqc_version`**                  | `string`           |
+# **`patient_id`**                   | `integer`          |
+# **`required_series`**              | `jsonb`            | `not null`
+# **`state`**                        | `integer`          | `default(0)`
+# **`updated_at`**                   | `datetime`         |
+# **`visit_number`**                 | `integer`          |
+# **`visit_type`**                   | `string`           |
+#
+# ### Indexes
+#
+# * `index_visits_on_assigned_image_series_index`:
+#     * **`assigned_image_series_index`**
+# * `index_visits_on_mqc_results`:
+#     * **`mqc_results`**
+# * `index_visits_on_mqc_user_id`:
+#     * **`mqc_user_id`**
+# * `index_visits_on_patient_id`:
+#     * **`patient_id`**
+# * `index_visits_on_required_series`:
+#     * **`required_series`**
+# * `index_visits_on_visit_number`:
+#     * **`visit_number`**
+#
 class Visit < ActiveRecord::Base
   include DominoDocument
 
@@ -463,7 +504,7 @@ class Visit < ActiveRecord::Base
   # If defined returns the mqc_version for this visit. Otherwise it
   # returns the locked version for the associated study.
   #
-  # @returns [String] The mqc version
+  # @return [String] The mqc version
   def mqc_version
     read_attribute(:mqc_version) || study.andand.locked_version
   end

@@ -21,9 +21,8 @@ class Users::SessionsController < Devise::SessionsController
       return
     end
 
-    #session = Session.find(session_id)
-    #is_session_admin = (can? :manage, session)
-    is_session_admin = user.is_app_admin?
+    session = Session.find(session_id)
+    is_session_admin = can?(:manage, session)
 
     render :json => {:error_code => 0, :success => true, :is_session_admin => is_session_admin}
   end

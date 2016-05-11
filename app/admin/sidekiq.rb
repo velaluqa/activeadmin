@@ -1,3 +1,7 @@
 ActiveAdmin.register_page 'Sidekiq' do
-  menu url: '/sidekiq', if: proc {current_user.is_app_admin?}
+  menu if: proc { authorized?(:manage, Sidekiq) }
+
+  content do
+    content_tag(:iframe, '', src: '/sidekiq', class: 'sidekiq frame')
+  end
 end

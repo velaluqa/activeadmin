@@ -1,5 +1,28 @@
 require 'domino_document_mixin'
 
+# ## Schema Information
+#
+# Table name: `patients`
+#
+# ### Columns
+#
+# Name                  | Type               | Attributes
+# --------------------- | ------------------ | ---------------------------
+# **`center_id`**       | `integer`          |
+# **`created_at`**      | `datetime`         |
+# **`data`**            | `jsonb`            | `not null`
+# **`domino_unid`**     | `string`           |
+# **`export_history`**  | `jsonb`            | `not null`
+# **`id`**              | `integer`          | `not null, primary key`
+# **`images_folder`**   | `string`           |
+# **`subject_id`**      | `string`           |
+# **`updated_at`**      | `datetime`         |
+#
+# ### Indexes
+#
+# * `index_patients_on_center_id`:
+#     * **`center_id`**
+#
 class Patient < ActiveRecord::Base
   include DominoDocument
 
@@ -21,6 +44,24 @@ class Patient < ActiveRecord::Base
     joins(:center)
       .where(centers: { study_id: Array[ids].flatten })
   }
+
+  include ScopablePermissions
+
+  def self.with_permissions
+    joins(<<JOIN)
+INNER JOIN centers ON centers.id = patients.center_id
+INNER JOIN studies ON centers.study_id = studies.id
+INNER JOIN user_roles ON
+  (
+       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+    OR user_roles.scope_object_id IS NULL
+  )
+INNER JOIN roles ON user_roles.role_id = roles.id
+INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
 
   before_destroy do
     unless cases.empty? and form_answers.empty?

@@ -60,7 +60,7 @@ StudyServer::Application.routes.draw do
 
   get 'wado' => 'wado#wado'
 
-  authenticate :user, ->(u) { u.is_app_admin? } do
+  authenticate :user, ->(user) { user.can?(:manage, Sidekiq) } do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'
   end

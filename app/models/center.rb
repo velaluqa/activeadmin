@@ -1,5 +1,29 @@
 require 'domino_document_mixin'
 
+# ## Schema Information
+#
+# Table name: `centers`
+#
+# ### Columns
+#
+# Name               | Type               | Attributes
+# ------------------ | ------------------ | ---------------------------
+# **`code`**         | `string`           |
+# **`created_at`**   | `datetime`         |
+# **`domino_unid`**  | `string`           |
+# **`id`**           | `integer`          | `not null, primary key`
+# **`name`**         | `string`           |
+# **`study_id`**     | `integer`          |
+# **`updated_at`**   | `datetime`         |
+#
+# ### Indexes
+#
+# * `index_centers_on_study_id`:
+#     * **`study_id`**
+# * `index_centers_on_study_id_and_code` (_unique_):
+#     * **`study_id`**
+#     * **`code`**
+#
 class Center < ActiveRecord::Base
   include DominoDocument
 
@@ -15,6 +39,22 @@ class Center < ActiveRecord::Base
   scope :by_study_ids, lambda { |*ids|
     where(study_id: Array[ids].flatten)
   }
+
+  include ScopablePermissions
+
+  def self.with_permissions
+    joins(<<JOIN)
+INNER JOIN studies ON centers.study_id = studies.id
+INNER JOIN user_roles ON
+  (
+       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+    OR user_roles.scope_object_id IS NULL
+  )
+INNER JOIN roles ON user_roles.role_id = roles.id
+INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
 
   validates_uniqueness_of :name, :scope => :study_id
   validates_uniqueness_of :code, :scope => :study_id

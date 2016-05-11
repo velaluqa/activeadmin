@@ -1,0 +1,7 @@
+.permissions_matrix{ class: state }
+  - Ability::ACTIVITIES.each_pair do |subject, activities|
+    %li{ class: "permission #{subject}" }
+      %label.subject=subject
+      %div.activities
+        - activities.each do |activity|
+          = permissions_matrix_activity(@role, subject, activity, disabled: disabled)

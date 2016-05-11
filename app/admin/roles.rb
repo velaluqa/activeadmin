@@ -1,81 +1,33 @@
+# coding: utf-8
 ActiveAdmin.register Role do
-  config.comments = false
+  filter :title
+  filter :user
 
-  controller do
-    def max_csv_records
-      1_000_000
-    end
-
-    def update
-      # this verifies that the constraints on role creation/update on ERICA Remote admins are enforced
-      updated_role = Role.new(params[:role])
-      authorize! :update, updated_role
-
-      update!
-    end
-  end
+  form partial: 'form'
 
   index do
     selectable_column
-    column :user, :sortable => :user_id
-    column :subject, :sortable => :subject_id do |role|
-      if role.subject.nil?
-        'System'
-      else
-        auto_link(role.subject)
-      end
+    column :title, sortable: :name do |role|
+      link_to role.title, admin_role_path(role)
     end
-    column :role, :sortable => :role do |role|
-      role.role_name
+    column 'Users' do |role|
+      link_to "#{role.users.distinct.count} Users", admin_users_path(q: { user_roles_role_id_eq: role.id })
     end
-
     customizable_default_actions(current_ability)
   end
 
   show do |role|
     attributes_table do
-      row :user
-      row :subject do |role|
-        if role.subject.nil?
-          'System'
-        else
-          auto_link(role.subject)
-        end
-      end
-      row :role do |role|
-        role.role_name
+      row :id
+      row :title
+      row :created_at
+      row :updated_at
+      row :users do
+        link_to "#{role.users.distinct.count} Users", admin_users_path(q: { user_roles_role_id_eq: role.id })
       end
     end
-  end
-
-  form do |f|
-    subjects = [["System", nil]] + Study.all.map{|s| ["Study: #{s.name}", "study_#{s.id}"]}
-    roles = {}
-    Role::ROLE_SYMS.each_with_index do |role_sym, index|
-      if(Rails.application.config.is_erica_remote)
-        next unless role_sym.to_s.start_with?('remote_')
-      else
-        next if role_sym.to_s.start_with?('remote_')
-      end
-
-      roles[Role::ROLE_NAMES[index]] = role_sym
+    panel 'Permissions', class: 'permissions' do
+      render partial: 'permissions_matrix', locals: { state: 'show', role: role, disabled: true }
     end
-
-    f.inputs 'Role details' do
-      f.input :user, :required => true
-      # HACK: we transform the malformed subject type in the Role model via a before_save filter and expand it into the proper subject_type and subject_id
-      f.input :subject_type, :label => 'Subject', :collection => subjects
-      f.input :role, :collection => roles, :as => :select, :include_blank => false, :hint => 'Please note that audit and read-only roles cannot be assigned system-wide and have to be assigned at a study or session level.'
-    end
-    
-    f.actions
-  end
-
-  # filters
-  filter :user
-  filter :role, :as => :check_boxes, :collection => Role::ROLE_SYMS.each_with_index.map {|role, i| [Role::role_sym_to_role_name(role), i]}
-
-  action_item :edit, :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'role', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

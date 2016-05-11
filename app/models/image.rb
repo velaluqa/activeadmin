@@ -1,3 +1,23 @@
+#
+#
+# ## Schema Information
+#
+# Table name: `images`
+#
+# ### Columns
+#
+# Name                   | Type               | Attributes
+# ---------------------- | ------------------ | ---------------------------
+# **`created_at`**       | `datetime`         |
+# **`id`**               | `integer`          | `not null, primary key`
+# **`image_series_id`**  | `integer`          |
+# **`updated_at`**       | `datetime`         |
+#
+# ### Indexes
+#
+# * `index_images_on_image_series_id`:
+#     * **`image_series_id`**
+#
 class Image < ActiveRecord::Base
   has_paper_trail
   
@@ -12,6 +32,26 @@ class Image < ActiveRecord::Base
     joins(image_series: { patient: :center })
       .where(centers: { study_id: Array[ids].flatten })
   }
+
+  include ScopablePermissions
+
+  def self.with_permissions
+    joins(<<JOIN)
+INNER JOIN image_series ON image_series.id = images.image_series_id
+INNER JOIN patients ON patients.id = image_series.patient_id
+INNER JOIN centers ON centers.id = patients.center_id
+INNER JOIN studies ON centers.study_id = studies.id
+INNER JOIN user_roles ON
+  (
+       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+    OR user_roles.scope_object_id IS NULL
+  )
+INNER JOIN roles ON user_roles.role_id = roles.id
+INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
 
   def study
     if self.image_series.nil?

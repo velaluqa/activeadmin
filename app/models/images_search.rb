@@ -1,3 +1,16 @@
+# ## Schema Information
+#
+# Table name: `images_search`
+#
+# ### Columns
+#
+# Name               | Type               | Attributes
+# ------------------ | ------------------ | ---------------------------
+# **`result_id`**    | `text`             |
+# **`result_type`**  | `text`             |
+# **`study_id`**     | `integer`          |
+# **`text`**         | `string`           |
+#
 class ImagesSearch < ActiveRecord::Base
 
   self.table_name = 'images_search'

@@ -1,8 +1,27 @@
+# coding: utf-8
 require 'git_config_repository'
 require 'schema_validation'
 require 'uri'
 require 'domino_integration_client'
 
+# ## Schema Information
+#
+# Table name: `studies`
+#
+# ### Columns
+#
+# Name                        | Type               | Attributes
+# --------------------------- | ------------------ | ---------------------------
+# **`created_at`**            | `datetime`         |
+# **`domino_db_url`**         | `string`           |
+# **`domino_server_name`**    | `string`           |
+# **`id`**                    | `integer`          | `not null, primary key`
+# **`locked_version`**        | `string`           |
+# **`name`**                  | `string`           |
+# **`notes_links_base_uri`**  | `string`           |
+# **`state`**                 | `integer`          | `default(0)`
+# **`updated_at`**            | `datetime`         |
+#
 class Study < ActiveRecord::Base
   has_paper_trail
   acts_as_taggable
@@ -23,6 +42,18 @@ class Study < ActiveRecord::Base
   scope :production, -> { where(state: 1) }
 
   scope :by_ids, ->(*ids) { where(id: Array[ids].flatten) }
+
+  include ScopablePermissions
+
+  def self.with_permissions
+    joins(<<JOIN)
+INNER JOIN user_roles ON
+  ((user_roles.scope_object_type = 'Study' AND user_roles.scope_object_id = studies.id)
+    OR user_roles.scope_object_id IS NULL)
+INNER JOIN roles ON user_roles.role_id = roles.id
+INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
 
   before_destroy do
     unless centers.empty?
@@ -156,6 +187,10 @@ class Study < ActiveRecord::Base
     self.notes_links_base_uri
   end
 
+  def to_s
+    "Study — #{name} (#{id})"
+  end
+  
   protected
 
   def run_schema_validation(config)

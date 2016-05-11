@@ -1,5 +1,39 @@
 require 'domino_document_mixin'
 
+# ## Schema Information
+#
+# Table name: `image_series`
+#
+# ### Columns
+#
+# Name                      | Type               | Attributes
+# ------------------------- | ------------------ | ---------------------------
+# **`comment`**             | `string`           |
+# **`created_at`**          | `datetime`         |
+# **`domino_unid`**         | `string`           |
+# **`id`**                  | `integer`          | `not null, primary key`
+# **`imaging_date`**        | `date`             |
+# **`name`**                | `string`           |
+# **`patient_id`**          | `integer`          |
+# **`properties`**          | `jsonb`            | `not null`
+# **`properties_version`**  | `string`           |
+# **`series_number`**       | `integer`          |
+# **`state`**               | `integer`          | `default(0)`
+# **`updated_at`**          | `datetime`         |
+# **`visit_id`**            | `integer`          |
+#
+# ### Indexes
+#
+# * `index_image_series_on_patient_id`:
+#     * **`patient_id`**
+# * `index_image_series_on_patient_id_and_series_number` (_unique_):
+#     * **`patient_id`**
+#     * **`series_number`**
+# * `index_image_series_on_series_number`:
+#     * **`series_number`**
+# * `index_image_series_on_visit_id`:
+#     * **`visit_id`**
+#
 class ImageSeries < ActiveRecord::Base
   include DominoDocument
 
@@ -22,6 +56,25 @@ class ImageSeries < ActiveRecord::Base
     joins(patient: :center)
       .where(centers: { study_id: Array[ids].flatten })
   }
+
+  include ScopablePermissions
+
+  def self.with_permissions
+    joins(<<JOIN)
+INNER JOIN patients ON patients.id = image_series.patient_id
+INNER JOIN centers ON centers.id = patients.center_id
+INNER JOIN studies ON centers.study_id = studies.id
+INNER JOIN user_roles ON
+  (
+       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+    OR user_roles.scope_object_id IS NULL
+  )
+INNER JOIN roles ON user_roles.role_id = roles.id
+INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
 
   before_save :ensure_study_is_unchanged
   before_save :ensure_visit_is_for_patient

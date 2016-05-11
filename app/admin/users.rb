@@ -8,24 +8,9 @@ ActiveAdmin.register User do
       1_000_000
     end
 
-    def create
-      private_key_password = params[:user][:signature_password]
-      if(private_key_password != params[:user][:signature_password_confirmation])
-        flash[:error] = 'Signature password doesn\'t match confirmation'
-        redirect_to :back
-        return
-      elsif(private_key_password == params[:user][:password])
-        flash[:error] = 'Signature password must be different from login password'
-        redirect_to :back
-        return
-      elsif(private_key_password.length < 6)
-        flash[:error] = 'Signature password must be at least 6 characters'
-        redirect_to :back
-        return
-      end
 
-      create!
-      @user.generate_keypair(private_key_password, true)
+    def scoped_collection
+      end_of_association_chain.distinct
     end
   end
 
@@ -49,7 +34,9 @@ ActiveAdmin.register User do
         status_tag('Unlocked', :ok)
       end
     end
-
+    column 'Roles' do |user|
+      link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
+    end
     customizable_default_actions(current_ability)
   end
 
@@ -97,6 +84,9 @@ ActiveAdmin.register User do
           link_to 'Download Private Key', download_private_key_admin_user_path(user)
         end
       end
+      row 'Roles' do |user|
+        link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
+      end
     end
   end
 
@@ -104,22 +94,28 @@ ActiveAdmin.register User do
     inputs 'User Information' do
       input :username
       input :name
-      if current_user.is_app_admin? || !object.persisted?
-        input :password
+      if object.new_record? || can?(:change_password, object)
+        input :password, :required => object.new_record?
         input :password_confirmation
       end
-      unless object.persisted?
+      if object.new_record?
         input :signature_password, :required => true
-        input :signature_password_confirmation, :required => true
+        input :signature_password_confirmation
       end
     end
-
+    inputs 'Roles' do
+      has_many :user_roles, allow_destroy: true do |ur|
+        ur.input :role
+        ur.input :scope_object_identifier, collection: [['*system-wide*', 'systemwide']] + UserRole.accessible_scope_object_identifiers(current_ability)
+      end
+    end
     actions
   end
 
   # filters
   filter :username
   filter :name
+  filter :roles
 
   member_action :download_public_key do
     @user = User.find(params[:id])

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160420133845) do
+ActiveRecord::Schema.define(version: 20160506073604) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -139,6 +139,18 @@ ActiveRecord::Schema.define(version: 20160420133845) do
 
   add_index "patients", ["center_id"], name: "index_patients_on_center_id", using: :btree
 
+  create_table "permissions", force: :cascade do |t|
+    t.integer  "role_id",    null: false
+    t.string   "activity",   null: false
+    t.string   "subject",    null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "permissions", ["activity"], name: "index_permissions_on_activity", using: :btree
+  add_index "permissions", ["role_id"], name: "index_permissions_on_role_id", using: :btree
+  add_index "permissions", ["subject"], name: "index_permissions_on_subject", using: :btree
+
   create_table "public_keys", force: :cascade do |t|
     t.integer  "user_id",        null: false
     t.text     "public_key",     null: false
@@ -159,17 +171,10 @@ ActiveRecord::Schema.define(version: 20160420133845) do
   add_index "readers_sessions", ["user_id", "session_id"], name: "index_readers_sessions_on_user_id_and_session_id", using: :btree
 
   create_table "roles", force: :cascade do |t|
-    t.integer  "subject_id"
-    t.string   "subject_type"
-    t.integer  "user_id"
-    t.integer  "role"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "title",      null: false
   end
-
-  add_index "roles", ["subject_id"], name: "index_roles_on_subject_id", using: :btree
-  add_index "roles", ["subject_type"], name: "index_roles_on_subject_type", using: :btree
-  add_index "roles", ["user_id"], name: "index_roles_on_user_id", using: :btree
 
   create_table "sessions", force: :cascade do |t|
     t.string   "name"
@@ -213,9 +218,22 @@ ActiveRecord::Schema.define(version: 20160420133845) do
 
   add_index "tags", ["name"], name: "index_tags_on_name", unique: true, using: :btree
 
+  create_table "user_roles", force: :cascade do |t|
+    t.integer  "user_id",           null: false
+    t.integer  "role_id",           null: false
+    t.integer  "scope_object_id"
+    t.string   "scope_object_type"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
+  add_index "user_roles", ["role_id"], name: "index_user_roles_on_role_id", using: :btree
+  add_index "user_roles", ["scope_object_type", "scope_object_id"], name: "index_user_roles_on_scope_object_type_and_scope_object_id", using: :btree
+  add_index "user_roles", ["user_id"], name: "index_user_roles_on_user_id", using: :btree
+
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  default: "", null: false
-    t.string   "encrypted_password",     default: "", null: false
+    t.string   "email",                  default: "",    null: false
+    t.string   "encrypted_password",     default: "",    null: false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
@@ -235,6 +253,7 @@ ActiveRecord::Schema.define(version: 20160420133845) do
     t.integer  "failed_attempts",        default: 0
     t.string   "unlock_token"
     t.datetime "locked_at"
+    t.boolean  "is_root_user",           default: false, null: false
   end
 
   add_index "users", ["authentication_token"], name: "index_users_on_authentication_token", unique: true, using: :btree

@@ -4,6 +4,8 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   #check_authorization
 
+  helper_method :current_ability
+  
   rescue_from Exceptions::FormNotFoundError do |exception|
     main_message = "The requested form '#{exception.form_name}'"
     main_message += " for case #{exception.case}" unless exception.case.nil?
@@ -65,10 +67,6 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource)
-    if(current_user and current_user.has_system_role?(:image_manage))
-      admin_studies_path
-    else
-      admin_root_path
-    end
+    admin_root_path
   end
 end
