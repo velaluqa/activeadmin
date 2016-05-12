@@ -26,7 +26,7 @@ class Role < ActiveRecord::Base
 
   has_many :permissions, dependent: :destroy
 
-  validates :title, presence: true
+  validates :title, presence: true, uniqueness: true
 
   def allows?(activities, subject)
     subject_string = subject.to_s.underscore

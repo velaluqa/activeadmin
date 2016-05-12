@@ -1,4 +1,10 @@
 RSpec.describe Role do
+  it 'validates uniqueness of title attribute' do
+    create(:role, title: 'My Role')
+    new_role = build(:role, title: 'My Role')
+    expect(new_role).not_to be_valid
+  end
+
   describe '#abilities' do
     before(:each) do
       @role = create(:role, with_permissions: {
