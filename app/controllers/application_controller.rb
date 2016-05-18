@@ -1,8 +1,9 @@
 require 'exceptions'
 
 class ApplicationController < ActionController::Base
+  before_filter :authenticate_user_from_token!
+  
   protect_from_forgery
-  #check_authorization
 
   helper_method :current_ability
   
@@ -68,5 +69,22 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
     admin_root_path
+  end#
+
+  protected
+  
+  def authenticate_user_from_token!
+    username = request.headers['HTTP_X_SESSION_USERNAME']
+    token    = request.headers['HTTP_X_SESSION_TOKEN']
+    user     = username && User.find_by_username(username)
+
+    # Notice how we use Devise.secure_compare to compare the token
+    # in the database with the token given in the params, mitigating
+    # timing attacks.
+    # See: https://gist.github.com/josevalim/fb706b1e933ef01e4fb6
+    if user && Devise.secure_compare(user.authentication_token, token)
+      env['devise.skip_trackable'] = true
+      sign_in user, store: false
+    end
   end
 end
