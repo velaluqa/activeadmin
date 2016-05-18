@@ -22,20 +22,15 @@ class Ability
   def initialize(current_user)
     @current_user = current_user
 
-    can :read, ActiveAdmin::Page, name: 'Dashboard', namespace_name: 'admin'
-    can :read, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
-
     if current_user.is_root_user?
       can :manage, ACTIVITIES.keys
     else
       define_system_wide_abilities
       define_scopable_abilities
-      basic_abilities
+      define_basic_abilities
     end
 
-    if can?(:manage, Sidekiq)
-      can :read, ActiveAdmin::Page, name: 'Sidekiq', namespace_name: 'admin'
-    end
+    define_page_abilities
   end
 
   private
@@ -77,7 +72,7 @@ class Ability
   # Basic abilities are granted irrespective of the permissions
   # defined in any role. For example, a user should always be
   # permitted to manage his own user account and his own public keys.
-  def basic_abilities
+  def define_basic_abilities
     unless can?(:manage, User)
       can :manage, User, ['users.id = ?', current_user.id] do |user|
         user == current_user
@@ -88,6 +83,14 @@ class Ability
       can :manage, PublicKey, ['public_keys.user_id = ?', current_user.id] do |public_key|
         public_key.user == current_user
       end
+    end
+  end
+
+  def define_page_abilities
+    can :read, ActiveAdmin::Page, name: 'Dashboard', namespace_name: 'admin'
+    can :read, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
+    if can?(:manage, Sidekiq)
+      can :read, ActiveAdmin::Page, name: 'Sidekiq', namespace_name: 'admin'
     end
   end
 end
