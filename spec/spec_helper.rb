@@ -99,6 +99,9 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/v/3-0/docs
   config.infer_spec_type_from_file_location!
 
+  # Filter lines from Rails gems in backtraces.
+  config.filter_rails_from_backtrace!
+
   # Ensure that spec tmp directory exists.
   FileUtils.mkdir_p('spec/tmp')
 end
