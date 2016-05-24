@@ -95,5 +95,8 @@ class Ability
     if can?(:manage, Sidekiq)
       can :read, ActiveAdmin::Page, name: 'Sidekiq', namespace_name: 'admin'
     end
+    if can?(:upload, ImageSeries)
+      can :read, ActiveAdmin::Page, name: 'Image Upload', namespace_name: 'admin'
+    end
   end
 end
