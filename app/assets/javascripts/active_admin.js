@@ -10,3 +10,5 @@
 //= require tree.jquery
 //= require aa_erica_keywords
 //= require extensions
+//= require vendor/polyfill_setAsap
+//= require vendor/polyfill_promise
