@@ -21,6 +21,7 @@ class Ability
 
   def initialize(current_user)
     @current_user = current_user
+    return unless @current_user
 
     if current_user.is_root_user?
       can :manage, ACTIVITIES.keys
