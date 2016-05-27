@@ -11,9 +11,13 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
   initialize: ->
     @listenTo @model, 'change:imageCount', @updateImageCount
     @listenTo @model, 'change:showImages', @showHideImages
+    @listenTo @model, 'change:seriesDateTime', @updateDateTime
 
   updateImageCount: ->
     @$('.image-count').html(@model.get('imageCount'))
+
+  updateDateTime: =>
+    @$('.datetime').html(@model.get('seriesDateTime'))
 
   toggleShowImages: (e) =>
     return if $(e.target).hasClass('hasDatepicker')
@@ -26,6 +30,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @$el.html @template
       name: @model.get('name')
       imageCount: @model.get('imageCount')
+      seriesDateTime: @model.get('seriesDateTime')
 
     @$('td.date input').datepicker
       autoclose: true

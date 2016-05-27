@@ -4,8 +4,8 @@
   %td.name
     = @name
   %td.image-count= @imageCount
-  %td.date
-    %input.form-control{ type: 'text' }
+  %td.datetime
+    = JSON.stringify(@seriesDateTime)
   %td.visit
   %td.required-series
   %td.state
