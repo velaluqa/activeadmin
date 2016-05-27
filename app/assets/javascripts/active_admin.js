@@ -12,3 +12,4 @@
 //= require extensions
 //= require vendor/polyfill_setAsap
 //= require vendor/polyfill_promise
+//= require shared/promise_queue
