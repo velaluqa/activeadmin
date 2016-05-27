@@ -19,8 +19,14 @@ module ControllerMacros
       ability.extend(CanCan::Ability)
       ability.instance_eval(&block) if block_given?
 
-      allow(@controller.send(:active_admin_authorization))
-        .to receive(:cancan_ability).and_return(ability)
+      begin
+        allow(@controller.send(:active_admin_authorization))
+          .to receive(:cancan_ability).and_return(ability)
+      rescue NoMethodError
+        # Since we are calling a private method, we cannot check the
+        # `#respond_to?` for @controller. Also `#private_method_defined?`
+        # does not do the job. So we ignore the `NoMethodError`.
+      end
       allow(@controller)
         .to receive(:current_ability).and_return(ability)
     end
