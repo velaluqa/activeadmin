@@ -83,7 +83,7 @@ JOIN
 
   #before_validation :assign_series_number
 
-  STATE_SYMS = [:imported, :visit_assigned, :required_series_assigned, :not_required]
+  STATE_SYMS = [:importing, :imported, :visit_assigned, :required_series_assigned, :not_required]
 
   def state_index
     read_attribute(:state)
