@@ -103,3 +103,18 @@ class ImageUploader.Models.App extends Backbone.Model
     query.push("center_id=#{@get('center').id}") if @get('center')
     query.push("patient_id=#{@get('patient').id}") if @get('patient')
     "?#{query.join('&')}"
+
+  startUpload: =>
+    seriesSaved = @imageSeries.map (series) =>
+      series.set(patient_id: @get('patient').get('id'))
+      series.set(state: 'importing')
+      series.save()
+
+    Promise.all(seriesSaved)
+      .then (args) ->
+        console.log 'series should be saved', args
+      # series.images.each (image) =>
+      #  # upload image
+      # on success:
+      # assign visit
+      # assign required series

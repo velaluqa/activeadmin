@@ -1,8 +1,14 @@
 @ImageUploader ?= {}
 @ImageUploader.Views ?= {}
 class ImageUploader.Views.App extends Backbone.View
+  events:
+    'click button': 'startUpload'
+
   initialize: ->
     @subviews ?= {}
+
+  startUpload: =>
+    @model.startUpload()
 
   render: =>
     @subviews.studySelect = view = new ImageUploader.Views.ResourceSelect
