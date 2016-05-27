@@ -18,7 +18,7 @@ class ImageUploader.Models.Image extends Backbone.Model
       age: null
       institutionName: null
 
-  parse: (item) ->
+  parse: (file) ->
     reader = new FileReader()
     reader.onload = =>
       arrayBuffer = reader.result
@@ -58,7 +58,7 @@ class ImageUploader.Models.Image extends Backbone.Model
           state: 'error'
           warnings: error
 
-    reader.readAsArrayBuffer(item.getAsFile())
+    reader.readAsArrayBuffer(file)
 
   parseDateTime: (date, time, timeZone) ->
     year = parseInt(date[0..3], 10)

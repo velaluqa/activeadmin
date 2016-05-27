@@ -25,7 +25,8 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
   drop: (e) =>
     e.stopPropagation()
     e.preventDefault()
-    @model.addDataTransferItems(e.dataTransfer.items)
+    entries = (item.webkitGetAsEntry() for item in e.dataTransfer.items)
+    @model.addFsEntries(entries)
 
   render: =>
     @$el.html(@template())

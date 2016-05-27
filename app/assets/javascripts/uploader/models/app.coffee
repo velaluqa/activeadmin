@@ -67,22 +67,21 @@ class ImageUploader.Models.App extends Backbone.Model
   patientSelected: =>
     history.pushState({}, '', @urlQuery())
 
-  addDataTransferItems: (items) =>
-    for item in items
-      switch item.kind
-        when 'file' then @addFile(item)
-        when 'directory' then @addDirectory(item)
+  addFsEntries: (entries) =>
+    for entry in entries
+      @addFile(entry) if entry.isFile
+      @addDirectory(entry) if entry.isDirectory
 
-  addFile: (item) =>
-    entry = item.webkitGetAsEntry()
+  addFile: (entry) =>
     image = new ImageUploader.Models.Image
       fileName: entry.fullPath
       fsName: entry.filesystem.name
     @parsingCollection.push(image)
-    image.parse(item)
+    entry.file (file) -> image.parse(file)
 
-  addDirectory: (item) ->
-    console.log 'dir', item
+  addDirectory: (entry) ->
+    dirReader = entry.createReader()
+    dirReader.readEntries @addFsEntries
 
   findOrCreateImageSeries: (name) ->
     series = @imageSeries.findWhere(name: name)
