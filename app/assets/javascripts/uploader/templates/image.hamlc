@@ -1,0 +1,2 @@
+%td= @fileName
+%td= @fileSize

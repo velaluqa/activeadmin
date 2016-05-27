@@ -25,3 +25,8 @@ class ImageUploader.Views.App extends Backbone.View
       selectableAttribute: 'patient'
       selectableCollection: 'patients'
     view.render()
+
+    @subviews.imageSeries = view = new ImageUploader.Views.ImageSeriesTable
+      el: @$('#image-series .panel_contents')
+      model: @model
+    view.render()

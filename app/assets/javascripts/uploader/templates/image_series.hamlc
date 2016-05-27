@@ -1,0 +1,15 @@
+%tr.image-series
+  %td.collapsible
+    .arrow
+  %td.name
+    = @name
+  %td.image-count= @imageCount
+  %td.date
+    %input.form-control{ type: 'text' }
+  %td.visit
+  %td.required-series
+  %td.state
+    .progress
+      .progress-bar.progress-bar-success.progress-bar-striped{ width: '20%' }
+%tr.images
+  %td{ colspan: 7 }

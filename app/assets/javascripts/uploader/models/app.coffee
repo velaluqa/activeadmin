@@ -45,6 +45,10 @@ class ImageUploader.Models.App extends Backbone.Model
 
     @studies.fetch()
 
+    @imageSeries = new ImageUploader.Collections.ImageSeries()
+    @parsingCollection = new ImageUploader.Models.ImageSeries(name: 'Parsing')
+    @listenTo @parsingCollection.images, 'change:state', @regroupParsedImage
+
   studySelected: (_, study) =>
     @set(center: null)
     @centers.studyId = @get('study').id
@@ -62,6 +66,36 @@ class ImageUploader.Models.App extends Backbone.Model
 
   patientSelected: =>
     history.pushState({}, '', @urlQuery())
+
+  addDataTransferItems: (items) =>
+    for item in items
+      switch item.kind
+        when 'file' then @addFile(item)
+        when 'directory' then @addDirectory(item)
+
+  addFile: (item) =>
+    entry = item.webkitGetAsEntry()
+    image = new ImageUploader.Models.Image
+      fileName: entry.fullPath
+      fsName: entry.filesystem.name
+    @parsingCollection.push(image)
+    image.parse(item)
+
+  addDirectory: (item) ->
+    console.log 'dir', item
+
+  findOrCreateImageSeries: (name) ->
+    series = @imageSeries.findWhere(name: name)
+    return series if series?
+
+    series = new ImageUploader.Models.ImageSeries(name: name)
+    @imageSeries.push(series)
+    series
+
+  regroupParsedImage: (image) ->
+    @parsingCollection.images.remove(image)
+    series = @findOrCreateImageSeries(image.get('seriesDescription'))
+    series.push(image)
 
   urlQuery: =>
     query = []

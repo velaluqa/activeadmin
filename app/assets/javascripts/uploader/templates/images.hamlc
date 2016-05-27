@@ -1,0 +1,5 @@
+%table
+  %thead
+    %th Filename
+    %th Size
+  %tbody
