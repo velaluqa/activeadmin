@@ -61,6 +61,7 @@ StudyServer::Application.routes.draw do
   get 'wado' => 'wado#wado'
 
   namespace :v1 do
+    resources :images
     resources :image_series
   end
 
