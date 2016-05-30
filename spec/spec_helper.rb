@@ -44,14 +44,25 @@ RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
   config.include Devise::TestHelpers, type: :controller
   config.extend ControllerMacros, type: :controller
+
+  def clear_data
+    FileUtils.rm_rf('spec/data')
+    FileUtils.mkdir_p('spec/data/images')
+    FileUtils.mkdir_p('spec/data/studies')
+    FileUtils.mkdir_p('spec/data/forms')
+    FileUtils.mkdir_p('spec/data/sessions')
+  end
+
   config.before(:suite) do
     FactoryGirl.reload
     FactoryGirl.lint
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
+    clear_data
   end
   config.before(:each) do
     DatabaseCleaner.start
+    clear_data
   end
   config.after(:each) do
     DatabaseCleaner.clean
