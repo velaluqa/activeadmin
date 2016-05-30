@@ -1,4 +1,30 @@
 RSpec.describe Study do
+  describe 'image storage' do
+    it 'handles create' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1'))
+      create(:study, id: 1)
+      expect(File).to exist(ERICA.image_storage_path.join('1'))
+    end
+
+    it 'handles update' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1'))
+      study = create(:study, id: 1)
+      expect(File).to exist(ERICA.image_storage_path.join('1'))
+      study.id = 2
+      study.save
+      expect(File).to exist(ERICA.image_storage_path.join('2'))
+      expect(File).not_to exist(ERICA.image_storage_path.join('1'))
+    end
+
+    it 'handles destroy' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1'))
+      study = create(:study, id: 1)
+      expect(File).to exist(ERICA.image_storage_path.join('1'))
+      study.destroy
+      expect(File).not_to exist(ERICA.image_storage_path.join('1'))
+    end
+  end
+
   describe 'scope #by_ids' do
     before :each do
       @study1 = create(:study)

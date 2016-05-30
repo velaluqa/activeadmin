@@ -33,6 +33,7 @@ class Image < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
+  include ImageStorageCallbacks
   include ScopablePermissions
 
   def self.with_permissions
@@ -61,17 +62,8 @@ JOIN
     end
   end
 
-  def previous_image_storage_path
-    if(self.previous_changes.include?(:image_series_id))
-      previous_image_series = ImageSeries.find(self.previous_changes[:image_series_id][0])
-      
-      previous_image_series.image_storage_path + '/' + self.id.to_s
-    else
-      image_storage_path
-    end
-  end
   def image_storage_path
-    self.image_series.image_storage_path + '/' + self.id.to_s
+    "#{image_series.image_storage_path}/#{id}"
   end
   def absolute_image_storage_path
     Rails.application.config.image_storage_root + '/' + self.image_storage_path

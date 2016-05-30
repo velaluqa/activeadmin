@@ -29,9 +29,6 @@ module StudyServer
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W(#{config.root}/app/workers #{config.root}/app/models/concerns)
 
-    # Activate observers that should always be running.
-    config.active_record.observers = :image_storage_observer
-
     # Opt-in into the future default behaviour.
     config.active_record.raise_in_transactional_callbacks = true
 

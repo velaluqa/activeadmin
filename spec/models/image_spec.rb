@@ -1,4 +1,42 @@
 RSpec.describe Image do
+  describe 'image storage' do
+    before(:each) do
+      @study = create(:study, id: 1)
+      @center = create(:center, id: 1, study: @study)
+      @patient = create(:patient, id: 1, center: @center)
+      @image_series = create(:image_series, id: 1, patient: @patient)
+      @image_series2 = create(:image_series, id: 2, patient: @patient)
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1'))
+    end
+
+    it 'handles create' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
+      image = create(:image, id: 1, image_series: @image_series)
+      image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
+    end
+
+    it 'handles update' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
+      image = create(:image, id: 1, image_series: @image_series)
+      image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
+      image.image_series_id = 2
+      image.save
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/2/1'))
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
+    end
+
+    it 'handles destroy' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
+      image = create(:image, id: 1, image_series: @image_series)
+      image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
+      image.destroy
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
+    end
+  end
+
   describe 'scope #by_study_ids' do
     before :each do
       @study1            = create(:study)

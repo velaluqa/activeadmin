@@ -57,6 +57,7 @@ class ImageSeries < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
+  include ImageStorageCallbacks
   include ScopablePermissions
 
   def self.with_permissions
@@ -122,32 +123,11 @@ JOIN
     end
   end
 
-  def previous_image_storage_path
-    if(self.previous_changes.include?(:patient_id) || self.previous_changes.include?(:visit_id))
-      previous_patient = (self.previous_changes[:patient_id].nil? ? self.patient : Patient.find(self.previous_changes[:patient_id][0]))
-      previous_visit = if self.previous_changes[:visit_id].nil?
-                         self.visit
-                       elsif self.previous_changes[:visit_id][0].nil?
-                         nil
-                       else
-                         Visit.find(self.previous_changes[:visit_id][0])
-                       end
-
-
-      if(previous_visit.nil?)
-        previous_patient.image_storage_path + '/__unassigned/' + self.id.to_s
-      else
-        previous_visit.image_storage_path + '/' + self.id.to_s
-      end
-    else
-      image_storage_path
-    end
-  end
   def image_storage_path
-    if(self.visit.nil?)
-      self.patient.image_storage_path + '/__unassigned/' + self.id.to_s
+    if visit
+      "#{visit.image_storage_path}/#{id}"
     else
-      self.visit.image_storage_path + '/' + self.id.to_s
+      "#{patient.image_storage_path}/__unassigned/#{id}"
     end
   end
   def absolute_image_storage_path

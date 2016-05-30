@@ -1,4 +1,39 @@
 RSpec.describe Visit do
+  describe 'image storage' do
+    before(:each) do
+      @study = create(:study, id: 1)
+      @center = create(:center, id: 1, study: @study)
+      @patient = create(:patient, id: 1, center: @center)
+      @patient2 = create(:patient, id: 2, center: @center)
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned'))
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/2/__unassigned'))
+    end
+
+    it 'handles create' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/1'))
+      create(:visit, id: 1, patient: @patient)
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/1/1'))
+    end
+
+    it 'handles update' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/1'))
+      visit = create(:visit, id: 1, patient: @patient)
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/1/1'))
+      visit.patient_id = 2
+      visit.save
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/2/1'))
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/1'))
+    end
+
+    it 'handles destroy' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/1'))
+      visit = create(:visit, id: 1, patient: @patient)
+      expect(File).to exist(ERICA.image_storage_path.join('1/1/1/1'))
+      visit.destroy
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/1'))
+    end
+  end
+
   describe 'scope #by_study_ids' do
     before :each do
       @study1     = create(:study)

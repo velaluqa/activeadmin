@@ -75,6 +75,7 @@ class Visit < ActiveRecord::Base
 
   before_save :ensure_study_is_unchanged
 
+  include ImageStorageCallbacks
   def name
     if(patient.nil?)
       '#'+visit_number.to_s
@@ -239,20 +240,11 @@ class Visit < ActiveRecord::Base
     end
   end
 
-  def previous_image_storage_path
-    if(self.previous_changes.include?(:patient_id))
-      previous_patient = Patient.find(self.previous_changes[:patient_id][0])
-      
-      previous_patient.image_storage_path + '/' + self.id.to_s
-    else
-      image_storage_path
-    end
-  end
   def image_storage_path
-    self.patient.image_storage_path + '/' + self.id.to_s
+    "#{patient.image_storage_path}/#{id}"
   end
   def required_series_image_storage_path(required_series_name)
-    self.image_storage_path + '/' + required_series_name
+    "#{image_storage_path}/#{required_series_name}"
   end
 
   def wado_query

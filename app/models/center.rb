@@ -40,6 +40,8 @@ class Center < ActiveRecord::Base
     where(study_id: Array[ids].flatten)
   }
 
+  include ImageStorageCallbacks
+
   include ScopablePermissions
 
   def self.with_permissions
@@ -75,17 +77,8 @@ JOIN
     self.code + ' - ' + self.name
   end
   
-  def previous_image_storage_path
-    if(self.previous_changes.include?(:study_id))
-      previous_study = Study.find(self.previous_changes[:study_id][0])
-      
-      previous_study.image_storage_path + '/' + self.id.to_s
-    else
-      image_storage_path
-    end
-  end
   def image_storage_path
-    self.study.image_storage_path + '/' + self.id.to_s
+    "#{study.image_storage_path}/#{id}"
   end
 
   def wado_query

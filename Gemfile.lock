@@ -650,7 +650,6 @@ DEPENDENCIES
   pry-stack_explorer
   railroady
   rails (= 4.2.6)
-  rails-observers
   rails_best_practices
   railties (= 4.2.6)
   raindrops (~> 0.16.0)

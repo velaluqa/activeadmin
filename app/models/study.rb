@@ -43,6 +43,8 @@ class Study < ActiveRecord::Base
 
   scope :by_ids, ->(*ids) { where(id: Array[ids].flatten) }
 
+  include ImageStorageCallbacks
+
   include ScopablePermissions
 
   def self.with_permissions
@@ -96,11 +98,8 @@ JOIN
     write_attribute(:state, index)
   end
 
-  def previous_image_storage_path
-    image_storage_path
-  end
   def image_storage_path
-    self.id.to_s
+    id.to_s
   end
   def absolute_image_storage_path
     Rails.application.config.image_storage_root + '/' + self.image_storage_path

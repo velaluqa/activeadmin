@@ -16,7 +16,6 @@ gem 'protected_attributes' # https://github.com/rails/protected_attributes
 gem 'activeresource' # https://github.com/rails/activeresource
 gem 'actionpack-action_caching' # https://github.com/rails/actionpack-action_caching
 gem 'activerecord-session_store' # https://github.com/rails/activerecord-session_store
-gem 'rails-observers' # https://github.com/rails/rails-observers
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'

@@ -45,6 +45,8 @@ class Patient < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
+  include ImageStorageCallbacks
+
   include ScopablePermissions
 
   def self.with_permissions
@@ -95,20 +97,10 @@ JOIN
 
   def next_series_number
     return 1 if self.image_series.empty?
-    return self.image_series.order('series_number DESC').first.series_number+1
-  end
-
-  def previous_image_storage_path
-    if(self.previous_changes.include?(:center_id))
-      previous_center = Center.find(self.previous_changes[:center_id][0])
-      
-      previous_center.image_storage_path + '/' + self.id.to_s
-    else
-      image_storage_path
-    end
+    image_series.order('series_number DESC').first.series_number + 1
   end
   def image_storage_path
-    self.center.image_storage_path + '/' + self.id.to_s
+    "#{center.image_storage_path}/#{id}"
   end
 
   def wado_query

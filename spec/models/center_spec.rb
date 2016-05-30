@@ -1,4 +1,41 @@
 RSpec.describe Center do
+  describe 'image storage' do
+    before(:each) do
+      @study = create(:study, id: 1)
+      @study2 = create(:study, id: 2)
+      expect(File).to exist(ERICA.image_storage_path.join('1'))
+      expect(File).to exist(ERICA.image_storage_path.join('2'))
+    end
+
+    it 'handles create' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1'))
+      create(:center, id: 1, study: @study)
+      expect(File).to exist(ERICA.image_storage_path.join('1/1'))
+    end
+
+    # TODO: Currently the change of a study for a center is not
+    # allowed. Remember to add this, when a center may be allowed to
+    # switch studies.
+    #
+    # it 'handles update' do
+    #   expect(File).not_to exist(ERICA.image_storage_path.join('1/1'))
+    #   center = create(:center, id: 1, study: @study)
+    #   expect(File).to exist(ERICA.image_storage_path.join('1/1'))
+    #   center.study_id = 2
+    #   center.save!
+    #   expect(File).to exist(ERICA.image_storage_path.join('2/1'))
+    #   expect(File).not_to exist(ERICA.image_storage_path.join('1/1'))
+    # end
+
+    it 'handles destroy' do
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1'))
+      center = create(:center, id: 1, study: @study)
+      expect(File).to exist(ERICA.image_storage_path.join('1/1'))
+      center.destroy
+      expect(File).not_to exist(ERICA.image_storage_path.join('1/1'))
+    end
+  end
+
   describe 'scope #by_study_ids' do
     before :each do
       @study1 = create(:study)
