@@ -13,6 +13,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     @set imageCount: @images.size()
 
   push: (image) ->
+    image.series = this
     @images.push(image)
 
   toJSON: (options = {}) ->

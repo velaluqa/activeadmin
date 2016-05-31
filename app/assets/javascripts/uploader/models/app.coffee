@@ -100,7 +100,6 @@ class ImageUploader.Models.App extends Backbone.Model
       series.set(seriesDateTime: image.get('seriesDateTime'))
     unless series.get('seriesNumber')?
       series.set(seriesNumber: image.get('seriesNumber'))
-    image.series = series
     series.push(image)
 
   urlQuery: =>
