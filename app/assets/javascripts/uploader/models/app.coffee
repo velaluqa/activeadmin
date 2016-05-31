@@ -118,9 +118,15 @@ class ImageUploader.Models.App extends Backbone.Model
 
     Promise.all(seriesSaved)
       .then (args) =>
-        @imageSeries.each (series) =>
-          series.images.each (image) =>
+        @imageSeries.each (series) ->
+          # A list of promises. When the whole series is uploaded, we
+          # can assign the visit and the required series.
+          seriesUploads = series.images.map (image) ->
             uploadQueue.push -> image.upload()
+
+          Promise.all(seriesUploads)
+            .then ->
+              series.saveAsImported()
         uploadQueue.start()
       .then ->
         console.log 'all uploads done', arguments

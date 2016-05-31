@@ -1,7 +1,12 @@
 @ImageUploader ?= {}
 @ImageUploader.Models ?= {}
 class ImageUploader.Models.ImageSeries extends Backbone.Model
-  url: '/v1/image_series.json'
+  url: ->
+    id = @get('id')
+    if id?
+      "/v1/image_series/#{id}.json"
+    else
+      '/v1/image_series.json'
 
   defaults:
     uploadState: 'parsed'
@@ -71,3 +76,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       imaging_date: @attributes.seriesDateTime,
       series_number: @attributes.seriesNumber
     }
+
+  saveAsImported: ->
+    console.log 'save as imported'
+    @save(state: 'imported')
