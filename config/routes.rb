@@ -63,6 +63,10 @@ StudyServer::Application.routes.draw do
   namespace :v1 do
     resources :images
     resources :image_series
+    resources :patients do
+      resources :visits
+    end
+    resources :visits
   end
 
   authenticate :user, ->(user) { user.can?(:manage, Sidekiq) } do
