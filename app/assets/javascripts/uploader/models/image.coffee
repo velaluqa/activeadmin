@@ -1,6 +1,8 @@
 @ImageUploader ?= {}
 @ImageUploader.Models ?= {}
 class ImageUploader.Models.Image extends Backbone.Model
+  url: '/v1/images.json'
+
   defaults:
     state: 'parsing'
     warnings: null
@@ -19,6 +21,8 @@ class ImageUploader.Models.Image extends Backbone.Model
       institutionName: null
 
   parse: (file) ->
+    @file = file
+
     reader = new FileReader()
     reader.onload = =>
       arrayBuffer = reader.result
@@ -73,3 +77,20 @@ class ImageUploader.Models.Image extends Backbone.Model
   @parse: (file) ->
     image = new ImageUploader.Models.Image
     image.parse(file)
+
+  upload: ->
+    formData = new FormData()
+    formData.append('image[image_series_id]', @series.get('id'))
+    formData.append('image[file][name]', @get('fileName'))
+    formData.append('image[file][data]', @file)
+    $.ajax
+      type: 'POST'
+      url: '/v1/images.json'
+      data: formData
+      success: ->
+        console.log 'request success', arguments
+      error: ->
+        console.log 'request error', arguments
+      cache: false
+      processData: false
+      contentType: false

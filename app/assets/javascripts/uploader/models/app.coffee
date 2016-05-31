@@ -115,12 +115,13 @@ class ImageUploader.Models.App extends Backbone.Model
       series.set(patient_id: @get('patient').get('id'))
       series.set(state: 'importing')
       series.save()
+    uploadQueue = new PromiseQueue(2)
 
     Promise.all(seriesSaved)
-      .then (args) ->
-        console.log 'series should be saved', args
-      # series.images.each (image) =>
-      #  # upload image
-      # on success:
-      # assign visit
-      # assign required series
+      .then (args) =>
+        @imageSeries.each (series) =>
+          series.images.each (image) =>
+            uploadQueue.push -> image.upload()
+        uploadQueue.start()
+      .then ->
+        console.log 'all uploads done', arguments
