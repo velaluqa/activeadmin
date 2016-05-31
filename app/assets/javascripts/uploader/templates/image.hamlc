@@ -1,2 +1,3 @@
 %td= @fileName
 %td= @fileSize
+%td{ class: "#{@state} status" }= @state

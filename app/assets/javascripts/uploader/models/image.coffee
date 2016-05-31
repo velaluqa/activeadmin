@@ -87,10 +87,12 @@ class ImageUploader.Models.Image extends Backbone.Model
       type: 'POST'
       url: '/v1/images.json'
       data: formData
-      success: ->
-        console.log 'request success', arguments
-      error: ->
-        console.log 'request error', arguments
+      beforeSend: =>
+        @set state: 'uploading'
+      success: =>
+        @set state: 'uploaded'
+      error: =>
+        @set state: 'upload failed'
       cache: false
       processData: false
       contentType: false
