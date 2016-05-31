@@ -208,6 +208,7 @@ ActiveAdmin.register Visit do
                   else
                     nil
                   end
+    f.object.patient_id = params[:patient_id]
 
     f.inputs 'Details' do
       f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : patients), :include_blank => (not f.object.persisted?)
