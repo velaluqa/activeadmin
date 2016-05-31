@@ -1,4 +1,5 @@
 json.call(visit,
+          :id,
           :patient_id,
           :visit_number,
           :description,
