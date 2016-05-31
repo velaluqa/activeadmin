@@ -12,12 +12,22 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @listenTo @model, 'change:imageCount', @updateImageCount
     @listenTo @model, 'change:showImages', @showHideImages
     @listenTo @model, 'change:seriesDateTime', @updateDateTime
+    @listenTo @model, 'change:imageCount change:uploadState change:uploadProgress', @updateUploadState
 
   updateImageCount: ->
     @$('.image-count').html(@model.get('imageCount'))
 
   updateDateTime: =>
     @$('.datetime').html(@model.get('seriesDateTime'))
+
+  updateUploadState: =>
+    state = @model.get('uploadState')
+    progress = @model.get('uploadProgress')
+    @$('.upload-state .progress-bar').toggleClass('parsed', state is 'parsed')
+    @$('.upload-state .progress-bar').toggleClass('uploading', state is 'uploading')
+    @$('.upload-state .progress-bar').toggleClass('uploaded', state is 'uploaded')
+    @$('.upload-state .progress').css width: "#{progress}%"
+    @$('.upload-state .label').html(@model.getUploadStateLabel())
 
   toggleShowImages: (e) =>
     return if $(e.target).hasClass('hasDatepicker')
@@ -32,8 +42,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
       imageCount: @model.get('imageCount')
       seriesDateTime: @model.get('seriesDateTime')
 
-    @$('td.date input').datepicker
-      autoclose: true
+    @updateUploadState()
 
     images = new ImageUploader.Views.Images
       el: @$('tr.images td')

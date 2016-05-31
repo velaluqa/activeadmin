@@ -8,8 +8,10 @@
     = JSON.stringify(@seriesDateTime)
   %td.visit
   %td.required-series
-  %td.state
-    .progress
-      .progress-bar.progress-bar-success.progress-bar-striped{ width: '20%' }
+  %td.upload-state
+    .progress-bar
+      .label
+      .progress{ style: "width: 0%" }
+        .label
 %tr.images
   %td{ colspan: 7 }
