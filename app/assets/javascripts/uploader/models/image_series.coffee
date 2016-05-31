@@ -78,5 +78,10 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     }
 
   saveAsImported: ->
-    console.log 'save as imported'
     @save(state: 'imported')
+
+  saveAssignedVisit: ->
+    console.log 'save assigned visit'
+
+  saveAssignedRequiredSeries: ->
+    console.log 'save '

@@ -127,6 +127,11 @@ class ImageUploader.Models.App extends Backbone.Model
           Promise.all(seriesUploads)
             .then ->
               series.saveAsImported()
+            .then ->
+              series.saveAssignedVisit()
+            .then ->
+              series.saveAssignedRequiredSeries()
+
         uploadQueue.start()
       .then ->
         console.log 'all uploads done', arguments
