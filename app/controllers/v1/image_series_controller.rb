@@ -19,6 +19,23 @@ module V1
       end
     end
 
+    def update
+      authorize! :update, ImageSeries
+
+      @series = ImageSeries.find(params[:id])
+      @series.assign_attributes(image_series_params)
+
+      respond_to do |format|
+        format.json do
+          if @series.save
+            render json: { status: :ok }, status: :ok
+          else
+            render json: { errors: @series.errors.full_messages }, status: :unprocessable_entity
+          end
+        end
+      end
+    end
+
     protected
 
     def image_series_params

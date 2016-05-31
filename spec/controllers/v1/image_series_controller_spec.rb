@@ -39,4 +39,42 @@ RSpec.describe V1::ImageSeriesController do
       end
     end
   end
+
+  describe '#update' do
+    before(:each) do
+      @image_series = create(:image_series, name: 'Some Series', state: :importing)
+      @new_attributes = {
+        name: 'My Awesome Series',
+        state: 'imported'
+      }
+    end
+
+    describe 'without current user' do
+      let(:response) { put(:update, id: @image_series.id, format: :json, image_series: @new_attributes) }
+      it { expect(response).to have_http_status(:forbidden) }
+    end
+
+    describe 'for authorized image_series' do
+      login_user_with_abilities do
+        can :read, ImageSeries
+        can :update, ImageSeries
+      end
+
+      it 'succeeds' do
+        response = put(:update, id: @image_series.id, format: :json, image_series: @new_attributes)
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    describe 'for unauthorized image_series' do
+      login_user_with_abilities do
+        can :read, ImageSeries
+      end
+
+      it 'denies access' do
+        response = put(:update, id: @image_series.id, format: :json, image_series: @new_attributes)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end
