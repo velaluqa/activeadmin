@@ -85,4 +85,16 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     @save(visit_id: @get('assignVisitId'))
 
   saveAssignedRequiredSeries: ->
-    console.log 'save '
+    $.ajax
+      type: 'POST'
+      url: "/v1/image_series/#{@get('id')}/assign_required_series.json"
+      data:
+        required_series: @get('assignRequiredSeries')
+      beforeSend: ->
+      success: =>
+        @set
+          required_series: @get('assignRequiredSeries')
+          state: 'required_series_assigned'
+      error: ->
+        console.log 'assign required series failed', arguments
+      cache: false

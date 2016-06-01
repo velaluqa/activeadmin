@@ -58,8 +58,9 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
       else
         @model.set assignVisitId: parseInt(visitId, 10)
 
-  changeAssignedRequiredSeries: ->
-    console.log 'required series changed', arguments
+  changeAssignedRequiredSeries: (e) ->
+    values = $(e.currentTarget).val()
+    @model.set assignRequiredSeries: values
 
   showHideImages: =>
     @$el.toggleClass('show-images', @model.get('showImages') is true)
