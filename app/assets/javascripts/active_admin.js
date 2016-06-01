@@ -12,4 +12,5 @@
 //= require extensions
 //= require vendor/polyfill_setAsap
 //= require vendor/polyfill_promise
+//= require vendor/naturalSort
 //= require shared/promise_queue
