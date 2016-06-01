@@ -82,7 +82,9 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     @save(state: 'imported')
 
   saveAssignedVisit: ->
-    @save(visit_id: @get('assignVisitId'))
+    @save
+      state: 'visit_assigned'
+      visit_id: @get('assignVisitId')
 
   saveAssignedRequiredSeries: ->
     $.ajax

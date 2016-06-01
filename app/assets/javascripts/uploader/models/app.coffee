@@ -76,28 +76,35 @@ class ImageUploader.Models.App extends Backbone.Model
     "?#{query.join('&')}"
 
   startUpload: =>
-    seriesSaved = @imageSeries.map (series) =>
+    uploadQueue = new PromiseQueue(5)
+
+    seriesSaved = []
+    @imageSeries.each (series) =>
       series.set(patient_id: @get('patient').get('id'))
-      series.set(state: 'importing')
-      series.save()
-    uploadQueue = new PromiseQueue(2)
+      return unless series.isNew()
+      seriesSaved.push series.save()
 
     Promise.all(seriesSaved)
       .then (args) =>
         @imageSeries.each (series) ->
           # A list of promises. When the whole series is uploaded, we
           # can assign the visit and the required series.
-          seriesUploads = series.images.map (image) ->
-            uploadQueue.push -> image.upload()
+          seriesUploads = []
+          series.images.each (image) ->
+            return if image.get('state') is 'uploaded'
+            seriesUploads.push uploadQueue.push -> image.upload()
 
           Promise.all(seriesUploads)
             .then ->
+              return unless series.get('state') is 'importing'
               series.saveAsImported()
             .then ->
+              return unless series.get('state') is 'imported'
               series.saveAssignedVisit()
             .then ->
+              return unless series.get('state') is 'visit_assigned'
               series.saveAssignedRequiredSeries()
 
         uploadQueue.start()
       .then ->
-        console.log 'all uploads done', arguments
+        console.log 'all uploads done'
