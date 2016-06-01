@@ -74,14 +74,15 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       state: @attributes.state,
       patient_id: @attributes.patient_id,
       imaging_date: @attributes.seriesDateTime,
-      series_number: @attributes.seriesNumber
+      series_number: @attributes.seriesNumber,
+      visit_id: @attributes.visit_id
     }
 
   saveAsImported: ->
     @save(state: 'imported')
 
   saveAssignedVisit: ->
-    console.log 'save assigned visit'
+    @save(visit_id: @get('assignVisitId'))
 
   saveAssignedRequiredSeries: ->
     console.log 'save '

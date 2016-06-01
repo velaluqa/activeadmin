@@ -20,7 +20,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @listenTo @model, 'change:showImages', @showHideImages
     @listenTo @model, 'change:seriesDateTime', @updateDateTime
     @listenTo @model, 'change:imageCount change:uploadState change:uploadProgress', @updateUploadState
-    @listenTo @model, 'change:visit_id', @renderRequiredSeriesSelectbox
+    @listenTo @model, 'change:assignVisitId', @renderRequiredSeriesSelectbox
 
     @listenTo ImageUploader.app, 'change:patient', @renderVisitsSelectbox
 
@@ -54,9 +54,9 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
         window.open("/admin/visits/new?patient_id=#{patientId}", 'Create Visit')
         @$('select.visit').val('').trigger('change')
       when ''
-        @model.set visit_id: null
+        @model.set assignVisitId: null
       else
-        @model.set visit_id: visitId
+        @model.set assignVisitId: parseInt(visitId, 10)
 
   changeAssignedRequiredSeries: ->
     console.log 'required series changed', arguments
@@ -68,7 +68,6 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     patientId = ImageUploader.app.get('patient')?.id
     if patientId?
       @$('select.visit').select2
-        # placeholder: 'No visit assigned'
         placeholder: 'No visit assigned'
         allowClear: true
         ajax:
@@ -91,12 +90,12 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
         allowClear: true
 
   renderRequiredSeriesSelectbox: =>
-    visitId = @model.get('visit_id')
+    visitId = @model.get('assignVisitId')
     options =
       placeholder: 'No required series assigned'
       data: @visits[visitId]?.required_series or []
     @$requiredSeriesSelect ?= @$('select.required-series').select2(options)
-    if @model.get('visit_id')?
+    if @model.get('assignVisitId')?
       @$('select.required-series').prop('disabled', false).select2(options)
     else
       @$('select.required-series').val([]).trigger('change')
