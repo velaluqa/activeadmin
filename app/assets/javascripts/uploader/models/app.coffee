@@ -73,6 +73,8 @@ class ImageUploader.Models.App extends Backbone.Model
       @addDirectory(entry) if entry.isDirectory
 
   addFile: (entry) =>
+    return if entry.fullPath.endsWith('DICOMDIR')
+
     image = new ImageUploader.Models.Image
       fileName: entry.fullPath
       fsName: entry.filesystem.name
