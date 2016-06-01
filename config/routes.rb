@@ -62,7 +62,11 @@ StudyServer::Application.routes.draw do
 
   namespace :v1 do
     resources :images
-    resources :image_series
+    resources :image_series do
+      member do
+        post :assign_required_series
+      end
+    end
     resources :patients do
       resources :visits
     end

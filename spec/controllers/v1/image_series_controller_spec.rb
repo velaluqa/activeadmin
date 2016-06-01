@@ -77,4 +77,40 @@ RSpec.describe V1::ImageSeriesController do
       end
     end
   end
+
+  describe '#assign_required_series' do
+    before(:each) do
+      @visit = create(:visit)
+      @image_series = create(:image_series, visit: @visit, name: 'Some Series', state: :imported)
+      @required_series = ['liver_portal_venous']
+    end
+
+    describe 'without current user' do
+      let(:response) { post(:assign_required_series, id: @image_series.id, format: :json, required_series: @required_series) }
+      it { expect(response).to have_http_status(:forbidden) }
+    end
+
+    describe 'for authorized image_series' do
+      login_user_with_abilities do
+        can :read, ImageSeries
+        can :assign_required_series, Visit
+      end
+
+      it 'succeeds' do
+        response = post(:assign_required_series, id: @image_series.id, format: :json, required_series: @required_series)
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    describe 'for unauthorized image_series' do
+      login_user_with_abilities do
+        can :read, ImageSeries
+      end
+
+      it 'denies access' do
+        response = post(:assign_required_series, id: @image_series.id, format: :json, required_series: @required_series)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end

@@ -36,6 +36,22 @@ module V1
       end
     end
 
+    def assign_required_series
+      @series = ImageSeries.find(params[:id])
+
+      authorize! :assign_required_series, @series.visit
+
+      unless @series.visit
+        render json: { errors: ['Resource does not have a visit associated.'] },
+               status: :method_not_allowed
+        return
+      end
+
+      @series.change_required_series_assignment(params[:required_series])
+
+      render json: { status: :ok }, status: :ok
+    end
+
     protected
 
     def image_series_params
