@@ -79,6 +79,6 @@ ActiveAdmin.register_page 'Viewer Cart' do
     end
     @wado_query_urls.reject! {|url| url.nil? }
 
-    render 'admin/shared/weasis_webstart.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
+    render 'admin/shared/viewer_weasis.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
   end
 end
