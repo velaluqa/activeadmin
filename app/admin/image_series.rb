@@ -314,7 +314,7 @@ ActiveAdmin.register ImageSeries do
     current_user.ensure_authentication_token!
     @wado_query_urls = [wado_query_image_series_url(@image_series, :format => :xml, :authentication_token => current_user.authentication_token)]
 
-    render 'admin/shared/weasis_webstart.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
+    render 'admin/shared/viewer_weasis.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
   end
 
   member_action :edit_properties, :method => :post do
