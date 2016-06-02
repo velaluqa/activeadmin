@@ -11,9 +11,7 @@ class V1::ImagesController < V1::ApiController
           return
         end
         begin
-          File.open(@image.absolute_image_storage_path, 'wb') do |target_file|
-            target_file.write(image_params[:file][:data].read)
-          end
+          @image.write_anonymized_file(image_params[:file][:data].read)
         rescue StandardError => e
           @image.destroy
           Rails.logger.error "Failed to write uploaded image to image storage: #{e.message}"

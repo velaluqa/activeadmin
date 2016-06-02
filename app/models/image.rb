@@ -1,3 +1,5 @@
+require 'tempfile'
+
 #
 #
 # ## Schema Information
@@ -77,15 +79,19 @@ JOIN
     File.readable?(Rails.application.config.image_storage_root + '/' + image_storage_path)
   end
 
-  ##
-  # Writes the given contents to the image file specified by its
-  # `absolute_image_storage_path`.
-  #
-  # @param [String] contents The content to write to the file (e.g.
-  #                          return value of a previous `IO.read`)
-  def write_file(contents)
-    File.open(absolute_image_storage_path, 'wb') do |file|
-      file.write(contents)
+  def write_anonymized_file(file)
+    tmp = Tempfile.new('image_to_anonymize')
+    begin
+      tmp.binmode
+      tmp.write(file)
+      tmp.close
+
+      tmp_dicom = DICOM::DObject.read(tmp.path)
+      tmp_dicom.patients_name = "#{image_series.patient.center_id}#{image_series.patient.subject_id}"
+      tmp_dicom.write(absolute_image_storage_path)
+    ensure
+      tmp.close
+      tmp.unlink
     end
   end
 

@@ -102,4 +102,15 @@ RSpec.describe Image do
         ]
     end
   end
+
+  describe '#write_anonymized_file' do
+    it 'anonymizes a file and writes it to the image_storage' do
+      @image = create(:image)
+      @image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      dicom = DICOM::DObject.read('spec/files/test.dicom')
+      expect(dicom.patients_name.value).to eq '1001015_MRI_30-01-2014_SORAMIC'
+      dicom = DICOM::DObject.read(@image.absolute_image_storage_path)
+      expect(dicom.patients_name.value).to eq "#{@image.image_series.patient.center_id}#{@image.image_series.patient.subject_id}"
+    end
+  end
 end
