@@ -280,10 +280,9 @@ ActiveAdmin.register ImageSeries do
       f.input :imaging_date, :as => :datepicker
       f.input :force_update, :as => :hidden, :value => (params[:force_update] ? 'true' : 'false') if f.object.persisted?
       f.input :comment
-      f.form_buffers.last # https://github.com/gregbell/active_admin/pull/965
     end
 
-    f.buttons
+    f.actions
   end
 
   csv do
