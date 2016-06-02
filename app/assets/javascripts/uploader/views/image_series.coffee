@@ -7,6 +7,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
 
   events:
     'click .select2': 'stopPropagation'
+    'click .upload-flag': 'markForUpload'
     'change select.visit': 'changeAssignedVisit'
     'change select.required-series': 'changeAssignedRequiredSeries'
     'click tr.image-series': 'toggleShowImages'
@@ -21,6 +22,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @listenTo @model, 'change:seriesDateTime', @updateDateTime
     @listenTo @model, 'change:imageCount change:uploadState change:uploadProgress', @updateUploadState
     @listenTo @model, 'change:assignVisitId', @renderRequiredSeriesSelectbox
+    @listenTo @model, 'change:markedForUpload', @renderMarkForUpload
 
     @listenTo ImageUploader.app, 'change:patient', @renderVisitsSelectbox
 
@@ -46,6 +48,11 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     return if $(e.target).hasClass('hasDatepicker')
     @model.set(showImages: not @model.get('showImages'))
 
+  markForUpload: (e) =>
+    e.stopPropagation()
+    marked = @model.get('markedForUpload')
+    @model.set markedForUpload: not marked
+
   changeAssignedVisit: (e) ->
     visitId = $(e.currentTarget).val()
     patientId = ImageUploader.app.get('patient')?.id
@@ -65,9 +72,15 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
   showHideImages: =>
     @$el.toggleClass('show-images', @model.get('showImages') is true)
 
+  renderMarkForUpload: =>
+    marked = @model.get('markedForUpload')
+    @$('tr.image-series').toggleClass('marked-for-upload', marked)
+    @renderVisitsSelectbox()
+
   renderVisitsSelectbox: =>
+    markedForUpload = @model.get('markedForUpload')
     patientId = ImageUploader.app.get('patient')?.id
-    if patientId?
+    if patientId? and markedForUpload
       @$('select.visit').select2
         placeholder: 'No visit assigned'
         allowClear: true
@@ -84,11 +97,18 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
                 text: "#{visit.visit_number} — #{visit.visit_type}"
               }
             return { results: results }
-      @$('select.visit').val('').trigger('change')
+      @$('select.visit')
+        .prop('disabled', false)
+        .val('')
+        .trigger('change')
     else
-      @$('select.visit').select2
-        placeholder: 'No visit assigned'
-        allowClear: true
+      @$('select.visit')
+        .prop('disabled', true)
+        .val('')
+        .trigger('change')
+        .select2
+          placeholder: 'No visit assigned'
+          allowClear: true
 
   renderRequiredSeriesSelectbox: =>
     visitId = @model.get('assignVisitId')

@@ -152,6 +152,15 @@
 	padding-left: 15px;
       }
 
+      tr.image-series {
+	color: #aaa;
+
+
+	&.marked-for-upload {
+	  color: #323537;
+	}
+      }
+
       tr.image-series:hover {
 	background-color: #e4e4e4;
       }
@@ -167,7 +176,6 @@
 	  
 	}
 	table {
-	  /* background-color: rgba(#000, 0.05); */
 	  td, th{
 	    padding: 10px;
 	  }

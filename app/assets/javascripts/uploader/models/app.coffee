@@ -79,14 +79,14 @@ class ImageUploader.Models.App extends Backbone.Model
     uploadQueue = new PromiseQueue(5)
 
     seriesSaved = []
-    @imageSeries.each (series) =>
+    for series in @imageSeries.where(markedForUpload: true)
       series.set(patient_id: @get('patient').get('id'))
       return unless series.isNew()
       seriesSaved.push series.save()
 
     Promise.all(seriesSaved)
       .then (args) =>
-        @imageSeries.each (series) ->
+        for series in @imageSeries.where(markedForUpload: true)
           # A list of promises. When the whole series is uploaded, we
           # can assign the visit and the required series.
           seriesUploads = []

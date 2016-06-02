@@ -4,6 +4,7 @@
     %th Series Name
     %th Images
     %th Series Date
+    %th Upload?
     %th Assign Visit
     %th Required Series
     %th Status

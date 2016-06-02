@@ -6,6 +6,8 @@
   %td.image-count= @imageCount
   %td.datetime
     = JSON.stringify(@seriesDateTime)
+  %td.upload-flag
+    %input{ type: 'checkbox' }
   %td.visit
     %select.visit
       %option
