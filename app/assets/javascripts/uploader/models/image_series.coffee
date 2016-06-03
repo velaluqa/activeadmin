@@ -71,7 +71,6 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     return {
       id: @attributes.id,
       name: @attributes.name,
-      state: @attributes.state,
       patient_id: @attributes.patient_id,
       imaging_date: @attributes.seriesDateTime,
       series_number: @attributes.seriesNumber,
@@ -79,24 +78,34 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     }
 
   saveAsImported: ->
-    @save(state: 'imported')
+    request =
+      type: 'POST'
+      url: "/v1/image_series/#{@get('id')}/finish_import.json"
+      data:
+        expected_image_count: @images.size()
+      error: -> console.log 'assign required series failed', arguments
+      cache: false
+
+    $.ajax(request).then =>
+      @set state: 'imported'
 
   saveAssignedVisit: ->
-    @save
-      state: 'visit_assigned'
+    return unless @get('assignVisitId')?
+    attributes =
       visit_id: @get('assignVisitId')
+    @save(attributes, patch: true).then =>
+      @set state: 'visit_assigned'
 
   saveAssignedRequiredSeries: ->
-    $.ajax
+    return unless @get('assignRequiredSeries')?
+    return unless @get('assignRequiredSeries').length
+    request =
       type: 'POST'
       url: "/v1/image_series/#{@get('id')}/assign_required_series.json"
       data:
         required_series: @get('assignRequiredSeries')
-      beforeSend: ->
-      success: =>
-        @set
-          required_series: @get('assignRequiredSeries')
-          state: 'required_series_assigned'
-      error: ->
-        console.log 'assign required series failed', arguments
+      error: -> console.log 'assign required series failed', arguments
       cache: false
+
+    $.ajax(request).then =>
+      @set(state: 'required_series_assigned')
