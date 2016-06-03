@@ -4,7 +4,7 @@
 //= require reorder_case_list
 //= require reorder_visits
 
-//= require select2
+//= require vendor/select2.full
 //= require cases_advanced_filters
 //= require aa_advanced_filters
 //= require tree.jquery
