@@ -78,6 +78,42 @@ RSpec.describe V1::ImageSeriesController do
     end
   end
 
+  describe '#finish_import' do
+    before(:each) do
+      @image_series = create(:image_series, state: :importing)
+    end
+
+    describe 'without current user' do
+      let(:response) { post(:finish_import, id: @image_series.id, format: :json, expected_image_count: 0) }
+      it { expect(response).to have_http_status(:forbidden) }
+    end
+
+    describe 'for authorized image_series' do
+      login_user_with_abilities do
+        can :read, ImageSeries
+        can :upload, ImageSeries
+      end
+
+      it 'succeeds' do
+        response = post(:finish_import, id: @image_series.id, format: :json, expected_image_count: 0)
+        expect(response).to have_http_status(:ok)
+        @image_series.reload
+        expect(@image_series.state).to eq :imported
+      end
+    end
+
+    describe 'for unauthorized image_series' do
+      login_user_with_abilities do
+        can :read, ImageSeries
+      end
+
+      it 'denies access' do
+        response = post(:finish_import, id: @image_series.id, format: :json, expected_image_count: 0)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
+
   describe '#assign_required_series' do
     before(:each) do
       @visit = create(:visit)

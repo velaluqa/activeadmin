@@ -20,9 +20,10 @@ module V1
     end
 
     def update
-      authorize! :update, ImageSeries
-
       @series = ImageSeries.find(params[:id])
+
+      authorize! :update, @series
+
       @series.assign_attributes(image_series_params)
 
       respond_to do |format|
@@ -34,6 +35,26 @@ module V1
           end
         end
       end
+    end
+
+    def finish_import
+      @series = ImageSeries.find(params[:id])
+      authorize! :upload, ImageSeries
+
+      unless params[:expected_image_count]
+        render json: { errors: ["Parameter `expected_image_count` missing."] },
+               status: :bad_request
+        return
+      end
+
+      if expected_image_count != @series.images.count
+        render json: { errors: ["Could not finish import. Expected #{expected_image_count} images, server got #{@series.images.count}."] },
+               status: :conflict
+        return
+      end
+
+      @series.update_attribute(:state, :imported)
+      render json: {}, status: :ok
     end
 
     def assign_required_series
@@ -58,6 +79,12 @@ module V1
       params
         .require(:image_series)
         .permit(:name, :series_number, :patient_id, :imaging_date, :visit_id, :state)
+    end
+
+    def expected_image_count
+      params[:expected_image_count].to_i
+    rescue
+      -1
     end
   end
 end

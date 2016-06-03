@@ -64,6 +64,7 @@ StudyServer::Application.routes.draw do
     resources :images
     resources :image_series do
       member do
+        post :finish_import
         post :assign_required_series
       end
     end
