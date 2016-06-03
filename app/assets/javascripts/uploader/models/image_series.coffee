@@ -14,11 +14,46 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     state: 'importing'
 
   initialize: ->
+    @warnings = {}
     @images = new ImageUploader.Collections.Images()
     @updateImageCount()
-    @listenTo @images, 'add', @updateImageCount
-    @listenTo @images, 'remove', @updateImageCount
+    @listenTo @images, 'add remove', @updateImageCount
+    @listenTo @images, 'add remove', @updateWarnings
     @listenTo @images, 'change:state', @updateState
+    @listenTo @images, 'warnings', => @trigger('warnings')
+
+  updateWarnings: (image) ->
+    @trigger('warnings') if image.hasWarnings()
+
+  hasWarnings: ->
+    hasSeriesWarnings = not _.isEmpty(@warnings)
+    hasSeriesWarnings or @images.some (image) -> image.hasWarnings()
+
+  formatWarnings: ->
+    strings = _
+      .chain(@warnings)
+      .map (warnings, action) ->
+        return [] unless warnings?
+        _(warnings).map (warning) -> "#{action.capitalize()}: #{warning}"
+      .flatten()
+      .value()
+    imageWarnings = @images
+      .select (image) -> image.hasWarnings()
+      .length
+    if imageWarnings
+      strings.push("Warnings for #{imageWarnings} images")
+    strings
+
+  pushWarnings: (action, warnings) ->
+    warnings = Array.ensureArray(warnings)
+    @warnings[action] ?= []
+    for warning in warnings when warning not in @warnings[action]
+      @warnings[action].push(warning)
+    @trigger('warnings')
+
+  clearWarnings: (action) ->
+    delete @warnings[action]
+    @trigger('warnings')
 
   updateState: (image, state) =>
     count = @images.size()
@@ -77,13 +112,27 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       visit_id: @attributes.visit_id
     }
 
+  createWithPatientId: (patientId) ->
+    return unless @isNew()
+
+    @save { patient_id: patientId },
+      success: =>
+        @set state: 'importing'
+        @clearWarnings('create')
+      error: (_, response) =>
+        console.log response.responseJSON?.errors
+        @pushWarnings('create', response.responseJSON?.errors)
+
   saveAsImported: ->
     request =
       type: 'POST'
       url: "/v1/image_series/#{@get('id')}/finish_import.json"
       data:
         expected_image_count: @images.size()
-      error: -> console.log 'assign required series failed', arguments
+      success: =>
+        @clearWarnings('finish import')
+      error: (response) =>
+        @pushWarnings('finish import', response.responseJSON?.errors)
       cache: false
 
     $.ajax(request).then =>
@@ -92,9 +141,14 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
   saveAssignedVisit: ->
     return unless @get('assignVisitId')?
     attributes =
-      visit_id: @get('assignVisitId')
-    @save(attributes, patch: true).then =>
-      @set state: 'visit_assigned'
+
+    @save { visit_id: @get('assignVisitId') },
+      patch: true
+      success: =>
+        @set state: 'visit_assigned'
+        @clearWarnings('assign visit')
+      error: (_, response) =>
+        @pushWarnings('assign visit', response.responseJSON?.errors)
 
   saveAssignedRequiredSeries: ->
     return unless @get('assignRequiredSeries')?
@@ -104,7 +158,10 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       url: "/v1/image_series/#{@get('id')}/assign_required_series.json"
       data:
         required_series: @get('assignRequiredSeries')
-      error: -> console.log 'assign required series failed', arguments
+      success: =>
+        @clearWarnings('assign required series')
+      error: (response) =>
+        @pushWarnings('assign required series', response.responseJSON?.errors)
       cache: false
 
     $.ajax(request).then =>

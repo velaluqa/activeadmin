@@ -80,31 +80,34 @@ class ImageUploader.Models.App extends Backbone.Model
 
     seriesSaved = []
     for series in @imageSeries.where(markedForUpload: true)
-      series.set(patient_id: @get('patient').get('id'))
-      continue unless series.isNew()
-      seriesSaved.push series.save()
+      seriesSaved.push series.createWithPatientId(@get('patient').get('id'))
 
     Promise.all(seriesSaved)
       .then =>
-        for series in @imageSeries.where(markedForUpload: true)
-          # A list of promises. When the whole series is uploaded, we
-          # can assign the visit and the required series.
-          seriesUploads = []
-          series.images.each (image) ->
-            return if image.get('state') is 'uploaded'
-            seriesUploads.push uploadQueue.push -> image.upload()
+        seriesCompleted = for series in @imageSeries.where(markedForUpload: true)
+          do (series) ->
+            # A list of promises. When the whole series is uploaded, we
+            # can assign the visit and the required series.
+            seriesUploads = series.images.map (image) ->
+              return if image.get('state') is 'uploaded'
+              uploadQueue.push -> image.upload()
 
-          Promise.all(seriesUploads)
-            .then ->
-              return unless series.get('state') is 'importing'
-              series.saveAsImported()
-            .then ->
-              return unless series.get('state') is 'imported'
-              series.saveAssignedVisit()
-            .then ->
-              return unless series.get('state') is 'visit_assigned'
-              series.saveAssignedRequiredSeries()
-
-        uploadQueue.start()
-      .then ->
-        console.log 'all uploads done'
+            Promise.all(seriesUploads)
+              .then ->
+                return unless series.get('state') is 'importing'
+                series.saveAsImported()
+              .then ->
+                return unless series.get('state') is 'imported'
+                series.saveAssignedVisit()
+              .then ->
+                return unless series.get('state') is 'visit_assigned'
+                series.saveAssignedRequiredSeries()
+              .catch ->
+                # ignore warnings here
+        Promise.all([seriesCompleted..., uploadQueue.start()])
+      .then =>
+        someWarnings = @imageSeries.some (series) -> series.hasWarnings()
+        if someWarnings
+          alert('Something went wrong with the upload. Please check the error messages.')
+        else
+          alert('Upload complete!')

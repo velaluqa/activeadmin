@@ -19,5 +19,8 @@
       .label
       .progress{ style: "width: 0%" }
         .label
+  %td.warnings
+    %a{ tabindex: '0', role: 'button', 'data-toggle' => 'popover', 'data-trigger' => 'focus' }
+      %span.glyphicon.glyphicon-exclamation-sign
 %tr.images
-  %td{ colspan: 8 }
+  %td{ colspan: 9 }

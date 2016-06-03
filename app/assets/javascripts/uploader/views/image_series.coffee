@@ -2,12 +2,16 @@
 @ImageUploader.Views ?= {}
 class ImageUploader.Views.ImageSeries extends Backbone.View
   template: JST['uploader/templates/image_series']
+  warningsListTemplate: JST['uploader/templates/warnings_list']
+
   tagName: 'tbody'
   className: 'image-series'
 
   events:
     'click .select2': 'stopPropagation'
-    'click .upload-flag': 'markForUpload'
+    'click td.warnings': 'stopPropagation'
+    'click .upload-flag': 'stopPropagation'
+    'change .upload-flag input': 'markForUpload'
     'change select.visit': 'changeAssignedVisit'
     'change select.required-series': 'changeAssignedRequiredSeries'
     'click tr.image-series': 'toggleShowImages'
@@ -23,6 +27,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @listenTo @model, 'change:imageCount change:uploadState change:uploadProgress', @updateUploadState
     @listenTo @model, 'change:assignVisitId', @renderRequiredSeriesSelectbox
     @listenTo @model, 'change:markedForUpload', @renderMarkForUpload
+    @listenTo @model, 'warnings', @renderWarnings
 
     @listenTo ImageUploader.app, 'change:patient', @renderVisitsSelectbox
 
@@ -115,18 +120,26 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     options =
       placeholder: 'No required series assigned'
       data: @visits[visitId]?.required_series or []
-    @$requiredSeriesSelect ?= @$('select.required-series').select2(options)
     if @model.get('assignVisitId')?
       @$('select.required-series').prop('disabled', false).select2(options)
     else
       @$('select.required-series').val([]).trigger('change')
       @$('select.required-series').prop('disabled', true).select2(options)
 
+  renderWarnings: =>
+    @$('tr.image-series').toggleClass('has-warnings', @model.hasWarnings())
+
   render: =>
     @$el.html @template
       name: @model.get('name')
       imageCount: @model.get('imageCount')
       seriesDateTime: @model.get('seriesDateTime')
+
+    @$('tr.image-series > td.warnings > a[data-toggle=popover]').popover
+      placement: 'left'
+      html: true
+      content: =>
+        @warningsListTemplate(warnings: @model.formatWarnings())
 
     @updateUploadState()
 

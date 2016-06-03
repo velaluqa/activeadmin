@@ -3,4 +3,5 @@
     %th Filename
     %th Size
     %th Status
+    %th
   %tbody

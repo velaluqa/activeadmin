@@ -155,14 +155,13 @@
       tr.image-series {
 	color: #aaa;
 
-
 	&.marked-for-upload {
 	  color: #323537;
 	}
       }
 
       tr.image-series:hover {
-	background-color: #e4e4e4;
+	background-color: rgba(#000, 0.05);
       }
 
       tr.images {
@@ -196,13 +195,20 @@
 	display: none;
       }
 
-      td .arrow {
+      td > .arrow {
         width: 0;
         height: 0;
         border-style: solid;
         border-width: 5px 0 5px 5px;
         border-color: transparent transparent transparent #666;
 	margin: 4px;
+      }
+
+      td.warnings {
+        width: 1px;
+	padding: 10px 15px !important;
+
+	a { color: #dd3333; }
       }
 
       td.visit {
@@ -248,7 +254,7 @@
 	tr.images {
 	  display: table-row;
 	}
-	td .arrow {
+	td > .arrow {
 	  transform: rotate(90deg);
 	}
       }
@@ -256,6 +262,18 @@
 
     #drop-image-series {
       min-height: 300px;
+    }
+
+    td.warnings a {
+      display: none;
+    }
+    
+    tr.has-warnings {
+      background-color: rgba(#a00, 0.1);
+
+      &> td.warnings a {
+        display: block;
+      }
     }
   } 
 }
