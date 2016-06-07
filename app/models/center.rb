@@ -67,8 +67,6 @@ JOIN
       errors.add :base, 'You cannot delete a center which has patients associated.' 
       return false
     end
-
-    return true
   end
 
   before_save :ensure_study_is_unchanged
@@ -130,11 +128,9 @@ JOIN
   protected
   
   def ensure_study_is_unchanged
-    if(self.persisted? and self.study_id_changed?)
+    if persisted? && study_id_changed?
       errors[:study] << 'A center cannot be reassigned to a different study.'
       return false
     end
-
-    return true
   end
 end

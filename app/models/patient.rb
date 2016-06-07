@@ -65,13 +65,6 @@ INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
-  before_destroy do
-    unless cases.empty? and form_answers.empty?
-      errors.add :base, 'You cannot delete a patient which has cases or form answers associated.' 
-      return false
-    end
-  end
-
   before_save :ensure_study_is_unchanged
 
   def form_answers
