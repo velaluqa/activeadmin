@@ -146,11 +146,21 @@
       margin-top: 0;
     }
 
-    tbody.image-series {
-      td.collapsible { 
+    table.image-series {
+      th.collapsible, td.collapsible { 
 	width: 15px; 
 	padding-left: 15px;
       }
+
+      th.visit, td.visit {
+	width: 200px;
+	.select2 {
+	  min-width: 200px;
+	}
+      }
+    }
+
+    tbody.image-series {
 
       tr.image-series {
 	color: #aaa;
@@ -209,13 +219,6 @@
 	padding: 10px 15px !important;
 
 	a { color: #dd3333; }
-      }
-
-      td.visit {
-	width: 200px;
-	.select2 {
-	  min-width: 200px;
-	}
       }
 
       td.required-series {

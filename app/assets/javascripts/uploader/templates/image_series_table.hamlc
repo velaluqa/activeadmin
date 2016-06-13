@@ -1,11 +1,12 @@
-%table
+%table.image-series
   %tr
-    %th
-    %th Series Name
-    %th Images
-    %th Series Date
-    %th Upload?
-    %th Assign Visit
-    %th Required Series
-    %th Status
+    %th.collapsible
+    %th.name Series Name
+    %th.image-count Images
+    %th.datetime Series Date
+    %th.upload-flag Upload?
+    %th.visit
+      %select.mass-assign-visit
+    %th.required-series Required Series
+    %th.upload-state Status
     %th

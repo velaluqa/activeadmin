@@ -25,11 +25,13 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @listenTo @model, 'change:showImages', @showHideImages
     @listenTo @model, 'change:seriesDateTime', @updateDateTime
     @listenTo @model, 'change:imageCount change:uploadState change:uploadProgress', @updateUploadState
-    @listenTo @model, 'change:assignVisitId', @renderRequiredSeriesSelectbox
+    @listenTo @model, 'change:assignVisitId', @updateRequiredSeriesSelectbox
+    @listenTo @model, 'change:markedForUpload', @updateVisitsSelectbox
+    @listenTo @model, 'change:markedForUpload', @updateRequiredSeriesSelectbox
     @listenTo @model, 'change:markedForUpload', @renderMarkForUpload
     @listenTo @model, 'warnings', @renderWarnings
 
-    @listenTo ImageUploader.app, 'change:patient', @renderVisitsSelectbox
+    @listenTo ImageUploader.app, 'change:patient', @updateVisitsSelectbox
 
   updateImageCount: ->
     @$('.image-count').html(@model.get('imageCount'))
@@ -83,48 +85,67 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @renderVisitsSelectbox()
 
   renderVisitsSelectbox: =>
-    markedForUpload = @model.get('markedForUpload')
-    patientId = ImageUploader.app.get('patient')?.id
-    if patientId? and markedForUpload
-      @$('select.visit').select2
-        placeholder: 'No visit assigned'
-        allowClear: true
-        ajax:
-          cache: true
-          url: "/v1/patients/#{patientId}/visits.json"
-          processResults: (data, params) =>
-            @visits = {}
-            results = [{ id: 'create', text: 'Create New Visit' }]
-            results = results.concat _.map data, (visit) =>
-              @visits[visit.id] = visit
-              {
-                id: visit.id
-                text: "#{visit.visit_number} — #{visit.visit_type}"
-              }
-            return { results: results }
+    @$('select.visit').select2
+      placeholder: 'No visit assigned'
+      allowClear: true
+      ajax:
+        cache: true
+        url: ->
+          "/v1/patients/#{ImageUploader.app.get('patient')?.id}/visits.json"
+        processResults: (data, params) =>
+          @visits = {}
+          results = [{ id: 'create', text: 'Create New Visit' }]
+          results = results.concat _.map data, (visit) =>
+            @visits[visit.id] = visit
+            {
+              id: visit.id
+              text: "#{visit.visit_number} — #{visit.visit_type or 'no visit type'}"
+            }
+          return { results: results }
       @$('select.visit')
-        .prop('disabled', false)
-        .val('')
+        .prop('disabled', not @model.get('markedForUpload'))
         .trigger('change')
-    else
-      @$('select.visit')
-        .prop('disabled', true)
-        .val('')
-        .trigger('change')
-        .select2
-          placeholder: 'No visit assigned'
-          allowClear: true
+
+  updateVisitsSelectbox: (model) =>
+    changed = model.changedAttributes()
+
+    $select = @$('select.visit')
+    $select.prop('disabled', not @model.get('markedForUpload'))
+    $select.val('') if 'patient' of changed
+    $select.trigger('change')
+
+  massAssignVisit: (item) ->
+    @visits[item.id] = item.visit
+    option = new Option(item.text, item.id, true, true)
+    @$('select.visit').append(option)
+    @$('select.visit')
+      .val(item.id)
+      .trigger('change')
 
   renderRequiredSeriesSelectbox: =>
-    visitId = @model.get('assignVisitId')
-    options =
-      placeholder: 'No required series assigned'
-      data: @visits[visitId]?.required_series or []
-    if @model.get('assignVisitId')?
-      @$('select.required-series').prop('disabled', false).select2(options)
-    else
-      @$('select.required-series').val([]).trigger('change')
-      @$('select.required-series').prop('disabled', true).select2(options)
+    @$('select.required-series')
+      .select2
+        placeholder: 'No required series assigned'
+    @$('select.required-series')
+      .prop('disabled', not @model.get('markedForUpload') or not @model.get('assignVisitId')?)
+      .trigger('change')
+
+  updateRequiredSeriesSelectbox: (model) =>
+    changed = model.changedAttributes()
+
+    $select = @$('select.required-series')
+    if 'assignVisitId' of changed
+      if changed.assignVisitId?
+        $select.select2
+          placeholder: 'No required series assigned'
+          data: @visits[changed.assignVisitId]?.required_series or []
+      else
+        $select.select2
+          placeholder: 'No required series assigned'
+      $select.val([])
+
+    $select.prop('disabled', not @model.get('markedForUpload') or not @model.get('assignVisitId')?)
+    $select.trigger('change')
 
   renderWarnings: =>
     @$('tr.image-series').toggleClass('has-warnings', @model.hasWarnings())
