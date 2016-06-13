@@ -14,7 +14,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     'change .upload-flag input': 'markForUpload'
     'change select.visit': 'changeAssignedVisit'
     'change select.required-series': 'changeAssignedRequiredSeries'
-    'click tr.image-series': 'toggleShowImages'
+    'click tr.image-series': 'clickImageSeries'
 
   initialize: ->
     # Visits need to be saved temporarily so we can access the visit
@@ -51,9 +51,13 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
   stopPropagation: (e) ->
     e.stopPropagation()
 
-  toggleShowImages: (e) =>
-    return if $(e.target).hasClass('hasDatepicker')
-    @model.set(showImages: not @model.get('showImages'))
+  clickImageSeries: (e) =>
+    if e.ctrlKey
+      marked = @model.get('markedForUpload')
+      @model.set markedForUpload: not marked
+    else
+      return if $(e.target).hasClass('hasDatepicker')
+      @model.set(showImages: not @model.get('showImages'))
 
   markForUpload: (e) =>
     e.stopPropagation()
