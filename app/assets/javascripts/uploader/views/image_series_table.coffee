@@ -4,13 +4,26 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
   template: JST['uploader/templates/image_series_table']
 
   events:
+    'change input#mark-all-for-upload': 'markForUpload'
     'change select.mass-assign-visit': 'massAssignVisit'
 
   initialize: ->
     @subviews = {}
     @listenTo @model.imageSeries, 'add', @appendImageSeries
+    @listenTo @model.imageSeries, 'change:markedForUpload', @updateMarkForUpload
 
     @listenTo ImageUploader.app, 'change:patient', @updateVisitsSelectbox
+
+  updateMarkForUpload: =>
+    setTimeout =>
+      marked = @model.imageSeries.where(markedForUpload: true).length
+      @$('input#mark-all-for-upload').prop('checked', marked is @model.imageSeries.size())
+    , 0
+
+  markForUpload: (e) =>
+    checked = $(e.currentTarget).prop('checked')
+    for series in @model.imageSeries.models
+      series.set markedForUpload: checked
 
   massAssignVisit: (e) =>
     visitId = $(e.currentTarget).val()
@@ -45,6 +58,7 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
         id: massAssignVisitId
         text: @$('.mass-assign-visit').select2('data')[0].text
         visit: @visits[massAssignVisitId]
+    @updateMarkForUpload()
 
   updateVisitsSelectbox: =>
     @$('select.mass-assign-visit')

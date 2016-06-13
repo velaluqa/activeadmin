@@ -82,6 +82,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
   renderMarkForUpload: =>
     marked = @model.get('markedForUpload')
     @$('tr.image-series').toggleClass('marked-for-upload', marked)
+    @$('tr.image-series td.upload-flag input').prop('checked', marked)
     @renderVisitsSelectbox()
 
   renderVisitsSelectbox: =>

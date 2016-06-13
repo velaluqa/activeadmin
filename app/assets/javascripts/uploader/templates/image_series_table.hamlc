@@ -4,7 +4,9 @@
     %th.name Series Name
     %th.image-count Images
     %th.datetime Series Date
-    %th.upload-flag Upload?
+    %th.upload-flag
+      %input#mark-all-for-upload{ type: 'checkbox', name: 'mark-all-for-upload' }
+      %label{ for: 'mark-all-for-upload' } Upload?
     %th.visit
       %select.mass-assign-visit
     %th.required-series Required Series
