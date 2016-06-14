@@ -9,8 +9,10 @@
 //= require aa_advanced_filters
 //= require tree.jquery
 //= require aa_erica_keywords
+//= require vendor/underscore
 //= require extensions
 //= require vendor/polyfill_setAsap
 //= require vendor/polyfill_promise
 //= require vendor/naturalSort
 //= require shared/promise_queue
+//= require shared/user

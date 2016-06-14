@@ -1,0 +1,6 @@
+- if current_user
+  :coffeescript
+    @currentUser = new ILR.User(#{current_user.permission_matrix.to_json})
+- else
+  :coffeescript
+    @currentUser = null
