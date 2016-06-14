@@ -93,7 +93,8 @@ class User < ActiveRecord::Base
   end
   
   def can?(activity, subject)
-    Ability.new(self).can?(activity, subject)
+    @ability ||= Ability.new(self)
+    @ability.can?(activity, subject)
   end
   
   # hack to allow mongoid-history to store the modifier using an ActiveRecord model (this model)
