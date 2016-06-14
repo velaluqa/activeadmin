@@ -69,13 +69,13 @@ RSpec.describe Ability do
     end
 
     it 'denies updating an image' do
-      expect(@ability.can?(:update, Image)).to be_truthy
+      expect(@ability.can?(:update, Image)).to be_falsy
       expect(@ability.can?(:update, @image1)).to be_falsy
       expect(@ability.can?(:update, @image2)).to be_falsy
     end
 
     it 'denies non-authorized activity and subjects' do
-      expect(@ability.can?(:update, ImageSeries)).to be_truthy
+      expect(@ability.can?(:update, ImageSeries)).to be_falsy
       expect(@ability.can?(:update, @image_series1)).to be_falsy
       expect(@ability.can?(:update, @image_series2)).to be_falsy
     end
@@ -114,13 +114,13 @@ RSpec.describe Ability do
     end
 
     it 'denies updating an image' do
-      expect(@ability.can?(:update, Image)).to be_truthy
+      expect(@ability.can?(:update, Image)).to be_falsy
       expect(@ability.can?(:update, @image1)).to be_falsy
       expect(@ability.can?(:update, @image2)).to be_falsy
     end
 
     it 'denies non-authorized activity and subjects' do
-      expect(@ability.can?(:update, ImageSeries)).to be_truthy
+      expect(@ability.can?(:update, ImageSeries)).to be_falsy
       expect(@ability.can?(:update, @image_series1)).to be_falsy
       expect(@ability.can?(:update, @image_series2)).to be_falsy
     end
@@ -160,13 +160,13 @@ RSpec.describe Ability do
     end
 
     it 'denies updating an image' do
-      expect(@ability.can?(:update, Image)).to be_truthy
+      expect(@ability.can?(:update, Image)).to be_falsy
       expect(@ability.can?(:update, @image1)).to be_falsy
       expect(@ability.can?(:update, @image2)).to be_falsy
     end
 
     it 'denies non-authorized activity and subjects' do
-      expect(@ability.can?(:update, ImageSeries)).to be_truthy
+      expect(@ability.can?(:update, ImageSeries)).to be_falsy
       expect(@ability.can?(:update, @image_series1)).to be_falsy
       expect(@ability.can?(:update, @image_series2)).to be_falsy
     end
@@ -221,7 +221,7 @@ RSpec.describe Ability do
     end
 
     it 'denies non-authorized activity and subjects' do
-      expect(@ability.can?(:update, ImageSeries)).to be_truthy
+      expect(@ability.can?(:update, ImageSeries)).to be_falsy
       expect(@ability.can?(:update, @image_series1)).to be_falsy
       expect(@ability.can?(:update, @image_series2)).to be_falsy
     end

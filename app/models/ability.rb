@@ -61,6 +61,8 @@ class Ability
   end
 
   def define_scopable_ability(subject, activity)
+    return unless subject.granted_for(user: current_user, activity: activity).exists?
+
     can activity, subject do |subject_instance|
       subject
         .granted_for(user: current_user, activity: activity)
