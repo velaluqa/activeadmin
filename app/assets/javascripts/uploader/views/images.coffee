@@ -9,9 +9,15 @@ class ImageUploader.Views.Images extends Backbone.View
     @listenTo @collection, 'remove', @remove
 
   append: (image) =>
+    index = @collection.indexOf(image)
     @subviews[image.get('fileName')] = view = new ImageUploader.Views.Image
       model: image
-    @$tbody.append(view.render().el)
+
+    $previous = @$tbody.children().eq(index)
+    if $previous.length > 0
+      $previous.before(view.render().el)
+    else
+      @$tbody.append(view.render().el)
 
   remove: (image) =>
     @subviews[image.get('fileName')].remove()

@@ -98,9 +98,9 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       when 'uploaded'
         return "Uploaded (#{count})"
 
-  push: (image) ->
+  add: (image) ->
     image.series = this
-    @images.push(image)
+    @images.add(image)
 
   toJSON: (options = {}) ->
     return {

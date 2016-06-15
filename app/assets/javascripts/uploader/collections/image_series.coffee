@@ -23,4 +23,4 @@ class ImageUploader.Collections.ImageSeries extends Backbone.Collection
       series.set(seriesDateTime: image.get('seriesDateTime'))
     unless series.get('seriesNumber')?
       series.set(seriesNumber: image.get('seriesNumber'))
-    series.push(image)
+    series.add(image)
