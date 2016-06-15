@@ -7,8 +7,10 @@
     %th.upload-flag
       %input#mark-all-for-upload{ type: 'checkbox', name: 'mark-all-for-upload' }
       %label{ for: 'mark-all-for-upload' } Upload?
-    %th.visit
-      %select.mass-assign-visit
-    %th.required-series Required Series
+    - if currentUser.can('assign_visit', 'ImageSeries')
+      %th.visit
+        %select.mass-assign-visit
+    - if currentUser.can('assign_visit', 'ImageSeries') and currentUser.can('assign_required_series', 'Visit')
+      %th.required-series Required Series
     %th.upload-state Status
     %th

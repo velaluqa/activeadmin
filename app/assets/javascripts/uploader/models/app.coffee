@@ -97,9 +97,11 @@ class ImageUploader.Models.App extends Backbone.Model
                 return unless series.get('state') is 'importing'
                 series.saveAsImported()
               .then ->
+                return unless currentUser.can('assign_visit', 'ImageSeries')
                 return unless series.get('state') is 'imported'
                 series.saveAssignedVisit()
               .then ->
+                return unless currentUser.can('assign_visit', 'ImageSeries') and currentUser.can('assign_required_series', 'Visit')
                 return unless series.get('state') is 'visit_assigned'
                 series.saveAssignedRequiredSeries()
               .catch ->
