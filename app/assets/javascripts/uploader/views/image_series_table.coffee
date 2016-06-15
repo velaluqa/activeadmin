@@ -70,7 +70,7 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
   updateVisitsSelectbox: =>
     @$('select.mass-assign-visit')
       .val('')
-      .trigger('change')
+      .trigger('change.select2')
 
   renderVisitsSelectbox: ->
     @$('select.mass-assign-visit').select2
@@ -80,6 +80,8 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
         cache: true
         url: ->
           "/v1/patients/#{ImageUploader.app.get('patient')?.id}/visits.json"
+        data: (params) ->
+          return { filter: params.term }
         processResults: (data, params) =>
           @visits = {}
           results = [{ id: 'create', text: 'Create New Visit' }]
