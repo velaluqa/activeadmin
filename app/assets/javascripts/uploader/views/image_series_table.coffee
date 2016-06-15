@@ -48,9 +48,9 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
         view.massAssignVisit id: visitId
 
   appendImageSeries: (series) =>
-    name = series.get('name')
+    uid = series.get('instanceUid')
     index = @model.imageSeries.indexOf(series)
-    @subviews[name] = view = new ImageUploader.Views.ImageSeries
+    @subviews[uid] = view = new ImageUploader.Views.ImageSeries
       model: series
 
     $previous = @$table.children().eq(index)
