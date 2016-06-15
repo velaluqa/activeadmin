@@ -175,6 +175,7 @@
     tbody.image-series {
 
       tr.image-series {
+	cursor: pointer;
 	color: #aaa;
 
 	&.marked-for-upload {
