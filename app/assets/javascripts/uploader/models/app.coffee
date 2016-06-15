@@ -46,9 +46,23 @@ class ImageUploader.Models.App extends Backbone.Model
     @studies.fetch()
 
     @imageSeries = new ImageUploader.Collections.ImageSeries()
+    @listenTo @imageSeries, 'change:assignRequiredSeries change:assignVisitId', @validate
 
     @fileParser = new ImageUploader.Models.FileParser()
     @listenTo @fileParser, 'parsed', @imageSeries.addImage
+
+  validate: =>
+    for series in @imageSeries.models
+      warnings = []
+      allSeriesSameVisit = @imageSeries.where(assignVisitId: series.get('assignVisitId'))
+      for seriesSameVisit in allSeriesSameVisit when seriesSameVisit isnt series
+        intersection = _.intersection(series.get('assignRequiredSeries'), seriesSameVisit.get('assignRequiredSeries'))
+        if intersection.length > 0
+          warnings.push "Required series (#{intersection.join(', ')}) were assigned multiple times for the same visit."
+      if warnings.length
+        series.setWarnings('validation', warnings)
+      else
+        series.clearWarnings('validation')
 
   studySelected: (_, study) =>
     @set(center: null)
@@ -77,6 +91,9 @@ class ImageUploader.Models.App extends Backbone.Model
 
   startUpload: =>
     uploadQueue = new PromiseQueue(5)
+
+    if @imageSeries.some((series) -> series.hasWarnings('validation'))
+      return alert('Some image series have validation warnings. Please check them and try again.')
 
     seriesSaved = []
     for series in @imageSeries.where(markedForUpload: true)
