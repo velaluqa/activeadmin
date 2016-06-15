@@ -76,6 +76,18 @@ class Visit < ActiveRecord::Base
   before_save :ensure_study_is_unchanged
 
   include ImageStorageCallbacks
+
+  # TODO: Replace with a less naive full-text search index
+  scope :filter, lambda { |query|
+    return unless query
+
+    words = query.split(' ')
+    conditions = words.map { 'CONCAT(visit_number, visit_type) LIKE ?' }.join(' AND ')
+    terms = words.map { |word| "%#{word}%" }
+
+    where(conditions, *terms)
+  }
+
   def name
     if(patient.nil?)
       '#'+visit_number.to_s
