@@ -25,7 +25,9 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
   updateWarnings: (image) ->
     @trigger('warnings') if image.hasWarnings()
 
-  hasWarnings: ->
+  hasWarnings: (type) ->
+    if type?
+      return not _.isEmpty(@warnings[type])
     hasSeriesWarnings = not _.isEmpty(@warnings)
     hasSeriesWarnings or @images.some (image) -> image.hasWarnings()
 
