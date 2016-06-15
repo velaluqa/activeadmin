@@ -46,6 +46,10 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       strings.push("Warnings for #{imageWarnings} images")
     strings
 
+  setWarnings: (action, warnings) ->
+    @warnings[action] = Array.ensureArray(warnings)
+    @trigger('warnings')
+
   pushWarnings: (action, warnings) ->
     warnings = Array.ensureArray(warnings)
     @warnings[action] ?= []
