@@ -143,11 +143,11 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     $select = @$('select.required-series')
     if 'assignVisitId' of changed
       if changed.assignVisitId?
-        $select.select2
+        $select.html('').select2
           placeholder: 'No required series assigned'
           data: @visits[changed.assignVisitId]?.required_series or []
       else
-        $select.select2
+        $select.html('').select2
           placeholder: 'No required series assigned'
       $select.val([])
 
