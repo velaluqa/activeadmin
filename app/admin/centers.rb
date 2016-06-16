@@ -58,7 +58,7 @@ ActiveAdmin.register Center do
       f.input :code, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to problems in project management, because the code is used to identify centers across documents.' : '')
     end
 
-    f.buttons
+    f.actions
   end
 
   # filters
