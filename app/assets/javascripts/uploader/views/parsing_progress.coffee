@@ -12,6 +12,7 @@ class ImageUploader.Views.ParsingProgress extends Backbone.View
     @parser = @model.fileParser
 
     @listenTo @parser, 'change:state parsed', @renderParsingProgress
+    @listenTo ImageUploader.app, 'change:patient', @renderDisabled
 
   dragover: (e) ->
     e.stopPropagation()
@@ -44,6 +45,10 @@ class ImageUploader.Views.ParsingProgress extends Backbone.View
         @$el.toggleClass('parsing', true)
         @$('.progress-bar .label').html("Parsing #{parsedFiles} / #{totalFiles} files")
 
+  renderDisabled: =>
+    @$el.toggleClass('disabled', not ImageUploader.app.get('patient')?)
+
   render: ->
     @renderParsingProgress()
+    @renderDisabled()
     this

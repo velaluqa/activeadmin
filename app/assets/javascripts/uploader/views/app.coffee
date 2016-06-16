@@ -7,8 +7,13 @@ class ImageUploader.Views.App extends Backbone.View
   initialize: ->
     @subviews ?= {}
 
+    @listenTo ImageUploader.app, 'change:patient', @renderDisabled
+
   startUpload: =>
     @model.startUpload()
+
+  renderDisabled: =>
+    @$('button').prop('disabled', not ImageUploader.app.get('patient')?)
 
   render: =>
     @subviews.studySelect = view = new ImageUploader.Views.ResourceSelect
@@ -40,6 +45,10 @@ class ImageUploader.Views.App extends Backbone.View
     view.render()
 
     @subviews.imageSeries = view = new ImageUploader.Views.ImageSeriesTable
-      el: @$('#image-series .panel_contents')
+      el: @$('#image-series')
       model: @model
     view.render()
+
+    @renderDisabled()
+
+    this

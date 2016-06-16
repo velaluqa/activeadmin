@@ -13,6 +13,7 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
     @listenTo @model.imageSeries, 'change:markedForUpload', @updateMarkForUpload
 
     @listenTo ImageUploader.app, 'change:patient', @updateVisitsSelectbox
+    @listenTo ImageUploader.app, 'change:patient', @renderDisabled
 
   updateMarkForUpload: =>
     setTimeout =>
@@ -93,8 +94,13 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
             }
           return { results: results }
 
+  renderDisabled: =>
+    @$el.toggleClass('disabled', not ImageUploader.app.get('patient')?)
+
   render: =>
     @$el.html(@template())
+    @renderDisabled()
+
     @$table = @$('table')
 
     @model.imageSeries.each @appendImageSeries

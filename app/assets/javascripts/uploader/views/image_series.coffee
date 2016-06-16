@@ -179,4 +179,5 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
       collection: @model.images
     images.render()
 
+
     this
