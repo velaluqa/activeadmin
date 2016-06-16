@@ -93,7 +93,14 @@ class ImageUploader.Models.App extends Backbone.Model
 
   regroupParsedImage: (image) ->
     @parsingCollection.images.remove(image)
-    series = @findOrCreateImageSeries(image.get('seriesDescription'))
+    series = @findOrCreateImageSeries
+      name: image.get('seriesDescription')
+      instanceUid: image.get('seriesInstanceUid')
+    unless series.get('seriesDateTime')?
+      series.set(seriesDateTime: image.get('seriesDateTime'))
+    unless series.get('seriesNumber')?
+      series.set(seriesNumber: image.get('seriesNumber'))
+    image.series = series
     series.push(image)
 
   urlQuery: =>
