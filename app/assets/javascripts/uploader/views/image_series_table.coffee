@@ -49,9 +49,16 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
 
   appendImageSeries: (series) =>
     name = series.get('name')
+    index = @model.imageSeries.indexOf(series)
     @subviews[name] = view = new ImageUploader.Views.ImageSeries
       model: series
-    @$table.append(view.render().el)
+
+    $previous = @$table.children().eq(index)
+    if $previous.length > 0
+      $previous.after(view.render().el)
+    else
+      @$table.append(view.render().el)
+
     massAssignVisitId = @$('select.mass-assign-visit').val()
     if massAssignVisitId?
       view.massAssignVisit
