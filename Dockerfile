@@ -41,5 +41,8 @@ ADD Gemfile Gemfile.lock $APP_HOME/
 RUN gem install bundler && \
     bundle install --jobs 20 --retry 5
 
+# Allow other containers to use the app root (e.g. nginx container).
+VOLUME /app
+
 # Add the application code.
 COPY . /app
