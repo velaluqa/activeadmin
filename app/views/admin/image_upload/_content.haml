@@ -6,18 +6,12 @@
     Backbone.history.start()
 #image-upload
   .panel-columns
-    .panel#study-select
-      %h3 Select Study
-      %input.filter{ type: 'search', placeholder: 'Filter studies' }
-      .panel-contents
-    .panel#center-select
-      %h3 Select Center
-      %input.filter{ type: 'search', placeholder: 'Filter centers' }
-      .panel-contents
-    .panel#patient-select
-      %h3 Select Patient
-      %input.filter{ type: 'search', placeholder: 'Filter patients' }
-      .panel-contents
+    #study-select
+      %select
+    #center-select
+      %select
+    #patient-select
+      %select
   .panel#parse-images
     .hint.panel_contents
       Drag files or folders into your browser window

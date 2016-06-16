@@ -67,6 +67,7 @@ class ImageUploader.Models.App extends Backbone.Model
   studySelected: (_, study) =>
     @set(center: null)
     @centers.studyId = @get('study').id
+    @centers.reset()
     @centers.fetch()
     history.pushState({}, '', @urlQuery())
 
@@ -74,6 +75,7 @@ class ImageUploader.Models.App extends Backbone.Model
     @set(patient: null)
     if center?
       @patients.centerId = center.id
+      @patients.reset([])
       @patients.fetch()
     else
       @patients.reset([])

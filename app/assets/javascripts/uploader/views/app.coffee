@@ -23,6 +23,7 @@ class ImageUploader.Views.App extends Backbone.View
       model: @model
       selectableAttribute: 'center'
       selectableCollection: 'centers'
+      dependentAttribute: 'study'
     view.render()
 
     @subviews.patientSelect = view = new ImageUploader.Views.ResourceSelect
@@ -30,6 +31,7 @@ class ImageUploader.Views.App extends Backbone.View
       model: @model
       selectableAttribute: 'patient'
       selectableCollection: 'patients'
+      dependentAttribute: 'center'
     view.render()
 
     @subviews.parsingProgress = view = new ImageUploader.Views.ParsingProgress
