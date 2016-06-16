@@ -123,6 +123,10 @@ class ImageUploader.Models.App extends Backbone.Model
                 return unless currentUser.can('assign_visit', 'ImageSeries') and currentUser.can('assign_required_series', 'Visit')
                 return unless series.get('state') is 'visit_assigned'
                 series.saveAssignedRequiredSeries()
+              .then ->
+                series.set
+                  markedForUpload: false
+                  disabled: true
               .catch ->
                 # ignore warnings here
         Promise.all([seriesCompleted..., uploadQueue.start()])

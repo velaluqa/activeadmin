@@ -30,6 +30,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @listenTo @model, 'change:markedForUpload', @updateRequiredSeriesSelectbox
     @listenTo @model, 'change:markedForUpload', @renderMarkForUpload
     @listenTo @model, 'warnings', @renderWarnings
+    @listenTo @model, 'change:disabled', @renderDisabled
 
     @listenTo ImageUploader.app, 'change:patient', @updateVisitsSelectbox
 
@@ -53,6 +54,8 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
 
   clickImageSeries: (e) =>
     if e.ctrlKey
+      return if @model.get('disabled')
+
       marked = @model.get('markedForUpload')
       @model.set markedForUpload: not marked
     else
@@ -122,6 +125,8 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     $select.trigger('change')
 
   massAssignVisit: (item) ->
+    return if @model.get('disabled')
+
     @visits[item.id] = item.visit
     option = new Option(item.text, item.id, true, true)
     @$('select.visit').append(option)
@@ -156,6 +161,9 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
 
   renderWarnings: =>
     @$('tr.image-series').toggleClass('has-warnings', @model.hasWarnings())
+
+  renderDisabled: ->
+    @$('tr.image-series td.upload-flag input').prop('disabled', @model.get('disabled'))
 
   render: =>
     @$el.html @template

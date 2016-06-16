@@ -12,6 +12,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     uploadState: 'parsed'
     uploadProgress: 20
     state: 'importing'
+    disabled: false
 
   initialize: ->
     @warnings = {}

@@ -24,6 +24,7 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
   markForUpload: (e) =>
     checked = $(e.currentTarget).prop('checked')
     for series in @model.imageSeries.models
+      continue if series.get('disabled')
       series.set markedForUpload: checked
 
   massAssignVisit: (e) =>
