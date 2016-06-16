@@ -4,10 +4,6 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
   template: JST['uploader/templates/image_series_table']
 
   initialize: ->
-    dropzone = document.getElementById('drop-image-series')
-    dropzone.addEventListener 'dragover', @dragover, false
-    dropzone.addEventListener 'drop', @drop, false
-
     @subviews = {}
     @listenTo @model.imageSeries, 'add', @appendImageSeries
 
@@ -17,22 +13,10 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
       model: series
     @$table.append(view.render().el)
 
-  dragover: (e) ->
-    e.stopPropagation()
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'copy'
-
-  drop: (e) =>
-    e.stopPropagation()
-    e.preventDefault()
-    entries = (item.webkitGetAsEntry() for item in e.dataTransfer.items)
-    @model.addFsEntries(entries)
-
   render: =>
     @$el.html(@template())
     @$table = @$('table')
 
-    @appendImageSeries(@model.parsingCollection)
     @model.imageSeries.each @appendImageSeries
 
     this

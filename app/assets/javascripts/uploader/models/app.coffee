@@ -46,8 +46,9 @@ class ImageUploader.Models.App extends Backbone.Model
     @studies.fetch()
 
     @imageSeries = new ImageUploader.Collections.ImageSeries()
-    @parsingCollection = new ImageUploader.Models.ImageSeries(name: 'Parsing')
-    @listenTo @parsingCollection.images, 'change:state', @regroupParsedImage
+
+    @fileParser = new ImageUploader.Models.FileParser()
+    @listenTo @fileParser, 'parsed', @imageSeries.addImage
 
   studySelected: (_, study) =>
     @set(center: null)
@@ -66,43 +67,6 @@ class ImageUploader.Models.App extends Backbone.Model
 
   patientSelected: =>
     history.pushState({}, '', @urlQuery())
-
-  addFsEntries: (entries) =>
-    for entry in entries
-      @addFile(entry) if entry.isFile
-      @addDirectory(entry) if entry.isDirectory
-
-  addFile: (entry) =>
-    return if entry.fullPath.endsWith('DICOMDIR')
-
-    image = new ImageUploader.Models.Image
-      fileName: entry.fullPath
-      fsName: entry.filesystem.name
-    @parsingCollection.push(image)
-    entry.file (file) -> image.parse(file)
-
-  addDirectory: (entry) ->
-    dirReader = entry.createReader()
-    dirReader.readEntries @addFsEntries
-
-  findOrCreateImageSeries: (name) ->
-    series = @imageSeries.findWhere(name: name)
-    return series if series?
-
-    series = new ImageUploader.Models.ImageSeries(name: name)
-    @imageSeries.push(series)
-    series
-
-  regroupParsedImage: (image) ->
-    @parsingCollection.images.remove(image)
-    series = @findOrCreateImageSeries
-      name: image.get('seriesDescription')
-      instanceUid: image.get('seriesInstanceUid')
-    unless series.get('seriesDateTime')?
-      series.set(seriesDateTime: image.get('seriesDateTime'))
-    unless series.get('seriesNumber')?
-      series.set(seriesNumber: image.get('seriesNumber'))
-    series.push(image)
 
   urlQuery: =>
     query = []

@@ -29,6 +29,66 @@
   align-items: stretch;
   flex-direction: column;
 
+  .progress-bar {
+    position: relative;
+    width: 200px;
+    height: 28px;
+    background-color: #f5f5f5;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    border-radius: 4px;
+    overflow: hidden;
+    
+    .label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      line-height: 28px;
+      height: 28px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .progress {
+      position: relative;
+      height: 28px;
+      overflow: hidden;
+      -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+      -webkit-transition: width .6s ease;
+      -o-transition: width .6s ease;
+      transition: width .6s ease;
+
+      background-image: -webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+      background-image: -o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+      background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+      -webkit-background-size: 40px 40px;
+      background-size: 40px 40px;
+
+      .label {
+	color: #ffffff;
+	text-shadow: 1px 1px #444;
+      }
+    }
+
+    &.parsed .progress {
+      background-color: #4488aa;
+    }
+    
+    &.uploading .progress {
+      background-color: #4488aa;
+
+      -webkit-animation: progress-bar-stripes 2s linear infinite;
+      -o-animation: progress-bar-stripes 2s linear infinite;
+      animation: progress-bar-stripes 2s linear infinite;
+    }
+
+    &.uploaded .progress {
+      background-color: #44aa44;
+    }
+  }
+
   .panel-columns {
     display: flex;
     justify-content: space-between;
@@ -172,66 +232,6 @@
       td.upload-state {
 	width: 200px;
 	padding-right: 10px;
-
-	.progress-bar {
-	  position: relative;
-	  width: 200px;
-	  height: 28px;
-	  background-color: #f5f5f5;
-	  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
-	  box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
-	  border-radius: 4px;
-	  overflow: hidden;
-	  
-	  .label {
-	    position: absolute;
-	    top: 0;
-	    left: 0;
-	    width: 200px;
-	    line-height: 28px;
-	    height: 28px;
-	    text-align: center;
-	    font-weight: bold;
-	  }
-
-	  .progress {
-	    position: relative;
-            height: 28px;
-	    overflow: hidden;
-            -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
-            box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
-            -webkit-transition: width .6s ease;
-            -o-transition: width .6s ease;
-            transition: width .6s ease;
-
-            background-image: -webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
-            background-image: -o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
-            background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
-            -webkit-background-size: 40px 40px;
-            background-size: 40px 40px;
-
-	    .label {
-	      color: #ffffff;
-	      text-shadow: 1px 1px #444;
-	    }
-	  }
-
-	  &.parsed .progress {
-	    background-color: #4488aa;
-	  }
-	  
-	  &.uploading .progress {
-	    background-color: #4488aa;
-
-            -webkit-animation: progress-bar-stripes 2s linear infinite;
-            -o-animation: progress-bar-stripes 2s linear infinite;
-            animation: progress-bar-stripes 2s linear infinite;
-	  }
-
-	  &.uploaded .progress {
-	    background-color: #44aa44;
-	  }
-	}
       }
 
       &.show-images {
@@ -250,4 +250,51 @@
       min-height: 300px;
     }
   } 
+}
+
+#parse-images {
+  padding: 20px;
+  font-size: 14px;
+
+  .panel_contents {
+    padding: 0px;
+    text-align: center;
+  }
+  
+  #drop-image-series {
+  }
+  
+  .progress-container {
+    display: none;
+
+    .progress-bar {
+      display: inline-block;
+    }
+
+    .progress-bar .progress {
+      background-color: #448844;
+    }
+
+    .progress-bar, .progress-bar .label {
+      width: 400px;
+    }
+  }
+  
+  &.parsing {
+    .hint {
+      display: none;
+    }
+
+    .progress-container {
+      display: block;
+
+      .progress-bar .progress {
+	background-color: #4488aa;
+
+	-webkit-animation: progress-bar-stripes 2s linear infinite;
+	-o-animation: progress-bar-stripes 2s linear infinite;
+	animation: progress-bar-stripes 2s linear infinite;
+      }
+    }
+  }
 }

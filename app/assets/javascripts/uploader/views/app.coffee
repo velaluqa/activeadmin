@@ -32,6 +32,11 @@ class ImageUploader.Views.App extends Backbone.View
       selectableCollection: 'patients'
     view.render()
 
+    @subviews.parsingProgress = view = new ImageUploader.Views.ParsingProgress
+      el: @$('#parse-images')
+      model: @model
+    view.render()
+
     @subviews.imageSeries = view = new ImageUploader.Views.ImageSeriesTable
       el: @$('#image-series .panel_contents')
       model: @model

@@ -65,13 +65,14 @@ class ImageUploader.Models.Image extends Backbone.Model
     reader.readAsArrayBuffer(file)
 
   parseDateTime: (date, time, timeZone) ->
+    return null unless date?
     year = parseInt(date[0..3], 10)
     month = parseInt(date[4..5], 10) - 1
     day = parseInt(date[6..7], 10)
-    hours = parseInt(time[0..1], 10)
-    minutes = parseInt(time[2..3], 10)
-    seconds = parseInt(time[4..5], 10)
-    milliseconds = parseInt(time[7..9].paddingRight('000'), 10)
+    hours = if time? then parseInt(time[0..1], 10) else '0'
+    minutes = if time? then parseInt(time[2..3], 10) else '0'
+    seconds = if time? then parseInt(time[4..5], 10) else '0'
+    milliseconds = if time? then parseInt(time[7..9].paddingRight('000'), 10) else '000'
     new Date(Date.UTC(year, month, day, hours, minutes, seconds, milliseconds))
 
   @parse: (file) ->
