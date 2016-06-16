@@ -9,3 +9,4 @@
 //= require aa_advanced_filters
 //= require tree.jquery
 //= require aa_erica_keywords
+//= require extensions
