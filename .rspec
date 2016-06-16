@@ -1,1 +1,1 @@
---colour --format progress --tag ~slow
+--colour --format progress --tag ~slow -r turnip/rspec

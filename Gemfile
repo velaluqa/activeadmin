@@ -200,17 +200,15 @@ group :development, :test do
 
   gem 'spring'
   gem 'spring-commands-rspec'
-  gem 'spring-commands-cucumber'
 
   gem 'rspec', '~> 3.4.0'
   gem 'rspec-mocks', '~> 3.4.1'
   gem 'rspec-rails', '~> 3.4.2'
 
-  gem 'cucumber', require: false
-  gem 'cucumber-rails', require: false
+  gem 'turnip'
+  gem 'gherkin', '~> 2.5'
 
   gem 'guard', '~> 2.13.0'
-  gem 'guard-cucumber'
   gem 'guard-rspec'
 
   gem 'test-unit'

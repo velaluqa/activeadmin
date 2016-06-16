@@ -1,13 +1,15 @@
 ignore %r{^data/}, %r{^spec/data}
-directories %w(app config lib spec features)
+directories %w(app config lib spec)
 
 guard 'rspec', cmd: 'spring rspec -r spec_helper' do
-  watch(/^spec\/.+_spec\.rb$/)
-  watch(%r{^spec\/factories\/.+\.rb$}) { 'spec' }
-  watch(/^lib\/(.+)\.rb$/) { |m| "spec/lib/#{m[1]}_spec.rb" }
+  watch(%r{^spec/.+_spec\.rb$})
+  watch(%r{^spec/features\/.+.feature$})
+  watch(%r{^spec/features/steps/(.+)_steps.rb$}) { |m| "spec/features/#{m[1]}.feature" }
+  watch(%r{^spec/factories/.+\.rb$}) { 'spec' }
+  watch(%r{^lib/(.+)\.rb$}) { |m| "spec/lib/#{m[1]}_spec.rb" }
   watch('spec/spec_helper.rb') { 'spec' }
-  watch(/^app\/(.+)\.rb$/) { |m| "spec/#{m[1]}_spec.rb" }
-  watch(/^app\/(.*)(\.erb|\.slim|\.haml)$/) do |m|
+  watch(%r{^app/(.+)\.rb$}) { |m| "spec/#{m[1]}_spec.rb" }
+  watch(%r{^app/(.*)(\.erb|\.slim|\.haml)$}) do |m|
     "spec/#{m[1]}#{m[2]}_spec.rb"
   end
   watch(%r{^app/controllers/(.+)_(controller)\.rb$}) do |m|
@@ -24,12 +26,3 @@ guard 'rspec', cmd: 'spring rspec -r spec_helper' do
     "spec/features/#{m[1]}_spec.rb"
   end
 end
-
-# TODO: Add feature tests again, when we have some feature test
-# guard 'cucumber', command_prefix: 'spring', bundler: false do
-#   watch(%r{^features/.+\.feature$})
-#   watch(%r{^features/support/.+$}) { 'features' }
-#   watch(%r{^features/step_definitions/(.+)_steps\.rb$}) do |m|
-#     Dir[File.join("**/#{m[1]}.feature")][0] || 'features'
-#   end
-# end

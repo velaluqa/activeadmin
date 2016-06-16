@@ -3,6 +3,10 @@ if ENV['COVERAGE']
   SimpleCov.command_name 'RSpec'
 end
 
+require 'turnip'
+require 'turnip/capybara'
+Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
+
 require 'yarjuf'
 
 require 'webmock/rspec'
