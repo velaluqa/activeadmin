@@ -1,15 +1,15 @@
 postgres:
-  container_name: erica_postgres
+  container_name: erica_postgres_production
   image: postgres
   ports:
     - 5432:5432
 redis:
-  container_name: erica_redis
+  container_name: erica_redis_production
   image: redis
   ports:
     - 6379:6379
 app:
-  container_name: erica
+  container_name: erica_app_production
   image: erica:latest
   command: bundle exec unicorn -p 3000
   environment:
