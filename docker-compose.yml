@@ -6,38 +6,47 @@ redis:
   image: redis
   ports:
     - 6379:6379
-dev:
-  build: .
-  command: rails s -b 0.0.0.0
+app:
+  build: &build .
+  command: rails s -b 0.0.0.0 -p 3000
   tty: true
-  volumes:
+  volumes: &volumes
     - .:/app
     - ./config/database.yml.dev:/app/config/database.yml
     - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
   ports:
     - 3000:3000
-  environment:
+  environment: &environment
     DB_USERNAME: postgres
     DB_PASSWORD:
     TRUSTED_IP: 172.18.0.1
-  links:
+  links: &links
     - postgres
     - redis
 test:
-  build: .
+  build: *build
   command: guard
   tty: true
-  volumes:
-    - .:/app
-    - ./config/database.yml.dev:/app/config/database.yml
-    - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
-  ports:
-    - 3000:3000
+  volumes: *volumes
   environment:
+    <<: *environment
     RAILS_ENV: test
-    DB_USERNAME: postgres
-    DB_PASSWORD:
-    TRUSTED_IP: 172.18.0.1
+  links: *links
+worker:
+  build: *build
+  command: bundle exec sidekiq
+  volumes: *volumes
+  environment: *environment
+  links: *links
+https:
+  image: nginx
+  ports:
+    - 443:443
+    - 80:80
+  volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf
+    - ./erica.conf:/etc/nginx/conf.d/default.conf
+  volumes_from:
+    - app:rw
   links:
-    - postgres
-    - redis
+    - app
