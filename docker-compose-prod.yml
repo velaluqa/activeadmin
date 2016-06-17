@@ -38,8 +38,8 @@ https:
     - 443:443
     - 80:80
   volumes:
-    - ./nginx.conf:/etc/nginx/nginx.conf
-    - ./erica.conf:/etc/nginx/conf.d/default.conf
+    - ./config/nginx.conf:/etc/nginx/nginx.conf
+    - ./config/nginx_erica.conf:/etc/nginx/conf.d/default.conf
   volumes_from:
     - app:rw
   links:
