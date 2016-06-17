@@ -10,12 +10,12 @@ redis:
     - 6379:6379
 app:
   container_name: erica
-  build: .
-  command: bundle exec unicorn -p 80
+  image: erica:latest
+  command: bundle exec unicorn -p 3000
   environment:
     RAILS_ENV: production
   ports:
-    - 80:80
+    - 3000
   volumes:
     - ./config/database.yml:/app/config/database.yml
     - ./data:/app/data
@@ -24,3 +24,16 @@ app:
   links:
     - postgres
     - redis
+https:
+  container_name: erica_https_production
+  image: nginx
+  ports:
+    - 443:443
+    - 80:80
+  volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf
+    - ./erica.conf:/etc/nginx/conf.d/default.conf
+  volumes_from:
+    - app:rw
+  links:
+    - app
