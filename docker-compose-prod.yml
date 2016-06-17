@@ -10,20 +10,27 @@ redis:
     - 6379:6379
 app:
   container_name: erica_app_production
-  image: erica:latest
+  image: &app_image erica:latest
   command: bundle exec unicorn -p 3000
-  environment:
+  environment: &environment
     RAILS_ENV: production
   ports:
     - 3000
-  volumes:
+  volumes: &volumes
     - ./config/database.yml:/app/config/database.yml
     - ./data:/app/data
     - ./log:/app/log
     - ./tmp:/app/tmp
-  links:
+  links: &links
     - postgres
     - redis
+worker:
+  container_name: erica_sidekiq_production
+  image: *app_image
+  command: bundle exec sidekiq
+  environment: *environment
+  volumes: *volumes
+  links: *links
 https:
   container_name: erica_https_production
   image: nginx
