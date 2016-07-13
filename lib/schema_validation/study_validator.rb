@@ -28,7 +28,7 @@ module SchemaValidation
           begin
             Dentaku(value['expected'], {:x => 0})
           rescue Exception => e
-            errors << Kwalify::ValidationError.new('\'expected\' contains an invalid formula: '+e.message, path)
+            errors << Kwalify::ValidationError.new("'expected' with value '#{value['expected']}' contains an invalid formula: #{e.message}", path)
           end
         end
       when 'image_series_property'
