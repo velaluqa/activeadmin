@@ -77,6 +77,18 @@ JOIN
     File.readable?(Rails.application.config.image_storage_root + '/' + image_storage_path)
   end
 
+  ##
+  # Writes the given contents to the image file specified by its
+  # `absolute_image_storage_path`.
+  #
+  # @param [String] contents The content to write to the file (e.g.
+  #                          return value of a previous `IO.read`)
+  def write_file(contents)
+    File.open(absolute_image_storage_path, 'wb') do |file|
+      file.write(contents)
+    end
+  end
+
   def dicom_metadata
     dicom_metadata_doc = self.dicom_metadata_xml
 

@@ -12,14 +12,14 @@ RSpec.describe Image do
     it 'handles create' do
       expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image = create(:image, id: 1, image_series: @image_series)
-      image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      image.write_file(File.read('spec/files/test.dicom'))
       expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
     end
 
     it 'handles update' do
       expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image = create(:image, id: 1, image_series: @image_series)
-      image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      image.write_file(File.read('spec/files/test.dicom'))
       expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image.image_series_id = 2
       image.save
@@ -30,7 +30,7 @@ RSpec.describe Image do
     it 'handles destroy' do
       expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image = create(:image, id: 1, image_series: @image_series)
-      image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      image.write_file(File.read('spec/files/test.dicom'))
       expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image.destroy
       expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
