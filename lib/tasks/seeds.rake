@@ -20,6 +20,7 @@ namespace :erica do
       user.password_changed_at = nil
       user.password = 'change'
       user.password_confirmation = 'change'
+      user.confirmed_at = DateTime.now
       user.save!
     end
 
