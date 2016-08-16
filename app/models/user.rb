@@ -8,6 +8,9 @@ require 'email_validator'
 # Name                          | Type               | Attributes
 # ----------------------------- | ------------------ | ---------------------------
 # **`authentication_token`**    | `string`           |
+# **`confirmation_sent_at`**    | `datetime`         |
+# **`confirmation_token`**      | `string`           |
+# **`confirmed_at`**            | `datetime`         |
 # **`created_at`**              | `datetime`         |
 # **`current_sign_in_at`**      | `datetime`         |
 # **`current_sign_in_ip`**      | `string`           |
@@ -27,6 +30,7 @@ require 'email_validator'
 # **`reset_password_sent_at`**  | `datetime`         |
 # **`reset_password_token`**    | `string`           |
 # **`sign_in_count`**           | `integer`          | `default(0)`
+# **`unconfirmed_email`**       | `string`           |
 # **`unlock_token`**            | `string`           |
 # **`updated_at`**              | `datetime`         |
 # **`username`**                | `string`           |
@@ -46,7 +50,7 @@ class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable,
+  devise :database_authenticatable, :confirmable,
          :recoverable, :rememberable, :trackable, :lockable,
          :token_authenticatable
 
