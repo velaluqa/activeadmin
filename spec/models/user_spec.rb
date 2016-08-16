@@ -1,4 +1,15 @@
 RSpec.describe User do
+  it 'validates the email address' do
+    user = build(:user, email: nil)
+    expect(user).to_not be_valid
+    user = build(:user, email: '')
+    expect(user).to_not be_valid
+    user = build(:user, email: 'foo@bar')
+    expect(user).to_not be_valid
+    user = build(:user, email: 'foo@bar.berlin')
+    expect(user).to be_valid
+  end
+
   describe 'given signature_password' do
     before(:each) do
       @user = create(:user, signature_password: 'somepass')

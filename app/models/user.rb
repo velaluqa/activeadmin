@@ -1,3 +1,4 @@
+require 'email_validator'
 # ## Schema Information
 #
 # Table name: `users`
@@ -50,7 +51,7 @@ class User < ActiveRecord::Base
          :token_authenticatable
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :username, :name, :password, :password_confirmation
+  attr_accessible :username, :name, :email, :password, :password_confirmation
   attr_accessible :remember_me, :public_key, :private_key
   attr_accessible :password_changed_at
 
@@ -60,6 +61,7 @@ class User < ActiveRecord::Base
   
   validates :username, :uniqueness => true, :presence => true
   validates :name, :uniqueness => true, :presence => true
+  validates :email, :uniqueness => true, :presence => true, :email => true
   validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :create
   validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :update, allow_blank: true
   validates :signature_password, :confirmation => true, :length => { :minimum => 6 }, on: :create, allow_blank: true
