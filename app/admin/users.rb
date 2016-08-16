@@ -20,6 +20,9 @@ ActiveAdmin.register User do
       link_to user.name, admin_user_path(user)
     end
     column :username
+    column :email do |user|
+      user.email || '-'
+    end
     column :key_pair do |user|
       if(user.public_key.nil? or user.private_key.nil?)
         status_tag("Missing", :error)
@@ -44,6 +47,7 @@ ActiveAdmin.register User do
     attributes_table do
       row :name
       row :username
+      row :email
       row :sign_in_count
       row :currently_signed_in do
         if(user.current_sign_in_at.nil?)
@@ -94,6 +98,7 @@ ActiveAdmin.register User do
     inputs 'User Information' do
       input :username
       input :name
+      input :email
       if object.new_record? || can?(:change_password, object)
         input :password, :required => object.new_record?
         input :password_confirmation
