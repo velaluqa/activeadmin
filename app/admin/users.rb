@@ -37,6 +37,13 @@ ActiveAdmin.register User do
         status_tag('Unlocked', :ok)
       end
     end
+    column :confirmed do |user|
+      if user.confirmed?
+        status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", :ok)
+      else
+        status_tag('Unconfirmed', :error)
+      end
+    end
     column 'Roles' do |user|
       link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
     end
@@ -69,6 +76,13 @@ ActiveAdmin.register User do
           status_tag("Locked at #{pretty_format(user.locked_at)}", :error)
         else
           status_tag('Unlocked', :ok)
+        end
+      end
+      row :confirmed do
+        if user.confirmed?
+          status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", :ok)
+        else
+          status_tag('Unconfirmed', :error)
         end
       end
       row :public_key do
