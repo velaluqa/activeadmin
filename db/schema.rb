@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160816091507) do
+ActiveRecord::Schema.define(version: 20160817124905) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -125,6 +125,52 @@ ActiveRecord::Schema.define(version: 20160816091507) do
   end
 
   add_index "images", ["image_series_id"], name: "index_images_on_image_series_id", using: :btree
+
+  create_table "notification_profiles", force: :cascade do |t|
+    t.string   "title",                                      null: false
+    t.text     "description"
+    t.string   "notification_type"
+    t.string   "triggering_action",          default: "all", null: false
+    t.string   "triggering_resource",                        null: false
+    t.jsonb    "triggering_changes",         default: {},    null: false
+    t.jsonb    "filters",                    default: {},    null: false
+    t.boolean  "only_authorized_recipients", default: true,  null: false
+    t.boolean  "is_active",                  default: false, null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+  end
+
+  create_table "notification_profiles_roles", id: false, force: :cascade do |t|
+    t.integer "notification_profile_id", null: false
+    t.integer "role_id",                 null: false
+  end
+
+  add_index "notification_profiles_roles", ["notification_profile_id", "role_id"], name: "index_notification_profiles_roles_join_table_index", unique: true, using: :btree
+  add_index "notification_profiles_roles", ["role_id"], name: "index_notification_profiles_roles_on_role_id", using: :btree
+
+  create_table "notification_profiles_users", id: false, force: :cascade do |t|
+    t.integer "notification_profile_id", null: false
+    t.integer "user_id",                 null: false
+  end
+
+  add_index "notification_profiles_users", ["notification_profile_id", "user_id"], name: "index_notification_profiles_users_join_table_index", unique: true, using: :btree
+  add_index "notification_profiles_users", ["user_id"], name: "index_notification_profiles_users_on_user_id", using: :btree
+
+  create_table "notifications", force: :cascade do |t|
+    t.integer  "notification_profile_id", null: false
+    t.integer  "resource_id",             null: false
+    t.string   "resource_type",           null: false
+    t.integer  "version_id"
+    t.integer  "user_id",                 null: false
+    t.datetime "email_sent_at"
+    t.datetime "marked_seen_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "notifications", ["resource_type", "resource_id"], name: "index_notifications_on_resource_type_and_resource_id", using: :btree
+  add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree
+  add_index "notifications", ["version_id"], name: "index_notifications_on_version_id", using: :btree
 
   create_table "patients", force: :cascade do |t|
     t.string   "subject_id"
