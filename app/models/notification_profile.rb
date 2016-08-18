@@ -23,4 +23,12 @@
 # **`updated_at`**                  | `datetime`         | `not null`
 #
 class NotificationProfile < ActiveRecord::Base
+  def self.triggered_by(action, record, changes)
+
+
+  end
+
+  def trigger(action, resource)
+
+  end
 end
