@@ -209,6 +209,7 @@ group :development, :test do
   gem 'rspec', '~> 3.4.0'
   gem 'rspec-mocks', '~> 3.4.1'
   gem 'rspec-rails', '~> 3.4.2'
+  gem 'with_model', '~> 1.2.1'
 
   gem 'turnip'
   gem 'gherkin', '~> 2.5'

@@ -16,6 +16,8 @@ ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 
+
+require 'with_model'
 require 'database_cleaner'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -44,6 +46,7 @@ RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
   config.include Devise::TestHelpers, type: :controller
   config.extend ControllerMacros, type: :controller
+  config.extend WithModel
 
   def clear_data
     FileUtils.rm_rf('spec/data')
