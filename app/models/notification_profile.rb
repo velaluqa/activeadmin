@@ -32,4 +32,35 @@ class NotificationProfile < ActiveRecord::Base
   def trigger(action, resource)
 
   end
+
+  def triggering_changes_description
+    return if triggering_changes.empty?
+    conjs = triggering_changes.map do |conj|
+      conj.map do |key, triggering|
+        from = triggering.key?(:from) ? triggering[:from].inspect : '*any*'
+        to = triggering.key?(:to) ? triggering[:to].inspect : '*any*'
+        "#{key}(#{from}=>#{to})"
+      end.join(' AND ')
+    end
+    conjs.map! do |conj|
+      if conj.include?('AND')
+        "(#{conj})"
+      else
+        conj
+      end
+    end
+    conjs.join(' OR ')
+  end
+
+  def to_s
+    changes = triggering_changes_description
+    changes = ", #{changes}" if changes
+    "NotificationProfile[#{id}, #{triggering_action}, #{triggering_resource}#{changes}]"
+  end
+
+  def inspect
+    changes = triggering_changes_description
+    changes = ", #{changes}" if changes
+    "NotificationProfile[#{id}, #{triggering_action}, #{triggering_resource}#{changes}]"
+  end
 end
