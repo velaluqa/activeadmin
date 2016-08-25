@@ -1,3 +1,5 @@
+require 'serializers/hash_array_serializer'
+
 # Notification Profiles describe which actions within the ERICA system
 # trigger notifications.
 #
@@ -23,7 +25,56 @@
 # **`updated_at`**                  | `datetime`         | `not null`
 #
 class NotificationProfile < ActiveRecord::Base
-  def self.triggered_by(action, record, changes)
+  serialize :triggering_changes, HashArraySerializer
+  serialize :filters, HashArraySerializer
+
+  # For convenience we convert all triggering_changes hashes to
+  # `HashWithIndifferentAccess`, allowing us to access { 'a' => 1 }
+  # with either `:a` and `'a'`.
+  def triggering_changes
+    read_attribute(:triggering_changes).map(&:with_indifferent_access)
+  end
+
+  # For convenience we convert all filter hashes to
+  # `HashWithIndifferentAccess`, allowing us to access { 'a' => 1 }
+  # with either `:a` and `'a'`.
+  def filters
+    read_attribute(:filters).map(&:with_indifferent_access)
+  end
+
+  # Returns all profiles that match the given action for given
+  # resource. The resource may have changes, which are used to match
+  # against a profiles `triggering_changes`.
+  #
+  # @param [Symbol] action the specific action that was performed
+  # @param [ActiveRecord::Base] record the record the action was performed on
+  #
+  # @return [Array] an array of matched `NotificationProfile` instances
+  def self.triggered_by(action, record)
+    relation = where(%(triggering_action = 'all' OR triggering_action = ?), action.to_s)
+    relation.where('triggering_resource = ?', record.class.to_s)
+    relation.to_a.keep_if do |profile|
+      profile.triggering_changes?(record)
+    end
+  end
+
+  # Matches the `changes` of given record against the `triggering_changes`.
+  #
+  # @param [ActiveRecord::Base] the record with changes
+  #
+  # @return [Boolean] whether the record triggers of not
+  def triggering_changes?(record)
+    return true if triggering_changes.empty?
+    changes = record.changes.with_indifferent_access
+    triggering_changes.map do |conj_changes|
+      triggers_matched = true
+      conj_changes.each_pair do |attribute, triggering|
+        triggers_matched &= false if triggering.key?(:from) && (!changes[attribute] || changes[attribute][0] != triggering[:from])
+        triggers_matched &= false if triggering.key?(:to) && (!changes[attribute] || changes[attribute][1] != triggering[:to])
+      end
+      triggers_matched
+    end.any?
+  end
 
   def filter_matches?(record)
 
@@ -33,6 +84,9 @@ class NotificationProfile < ActiveRecord::Base
 
   end
 
+  # Creates a String in the form "attribute(from => to)" from the
+  # `triggering_changes` Array. Array elements are logically disjunct
+  # and all hash keys are logically conjunct.
   def triggering_changes_description
     return if triggering_changes.empty?
     conjs = triggering_changes.map do |conj|
