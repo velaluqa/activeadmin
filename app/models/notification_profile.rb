@@ -25,6 +25,7 @@
 class NotificationProfile < ActiveRecord::Base
   def self.triggered_by(action, record, changes)
 
+  def filter_matches?(record)
 
   end
 
