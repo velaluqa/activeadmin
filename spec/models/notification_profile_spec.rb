@@ -370,6 +370,8 @@ RSpec.describe NotificationProfile do
       t.string :foo, null: true
     end
     model do
+      has_paper_trail class_name: 'Version'
+
       has_one :test_model
     end
   end
@@ -617,6 +619,48 @@ RSpec.describe NotificationProfile do
   describe '#trigger' do
     it 'is defined' do
       expect(NotificationProfile.new).to respond_to('trigger')
+    end
+
+    it 'returns false if the filters do not match' do
+      profile = create(:notification_profile)
+      record = TestModel.create
+      expect(profile).to receive(:filters_match?).at_least(1).and_return(false)
+      expect(profile.trigger(:create, record)).to be_falsy
+    end
+
+    it 'creates a new notification' do
+      user = create(:user)
+      profile = create(:notification_profile, users: [user], triggering_resource: 'TestModel')
+      record = TestModel.create(foobar: 'foo')
+      expect do
+        profile.trigger(:create, record)
+      end.to change(Notification, :count).by(1)
+    end
+
+    describe 'for model with versions' do
+      it 'creates a notification with a version after create' do
+        user = create(:user)
+        profile = create(:notification_profile, users: [user], triggering_resource: 'ExtraModel')
+        record = ExtraModel.create(foo: 'foo')
+        expect do
+          profile.trigger(:create, record)
+        end.to change(Notification, :count).by(1)
+        notification = Notification.last
+        expect(notification.version).to eq record.versions.last
+      end
+
+      it 'creates a notification with a version after update' do
+        user = create(:user)
+        profile = create(:notification_profile, users: [user], triggering_resource: 'ExtraModel')
+        record = ExtraModel.create(foo: 'foo')
+        record.foo = 'bar'
+        record.save!
+        expect do
+          profile.trigger(:update, record)
+        end.to change(Notification, :count).by(1)
+        notification = Notification.last
+        expect(notification.version).to eq record.versions.last
+      end
     end
   end
 end

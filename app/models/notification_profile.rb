@@ -134,8 +134,17 @@ JOIN
     end.any?
   end
 
-  def trigger(action, resource)
-
+  def trigger(action, record)
+    return false unless filters_match?(record)
+    version = record.respond_to?(:versions) && record.versions.last
+    recipients.map do |user|
+      Notification.create(
+        notification_profile: self,
+        resource: record,
+        user: user,
+        version: version
+      )
+    end
   end
 
   # Creates a String in the form "attribute(from => to)" from the
