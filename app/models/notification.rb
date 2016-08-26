@@ -31,5 +31,8 @@
 #     * **`version_id`**
 #
 class Notification < ActiveRecord::Base
-
+  belongs_to :notification_profile
+  belongs_to :user
+  belongs_to :version
+  belongs_to :resource, polymorphic: true
 end

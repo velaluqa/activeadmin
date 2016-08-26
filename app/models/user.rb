@@ -80,6 +80,10 @@ class User < ActiveRecord::Base
   has_many :public_keys
 
   has_and_belongs_to_many :notification_profiles
+  
+  # A use might be the sole recipient of many notifications that are
+  # for him to decide to be marked as seen.
+  has_many :notifications
 
   before_create :create_keypair
 

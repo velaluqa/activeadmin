@@ -321,6 +321,7 @@ RSpec.describe NotificationProfile do
   describe 'model' do
     it { should have_and_belong_to_many(:users) }
     it { should have_and_belong_to_many(:roles) }
+    it { should have_many(:notifications) }
 
     describe '#recipients' do
       before(:each) do

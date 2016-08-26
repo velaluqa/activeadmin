@@ -30,6 +30,7 @@ class NotificationProfile < ActiveRecord::Base
 
   has_and_belongs_to_many :users
   has_and_belongs_to_many :roles
+  has_many :notifications
 
   # Returns a relations querying all recipient from the `users` and
   # the `roles` associations.

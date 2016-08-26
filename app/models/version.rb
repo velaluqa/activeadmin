@@ -22,4 +22,5 @@
 #     * **`item_id`**
 #
 class Version < PaperTrail::Version
+  has_many :notifications
 end
