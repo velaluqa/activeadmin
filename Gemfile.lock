@@ -502,6 +502,8 @@ GEM
       thor (~> 0.14)
     sexp_processor (4.7.0)
     shellany (0.0.1)
+    shoulda-matchers (3.1.1)
+      activesupport (>= 4.0.0)
     sidekiq (4.1.1)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
@@ -678,6 +680,7 @@ DEPENDENCIES
   rugged (~> 0.24.0)
   sass-rails (~> 5.0.4)
   select2-rails (~> 4.0.1)
+  shoulda-matchers
   sidekiq
   simplecov
   simplecov-cobertura
