@@ -31,6 +31,19 @@ class NotificationProfile < ActiveRecord::Base
   has_and_belongs_to_many :users
   has_and_belongs_to_many :roles
 
+  # Returns a relations querying all recipient from the `users` and
+  # the `roles` associations.
+  def recipients
+    relation = User.joins(<<JOIN)
+LEFT JOIN "notification_profiles_users" AS "np_u" ON "np_u"."user_id" = "users"."id"
+LEFT JOIN "user_roles" AS "u_r" ON "u_r"."user_id" = "users"."id"
+LEFT JOIN "notification_profiles_roles" AS "np_r" ON "np_r"."role_id" = "u_r"."role_id"
+JOIN
+    relation
+      .select('DISTINCT("users"."id"), "users".*')
+      .where('"np_u"."notification_profile_id" = ? OR "np_r"."notification_profile_id" = ?', id, id)
+  end
+
   # For convenience we convert all triggering_changes hashes to
   # `HashWithIndifferentAccess`, allowing us to access { 'a' => 1 }
   # with either `:a` and `'a'`.

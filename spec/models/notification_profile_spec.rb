@@ -321,6 +321,37 @@ RSpec.describe NotificationProfile do
   describe 'model' do
     it { should have_and_belong_to_many(:users) }
     it { should have_and_belong_to_many(:roles) }
+
+    describe '#recipients' do
+      before(:each) do
+        @user1 = create(:user, email: 'foo@test.com')
+        @user2 = create(:user, email: 'bar@test.com')
+        @role = create(:role, users: [@user1])
+        @profile1 = create(:notification_profile, users: [@user1], roles: [@role])
+        @profile2 = create(:notification_profile, users: [@user2], roles: [@role])
+        @profile3 = create(:notification_profile, users: [@user1, @user2], roles: [@role])
+      end
+
+      it 'returns unique recipients' do
+        expect(@profile1.recipients).to contain(@user1, count: 1)
+        expect(@profile1.recipients).to contain(@user2, count: 0)
+        expect(@profile2.recipients).to contain(@user1, count: 1)
+        expect(@profile2.recipients).to contain(@user2, count: 1)
+        expect(@profile3.recipients).to contain(@user1, count: 1)
+        expect(@profile3.recipients).to contain(@user2, count: 1)
+      end
+
+      it 'returns all recipients from `users` and `roles`' do
+        expect(@profile1.recipients).to include(@user1)
+        expect(@profile1.recipients).not_to include(@user2)
+
+        expect(@profile2.recipients).to include(@user1)
+        expect(@profile2.recipients).to include(@user2)
+
+        expect(@profile3.recipients).to include(@user1)
+        expect(@profile3.recipients).to include(@user2)
+      end
+    end
   end
 
   with_model :MultiModel do
