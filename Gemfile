@@ -160,6 +160,9 @@ group :development do
   # Gems for prettier errors in development
   gem 'better_errors'
   gem 'binding_of_caller'
+
+  # Catching mails and serving them locally via a web interface.
+  gem 'letter_opener_web', '~> 1.2.0'
 end
 
 group :development, :test do

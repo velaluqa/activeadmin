@@ -274,6 +274,11 @@ GEM
       less (~> 2.6.0)
       sprockets (> 2, < 4)
       tilt
+    letter_opener (1.4.1)
+      launchy (~> 2.2)
+    letter_opener_web (1.2.3)
+      letter_opener (~> 1.0)
+      rails (>= 3.2)
     libv8 (3.11.8.17)
     listen (3.0.6)
       rb-fsevent (>= 0.9.3)
@@ -645,6 +650,7 @@ DEPENDENCIES
   kramdown
   kwalify
   less-rails (~> 2.7.1)
+  letter_opener_web (~> 1.2.0)
   libv8 (~> 3.11.8)
   lol_dba
   meta_request (~> 0.4.0)
