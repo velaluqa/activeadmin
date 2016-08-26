@@ -25,6 +25,8 @@
 #     * **`user_id`**
 #
 class UserRole < ActiveRecord::Base
+  has_paper_trail class_name: 'Version'
+
   belongs_to :user
   belongs_to :role
   belongs_to :scope_object, polymorphic: true

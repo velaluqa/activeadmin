@@ -25,6 +25,8 @@ require 'serializers/hash_array_serializer'
 # **`updated_at`**                  | `datetime`         | `not null`
 #
 class NotificationProfile < ActiveRecord::Base
+  has_paper_trail class_name: 'Version'
+
   serialize :triggering_changes, HashArraySerializer
   serialize :filters, HashArraySerializer
 

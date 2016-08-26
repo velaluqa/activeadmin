@@ -31,6 +31,12 @@
 #     * **`version_id`**
 #
 class Notification < ActiveRecord::Base
+  has_paper_trail(
+    class_name: 'Version',
+    version: :paper_trail_version,
+    versions: :paper_trail_versions
+  )
+
   belongs_to :notification_profile
   belongs_to :user
   belongs_to :version
