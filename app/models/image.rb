@@ -21,7 +21,7 @@ require 'tempfile'
 #     * **`image_series_id`**
 #
 class Image < ActiveRecord::Base
-  has_paper_trail
+  has_paper_trail class_name: 'Version'
   
   attr_accessible :image_series_id
   attr_accessible :image_series

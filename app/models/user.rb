@@ -45,7 +45,7 @@ require 'email_validator'
 #     * **`username`**
 #
 class User < ActiveRecord::Base
-  has_paper_trail
+  has_paper_trail class_name: 'Version'
 
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,

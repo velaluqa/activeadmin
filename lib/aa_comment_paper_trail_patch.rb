@@ -2,7 +2,7 @@ module ActiveAdminCommentPaperTrailPatch
   extend ActiveSupport::Concern
 
   included do
-    has_paper_trail    
+    has_paper_trail class_name: 'Version'
   end
 
   module InstanceMethods
