@@ -69,8 +69,8 @@ class NotificationProfile < ActiveRecord::Base
     triggering_changes.map do |conj_changes|
       triggers_matched = true
       conj_changes.each_pair do |attribute, triggering|
-        triggers_matched &= false if triggering.key?(:from) && (!changes[attribute] || changes[attribute][0] != triggering[:from])
-        triggers_matched &= false if triggering.key?(:to) && (!changes[attribute] || changes[attribute][1] != triggering[:to])
+        triggers_matched &= !triggering.key?(:from) || (changes[attribute] && changes[attribute][0] == triggering[:from])
+        triggers_matched &= !triggering.key?(:to) || (changes[attribute] && changes[attribute][1] == triggering[:to])
       end
       triggers_matched
     end.any?
