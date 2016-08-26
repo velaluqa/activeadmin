@@ -316,18 +316,39 @@ RSpec.shared_examples "triggering changes" do |options|
   end
 end
 
-RSpec.describe NotificationProfile, focus: true do
-  describe '::triggered_by' do
-    with_model :TestModel do
-      table do |t|
-        t.string :foobar, null: true
-        t.string :foobaz, null: true
-      end
-      model do
-        include NotificationObservable
-      end
+RSpec.describe NotificationProfile do
+  with_model :MultiModel do
+    table do |t|
+      t.string :foo, null: true
+      t.references :test_model
     end
+    model do
+      belongs_to :test_model
+    end
+  end
 
+  with_model :ExtraModel do
+    table do |t|
+      t.string :foo, null: true
+    end
+    model do
+      has_one :test_model
+    end
+  end
+
+  with_model :TestModel do
+    table do |t|
+      t.string :foobar, null: true
+      t.string :foobaz, null: true
+      t.references :extra_model
+    end
+    model do
+      has_many :multi_models
+      belongs_to :extra_model
+    end
+  end
+
+  describe '::triggered_by' do
     before(:each) do
       @p1 = create(:notification_profile, triggering_action: 'all', triggering_resource: 'TestModel')
       @p2 = create(:notification_profile, triggering_action: 'create', triggering_resource: 'TestModel')
@@ -386,7 +407,6 @@ RSpec.describe NotificationProfile, focus: true do
     end
 
     describe ':destroy TestModel' do
-
       it 'returns profiles triggered for all actions' do
         triggered_profiles = NotificationProfile.triggered_by(:destroy, @record)
         expect(triggered_profiles).to include(@p1)
@@ -409,15 +429,156 @@ RSpec.describe NotificationProfile, focus: true do
     end
   end
 
-  describe '#filter_matches?' do
+  describe '#filters_match?' do
+    before(:each) do
+      @p0 = create(:notification_profile,
+                   triggering_action: 'all',
+                   triggering_resource: 'TestModel')
+      @p1 = create(:notification_profile,
+                   triggering_action: 'all',
+                   triggering_resource: 'TestModel',
+                   filters: [
+                     {
+                       attributes: {
+                         foobar: 'foo',
+                         foobaz: nil
+                       }
+                     }
+                   ])
+      @p2 = create(:notification_profile,
+                   triggering_action: 'all',
+                   triggering_resource: 'TestModel',
+                   filters: [
+                     {
+                       extra_model: {
+                         foo: 'baz'
+                       }
+                     }
+                   ])
+      @p3 = create(:notification_profile,
+                   triggering_action: 'all',
+                   triggering_resource: 'TestModel',
+                   filters: [
+                     {
+                       multi_models: true
+                     }
+                   ])
+      @p4 = create(:notification_profile,
+                   triggering_action: 'all',
+                   triggering_resource: 'TestModel',
+                   filters: [
+                     {
+                       multi_models: false
+                     }
+                   ])
+      @p5 = create(:notification_profile,
+                   triggering_action: 'all',
+                   triggering_resource: 'TestModel',
+                   filters: [
+                     {
+                       multi_models: {
+                         foo: 'bar'
+                       }
+                     }
+                   ])
+      @p6 = create(:notification_profile,
+                   triggering_action: 'all',
+                   triggering_resource: 'TestModel',
+                   filters: [
+                     {
+                       attributes: {
+                         foobar: 'foo'
+                       },
+                       multi_models: {
+                         foo: 'bar'
+                       }
+                     }
+                   ])
+      @p7 = create(:notification_profile,
+                   triggering_action: 'all',
+                   triggering_resource: 'TestModel',
+                   filters: [
+                     {
+                       attributes: {
+                         foobar: 'foo'
+                       }
+                     }, {
+                       multi_models: {
+                         foo: 'bar'
+                       }
+                     }
+                   ])
+      @tm = TestModel.create(foobar: 'foo', foobaz: nil)
+      @em1 = ExtraModel.create(foo: 'baz')
+      @tm_em1 = TestModel.create(foobar: 'foo', extra_model: @em1)
+      @em2 = ExtraModel.create(foo: 'bar')
+      @tm_em2 = TestModel.create(foobar: 'foo', extra_model: @em2)
+      @mm0 = MultiModel.create(foo: nil)
+      @mm1 = MultiModel.create(foo: 'fu')
+      @mm2 = MultiModel.create(foo: 'bar')
+      @mm3 = MultiModel.create(foo: 'bar')
+      @tm_mm1 = TestModel.create(foobar: 'foo', multi_models: [@mm0])
+      @tm_mm2 = TestModel.create(foobar: 'foo', multi_models: [@mm1])
+      @tm_mm3 = TestModel.create(foobar: 'foo', multi_models: [@mm2])
+      @tm_mm4 = TestModel.create(foobar: 'bar', multi_models: [@mm3])
+    end
+
     it 'is defined' do
-      expect(NotificationProfile.new).to respond_to('filter_matches?')
+      expect(NotificationProfile.new).to respond_to('filters_match?')
+    end
+
+    it 'is always true for profiles without filters' do
+      expect(@p0.filters_match?(@tm)).to be_truthy
+      expect(@p0.filters_match?(@tm_em1)).to be_truthy
+      expect(@p0.filters_match?(@tm_em2)).to be_truthy
+    end
+
+    it 'matches resource attributes' do
+      expect(@p1.filters_match?(@tm)).to be_truthy
+      expect(@p2.filters_match?(@tm)).to be_falsy
+      expect(@p6.filters_match?(@tm)).to be_falsy
+    end
+    it 'matches resource has_one/belongs_to relations' do
+      expect(@p2.filters_match?(@tm)).to be_falsy
+      expect(@p2.filters_match?(@tm_em1)).to be_truthy
+      expect(@p2.filters_match?(@tm_em2)).to be_falsy
+    end
+    it 'matches resource has_many/habtm relations' do
+      expect(@p3.filters_match?(@tm)).to be_falsy
+      expect(@p3.filters_match?(@tm_mm1)).to be_truthy
+      expect(@p3.filters_match?(@tm_mm2)).to be_truthy
+      expect(@p3.filters_match?(@tm_mm3)).to be_truthy
+      expect(@p3.filters_match?(@tm_mm4)).to be_truthy
+
+      expect(@p4.filters_match?(@tm)).to be_truthy
+      expect(@p4.filters_match?(@tm_mm1)).to be_falsy
+      expect(@p4.filters_match?(@tm_mm2)).to be_falsy
+      expect(@p4.filters_match?(@tm_mm3)).to be_falsy
+      expect(@p4.filters_match?(@tm_mm4)).to be_falsy
+
+      expect(@p5.filters_match?(@tm)).to be_falsy
+      expect(@p5.filters_match?(@tm_mm1)).to be_falsy
+      expect(@p5.filters_match?(@tm_mm2)).to be_falsy
+      expect(@p5.filters_match?(@tm_mm3)).to be_truthy
+      expect(@p5.filters_match?(@tm_mm4)).to be_truthy
+
+      expect(@p6.filters_match?(@tm)).to be_falsy
+      expect(@p6.filters_match?(@tm_mm1)).to be_falsy
+      expect(@p6.filters_match?(@tm_mm2)).to be_falsy
+      expect(@p6.filters_match?(@tm_mm3)).to be_truthy
+      expect(@p6.filters_match?(@tm_mm4)).to be_falsy
+
+      expect(@p7.filters_match?(@tm)).to be_truthy
+      expect(@p7.filters_match?(@tm_mm1)).to be_truthy
+      expect(@p7.filters_match?(@tm_mm2)).to be_truthy
+      expect(@p7.filters_match?(@tm_mm3)).to be_truthy
+      expect(@p7.filters_match?(@tm_mm4)).to be_truthy
     end
   end
 
   describe '#trigger' do
     it 'is defined' do
-      expect(NotificationProfile.new).to respond_to('filter_matches?')
+      expect(NotificationProfile.new).to respond_to('trigger')
     end
   end
 end

@@ -76,8 +76,43 @@ class NotificationProfile < ActiveRecord::Base
     end.any?
   end
 
-  def filter_matches?(record)
+  # Apply filters on given `record`.
+  #
+  # @param [ActiveRecord::Base] record the record to match the filters against
+  # @return [Boolean] whether the filter matched or not
+  def filters_match?(record)
+    return true if filters.empty?
 
+    filters.map do |filter|
+      filter_matched = true
+      attr_filters = filter.delete(:attributes) || {}
+      attr_filters.each_pair do |attr, val|
+        filter_matched &= record.has_attribute?(attr) && record[attr] == val
+      end
+      filter.each_pair do |assoc, filters|
+        next unless record._reflections.key?(assoc)
+        if assoc =~ /s$/
+          relation = record.send(assoc.to_sym)
+          case filters
+          when TrueClass, FalseClass
+            filter_matched &= filters == relation.exists?
+          when Hash
+            filter_matched &= relation.where(filters).exists?
+          end
+        else
+          related_record = record.send(assoc.to_sym)
+          case filters
+          when TrueClass, FalseClass
+            filter_matched &= !filters == related_record.nil?
+          when Hash
+            filters.each_pair do |attr, val|
+              filter_matched &= related_record.andand.has_attribute?(attr) && related_record[attr] == val
+            end
+          end
+        end
+      end
+      filter_matched
+    end.any?
   end
 
   def trigger(action, resource)
