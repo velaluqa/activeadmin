@@ -28,6 +28,9 @@ class NotificationProfile < ActiveRecord::Base
   serialize :triggering_changes, HashArraySerializer
   serialize :filters, HashArraySerializer
 
+  has_and_belongs_to_many :users
+  has_and_belongs_to_many :roles
+
   # For convenience we convert all triggering_changes hashes to
   # `HashWithIndifferentAccess`, allowing us to access { 'a' => 1 }
   # with either `:a` and `'a'`.

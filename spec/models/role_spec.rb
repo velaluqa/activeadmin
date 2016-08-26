@@ -1,4 +1,6 @@
 RSpec.describe Role do
+  it { should have_and_belong_to_many(:notification_profiles) }
+
   it 'validates uniqueness of title attribute' do
     create(:role, title: 'My Role')
     new_role = build(:role, title: 'My Role')

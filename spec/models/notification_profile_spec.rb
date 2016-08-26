@@ -316,7 +316,13 @@ RSpec.shared_examples "triggering changes" do |options|
   end
 end
 
+
 RSpec.describe NotificationProfile do
+  describe 'model' do
+    it { should have_and_belong_to_many(:users) }
+    it { should have_and_belong_to_many(:roles) }
+  end
+
   with_model :MultiModel do
     table do |t|
       t.string :foo, null: true

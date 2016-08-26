@@ -79,6 +79,8 @@ class User < ActiveRecord::Base
 
   has_many :public_keys
 
+  has_and_belongs_to_many :notification_profiles
+
   before_create :create_keypair
 
   before_save :ensure_authentication_token

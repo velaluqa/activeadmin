@@ -1,4 +1,6 @@
 RSpec.describe User do
+  it { should have_and_belong_to_many(:notification_profiles) }
+
   it 'validates the email address' do
     user = build(:user, email: nil)
     expect(user).to_not be_valid
