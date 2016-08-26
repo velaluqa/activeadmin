@@ -125,19 +125,11 @@ class NotificationProfile < ActiveRecord::Base
   def triggering_changes_description
     return if triggering_changes.empty?
     conjs = triggering_changes.map do |conj|
-      conj.map do |key, triggering|
-        from = triggering.key?(:from) ? triggering[:from].inspect : '*any*'
-        to = triggering.key?(:to) ? triggering[:to].inspect : '*any*'
-        "#{key}(#{from}=>#{to})"
+      conj.map do |key, t|
+        "#{key}(#{t.fetch(:from, '*any*')}=>#{t.fetch(:to, '*any*')})"
       end.join(' AND ')
     end
-    conjs.map! do |conj|
-      if conj.include?('AND')
-        "(#{conj})"
-      else
-        conj
-      end
-    end
+    conjs.map! { |conj| conj.include?('AND') ? "(#{conj})" : conj }
     conjs.join(' OR ')
   end
 
