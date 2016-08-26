@@ -79,6 +79,7 @@ class User < ActiveRecord::Base
 
   has_many :public_keys
 
+  # A user may be recipient to a multitude of notification profiles.
   has_and_belongs_to_many :notification_profiles
   
   # A use might be the sole recipient of many notifications that are
