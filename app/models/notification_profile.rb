@@ -34,6 +34,8 @@ class NotificationProfile < ActiveRecord::Base
 
   # Returns a relations querying all recipient from the `users` and
   # the `roles` associations.
+  #
+  # @return [ActiveRecord::Relation] the relation specifying all users
   def recipients
     relation = User.joins(<<JOIN)
 LEFT JOIN "notification_profiles_users" AS "np_u" ON "np_u"."user_id" = "users"."id"
