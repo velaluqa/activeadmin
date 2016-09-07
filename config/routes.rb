@@ -78,6 +78,7 @@ StudyServer::Application.routes.draw do
 
   authenticate :user, ->(user) { user.can?(:manage, Sidekiq) } do
     require 'sidekiq/web'
+    require 'sidekiq-scheduler/web'
     mount Sidekiq::Web => '/sidekiq'
   end
 
