@@ -1,0 +1,2 @@
+SendNotificationEmails:
+  every: '10m'
