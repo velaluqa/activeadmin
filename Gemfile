@@ -114,6 +114,10 @@ gem 'dentaku', '~> 2.0.7'
 # Sidekiq is used for asynchronous job execution, i.e. DICOM searches, exports, ...
 gem 'sidekiq'
 
+# Sideiq-scheduler is used for recurring jobs (i.e. checking for and
+# sending notifications via e-Mail).
+gem 'sidekiq-scheduler', '~> 2.0'
+
 # Ruby DICOM lib
 gem 'dicom'
 
