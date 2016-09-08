@@ -71,4 +71,6 @@ StudyServer::Application.configure do
   config.erica_remote_verification_key = 'config/erica_remote_verification_development.pem'
 
   config.airbrake_api_key = '75336396cd50acb145d5a78eaca49a57'
+
+  config.maximum_email_throttling_delay = 30*24*60*60 # monthly
 end
