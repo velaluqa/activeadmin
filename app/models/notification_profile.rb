@@ -9,20 +9,21 @@ require 'serializers/hash_array_serializer'
 #
 # ### Columns
 #
-# Name                              | Type               | Attributes
-# --------------------------------- | ------------------ | ---------------------------
-# **`created_at`**                  | `datetime`         | `not null`
-# **`description`**                 | `text`             |
-# **`filters`**                     | `jsonb`            | `not null`
-# **`id`**                          | `integer`          | `not null, primary key`
-# **`is_active`**                   | `boolean`          | `default(FALSE), not null`
-# **`notification_type`**           | `string`           |
-# **`only_authorized_recipients`**  | `boolean`          | `default(TRUE), not null`
-# **`title`**                       | `string`           | `not null`
-# **`triggering_action`**           | `string`           | `default("all"), not null`
-# **`triggering_changes`**          | `jsonb`            | `not null`
-# **`triggering_resource`**         | `string`           | `not null`
-# **`updated_at`**                  | `datetime`         | `not null`
+# Name                                  | Type               | Attributes
+# ------------------------------------- | ------------------ | ---------------------------
+# **`created_at`**                      | `datetime`         | `not null`
+# **`description`**                     | `text`             |
+# **`filters`**                         | `jsonb`            | `not null`
+# **`id`**                              | `integer`          | `not null, primary key`
+# **`is_active`**                       | `boolean`          | `default(FALSE), not null`
+# **`maximum_email_throttling_delay`**  | `integer`          |
+# **`notification_type`**               | `string`           |
+# **`only_authorized_recipients`**      | `boolean`          | `default(TRUE), not null`
+# **`title`**                           | `string`           | `not null`
+# **`triggering_action`**               | `string`           | `default("all"), not null`
+# **`triggering_changes`**              | `jsonb`            | `not null`
+# **`triggering_resource`**             | `string`           | `not null`
+# **`updated_at`**                      | `datetime`         | `not null`
 #
 class NotificationProfile < ActiveRecord::Base
   has_paper_trail class_name: 'Version'
