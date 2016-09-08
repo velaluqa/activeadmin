@@ -1,2 +1,28 @@
-SendNotificationEmails:
-  every: '10m'
+SendThrottledNotificationEmails:
+  cron: '0 * * * *' # every full hour
+  args:
+    throttled_delay: 'hourly'
+SendThrottledNotificationEmails:
+  cron: '0 0 * * *' # every day at 00:00
+  args:
+    throttled_delay: 'daily'
+SendThrottledNotificationEmails:
+  cron: '0 0 * * 6' # every saturday
+  args:
+    throttled_delay: 'weekly'
+SendThrottledNotificationEmails:
+  cron: '0 0 1 */1 *' # every 1st day of everxy month
+  args:
+    throttled_delay: 'monthly'
+SendThrottledNotificationEmails:
+  cron: '0 0 1 */3 *' # every 1st day all three months
+  args:
+    throttled_delay: 'quarterly'
+SendThrottledNotificationEmails:
+  cron: '0 0 1 6 *' # every 1st of june
+  args:
+    throttled_delay: 'semesterly'
+SendThrottledNotificationEmails:
+  cron: '0 0 1 1 *' # every 1st of january
+  args:
+    throttled_delay: 'yearly'
