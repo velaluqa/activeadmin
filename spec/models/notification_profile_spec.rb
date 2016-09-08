@@ -341,19 +341,114 @@ RSpec.describe NotificationProfile do
         expect(@profile3.recipients).to contain(@user1, count: 1)
         expect(@profile3.recipients).to contain(@user2, count: 1)
       end
+    end
+  end
 
-      it 'returns all recipients from `users` and `roles`' do
-        expect(@profile1.recipients).to include(@user1)
-        expect(@profile1.recipients).not_to include(@user2)
+  describe 'scope ::recipients_with_pending', focus: true do
+    describe 'without throttled option' do
+      before(:each) do
+        @user1 = create(:user)
+        @user2 = create(:user)
+        @profile = create(:notification_profile, users: [@user1, @user2])
+        @notification1 = create(:notification, notification_profile: @profile, user: @user1)
+        @notification2 = create(:notification, notification_profile: @profile, user: @user2, email_sent_at: 1.hour.ago, created_at: 2.hours.ago)
 
-        expect(@profile2.recipients).to include(@user1)
-        expect(@profile2.recipients).to include(@user2)
+        @recipients = @profile.recipients_with_pending
+      end
 
-        expect(@profile3.recipients).to include(@user1)
-        expect(@profile3.recipients).to include(@user2)
+      it 'returns all users with pending notifications for profile' do
+        expect(@recipients).to contain(@user1, count: 1)
+        expect(@recipients).not_to include(@user2)
+      end
+    end
+
+    describe 'with throttled option and' do
+      describe 'profiles maximum throttling delay is minimum' do
+        before(:each) do
+          Rails.application.config.maximum_email_throttling_delay = 24*60*60
+
+          @user1 = create(:user, email_throttling_delay: 24*60*60)
+          @user2 = create(:user)
+          @profile1 = create(:notification_profile, users: [@user1, @user2], maximum_email_throttling_delay: 60*60)
+          @profile2 = create(:notification_profile, users: [@user1, @user2])
+          @notification1 = create(:notification, notification_profile: @profile1, user: @user1)
+          @notification2 = create(:notification, notification_profile: @profile1, user: @user2)
+          @notification3 = create(:notification, notification_profile: @profile2, user: @user1)
+          @notification4 = create(:notification, notification_profile: @profile2, user: @user2)
+        end
+
+        it 'returns only users with pending notifications matching the throttling settings for the profile-user-combination' do
+          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user1, count: 1)
+          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user2, count: 1)
+
+          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user1)
+          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user2)
+
+          expect(@profile2.recipients_with_pending(throttle: 60*60)).to_not include(@user1)
+          expect(@profile2.recipients_with_pending(throttle: 60*60)).to_not include(@user2)
+
+          expect(@profile2.recipients_with_pending(throttle: 24*60*60)).to contain(@user1, count: 1)
+          expect(@profile2.recipients_with_pending(throttle: 24*60*60)).to contain(@user2, count: 1)
+        end
+      end
+
+      describe 'user throttling delay is minimum' do
+        before(:each) do
+          Rails.application.config.maximum_email_throttling_delay = 24*60*60
+
+          @user1 = create(:user, email_throttling_delay: 60*60)
+          @user2 = create(:user)
+          @profile1 = create(:notification_profile, users: [@user1, @user2])
+          @notification1 = create(:notification, notification_profile: @profile1, user: @user1)
+          @notification2 = create(:notification, notification_profile: @profile1, user: @user2)
+        end
+
+        it 'returns only users with pending notifications matching the throttling settings for the profile-user-combination' do
+          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user1, count: 1)
+          expect(@profile1.recipients_with_pending(throttle: 60*60)).not_to include(@user2)
+
+          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user1)
+          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).to contain(@user2, count: 1)
+        end
+      end
+
+      describe 'system maximum throttling delay is minimum' do
+        before(:each) do
+          Rails.application.config.maximum_email_throttling_delay = 60*60
+
+          @user1 = create(:user, email_throttling_delay: 7*24*60*60)
+          @user2 = create(:user)
+          @profile1 = create(:notification_profile, users: [@user1])
+          @profile2 = create(:notification_profile, users: [@user1, @user2], maximum_email_throttling_delay: 24*60*60)
+          @notification1 = create(:notification, notification_profile: @profile1, user: @user1)
+          @notification2 = create(:notification, notification_profile: @profile1, user: @user2)
+          @notification3 = create(:notification, notification_profile: @profile2, user: @user1)
+          @notification4 = create(:notification, notification_profile: @profile2, user: @user2)
+        end
+
+        it 'returns only users with pending notifications matching the throttling settings for the profile-user-combination' do
+          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user1, count: 1)
+          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user2, count: 1)
+
+          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user1)
+          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user2)
+
+          expect(@profile1.recipients_with_pending(throttle: 7*24*60*60)).not_to include(@user1)
+          expect(@profile1.recipients_with_pending(throttle: 7*24*60*60)).not_to include(@user2)
+
+          expect(@profile2.recipients_with_pending(throttle: 60*60)).to contain(@user1, count: 1)
+          expect(@profile2.recipients_with_pending(throttle: 60*60)).to contain(@user2, count: 1)
+
+          expect(@profile2.recipients_with_pending(throttle: 24*60*60)).not_to include(@user1)
+          expect(@profile2.recipients_with_pending(throttle: 24*60*60)).not_to include(@user2)
+
+          expect(@profile2.recipients_with_pending(throttle: 7*24*60*60)).not_to include(@user1)
+          expect(@profile2.recipients_with_pending(throttle: 7*24*60*60)).not_to include(@user2)
+        end
       end
     end
   end
+
 
   with_model :MultiModel do
     table do |t|

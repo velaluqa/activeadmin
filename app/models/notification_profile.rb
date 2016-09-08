@@ -50,6 +50,26 @@ JOIN
       .where('"np_u"."notification_profile_id" = ? OR "np_r"."notification_profile_id" = ?', id, id)
   end
 
+  # Returns all `recipients` with `pending` and `sendable` notifications.
+  #
+  # Sendable notifications are notifications that either are not
+  # throttled or thats throttling period has expired.
+  #
+  # The throttling period is the minimum of these three values:
+  #
+  # * ERICA.maximum_email_throttling_delay ([Integer] in seconds)
+  # * notification_profile.maximum_email_throttling_delay = ([Integer] in seconds)
+  # * user.email_throttling_delay = ([Integer] in seconds)
+  def recipients_with_pending(options = {})
+    relation =
+      User
+      .joins(notifications: :notification_profile)
+      .merge(Notification.of(self).pending)
+
+    return relation unless options[:throttle]
+    relation.merge(Notification.throttled(options[:throttle], joins: false))
+  end
+
   # For convenience we convert all triggering_changes hashes to
   # `HashWithIndifferentAccess`, allowing us to access { 'a' => 1 }
   # with either `:a` and `'a'`.

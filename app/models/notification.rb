@@ -41,4 +41,25 @@ class Notification < ActiveRecord::Base
   belongs_to :user
   belongs_to :version
   belongs_to :resource, polymorphic: true
+
+  # All notifications that have not yet been sent.
+  scope :pending, -> { where(email_sent_at: nil) }
+
+  # All notifications for given user.
+  #
+  # @param [User,Integer] user The user to filter by.
+  scope :for, -> (user) { where(user: user) }
+
+  # All notifications belonging to given profile.
+  #
+  # @param [NotificationProfile,Integer] profile The profile to filter by.
+  scope :of, -> (profile) { where(notification_profile: profile) }
+
+  # All notifications that are throttled via given throttling delay.
+  scope :throttled, -> (throttle, options = { joins: true }) do
+    throttle = Email.ensure_throttling_delay(throttle)
+    (options[:joins] ? joins(:notification_profile, :user) : all)
+      .where('least(?, notification_profiles.maximum_email_throttling_delay, users.email_throttling_delay) = ?',
+             ERICA.maximum_email_throttling_delay, throttle)
+  end
 end
