@@ -88,4 +88,8 @@ StudyServer::Application.configure do
   config.airbrake_api_key = '21996bca9601d39ad1aa911e03922000'
 
   config.maximum_email_throttling_delay = 30*24*60*60 # monthly
+
+  config.action_mailer.default_options = {
+    from: 'noreply@pharmtrace.com'
+  }
 end

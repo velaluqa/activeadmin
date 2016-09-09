@@ -645,6 +645,10 @@ class Visit < ActiveRecord::Base
     end
   end
 
+  def to_s
+    "#{visit_type}(#{visit_number})"
+  end
+
   protected
 
   def reset_mqc
