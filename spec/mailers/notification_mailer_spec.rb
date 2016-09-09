@@ -1,9 +1,47 @@
 RSpec.describe NotificationMailer do
-  describe 'throttled_notification_email' do
+  before(:each) do
+    Rails.application.routes.default_url_options[:host] = 'test.de'
+  end
+
+  describe 'instant_notification_email' do
     before(:each) do
-      Rails.application.routes.default_url_options[:host] = 'test.de'
+      @notification = create(:notification)
     end
 
+    let(:mail) do
+      NotificationMailer.instant_notification_email(@notification)
+    end
+
+    it 'renders the subject' do
+      expect(mail.subject).to eql(@notification.notification_profile.title)
+    end
+
+    it 'renders the receiver email' do
+      expect(mail.to).to eql([@notification.user.email])
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eql(['noreply@pharmtrace.com'])
+    end
+
+    it 'greets the user by name' do
+      expect(mail.body.encoded).to match(@notification.user.name)
+    end
+
+    it 'lists all notification resource types' do
+      expect(mail.body.encoded).to match('Visit')
+    end
+
+    it 'lists all notification resources' do
+      expect(mail.body.encoded).to include(@notification.resource.to_s)
+    end
+
+    it 'links to the changed resource' do
+      expect(mail.body.encoded).to include("test.de/admin/visits/#{@notification.resource.id}")
+    end
+  end
+
+  describe 'throttled_notification_email' do
     let(:user) { create(:user, email: 'some@mail.com') }
     let(:profile) { create(:notification_profile) }
     let(:notifications) do

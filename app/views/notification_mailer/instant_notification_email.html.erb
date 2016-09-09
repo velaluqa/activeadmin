@@ -1,0 +1,14 @@
+<table>
+  <thead>
+    <th>Resource Type</th>
+    <th>Resource</th>
+    <th></th>
+  </thead>
+  <% @notifications.each do |notification| %>
+  <tr>
+    <td><%= notification.resource.class.to_s %></td>
+    <td><%= notification.resource %></td>
+    <td><%= link_to 'Open in ERICA', admin_url_for(notification.resource) %></td>
+  </tr>
+  <% end %>
+</table>
