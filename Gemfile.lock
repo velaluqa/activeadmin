@@ -469,6 +469,9 @@ GEM
       rspec-expectations (~> 3.4.0)
       rspec-mocks (~> 3.4.0)
       rspec-support (~> 3.4.0)
+    rspec-sidekiq (2.2.0)
+      rspec (~> 3.0, >= 3.0.0)
+      sidekiq (>= 2.4.0)
     rspec-support (3.4.1)
     rubocop (0.39.0)
       parser (>= 2.3.0.7, < 3.0)
@@ -685,6 +688,7 @@ DEPENDENCIES
   rspec (~> 3.4.0)
   rspec-mocks (~> 3.4.1)
   rspec-rails (~> 3.4.2)
+  rspec-sidekiq
   rubocop
   rubocop-checkstyle_formatter
   ruby-progressbar
