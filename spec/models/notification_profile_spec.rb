@@ -344,7 +344,7 @@ RSpec.describe NotificationProfile do
     end
   end
 
-  describe 'scope ::recipients_with_pending', focus: true do
+  describe 'scope ::recipients_with_pending' do
     describe 'without throttled option' do
       before(:each) do
         @user1 = create(:user)
