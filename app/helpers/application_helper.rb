@@ -7,4 +7,8 @@ module ApplicationHelper
     new = values[:to].to_yaml(canonical: false, indentation: 9).lines.to_a[1..-1].join.gsub(/!ruby\/hash:ActiveSupport::HashWithIndifferentAccess/, '')
     return Diffy::Diff.new(old, new).to_s(:html).html_safe
   end
+
+  def admin_url_for(model)
+    Rails.application.routes.url_helpers.send("admin_#{model.class.to_s.underscore}_url", model)
+  end
 end
