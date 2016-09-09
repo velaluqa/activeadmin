@@ -2,7 +2,6 @@ RSpec.describe NotificationMailer do
   describe 'throttled_notification_email' do
     before(:each) do
       Rails.application.routes.default_url_options[:host] = 'test.de'
-      Rails.application.routes.default_url_options[:from] = 'noreply@pharmtrace.com'
     end
 
     let(:user) { create(:user, email: 'some@mail.com') }
@@ -23,7 +22,6 @@ RSpec.describe NotificationMailer do
     it 'renders the receiver email' do
       expect(mail.to).to eql([user.email])
     end
-
 
     it 'renders the sender email' do
       expect(mail.from).to eql(['noreply@pharmtrace.com'])
