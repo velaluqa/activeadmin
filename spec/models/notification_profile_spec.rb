@@ -490,7 +490,13 @@ RSpec.describe NotificationProfile do
       @p3 = create(:notification_profile, triggering_action: 'update', triggering_resource: 'TestModel')
       @p4 = create(:notification_profile, triggering_action: 'destroy', triggering_resource: 'TestModel')
 
+      @pe1 = create(:notification_profile, triggering_action: 'all', triggering_resource: 'ExtraModel')
+      @pe2 = create(:notification_profile, triggering_action: 'create', triggering_resource: 'ExtraModel')
+      @pe3 = create(:notification_profile, triggering_action: 'update', triggering_resource: 'ExtraModel')
+      @pe4 = create(:notification_profile, triggering_action: 'destroy', triggering_resource: 'ExtraModel')
+
       @record = TestModel.create
+      @record2 = ExtraModel.create
     end
 
     it 'is defined' do
@@ -498,21 +504,26 @@ RSpec.describe NotificationProfile do
     end
 
     describe ':create TestModel' do
+      before(:each) do
+        @triggered_profiles = NotificationProfile.triggered_by(:create, @record)
+      end
       it 'returns profiles triggered for all actions' do
-        triggered_profiles = NotificationProfile.triggered_by(:create, @record)
-        expect(triggered_profiles).to include(@p1)
+        expect(@triggered_profiles).to include(@p1)
       end
       it 'returns profiles triggered for :create actions' do
-        triggered_profiles = NotificationProfile.triggered_by(:create, @record)
-        expect(triggered_profiles).to include(@p2)
+        expect(@triggered_profiles).to include(@p2)
       end
       it 'does not return profiles triggered for :update' do
-        triggered_profiles = NotificationProfile.triggered_by(:create, @record)
-        expect(triggered_profiles).not_to include(@p3)
+        expect(@triggered_profiles).not_to include(@p3)
       end
       it 'does not return profiles triggered for :destroy' do
-        triggered_profiles = NotificationProfile.triggered_by(:create, @record)
-        expect(triggered_profiles).not_to include(@p4)
+        expect(@triggered_profiles).not_to include(@p4)
+      end
+      it 'does not return any profile triggered for ExtraModel' do
+        expect(@triggered_profiles).not_to include(@pe1)
+        expect(@triggered_profiles).not_to include(@pe2)
+        expect(@triggered_profiles).not_to include(@pe3)
+        expect(@triggered_profiles).not_to include(@pe4)
       end
 
       include_examples 'triggering changes', triggering_action: 'all', event_action: :create
@@ -520,21 +531,26 @@ RSpec.describe NotificationProfile do
     end
 
     describe ':update TestModel' do
+      before(:each) do
+        @triggered_profiles = NotificationProfile.triggered_by(:update, @record)
+      end
       it 'returns profiles triggered for all actions' do
-        triggered_profiles = NotificationProfile.triggered_by(:update, @record)
-        expect(triggered_profiles).to include(@p1)
+        expect(@triggered_profiles).to include(@p1)
       end
       it 'returns profiles triggered for :create actions' do
-        triggered_profiles = NotificationProfile.triggered_by(:update, @record)
-        expect(triggered_profiles).not_to include(@p2)
+        expect(@triggered_profiles).not_to include(@p2)
       end
       it 'does not return profiles triggered for :update' do
-        triggered_profiles = NotificationProfile.triggered_by(:update, @record)
-        expect(triggered_profiles).to include(@p3)
+        expect(@triggered_profiles).to include(@p3)
       end
       it 'does not return profiles triggered for :destroy' do
-        triggered_profiles = NotificationProfile.triggered_by(:update, @record)
-        expect(triggered_profiles).not_to include(@p4)
+        expect(@triggered_profiles).not_to include(@p4)
+      end
+      it 'does not return any profile triggered for ExtraModel' do
+        expect(@triggered_profiles).not_to include(@pe1)
+        expect(@triggered_profiles).not_to include(@pe2)
+        expect(@triggered_profiles).not_to include(@pe3)
+        expect(@triggered_profiles).not_to include(@pe4)
       end
 
       include_examples 'triggering changes', triggering_action: 'all', event_action: :update
@@ -542,21 +558,26 @@ RSpec.describe NotificationProfile do
     end
 
     describe ':destroy TestModel' do
+      before(:each) do
+        @triggered_profiles = NotificationProfile.triggered_by(:destroy, @record)
+      end
       it 'returns profiles triggered for all actions' do
-        triggered_profiles = NotificationProfile.triggered_by(:destroy, @record)
-        expect(triggered_profiles).to include(@p1)
+        expect(@triggered_profiles).to include(@p1)
       end
       it 'returns profiles triggered for :create actions' do
-        triggered_profiles = NotificationProfile.triggered_by(:destroy, @record)
-        expect(triggered_profiles).not_to include(@p2)
+        expect(@triggered_profiles).not_to include(@p2)
       end
       it 'does not return profiles triggered for :update' do
-        triggered_profiles = NotificationProfile.triggered_by(:destroy, @record)
-        expect(triggered_profiles).not_to include(@p3)
+        expect(@triggered_profiles).not_to include(@p3)
       end
       it 'does not return profiles triggered for :destroy' do
-        triggered_profiles = NotificationProfile.triggered_by(:destroy, @record)
-        expect(triggered_profiles).to include(@p4)
+        expect(@triggered_profiles).to include(@p4)
+      end
+      it 'does not return any profile triggered for ExtraModel' do
+        expect(@triggered_profiles).not_to include(@pe1)
+        expect(@triggered_profiles).not_to include(@pe2)
+        expect(@triggered_profiles).not_to include(@pe3)
+        expect(@triggered_profiles).not_to include(@pe4)
       end
 
       include_examples 'triggering changes', triggering_action: 'all', event_action: :destroy

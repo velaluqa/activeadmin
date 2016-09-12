@@ -94,7 +94,7 @@ JOIN
   # @return [Array] an array of matched `NotificationProfile` instances
   def self.triggered_by(action, record)
     relation = where(%(triggering_action = 'all' OR triggering_action = ?), action.to_s)
-    relation.where('triggering_resource = ?', record.class.to_s)
+    relation = relation.where('triggering_resource = ?', record.class.to_s)
     relation.to_a.keep_if do |profile|
       profile.triggering_changes?(record)
     end
