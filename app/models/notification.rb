@@ -79,4 +79,11 @@ class Notification < ActiveRecord::Base
       user.email_throttling_delay
     ].compact.min
   end
+
+  # Whether a notification is throttled or not.
+  #
+  # @return [Boolean] true if throttled
+  def throttled?
+    email_throttling_delay > 0
+  end
 end

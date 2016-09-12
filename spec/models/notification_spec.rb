@@ -91,4 +91,20 @@ RSpec.describe Notification do
       expect(@notification3.email_throttling_delay).to eq 0
     end
   end
+
+  describe '#throttled?' do
+    before(:each) do
+      @notification = create(:notification)
+    end
+
+    it 'returns false if email_throttling_delay is greater than 0' do
+      expect(@notification).to receive(:email_throttling_delay).and_return(0)
+      expect(@notification).not_to be_throttled
+    end
+
+    it 'returns true if email_throttling_delay is greater than 0' do
+      expect(@notification).to receive(:email_throttling_delay).and_return(5)
+      expect(@notification).to be_throttled
+    end
+  end
 end
