@@ -61,8 +61,8 @@ JOIN
   # * notification_profile.maximum_email_throttling_delay = ([Integer] in seconds)
   # * user.email_throttling_delay = ([Integer] in seconds)
   def recipients_with_pending(options = {})
-    relation =
-      User
+    relation = User
+      .select('DISTINCT("users"."id"), "users".*')
       .joins(notifications: :notification_profile)
       .merge(Notification.of(self).pending)
 

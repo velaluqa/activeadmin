@@ -350,8 +350,9 @@ RSpec.describe NotificationProfile do
         @user1 = create(:user)
         @user2 = create(:user)
         @profile = create(:notification_profile, users: [@user1, @user2])
-        @notification1 = create(:notification, notification_profile: @profile, user: @user1)
-        @notification2 = create(:notification, notification_profile: @profile, user: @user2, email_sent_at: 1.hour.ago, created_at: 2.hours.ago)
+        create(:notification, notification_profile: @profile, user: @user1)
+        create(:notification, notification_profile: @profile, user: @user1)
+        create(:notification, notification_profile: @profile, user: @user2, email_sent_at: 1.hour.ago, created_at: 2.hours.ago)
 
         @recipients = @profile.recipients_with_pending
       end
@@ -371,10 +372,11 @@ RSpec.describe NotificationProfile do
           @user2 = create(:user)
           @profile1 = create(:notification_profile, users: [@user1, @user2], maximum_email_throttling_delay: 60*60)
           @profile2 = create(:notification_profile, users: [@user1, @user2])
-          @notification1 = create(:notification, notification_profile: @profile1, user: @user1)
-          @notification2 = create(:notification, notification_profile: @profile1, user: @user2)
-          @notification3 = create(:notification, notification_profile: @profile2, user: @user1)
-          @notification4 = create(:notification, notification_profile: @profile2, user: @user2)
+          create(:notification, notification_profile: @profile1, user: @user1)
+          create(:notification, notification_profile: @profile1, user: @user1)
+          create(:notification, notification_profile: @profile1, user: @user2)
+          create(:notification, notification_profile: @profile2, user: @user1)
+          create(:notification, notification_profile: @profile2, user: @user2)
         end
 
         it 'returns only users with pending notifications matching the throttling settings for the profile-user-combination' do
@@ -399,8 +401,8 @@ RSpec.describe NotificationProfile do
           @user1 = create(:user, email_throttling_delay: 60*60)
           @user2 = create(:user)
           @profile1 = create(:notification_profile, users: [@user1, @user2])
-          @notification1 = create(:notification, notification_profile: @profile1, user: @user1)
-          @notification2 = create(:notification, notification_profile: @profile1, user: @user2)
+          create(:notification, notification_profile: @profile1, user: @user1)
+          create(:notification, notification_profile: @profile1, user: @user2)
         end
 
         it 'returns only users with pending notifications matching the throttling settings for the profile-user-combination' do
@@ -420,10 +422,11 @@ RSpec.describe NotificationProfile do
           @user2 = create(:user)
           @profile1 = create(:notification_profile, users: [@user1])
           @profile2 = create(:notification_profile, users: [@user1, @user2], maximum_email_throttling_delay: 24*60*60)
-          @notification1 = create(:notification, notification_profile: @profile1, user: @user1)
-          @notification2 = create(:notification, notification_profile: @profile1, user: @user2)
-          @notification3 = create(:notification, notification_profile: @profile2, user: @user1)
-          @notification4 = create(:notification, notification_profile: @profile2, user: @user2)
+          create(:notification, notification_profile: @profile1, user: @user1)
+          create(:notification, notification_profile: @profile1, user: @user1)
+          create(:notification, notification_profile: @profile1, user: @user2)
+          create(:notification, notification_profile: @profile2, user: @user1)
+          create(:notification, notification_profile: @profile2, user: @user2)
         end
 
         it 'returns only users with pending notifications matching the throttling settings for the profile-user-combination' do
