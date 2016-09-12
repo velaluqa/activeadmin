@@ -66,4 +66,17 @@ class Notification < ActiveRecord::Base
       .where('least(?, notification_profiles.maximum_email_throttling_delay, users.email_throttling_delay) = ?',
              ERICA.maximum_email_throttling_delay, throttle)
   end
+
+  # Returns the delay to which this notification is throttled.
+  # This throttling delay is limited by the system-wide and
+  # notification profiles `maximum_email_throttling_delay`.
+  #
+  # @return [Integer] the throttling delay in seconds
+  def email_throttling_delay
+    [
+      ERICA.maximum_email_throttling_delay,
+      notification_profile.maximum_email_throttling_delay,
+      user.email_throttling_delay
+    ].compact.min
+  end
 end

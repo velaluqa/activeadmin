@@ -75,4 +75,20 @@ RSpec.describe Notification do
       expect(Notification.of(@profile2.id)).to include(@not2)
     end
   end
+
+  describe '#email_throttling_delay' do
+    before(:each) do
+      @user = create(:user, email_throttling_delay: 0)
+      @profile = create(:notification_profile, maximum_email_throttling_delay: 0)
+      @notification1 = create(:notification)
+      @notification2 = create(:notification, user: @user)
+      @notification3 = create(:notification, notification_profile: @profile)
+    end
+
+    it 'returns the minimum delay of profile, user or system-wide email_throttling_delay' do
+      expect(@notification1.email_throttling_delay).to eq ERICA.maximum_email_throttling_delay
+      expect(@notification2.email_throttling_delay).to eq 0
+      expect(@notification3.email_throttling_delay).to eq 0
+    end
+  end
 end
