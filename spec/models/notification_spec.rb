@@ -4,6 +4,20 @@ RSpec.describe Notification do
   it { should belong_to(:version) }
   it { should belong_to(:resource) }
 
+  describe 'model' do
+    it 'is invalid without user' do
+      expect(build(:notification, user: nil)).not_to be_valid
+    end
+
+    it 'is invalid without profile' do
+      expect(build(:notification, notification_profile: nil)).not_to be_valid
+    end
+
+    it 'is invalid without resource' do
+      expect(build(:notification, resource: nil)).not_to be_valid
+    end
+  end
+
   describe 'scope ::pending' do
     before(:each) do
       @not1 = create(:notification)

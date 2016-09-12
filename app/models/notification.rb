@@ -42,6 +42,10 @@ class Notification < ActiveRecord::Base
   belongs_to :version
   belongs_to :resource, polymorphic: true
 
+  validates :user, presence: true
+  validates :notification_profile, presence: true
+  validates :resource, presence: true
+
   # All notifications that have not yet been sent.
   scope :pending, -> { where(email_sent_at: nil) }
 
