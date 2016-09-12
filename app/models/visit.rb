@@ -1,4 +1,3 @@
-require 'domino_document_mixin'
 require 'git_config_repository'
 
 # ## Schema Information

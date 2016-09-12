@@ -1,5 +1,3 @@
-require 'domino_document_mixin'
-
 # ## Schema Information
 #
 # Table name: `patients`
