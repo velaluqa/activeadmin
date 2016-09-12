@@ -23,6 +23,8 @@ require 'domino_integration_client'
 # **`updated_at`**            | `datetime`         |
 #
 class Study < ActiveRecord::Base
+  include NotificationObservable
+
   has_paper_trail class_name: 'Version'
   acts_as_taggable
 

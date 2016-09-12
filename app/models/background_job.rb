@@ -33,6 +33,8 @@
 #     * **`user_id`**
 #
 class BackgroundJob < ActiveRecord::Base
+  include NotificationObservable
+
   belongs_to :user
 
   before_destroy :remove_zipfile

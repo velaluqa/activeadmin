@@ -22,6 +22,7 @@
 #     * **`center_id`**
 #
 class Patient < ActiveRecord::Base
+  include NotificationObservable
   include DominoDocument
 
   has_paper_trail class_name: 'Version'

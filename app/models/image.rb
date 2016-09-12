@@ -35,6 +35,7 @@ class Image < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
+  include NotificationObservable
   include ImageStorageCallbacks
   include ScopablePermissions
 

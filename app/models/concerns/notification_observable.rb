@@ -1,7 +1,13 @@
 module NotificationObservable
   extend ActiveSupport::Concern
 
+  def self.resources
+    @resources ||= []
+  end
+
   included do
+    NotificationObservable.resources << self
+
     after_create :notification_observable_create
     after_update :notification_observable_update
     after_destroy :notification_observable_destroy

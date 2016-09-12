@@ -58,4 +58,9 @@ RSpec.describe NotificationObservable do
     expect(NotificationObservableModel.notification_observable?).to be_truthy
     expect(NotNotificationObservableModel.notification_observable?).to be_falsy
   end
+
+  it 'keeps all observable resources in a list' do
+    expect(NotificationObservable.resources).to include(NotificationObservableModel)
+    expect(NotificationObservable.resources).not_to include(NotNotificationObservableModel)
+  end
 end

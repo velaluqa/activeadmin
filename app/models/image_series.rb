@@ -33,6 +33,7 @@
 #     * **`visit_id`**
 #
 class ImageSeries < ActiveRecord::Base
+  include NotificationObservable
   include DominoDocument
 
   has_paper_trail class_name: 'Version'

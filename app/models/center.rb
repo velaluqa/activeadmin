@@ -23,6 +23,7 @@
 #     * **`code`**
 #
 class Center < ActiveRecord::Base
+  include NotificationObservable
   include DominoDocument
 
   has_paper_trail class_name: 'Version'

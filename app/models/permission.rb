@@ -23,6 +23,8 @@
 #     * **`subject`**
 #
 class Permission < ActiveRecord::Base
+  include NotificationObservable
+
   ABILITY_REGEX = /^(.+)_(#{Ability::ACTIVITIES.keys.map{|subject| subject.to_s.underscore}.join('|')})$/
 
   belongs_to :role
