@@ -170,7 +170,7 @@ group :development do
 end
 
 group :test do
-  gem 'rspec-sidekiq'
+  gem 'rspec-sidekiq', github: 'velaluqa/rspec-sidekiq', branch: 'deprecate-have-enqueued-job'
 end
 
 group :development, :test do
