@@ -18,6 +18,10 @@ module NotificationObservable
       trigger_respective_profiles(:destroy, self)
     end
 
+    def self.notification_observable?
+      true
+    end
+
     private
 
     def trigger_respective_profiles(action, record)
@@ -25,6 +29,15 @@ module NotificationObservable
       triggered_profiles.each do |profile|
         profile.trigger(action, record)
       end
+    end
+  end
+end
+
+# Per default, models should not be `notification_observable?`.
+module ActiveRecord
+  class Base
+    def self.notification_observable?
+      false
     end
   end
 end
