@@ -4,7 +4,7 @@ describe SendThrottledNotificationEmails do
 
   it 'enqueues another send throttled notification email job' do
     SendThrottledNotificationEmails.perform_async('hourly')
-    expect(SendThrottledNotificationEmails).to have_enqueued_job('hourly')
+    expect(SendThrottledNotificationEmails).to have_enqueued_sidekiq_job('hourly')
   end
 
   context 'with existing throttled notifications' do
@@ -19,8 +19,8 @@ describe SendThrottledNotificationEmails do
 
     it 'enqueues other emailing jobs' do
       SendThrottledNotificationEmails.new.perform(24*60*60)
-      expect(SendThrottledNotificationEmail).to have_enqueued_job(@user1.id, @profile.id, [@notification1.id])
-      expect(SendThrottledNotificationEmail).to have_enqueued_job(@user2.id, @profile.id, [@notification2.id])
+      expect(SendThrottledNotificationEmail).to have_enqueued_sidekiq_job(@user1.id, @profile.id, [@notification1.id])
+      expect(SendThrottledNotificationEmail).to have_enqueued_sidekiq_job(@user2.id, @profile.id, [@notification2.id])
     end
   end
 end

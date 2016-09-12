@@ -4,7 +4,7 @@ describe SendInstantNotificationEmail do
 
   it 'enqueues another send throttled notification email job' do
     SendInstantNotificationEmail.perform_async(1)
-    expect(SendInstantNotificationEmail).to have_enqueued_job(1)
+    expect(SendInstantNotificationEmail).to have_enqueued_sidekiq_job(1)
   end
 
   context 'with existing throttled notifications' do
