@@ -37,6 +37,8 @@ class Notification < ActiveRecord::Base
     versions: :paper_trail_versions
   )
 
+  after_create :send_instant_notification_email
+
   belongs_to :notification_profile
   belongs_to :user
   belongs_to :version
@@ -85,5 +87,12 @@ class Notification < ActiveRecord::Base
   # @return [Boolean] true if throttled
   def throttled?
     email_throttling_delay > 0
+  end
+
+  protected
+
+  def send_instant_notification_email
+    return if throttled?
+    SendInstantNotificationEmail.perform_async(id)
   end
 end

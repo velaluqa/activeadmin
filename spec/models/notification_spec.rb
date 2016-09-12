@@ -107,4 +107,20 @@ RSpec.describe Notification do
       expect(@notification).to be_throttled
     end
   end
+
+  describe 'non-throttled notification' do
+    describe 'on create' do
+      before(:each) do
+        @user = create(:user)
+        @visit = create(:visit)
+        @profile = create(:notification_profile, maximum_email_throttling_delay: 0)
+      end
+
+      it 'schedules an instant notification job' do
+        expect(SendInstantNotificationEmail).not_to have_enqueued_sidekiq_job
+        notification = @profile.notifications.create(user: @user, resource: @visit)
+        expect(SendInstantNotificationEmail).to have_enqueued_sidekiq_job(notification.id)
+      end
+    end
+  end
 end
