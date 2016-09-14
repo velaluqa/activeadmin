@@ -1,3 +1,6 @@
+require 'notification_observable/filter'
+require 'notification_observable/filter/schema'
+
 module NotificationObservable
   extend ActiveSupport::Concern
 
