@@ -491,6 +491,7 @@ GEM
     ruby2ruby (2.3.0)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.0)
+    ruby_dig2 (0.0.1)
     ruby_parser (3.8.1)
       sexp_processor (~> 4.1)
     rubycritic (2.8.0)
@@ -698,6 +699,7 @@ DEPENDENCIES
   rubocop
   rubocop-checkstyle_formatter
   ruby-progressbar
+  ruby_dig2
   rubycritic
   rubyzip
   rugged (~> 0.24.0)
@@ -728,4 +730,4 @@ DEPENDENCIES
   yarjuf (~> 2.0.0)
 
 BUNDLED WITH
-   1.12.5
+   1.13.3
