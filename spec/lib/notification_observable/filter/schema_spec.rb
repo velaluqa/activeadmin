@@ -11,7 +11,7 @@ RSpec.describe NotificationObservable::Filter::Schema, focus: true do
 
   with_model :SubModel do
     table do |t|
-      t.integer :foo
+      t.integer :bar
     end
     model do
       has_one :test_model
@@ -30,112 +30,19 @@ RSpec.describe NotificationObservable::Filter::Schema, focus: true do
     end
   end
 
-  describe '#for_model' do
+  describe '#schema' do
     before(:each) do
-      @schema = NotificationObservable::Filter::Schema.new().for_model(TestModel)
+      @schema = NotificationObservable::Filter::Schema.new(TestModel).schema
     end
 
-    it 'returns schema for root attributes' do
-      expect(@schema).to include(:oneOf)
-      expect(@schema[:oneOf]).to include(include(title: 'id'))
-      expect(@schema[:oneOf].detect { |x| x[:title] == 'id' })
-        .to include(properties: {
-                      'id' => {
-                        oneOf: [
-                          {
-                            type: 'object',
-                            properties: {
-                              matches: {
-                                type: 'number'
-                              }
-                            }
-                          },
-                          {
-                            type: 'object',
-                            properties: {
-                              changes: {
-                                type: 'object',
-                                properties: {
-                                  from: {
-                                    type: 'number'
-                                  },
-                                  to: {
-                                    type: 'number'
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    })
-      expect(@schema[:oneOf]).to include(include(title: 'foo'))
-      expect(@schema[:oneOf].detect { |x| x[:title] == 'foo' })
-        .to include(properties: {
-                      'foo' => {
-                        oneOf: [
-                          {
-                            type: 'object',
-                            properties: {
-                              matches: {
-                                type: 'string'
-                              }
-                            }
-                          },
-                          {
-                            type: 'object',
-                            properties: {
-                              changes: {
-                                type: 'object',
-                                properties: {
-                                  from: {
-                                    type: 'string'
-                                  },
-                                  to: {
-                                    type: 'string'
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    })
-    end
+    it 'has model definitions for all nested relations' do
+      sub_model = NotificationObservable::Filter::Schema::Model.new(SubModel, filters: [:matches, :relations], path: [TestModel])
+      expect(@schema.dig2(:definitions))
+        .to include('#/definitions/model_sub_model' => sub_model.definition)
 
-    it 'returns schema for related models foreign keys' do
-      expect(@schema[:oneOf]).to include(include(title: 'sub_model_id'))
-      expect(@schema[:oneOf].detect { |x| x[:title] == 'sub_model_id' })
-        .to include(properties: {
-                      'sub_model_id' => {
-                        oneOf: [
-                          {
-                            type: 'object',
-                            properties: {
-                              matches: {
-                                type: 'number'
-                              }
-                            }
-                          },
-                          {
-                            type: 'object',
-                            properties: {
-                              changes: {
-                                type: 'object',
-                                properties: {
-                                  from: {
-                                    type: 'number'
-                                  },
-                                  to: {
-                                    type: 'number'
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    })
+      sub_sub_model = NotificationObservable::Filter::Schema::Model.new(SubSubModel, filters: [:matches, :relations], path: [TestModel, SubModel])
+      expect(@schema.dig2(:definitions))
+        .to include('#/definitions/model_sub_sub_model' => sub_sub_model.definition)
     end
   end
 end
