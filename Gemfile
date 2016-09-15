@@ -151,6 +151,9 @@ gem 'haml_coffee_assets'
 # See: https://github.com/emilioforrer/haml_coffee_assets/issues/152
 gem 'sprockets-rails', '2.3.3'
 
+# Validate JSONB columns via JSONschema
+gem 'activerecord_json_validator'
+
 # Enhanced `Array#dig` and `Hash#dig` for digging nested array/hash structures.
 gem 'ruby_dig2'
 
