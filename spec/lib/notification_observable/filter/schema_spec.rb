@@ -1,4 +1,4 @@
-RSpec.describe NotificationObservable::Filter::Schema, focus: true do
+RSpec.describe NotificationObservable::Filter::Schema do
   with_model :TestModel do
     table do |t|
       t.string :foo

@@ -1,4 +1,4 @@
-RSpec.describe NotificationObservable::Filter::Schema::Attribute, focus: true do
+RSpec.describe NotificationObservable::Filter::Schema::Attribute do
   with_model :TestModel do
     table do |t|
       t.integer :integer_field
