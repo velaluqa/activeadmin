@@ -45,6 +45,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
                         oneOf: [
                           {
                             type: 'object',
+                            required: ['matches'],
                             properties: {
                               matches: {
                                 type: 'integer'
@@ -53,6 +54,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
                           },
                           {
                             type: 'object',
+                            required: ['changes'],
                             properties: {
                               changes: {
                                 type: 'object',
@@ -77,6 +79,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
                         oneOf: [
                           {
                             type: 'object',
+                            required: ['matches'],
                             properties: {
                               matches: {
                                 type: 'string'
@@ -85,6 +88,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
                           },
                           {
                             type: 'object',
+                            required: ['changes'],
                             properties: {
                               changes: {
                                 type: 'object',
@@ -112,6 +116,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
                         oneOf: [
                           {
                             type: 'object',
+                            required: ['matches'],
                             properties: {
                               matches: {
                                 type: 'integer'
@@ -120,6 +125,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
                           },
                           {
                             type: 'object',
+                            required: ['changes'],
                             properties: {
                               changes: {
                                 type: 'object',

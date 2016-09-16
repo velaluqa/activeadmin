@@ -18,6 +18,7 @@ module NotificationObservable
           {
             title: "Related #{klass}",
             type: 'object',
+            required: [klass.to_s.underscore],
             properties: {
               klass.to_s.underscore => {
                 '$ref' => model.definition_ref

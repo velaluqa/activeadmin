@@ -29,6 +29,25 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
   end
 
+  describe '#schema' do
+    before(:each) do
+      @column = TestModel.columns.first
+      @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+      @schema = @attr.schema(filters: %i(matches changes))
+    end
+
+    it 'is of type `object`' do
+      expect(@schema).to include(type: 'object')
+    end
+    it 'requires column name' do
+      expect(@schema).to include(required: %w(id))
+    end
+    it 'defines property schema for column name' do
+      expect(@schema.dig2(:properties)).to have_key('id')
+      expect(@schema.dig2(:properties, 'id')).to have_key(:oneOf)
+    end
+  end
+
   describe '#filters' do
     before(:each) do
       @column = TestModel.columns.first
@@ -44,6 +63,30 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       expect(@attr.filters(filters: %i(changes))).not_to include(matches_filter)
       expect(@attr.filters(filters: %i(matches))).not_to include(changes_filter)
       expect(@attr.filters(filters: %i(matches))).to include(matches_filter)
+    end
+  end
+
+  describe '#matches_filter' do
+    before(:each) do
+      @column = TestModel.columns.first
+      @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+      @filter = @attr.matches_filter
+    end
+
+    it 'requires `matches` property' do
+      expect(@filter).to include(required: %w(matches))
+    end
+  end
+
+  describe '#changes_filter' do
+    before(:each) do
+      @column = TestModel.columns.first
+      @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+      @filter = @attr.changes_filter
+    end
+
+    it 'requires `changes` property' do
+      expect(@filter).to include(required: %w(changes))
     end
   end
 

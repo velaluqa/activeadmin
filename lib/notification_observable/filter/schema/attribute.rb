@@ -13,6 +13,7 @@ module NotificationObservable
           {
             title: @column.name,
             type: 'object',
+            required: [@column.name],
             properties: {
               @column.name => {
                 oneOf: filters(options)
@@ -30,6 +31,7 @@ module NotificationObservable
         def matches_filter
           {
             type: 'object',
+            required: ['matches'],
             properties: {
               matches: validation
             }
@@ -39,6 +41,7 @@ module NotificationObservable
         def changes_filter
           {
             type: 'object',
+            required: ['changes'],
             properties: {
               changes: {
                 type: 'object',
