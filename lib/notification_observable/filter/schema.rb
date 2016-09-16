@@ -25,8 +25,7 @@ module NotificationObservable
             minItems: 1,
             items: {
               title: 'Condition',
-              oneOf: definition
-            }
+            }.merge(definition)
           }
         }
       end

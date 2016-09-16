@@ -35,6 +35,11 @@ RSpec.describe NotificationObservable::Filter::Schema, focus: true do
       @schema = NotificationObservable::Filter::Schema.new(TestModel).schema
     end
 
+    it 'defines the basic filter schema to the root model' do
+      model = NotificationObservable::Filter::Schema::Model.new(TestModel)
+      expect(@schema.dig2(:items, :items)).to include(model.definition)
+    end
+
     it 'has model definitions for all nested relations' do
       sub_model = NotificationObservable::Filter::Schema::Model.new(SubModel, filters: [:matches, :relations], path: [TestModel])
       expect(@schema.dig2(:definitions))
