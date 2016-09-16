@@ -7,9 +7,9 @@ module NotificationObservable
         def initialize(klass, options = {})
           @options = {
             filters: %i(matches changes relations),
-            path: []
+            ignore_relations: [Version]
           }.merge(options)
-          @options[:path] = @options[:path] + [klass]
+          @options[:ignore_relations] = @options[:ignore_relations] + [klass]
           @klass = klass
           @definitions = {}
         end
@@ -32,7 +32,7 @@ module NotificationObservable
 
         def relations
           @klass._reflections.values.map do |reflection|
-            next if options[:path].include?(reflection.klass)
+            next if options[:ignore_relations].include?(reflection.klass)
             relation = Relation.new(reflection.klass, options)
             schema = relation.schema
             @definitions.merge!(relation.definitions)

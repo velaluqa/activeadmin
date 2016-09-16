@@ -7,7 +7,6 @@ module NotificationObservable
         def initialize(klass, options = {})
           @options = {
             filters: %i(matches relations),
-            path: []
           }.merge(options)
           @options[:filters] = @options[:filters] - [:changes]
           @klass = klass
