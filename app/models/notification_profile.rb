@@ -35,6 +35,8 @@ class NotificationProfile < ActiveRecord::Base
   has_and_belongs_to_many :roles
   has_many :notifications
 
+  validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }
+
   # Returns a relations querying all recipient from the `users` and
   # the `roles` associations.
   #
@@ -194,5 +196,13 @@ JOIN
     changes = triggering_changes_description
     changes = ", #{changes}" if changes
     "NotificationProfile[#{id}, #{triggering_action}, #{triggering_resource}#{changes}]"
+  end
+
+  def filters_schema
+    NotificationObservable::Filter::Schema.new(triggering_resource_class).schema
+  end
+
+  def triggering_resource_class
+    triggering_resource.constantize
   end
 end
