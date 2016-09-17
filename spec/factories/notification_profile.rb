@@ -8,6 +8,8 @@ FactoryGirl.define do
     triggering_resource 'Visit'
     triggering_changes { Hash.new }
 
+    filters([])
+
     only_authorized_recipients true
 
     is_active true
