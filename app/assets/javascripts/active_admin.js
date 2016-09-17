@@ -5,6 +5,7 @@
 //= require reorder_visits
 
 //= require vendor/select2.full
+//= require vendor/jsoneditor
 //= require cases_advanced_filters
 //= require aa_advanced_filters
 //= require tree.jquery
