@@ -59,10 +59,10 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       matches_filter = @attr.matches_filter
       changes_filter = @attr.changes_filter
       expect(@attr.filters(filters: %i(matches changes))).to include(matches_filter)
-      expect(@attr.filters(filters: %i(matches changes))).to include(changes_filter)
-      expect(@attr.filters(filters: %i(changes))).to include(changes_filter)
+      expect(@attr.filters(filters: %i(matches changes))).to include(*changes_filter)
+      expect(@attr.filters(filters: %i(changes))).to include(*changes_filter)
       expect(@attr.filters(filters: %i(changes))).not_to include(matches_filter)
-      expect(@attr.filters(filters: %i(matches))).not_to include(changes_filter)
+      expect(@attr.filters(filters: %i(matches))).not_to include(*changes_filter)
       expect(@attr.filters(filters: %i(matches))).to include(matches_filter)
     end
   end
@@ -88,14 +88,97 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
   end
 
   describe '#changes_filter' do
-    before(:each) do
+    it 'validates many changes filters' do
       @column = TestModel.columns.first
       @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
       @filter = @attr.changes_filter
+      expect(@filter).to include(@attr.changes_bool_filter,
+                                 @attr.changes_from_filter,
+                                 @attr.changes_to_filter,
+                                 @attr.changes_from_to_filter)
+    end
+  end
+
+  describe '#changes_bool_filter' do
+    before(:each) do
+      @column = TestModel.columns.first
+      @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+      @filter = @attr.changes_bool_filter
     end
 
     it 'has title `changes`' do
       expect(@filter).to include(title: 'changes')
+    end
+
+    it 'requires `changes` property' do
+      expect(@filter).to include(required: %w(changes))
+    end
+
+    it 'validates boolean' do
+      expect(@filter.dig2(:properties, :changes)).to include(type: 'boolean')
+    end
+  end
+
+
+  describe '#changes_from_filter' do
+    before(:each) do
+      @column = TestModel.columns.first
+      @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+      @filter = @attr.changes_from_filter
+    end
+
+    it 'has title `changes`' do
+      expect(@filter).to include(title: 'changes (from => any value)')
+    end
+
+    it 'requires `changes` property' do
+      expect(@filter).to include(required: %w(changes))
+    end
+
+    it 'validates the from value' do
+      expect(@filter.dig2(:properties, :changes, :properties)).to have_key(:from)
+      expect(@filter.dig2(:properties, :changes, :properties, :from)).to eq @attr.validation
+    end
+
+    it 'validates the to value' do
+      expect(@filter.dig2(:properties, :changes, :properties)).not_to have_key(:to)
+    end
+  end
+
+  describe '#changes_to_filter' do
+    before(:each) do
+      @column = TestModel.columns.first
+      @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+      @filter = @attr.changes_to_filter
+    end
+
+    it 'has title `changes`' do
+      expect(@filter).to include(title: 'changes (any value => to)')
+    end
+
+    it 'requires `changes` property' do
+      expect(@filter).to include(required: %w(changes))
+    end
+
+    it 'validates the from value' do
+      expect(@filter.dig2(:properties, :changes, :properties)).not_to have_key(:from)
+    end
+
+    it 'validates the to value' do
+      expect(@filter.dig2(:properties, :changes, :properties)).to have_key(:to)
+      expect(@filter.dig2(:properties, :changes, :properties, :to)).to eq @attr.validation
+    end
+  end
+
+  describe '#changes_from_to_filter' do
+    before(:each) do
+      @column = TestModel.columns.first
+      @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+      @filter = @attr.changes_from_to_filter
+    end
+
+    it 'has title `changes`' do
+      expect(@filter).to include(title: 'changes (from => to)')
     end
 
     it 'requires `changes` property' do
@@ -121,7 +204,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       end
 
       it 'allows null' do
-        expect(@validation[:oneOf]).to include(title: 'null', type: 'null')
+        expect(@validation[:oneOf]).to include(title: 'NULL', type: 'null')
       end
 
       it 'allows value for column' do

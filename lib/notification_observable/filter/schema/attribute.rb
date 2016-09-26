@@ -25,7 +25,7 @@ module NotificationObservable
         def filters(options = {})
           (FILTERS & options[:filters]).map do |filter|
             send("#{filter}_filter")
-          end
+          end.flatten
         end
 
         def matches_filter
@@ -40,13 +40,36 @@ module NotificationObservable
         end
 
         def changes_filter
+          [
+            changes_bool_filter,
+            changes_from_filter,
+            changes_to_filter,
+            changes_from_to_filter
+          ]
+        end
+
+        def changes_bool_filter
           {
             title: 'changes',
             type: 'object',
             required: ['changes'],
             properties: {
               changes: {
+                type: 'boolean'
+              }
+            }
+          }
+        end
+
+        def changes_from_to_filter
+          {
+            title: 'changes (from => to)',
+            type: 'object',
+            required: ['changes'],
+            properties: {
+              changes: {
                 type: 'object',
+                required: ['from', 'to'],
                 properties: {
                   from: validation,
                   to: validation
@@ -56,9 +79,43 @@ module NotificationObservable
           }
         end
 
+        def changes_from_filter
+          {
+            title: 'changes (from => any value)',
+            type: 'object',
+            required: ['changes'],
+            properties: {
+              changes: {
+                type: 'object',
+                required: ['from'],
+                properties: {
+                  from: validation
+                }
+              }
+            }
+          }
+        end
+
+        def changes_to_filter
+          {
+            title: 'changes (any value => to)',
+            type: 'object',
+            required: ['changes'],
+            properties: {
+              changes: {
+                type: 'object',
+                required: ['to'],
+                properties: {
+                  to: validation
+                }
+              }
+            }
+          }
+        end
+
         def validation
           options = []
-          options << { title: 'null', type: 'null' } if @column.null
+          options << { title: 'NULL', type: 'null' } if @column.null
           options << value_validation
           { oneOf: options }
         end
