@@ -7,7 +7,9 @@ module NotificationObservable
         def initialize(klass, options = {})
           @options = {
             filters: %i(matches changes relations),
-            ignore_relations: [Version]
+            ignore_relations: [Notification, NotificationProfile,
+                               Version, ActsAsTaggableOn::Taggable,
+                               ActsAsTaggableOn::Tagger, ActsAsTaggableOn::Tagging]
           }.merge(options)
           @options[:ignore_relations] = @options[:ignore_relations] + [klass]
           @klass = klass
