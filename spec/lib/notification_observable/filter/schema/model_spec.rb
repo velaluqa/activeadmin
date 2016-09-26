@@ -39,117 +39,17 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
     it 'returns schema for root attributes' do
       expect(@schema).to include(:oneOf)
       expect(@schema[:oneOf]).to include(include(title: 'id'))
-      expect(@schema.dig2(:oneOf, {title: 'id'}))
-        .to include(properties: {
-                      'id' => {
-                        oneOf: [
-                          {
-                            type: 'object',
-                            required: ['matches'],
-                            properties: {
-                              matches: {
-                                type: 'integer'
-                              }
-                            }
-                          },
-                          {
-                            type: 'object',
-                            required: ['changes'],
-                            properties: {
-                              changes: {
-                                type: 'object',
-                                properties: {
-                                  from: {
-                                    type: 'integer'
-                                  },
-                                  to: {
-                                    type: 'integer'
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    })
       expect(@schema[:oneOf]).to include(include(title: 'foo'))
-      expect(@schema[:oneOf].detect { |x| x[:title] == 'foo' })
-        .to include(properties: {
-                      'foo' => {
-                        oneOf: [
-                          {
-                            type: 'object',
-                            required: ['matches'],
-                            properties: {
-                              matches: {
-                                type: 'string'
-                              }
-                            }
-                          },
-                          {
-                            type: 'object',
-                            required: ['changes'],
-                            properties: {
-                              changes: {
-                                type: 'object',
-                                properties: {
-                                  from: {
-                                    type: 'string'
-                                  },
-                                  to: {
-                                    type: 'string'
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    })
     end
 
     it 'returns schema for related models foreign keys' do
       expect(@schema[:oneOf]).to include(include(title: 'sub_model_id'))
-      expect(@schema[:oneOf].detect { |x| x[:title] == 'sub_model_id' })
-        .to include(properties: {
-                      'sub_model_id' => {
-                        oneOf: [
-                          {
-                            type: 'object',
-                            required: ['matches'],
-                            properties: {
-                              matches: {
-                                type: 'integer'
-                              }
-                            }
-                          },
-                          {
-                            type: 'object',
-                            required: ['changes'],
-                            properties: {
-                              changes: {
-                                type: 'object',
-                                properties: {
-                                  from: {
-                                    type: 'integer'
-                                  },
-                                  to: {
-                                    type: 'integer'
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    })
     end
 
     it 'returns schema with references for related models' do
-      expect(@schema[:oneOf])
-        .to include(include(title: 'Related SubModel'))
+      expect(@schema[:oneOf]).to include(include(title: 'Related SubModel'))
 
-      sub_model = @schema.dig2(:oneOf, { title: 'Related SubModel'}, :properties, 'sub_model')
+      sub_model = @schema.dig2(:oneOf, { title: 'Related SubModel' }, :properties, 'sub_model')
       expect(sub_model).to include('$ref' => '#/definitions/model_sub_model')
     end
 
