@@ -38,6 +38,13 @@ module NotificationObservable
 
         def relations
           @klass._reflections.values.map do |reflection|
+            # Polymorphic relations do not have a `@klass`, but need
+            # to be checked before calling `reflection.klass`, because
+            # the `klass` method would try to find the class constant,
+            # which mustn't be defined for polymorphic relations.
+            next if reflection.polymorphic?
+            # Through relations do not have a `@klass`.
+            next unless reflection.andand.klass
             next if options[:ignore_relations].include?(reflection.klass)
             relation = Relation.new(reflection, options)
             schema = relation.schema
