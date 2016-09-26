@@ -90,12 +90,12 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
   end
 
-  describe '#validation' do
+  describe '#value_validation' do
     describe 'for integer column' do
       before(:each) do
         @column = TestModel.columns_hash['integer_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
@@ -110,7 +110,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       before(:each) do
         @column = TestModel.columns_hash['bigint_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
@@ -123,7 +123,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       before(:each) do
         @column = TestModel.columns_hash['float_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
@@ -138,7 +138,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       before(:each) do
         @column = TestModel.columns_hash['decimal_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
@@ -154,7 +154,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
         before(:each) do
           @column = TestModel.columns_hash['string1_field']
           @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-          @validation = @attr.validation
+          @validation = @attr.value_validation
         end
 
         it 'returns the correct schema' do
@@ -167,7 +167,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
         before(:each) do
           @column = TestModel.columns_hash['string2_field']
           @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-          @validation = @attr.validation
+          @validation = @attr.value_validation
         end
 
         it 'returns the correct schema' do
@@ -180,7 +180,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
         before(:each) do
           @column = TestModel.columns_hash['string3_field']
           @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-          @validation = @attr.validation
+          @validation = @attr.value_validation
         end
 
         it 'returns the correct schema' do
@@ -193,7 +193,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
         before(:each) do
           @column = TestModel.columns_hash['string4_field']
           @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-          @validation = @attr.validation
+          @validation = @attr.value_validation
         end
 
         it 'returns the correct schema' do
@@ -206,7 +206,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       before(:each) do
         @column = TestModel.columns_hash['datetime_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
@@ -218,7 +218,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       before(:each) do
         @column = TestModel.columns_hash['date_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
@@ -230,7 +230,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       before(:each) do
         @column = TestModel.columns_hash['time_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
@@ -242,7 +242,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       before(:each) do
         @column = TestModel.columns_hash['binary_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
@@ -254,7 +254,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       before(:each) do
         @column = TestModel.columns_hash['boolean_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
@@ -266,7 +266,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       before(:each) do
         @column = TestModel.columns_hash['enum_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-        @validation = @attr.validation
+        @validation = @attr.value_validation
       end
 
       it 'returns the correct schema' do
