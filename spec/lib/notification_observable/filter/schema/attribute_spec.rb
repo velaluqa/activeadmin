@@ -1,7 +1,7 @@
 RSpec.describe NotificationObservable::Filter::Schema::Attribute do
   with_model :TestModel do
     table do |t|
-      t.integer :integer_field
+      t.integer :integer_field, null: true
       t.bigint :bigint_field
       t.float :float_field
       t.decimal :decimal_field
@@ -15,6 +15,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       t.binary :binary_field
       t.boolean :boolean_field
       t.string :enum_field
+      t.string :notnull_field, null: false
     end
     model do
       validates :integer_field, numericality: { greater_than_or_equal_to: 5, less_than_or_equal_to: 10 }
@@ -78,7 +79,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
 
     it 'validates the value' do
-      expect(@filter.dig2(:properties, :matches)).to eq @attr.value_validation
+      expect(@filter.dig2(:properties, :matches)).to eq @attr.validation
     end
   end
 
@@ -94,11 +95,45 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
 
     it 'validates the from value' do
-      expect(@filter.dig2(:properties, :changes, :properties, :from)).to eq @attr.value_validation
+      expect(@filter.dig2(:properties, :changes, :properties, :from)).to eq @attr.validation
     end
 
     it 'validates the to value' do
-      expect(@filter.dig2(:properties, :changes, :properties, :to)).to eq @attr.value_validation
+      expect(@filter.dig2(:properties, :changes, :properties, :to)).to eq @attr.validation
+    end
+  end
+
+  describe '#validation' do
+    describe 'for nullable column' do
+      before(:each) do
+        @column = TestModel.columns_hash['integer_field']
+        @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+        @validation = @attr.validation
+        expect(@validation).to be_a(Hash)
+      end
+
+      it 'allows null' do
+        expect(@validation[:oneOf]).to include(title: 'null', type: 'null')
+      end
+
+      it 'allows value for column' do
+        expect(@validation[:oneOf]).to include(@attr.value_validation)
+      end
+    end
+
+    describe 'for not-null column' do
+      before(:each) do
+        @column = TestModel.columns_hash['notnull_field']
+        @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+        @validation = @attr.validation
+      end
+
+      it 'denies null' do
+        expect(@validation[:oneOf]).not_to include(include(type: 'null'))
+      end
+      it 'allows values for column' do
+        expect(@validation[:oneOf]).to include(@attr.value_validation)
+      end
     end
   end
 

@@ -33,7 +33,7 @@ module NotificationObservable
             type: 'object',
             required: ['matches'],
             properties: {
-              matches: value_validation
+              matches: validation
             }
           }
         end
@@ -46,16 +46,23 @@ module NotificationObservable
               changes: {
                 type: 'object',
                 properties: {
-                  from: value_validation,
-                  to: value_validation
+                  from: validation,
+                  to: validation
                 }
               }
             }
           }
         end
 
+        def validation
+          options = []
+          options << { title: 'null', type: 'null' } if @column.null
+          options << value_validation
+          { oneOf: options }
+        end
+
         def value_validation
-          schema = type_defaults
+          schema = { title: 'value' }.merge(type_defaults)
           @model.validators_on(@column.name).each do |validator|
             schema.merge!(from_validator(validator))
           end
