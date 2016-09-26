@@ -16,7 +16,7 @@ module NotificationObservable
         def schema
           merge_definitions(model)
           {
-            title: "Related #{reflection.klass}",
+            title: "Related #{reflection.name.to_s.camelize}",
             type: 'object',
             required: [reflection.name.to_s],
             properties: {

@@ -64,7 +64,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Relation do
 
       it 'returns schema for relation' do
         expect(@schema).to include(
-                             title: 'Related SubSubModel',
+                             title: 'Related SubSubModels',
                              type: 'object',
                              required: ['sub_sub_models'],
                              properties: {
