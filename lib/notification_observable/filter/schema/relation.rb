@@ -2,25 +2,25 @@ module NotificationObservable
   class Filter
     class Schema
       class Relation
-        attr_reader :klass, :definitions, :options
+        attr_reader :reflection, :definitions, :options
 
-        def initialize(klass, options = {})
+        def initialize(reflection, options = {})
           @options = {
             filters: %i(matches relations),
           }.merge(options)
           @options[:filters] = @options[:filters] - [:changes]
-          @klass = klass
+          @reflection = reflection
           @definitions = {}
         end
 
         def schema
           merge_definitions(model)
           {
-            title: "Related #{klass}",
+            title: "Related #{reflection.klass}",
             type: 'object',
-            required: [klass.to_s.underscore],
+            required: [reflection.name.to_s],
             properties: {
-              klass.to_s.underscore => {
+              reflection.name.to_s => {
                 '$ref' => model.definition_ref
               }
             }
@@ -30,11 +30,11 @@ module NotificationObservable
         protected
 
         def model
-          @model ||= Model.new(klass, options)
+          @model ||= Model.new(reflection.klass, options)
         end
 
         def merge_definitions(model)
-          @definitions[model.definition_ref] ||= model.definition
+          @definitions[model.definition_key] ||= model.definition
           @definitions.merge!(model.definitions)
         end
       end

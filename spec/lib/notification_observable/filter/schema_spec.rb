@@ -43,11 +43,11 @@ RSpec.describe NotificationObservable::Filter::Schema do
     it 'has model definitions for all nested relations' do
       sub_model = NotificationObservable::Filter::Schema::Model.new(SubModel, filters: [:matches, :relations], ignore_relations: [TestModel])
       expect(@schema.dig2(:definitions))
-        .to include('#/definitions/model_sub_model' => sub_model.definition)
+        .to include('model_sub_model' => sub_model.definition)
 
       sub_sub_model = NotificationObservable::Filter::Schema::Model.new(SubSubModel, filters: [:matches, :relations], ignore_relations: [TestModel, SubModel])
       expect(@schema.dig2(:definitions))
-        .to include('#/definitions/model_sub_sub_model' => sub_sub_model.definition)
+        .to include('model_sub_sub_model' => sub_sub_model.definition)
     end
   end
 end

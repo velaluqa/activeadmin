@@ -19,7 +19,11 @@ module NotificationObservable
         end
 
         def definition_ref
-          "#/definitions/model_#{@klass.to_s.underscore}"
+          "#/definitions/#{definition_key}"
+        end
+
+        def definition_key
+          "model_#{@klass.to_s.underscore}"
         end
 
         protected
@@ -33,7 +37,7 @@ module NotificationObservable
         def relations
           @klass._reflections.values.map do |reflection|
             next if options[:ignore_relations].include?(reflection.klass)
-            relation = Relation.new(reflection.klass, options)
+            relation = Relation.new(reflection, options)
             schema = relation.schema
             @definitions.merge!(relation.definitions)
             schema
