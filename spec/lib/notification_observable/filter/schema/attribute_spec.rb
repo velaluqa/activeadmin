@@ -74,6 +74,10 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       @filter = @attr.matches_filter
     end
 
+    it 'has title `changes`' do
+      expect(@filter).to include(title: 'matches')
+    end
+
     it 'requires `matches` property' do
       expect(@filter).to include(required: %w(matches))
     end
@@ -88,6 +92,10 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       @column = TestModel.columns.first
       @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
       @filter = @attr.changes_filter
+    end
+
+    it 'has title `changes`' do
+      expect(@filter).to include(title: 'changes')
     end
 
     it 'requires `changes` property' do

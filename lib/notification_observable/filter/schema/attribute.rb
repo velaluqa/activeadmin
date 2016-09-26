@@ -30,6 +30,7 @@ module NotificationObservable
 
         def matches_filter
           {
+            title: 'matches',
             type: 'object',
             required: ['matches'],
             properties: {
@@ -40,6 +41,7 @@ module NotificationObservable
 
         def changes_filter
           {
+            title: 'changes',
             type: 'object',
             required: ['changes'],
             properties: {
