@@ -168,29 +168,29 @@ RSpec.describe NotificationObservable::Filter do
     end
   end
 
-  describe '#match_change? for filter' do
+  describe '#match_change for filter' do
     describe 'foo[=>"home"]' do
       before(:each) do
         @filter = NotificationObservable::Filter.new({})
       end
 
       it 'matches foo["office"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_truthy
+        expect(@filter.match_change('foo', { to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_truthy
       end
       it 'matches foo[nil=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { to: 'home' }, { 'foo' => nil }, { 'foo' => 'home' })).to be_truthy
+        expect(@filter.match_change('foo', { to: 'home' }, { 'foo' => nil }, { 'foo' => 'home' })).to be_truthy
       end
       it 'matches foo["office"=>"gym"] accordingly' do
-        expect(@filter.match_change?('foo', { to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
+        expect(@filter.match_change('foo', { to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
       end
       it 'matches foo["office"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { to: 'home' }, { 'foo' => 'office' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', { to: 'home' }, { 'foo' => 'office' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["gym"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { to: 'home' }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', { to: 'home' }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["home"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { to: 'home' }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
+        expect(@filter.match_change('foo', { to: 'home' }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
       end
     end
     describe 'foo[nil=>"home"]' do
@@ -199,22 +199,22 @@ RSpec.describe NotificationObservable::Filter do
       end
 
       it 'matches foo["office"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: nil, to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_falsy
+        expect(@filter.match_change('foo', { from: nil, to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_falsy
       end
       it 'matches foo[nil=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: nil, to: 'home' }, { 'foo' => nil }, { 'foo' => 'home' })).to be_truthy
+        expect(@filter.match_change('foo', { from: nil, to: 'home' }, { 'foo' => nil }, { 'foo' => 'home' })).to be_truthy
       end
       it 'matches foo["office"=>"gym"] accordingly' do
-        expect(@filter.match_change?('foo', { from: nil, to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
+        expect(@filter.match_change('foo', { from: nil, to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
       end
       it 'matches foo["office"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { from: nil, to: 'home' }, { 'foo' => 'office' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', { from: nil, to: 'home' }, { 'foo' => 'office' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["gym"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { from: nil, to: 'home' }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', { from: nil, to: 'home' }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["home"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: nil, to: 'home' }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
+        expect(@filter.match_change('foo', { from: nil, to: 'home' }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
       end
     end
     describe 'foo["office"=>"home"]' do
@@ -223,22 +223,22 @@ RSpec.describe NotificationObservable::Filter do
       end
 
       it 'matches foo["office"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_truthy
+        expect(@filter.match_change('foo', { from: 'office', to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_truthy
       end
       it 'matches foo[nil=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: 'home' }, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: 'home' }, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
       end
       it 'matches foo["office"=>"gym"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: 'home' }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
       end
       it 'matches foo["office"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: 'home' }, { 'foo' => 'office' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: 'home' }, { 'foo' => 'office' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["gym"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: 'home' }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: 'home' }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["home"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: 'home' }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: 'home' }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
       end
     end
     describe 'foo["office"=>]' do
@@ -247,22 +247,22 @@ RSpec.describe NotificationObservable::Filter do
       end
 
       it 'matches foo["office"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office' }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_truthy
+        expect(@filter.match_change('foo', { from: 'office' }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_truthy
       end
       it 'matches foo[nil=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office' }, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office' }, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
       end
       it 'matches foo["office"=>"gym"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office' }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_truthy
+        expect(@filter.match_change('foo', { from: 'office' }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_truthy
       end
       it 'matches foo["office"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office' }, { 'foo' => 'office' }, { 'foo' => nil })).to be_truthy
+        expect(@filter.match_change('foo', { from: 'office' }, { 'foo' => 'office' }, { 'foo' => nil })).to be_truthy
       end
       it 'matches foo["gym"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office' }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office' }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["home"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office' }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office' }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
       end
     end
     describe 'foo["office"=>nil]' do
@@ -271,22 +271,22 @@ RSpec.describe NotificationObservable::Filter do
       end
 
       it 'matches foo["office"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: nil }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: nil }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_falsy
       end
       it 'matches foo[nil=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: nil }, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: nil }, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
       end
       it 'matches foo["office"=>"gym"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: nil }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: nil }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
       end
       it 'matches foo["office"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: nil }, { 'foo' => 'office' }, { 'foo' => nil })).to be_truthy
+        expect(@filter.match_change('foo', { from: 'office', to: nil }, { 'foo' => 'office' }, { 'foo' => nil })).to be_truthy
       end
       it 'matches foo["gym"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: nil }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: nil }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["home"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { from: 'office', to: nil }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
+        expect(@filter.match_change('foo', { from: 'office', to: nil }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
       end
     end
     describe 'foo[=>nil]' do
@@ -295,22 +295,22 @@ RSpec.describe NotificationObservable::Filter do
       end
 
       it 'matches foo["office"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { to: nil }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_falsy
+        expect(@filter.match_change('foo', { to: nil }, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_falsy
       end
       it 'matches foo[nil=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { to: nil }, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
+        expect(@filter.match_change('foo', { to: nil }, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
       end
       it 'matches foo["office"=>"gym"] accordingly' do
-        expect(@filter.match_change?('foo', { to: nil }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
+        expect(@filter.match_change('foo', { to: nil }, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
       end
       it 'matches foo["office"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { to: nil }, { 'foo' => 'office' }, { 'foo' => nil })).to be_truthy
+        expect(@filter.match_change('foo', { to: nil }, { 'foo' => 'office' }, { 'foo' => nil })).to be_truthy
       end
       it 'matches foo["gym"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', { to: nil }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_truthy
+        expect(@filter.match_change('foo', { to: nil }, { 'foo' => 'gym' }, { 'foo' => nil })).to be_truthy
       end
       it 'matches foo["home"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', { to: nil }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
+        expect(@filter.match_change('foo', { to: nil }, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
       end
     end
     describe 'foo[change]' do
@@ -319,22 +319,22 @@ RSpec.describe NotificationObservable::Filter do
       end
 
       it 'matches foo["office"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', true, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_truthy
+        expect(@filter.match_change('foo', true, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_truthy
       end
       it 'matches foo[nil=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', true, { 'foo' => nil }, { 'foo' => 'home' })).to be_truthy
+        expect(@filter.match_change('foo', true, { 'foo' => nil }, { 'foo' => 'home' })).to be_truthy
       end
       it 'matches foo["office"=>"gym"] accordingly' do
-        expect(@filter.match_change?('foo', true, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_truthy
+        expect(@filter.match_change('foo', true, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_truthy
       end
       it 'matches foo["office"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', true, { 'foo' => 'office' }, { 'foo' => nil })).to be_truthy
+        expect(@filter.match_change('foo', true, { 'foo' => 'office' }, { 'foo' => nil })).to be_truthy
       end
       it 'matches foo["gym"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', true, { 'foo' => 'gym' }, { 'foo' => nil })).to be_truthy
+        expect(@filter.match_change('foo', true, { 'foo' => 'gym' }, { 'foo' => nil })).to be_truthy
       end
       it 'matches foo["home"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', true, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
+        expect(@filter.match_change('foo', true, { 'foo' => 'home' }, { 'foo' => "home" })).to be_falsy
       end
     end
     describe 'foo[nochange]' do
@@ -343,34 +343,34 @@ RSpec.describe NotificationObservable::Filter do
       end
 
       it 'matches foo["office"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', false, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_falsy
+        expect(@filter.match_change('foo', false, { 'foo' => 'office' }, { 'foo' => 'home' })).to be_falsy
       end
       it 'matches foo[nil=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', false, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
+        expect(@filter.match_change('foo', false, { 'foo' => nil }, { 'foo' => 'home' })).to be_falsy
       end
       it 'matches foo["office"=>"gym"] accordingly' do
-        expect(@filter.match_change?('foo', false, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
+        expect(@filter.match_change('foo', false, { 'foo' => 'office' }, { 'foo' => 'gym' })).to be_falsy
       end
       it 'matches foo["office"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', false, { 'foo' => 'office' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', false, { 'foo' => 'office' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["gym"=>nil] accordingly' do
-        expect(@filter.match_change?('foo', false, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
+        expect(@filter.match_change('foo', false, { 'foo' => 'gym' }, { 'foo' => nil })).to be_falsy
       end
       it 'matches foo["home"=>"home"] accordingly' do
-        expect(@filter.match_change?('foo', false, { 'foo' => 'home' }, { 'foo' => "home" })).to be_truthy
+        expect(@filter.match_change('foo', false, { 'foo' => 'home' }, { 'foo' => "home" })).to be_truthy
       end
     end
   end
 
-  describe '#match_value? for filter' do
+  describe '#match_value for filter' do
     before(:each) do
       @filter = NotificationObservable::Filter.new({})
     end
 
-    it 'matches exact value' do
-      expect(@filter.match_value?('foo', 'abc', { 'foo' => 'abc' })).to be_truthy
-      expect(@filter.match_value?('foo', 'def', { 'foo' => 'abc' })).to be_falsy
+    it 'matches `equal`' do
+      expect(@filter.match_value('foo', 'abc', { 'foo' => 'abc' })).to be_truthy
+      expect(@filter.match_value('foo', 'def', { 'foo' => 'abc' })).to be_falsy
     end
   end
 

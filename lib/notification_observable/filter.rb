@@ -26,8 +26,8 @@ module NotificationObservable
     def match_attribute(attr, condition, model, changes = {})
       condition.map do |name, filter|
         case name
-        when :matches then match_value?(attr, filter, model.attributes)
-        when :changes then match_change?(attr, filter, previous_attributes(model, changes), model.attributes)
+        when :matches then match_value(attr, filter, model.attributes)
+        when :changes then match_change(attr, filter, previous_attributes(model, changes), model.attributes)
         else false
         end
       end.all?
@@ -61,7 +61,7 @@ module NotificationObservable
       relation_condition(model, *condition.first)
     end
 
-    def match_change?(attr, change, old, new)
+    def match_change(attr, change, old, new)
       return old[attr] != new[attr] if change == true
       return old[attr] == new[attr] if change == false
       change.map do |key, value|
@@ -72,7 +72,7 @@ module NotificationObservable
       end.all?
     end
 
-    def match_value?(attr, value, attributes)
+    def match_value(attr, value, attributes)
       attributes[attr] == value
     end
 
