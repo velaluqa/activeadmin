@@ -76,6 +76,10 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     it 'requires `matches` property' do
       expect(@filter).to include(required: %w(matches))
     end
+
+    it 'validates the value' do
+      expect(@filter.dig2(:properties, :matches)).to eq @attr.value_validation
+    end
   end
 
   describe '#changes_filter' do
@@ -87,6 +91,14 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
 
     it 'requires `changes` property' do
       expect(@filter).to include(required: %w(changes))
+    end
+
+    it 'validates the from value' do
+      expect(@filter.dig2(:properties, :changes, :properties, :from)).to eq @attr.value_validation
+    end
+
+    it 'validates the to value' do
+      expect(@filter.dig2(:properties, :changes, :properties, :to)).to eq @attr.value_validation
     end
   end
 
