@@ -17,6 +17,7 @@ module NotificationObservable
 
         {
           definitions: model.definitions,
+          format: 'tabs',
           type: 'array',
           items: {
             title: 'Filter',
