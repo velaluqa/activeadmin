@@ -34,7 +34,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     before(:each) do
       @column = TestModel.columns.first
       @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-      @schema = @attr.schema(filters: %i(matches changes))
+      @schema = @attr.schema(filters: %i(equality changes))
     end
 
     it 'is of type `object`' do
@@ -56,34 +56,32 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
 
     it 'returns only schemas from options[:filters]' do
-      matches_filter = @attr.matches_filter
+      equality_filter = @attr.equality_filter
       changes_filter = @attr.changes_filter
-      expect(@attr.filters(filters: %i(matches changes))).to include(matches_filter)
-      expect(@attr.filters(filters: %i(matches changes))).to include(*changes_filter)
+      expect(@attr.filters(filters: %i(equality changes))).to include(*equality_filter)
+      expect(@attr.filters(filters: %i(equality changes))).to include(*changes_filter)
       expect(@attr.filters(filters: %i(changes))).to include(*changes_filter)
-      expect(@attr.filters(filters: %i(changes))).not_to include(matches_filter)
-      expect(@attr.filters(filters: %i(matches))).not_to include(*changes_filter)
-      expect(@attr.filters(filters: %i(matches))).to include(matches_filter)
+      expect(@attr.filters(filters: %i(changes))).not_to include(*equality_filter)
+      expect(@attr.filters(filters: %i(equality))).not_to include(*changes_filter)
+      expect(@attr.filters(filters: %i(equality))).to include(*equality_filter)
     end
   end
 
-  describe '#matches_filter' do
+  describe '#equality_filter' do
     before(:each) do
       @column = TestModel.columns.first
       @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-      @filter = @attr.matches_filter
+      @filter = @attr.equality_filter
     end
 
-    it 'has title `changes`' do
-      expect(@filter).to include(title: 'matches')
+    it 'validates equality' do
+      expect(@filter).to include(include(title: 'equals', required: %w(equal)))
+      expect(@filter).to include(include(properties: have_key(:equal)))
     end
 
-    it 'requires `matches` property' do
-      expect(@filter).to include(required: %w(matches))
-    end
-
-    it 'validates the value' do
-      expect(@filter.dig2(:properties, :matches)).to eq @attr.validation
+    it 'validates non-equality' do
+      expect(@filter).to include(include(title: 'does not equal', required: %w(notEqual)))
+      expect(@filter).to include(include(properties: have_key(:notEqual)))
     end
   end
 

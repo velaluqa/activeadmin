@@ -6,7 +6,7 @@ module NotificationObservable
 
         def initialize(klass, options = {})
           @options = {
-            filters: %i(matches changes relations),
+            filters: %i(equality changes relations),
             ignore_relations: [Notification, NotificationProfile,
                                Version, ActsAsTaggableOn::Taggable,
                                ActsAsTaggableOn::Tagger, ActsAsTaggableOn::Tagging],

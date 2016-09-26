@@ -2,7 +2,7 @@ module NotificationObservable
   class Filter
     class Schema
       class Attribute
-        FILTERS = %i(matches changes).freeze
+        FILTERS = %i(equality changes).freeze
 
         def initialize(model, column)
           @model = model
@@ -28,15 +28,25 @@ module NotificationObservable
           end.flatten
         end
 
-        def matches_filter
-          {
-            title: 'matches',
-            type: 'object',
-            required: ['matches'],
-            properties: {
-              matches: validation
+        def equality_filter
+          [
+            {
+              title: 'equals',
+              type: 'object',
+              required: ['equal'],
+              properties: {
+                equal: validation
+              }
+            },
+            {
+              title: 'does not equal',
+              type: 'object',
+              required: ['notEqual'],
+              properties: {
+                notEqual: validation
+              }
             }
-          }
+          ]
         end
 
         def changes_filter
