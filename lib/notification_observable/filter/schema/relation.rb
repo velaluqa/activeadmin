@@ -5,10 +5,10 @@ module NotificationObservable
         attr_reader :reflection, :definitions, :options
 
         def initialize(reflection, options = {})
-          @options = {
+          @options = options.merge(
             filters: %i(matches relations),
-          }.merge(options)
-          @options[:filters] = @options[:filters] - [:changes]
+            is_relation: true
+          )
           @reflection = reflection
           @definitions = {}
         end

@@ -31,31 +31,44 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
   end
 
   describe '#definition' do
-    before(:each) do
-      @model = NotificationObservable::Filter::Schema::Model.new(TestModel)
-      @schema = @model.definition
+    describe 'for is_relation: true' do
+      before(:each) do
+        @model = NotificationObservable::Filter::Schema::Model.new(TestModel, is_relation: true)
+        @schema = @model.definition
+      end
+
+      it 'validates existance' do
+        expect(@schema[:oneOf]).to include(include(title: 'Record exists?', type: 'boolean'))
+      end
     end
 
-    it 'returns schema for root attributes' do
-      expect(@schema).to include(:oneOf)
-      expect(@schema[:oneOf]).to include(include(title: 'id'))
-      expect(@schema[:oneOf]).to include(include(title: 'foo'))
-    end
+    describe 'without options' do
+      before(:each) do
+        @model = NotificationObservable::Filter::Schema::Model.new(TestModel)
+        @schema = @model.definition
+      end
 
-    it 'returns schema for related models foreign keys' do
-      expect(@schema[:oneOf]).to include(include(title: 'sub_model_id'))
-    end
+      it 'returns schema for root attributes' do
+        expect(@schema).to include(:oneOf)
+        expect(@schema[:oneOf]).to include(include(title: 'id'))
+        expect(@schema[:oneOf]).to include(include(title: 'foo'))
+      end
 
-    it 'returns schema with references for related models' do
-      expect(@schema[:oneOf]).to include(include(title: 'Related SubModel'))
+      it 'returns schema for related models foreign keys' do
+        expect(@schema[:oneOf]).to include(include(title: 'sub_model_id'))
+      end
 
-      sub_model = @schema.dig2(:oneOf, { title: 'Related SubModel' }, :properties, 'sub_model')
-      expect(sub_model).to include('$ref' => '#/definitions/model_sub_model')
-    end
+      it 'returns schema with references for related models' do
+        expect(@schema[:oneOf]).to include(include(title: 'Related SubModel'))
 
-    it 'skips relations if already in path' do
-      @model = NotificationObservable::Filter::Schema::Model.new(SubModel, path: [TestModel])
-      expect(@model.definition[:oneOf]).not_to include(nil)
+        sub_model = @schema.dig2(:oneOf, { title: 'Related SubModel' }, :properties, 'sub_model')
+        expect(sub_model).to include('$ref' => '#/definitions/model_sub_model')
+      end
+
+      it 'skips relations if already in path' do
+        @model = NotificationObservable::Filter::Schema::Model.new(SubModel, path: [TestModel])
+        expect(@model.definition[:oneOf]).not_to include(nil)
+      end
     end
   end
 end

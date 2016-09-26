@@ -9,7 +9,8 @@ module NotificationObservable
             filters: %i(matches changes relations),
             ignore_relations: [Notification, NotificationProfile,
                                Version, ActsAsTaggableOn::Taggable,
-                               ActsAsTaggableOn::Tagger, ActsAsTaggableOn::Tagging]
+                               ActsAsTaggableOn::Tagger, ActsAsTaggableOn::Tagging],
+            is_relation: false
           }.merge(options)
           @options[:ignore_relations] = @options[:ignore_relations] + [klass]
           @klass = klass
@@ -17,7 +18,7 @@ module NotificationObservable
         end
 
         def definition
-          { oneOf: attributes + relations }
+          { oneOf: relation_existance + attributes + relations }
         end
 
         def definition_ref
@@ -29,6 +30,11 @@ module NotificationObservable
         end
 
         protected
+
+        def relation_existance
+          return [] unless options[:is_relation]
+          [{ title: 'Record exists?', type: 'boolean' }]
+        end
 
         def attributes
           @klass.columns.map do |column|
