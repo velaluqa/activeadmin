@@ -16,7 +16,7 @@ module NotificationObservable
             required: [@column.name],
             properties: {
               @column.name => {
-                oneOf: filters(options)
+                anyOf: filters(options)
               }
             }
           }

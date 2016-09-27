@@ -45,7 +45,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
     it 'defines property schema for column name' do
       expect(@schema.dig2(:properties)).to have_key('id')
-      expect(@schema.dig2(:properties, 'id')).to have_key(:oneOf)
+      expect(@schema.dig2(:properties, 'id')).to have_key(:anyOf)
     end
   end
 
