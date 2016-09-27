@@ -40,9 +40,9 @@ RSpec.describe NotificationObservable::Filter do
       it 'matches attribute' do
         expect(@filter).to receive(:match_attribute)
                             .once
-                            .with('foo', { matches: 'office' }, @model, @changes)
+                            .with('foo', { equal: 'office' }, @model, @changes)
                             .and_return(true)
-        @filter.match_condition({ foo: { matches: 'office' } }, @model, @changes)
+        @filter.match_condition({ foo: { equal: 'office' } }, @model, @changes)
       end
     end
     describe 'given relation condition' do
@@ -55,9 +55,9 @@ RSpec.describe NotificationObservable::Filter do
       it 'matches relation' do
         expect(@filter).to receive(:match_relation)
                             .once
-                            .with(@model, 'sub_model', { bar: { matches: 5 } })
+                            .with(@model, 'sub_model', { bar: { equal: 5 } })
                             .and_return(true)
-        @filter.match_condition({ sub_model: { bar: { matches: 5 } } }, @model, @changes)
+        @filter.match_condition({ sub_model: { bar: { equal: 5 } } }, @model, @changes)
       end
     end
   end
@@ -70,9 +70,9 @@ RSpec.describe NotificationObservable::Filter do
         @changes = { 'foo' => %w(home office) }
       end
 
-      it 'handles match' do
-        expect(@filter.match_attribute('foo', { matches: 'office' }, @model, @changes)).to be_truthy
-        expect(@filter.match_attribute('foo', { matches: 'home' }, @model, @changes)).to be_falsy
+      it 'handles `equal`' do
+        expect(@filter.match_attribute('foo', { equal: 'office' }, @model, @changes)).to be_truthy
+        expect(@filter.match_attribute('foo', { equal: 'home' }, @model, @changes)).to be_falsy
       end
 
       it 'handles change' do
@@ -113,7 +113,7 @@ RSpec.describe NotificationObservable::Filter do
       end
     end
 
-    describe 'for attribute match'  do
+    describe 'for attribute equality'  do
       before(:each) do
         @filter = NotificationObservable::Filter.new({})
         @model = TestModel.create(foo: 'office')
@@ -121,14 +121,33 @@ RSpec.describe NotificationObservable::Filter do
         @sub_sub_model = SubSubModel.create(foobar: 'much_more', sub_model: @sub_model)
       end
 
-      it 'matches sub_model.bar' do
-        expect(@filter.match_relation(@model, 'sub_model', {bar: { matches: 15}})).to be_truthy
-        expect(@filter.match_relation(@model, 'sub_model', {bar: { matches: 20}})).to be_falsy
+      it 'matches equality of sub_model.bar' do
+        expect(@filter.match_relation(@model, 'sub_model', { bar: { equal: 15 }})).to be_truthy
+        expect(@filter.match_relation(@model, 'sub_model', { bar: { equal: 20 }})).to be_falsy
       end
 
-      it 'matches sub_model.sub_sub_model.foobar' do
-        expect(@filter.match_relation(@model, 'sub_model', {sub_sub_models: {foobar: {matches: 'much_more'}}})).to be_truthy
-        expect(@filter.match_relation(@model, 'sub_model', {sub_sub_models: {foobar: {matches: 'nothing'}}})).to be_falsy
+      it 'matches equality of sub_model.sub_sub_model.foobar' do
+        expect(@filter.match_relation(@model, 'sub_model', { sub_sub_models: { foobar: { equal: 'much_more' }}})).to be_truthy
+        expect(@filter.match_relation(@model, 'sub_model', { sub_sub_models: { foobar: { equal: 'nothing' }}})).to be_falsy
+      end
+
+      describe 'for attribute non-equality'  do
+        before(:each) do
+          @filter = NotificationObservable::Filter.new({})
+          @model = TestModel.create(foo: 'office')
+          @sub_model = SubModel.create(bar: 15, test_model: @model)
+          @sub_sub_model = SubSubModel.create(foobar: 'much_more', sub_model: @sub_model)
+        end
+
+        it 'matches equality of sub_model.bar' do
+          expect(@filter.match_relation(@model, 'sub_model', { bar: { notEqual: 15 }})).to be_falsy
+          expect(@filter.match_relation(@model, 'sub_model', { bar: { notEqual: 20 }})).to be_truthy
+        end
+
+        it 'matches equality of sub_model.sub_sub_model.foobar' do
+          expect(@filter.match_relation(@model, 'sub_model', { sub_sub_models: { foobar: { notEqual: 'much_more' }}})).to be_falsy
+          expect(@filter.match_relation(@model, 'sub_model', { sub_sub_models: { foobar: { notEqual: 'nothing' }}})).to be_truthy
+        end
       end
     end
   end
@@ -139,8 +158,8 @@ RSpec.describe NotificationObservable::Filter do
     end
 
     it 'returns the correct joins structure' do
-      expect(@filter.relation_joins('sub_model', {'sub_sub_model' => {foobar: {matches: 'something'}}})).to eq(sub_model: :sub_sub_model)
-      expect(@filter.relation_joins('sub_model', {foo: {matches: 'something'}})).to eq(:sub_model)
+      expect(@filter.relation_joins('sub_model', {'sub_sub_model' => {foobar: {equal: 'something'}}})).to eq(sub_model: :sub_sub_model)
+      expect(@filter.relation_joins('sub_model', {foo: {equal: 'something'}})).to eq(:sub_model)
     end
   end
 
@@ -149,22 +168,76 @@ RSpec.describe NotificationObservable::Filter do
       @filter = NotificationObservable::Filter.new({})
     end
 
-    it 'returns the correct conditions for value match' do
-      expect(@filter.relation_condition(TestModel, 'sub_model', {'sub_sub_model' => {foobar: {matches: 'something'}}})[0]).to match(/sub_sub_models/)
-      expect(@filter.relation_condition(TestModel, 'sub_model', {'sub_sub_model' => {foobar: {matches: 'something'}}})[1]).to eq('foobar')
-      expect(@filter.relation_condition(TestModel, 'sub_model', {'sub_sub_model' => {foobar: {matches: 'something'}}})[2]).to eq('something')
+    describe 'checking for existance' do
+      it 'returns the correct conditions' do
+        condition = @filter.relation_condition(TestModel, 'sub_model', true)
+        expect(condition[0]).to match(/sub_models/)
+        expect(condition[1]).to be_nil
+        expect(condition[2]).to be_truthy
+        expect(condition[3]).to be_nil
+      end
+
+      it 'returns the correct conditions for related models' do
+        condition = @filter.relation_condition(TestModel, 'sub_model', {'sub_sub_models' => true})
+        expect(condition[0]).to match('sub_sub_models')
+        expect(condition[1]).to be_nil
+        expect(condition[2]).to be_truthy
+        expect(condition[3]).to be_nil
+      end
     end
 
-    it 'returns the correct conditions for existence' do
-      expect(@filter.relation_condition(TestModel, 'sub_model', {'sub_sub_model' => false})[0]).to match('sub_sub_models')
-      expect(@filter.relation_condition(TestModel, 'sub_model', {'sub_sub_model' => false})[1]).to be_nil
-      expect(@filter.relation_condition(TestModel, 'sub_model', {'sub_sub_model' => false})[2]).to be_falsy
-      expect(@filter.relation_condition(TestModel, 'sub_model', {'sub_sub_model' => true})[0]).to match('sub_sub_models')
-      expect(@filter.relation_condition(TestModel, 'sub_model', {'sub_sub_model' => true})[1]).to be_nil
-      expect(@filter.relation_condition(TestModel, 'sub_model', {'sub_sub_model' => true})[2]).to be_truthy
-      expect(@filter.relation_condition(TestModel, 'sub_model', true)[0]).to match(/sub_models/)
-      expect(@filter.relation_condition(TestModel, 'sub_model', true)[1]).to be_nil
-      expect(@filter.relation_condition(TestModel, 'sub_model', true)[2]).to be_truthy
+    describe 'checking for non-existance' do
+      it 'returns the correct conditions' do
+        condition = @filter.relation_condition(TestModel, 'sub_model', false)
+        expect(condition[0]).to match(/sub_models/)
+        expect(condition[1]).to be_nil
+        expect(condition[2]).to be_falsy
+        expect(condition[3]).to be_nil
+      end
+
+      it 'returns the correct conditions for related models' do
+        condition = @filter.relation_condition(TestModel, 'sub_model', {'sub_sub_models' => false})
+        expect(condition[0]).to match('sub_sub_models')
+        expect(condition[1]).to be_nil
+        expect(condition[2]).to be_falsy
+        expect(condition[3]).to be_nil
+      end
+    end
+
+    describe 'checking for equality' do
+      it 'returns the correct conditions for value match' do
+        condition = @filter.relation_condition(TestModel, 'sub_model', {foo: {equal: 'something'}})
+        expect(condition[0]).to match(/sub_model/)
+        expect(condition[1]).to eq('foo')
+        expect(condition[2]).to eq('something')
+        expect(condition[3]).to be_truthy
+      end
+
+      it 'returns the correct conditions for related models value match' do
+        condition = @filter.relation_condition(TestModel, 'sub_model', {'sub_sub_models' => {foobar: {equal: 'something'}}})
+        expect(condition[0]).to match(/sub_sub_models/)
+        expect(condition[1]).to eq('foobar')
+        expect(condition[2]).to eq('something')
+        expect(condition[3]).to be_truthy
+      end
+    end
+
+    describe 'checking for non-equality' do
+      it 'returns the correct conditions for value match' do
+        condition = @filter.relation_condition(TestModel, 'sub_model', {foo: {notEqual: 'something'}})
+        expect(condition[0]).to match(/sub_model/)
+        expect(condition[1]).to eq('foo')
+        expect(condition[2]).to eq('something')
+        expect(condition[3]).to be_falsy
+      end
+
+      it 'returns the correct conditions for related models value match' do
+        condition = @filter.relation_condition(TestModel, 'sub_model', {'sub_sub_models' => {foobar: {notEqual: 'something'}}})
+        expect(condition[0]).to match(/sub_sub_models/)
+        expect(condition[1]).to eq('foobar')
+        expect(condition[2]).to eq('something')
+        expect(condition[3]).to be_falsy
+      end
     end
   end
 
@@ -361,19 +434,5 @@ RSpec.describe NotificationObservable::Filter do
         expect(@filter.match_change('foo', false, { 'foo' => 'home' }, { 'foo' => "home" })).to be_truthy
       end
     end
-  end
-
-  describe '#match_value for filter' do
-    before(:each) do
-      @filter = NotificationObservable::Filter.new({})
-    end
-
-    it 'matches `equal`' do
-      expect(@filter.match_value('foo', 'abc', { 'foo' => 'abc' })).to be_truthy
-      expect(@filter.match_value('foo', 'def', { 'foo' => 'abc' })).to be_falsy
-    end
-  end
-
-  describe '#match_relation' do
   end
 end

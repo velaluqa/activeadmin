@@ -26,7 +26,8 @@ module NotificationObservable
     def match_attribute(attr, condition, model, changes = {})
       condition.map do |name, filter|
         case name
-        when :matches then match_value(attr, filter, model.attributes)
+        when :equal then model.attributes[attr] == filter
+        when :notEqual then model.attributes[attr] != filter
         when :changes then match_change(attr, filter, previous_attributes(model, changes), model.attributes)
         else false
         end
@@ -37,16 +38,20 @@ module NotificationObservable
       relation = model.class
         .joins(relation_joins(key, condition))
         .where(id: model.id)
-      table_name, attr, expected = relation_condition(model, key, condition)
+      table_name, attr, expected, equal = relation_condition(model, key, condition)
       if attr
-        relation.where(table_name => { attr => expected }).exists?
+        if equal
+          relation.where(%("#{table_name}"."#{attr}" = ?), expected).exists?
+        else
+          relation.where(%("#{table_name}"."#{attr}" != ?), expected).exists?
+        end
       else
-        relation.where(%Q("#{table_name}"."id" IS NOT NULL)).exists? == expected
+        relation.where(%("#{table_name}"."id" IS NOT NULL)).exists? == expected
       end
     end
 
     def relation_joins(key, condition)
-      return nil if condition.is_a?(Hash) && condition.key?(:matches)
+      return nil if condition.is_a?(Hash) && (condition.key?(:equal) || condition.key?(:notEqual))
       return key.to_sym if condition == true || condition == false
       sub = relation_joins(*condition.first)
       return key.to_sym unless sub
@@ -55,10 +60,8 @@ module NotificationObservable
 
     def relation_condition(model, key, condition)
       key = key.to_s
-      return [model.table_name, key, condition[:matches]] if condition.is_a?(Hash) && condition.key?(:matches)
-      model = (model._reflections[key] || model._reflections[key.pluralize]).klass
-      return [model.table_name, nil, condition] if condition == true || condition == false
-      relation_condition(model, *condition.first)
+      ret = relation_equality_condition(model, key, condition) and return ret
+      relation_existance_condition(model, key, condition)
     end
 
     def match_change(attr, change, old, new)
@@ -72,8 +75,18 @@ module NotificationObservable
       end.all?
     end
 
-    def match_value(attr, value, attributes)
-      attributes[attr] == value
+    private
+
+    def relation_equality_condition(model, key, condition)
+      return unless condition.is_a?(Hash)
+      return [model.table_name, key, condition[:equal], true] if condition.key?(:equal)
+      return [model.table_name, key, condition[:notEqual], false] if condition.key?(:notEqual)
+    end
+
+    def relation_existance_condition(model, key, condition)
+      model = model._reflections[key].klass
+      return [model.table_name, nil, condition, nil] if condition == true || condition == false
+      relation_condition(model, *condition.first)
     end
 
     def previous_attributes(model, changes)
