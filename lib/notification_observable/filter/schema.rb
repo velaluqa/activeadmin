@@ -28,7 +28,7 @@ module NotificationObservable
               title: 'Condition',
             }.merge(definition)
           }
-        }
+        }.deep_stringify_keys
       end
     end
   end
