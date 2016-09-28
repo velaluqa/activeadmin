@@ -3,7 +3,11 @@ module NotificationObservable
     attr_reader :filters
 
     def initialize(filters)
-      @filters = filters
+      @filters = filters.map do |conditions|
+        conditions.map do |condition|
+          condition.deep_symbolize_keys
+        end
+      end
     end
 
     def match?(model, changes = {})
@@ -19,7 +23,7 @@ module NotificationObservable
       if model.has_attribute?(attr)
         match_attribute(attr.to_s, cond, model, changes)
       else
-        match_relation(model, attr.to_s, cond)
+        match_relation(model, attr, cond)
       end
     end
 
@@ -34,6 +38,16 @@ module NotificationObservable
       end.all?
     end
 
+    def match_change(attr, changes, old, new)
+      return old[attr] != new[attr] if changes == true
+      return old[attr] == new[attr] if changes == false
+      changes.map do |key, value|
+        case key
+        when :from then old[attr] == value && old[attr] != new[attr]
+        when :to then new[attr] == value && old[attr] != new[attr]
+        end
+      end.all?
+    end
     def match_relation(model, key, condition)
       relation = model.class
         .joins(relation_joins(key, condition))
@@ -52,27 +66,17 @@ module NotificationObservable
 
     def relation_joins(key, condition)
       return nil if condition.is_a?(Hash) && (condition.key?(:equal) || condition.key?(:notEqual))
-      return key.to_sym if condition == true || condition == false
+      return key if condition == true || condition == false
       sub = relation_joins(*condition.first)
-      return key.to_sym unless sub
-      { key.to_sym => sub }
+      return key unless sub
+      { key => sub }
     end
 
     def relation_condition(model, key, condition)
-      key = key.to_s
       ret = relation_equality_condition(model, key, condition) and return ret
       relation_existance_condition(model, key, condition)
     end
 
-    def match_change(attr, change, old, new)
-      return old[attr] != new[attr] if change == true
-      return old[attr] == new[attr] if change == false
-      change.map do |key, value|
-        case key
-        when :from then old[attr] == value && old[attr] != new[attr]
-        when :to then new[attr] == value && old[attr] != new[attr]
-        end
-      end.all?
     end
 
     private
@@ -84,7 +88,7 @@ module NotificationObservable
     end
 
     def relation_existance_condition(model, key, condition)
-      model = model._reflections[key].klass
+      model = model._reflections[key.to_s].klass
       return [model.table_name, nil, condition, nil] if condition == true || condition == false
       relation_condition(model, *condition.first)
     end
