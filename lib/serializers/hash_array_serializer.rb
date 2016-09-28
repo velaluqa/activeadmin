@@ -4,6 +4,6 @@ class HashArraySerializer
   end
 
   def self.load(array)
-    (array || []).map(&:with_indifferent_access)
+    array
   end
 end
