@@ -8,8 +8,13 @@ module NotificationObservable
     @resources ||= []
   end
 
+  def self.register(model)
+    resources << model
+    resources.uniq!
+  end
+
   included do
-    NotificationObservable.resources << self
+    NotificationObservable.register(self)
 
     after_create :notification_observable_create
     after_update :notification_observable_update
