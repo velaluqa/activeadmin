@@ -72,20 +72,6 @@ JOIN
     relation.merge(Notification.throttled(options[:throttle], joins: false))
   end
 
-  # For convenience we convert all triggering_changes hashes to
-  # `HashWithIndifferentAccess`, allowing us to access { 'a' => 1 }
-  # with either `:a` and `'a'`.
-  def triggering_changes
-    read_attribute(:triggering_changes).map(&:with_indifferent_access)
-  end
-
-  # For convenience we convert all filter hashes to
-  # `HashWithIndifferentAccess`, allowing us to access { 'a' => 1 }
-  # with either `:a` and `'a'`.
-  def filters
-    read_attribute(:filters).map(&:with_indifferent_access)
-  end
-
   # Returns all profiles that match the given action for given
   # resource. The resource may have changes, which are used to match
   # against a profiles `triggering_changes`.
