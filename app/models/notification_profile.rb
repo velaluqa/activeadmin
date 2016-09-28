@@ -21,14 +21,12 @@ require 'serializers/hash_array_serializer'
 # **`only_authorized_recipients`**      | `boolean`          | `default(TRUE), not null`
 # **`title`**                           | `string`           | `not null`
 # **`triggering_action`**               | `string`           | `default("all"), not null`
-# **`triggering_changes`**              | `jsonb`            | `not null`
 # **`triggering_resource`**             | `string`           | `not null`
 # **`updated_at`**                      | `datetime`         | `not null`
 #
 class NotificationProfile < ActiveRecord::Base
   has_paper_trail class_name: 'Version'
 
-  serialize :triggering_changes, HashArraySerializer
   serialize :filters, HashArraySerializer
 
   has_and_belongs_to_many :users
@@ -80,73 +78,19 @@ JOIN
   # @param [ActiveRecord::Base] record the record the action was performed on
   #
   # @return [Array] an array of matched `NotificationProfile` instances
-  def self.triggered_by(action, record)
+  def self.triggered_by(action, record, changes = {})
     relation = where(%(triggering_action = 'all' OR triggering_action = ?), action.to_s)
     relation = relation.where('triggering_resource = ?', record.class.to_s)
     relation.to_a.keep_if do |profile|
-      profile.triggering_changes?(record)
+      profile.filter.match?(record, changes)
     end
   end
 
-  # Matches the `changes` of given record against the `triggering_changes`.
-  #
-  # @param [ActiveRecord::Base] the record with changes
-  #
-  # @return [Boolean] whether the record triggers of not
-  def triggering_changes?(record)
-    return true if triggering_changes.empty?
-    changes = record.changes.with_indifferent_access
-    triggering_changes.map do |conj_changes|
-      triggers_matched = true
-      conj_changes.each_pair do |attribute, triggering|
-        triggers_matched &= !triggering.key?(:from) || (changes[attribute] && changes[attribute][0] == triggering[:from])
-        triggers_matched &= !triggering.key?(:to) || (changes[attribute] && changes[attribute][1] == triggering[:to])
-      end
-      triggers_matched
-    end.any?
-  end
-
-  # Apply filters on given `record`.
-  #
-  # @param [ActiveRecord::Base] record the record to match the filters against
-  # @return [Boolean] whether the filter matched or not
-  def filters_match?(record)
-    return true if filters.empty?
-
-    filters.map do |filter|
-      filter_matched = true
-      attr_filters = filter.delete(:attributes) || {}
-      attr_filters.each_pair do |attr, val|
-        filter_matched &= record.has_attribute?(attr) && record[attr] == val
-      end
-      filter.each_pair do |assoc, filters|
-        next unless record._reflections.key?(assoc)
-        if assoc =~ /s$/
-          relation = record.send(assoc.to_sym)
-          case filters
-          when TrueClass, FalseClass
-            filter_matched &= filters == relation.exists?
-          when Hash
-            filter_matched &= relation.where(filters).exists?
-          end
-        else
-          related_record = record.send(assoc.to_sym)
-          case filters
-          when TrueClass, FalseClass
-            filter_matched &= !filters == related_record.nil?
-          when Hash
-            filters.each_pair do |attr, val|
-              filter_matched &= related_record.andand.has_attribute?(attr) && related_record[attr] == val
-            end
-          end
-        end
-      end
-      filter_matched
-    end.any?
+  def filter
+    @filter ||= NotificationObservable::Filter.new(filters)
   end
 
   def trigger(action, record)
-    return false unless filters_match?(record)
     version = record.respond_to?(:versions) && record.versions.last
     recipients.map do |user|
       Notification.create(
@@ -158,34 +102,15 @@ JOIN
     end
   end
 
-  # Creates a String in the form "attribute(from => to)" from the
-  # `triggering_changes` Array. Array elements are logically disjunct
-  # and all hash keys are logically conjunct.
-  def triggering_changes_description
-    return if triggering_changes.empty?
-    conjs = triggering_changes.map do |conj|
-      conj.map do |key, t|
-        "#{key}(#{t.fetch(:from, '*any*')}=>#{t.fetch(:to, '*any*')})"
-      end.join(' AND ')
-    end
-    conjs.map! { |conj| conj.include?('AND') ? "(#{conj})" : conj }
-    conjs.join(' OR ')
-  end
-
   def to_s
-    changes = triggering_changes_description
-    changes = ", #{changes}" if changes
-    "NotificationProfile[#{id}, #{triggering_action}, #{triggering_resource}#{changes}]"
+    props = [id, triggering_action, triggering_resource, filter.to_s]
+    "NotificationProfile[#{props.compact.join(', ')}]"
   end
 
-  def inspect
-    changes = triggering_changes_description
-    changes = ", #{changes}" if changes
-    "NotificationProfile[#{id}, #{triggering_action}, #{triggering_resource}#{changes}]"
-  end
+  protected
 
   def filters_schema
-    NotificationObservable::Filter::Schema.new(triggering_resource_class).schema
+    NotificationObservable::Filter::Schema.new(triggering_resource_class).schema.deep_stringify_keys
   end
 
   def triggering_resource_class

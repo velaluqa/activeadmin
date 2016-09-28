@@ -1,4 +1,4 @@
-RSpec.shared_examples "triggering changes" do |options|
+RSpec.shared_examples 'filters changes' do |options|
   triggering_action = options[:triggering_action].andand.to_s || 'all'
   event_action = options[:event_action].andand.to_sym || :update
 
@@ -7,315 +7,339 @@ RSpec.shared_examples "triggering changes" do |options|
       @pc1 = create(:notification_profile,
                     triggering_action: triggering_action,
                     triggering_resource: 'TestModel',
-                    triggering_changes: [
-                      {
-                        foobar: {
-                          to: 'baz'
-                        }
-                      }
-                    ])
+                    filters: [[{
+                                 foobar: {
+                                   changes: {
+                                     to: 'baz'
+                                   }
+                                 }
+                               }]])
       @pc2 = create(:notification_profile,
                     triggering_action: triggering_action,
                     triggering_resource: 'TestModel',
-                    triggering_changes: [
-                      {
-                        foobar: {
-                          to: 'bar'
-                        }
-                      }
-                    ])
+                    filters: [[{
+                                 foobar: {
+                                   changes: {
+                                     to: 'bar'
+                                   }
+                                 }
+                               }]])
       @pc3 = create(:notification_profile,
                     triggering_action: triggering_action,
                     triggering_resource: 'TestModel',
-                    triggering_changes: [
-                      {
-                        foobar: {
-                          from: 'foo',
-                          to: 'baz'
-                        }
-                      }
-                    ])
+                    filters: [[{
+                                 foobar: {
+                                   changes: {
+                                     from: 'foo',
+                                     to: 'baz'
+                                   }
+                                 }
+                               }]])
       @pc4 = create(:notification_profile,
                     triggering_action: triggering_action,
                     triggering_resource: 'TestModel',
-                    triggering_changes: [
-                      {
-                        foobar: {
-                          from: 'foo',
-                          to: 'bar'
-                        }
-                      }
-                    ])
+                    filters: [[{
+                                 foobar: {
+                                   changes: {
+                                     from: 'foo',
+                                     to: 'bar'
+                                   }
+                                 }
+                               }]])
       @pc5 = create(:notification_profile,
                     triggering_action: triggering_action,
                     triggering_resource: 'TestModel',
-                    triggering_changes: [
-                      {
-                        foobar: {
-                          from: 'fu',
-                          to: 'baz'
-                        }
-                      }
-                    ])
+                    filters: [[{
+                                 foobar: {
+                                   changes: {
+                                     from: 'fu',
+                                     to: 'baz'
+                                   }
+                                 }
+                               }]])
       @pc6 = create(:notification_profile,
                     triggering_action: triggering_action,
                     triggering_resource: 'TestModel',
-                    triggering_changes: [
-                      {
-                        foobar: {
-                          from: 'fu',
-                          to: 'bar'
-                        }
-                      }
+                    filters: [
+                      [{
+                         foobar: {
+                           changes: {
+                             from: 'fu',
+                             to: 'bar'
+                           }
+                         }
+                       }]
                     ])
       @pc7 = create(:notification_profile,
                     triggering_action: triggering_action,
                     triggering_resource: 'TestModel',
-                    triggering_changes: [
-                      {
-                        foobar: {
-                          from: 'foo'
-                        }
-                      }
-                    ])
+                    filters: [[{
+                                 foobar: {
+                                   changes: {
+                                     from: 'foo'
+                                   }
+                                 }
+                               }]])
       @pc8 = create(:notification_profile,
                     triggering_action: triggering_action,
                     triggering_resource: 'TestModel',
-                    triggering_changes: [
-                      {
-                        foobar: {
-                          from: 'fu'
-                        }
-                      }
+                    filters: [
+                      [{
+                         foobar: {
+                           changes: {
+                             from: 'fu'
+                           }
+                         }
+                       }]
                     ])
       @pc9 = create(:notification_profile,
                     triggering_action: triggering_action,
                     triggering_resource: 'TestModel',
-                    triggering_changes: [
-                      {
+                    filters: [
+                      [{
                         foobar: {
-                          from: 'foo',
-                          to: nil
+                          changes: {
+                            from: 'foo',
+                            to: nil
+                          }
                         }
-                      }
+                      }]
                     ])
       @pc10 = create(:notification_profile,
                      triggering_action: triggering_action,
                      triggering_resource: 'TestModel',
-                     triggering_changes: [
-                       {
+                     filters: [
+                       [{
                          foobar: {
-                           from: nil,
-                           to: 'bar'
+                           changes: {
+                             from: nil,
+                             to: 'bar'
+                           }
                          }
-                       }
+                       }]
                      ])
       @pc11 = create(:notification_profile,
                      triggering_action: triggering_action,
                      triggering_resource: 'TestModel',
-                     triggering_changes: [
-                       {
-                         foobar: {
-                           to: 'bar'
-                         },
-                         foobaz: {
-                           from: 'bar',
-                           to: 'buz'
+                     filters: [
+                       [
+                         {
+                           foobar: {
+                             changes: {
+                               to: 'bar'
+                             }
+                           }
+                         }, {
+                           foobaz: {
+                             changes: {
+                               from: 'bar',
+                               to: 'buz'
+                             }
+                           }
                          }
-                       }
+                       ]
                      ])
       @pc12 = create(:notification_profile,
                      triggering_action: triggering_action,
                      triggering_resource: 'TestModel',
-                     triggering_changes: [
-                       {
-                         foobar: {
-                           to: 'baz'
-                         }
-                       }, {
-                         foobar: {
-                           to: 'bar'
-                         }
-                       }
+                     filters: [
+                       [{
+                          foobar: {
+                            changes: {
+                              to: 'baz'
+                            }
+                          }
+                        }],
+                       [{
+                          foobar: {
+                            changes: {
+                              to: 'bar'
+                            }
+                          }
+                        }]
                      ])
       @pc13 = create(:notification_profile,
                      triggering_action: triggering_action,
                      triggering_resource: 'TestModel',
-                     triggering_changes: [
-                       {
-                         foobar: {
-                           to: 'baz'
-                         },
-                         foobaz: {
-                           from: 'bar',
-                           to: 'buz'
+                     filters: [
+                       [
+                         {
+                           foobar: {
+                             changes: {
+                               to: 'baz'
+                             }
+                           }
+                         }, {
+                           foobaz: {
+                             changes: {
+                               from: 'bar',
+                               to: 'buz'
+                             }
+                           }
                          }
-                       }, {
-                         foobar: {
-                           to: 'bar'
+                       ], [
+                         {
+                           foobar: {
+                             changes: {
+                               to: 'bar'
+                             }
+                           }
                          }
-                       }
+                       ]
                      ])
-
-      @record = TestModel.create
     end
 
     describe 'foobar(nil => "bar")' do
       before(:each) do
-        expect(@record)
-          .to receive(:changes)
-          .at_least(1)
-          .and_return(
-            foobar: [nil, 'bar'],
-            foobaz: [nil, 'buz']
-          )
-        @triggered_profiles = NotificationProfile.triggered_by(event_action, @record)
+        @record = TestModel.create(foobar: 'bar', foobaz: 'buz')
+        @profiles = NotificationProfile.triggered_by(
+          event_action, @record,
+          foobar: [nil, 'bar'],
+          foobaz: [nil, 'buz']
+        )
       end
 
-      it 'does not return profile triggered by attribute `foobar` change from any value to `baz`' do
-        expect(@triggered_profiles).not_to include(@pc1)
+      it 'does not return profile triggered by foobar(*any* => "baz")' do
+        expect(@profiles).not_to include(@pc1)
       end
-      it 'returns profile triggered by attribute `foobar` change from any value to `bar`' do
-        expect(@triggered_profiles).to include(@pc2)
+      it 'returns profile triggered by foobar(*any* => "bar")' do
+        expect(@profiles).to include(@pc2)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `foo` to `baz`' do
-        expect(@triggered_profiles).not_to include(@pc3)
+      it 'does not return profile triggered by foobar("foo" => "baz")' do
+        expect(@profiles).not_to include(@pc3)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `foo` to `bar`' do
-        expect(@triggered_profiles).not_to include(@pc4)
+      it 'does not return profile triggered by foobar("foo" => "bar")' do
+        expect(@profiles).not_to include(@pc4)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `fu` to `baz`' do
-        expect(@triggered_profiles).not_to include(@pc5)
+      it 'does not return profile triggered by foobar("fu" => "baz")' do
+        expect(@profiles).not_to include(@pc5)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `fu` to `bar`' do
-        expect(@triggered_profiles).not_to include(@pc6)
+      it 'does not return profile triggered by foobar("fu" => "bar")' do
+        expect(@profiles).not_to include(@pc6)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `foo` to any value' do
-        expect(@triggered_profiles).not_to include(@pc7)
+      it 'does not return profile triggered by foobar("foo" => *any*)' do
+        expect(@profiles).not_to include(@pc7)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `fu` to any value' do
-        expect(@triggered_profiles).not_to include(@pc8)
+      it 'does not return profile triggered by foobar("fu" => *any*)' do
+        expect(@profiles).not_to include(@pc8)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `foo` to nil' do
-        expect(@triggered_profiles).not_to include(@pc9)
+      it 'does not return profile triggered by foobar("foo" => nil)' do
+        expect(@profiles).not_to include(@pc9)
       end
-      it 'returns profile triggered by attribute `foobar` change from nil to `bar`' do
-        expect(@triggered_profiles).to include(@pc10)
+      it 'returns profile triggered by foobar(nil => "bar")' do
+        expect(@profiles).to include(@pc10)
       end
       it 'does not return profile triggered by foobar(*any* => "bar") and foobaz("bar" => *any*)' do
-        expect(@triggered_profiles).not_to include(@pc11)
+        expect(@profiles).not_to include(@pc11)
       end
-      it 'does not return profile triggered by foobar(*any* => "baz") OR foobar(*any* => "bar")' do
-        expect(@triggered_profiles).to include(@pc12)
+      it 'returns profile triggered by foobar(*any* => "baz") OR foobar(*any* => "bar")' do
+        expect(@profiles).to include(@pc12)
       end
-      it 'does not return profile triggered by (foobar(*any* => "baz") AND foobaz("bar" => "buz")) OR foobar(*any* => "bar")' do
-        expect(@triggered_profiles).to include(@pc13)
+      it 'returns profile triggered by (foobar(*any* => "baz") AND foobaz("bar" => "buz")) OR foobar(*any* => "bar")' do
+        expect(@profiles).to include(@pc13)
       end
     end
     describe 'change from `foo` to `bar`' do
       before(:each) do
-        expect(@record)
-          .to receive(:changes)
-          .at_least(1)
-          .and_return(
-            foobar: ['foo', 'bar'],
-            foobaz: ['bar', 'buz']
-          )
-        @triggered_profiles = NotificationProfile.triggered_by(event_action, @record)
+        @record = TestModel.create(foobar: 'bar', foobaz: 'buz')
+        @profiles = NotificationProfile.triggered_by(
+          event_action, @record,
+          foobar: ['foo', 'bar'],
+          foobaz: ['bar', 'buz']
+        )
       end
 
-      it 'does not return profile triggered by attribute `foobar` change from any value to `baz`' do
-        expect(@triggered_profiles).not_to include(@pc1)
+      it 'does not return profile triggered by foobar(*any* => "baz")' do
+        expect(@profiles).not_to include(@pc1)
       end
-      it 'returns profile triggered by attribute `foobar` change from any value to `bar`' do
-        expect(@triggered_profiles).to include(@pc2)
+      it 'returns profile triggered by foobar(*any* => "bar")' do
+        expect(@profiles).to include(@pc2)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `foo` to `baz`' do
-        expect(@triggered_profiles).not_to include(@pc3)
+      it 'does not return profile triggered by foobar("foo" => "baz")' do
+        expect(@profiles).not_to include(@pc3)
       end
-      it 'returns profile triggered by attribute `foobar` change from `foo` to `bar`' do
-        expect(@triggered_profiles).to include(@pc4)
+      it 'returns profile triggered by foobar("foo" => "bar")' do
+        expect(@profiles).to include(@pc4)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `fu` to `baz`' do
-        expect(@triggered_profiles).not_to include(@pc5)
+      it 'does not return profile triggered by foobar("fu" => "baz")' do
+        expect(@profiles).not_to include(@pc5)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `fu` to `bar`' do
-        expect(@triggered_profiles).not_to include(@pc6)
+      it 'does not return profile triggered by foobar("fu" => "bar")' do
+        expect(@profiles).not_to include(@pc6)
       end
-      it 'returns profile triggered by attribute `foobar` change from `foo` to any value' do
-        expect(@triggered_profiles).to include(@pc7)
+      it 'returns profile triggered by foobar("foo" => *any*)' do
+        expect(@profiles).to include(@pc7)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `fu` to any value' do
-        expect(@triggered_profiles).not_to include(@pc8)
+      it 'does not return profile triggered by foobar("fu" => *any*)' do
+        expect(@profiles).not_to include(@pc8)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `foo` to nil' do
-        expect(@triggered_profiles).not_to include(@pc9)
+      it 'does not return profile triggered by foobar("foo" => nil)' do
+        expect(@profiles).not_to include(@pc9)
       end
-      it 'does not return profile triggered by attribute `foobar` change from nil to `bar`' do
-        expect(@triggered_profiles).not_to include(@pc10)
+      it 'does not return profile triggered by foobar(nil => "bar")' do
+        expect(@profiles).not_to include(@pc10)
       end
       it 'returns profile triggered by foobar(*any* => "bar") and foobaz("bar" => *any*)' do
-        expect(@triggered_profiles).to include(@pc11)
+        expect(@profiles).to include(@pc11)
       end
       it 'does not return profile triggered by foobar(*any* => "baz") OR foobar(*any* => "bar")' do
-        expect(@triggered_profiles).to include(@pc12)
+        expect(@profiles).to include(@pc12)
       end
       it 'does not return profile triggered by (foobar(*any* => "baz") AND foobaz("bar" => "buz")) OR foobar(*any* => "bar")' do
-        expect(@triggered_profiles).to include(@pc13)
+        expect(@profiles).to include(@pc13)
       end
     end
     describe 'change from `foo` to `nil`' do
       before(:each) do
-        expect(@record)
-          .to receive(:changes)
-          .at_least(1)
-          .and_return(foobar: ['foo', nil])
-        @triggered_profiles = NotificationProfile.triggered_by(event_action, @record)
+        @record = TestModel.create(foobar: nil)
+        @profiles = NotificationProfile.triggered_by(
+          event_action, @record,
+          foobar: ['foo', nil]
+        )
       end
 
-      it 'does not return profile triggered by attribute `foobar` change from any value to `baz`' do
-        expect(@triggered_profiles).not_to include(@pc1)
+      it 'does not return profile triggered by foobar(*any* => "baz")' do
+        expect(@profiles).not_to include(@pc1)
       end
-      it 'does not return profile triggered by attribute `foobar` change from any value to `bar`' do
-        expect(@triggered_profiles).not_to include(@pc2)
+      it 'does not return profile triggered by foobar(*any* => "bar")' do
+        expect(@profiles).not_to include(@pc2)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `foo` to `baz`' do
-        expect(@triggered_profiles).not_to include(@pc3)
+      it 'does not return profile triggered by foobar("foo" => "baz")' do
+        expect(@profiles).not_to include(@pc3)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `foo` to `bar`' do
-        expect(@triggered_profiles).not_to include(@pc4)
+      it 'does not return profile triggered by foobar("foo" => "bar")' do
+        expect(@profiles).not_to include(@pc4)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `fu` to `baz`' do
-        expect(@triggered_profiles).not_to include(@pc5)
+      it 'does not return profile triggered by foobar("fu" => "baz")' do
+        expect(@profiles).not_to include(@pc5)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `fu` to `bar`' do
-        expect(@triggered_profiles).not_to include(@pc6)
+      it 'does not return profile triggered by foobar("fu" => "bar")' do
+        expect(@profiles).not_to include(@pc6)
       end
-      it 'returns profile triggered by attribute `foobar` change from `foo` to any value' do
-        expect(@triggered_profiles).to include(@pc7)
+      it 'returns profile triggered by foobar("foo" => *any*)' do
+        expect(@profiles).to include(@pc7)
       end
-      it 'does not return profile triggered by attribute `foobar` change from `fu` to any value' do
-        expect(@triggered_profiles).not_to include(@pc8)
+      it 'does not return profile triggered by foobar("fu" => *any*)' do
+        expect(@profiles).not_to include(@pc8)
       end
-      it 'returns profile triggered by attribute `foobar` change from `foo` to nil' do
-        expect(@triggered_profiles).to include(@pc9)
+      it 'returns profile triggered by foobar("foo" => nil)' do
+        expect(@profiles).to include(@pc9)
       end
-      it 'does not return profile triggered by attribute `foobar` change from nil to `bar`' do
-        expect(@triggered_profiles).not_to include(@pc10)
+      it 'does not return profile triggered by foobar(nil => "bar")' do
+        expect(@profiles).not_to include(@pc10)
       end
       it 'does not return profile triggered by foobar(*any* => "bar") and foobaz("bar" => *any*)' do
-        expect(@triggered_profiles).not_to include(@pc11)
+        expect(@profiles).not_to include(@pc11)
       end
       it 'does not return profile triggered by foobar(*any* => "baz") OR foobar(*any* => "bar")' do
-        expect(@triggered_profiles).not_to include(@pc12)
+        expect(@profiles).not_to include(@pc12)
       end
       it 'does not return profile triggered by (foobar(*any* => "baz") AND foobaz("bar" => "buz")) OR foobar(*any* => "bar")' do
-        expect(@triggered_profiles).not_to include(@pc13)
+        expect(@profiles).not_to include(@pc13)
       end
     end
   end
 end
-
 
 RSpec.describe NotificationProfile do
   describe 'model' do
@@ -452,7 +476,6 @@ RSpec.describe NotificationProfile do
     end
   end
 
-
   with_model :MultiModel do
     table do |t|
       t.string :foo, null: true
@@ -508,243 +531,89 @@ RSpec.describe NotificationProfile do
 
     describe ':create TestModel' do
       before(:each) do
-        @triggered_profiles = NotificationProfile.triggered_by(:create, @record)
+        @profiles = NotificationProfile.triggered_by(:create, @record)
       end
       it 'returns profiles triggered for all actions' do
-        expect(@triggered_profiles).to include(@p1)
+        expect(@profiles).to include(@p1)
       end
       it 'returns profiles triggered for :create actions' do
-        expect(@triggered_profiles).to include(@p2)
+        expect(@profiles).to include(@p2)
       end
       it 'does not return profiles triggered for :update' do
-        expect(@triggered_profiles).not_to include(@p3)
+        expect(@profiles).not_to include(@p3)
       end
       it 'does not return profiles triggered for :destroy' do
-        expect(@triggered_profiles).not_to include(@p4)
+        expect(@profiles).not_to include(@p4)
       end
       it 'does not return any profile triggered for ExtraModel' do
-        expect(@triggered_profiles).not_to include(@pe1)
-        expect(@triggered_profiles).not_to include(@pe2)
-        expect(@triggered_profiles).not_to include(@pe3)
-        expect(@triggered_profiles).not_to include(@pe4)
+        expect(@profiles).not_to include(@pe1)
+        expect(@profiles).not_to include(@pe2)
+        expect(@profiles).not_to include(@pe3)
+        expect(@profiles).not_to include(@pe4)
       end
 
-      include_examples 'triggering changes', triggering_action: 'all', event_action: :create
-      include_examples 'triggering changes', triggering_action: 'create', event_action: :create
+      include_examples 'filters changes', triggering_action: 'all', event_action: :create
+      include_examples 'filters changes', triggering_action: 'create', event_action: :create
     end
 
     describe ':update TestModel' do
       before(:each) do
-        @triggered_profiles = NotificationProfile.triggered_by(:update, @record)
+        @profiles = NotificationProfile.triggered_by(:update, @record)
       end
       it 'returns profiles triggered for all actions' do
-        expect(@triggered_profiles).to include(@p1)
+        expect(@profiles).to include(@p1)
       end
       it 'returns profiles triggered for :create actions' do
-        expect(@triggered_profiles).not_to include(@p2)
+        expect(@profiles).not_to include(@p2)
       end
       it 'does not return profiles triggered for :update' do
-        expect(@triggered_profiles).to include(@p3)
+        expect(@profiles).to include(@p3)
       end
       it 'does not return profiles triggered for :destroy' do
-        expect(@triggered_profiles).not_to include(@p4)
+        expect(@profiles).not_to include(@p4)
       end
       it 'does not return any profile triggered for ExtraModel' do
-        expect(@triggered_profiles).not_to include(@pe1)
-        expect(@triggered_profiles).not_to include(@pe2)
-        expect(@triggered_profiles).not_to include(@pe3)
-        expect(@triggered_profiles).not_to include(@pe4)
+        expect(@profiles).not_to include(@pe1)
+        expect(@profiles).not_to include(@pe2)
+        expect(@profiles).not_to include(@pe3)
+        expect(@profiles).not_to include(@pe4)
       end
 
-      include_examples 'triggering changes', triggering_action: 'all', event_action: :update
-      include_examples 'triggering changes', triggering_action: 'update', event_action: :update
+      include_examples 'filters changes', triggering_action: 'all', event_action: :update
+      include_examples 'filters changes', triggering_action: 'update', event_action: :update
     end
 
     describe ':destroy TestModel' do
       before(:each) do
-        @triggered_profiles = NotificationProfile.triggered_by(:destroy, @record)
+        @profiles = NotificationProfile.triggered_by(:destroy, @record)
       end
       it 'returns profiles triggered for all actions' do
-        expect(@triggered_profiles).to include(@p1)
+        expect(@profiles).to include(@p1)
       end
       it 'returns profiles triggered for :create actions' do
-        expect(@triggered_profiles).not_to include(@p2)
+        expect(@profiles).not_to include(@p2)
       end
       it 'does not return profiles triggered for :update' do
-        expect(@triggered_profiles).not_to include(@p3)
+        expect(@profiles).not_to include(@p3)
       end
       it 'does not return profiles triggered for :destroy' do
-        expect(@triggered_profiles).to include(@p4)
+        expect(@profiles).to include(@p4)
       end
       it 'does not return any profile triggered for ExtraModel' do
-        expect(@triggered_profiles).not_to include(@pe1)
-        expect(@triggered_profiles).not_to include(@pe2)
-        expect(@triggered_profiles).not_to include(@pe3)
-        expect(@triggered_profiles).not_to include(@pe4)
+        expect(@profiles).not_to include(@pe1)
+        expect(@profiles).not_to include(@pe2)
+        expect(@profiles).not_to include(@pe3)
+        expect(@profiles).not_to include(@pe4)
       end
 
-      include_examples 'triggering changes', triggering_action: 'all', event_action: :destroy
-      include_examples 'triggering changes', triggering_action: 'destroy', event_action: :destroy
-    end
-  end
-
-  describe '#filters_match?' do
-    before(:each) do
-      @p0 = create(:notification_profile,
-                   triggering_action: 'all',
-                   triggering_resource: 'TestModel')
-      @p1 = create(:notification_profile,
-                   triggering_action: 'all',
-                   triggering_resource: 'TestModel',
-                   filters: [
-                     {
-                       attributes: {
-                         foobar: 'foo',
-                         foobaz: nil
-                       }
-                     }
-                   ])
-      @p2 = create(:notification_profile,
-                   triggering_action: 'all',
-                   triggering_resource: 'TestModel',
-                   filters: [
-                     {
-                       extra_model: {
-                         foo: 'baz'
-                       }
-                     }
-                   ])
-      @p3 = create(:notification_profile,
-                   triggering_action: 'all',
-                   triggering_resource: 'TestModel',
-                   filters: [
-                     {
-                       multi_models: true
-                     }
-                   ])
-      @p4 = create(:notification_profile,
-                   triggering_action: 'all',
-                   triggering_resource: 'TestModel',
-                   filters: [
-                     {
-                       multi_models: false
-                     }
-                   ])
-      @p5 = create(:notification_profile,
-                   triggering_action: 'all',
-                   triggering_resource: 'TestModel',
-                   filters: [
-                     {
-                       multi_models: {
-                         foo: 'bar'
-                       }
-                     }
-                   ])
-      @p6 = create(:notification_profile,
-                   triggering_action: 'all',
-                   triggering_resource: 'TestModel',
-                   filters: [
-                     {
-                       attributes: {
-                         foobar: 'foo'
-                       },
-                       multi_models: {
-                         foo: 'bar'
-                       }
-                     }
-                   ])
-      @p7 = create(:notification_profile,
-                   triggering_action: 'all',
-                   triggering_resource: 'TestModel',
-                   filters: [
-                     {
-                       attributes: {
-                         foobar: 'foo'
-                       }
-                     }, {
-                       multi_models: {
-                         foo: 'bar'
-                       }
-                     }
-                   ])
-      @tm = TestModel.create(foobar: 'foo', foobaz: nil)
-      @em1 = ExtraModel.create(foo: 'baz')
-      @tm_em1 = TestModel.create(foobar: 'foo', extra_model: @em1)
-      @em2 = ExtraModel.create(foo: 'bar')
-      @tm_em2 = TestModel.create(foobar: 'foo', extra_model: @em2)
-      @mm0 = MultiModel.create(foo: nil)
-      @mm1 = MultiModel.create(foo: 'fu')
-      @mm2 = MultiModel.create(foo: 'bar')
-      @mm3 = MultiModel.create(foo: 'bar')
-      @tm_mm1 = TestModel.create(foobar: 'foo', multi_models: [@mm0])
-      @tm_mm2 = TestModel.create(foobar: 'foo', multi_models: [@mm1])
-      @tm_mm3 = TestModel.create(foobar: 'foo', multi_models: [@mm2])
-      @tm_mm4 = TestModel.create(foobar: 'bar', multi_models: [@mm3])
-    end
-
-    it 'is defined' do
-      expect(NotificationProfile.new).to respond_to('filters_match?')
-    end
-
-    it 'is always true for profiles without filters' do
-      expect(@p0.filters_match?(@tm)).to be_truthy
-      expect(@p0.filters_match?(@tm_em1)).to be_truthy
-      expect(@p0.filters_match?(@tm_em2)).to be_truthy
-    end
-
-    it 'matches resource attributes' do
-      expect(@p1.filters_match?(@tm)).to be_truthy
-      expect(@p2.filters_match?(@tm)).to be_falsy
-      expect(@p6.filters_match?(@tm)).to be_falsy
-    end
-    it 'matches resource has_one/belongs_to relations' do
-      expect(@p2.filters_match?(@tm)).to be_falsy
-      expect(@p2.filters_match?(@tm_em1)).to be_truthy
-      expect(@p2.filters_match?(@tm_em2)).to be_falsy
-    end
-    it 'matches resource has_many/habtm relations' do
-      expect(@p3.filters_match?(@tm)).to be_falsy
-      expect(@p3.filters_match?(@tm_mm1)).to be_truthy
-      expect(@p3.filters_match?(@tm_mm2)).to be_truthy
-      expect(@p3.filters_match?(@tm_mm3)).to be_truthy
-      expect(@p3.filters_match?(@tm_mm4)).to be_truthy
-
-      expect(@p4.filters_match?(@tm)).to be_truthy
-      expect(@p4.filters_match?(@tm_mm1)).to be_falsy
-      expect(@p4.filters_match?(@tm_mm2)).to be_falsy
-      expect(@p4.filters_match?(@tm_mm3)).to be_falsy
-      expect(@p4.filters_match?(@tm_mm4)).to be_falsy
-
-      expect(@p5.filters_match?(@tm)).to be_falsy
-      expect(@p5.filters_match?(@tm_mm1)).to be_falsy
-      expect(@p5.filters_match?(@tm_mm2)).to be_falsy
-      expect(@p5.filters_match?(@tm_mm3)).to be_truthy
-      expect(@p5.filters_match?(@tm_mm4)).to be_truthy
-
-      expect(@p6.filters_match?(@tm)).to be_falsy
-      expect(@p6.filters_match?(@tm_mm1)).to be_falsy
-      expect(@p6.filters_match?(@tm_mm2)).to be_falsy
-      expect(@p6.filters_match?(@tm_mm3)).to be_truthy
-      expect(@p6.filters_match?(@tm_mm4)).to be_falsy
-
-      expect(@p7.filters_match?(@tm)).to be_truthy
-      expect(@p7.filters_match?(@tm_mm1)).to be_truthy
-      expect(@p7.filters_match?(@tm_mm2)).to be_truthy
-      expect(@p7.filters_match?(@tm_mm3)).to be_truthy
-      expect(@p7.filters_match?(@tm_mm4)).to be_truthy
+      include_examples 'filters changes', triggering_action: 'all', event_action: :destroy
+      include_examples 'filters changes', triggering_action: 'destroy', event_action: :destroy
     end
   end
 
   describe '#trigger' do
     it 'is defined' do
       expect(NotificationProfile.new).to respond_to('trigger')
-    end
-
-    it 'returns false if the filters do not match' do
-      profile = create(:notification_profile)
-      record = TestModel.create
-      expect(profile).to receive(:filters_match?).at_least(1).and_return(false)
-      expect(profile.trigger(:create, record)).to be_falsy
     end
 
     it 'creates a new notification' do

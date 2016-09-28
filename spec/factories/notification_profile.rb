@@ -6,7 +6,6 @@ FactoryGirl.define do
 
     triggering_action 'all'
     triggering_resource 'Visit'
-    triggering_changes { Hash.new }
 
     filters([])
 

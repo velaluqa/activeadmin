@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160907134504) do
+ActiveRecord::Schema.define(version: 20160928103548) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -132,7 +132,6 @@ ActiveRecord::Schema.define(version: 20160907134504) do
     t.string   "notification_type"
     t.string   "triggering_action",              default: "all", null: false
     t.string   "triggering_resource",                            null: false
-    t.jsonb    "triggering_changes",             default: {},    null: false
     t.jsonb    "filters",                        default: {},    null: false
     t.boolean  "only_authorized_recipients",     default: true,  null: false
     t.boolean  "is_active",                      default: false, null: false
