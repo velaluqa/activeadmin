@@ -17,6 +17,7 @@ module NotificationObservable
     # @param [Hash] changes Changes in the form of `{ attribute:['oldVal', 'newVal]}`
     # @return [Boolean] Whether the condition matched or not.
     def match?(model, changes = {})
+      return true if filters.empty?
       filters.map do |conditions|
         conditions.map do |condition|
           match_condition(condition, model, changes)

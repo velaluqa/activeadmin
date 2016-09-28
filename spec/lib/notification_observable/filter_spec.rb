@@ -37,6 +37,13 @@ RSpec.describe NotificationObservable::Filter do
       @record3 = TestModel.create(foo: 'buz')
     end
 
+    it 'matches for empty filters' do
+      @filter = NotificationObservable::Filter.new([])
+      expect(@filter.match?(@record1, foo: [nil, 'bar'], fu: [nil, 'baz'])).to be_truthy
+      expect(@filter.match?(@record2, foo: [nil, 'baz'])).to be_truthy
+      expect(@filter.match?(@record3, foo: [nil, 'buz'])).to be_truthy
+    end
+
     it 'matches single condition' do
       @filter = NotificationObservable::Filter.new(
         [
