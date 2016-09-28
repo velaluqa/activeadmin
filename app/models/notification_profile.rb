@@ -91,7 +91,7 @@ JOIN
   end
 
   def trigger(action, record)
-    version = record.respond_to?(:versions) && record.versions.last
+    version = record.try(:versions).andand.last
     recipients.map do |user|
       Notification.create(
         notification_profile: self,
