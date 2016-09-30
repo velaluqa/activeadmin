@@ -40,8 +40,8 @@ ActiveAdmin.register NotificationProfile do
     end
 
     f.inputs 'Triggers' do
-      f.input :triggering_action, as: :select, collection: %w(all create update destroy)
-      f.input :triggering_resource, as: :select, collection: NotificationObservable.resources.map(&:to_s).sort.uniq
+      f.input :triggering_action, as: :select, collection: %w(all create update destroy), input_html: { class: 'initialize-select2' }
+      f.input :triggering_resource, as: :select, collection: NotificationObservable.resources.map(&:to_s).sort.uniq, input_html: { class: 'initialize-select2' }
     end
 
     f.inputs 'Filters', class: 'filters' do
@@ -50,8 +50,8 @@ ActiveAdmin.register NotificationProfile do
     end
 
     f.inputs 'Recipients' do
-      f.input :roles, multiple: true, as: :select, collection: Role.all
-      f.input :users, multiple: true, as: :select, collection: User.all
+      f.input :users, type: :select, multiple: true, collection: User.all, input_html: { class: 'initialize-select2' }
+      f.input :roles, type: :select, multiple: true, collection: Role.all, input_html: { class: 'initialize-select2' }
       f.input :only_authorized_recipients
       f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays
     end
