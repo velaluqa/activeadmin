@@ -53,7 +53,7 @@ ActiveAdmin.register NotificationProfile do
       f.input :roles, multiple: true, as: :select, collection: Role.all
       f.input :users, multiple: true, as: :select, collection: User.all
       f.input :only_authorized_recipients
-      f.input :maximum_email_throttling_delay, as: :select, collection: Email::THROTTLING_DELAYS.keys
+      f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays
     end
 
     f.actions

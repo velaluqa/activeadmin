@@ -38,6 +38,7 @@ class NotificationProfile < ActiveRecord::Base
   validates :triggering_action, presence: true, inclusion: { in: %w(all create update destroy) }
   validates :triggering_resource, presence: true
   validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class
+  validates :maximum_email_throttling_delay, inclusion: { in: Email.allowed_throttling_delays.values }, if: :maximum_email_throttling_delay
 
   # Returns a relations querying all recipient from the `users` and
   # the `roles` associations.
