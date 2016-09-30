@@ -126,12 +126,32 @@ module NotificationObservable
     def to_s
       return if filters.empty?
       conjs = filters.map do |conditions|
-        conditions.map do |key, t|
-          "#{key}(#{t.fetch(:from, '*any*')} => #{t.fetch(:to, '*any*')})"
+        conditions.map do |condition|
+          condition_to_s(*condition.first)
         end.join(' AND ')
       end
       conjs.map! { |conj| conj.include?('AND') ? "(#{conj})" : conj }
       conjs.join(' OR ')
+    end
+
+    def condition_to_s(key, value, path = [])
+      return changes_to_s(key, value[:changes], path) if value.try(:key?, :changes)
+      case key
+      when :equal then "#{path.join('.')} == #{value}"
+      when :notEqual then "#{path.join('.')} != #{value}"
+      else
+        return "#{(path + [key]).join('.')} exist" if value == true
+        return "#{(path + [key]).join('.')} do not exist" if value == false
+        condition_to_s(*value.first, path + [key])
+      end
+    end
+
+    def changes_to_s(key, change, path = [])
+      case change
+      when TrueClass then "#{(path + [key]).join('.')} changes"
+      when FalseClass then "#{(path + [key]).join('.')} does not change"
+      when Hash then "#{(path + [key]).join('.')} changes(#{change.fetch(:from, '*any*')} => #{change.fetch(:to, '*any*')})"
+      end
     end
 
     private

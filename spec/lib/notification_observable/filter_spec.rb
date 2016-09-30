@@ -498,4 +498,52 @@ RSpec.describe NotificationObservable::Filter do
       end
     end
   end
+
+  describe '#to_s' do
+    it '' do
+      @filter = NotificationObservable::Filter.new(
+        [
+          [
+            {
+              foo: {
+                changes: true
+              }
+            },
+            {
+              bar: {
+                changes: {
+                  to: 'superduper'
+                }
+              }
+            },
+            {
+              some_relations: true
+            },
+            {
+              other_relations: {
+                subrelations: {
+                  attribute: {
+                    notEqual: 'foo'
+                  }
+                }
+              }
+            }
+          ],
+          [
+            {
+              foo: {
+                equal: 'bar'
+              }
+            },
+            {
+              some_relations: {
+                some_other_relation: false
+              }
+            }
+          ]
+        ]
+      )
+      expect(@filter.to_s).to eq '(foo changes AND bar changes(*any* => superduper) AND some_relations exist AND other_relations.subrelations.attribute != foo) OR (foo == bar AND some_relations.some_other_relation do not exist)'
+    end
+  end
 end
