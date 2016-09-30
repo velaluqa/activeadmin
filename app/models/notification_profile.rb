@@ -106,6 +106,14 @@ JOIN
     end
   end
 
+  def filters_json=(str)
+    self.filters = JSON.parse(str)
+  end
+
+  def filters_json
+    filters.to_json
+  end
+
   def to_s
     props = [id, triggering_action, triggering_resource, filter.to_s]
     "NotificationProfile[#{props.compact.join(', ')}]"
