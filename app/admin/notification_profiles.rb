@@ -16,9 +16,11 @@ ActiveAdmin.register NotificationProfile do
   index do
     selectable_column
     column :title
-    column :recipients do |profile|
-      "#{profile.recipients.count} recipients"
+    column :is_active do |profile|
+      profile.is_active ? 'active' : ''
     end
+    column :triggering_action
+    column :triggering_resource
     customizable_default_actions(current_ability)
   end
 
@@ -26,8 +28,30 @@ ActiveAdmin.register NotificationProfile do
     attributes_table do
       row :id
       row :title
-      column :recipients do
-        "#{profile.recipients.count} recipients"
+      row :description
+      row :is_active do
+        profile.is_active ? "active" : ""
+      end
+      row :triggering_action
+      row :triggering_resource
+      row :filters do
+        profile.filter.to_s
+      end
+      row :users do
+        profile.users
+          .map { |user| link_to(user.username, admin_url_for(user)) }
+          .join(', ')
+          .html_safe
+      end
+      row :roles do
+        profile.roles
+          .map { |role| link_to(role.title, admin_url_for(role)) }
+          .join(', ')
+          .html_safe
+      end
+      row :only_authorized_recipients
+      row :maximum_email_throttling_delay do
+        Email::THROTTLING_DELAYS.key(profile.maximum_email_throttling_delay)
       end
     end
   end
