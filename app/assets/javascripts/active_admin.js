@@ -17,3 +17,4 @@
 //= require vendor/naturalSort
 //= require shared/promise_queue
 //= require shared/user
+//= require select2-initializers
