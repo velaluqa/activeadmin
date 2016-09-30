@@ -12,6 +12,12 @@ class Email
     'yearly'     => 12*30*24*60*60
   }.with_indifferent_access
 
+  def self.allowed_throttling_delays
+    THROTTLING_DELAYS.keep_if do |key, value|
+      value <= ERICA.maximum_email_throttling_delay
+    end
+  end
+
   def self.ensure_throttling_delay(recur)
     return recur if recur.is_a?(Numeric)
     throttling_delay(recur)
