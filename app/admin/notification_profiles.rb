@@ -45,6 +45,7 @@ ActiveAdmin.register NotificationProfile do
     end
 
     f.inputs 'Filters', class: 'filters' do
+      f.input :filters_json, as: :hidden
       f.render partial: 'filters_json_editor'
     end
 
