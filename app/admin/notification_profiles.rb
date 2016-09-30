@@ -77,7 +77,7 @@ ActiveAdmin.register NotificationProfile do
       f.input :users, type: :select, multiple: true, collection: User.all, input_html: { class: 'initialize-select2' }
       f.input :roles, type: :select, multiple: true, collection: Role.all, input_html: { class: 'initialize-select2' }
       f.input :only_authorized_recipients
-      f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays
+      f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2' }
     end
 
     f.actions
