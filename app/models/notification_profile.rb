@@ -119,5 +119,7 @@ JOIN
 
   def triggering_resource_class
     triggering_resource.constantize
+  rescue
+    nil
   end
 end
