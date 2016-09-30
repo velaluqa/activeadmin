@@ -33,7 +33,11 @@ class NotificationProfile < ActiveRecord::Base
   has_and_belongs_to_many :roles
   has_many :notifications
 
-  validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }
+  validates :title, presence: true
+  validates :is_active, inclusion: { in: [true, false] }
+  validates :triggering_action, presence: true, inclusion: { in: %w(all create update destroy) }
+  validates :triggering_resource, presence: true
+  validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class
 
   # Returns a relations querying all recipient from the `users` and
   # the `roles` associations.

@@ -347,6 +347,30 @@ RSpec.describe NotificationProfile do
     it { should have_and_belong_to_many(:roles) }
     it { should have_many(:notifications) }
 
+    it 'validates title' do
+      expect(build(:notification_profile, title: nil)).not_to be_valid
+      expect(build(:notification_profile, title: '')).not_to be_valid
+    end
+
+    it 'validates is_active' do
+      expect(build(:notification_profile, is_active: nil)).not_to be_valid
+      expect(build(:notification_profile, is_active: '')).not_to be_valid
+    end
+
+    it 'validates triggering_action' do
+      expect(build(:notification_profile, triggering_action: nil)).not_to be_valid
+      expect(build(:notification_profile, triggering_action: 'some')).not_to be_valid
+      expect(build(:notification_profile, triggering_action: 'all')).to be_valid
+      expect(build(:notification_profile, triggering_action: 'create')).to be_valid
+      expect(build(:notification_profile, triggering_action: 'update')).to be_valid
+      expect(build(:notification_profile, triggering_action: 'destroy')).to be_valid
+    end
+
+    it 'validates triggering_resource' do
+      expect(build(:notification_profile, triggering_resource: nil)).not_to be_valid
+      expect(build(:notification_profile, triggering_resource: '')).not_to be_valid
+    end
+
     describe '#recipients' do
       before(:each) do
         @user1 = create(:user, email: 'foo@test.com')
