@@ -2,7 +2,7 @@ class Email
   extend ActiveModel::Naming
 
   THROTTLING_DELAYS = {
-    'none'       => 0,
+    'instantly'  => 0,
     'hourly'     => 60*60,
     'daily'      => 24*60*60,
     'weekly'     => 7*24*60*60,
