@@ -3,6 +3,10 @@ ActiveAdmin.register NotificationProfile do
 
   config.per_page = 100
 
+  permit_params :title, :description, :is_active, :triggering_action,
+                :triggering_resource, :filters_json, :user_ids, :role_ids,
+                :only_authorized_recipients, :maximum_email_throttling_delay
+
   controller do
     def max_csv_records
       1_000_000
