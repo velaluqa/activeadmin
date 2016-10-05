@@ -77,10 +77,11 @@ JOIN
 
   # Returns all profiles that match the given action for given
   # resource. The resource may have changes, which are used to match
-  # against a profiles `triggering_changes`.
+  # against a profiles `filters`.
   #
   # @param [Symbol] action the specific action that was performed
   # @param [ActiveRecord::Base] record the record the action was performed on
+  # @param [Hash] changes format of `{ attribute: [old, new] }`
   #
   # @return [Array] an array of matched `NotificationProfile` instances
   def self.triggered_by(action, record, changes = {})
