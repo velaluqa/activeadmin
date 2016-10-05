@@ -98,13 +98,14 @@ JOIN
   def trigger(action, record)
     version = record.try(:versions).andand.last
     recipients.map do |user|
+      next if user == ::PaperTrail.whodunnit
       Notification.create(
         notification_profile: self,
         resource: record,
         user: user,
         version: version
       )
-    end
+    end.compact
   end
 
   def filters_json=(str)

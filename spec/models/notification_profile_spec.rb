@@ -640,38 +640,61 @@ RSpec.describe NotificationProfile do
       expect(NotificationProfile.new).to respond_to('trigger')
     end
 
-    it 'creates a new notification' do
-      user = create(:user)
-      profile = create(:notification_profile, users: [user], triggering_resource: 'TestModel')
-      record = TestModel.create(foobar: 'foo')
+    before(:each) do
+      @user1 = create(:user)
+      @user2 = create(:user)
+      @profile = create(:notification_profile, users: [@user1, @user2], triggering_resource: 'TestModel')
+      @record = TestModel.create(foobar: 'foo')
+    end
+
+    it 'creates notification for system actions' do
+      allow(::PaperTrail).to receive(:whodunnit) { nil }
       expect do
-        profile.trigger(:create, record)
+        @profile.trigger(:create, @record)
+      end.to change(Notification, :count).by(2)
+      expect(Notification.where(user: @user1)).to exist
+      expect(Notification.where(user: @user2)).to exist
+    end
+
+    it 'creates notification for others actions' do
+      allow(::PaperTrail).to receive(:whodunnit) { @user2 }
+      expect do
+        @profile.trigger(:create, @record)
       end.to change(Notification, :count).by(1)
+      expect(Notification.where(user: @user1)).to exist
+    end
+
+    it 'does not create a notification for my own action' do
+      allow(::PaperTrail).to receive(:whodunnit) { @user2 }
+      expect do
+        @profile.trigger(:create, @record)
+      end.to change(Notification, :count).by(1)
+      expect(Notification.where(user: @user2)).not_to exist
     end
 
     describe 'for model with versions' do
+      before(:each) do
+        @user = create(:user)
+        @profile = create(:notification_profile, users: [@user], triggering_resource: 'ExtraModel')
+        @record = ExtraModel.create(foo: 'foo')
+      end
+
       it 'creates a notification with a version after create' do
-        user = create(:user)
-        profile = create(:notification_profile, users: [user], triggering_resource: 'ExtraModel')
-        record = ExtraModel.create(foo: 'foo')
         expect do
-          profile.trigger(:create, record)
+          @profile.trigger(:create, @record)
         end.to change(Notification, :count).by(1)
         notification = Notification.last
-        expect(notification.version).to eq record.versions.last
+        expect(notification.version).to eq @record.versions.last
       end
 
       it 'creates a notification with a version after update' do
-        user = create(:user)
-        profile = create(:notification_profile, users: [user], triggering_resource: 'ExtraModel')
-        record = ExtraModel.create(foo: 'foo')
-        record.foo = 'bar'
-        record.save!
+        @record.foo = 'bar'
+        @record.save!
         expect do
-          profile.trigger(:update, record)
+          @profile.trigger(:update, @record)
         end.to change(Notification, :count).by(1)
         notification = Notification.last
-        expect(notification.version).to eq record.versions.last
+        expect(notification.version).to eq @record.versions.last
       end
     end
   end
