@@ -1,28 +1,35 @@
-SendThrottledNotificationEmails:
+hourly_notification_mails:
+  class: SendThrottledNotificationEmails
   cron: '0 * * * *' # every full hour
   args:
-    throttled_delay: 'hourly'
-SendThrottledNotificationEmails:
+    - throttled_delay: 'hourly'
+daily_notification_mails:
+  class: SendThrottledNotificationEmails
   cron: '0 0 * * *' # every day at 00:00
   args:
-    throttled_delay: 'daily'
-SendThrottledNotificationEmails:
+    - throttled_delay: 'daily'
+weekly_notification_mails:
+  class: SendThrottledNotificationEmails
   cron: '0 0 * * 6' # every saturday
   args:
-    throttled_delay: 'weekly'
-SendThrottledNotificationEmails:
+    - throttled_delay: 'weekly'
+monthly_notification_mails:
+  class: SendThrottledNotificationEmails
   cron: '0 0 1 */1 *' # every 1st day of everxy month
   args:
-    throttled_delay: 'monthly'
-SendThrottledNotificationEmails:
+    - throttled_delay: 'monthly'
+quarterly_notification_mails:
+  class: SendThrottledNotificationEmails
   cron: '0 0 1 */3 *' # every 1st day all three months
   args:
-    throttled_delay: 'quarterly'
-SendThrottledNotificationEmails:
+    - throttled_delay: 'quarterly'
+semesterly_notification_mails:
+  class: SendThrottledNotificationEmails
   cron: '0 0 1 6 *' # every 1st of june
   args:
-    throttled_delay: 'semesterly'
-SendThrottledNotificationEmails:
+    - throttled_delay: 'semesterly'
+yearly_notification_mails:
+  class: SendThrottledNotificationEmails
   cron: '0 0 1 1 *' # every 1st of january
   args:
-    throttled_delay: 'yearly'
+    - throttled_delay: 'yearly'
