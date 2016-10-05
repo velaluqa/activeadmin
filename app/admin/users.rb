@@ -122,6 +122,9 @@ ActiveAdmin.register User do
         input :signature_password_confirmation
       end
     end
+    inputs 'Settings' do
+      input :email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2' }
+    end
     inputs 'Roles' do
       has_many :user_roles, allow_destroy: true do |ur|
         ur.input :role

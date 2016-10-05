@@ -73,7 +73,7 @@ class User < ActiveRecord::Base
 
   has_many :user_roles, dependent: :destroy
   accepts_nested_attributes_for :user_roles, allow_destroy: true
-  attr_accessible :user_roles_attributes
+  attr_accessible :user_roles_attributes, :email_throttling_delay
 
   has_many :roles, through: :user_roles
   has_many :permissions, through: :user_roles
