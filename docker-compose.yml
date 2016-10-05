@@ -23,6 +23,7 @@ app:
   links: &links
     - postgres
     - redis
+    - worker
 test:
   build: *build
   command: guard
@@ -39,7 +40,9 @@ worker:
   command: bundle exec sidekiq
   volumes: *volumes
   environment: *environment
-  links: *links
+  links:
+    - postgres
+    - redis
 https:
   image: nginx
   ports:
