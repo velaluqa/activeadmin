@@ -14,7 +14,7 @@ describe SendInstantNotificationEmail do
       @notification = create(:notification, notification_profile: @profile, user: @user)
     end
 
-    it 'enqueues another emailing job' do
+    it 'delivers the email' do
       SendInstantNotificationEmail.new.perform(@notification.id)
       expect(NotificationMailer)
         .to receive(:instant_notification_email)
@@ -23,6 +23,12 @@ describe SendInstantNotificationEmail do
       expect {
         SendInstantNotificationEmail.new.perform(@notification.id)
       }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+
+    it 'marks the notification as sent' do
+      SendInstantNotificationEmail.new.perform(@notification.id)
+      @notification.reload
+      expect(@notification.email_sent_at).not_to be_nil
     end
   end
 end

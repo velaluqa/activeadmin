@@ -16,5 +16,6 @@ class SendThrottledNotificationEmail
     NotificationMailer
       .throttled_notification_email(user, profile, notifications)
       .deliver_now
+    Notification.where(id: notification_ids).update_all(email_sent_at: DateTime.now)
   end
 end

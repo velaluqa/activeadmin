@@ -11,5 +11,6 @@ class SendInstantNotificationEmail
     NotificationMailer
       .instant_notification_email(notification)
       .deliver_now
+    Notification.where(id: notification_id).update_all(email_sent_at: DateTime.now)
   end
 end

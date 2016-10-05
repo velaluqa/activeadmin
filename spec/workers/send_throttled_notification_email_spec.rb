@@ -14,7 +14,7 @@ describe SendThrottledNotificationEmail do
       @notification = create(:notification, notification_profile: @profile, user: @user)
     end
 
-    it 'enqueues another emailing job' do
+    it 'delivers the email' do
       SendThrottledNotificationEmail.new.perform(@user.id, @profile.id, [@notification.id])
       expect(NotificationMailer)
         .to receive(:throttled_notification_email)
@@ -23,6 +23,12 @@ describe SendThrottledNotificationEmail do
       expect {
         SendThrottledNotificationEmail.new.perform(@user.id, @profile.id, [@notification.id])
       }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+
+    it 'marks the notification as sent' do
+      SendThrottledNotificationEmail.new.perform(@user.id, @profile.id, [@notification.id])
+      @notification.reload
+      expect(@notification.email_sent_at).not_to be_nil
     end
   end
 end
