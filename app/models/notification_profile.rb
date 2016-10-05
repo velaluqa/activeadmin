@@ -100,6 +100,7 @@ JOIN
     version = record.try(:versions).andand.last
     recipients.map do |user|
       next if user == ::PaperTrail.whodunnit
+      next if only_authorized_recipients && !user.can?(:read, record)
       Notification.create(
         notification_profile: self,
         resource: record,

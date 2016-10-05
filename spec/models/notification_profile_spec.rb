@@ -643,14 +643,16 @@ RSpec.describe NotificationProfile do
     before(:each) do
       @user1 = create(:user)
       @user2 = create(:user)
-      @profile = create(:notification_profile, users: [@user1, @user2], triggering_resource: 'TestModel')
+
+      @profile1 = create(:notification_profile, users: [@user1, @user2], triggering_resource: 'TestModel', only_authorized_recipients: false)
+      @profile2 = create(:notification_profile, users: [@user1, @user2], triggering_resource: 'TestModel', only_authorized_recipients: true)
       @record = TestModel.create(foobar: 'foo')
     end
 
     it 'creates notification for system actions' do
       allow(::PaperTrail).to receive(:whodunnit) { nil }
       expect do
-        @profile.trigger(:create, @record)
+        @profile1.trigger(:create, @record)
       end.to change(Notification, :count).by(2)
       expect(Notification.where(user: @user1)).to exist
       expect(Notification.where(user: @user2)).to exist
@@ -659,7 +661,7 @@ RSpec.describe NotificationProfile do
     it 'creates notification for others actions' do
       allow(::PaperTrail).to receive(:whodunnit) { @user2 }
       expect do
-        @profile.trigger(:create, @record)
+        @profile1.trigger(:create, @record)
       end.to change(Notification, :count).by(1)
       expect(Notification.where(user: @user1)).to exist
     end
@@ -667,8 +669,19 @@ RSpec.describe NotificationProfile do
     it 'does not create a notification for my own action' do
       allow(::PaperTrail).to receive(:whodunnit) { @user2 }
       expect do
-        @profile.trigger(:create, @record)
+        @profile1.trigger(:create, @record)
       end.to change(Notification, :count).by(1)
+      expect(Notification.where(user: @user2)).not_to exist
+    end
+
+    it 'creates notification only for authorized users' do
+      allow_any_instance_of(Ability).to receive(:can?) { |ability, activity, subject|
+        ability.current_user == @user1
+      }
+      expect do
+        @profile2.trigger(:create, @record)
+      end.to change(Notification, :count).by(1)
+      expect(Notification.where(user: @user1)).to exist
       expect(Notification.where(user: @user2)).not_to exist
     end
 
@@ -677,6 +690,7 @@ RSpec.describe NotificationProfile do
         @user = create(:user)
         @profile = create(:notification_profile, users: [@user], triggering_resource: 'ExtraModel')
         @record = ExtraModel.create(foo: 'foo')
+        allow_any_instance_of(Ability).to receive(:can?).and_return(true)
       end
 
       it 'creates a notification with a version after create' do
