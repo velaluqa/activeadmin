@@ -15,7 +15,7 @@ class SendThrottledNotificationEmails
   def perform(throttle)
     throttle = Email.ensure_throttling_delay(throttle)
     NotificationProfile.all.each do |profile|
-      users = profile.recipients_with_pending(throttled: throttle)
+      users = profile.recipients_with_pending(throttle: throttle)
       users.each { |user| send_throttled_email(user, profile) }
     end
   end
