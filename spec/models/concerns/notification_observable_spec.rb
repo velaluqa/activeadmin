@@ -1,4 +1,4 @@
-RSpec.describe NotificationObservable do
+RSpec.describe NotificationObservable, focus: true do
   with_model :NotificationObservableModel do
     table do |t|
       t.string :title
@@ -22,17 +22,21 @@ RSpec.describe NotificationObservable do
     before(:each) do
       @profile = create(:notification_profile,
                         triggering_resource: 'NotificationObservableModel')
-      expect(NotificationProfile)
-        .to receive(:triggered_by)
-             .at_least(1)
-             .and_return([@profile])
     end
 
     describe 'after create' do
       it 'executes triggers on triggerable notification profiles' do
-        model = NotificationObservableModel.new(title: 'foo')
-        expect(@profile).to receive(:trigger).with(:create, model)
-        model.save
+        model = NotificationObservableModel.create(title: 'foo')
+        expect(TriggerNotificationProfiles)
+          .to have_enqueued_sidekiq_job(:create, model.class.to_s, model.id,
+                                        YAML.dump(
+                                          {
+                                            'title' => [nil, 'foo'],
+                                            'created_at' => [nil, model.created_at],
+                                            'updated_at' => [nil, model.created_at],
+                                            'id' => [nil, 1]
+                                          }.with_indifferent_access
+                                        ))
       end
     end
 
@@ -40,16 +44,25 @@ RSpec.describe NotificationObservable do
       it 'executes triggers on triggerable notification profiles' do
         model = NotificationObservableModel.create(title: 'foo')
         model.title = 'bar'
-        expect(@profile).to receive(:trigger).with(:update, model)
         model.save
+        expect(TriggerNotificationProfiles)
+          .to have_enqueued_sidekiq_job('update', model.class.to_s,
+                                        model.id,
+                                        YAML.dump(
+                                          {
+                                            'title' => ['foo', 'bar'],
+                                            'updated_at' => [model.created_at, model.updated_at]
+                                          }.with_indifferent_access
+                                       ))
       end
     end
 
     describe 'after destroy' do
       it 'executes triggers on triggerable notification profiles' do
         model = NotificationObservableModel.create(title: 'foo')
-        expect(@profile).to receive(:trigger).with(:destroy, model)
         model.destroy
+        expect(TriggerNotificationProfiles)
+          .to have_enqueued_sidekiq_job('destroy', model.class.to_s, model.id, YAML.dump({}.with_indifferent_access))
       end
     end
   end

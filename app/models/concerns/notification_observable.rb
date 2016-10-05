@@ -39,10 +39,7 @@ module NotificationObservable
     private
 
     def trigger_respective_profiles(action, record)
-      triggered_profiles = NotificationProfile.triggered_by(action, record)
-      triggered_profiles.each do |profile|
-        profile.trigger(action, record)
-      end
+      TriggerNotificationProfiles.perform_async(action, record.class, record.id, YAML.dump(record.changes))
     end
   end
 end
