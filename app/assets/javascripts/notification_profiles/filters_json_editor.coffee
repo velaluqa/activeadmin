@@ -22,6 +22,7 @@ loadEditor = ->
           disable_array_reorder: true
           form_name_root: 'filters_editor'
           no_additional_properties: true
+          theme: 'custom'
           startval: startVal
         editor.on 'change', ->
           $('#notification_profile_filters_json').val(JSON.stringify(editor.getValue()))

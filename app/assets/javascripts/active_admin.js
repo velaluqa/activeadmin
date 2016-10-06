@@ -6,6 +6,7 @@
 
 //= require vendor/select2.full
 //= require vendor/jsoneditor
+//= require vendor/jsoneditor.erica-theme
 //= require cases_advanced_filters
 //= require aa_advanced_filters
 //= require tree.jquery
