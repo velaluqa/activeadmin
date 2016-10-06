@@ -90,6 +90,17 @@ StudyServer::Application.configure do
   config.maximum_email_throttling_delay = 30*24*60*60 # monthly
 
   config.action_mailer.default_options = {
-    from: 'noreply@pharmtrace.com'
+    from: (ENV['SMTP_SENDER'] || 'noreply@pharmtrace.com')
   }
+
+  config.action_mailer.delivery_method = :smtp
+  ActionMailer::Base.smtp_settings = {
+    port: (ENV['SMTP_PORT'] || '587').to_i,
+    address: ENV['SMTP_SERVER'],
+    user_name: ENV['SMTP_USERNAME'],
+    password: ENV['SMTP_PASSWORD'],
+    authentication: (ENV['SMTP_AUTH'] || 'plain').to_sym,
+    enable_starttls_auto: (ENV['SMTP_STARTTLS_AUTO'] == 'true')
+  }
+  routes.default_url_options[:host] = ENV['ERICA_HOST']
 end
