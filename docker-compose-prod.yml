@@ -11,30 +11,43 @@ redis:
   ports:
     - 6379:6379
 app:
+  build: &build .
   restart: always
   container_name: erica_app_production
-  image: &app_image erica:latest
+  # image: &app_image erica:latest
   command: bundle exec unicorn -p 3000
   environment: &environment
     RAILS_ENV: production
+    ERICA_HOST: 'localhost:3000'
+    SMTP_PORT: 587
+    SMTP_SERVER: 'mail.velalu.qa'
+    SMTP_USERNAME: pharmtrace@velalu.qa
+    SMTP_PASSWORD: password
+    SMTP_SENDER: pharmtrace@velalu.qa
+    SMTP_STARTTLS_AUTO: 'true'
+
   ports:
     - 3000
   volumes: &volumes
-    - ./config/database.yml:/app/config/database.yml
+    - ./config/database.yml.dev:/app/config/database.yml
     - ./data:/app/data
     - ./log:/app/log
     - ./tmp:/app/tmp
   links: &links
     - postgres
     - redis
+    - worker
 worker:
   restart: always
   container_name: erica_sidekiq_production
-  image: *app_image
-  command: bundle exec sidekiq
+  build: .
+  # image: *app_image
+  command: bundle exec sidekiq -q default -q notifications
   environment: *environment
   volumes: *volumes
-  links: *links
+  links:
+    - postgres
+    - redis
 https:
   restart: always
   container_name: erica_https_production
