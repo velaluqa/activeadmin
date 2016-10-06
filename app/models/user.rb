@@ -1,3 +1,4 @@
+require 'email_validator'
 # ## Schema Information
 #
 # Table name: `users`
@@ -7,6 +8,9 @@
 # Name                          | Type               | Attributes
 # ----------------------------- | ------------------ | ---------------------------
 # **`authentication_token`**    | `string`           |
+# **`confirmation_sent_at`**    | `datetime`         |
+# **`confirmation_token`**      | `string`           |
+# **`confirmed_at`**            | `datetime`         |
 # **`created_at`**              | `datetime`         |
 # **`current_sign_in_at`**      | `datetime`         |
 # **`current_sign_in_ip`**      | `string`           |
@@ -26,6 +30,7 @@
 # **`reset_password_sent_at`**  | `datetime`         |
 # **`reset_password_token`**    | `string`           |
 # **`sign_in_count`**           | `integer`          | `default(0)`
+# **`unconfirmed_email`**       | `string`           |
 # **`unlock_token`**            | `string`           |
 # **`updated_at`**              | `datetime`         |
 # **`username`**                | `string`           |
@@ -45,12 +50,12 @@ class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable,
+  devise :database_authenticatable, :confirmable,
          :recoverable, :rememberable, :trackable, :lockable,
          :token_authenticatable
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :username, :name, :password, :password_confirmation
+  attr_accessible :username, :name, :email, :password, :password_confirmation
   attr_accessible :remember_me, :public_key, :private_key
   attr_accessible :password_changed_at
 
@@ -60,6 +65,7 @@ class User < ActiveRecord::Base
   
   validates :username, :uniqueness => true, :presence => true
   validates :name, :uniqueness => true, :presence => true
+  validates :email, :uniqueness => true, :presence => true, :email => true
   validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :create
   validates :password, :confirmation => true, :length => { :minimum => 6 }, on: :update, allow_blank: true
   validates :signature_password, :confirmation => true, :length => { :minimum => 6 }, on: :create, allow_blank: true

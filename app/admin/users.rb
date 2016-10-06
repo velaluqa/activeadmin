@@ -20,6 +20,9 @@ ActiveAdmin.register User do
       link_to user.name, admin_user_path(user)
     end
     column :username
+    column :email do |user|
+      user.email || '-'
+    end
     column :key_pair do |user|
       if(user.public_key.nil? or user.private_key.nil?)
         status_tag("Missing", :error)
@@ -34,6 +37,13 @@ ActiveAdmin.register User do
         status_tag('Unlocked', :ok)
       end
     end
+    column :confirmed do |user|
+      if user.confirmed?
+        status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", :ok)
+      else
+        status_tag('Unconfirmed', :error)
+      end
+    end
     column 'Roles' do |user|
       link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
     end
@@ -44,6 +54,7 @@ ActiveAdmin.register User do
     attributes_table do
       row :name
       row :username
+      row :email
       row :sign_in_count
       row :currently_signed_in do
         if(user.current_sign_in_at.nil?)
@@ -65,6 +76,13 @@ ActiveAdmin.register User do
           status_tag("Locked at #{pretty_format(user.locked_at)}", :error)
         else
           status_tag('Unlocked', :ok)
+        end
+      end
+      row :confirmed do
+        if user.confirmed?
+          status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", :ok)
+        else
+          status_tag('Unconfirmed', :error)
         end
       end
       row :public_key do
@@ -94,6 +112,7 @@ ActiveAdmin.register User do
     inputs 'User Information' do
       input :username
       input :name
+      input :email
       if object.new_record? || can?(:change_password, object)
         input :password, :required => object.new_record?
         input :password_confirmation

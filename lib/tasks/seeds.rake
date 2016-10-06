@@ -14,11 +14,13 @@ namespace :erica do
         puts "Account exists. Making sure '#{user.username}' is an unlocked application administrator with password 'change'."
       end
       user.name = args[:username]
+      user.email = 'admin@pharmtrace.com'
       user.is_root_user = true
       user.locked_at = nil
       user.password_changed_at = nil
       user.password = 'change'
       user.password_confirmation = 'change'
+      user.confirmed_at = DateTime.now
       user.save!
     end
 
