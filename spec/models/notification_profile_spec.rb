@@ -414,8 +414,7 @@ RSpec.describe NotificationProfile do
     describe 'with throttled option and' do
       describe 'profiles maximum throttling delay is minimum' do
         before(:each) do
-          Rails.application.config.maximum_email_throttling_delay = 24*60*60
-
+          allow(Rails.application.config).to receive(:maximum_email_throttling_delay).and_return(24*60*60)
           @user1 = create(:user, email_throttling_delay: 24*60*60)
           @user2 = create(:user)
           @profile1 = create(:notification_profile, users: [@user1, @user2], maximum_email_throttling_delay: 60*60)
@@ -444,8 +443,7 @@ RSpec.describe NotificationProfile do
 
       describe 'user throttling delay is minimum' do
         before(:each) do
-          Rails.application.config.maximum_email_throttling_delay = 24*60*60
-
+          allow(Rails.application.config).to receive(:maximum_email_throttling_delay).and_return(24*60*60)
           @user1 = create(:user, email_throttling_delay: 60*60)
           @user2 = create(:user)
           @profile1 = create(:notification_profile, users: [@user1, @user2])
@@ -464,8 +462,7 @@ RSpec.describe NotificationProfile do
 
       describe 'system maximum throttling delay is minimum' do
         before(:each) do
-          Rails.application.config.maximum_email_throttling_delay = 60*60
-
+          allow(Rails.application.config).to receive(:maximum_email_throttling_delay).and_return(60*60)
           @user1 = create(:user, email_throttling_delay: 7*24*60*60)
           @user2 = create(:user)
           @profile1 = create(:notification_profile, users: [@user1])
