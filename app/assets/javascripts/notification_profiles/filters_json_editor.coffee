@@ -9,7 +9,7 @@ loadEditor = ->
       editor = null
     $('#filters-jsoneditor').html('Loading ...')
     $.ajax
-      url: "http://localhost:3000/admin/notification_profiles/filters_schema?triggering_resource=#{triggeringResource}"
+      url: "/admin/notification_profiles/filters_schema?triggering_resource=#{triggeringResource}"
       success: (schema) ->
         $('#filters-jsoneditor').html('')
         startVal = JSON.parse($('#notification_profile_filters_json').val())
