@@ -1,4 +1,4 @@
-RSpec.describe NotificationObservable, focus: true do
+RSpec.describe NotificationObservable do
   with_model :NotificationObservableModel do
     table do |t|
       t.string :title
