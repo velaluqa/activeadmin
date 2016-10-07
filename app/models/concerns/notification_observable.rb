@@ -16,9 +16,9 @@ module NotificationObservable
   included do
     NotificationObservable.register(self)
 
-    after_create :notification_observable_create
-    after_update :notification_observable_update
-    after_destroy :notification_observable_destroy
+    after_commit(:notification_observable_create, on: :create)
+    after_commit(:notification_observable_update, on: :update)
+    after_commit(:notification_observable_destroy, on: :destroy)
 
     def notification_observable_create
       trigger_respective_profiles(:create, self)
