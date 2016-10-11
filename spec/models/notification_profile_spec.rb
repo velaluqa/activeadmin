@@ -532,11 +532,15 @@ RSpec.describe NotificationProfile do
 
   describe '::triggered_by' do
     before(:each) do
+      @p0 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'TestModel', is_enabled: false)
+
       @p1 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'TestModel')
       @p2 = create(:notification_profile, triggering_actions: %w(create), triggering_resource: 'TestModel')
       @p3 = create(:notification_profile, triggering_actions: %w(update), triggering_resource: 'TestModel')
       @p4 = create(:notification_profile, triggering_actions: %w(destroy), triggering_resource: 'TestModel')
       @p5 = create(:notification_profile, triggering_actions: %w(create update), triggering_resource: 'TestModel')
+
+      @pe0 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'ExtraModel', is_enabled: false)
 
       @pe1 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'ExtraModel')
       @pe2 = create(:notification_profile, triggering_actions: %w(create), triggering_resource: 'ExtraModel')
@@ -555,6 +559,10 @@ RSpec.describe NotificationProfile do
     describe ':create TestModel' do
       before(:each) do
         @profiles = NotificationProfile.triggered_by(:create, @record)
+      end
+      it 'does not return disabled profiles triggered for all actions' do
+        expect(@profiles).not_to include(@p0)
+        expect(@profiles).not_to include(@pe0)
       end
       it 'returns profiles triggered for all actions' do
         expect(@profiles).to include(@p1)
@@ -587,6 +595,10 @@ RSpec.describe NotificationProfile do
       before(:each) do
         @profiles = NotificationProfile.triggered_by(:update, @record)
       end
+      it 'does not return disabled profiles triggered for all actions' do
+        expect(@profiles).not_to include(@p0)
+        expect(@profiles).not_to include(@pe0)
+      end
       it 'returns profiles triggered for all actions' do
         expect(@profiles).to include(@p1)
       end
@@ -616,6 +628,10 @@ RSpec.describe NotificationProfile do
     describe ':destroy TestModel' do
       before(:each) do
         @profiles = NotificationProfile.triggered_by(:destroy, @record)
+      end
+      it 'does not return disabled profiles triggered for all actions' do
+        expect(@profiles).not_to include(@p0)
+        expect(@profiles).not_to include(@pe0)
       end
       it 'returns profiles triggered for all actions' do
         expect(@profiles).to include(@p1)

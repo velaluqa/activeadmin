@@ -43,6 +43,8 @@ class NotificationProfile < ActiveRecord::Base
   validates :maximum_email_throttling_delay, inclusion: { in: Email.allowed_throttling_delays.values }, if: :maximum_email_throttling_delay
   validate :validate_triggering_actions
 
+  scope :enabled, -> { where(is_enabled: true) }
+
   # Returns a relations querying all recipient from the `users` and
   # the `roles` associations.
   #
@@ -88,8 +90,11 @@ JOIN
   #
   # @return [Array] an array of matched `NotificationProfile` instances
   def self.triggered_by(action, record, changes = {})
-    relation = where('triggering_actions ? :action', action: action)
-    relation = relation.where('triggering_resource = ?', record.class.to_s)
+    relation = enabled.where(
+      'triggering_actions ? :action AND triggering_resource = :resource',
+      action: action,
+      resource: record.class.to_s
+    )
     relation.to_a.keep_if do |profile|
       profile.filter.match?(record, changes)
     end
