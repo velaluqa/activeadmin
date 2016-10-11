@@ -1,4 +1,5 @@
 require 'serializers/hash_array_serializer'
+require 'serializers/string_array_serializer'
 
 # Notification Profiles describe which actions within the ERICA system
 # trigger notifications.
@@ -20,13 +21,14 @@ require 'serializers/hash_array_serializer'
 # **`notification_type`**               | `string`           |
 # **`only_authorized_recipients`**      | `boolean`          | `default(TRUE), not null`
 # **`title`**                           | `string`           | `not null`
-# **`triggering_action`**               | `string`           | `default("all"), not null`
+# **`triggering_actions`**              | `jsonb`            | `not null`
 # **`triggering_resource`**             | `string`           | `not null`
 # **`updated_at`**                      | `datetime`         | `not null`
 #
 class NotificationProfile < ActiveRecord::Base
   has_paper_trail class_name: 'Version'
 
+  serialize :triggering_actions, StringArraySerializer
   serialize :filters, HashArraySerializer
 
   has_and_belongs_to_many :users
@@ -35,10 +37,11 @@ class NotificationProfile < ActiveRecord::Base
 
   validates :title, presence: true
   validates :is_active, inclusion: { in: [true, false] }
-  validates :triggering_action, presence: true, inclusion: { in: %w(all create update destroy) }
+  validates :triggering_actions, presence: true
   validates :triggering_resource, presence: true
   validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class
   validates :maximum_email_throttling_delay, inclusion: { in: Email.allowed_throttling_delays.values }, if: :maximum_email_throttling_delay
+  validate :validate_triggering_actions
 
   # Returns a relations querying all recipient from the `users` and
   # the `roles` associations.
@@ -85,7 +88,7 @@ JOIN
   #
   # @return [Array] an array of matched `NotificationProfile` instances
   def self.triggered_by(action, record, changes = {})
-    relation = where(%(triggering_action = 'all' OR triggering_action = ?), action.to_s)
+    relation = where('triggering_actions ? :action', action: action)
     relation = relation.where('triggering_resource = ?', record.class.to_s)
     relation.to_a.keep_if do |profile|
       profile.filter.match?(record, changes)
@@ -123,7 +126,18 @@ JOIN
     "NotificationProfile[#{props.compact.join(', ')}]"
   end
 
+  def triggering_actions=(ary)
+    write_attribute(:triggering_actions, Array(ary).reject(&:blank?))
+  end
+
   protected
+
+  def validate_triggering_actions
+    return errors.add(:triggering_actions, :not_array) unless triggering_actions.is_a?(Array)
+    if triggering_actions - %w(create update destroy) != []
+      errors.add(:triggering_actions, :invalid)
+    end
+  end
 
   def filters_schema
     NotificationObservable::Filter::Schema.new(triggering_resource_class).schema.deep_stringify_keys

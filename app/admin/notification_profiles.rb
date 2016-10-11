@@ -3,9 +3,18 @@ ActiveAdmin.register NotificationProfile do
 
   config.per_page = 100
 
-  permit_params :title, :description, :is_active, :triggering_action,
-                :triggering_resource, :filters_json, :only_authorized_recipients,
-                :maximum_email_throttling_delay, user_ids: [], role_ids: []
+  permit_params(
+    :title,
+    :description,
+    :is_active,
+    :triggering_resource,
+    :filters_json,
+    :only_authorized_recipients,
+    :maximum_email_throttling_delay,
+    triggering_actions: [],
+    user_ids: [],
+    role_ids: []
+  )
 
   controller do
     def max_csv_records
@@ -19,7 +28,9 @@ ActiveAdmin.register NotificationProfile do
     column :is_active do |profile|
       profile.is_active ? 'active' : ''
     end
-    column :triggering_action
+    column :triggering_actions do
+      profile.triggering_actions.join(', ')
+    end
     column :triggering_resource
     customizable_default_actions(current_ability)
   end
@@ -32,7 +43,9 @@ ActiveAdmin.register NotificationProfile do
       row :is_active do
         profile.is_active ? "active" : ""
       end
-      row :triggering_action
+      row :triggering_actions do
+        profile.triggering_actions.join(', ')
+      end
       row :triggering_resource
       row :filters do
         profile.filter.to_s
@@ -64,7 +77,7 @@ ActiveAdmin.register NotificationProfile do
     end
 
     f.inputs 'Triggers' do
-      f.input :triggering_action, as: :select, collection: %w(all create update destroy), input_html: { class: 'initialize-select2' }
+      f.input :triggering_actions, as: :select, multiple: true, collection: %w(create update destroy), input_html: { class: 'initialize-select2' }
       f.input :triggering_resource, as: :select, collection: NotificationObservable.resources.map(&:to_s).sort.uniq, input_html: { class: 'initialize-select2' }
     end
 

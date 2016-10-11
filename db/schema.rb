@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160930124803) do
+ActiveRecord::Schema.define(version: 20161011103332) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,7 +130,6 @@ ActiveRecord::Schema.define(version: 20160930124803) do
     t.string   "title",                                          null: false
     t.text     "description"
     t.string   "notification_type"
-    t.string   "triggering_action",              default: "all", null: false
     t.string   "triggering_resource",                            null: false
     t.jsonb    "filters",                        default: [],    null: false
     t.boolean  "only_authorized_recipients",     default: true,  null: false
@@ -138,6 +137,7 @@ ActiveRecord::Schema.define(version: 20160930124803) do
     t.datetime "created_at",                                     null: false
     t.datetime "updated_at",                                     null: false
     t.integer  "maximum_email_throttling_delay"
+    t.jsonb    "triggering_actions",             default: [],    null: false
   end
 
   create_table "notification_profiles_roles", id: false, force: :cascade do |t|

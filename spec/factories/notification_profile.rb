@@ -4,7 +4,7 @@ FactoryGirl.define do
     description nil
     notification_type nil
 
-    triggering_action 'all'
+    triggering_actions %w(create update destroy)
     triggering_resource 'Visit'
 
     filters([])

@@ -1,11 +1,11 @@
 RSpec.shared_examples 'filters changes' do |options|
-  triggering_action = options[:triggering_action].andand.to_s || 'all'
+  triggering_actions = options[:triggering_actions].andand.map(&:to_s) || %w(create update destroy)
   event_action = options[:event_action].andand.to_sym || :update
 
   context 'changing' do
     before(:each) do
       @pc1 = create(:notification_profile,
-                    triggering_action: triggering_action,
+                    triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
                                  foobar: {
@@ -15,7 +15,7 @@ RSpec.shared_examples 'filters changes' do |options|
                                  }
                                }]])
       @pc2 = create(:notification_profile,
-                    triggering_action: triggering_action,
+                    triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
                                  foobar: {
@@ -25,7 +25,7 @@ RSpec.shared_examples 'filters changes' do |options|
                                  }
                                }]])
       @pc3 = create(:notification_profile,
-                    triggering_action: triggering_action,
+                    triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
                                  foobar: {
@@ -36,7 +36,7 @@ RSpec.shared_examples 'filters changes' do |options|
                                  }
                                }]])
       @pc4 = create(:notification_profile,
-                    triggering_action: triggering_action,
+                    triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
                                  foobar: {
@@ -47,7 +47,7 @@ RSpec.shared_examples 'filters changes' do |options|
                                  }
                                }]])
       @pc5 = create(:notification_profile,
-                    triggering_action: triggering_action,
+                    triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
                                  foobar: {
@@ -58,7 +58,7 @@ RSpec.shared_examples 'filters changes' do |options|
                                  }
                                }]])
       @pc6 = create(:notification_profile,
-                    triggering_action: triggering_action,
+                    triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [
                       [{
@@ -71,7 +71,7 @@ RSpec.shared_examples 'filters changes' do |options|
                        }]
                     ])
       @pc7 = create(:notification_profile,
-                    triggering_action: triggering_action,
+                    triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
                                  foobar: {
@@ -81,7 +81,7 @@ RSpec.shared_examples 'filters changes' do |options|
                                  }
                                }]])
       @pc8 = create(:notification_profile,
-                    triggering_action: triggering_action,
+                    triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [
                       [{
@@ -93,7 +93,7 @@ RSpec.shared_examples 'filters changes' do |options|
                        }]
                     ])
       @pc9 = create(:notification_profile,
-                    triggering_action: triggering_action,
+                    triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [
                       [{
@@ -106,7 +106,7 @@ RSpec.shared_examples 'filters changes' do |options|
                       }]
                     ])
       @pc10 = create(:notification_profile,
-                     triggering_action: triggering_action,
+                     triggering_actions: triggering_actions,
                      triggering_resource: 'TestModel',
                      filters: [
                        [{
@@ -119,7 +119,7 @@ RSpec.shared_examples 'filters changes' do |options|
                        }]
                      ])
       @pc11 = create(:notification_profile,
-                     triggering_action: triggering_action,
+                     triggering_actions: triggering_actions,
                      triggering_resource: 'TestModel',
                      filters: [
                        [
@@ -140,7 +140,7 @@ RSpec.shared_examples 'filters changes' do |options|
                        ]
                      ])
       @pc12 = create(:notification_profile,
-                     triggering_action: triggering_action,
+                     triggering_actions: triggering_actions,
                      triggering_resource: 'TestModel',
                      filters: [
                        [{
@@ -159,7 +159,7 @@ RSpec.shared_examples 'filters changes' do |options|
                         }]
                      ])
       @pc13 = create(:notification_profile,
-                     triggering_action: triggering_action,
+                     triggering_actions: triggering_actions,
                      triggering_resource: 'TestModel',
                      filters: [
                        [
@@ -358,12 +358,12 @@ RSpec.describe NotificationProfile do
     end
 
     it 'validates triggering_action' do
-      expect(build(:notification_profile, triggering_action: nil)).not_to be_valid
-      expect(build(:notification_profile, triggering_action: 'some')).not_to be_valid
-      expect(build(:notification_profile, triggering_action: 'all')).to be_valid
-      expect(build(:notification_profile, triggering_action: 'create')).to be_valid
-      expect(build(:notification_profile, triggering_action: 'update')).to be_valid
-      expect(build(:notification_profile, triggering_action: 'destroy')).to be_valid
+      expect(build(:notification_profile, triggering_actions: nil)).not_to be_valid
+      expect(build(:notification_profile, triggering_actions: %w(some))).not_to be_valid
+      expect(build(:notification_profile, triggering_actions: %w(create update destroy))).to be_valid
+      expect(build(:notification_profile, triggering_actions: %w(create))).to be_valid
+      expect(build(:notification_profile, triggering_actions: %w(update))).to be_valid
+      expect(build(:notification_profile, triggering_actions: %w(destroy))).to be_valid
     end
 
     it 'validates triggering_resource' do
@@ -532,15 +532,17 @@ RSpec.describe NotificationProfile do
 
   describe '::triggered_by' do
     before(:each) do
-      @p1 = create(:notification_profile, triggering_action: 'all', triggering_resource: 'TestModel')
-      @p2 = create(:notification_profile, triggering_action: 'create', triggering_resource: 'TestModel')
-      @p3 = create(:notification_profile, triggering_action: 'update', triggering_resource: 'TestModel')
-      @p4 = create(:notification_profile, triggering_action: 'destroy', triggering_resource: 'TestModel')
+      @p1 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'TestModel')
+      @p2 = create(:notification_profile, triggering_actions: %w(create), triggering_resource: 'TestModel')
+      @p3 = create(:notification_profile, triggering_actions: %w(update), triggering_resource: 'TestModel')
+      @p4 = create(:notification_profile, triggering_actions: %w(destroy), triggering_resource: 'TestModel')
+      @p5 = create(:notification_profile, triggering_actions: %w(create update), triggering_resource: 'TestModel')
 
-      @pe1 = create(:notification_profile, triggering_action: 'all', triggering_resource: 'ExtraModel')
-      @pe2 = create(:notification_profile, triggering_action: 'create', triggering_resource: 'ExtraModel')
-      @pe3 = create(:notification_profile, triggering_action: 'update', triggering_resource: 'ExtraModel')
-      @pe4 = create(:notification_profile, triggering_action: 'destroy', triggering_resource: 'ExtraModel')
+      @pe1 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'ExtraModel')
+      @pe2 = create(:notification_profile, triggering_actions: %w(create), triggering_resource: 'ExtraModel')
+      @pe3 = create(:notification_profile, triggering_actions: %w(update), triggering_resource: 'ExtraModel')
+      @pe4 = create(:notification_profile, triggering_actions: %w(destroy), triggering_resource: 'ExtraModel')
+      @pe5 = create(:notification_profile, triggering_actions: %w(create update), triggering_resource: 'ExtraModel')
 
       @record = TestModel.create
       @record2 = ExtraModel.create
@@ -566,15 +568,19 @@ RSpec.describe NotificationProfile do
       it 'does not return profiles triggered for :destroy' do
         expect(@profiles).not_to include(@p4)
       end
+      it 'does return profiles triggered for :create or :update' do
+        expect(@profiles).to include(@p5)
+      end
       it 'does not return any profile triggered for ExtraModel' do
         expect(@profiles).not_to include(@pe1)
         expect(@profiles).not_to include(@pe2)
         expect(@profiles).not_to include(@pe3)
         expect(@profiles).not_to include(@pe4)
+        expect(@profiles).not_to include(@pe5)
       end
 
-      include_examples 'filters changes', triggering_action: 'all', event_action: :create
-      include_examples 'filters changes', triggering_action: 'create', event_action: :create
+      include_examples 'filters changes', triggering_actions: %w(create update destroy), event_action: :create
+      include_examples 'filters changes', triggering_actions: %w(create), event_action: :create
     end
 
     describe ':update TestModel' do
@@ -593,6 +599,9 @@ RSpec.describe NotificationProfile do
       it 'does not return profiles triggered for :destroy' do
         expect(@profiles).not_to include(@p4)
       end
+      it 'does return profiles triggered for :create or :update' do
+        expect(@profiles).to include(@p5)
+      end
       it 'does not return any profile triggered for ExtraModel' do
         expect(@profiles).not_to include(@pe1)
         expect(@profiles).not_to include(@pe2)
@@ -600,8 +609,8 @@ RSpec.describe NotificationProfile do
         expect(@profiles).not_to include(@pe4)
       end
 
-      include_examples 'filters changes', triggering_action: 'all', event_action: :update
-      include_examples 'filters changes', triggering_action: 'update', event_action: :update
+      include_examples 'filters changes', triggering_actions: %w(create update destroy), event_action: :update
+      include_examples 'filters changes', triggering_actions: %w(update), event_action: :update
     end
 
     describe ':destroy TestModel' do
@@ -620,6 +629,9 @@ RSpec.describe NotificationProfile do
       it 'does not return profiles triggered for :destroy' do
         expect(@profiles).to include(@p4)
       end
+      it 'does not return profiles triggered for :create or :update' do
+        expect(@profiles).not_to include(@p5)
+      end
       it 'does not return any profile triggered for ExtraModel' do
         expect(@profiles).not_to include(@pe1)
         expect(@profiles).not_to include(@pe2)
@@ -627,8 +639,8 @@ RSpec.describe NotificationProfile do
         expect(@profiles).not_to include(@pe4)
       end
 
-      include_examples 'filters changes', triggering_action: 'all', event_action: :destroy
-      include_examples 'filters changes', triggering_action: 'destroy', event_action: :destroy
+      include_examples 'filters changes', triggering_actions: %w(create update destroy), event_action: :destroy
+      include_examples 'filters changes', triggering_actions: %w(destroy), event_action: :destroy
     end
   end
 
