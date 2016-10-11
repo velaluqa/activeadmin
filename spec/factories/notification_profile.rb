@@ -11,6 +11,6 @@ FactoryGirl.define do
 
     only_authorized_recipients true
 
-    is_active true
+    is_enabled true
   end
 end

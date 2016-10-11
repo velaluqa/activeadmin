@@ -6,7 +6,7 @@ ActiveAdmin.register NotificationProfile do
   permit_params(
     :title,
     :description,
-    :is_active,
+    :is_enabled,
     :triggering_resource,
     :filters_json,
     :only_authorized_recipients,
@@ -25,8 +25,8 @@ ActiveAdmin.register NotificationProfile do
   index do
     selectable_column
     column :title
-    column :is_active do |profile|
-      profile.is_active ? 'active' : ''
+    column :is_enabled do |profile|
+      profile.is_enabled ? 'enabled' : ''
     end
     column :triggering_actions do
       profile.triggering_actions.join(', ')
@@ -40,8 +40,8 @@ ActiveAdmin.register NotificationProfile do
       row :id
       row :title
       row :description
-      row :is_active do
-        profile.is_active ? "active" : ""
+      row :is_enabled do
+        profile.is_enabled ? 'enabled' : ''
       end
       row :triggering_actions do
         profile.triggering_actions.join(', ')
@@ -73,7 +73,7 @@ ActiveAdmin.register NotificationProfile do
     f.inputs 'Details' do
       f.input :title
       f.input :description
-      f.input :is_active
+      f.input :is_enabled
     end
 
     f.inputs 'Triggers' do

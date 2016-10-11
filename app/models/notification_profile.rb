@@ -16,7 +16,7 @@ require 'serializers/string_array_serializer'
 # **`description`**                     | `text`             |
 # **`filters`**                         | `jsonb`            | `not null`
 # **`id`**                              | `integer`          | `not null, primary key`
-# **`is_active`**                       | `boolean`          | `default(FALSE), not null`
+# **`is_enabled`**                      | `boolean`          | `default(FALSE), not null`
 # **`maximum_email_throttling_delay`**  | `integer`          |
 # **`notification_type`**               | `string`           |
 # **`only_authorized_recipients`**      | `boolean`          | `default(TRUE), not null`
@@ -36,7 +36,7 @@ class NotificationProfile < ActiveRecord::Base
   has_many :notifications
 
   validates :title, presence: true
-  validates :is_active, inclusion: { in: [true, false] }
+  validates :is_enabled, inclusion: { in: [true, false] }
   validates :triggering_actions, presence: true
   validates :triggering_resource, presence: true
   validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class
