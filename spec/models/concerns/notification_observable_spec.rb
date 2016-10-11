@@ -1,4 +1,4 @@
-RSpec.describe NotificationObservable do
+RSpec.describe NotificationObservable, transactional_spec: true do
   with_model :NotificationObservableModel do
     table do |t|
       t.string :title

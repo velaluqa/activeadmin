@@ -21,25 +21,19 @@ module NotificationObservable
     after_commit(:notification_observable_destroy, on: :destroy)
 
     def notification_observable_create
-      trigger_respective_profiles(:create, self)
+      TriggerNotificationProfiles.perform_async(:create, self.class, id, YAML.dump(previous_changes))
     end
 
     def notification_observable_update
-      trigger_respective_profiles(:update, self)
+      TriggerNotificationProfiles.perform_async(:update, self.class, id, YAML.dump(previous_changes))
     end
 
     def notification_observable_destroy
-      trigger_respective_profiles(:destroy, self)
+      TriggerNotificationProfiles.perform_async(:destroy, self.class, id, YAML.dump({}.with_indifferent_access))
     end
 
     def self.notification_observable?
       true
-    end
-
-    private
-
-    def trigger_respective_profiles(action, record)
-      TriggerNotificationProfiles.perform_async(action, record.class, record.id, YAML.dump(record.changes))
     end
   end
 end
