@@ -1,0 +1,89 @@
+#+SETUPFILE: theme-readtheorg.setup
+#+TITLE: ERICA Notifications
+#+AUTHOR: Arthur Andersen
+* Notification Profiles
+
+Notification Profiles describe which actions within the ERICA system
+trigger notifications.
+
+** Trigger
+
+A trigger is defined by two attributes:
+
+- [String] triggering_resource :: The resource which is triggering this
+     profile. Usually this is the model name within the ERICA system.
+- [String] triggering_action :: The CRUD action performed on that resource.
+     Typically this means the ActiveRecord action (e.g. ~create~, ~update~
+     or ~destroy~).
+
+** Filter
+
+When an action on a resource triggers this profile, this resource can
+be filtered.
+
+*** Filtering Attribute Values
+
+The triggering resource filtered by attribute value.
+
+Example: A NotificationProfile with triggering action ~create~ and
+triggering resource ~Visit~, can be filtered by attribute value match so
+that only for created visits with ~state != :incomplete_queried~
+triggers a notification.
+
+*** Filtering Changes
+
+The triggering resource is providing information about the changes
+performed by the triggering action (e.g. ~update~ in attributes).
+
+Example: A NotificationProfile with triggering action ~update~ and
+triggering resource ~ImageSeries~ can be filtered so that only a change
+of the state from ~:importing~ to ~:imported~ triggers a notification.
+
+*** Filtering Relations
+
+The triggering resource can be filtered by relations in two ways:
+
+- Existence :: e.g. an image series that has been assigned to a
+     visit should have a related visit.
+- Related Model Attribute Match :: e.g. an image series that has been
+     assigned to a visit with a specific attribute value.
+
+** Recipients
+
+Recipients can be defined via referencing users directly or via
+referencing user roles.
+
+Each profile has ~users~ and ~roles~. Furthermore you can configure the
+profile so that notifications are only created for those recipients,
+that are also authorized to access the triggering resource. For that,
+see the ~only_authorized_users~ attribute.
+
+* Notifications
+
+Notifications are simple relations describing which resource caused
+a notification profile to trigger an e-mail being sent as
+notification.
+
+* Throttling
+
+We do not want the user to be spammed by e-mails for each and every
+action done in the ERICA system. Thus sending e-mails can be throttled
+on a per-profile basis.
+
+ERICA is running recurring jobs for hourly, daily, weekly, monthly,
+semesterly, quarterly and yearly throttling. ERICA allows to configure
+the system-wide ~maximum_email_throttling_delay~ (default: monthly).
+
+A user can set an ~email_throttling_delay~ which is lower than the
+system-wide maximum.
+
+This email throttling delay can be overridden by NotificationProfile's
+~maximum_email_throttling__delay~. This way you can manage priority among
+your NotificationProfiles.
+
+For example you could set a profiles maximum throttling delay to
+~instantly~, which would mean, that the emails are sent as soon as the
+Notification is created.
+
+If you had set the maximum throttling delay to ~hourly~ the
+notifications would be sent each hour instead.
