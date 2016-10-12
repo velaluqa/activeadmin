@@ -1,3 +1,5 @@
 --markup markdown
 --markup-provider kramdown
 --charset UTF-8
+--plugin yard-activesupport-concern
+--plugin yard-activerecord
