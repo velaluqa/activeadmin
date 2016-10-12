@@ -1,5 +1,7 @@
 # # Notification
 #
+# Notifications are simple relations describing which resource caused
+# a notification profile to trigger an e-mail being sent as notification.
 #
 # ## Schema Information
 #
