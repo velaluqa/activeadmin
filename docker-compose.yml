@@ -31,7 +31,9 @@ test:
   environment:
     <<: *environment
     RAILS_ENV: test
-  links: *links
+  links:
+    - postgres
+    - redis
 worker:
   build: *build
   command: bundle exec sidekiq
