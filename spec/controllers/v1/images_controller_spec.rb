@@ -28,6 +28,7 @@ RSpec.describe V1::ImagesController do
       it 'succeeds' do
         response = post(:create, format: :json, image: @image_data)
         expect(response).to have_http_status(:created)
+        expect(File).to exist(ERICA.image_storage_path.join(Image.last.image_storage_path))
       end
     end
 
