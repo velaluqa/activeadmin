@@ -28,7 +28,7 @@ ActiveAdmin.register NotificationProfile do
     column :is_enabled do |profile|
       profile.is_enabled ? 'enabled' : ''
     end
-    column :triggering_actions do
+    column :triggering_actions do |profile|
       profile.triggering_actions.join(', ')
     end
     column :triggering_resource
