@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161011152237) do
+ActiveRecord::Schema.define(version: 20161024135131) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -166,6 +166,7 @@ ActiveRecord::Schema.define(version: 20161011152237) do
     t.datetime "marked_seen_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "triggering_action",       null: false
   end
 
   add_index "notifications", ["resource_type", "resource_id"], name: "index_notifications_on_resource_type_and_resource_id", using: :btree
