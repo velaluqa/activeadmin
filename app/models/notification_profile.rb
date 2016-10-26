@@ -99,14 +99,18 @@ require 'serializers/string_array_serializer'
 # **`triggering_resource`**             | `string`           | `not null`
 # **`updated_at`**                      | `datetime`         | `not null`
 #
+
 class NotificationProfile < ActiveRecord::Base
   has_paper_trail class_name: 'Version'
 
   serialize :triggering_actions, StringArraySerializer
   serialize :filters, HashArraySerializer
 
-  has_and_belongs_to_many :users
-  has_and_belongs_to_many :roles
+  has_many :notification_profile_users
+  has_many :users, through: :notification_profile_users, dependent: :destroy
+  has_many :notification_profile_roles
+  has_many :roles, through: :notification_profile_roles, dependent: :destroy
+
   has_many :notifications
 
   validates :title, presence: true
@@ -124,9 +128,9 @@ class NotificationProfile < ActiveRecord::Base
   # @return [ActiveRecord::Relation<User>] the relation specifying all users
   def recipients
     relation = User.joins(<<JOIN)
-LEFT JOIN "notification_profiles_users" AS "np_u" ON "np_u"."user_id" = "users"."id"
+LEFT JOIN "notification_profile_users" AS "np_u" ON "np_u"."user_id" = "users"."id"
 LEFT JOIN "user_roles" AS "u_r" ON "u_r"."user_id" = "users"."id"
-LEFT JOIN "notification_profiles_roles" AS "np_r" ON "np_r"."role_id" = "u_r"."role_id"
+LEFT JOIN "notification_profile_roles" AS "np_r" ON "np_r"."role_id" = "u_r"."role_id"
 JOIN
     relation
       .select('DISTINCT("users"."id"), "users".*')

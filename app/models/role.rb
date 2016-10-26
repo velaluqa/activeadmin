@@ -26,7 +26,8 @@ class Role < ActiveRecord::Base
 
   has_many :permissions, dependent: :destroy
 
-  has_and_belongs_to_many :notification_profiles
+  has_many :notification_profile_roles
+  has_many :notification_profiles, through: :notification_profile_roles, dependent: :destroy
 
   validates :title, presence: true, uniqueness: true
 

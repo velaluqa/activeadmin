@@ -343,8 +343,10 @@ end
 
 RSpec.describe NotificationProfile do
   describe 'model' do
-    it { should have_and_belong_to_many(:users) }
-    it { should have_and_belong_to_many(:roles) }
+    it { should have_many(:notification_profile_users) }
+    it { should have_many(:users) }
+    it { should have_many(:notification_profile_roles) }
+    it { should have_many(:roles) }
     it { should have_many(:notifications) }
 
     it 'validates title' do

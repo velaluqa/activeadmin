@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161024135131) do
+ActiveRecord::Schema.define(version: 20161026093633) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -126,6 +126,22 @@ ActiveRecord::Schema.define(version: 20161024135131) do
 
   add_index "images", ["image_series_id"], name: "index_images_on_image_series_id", using: :btree
 
+  create_table "notification_profile_roles", force: :cascade do |t|
+    t.integer "notification_profile_id", null: false
+    t.integer "role_id",                 null: false
+  end
+
+  add_index "notification_profile_roles", ["notification_profile_id", "role_id"], name: "index_notification_profile_roles_join_table_index", unique: true, using: :btree
+  add_index "notification_profile_roles", ["role_id"], name: "index_notification_profile_roles_on_role_id", using: :btree
+
+  create_table "notification_profile_users", force: :cascade do |t|
+    t.integer "notification_profile_id", null: false
+    t.integer "user_id",                 null: false
+  end
+
+  add_index "notification_profile_users", ["notification_profile_id", "user_id"], name: "index_notification_profile_users_join_table_index", unique: true, using: :btree
+  add_index "notification_profile_users", ["user_id"], name: "index_notification_profile_users_on_user_id", using: :btree
+
   create_table "notification_profiles", force: :cascade do |t|
     t.string   "title",                                          null: false
     t.text     "description"
@@ -139,22 +155,6 @@ ActiveRecord::Schema.define(version: 20161024135131) do
     t.integer  "maximum_email_throttling_delay"
     t.jsonb    "triggering_actions",             default: [],    null: false
   end
-
-  create_table "notification_profiles_roles", id: false, force: :cascade do |t|
-    t.integer "notification_profile_id", null: false
-    t.integer "role_id",                 null: false
-  end
-
-  add_index "notification_profiles_roles", ["notification_profile_id", "role_id"], name: "index_notification_profiles_roles_join_table_index", unique: true, using: :btree
-  add_index "notification_profiles_roles", ["role_id"], name: "index_notification_profiles_roles_on_role_id", using: :btree
-
-  create_table "notification_profiles_users", id: false, force: :cascade do |t|
-    t.integer "notification_profile_id", null: false
-    t.integer "user_id",                 null: false
-  end
-
-  add_index "notification_profiles_users", ["notification_profile_id", "user_id"], name: "index_notification_profiles_users_join_table_index", unique: true, using: :btree
-  add_index "notification_profiles_users", ["user_id"], name: "index_notification_profiles_users_on_user_id", using: :btree
 
   create_table "notifications", force: :cascade do |t|
     t.integer  "notification_profile_id", null: false
