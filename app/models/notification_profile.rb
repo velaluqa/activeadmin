@@ -202,6 +202,7 @@ JOIN
       next if only_authorized_recipients && !user.can?(:read, record)
       Notification.create(
         notification_profile: self,
+        triggering_action: action,
         resource: record,
         user: user,
         version: version

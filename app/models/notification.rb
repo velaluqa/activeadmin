@@ -18,6 +18,7 @@
 # **`notification_profile_id`**  | `integer`          | `not null`
 # **`resource_id`**              | `integer`          | `not null`
 # **`resource_type`**            | `string`           | `not null`
+# **`triggering_action`**        | `string`           | `not null`
 # **`updated_at`**               | `datetime`         |
 # **`user_id`**                  | `integer`          | `not null`
 # **`version_id`**               | `integer`          |
@@ -32,6 +33,7 @@
 # * `index_notifications_on_version_id`:
 #     * **`version_id`**
 #
+
 class Notification < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',

@@ -681,6 +681,8 @@ RSpec.describe NotificationProfile do
       end.to change(Notification, :count).by(2)
       expect(Notification.where(user: @user1)).to exist
       expect(Notification.where(user: @user2)).to exist
+      expect(Notification.where(user: @user1).first.triggering_action).to eq('create')
+      expect(Notification.where(user: @user2).first.triggering_action).to eq('create')
     end
 
     it 'creates notification for others actions' do
@@ -688,7 +690,7 @@ RSpec.describe NotificationProfile do
       expect do
         @profile1.trigger(:create, @record)
       end.to change(Notification, :count).by(1)
-      expect(Notification.where(user: @user1)).to exist
+      expect(Notification.where(user: @user1, triggering_action: 'create')).to exist
     end
 
     it 'does not create a notification for my own action' do

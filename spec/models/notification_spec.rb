@@ -118,7 +118,7 @@ RSpec.describe Notification do
 
       it 'schedules an instant notification job' do
         expect(SendInstantNotificationEmail).not_to have_enqueued_sidekiq_job
-        notification = @profile.notifications.create(user: @user, resource: @visit)
+        notification = @profile.notifications.create(user: @user, triggering_action:'create', resource: @visit)
         expect(SendInstantNotificationEmail).to have_enqueued_sidekiq_job(notification.id)
       end
     end
