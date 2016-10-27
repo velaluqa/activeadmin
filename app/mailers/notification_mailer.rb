@@ -31,7 +31,6 @@ class NotificationMailer < ActionMailer::Base
     @user = notification.user
     @profile = notification.notification_profile
     @notifications = [notification]
-    @notification = notification
     mail(
       to: @user.email,
       subject: @profile.title
