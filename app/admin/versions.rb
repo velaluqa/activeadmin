@@ -84,6 +84,7 @@ ActiveAdmin.register Version do
       end.accessible_by(current_ability)
     end
 
+    # TODO: #2237 - Refactor audit trail via decorators
     def self.classify_event(version)
       return version.event if version.changeset.nil?
       c = version.changeset
