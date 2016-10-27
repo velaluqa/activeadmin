@@ -4,6 +4,7 @@ require 'aa_viewer_cart_mixin'
 require 'aa_erica_comment'
 require 'aa_erica_keywords'
 require 'aa_comment_paper_trail_patch'
+require 'aa_views_pages_base'
 
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICACommentMixin::DSL)

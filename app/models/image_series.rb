@@ -26,7 +26,7 @@ require 'domino_document_mixin'
 #
 # * `index_image_series_on_patient_id`:
 #     * **`patient_id`**
-# * `index_image_series_on_patient_id_and_series_number` (_unique_):
+# * `index_image_series_on_patient_id_and_series_number`:
 #     * **`patient_id`**
 #     * **`series_number`**
 # * `index_image_series_on_series_number`:
@@ -83,7 +83,7 @@ JOIN
 
   #before_validation :assign_series_number
 
-  STATE_SYMS = [:imported, :visit_assigned, :required_series_assigned, :not_required]
+  STATE_SYMS = [:importing, :imported, :visit_assigned, :required_series_assigned, :not_required]
 
   def state_index
     read_attribute(:state)

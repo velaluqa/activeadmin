@@ -98,6 +98,21 @@ class User < ActiveRecord::Base
     generate_keypair(signature_password, false)
   end
   
+  def permission_matrix
+    matrix = {}
+    Ability::ACTIVITIES.each_pair do |subject, activities|
+      if can?(:manage, subject)
+        matrix[subject.to_s] = %i(manage)
+        next
+      end
+      granted = activities.map do |activity|
+        activity if can?(activity, subject)
+      end.compact
+      matrix[subject.to_s] = granted unless granted.empty?
+    end
+    matrix
+  end
+
   def can?(activity, subject)
     @ability ||= Ability.new(self)
     @ability.can?(activity, subject)

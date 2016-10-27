@@ -28,6 +28,16 @@ class Role < ActiveRecord::Base
 
   validates :title, presence: true, uniqueness: true
 
+  # Add permission to the role quickly.
+  #
+  # @param [Symbol, String] activity The activity to permit
+  # @param [ActiveRecord::Model, String] subject The subject to permit
+  #   activity on
+  def add_permission(activity, subject)
+    return if allows?(activity, subject)
+    permissions << Permission.new(activity: activity, subject: subject)
+  end
+
   def allows?(activities, subject)
     subject_string = subject.to_s.underscore
     Array[activities].flatten.any? do |activity|

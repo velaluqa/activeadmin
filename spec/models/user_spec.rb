@@ -30,6 +30,39 @@ RSpec.describe User do
     end
   end
 
+  describe '#permission_matrix' do
+    describe 'user with two roles' do
+      before(:each) do
+        @role1 = create(:role, with_permissions: {
+                          Study => %i(manage read),
+                          Image => %i(read)
+                        })
+        @role2 = create(:role, with_permissions: {
+                          Study => %i(manage read),
+                          Center => %i(manage read),
+                          Visit => %i(assign_required_series)
+                        })
+        @user = create(:user, with_user_roles: [@role1, @role2])
+      end
+
+      it 'only keeps :manage' do
+        expected = {
+          'Study' => %i(manage),
+          'Center' => %i(manage),
+          'Image' => %i(read),
+          'Visit' => %i(assign_required_series),
+          'User' => %i(manage),
+          'PublicKey' => %i(manage)
+        }
+        expect(@user.permission_matrix).to eq(expected)
+      end
+    end
+
+    describe 'user with scoped roles' do
+
+    end
+  end
+
   describe '#generate_keypair' do
     before(:each) do
       @user = create(:user, signature_password: 'somepass')

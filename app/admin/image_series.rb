@@ -172,6 +172,8 @@ ActiveAdmin.register ImageSeries do
     end
     column :state, :sortable => :state do |image_series|
       case image_series.state
+      when :importing
+        status_tag('Importing', :note)
       when :imported
         status_tag('Imported', :error)
       when :visit_assigned

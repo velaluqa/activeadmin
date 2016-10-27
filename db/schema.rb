@@ -113,7 +113,7 @@ ActiveRecord::Schema.define(version: 20160816091507) do
     t.string   "properties_version"
   end
 
-  add_index "image_series", ["patient_id", "series_number"], name: "index_image_series_on_patient_id_and_series_number", unique: true, using: :btree
+  add_index "image_series", ["patient_id", "series_number"], name: "index_image_series_on_patient_id_and_series_number", using: :btree
   add_index "image_series", ["patient_id"], name: "index_image_series_on_patient_id", using: :btree
   add_index "image_series", ["series_number"], name: "index_image_series_on_series_number", using: :btree
   add_index "image_series", ["visit_id"], name: "index_image_series_on_visit_id", using: :btree

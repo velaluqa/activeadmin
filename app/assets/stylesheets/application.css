@@ -10,6 +10,7 @@
  *
  *= require_self
  *= require bootstrap_and_overrides
+ *= require no_active_admin
  *= require form_answers
  *= require roles
  *= require form-login

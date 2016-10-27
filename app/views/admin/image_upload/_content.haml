@@ -1,0 +1,31 @@
+= javascript_include_tag "vendor/dicomParser"
+= javascript_include_tag "uploader/main"
+:coffeescript
+  $ ->
+    ImageUploader.router = new ImageUploader.Router()
+    Backbone.history.start()
+#image-upload
+  .panel-columns
+    #study-select
+      %select
+    #center-select
+      %select
+    #patient-select
+      %select
+  .panel#parse-images
+    .hint.panel_contents
+      Drag files or folders into your browser window
+      %br><
+      or
+      %br><
+      %label.btn.btn-default{ for: 'folders'} Choose Directory
+      %input#folders{ name: 'folders', type: 'file',  webkitdirectory: 'webkitdirectory',  mozdirectory: 'mozdirectory',  msdirectory: 'msdirectory',  odirectory: 'odirectory',  directory: 'directory',  multiple: 'multiple', style: 'visibility: hidden; position: absolute;' }
+    .progress-container.panel_contents
+      .progress-bar
+        .label
+        .progress{ style: "width: 0%" }
+          .label
+  .panel#image-series
+    .panel_contents
+  .button-group
+    %button Upload Image Series

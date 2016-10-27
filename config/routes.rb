@@ -60,6 +60,20 @@ StudyServer::Application.routes.draw do
 
   get 'wado' => 'wado#wado'
 
+  namespace :v1 do
+    resources :images
+    resources :image_series do
+      member do
+        post :finish_import
+        post :assign_required_series
+      end
+    end
+    resources :patients do
+      resources :visits
+    end
+    resources :visits
+  end
+
   authenticate :user, ->(user) { user.can?(:manage, Sidekiq) } do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'

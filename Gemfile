@@ -58,7 +58,7 @@ gem 'jquery-rails', '~> 3.1.4'
 gem 'bcrypt-ruby', '~> 3.0.0'
 
 # To use Jbuilder templates for JSON
-# gem 'jbuilder'
+gem 'jbuilder'
 
 # Use unicorn as the app server
 gem 'kgio', '~> 2.10.0'
@@ -140,6 +140,12 @@ gem 'factory_girl_rails', '~> 4.7.0'
 
 # Awesome Print for pretty printing of Ruby Objects
 gem 'awesome_print'
+
+# Use HAML and CoffeeScript for Backbone.JS SPAs
+gem 'haml_coffee_assets'
+# TODO: Upgrade to Sprockets >= 3.0 when haml_coffee_assets is fixed.
+# See: https://github.com/emilioforrer/haml_coffee_assets/issues/152
+gem 'sprockets-rails', '2.3.3'
 
 group :development do
   # Hint opimization opportunities while developing.
