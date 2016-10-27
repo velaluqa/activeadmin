@@ -1,5 +1,3 @@
-require 'domino_document_mixin'
-
 # note: this is not a proper activerecord model
 # it is a simple container class implementing the bare bones needed by the view components of activeadmin
 

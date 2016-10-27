@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160816091507) do
+ActiveRecord::Schema.define(version: 20161026093633) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -125,6 +125,53 @@ ActiveRecord::Schema.define(version: 20160816091507) do
   end
 
   add_index "images", ["image_series_id"], name: "index_images_on_image_series_id", using: :btree
+
+  create_table "notification_profile_roles", force: :cascade do |t|
+    t.integer "notification_profile_id", null: false
+    t.integer "role_id",                 null: false
+  end
+
+  add_index "notification_profile_roles", ["notification_profile_id", "role_id"], name: "index_notification_profile_roles_join_table_index", unique: true, using: :btree
+  add_index "notification_profile_roles", ["role_id"], name: "index_notification_profile_roles_on_role_id", using: :btree
+
+  create_table "notification_profile_users", force: :cascade do |t|
+    t.integer "notification_profile_id", null: false
+    t.integer "user_id",                 null: false
+  end
+
+  add_index "notification_profile_users", ["notification_profile_id", "user_id"], name: "index_notification_profile_users_join_table_index", unique: true, using: :btree
+  add_index "notification_profile_users", ["user_id"], name: "index_notification_profile_users_on_user_id", using: :btree
+
+  create_table "notification_profiles", force: :cascade do |t|
+    t.string   "title",                                          null: false
+    t.text     "description"
+    t.string   "notification_type"
+    t.string   "triggering_resource",                            null: false
+    t.jsonb    "filters",                        default: [],    null: false
+    t.boolean  "only_authorized_recipients",     default: true,  null: false
+    t.boolean  "is_enabled",                     default: false, null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.integer  "maximum_email_throttling_delay"
+    t.jsonb    "triggering_actions",             default: [],    null: false
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.integer  "notification_profile_id", null: false
+    t.integer  "resource_id",             null: false
+    t.string   "resource_type",           null: false
+    t.integer  "version_id"
+    t.integer  "user_id",                 null: false
+    t.datetime "email_sent_at"
+    t.datetime "marked_seen_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "triggering_action",       null: false
+  end
+
+  add_index "notifications", ["resource_type", "resource_id"], name: "index_notifications_on_resource_type_and_resource_id", using: :btree
+  add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree
+  add_index "notifications", ["version_id"], name: "index_notifications_on_version_id", using: :btree
 
   create_table "patients", force: :cascade do |t|
     t.string   "subject_id"
@@ -258,6 +305,7 @@ ActiveRecord::Schema.define(version: 20160816091507) do
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
     t.string   "unconfirmed_email"
+    t.integer  "email_throttling_delay"
   end
 
   add_index "users", ["authentication_token"], name: "index_users_on_authentication_token", unique: true, using: :btree

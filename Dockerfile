@@ -1,4 +1,4 @@
-FROM ruby:2.2
+FROM ruby:2.2.5
 MAINTAINER aandersen@velalu.qa
 
 ENV APP_HOME /app

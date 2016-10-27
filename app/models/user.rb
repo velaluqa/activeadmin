@@ -15,6 +15,7 @@ require 'email_validator'
 # **`current_sign_in_at`**      | `datetime`         |
 # **`current_sign_in_ip`**      | `string`           |
 # **`email`**                   | `string`           | `default(""), not null`
+# **`email_throttling_delay`**  | `integer`          |
 # **`encrypted_password`**      | `string`           | `default(""), not null`
 # **`failed_attempts`**         | `integer`          | `default(0)`
 # **`id`**                      | `integer`          | `not null, primary key`
@@ -45,7 +46,7 @@ require 'email_validator'
 #     * **`username`**
 #
 class User < ActiveRecord::Base
-  has_paper_trail
+  has_paper_trail class_name: 'Version'
 
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,
@@ -72,12 +73,20 @@ class User < ActiveRecord::Base
 
   has_many :user_roles, dependent: :destroy
   accepts_nested_attributes_for :user_roles, allow_destroy: true
-  attr_accessible :user_roles_attributes
+  attr_accessible :user_roles_attributes, :email_throttling_delay
 
   has_many :roles, through: :user_roles
   has_many :permissions, through: :user_roles
 
   has_many :public_keys
+
+  # A user may be recipient to a multitude of notification profiles.
+  has_many :notification_profile_users
+  has_many :notification_profiles, through: :notification_profile_users, dependent: :destroy
+
+  # A use might be the sole recipient of many notifications that are
+  # for him to decide to be marked as seen.
+  has_many :notifications
 
   before_create :create_keypair
 

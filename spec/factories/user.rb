@@ -9,6 +9,8 @@ FactoryGirl.define do
     password 'password'
     email { |u| Faker::Internet.safe_email }
 
+    confirmed_at { DateTime.now }
+
     trait :changed_password do
       password_changed_at DateTime.now
     end

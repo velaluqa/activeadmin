@@ -17,7 +17,7 @@
 # **`updated_at`**  | `datetime`         |
 #
 class Role < ActiveRecord::Base
-  has_paper_trail
+  has_paper_trail class_name: 'Version'
 
   attr_accessible :title, :abilities
 
@@ -25,6 +25,9 @@ class Role < ActiveRecord::Base
   has_many :users, through: :user_roles
 
   has_many :permissions, dependent: :destroy
+
+  has_many :notification_profile_roles
+  has_many :notification_profiles, through: :notification_profile_roles, dependent: :destroy
 
   validates :title, presence: true, uniqueness: true
 

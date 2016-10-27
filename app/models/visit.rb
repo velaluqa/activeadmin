@@ -1,4 +1,3 @@
-require 'domino_document_mixin'
 require 'git_config_repository'
 
 # ## Schema Information
@@ -43,9 +42,10 @@ require 'git_config_repository'
 #     * **`visit_number`**
 #
 class Visit < ActiveRecord::Base
+  include NotificationObservable
   include DominoDocument
 
-  has_paper_trail
+  has_paper_trail class_name: 'Version'
   acts_as_taggable
 
   attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid
@@ -643,6 +643,10 @@ class Visit < ActiveRecord::Base
     when :rs_tqc_performed then ['RS TQC performed', :ok]
     when :mqc_performed then ['MQC performed', :ok]
     end
+  end
+
+  def to_s
+    "#{visit_type}(#{visit_number})"
   end
 
   protected

@@ -33,5 +33,9 @@ class ERICA
     def config_paths
       [form_config_path, session_config_path, study_config_path]
     end
+
+    def maximum_email_throttling_delay
+      Rails.application.config.maximum_email_throttling_delay
+    end
   end
 end

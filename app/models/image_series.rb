@@ -1,5 +1,3 @@
-require 'domino_document_mixin'
-
 # ## Schema Information
 #
 # Table name: `image_series`
@@ -35,9 +33,10 @@ require 'domino_document_mixin'
 #     * **`visit_id`**
 #
 class ImageSeries < ActiveRecord::Base
+  include NotificationObservable
   include DominoDocument
 
-  has_paper_trail
+  has_paper_trail class_name: 'Version'
   acts_as_taggable
 
   attr_accessible :name, :visit_id, :patient_id, :imaging_date, :domino_unid, :series_number, :state, :comment

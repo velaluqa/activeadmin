@@ -16,6 +16,8 @@ ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 
+
+require 'with_model'
 require 'database_cleaner'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -26,6 +28,24 @@ require 'database_cleaner'
 # end with _spec.rb. You can configure this pattern with with the --pattern
 # option on the command line or in ~/.rspec, .rspec or `.rspec-local`.
 Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
+
+RSpec::Sidekiq.configure do |config|
+  # Clears all job queues before each example
+  config.clear_all_enqueued_jobs = true
+
+  # Whether to use terminal colours when outputting messages
+  config.enable_terminal_colours = true
+
+  # Warn when jobs are not enqueued to Redis but to a job array
+  config.warn_when_jobs_not_processed_by_sidekiq = true
+end
 
 RSpec.configure do |config|
   config.filter_run focus: true
@@ -44,6 +64,7 @@ RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
   config.include Devise::TestHelpers, type: :controller
   config.extend ControllerMacros, type: :controller
+  config.extend WithModel
 
   def clear_data
     FileUtils.rm_rf('spec/data')
@@ -66,6 +87,12 @@ RSpec.configure do |config|
   end
   config.after(:each) do
     DatabaseCleaner.clean
+  end
+
+  config.around(:each, transactional_spec: true) do |example|
+    DatabaseCleaner.strategy = :deletion
+    example.run
+    DatabaseCleaner.strategy = :transaction
   end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your

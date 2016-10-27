@@ -11,6 +11,8 @@ class Ability
     Patient => %i(manage read update create destroy),
     ImageSeries => %i(manage read update create destroy upload assign_patient assign_visit),
     Image => %i(manage read update create destroy),
+    NotificationProfile => %i(manage read update create destroy),
+    Notification => %i(manage read update create destroy),
     User => %i(manage read update create destroy),
     UserRole => %i(manage read update create destroy),
     PublicKey => %i(manage read update create destroy),

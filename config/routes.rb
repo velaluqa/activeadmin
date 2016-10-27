@@ -1,6 +1,8 @@
 StudyServer::Application.routes.draw do
   ActiveAdmin.routes(self)
 
+  mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?
+
   if ERICA.remote?
     get '/erica_remote/paths', to: 'erica_remote#paths'
   end
@@ -76,6 +78,7 @@ StudyServer::Application.routes.draw do
 
   authenticate :user, ->(user) { user.can?(:manage, Sidekiq) } do
     require 'sidekiq/web'
+    require 'sidekiq-scheduler/web'
     mount Sidekiq::Web => '/sidekiq'
   end
 

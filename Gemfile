@@ -114,6 +114,10 @@ gem 'dentaku', '~> 2.0.7'
 # Sidekiq is used for asynchronous job execution, i.e. DICOM searches, exports, ...
 gem 'sidekiq'
 
+# Sideiq-scheduler is used for recurring jobs (i.e. checking for and
+# sending notifications via e-Mail).
+gem 'sidekiq-scheduler', '~> 2.0'
+
 # Ruby DICOM lib
 gem 'dicom'
 
@@ -147,6 +151,12 @@ gem 'haml_coffee_assets'
 # See: https://github.com/emilioforrer/haml_coffee_assets/issues/152
 gem 'sprockets-rails', '2.3.3'
 
+# Validate JSONB columns via JSONschema
+gem 'activerecord_json_validator'
+
+# Enhanced `Array#dig` and `Hash#dig` for digging nested array/hash structures.
+gem 'ruby_dig2'
+
 group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
@@ -160,6 +170,13 @@ group :development do
   # Gems for prettier errors in development
   gem 'better_errors'
   gem 'binding_of_caller'
+
+  # Catching mails and serving them locally via a web interface.
+  gem 'letter_opener_web', '~> 1.2.0'
+end
+
+group :test do
+  gem 'rspec-sidekiq', github: 'velaluqa/rspec-sidekiq', branch: 'deprecate-have-enqueued-job'
 end
 
 group :development, :test do
@@ -194,6 +211,8 @@ group :development, :test do
   gem 'simplecov-json', require: false
   gem 'simplecov-rcov', require: false
   gem 'yard', require: false
+  gem 'yard-activesupport-concern', require: false
+  gem 'yard-activerecord', github: 'velaluqa/yard-activerecord', require: false
 
   gem 'gitdeploy', git: 'ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git', branch: :master, require: false
 
@@ -209,6 +228,8 @@ group :development, :test do
   gem 'rspec', '~> 3.4.0'
   gem 'rspec-mocks', '~> 3.4.1'
   gem 'rspec-rails', '~> 3.4.2'
+  gem 'with_model', '~> 1.2.1'
+  gem 'shoulda-matchers'
 
   gem 'turnip'
   gem 'gherkin', '~> 2.5'

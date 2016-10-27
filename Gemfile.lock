@@ -1,4 +1,20 @@
 GIT
+  remote: git://github.com/velaluqa/rspec-sidekiq.git
+  revision: 5ae1fc9cd060df0d496908e6ea517eabece7033a
+  branch: deprecate-have-enqueued-job
+  specs:
+    rspec-sidekiq (3.0.0)
+      rspec-core (~> 3.0, >= 3.0.0)
+      sidekiq (>= 2.4.0)
+
+GIT
+  remote: git://github.com/velaluqa/yard-activerecord.git
+  revision: dc2d9c1ea0a0fc9a0f9ab35d76a3208e51be506e
+  specs:
+    yard-activerecord (0.0.16)
+      yard (>= 0.8.3)
+
+GIT
   remote: ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git
   revision: 68dff41fedc7667ab1bd8d1ec74b90fe0ed5a2ac
   branch: master
@@ -60,6 +76,9 @@ GEM
       actionpack (>= 4.0.0, < 5)
       activerecord (>= 4.0.0, < 5)
       railties (>= 4.0.0, < 5)
+    activerecord_json_validator (1.0.0)
+      activerecord (>= 4.2.0, < 5)
+      json-schema (~> 2.5)
     activeresource (4.0.0)
       activemodel (~> 4.0)
       activesupport (~> 4.0)
@@ -259,6 +278,8 @@ GEM
     jquery-ui-rails (5.0.5)
       railties (>= 3.2.16)
     json (1.8.3)
+    json-schema (2.5.0)
+      addressable (~> 2.3)
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -274,6 +295,11 @@ GEM
       less (~> 2.6.0)
       sprockets (> 2, < 4)
       tilt
+    letter_opener (1.4.1)
+      launchy (~> 2.2)
+    letter_opener_web (1.2.3)
+      letter_opener (~> 1.0)
+      rails (>= 3.2)
     libv8 (3.11.8.17)
     listen (3.0.6)
       rb-fsevent (>= 0.9.3)
@@ -477,6 +503,7 @@ GEM
     ruby2ruby (2.3.0)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.0)
+    ruby_dig2 (0.0.1)
     ruby_parser (3.8.1)
       sexp_processor (~> 4.1)
     rubycritic (2.8.0)
@@ -489,6 +516,7 @@ GEM
       ruby_parser (~> 3.8)
       virtus (~> 1.0)
     rubyzip (1.2.0)
+    rufus-scheduler (3.1.10)
     rugged (0.24.0)
     safe_yaml (1.0.4)
     sass (3.4.22)
@@ -502,10 +530,18 @@ GEM
       thor (~> 0.14)
     sexp_processor (4.7.0)
     shellany (0.0.1)
+    shoulda-matchers (3.1.1)
+      activesupport (>= 4.0.0)
     sidekiq (4.1.1)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       redis (~> 3.2, >= 3.2.1)
+    sidekiq-scheduler (2.0.8)
+      multi_json (~> 1)
+      redis (~> 3)
+      rufus-scheduler (~> 3.1.8)
+      sidekiq (>= 3)
+      tilt (>= 1.4.0)
     simplecov (0.11.2)
       docile (~> 1.1.0)
       json (~> 1.8)
@@ -583,9 +619,13 @@ GEM
     websocket-driver (0.6.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
+    with_model (1.2.1)
+      activerecord (>= 3.0)
     xpath (2.0.0)
       nokogiri (~> 1.3)
     yard (0.8.7.6)
+    yard-activesupport-concern (0.0.1)
+      yard (>= 0.8)
     yarjuf (2.0.0)
       builder
       rspec (~> 3)
@@ -597,6 +637,7 @@ DEPENDENCIES
   actionpack-action_caching
   activeadmin (= 1.0.0.pre2)
   activerecord-session_store
+  activerecord_json_validator
   activeresource
   acts-as-taggable-on
   airbrake (~> 4.3)
@@ -641,6 +682,7 @@ DEPENDENCIES
   kramdown
   kwalify
   less-rails (~> 2.7.1)
+  letter_opener_web (~> 1.2.0)
   libv8 (~> 3.11.8)
   lol_dba
   meta_request (~> 0.4.0)
@@ -668,15 +710,19 @@ DEPENDENCIES
   rspec (~> 3.4.0)
   rspec-mocks (~> 3.4.1)
   rspec-rails (~> 3.4.2)
+  rspec-sidekiq!
   rubocop
   rubocop-checkstyle_formatter
   ruby-progressbar
+  ruby_dig2
   rubycritic
   rubyzip
   rugged (~> 0.24.0)
   sass-rails (~> 5.0.4)
   select2-rails (~> 4.0.1)
+  shoulda-matchers
   sidekiq
+  sidekiq-scheduler (~> 2.0)
   simplecov
   simplecov-cobertura
   simplecov-json
@@ -694,8 +740,11 @@ DEPENDENCIES
   uglifier (>= 1.0.3)
   unicorn (~> 5.1.0)
   webmock
+  with_model (~> 1.2.1)
   yard
+  yard-activerecord!
+  yard-activesupport-concern
   yarjuf (~> 2.0.0)
 
 BUNDLED WITH
-   1.12.3
+   1.13.3

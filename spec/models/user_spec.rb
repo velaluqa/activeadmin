@@ -1,4 +1,8 @@
 RSpec.describe User do
+  it { should have_many(:notification_profile_users) }
+  it { should have_many(:notification_profiles) }
+  it { should have_many(:notifications) }
+
   it 'validates the email address' do
     user = build(:user, email: nil)
     expect(user).to_not be_valid
@@ -10,23 +14,25 @@ RSpec.describe User do
     expect(user).to be_valid
   end
 
-  describe 'given signature_password' do
-    before(:each) do
-      @user = create(:user, signature_password: 'somepass')
+  describe '#create' do
+    describe 'given signature_password' do
+      before(:each) do
+        @user = create(:user, signature_password: 'somepass')
+      end
+
+      it 'generates a keypair' do
+        expect(@user.public_keys.count).to eq 1
+      end
     end
 
-    it 'generates a keypair' do
-      expect(@user.public_keys.count).to eq 1
-    end
-  end
+    describe 'not given signature_password' do
+      before(:each) do
+        @user = create(:user)
+      end
 
-  describe 'not given signature_password' do
-    before(:each) do
-      @user = create(:user)
-    end
-
-    it 'does not generate a keypair' do
-      expect(@user.public_keys.count).to eq 0
+      it 'does not generate a keypair' do
+        expect(@user.public_keys.count).to eq 0
+      end
     end
   end
 

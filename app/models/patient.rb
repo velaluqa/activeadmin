@@ -1,5 +1,3 @@
-require 'domino_document_mixin'
-
 # ## Schema Information
 #
 # Table name: `patients`
@@ -24,9 +22,10 @@ require 'domino_document_mixin'
 #     * **`center_id`**
 #
 class Patient < ActiveRecord::Base
+  include NotificationObservable
   include DominoDocument
 
-  has_paper_trail
+  has_paper_trail class_name: 'Version'
   acts_as_taggable
 
   attr_accessible :center, :subject_id, :domino_unid

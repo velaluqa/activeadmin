@@ -23,10 +23,12 @@
 #     * **`subject`**
 #
 class Permission < ActiveRecord::Base
+  include NotificationObservable
+
   ABILITY_REGEX = /^(.+)_(#{Ability::ACTIVITIES.keys.map{|subject| subject.to_s.underscore}.join('|')})$/
 
   belongs_to :role
-  has_many :users, through: :roles
+  has_many :users, through: :role
 
   # Initializes a new instance from a given ability string.
   #

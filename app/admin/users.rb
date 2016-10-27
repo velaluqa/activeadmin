@@ -122,10 +122,15 @@ ActiveAdmin.register User do
         input :signature_password_confirmation
       end
     end
-    inputs 'Roles' do
-      has_many :user_roles, allow_destroy: true do |ur|
-        ur.input :role
-        ur.input :scope_object_identifier, collection: [['*system-wide*', 'systemwide']] + UserRole.accessible_scope_object_identifiers(current_ability)
+    inputs 'Settings' do
+      input :email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2' }
+    end
+    if f.object != current_user && can?(%i(create update destroy), UserRole)
+      inputs 'Roles' do
+        has_many :user_roles, allow_destroy: true do |ur|
+          ur.input :role
+          ur.input :scope_object_identifier, collection: [['*system-wide*', 'systemwide']] + UserRole.accessible_scope_object_identifiers(current_ability)
+        end
       end
     end
     actions

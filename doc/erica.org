@@ -6,8 +6,9 @@ This document explains the basics about the ERICA Store/Remote system.
 
 Other documents:
 
-- [[file:erica_store.org][ERICA Store document]]
-- [[file:erica_remote.org][ERICA Remote document]]
+- [[file:erica_store.org][ERICA Store]]
+- [[file:erica_remote.org][ERICA Remote]]
+- [[file:erica_notifications.org][ERICA Notification Functionality]]
 - [[file:audit_trail_classification.org][Audit Trail Classification]]
 
 * Server Setup
@@ -223,7 +224,6 @@ service unicorn restart
 #+END_SRC
 
 * Common Administration Tasks
-
 ** Restart Application Server
 
 ERICA uses [[http://unicorn.bogomips.org/][Unicorn]] as application server. To restart unicorn use:

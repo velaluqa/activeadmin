@@ -101,6 +101,7 @@ RSpec.describe Admin::UsersController do
       {
         username: 'foobar',
         name: 'Foo Bar',
+        email: 'foo@baz.de',
         password: 'bazbazbazbaz',
         password_confirmation: 'bazbazbazbaz',
         signature_password: 'fubazfubaz',

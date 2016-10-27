@@ -5,6 +5,8 @@
 //= require reorder_visits
 
 //= require vendor/select2.full
+//= require vendor/jsoneditor
+//= require vendor/jsoneditor.erica-theme
 //= require cases_advanced_filters
 //= require aa_advanced_filters
 //= require tree.jquery
@@ -16,3 +18,4 @@
 //= require vendor/naturalSort
 //= require shared/promise_queue
 //= require shared/user
+//= require select2-initializers

@@ -1,5 +1,3 @@
-require 'domino_document_mixin'
-
 # ## Schema Information
 #
 # Table name: `centers`
@@ -25,9 +23,10 @@ require 'domino_document_mixin'
 #     * **`code`**
 #
 class Center < ActiveRecord::Base
+  include NotificationObservable
   include DominoDocument
 
-  has_paper_trail
+  has_paper_trail class_name: 'Version'
   acts_as_taggable
 
   attr_accessible :name, :study, :code, :domino_unid
