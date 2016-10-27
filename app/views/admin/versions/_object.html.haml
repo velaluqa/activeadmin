@@ -1,0 +1,23 @@
+%table
+  %thead
+    %tr
+      %th Field
+      %th Value
+  %tbody
+    - object.each do |field, value|
+      %tr
+        %td
+          - if item_type
+            %p= simple_format(item_type.human_attribute_name(field))
+            %p= '(' + field + ')'
+          - else
+            %p= field
+        %td
+          - if field == 'state' && item_type.andand.respond_to?(:int_to_state_sym)
+            = item_type.int_to_state_sym(value.to_i).to_s
+          - elsif field == 'flag' && item_type.andand.respond_to?(:int_to_flag_sym)
+            = item_type.int_to_flag_sym(value.to_i).to_s
+          - elsif field == 'mqc_state' && item_type.andand.respond_to?(:int_to_mqc_state_sym)
+            = item_type.int_to_mqc_state_sym(value.to_i).to_s
+          - else
+            = value
