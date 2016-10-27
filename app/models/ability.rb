@@ -9,6 +9,7 @@ class Ability
     Study  => %i(manage read update create destroy),
     Center => %i(manage read update create destroy),
     Patient => %i(manage read update create destroy),
+    EmailTemplate => %i(manage read update create destroy),
     ImageSeries => %i(manage read update create destroy upload assign_patient assign_visit),
     Image => %i(manage read update create destroy),
     NotificationProfile => %i(manage read update create destroy),
