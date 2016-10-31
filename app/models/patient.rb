@@ -56,9 +56,7 @@ SELECT
   include ScopablePermissions
 
   def self.with_permissions
-    joins(<<JOIN)
-INNER JOIN centers ON centers.id = patients.center_id
-INNER JOIN studies ON centers.study_id = studies.id
+    joins(center: :study).joins(<<JOIN)
 INNER JOIN user_roles ON
   (
        (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)

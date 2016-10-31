@@ -44,8 +44,7 @@ class Center < ActiveRecord::Base
   include ScopablePermissions
 
   def self.with_permissions
-    joins(<<JOIN)
-INNER JOIN studies ON centers.study_id = studies.id
+    joins(:study).joins(<<JOIN)
 INNER JOIN user_roles ON
   (
        (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
