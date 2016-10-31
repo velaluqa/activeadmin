@@ -14,6 +14,11 @@ RSpec.describe BackgroundJob do
     end
   end
 
+  it 'is creatable' do
+    job = nil
+    expect { job = BackgroundJob.create(name: 'Foo Job') }.not_to raise_error
+  end
+
   describe '#finished?' do
     it 'returns true if complete' do
       job = create(:background_job, :complete)

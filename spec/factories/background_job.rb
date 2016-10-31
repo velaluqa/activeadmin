@@ -3,6 +3,8 @@ FactoryGirl.define do
     user
     completed false
 
+    name { Faker::Lorem.words(3) }
+
     trait :complete do
       completed true
       progress 1.0

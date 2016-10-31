@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161027115738) do
+ActiveRecord::Schema.define(version: 20161031111039) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,10 +42,12 @@ ActiveRecord::Schema.define(version: 20161027115738) do
     t.jsonb    "results",       default: {},    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name",                          null: false
   end
 
   add_index "background_jobs", ["completed"], name: "index_background_jobs_on_completed", using: :btree
   add_index "background_jobs", ["legacy_id"], name: "index_background_jobs_on_legacy_id", using: :btree
+  add_index "background_jobs", ["name"], name: "index_background_jobs_on_name", using: :btree
   add_index "background_jobs", ["results"], name: "index_background_jobs_on_results", using: :gin
   add_index "background_jobs", ["user_id"], name: "index_background_jobs_on_user_id", using: :btree
 

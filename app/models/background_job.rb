@@ -15,6 +15,7 @@
 # **`error_message`**  | `text`             |
 # **`id`**             | `integer`          | `not null, primary key`
 # **`legacy_id`**      | `string`           |
+# **`name`**           | `string`           | `not null`
 # **`progress`**       | `float`            | `default(0.0), not null`
 # **`results`**        | `jsonb`            | `not null`
 # **`successful`**     | `boolean`          |
@@ -27,6 +28,8 @@
 #     * **`completed`**
 # * `index_background_jobs_on_legacy_id`:
 #     * **`legacy_id`**
+# * `index_background_jobs_on_name`:
+#     * **`name`**
 # * `index_background_jobs_on_results`:
 #     * **`results`**
 # * `index_background_jobs_on_user_id`:
