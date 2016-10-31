@@ -83,6 +83,21 @@ SELECT
   before_save :ensure_study_is_unchanged
 
   include ImageStorageCallbacks
+  include ScopablePermissions
+
+  def self.with_permissions
+    joins(patient: { center: :study }).joins(<<JOIN)
+INNER JOIN user_roles ON
+  (
+       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+    OR user_roles.scope_object_id IS NULL
+  )
+INNER JOIN roles ON user_roles.role_id = roles.id
+INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
 
   # TODO: Replace with a less naive full-text search index
   scope :filter, lambda { |query|
