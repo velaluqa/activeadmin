@@ -1,4 +1,33 @@
 RSpec.describe BackgroundJob do
+  describe 'scope ::searchable' do
+    it 'selects search fields' do
+      create(:background_job, name: 'FooJob')
+      expect(BackgroundJob.searchable.as_json)
+        .to eq [{
+                  'id' => nil,
+                  'study_id' => nil,
+                  'text' => 'FooJob',
+                  'result_id' => 'BackgroundJob_4',
+                  'result_type' => 'BackgroundJob'
+                }]
+    end
+  end
+
+  describe 'scope ::granted_for' do
+    it 'returns only the given users background jobs' do
+      user1 = create(:user)
+      user2 = create(:user)
+      user3 = create(:user, is_root_user: true)
+      job1 = create(:background_job, user_id: user1.id)
+      job2 = create(:background_job, user_id: user2.id)
+      expect(BackgroundJob.granted_for(user: user1)).to include(job1)
+      expect(BackgroundJob.granted_for(user: user1)).not_to include(job2)
+      expect(BackgroundJob.granted_for(user: user2)).not_to include(job1)
+      expect(BackgroundJob.granted_for(user: user2)).to include(job2)
+      expect(BackgroundJob.granted_for(user: user3)).to include(job1, job2)
+    end
+  end
+
   describe 'before destroy' do
     it 'removes zip files' do
       background_job = create(:background_job,
