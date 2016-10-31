@@ -63,6 +63,13 @@ class Visit < ActiveRecord::Base
       .where(studies: { id: Array[ids].flatten })
   }
 
+  scope :searchable, -> { select(<<SELECT) }
+centers.study_id AS study_id,
+centers.code || patients.subject_id || '#' || visits.visit_number AS text,
+visits.id AS result_id,
+'Visit' AS result_type
+SELECT
+
   validates_uniqueness_of :visit_number, :scope => :patient_id
   validates_presence_of :visit_number, :patient_id
 
