@@ -56,6 +56,13 @@ class ImageSeries < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
+  scope :searchable, -> { select(<<SELECT) }
+centers.study_id AS study_id,
+image_series.series_number::text AS text,
+image_series.id AS result_id,
+'ImageSeries' AS result_type
+SELECT
+
   include ImageStorageCallbacks
   include ScopablePermissions
 
