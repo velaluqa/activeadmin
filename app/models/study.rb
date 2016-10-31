@@ -48,7 +48,7 @@ class Study < ActiveRecord::Base
   scope :searchable, -> { select(<<SELECT) }
 studies.id AS study_id,
 studies.name AS text,
-'Study_' || studies.id AS result_id,
+studies.id AS result_id,
 'Study' AS result_type
 SELECT
 

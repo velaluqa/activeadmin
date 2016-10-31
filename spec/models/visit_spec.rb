@@ -3,13 +3,13 @@ RSpec.describe Visit do
     it 'selects search fields' do
       center = create(:center, code: 'Foo')
       patient = create(:patient, subject_id: 'Bar', center: center)
-      create(:visit, patient: patient)
+      visit = create(:visit, patient: patient)
       expect(Visit.joins(patient: :center).searchable.as_json)
         .to eq [{
                   'id' => nil,
-                  'study_id' => 7,
-                  'text' => 'FooBar#30',
-                  'result_id' => 25,
+                  'study_id' => visit.patient.center.study_id,
+                  'text' => "FooBar##{visit.visit_number}",
+                  'result_id' => visit.id,
                   'result_type' => 'Visit'
                 }]
     end

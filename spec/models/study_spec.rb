@@ -1,13 +1,13 @@
 RSpec.describe Study do
   describe 'scope ::searchable' do
     it 'selects search fields' do
-      create(:study, name: 'FooStudy')
+      study = create(:study, name: 'FooStudy')
       expect(Study.searchable.as_json)
         .to eq [{
                   'id' => nil,
-                  'study_id' => 7,
+                  'study_id' => study.id,
                   'text' => 'FooStudy',
-                  'result_id' => 'Study_7',
+                  'result_id' => study.id,
                   'result_type' => 'Study'
                 }]
     end

@@ -59,7 +59,7 @@ JOIN
   scope :searchable, -> { select(<<SELECT) }
 centers.study_id AS study_id,
 centers.code || ' - ' || centers.name AS text,
-'Center_' || centers.id AS result_id,
+centers.id AS result_id,
 'Center' AS result_type
 SELECT
 

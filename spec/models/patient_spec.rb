@@ -2,13 +2,13 @@ RSpec.describe Patient do
   describe 'scope ::searchable' do
     it 'selects search fields' do
       center = create(:center, code: 'Foo')
-      create(:patient, subject_id: 'Bar', center: center)
-      expect(Patient.joins(:center).searchable.as_json)
+      patient = create(:patient, subject_id: 'Bar', center: center)
+      expect(Patient.searchable.as_json)
         .to eq [{
                   'id' => nil,
-                  'study_id' => 1,
+                  'study_id' => patient.center.study_id,
                   'text' => 'FooBar',
-                  'result_id' => 1,
+                  'result_id' => patient.id,
                   'result_type' => 'Patient'
                 }]
     end

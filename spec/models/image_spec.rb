@@ -2,11 +2,11 @@ RSpec.describe Image do
   describe 'scope ::searchable' do
     it 'selects search fields' do
       image = create(:image)
-      expect(Image.joins(image_series: { patient: :center }).searchable.as_json)
+      expect(Image.searchable.as_json)
         .to eq [{
                   'id' => nil,
                   'study_id' => image.image_series.patient.center.study.id,
-                  'text' => '10#2',
+                  'text' => "#{image.image_series.series_number}##{image.id}",
                   'result_id' => image.id,
                   'result_type' => 'Image'
                 }]
