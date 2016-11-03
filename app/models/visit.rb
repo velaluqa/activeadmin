@@ -63,7 +63,7 @@ class Visit < ActiveRecord::Base
       .where(studies: { id: Array[ids].flatten })
   }
 
-  scope :searchable, -> { select(<<SELECT) }
+  scope :searchable, -> { joins(patient: :center).select(<<SELECT) }
 centers.study_id AS study_id,
 centers.code || patients.subject_id || '#' || visits.visit_number AS text,
 visits.id AS result_id,
