@@ -1,3 +1,10 @@
 %pre#editor{ style: "height:400px; width: 100%"}
+%fieldset.inputs
+  %legend
+    %span Preview
+  %ol
+    %li.string.input.optional.stringish
+      %label Resource
+      %select#preview-resource{ name: 'email_template[preview_record]', style: 'width: 200px' }
 = javascript_include_tag '/ace/ace.js'
 = javascript_include_tag 'email_templates/form'
