@@ -165,4 +165,58 @@ RSpec.describe Admin::EmailTemplatesController do
       end
     end
   end
+
+  describe '#preview' do
+    before(:each) do
+      @study = create(:study)
+    end
+
+    describe 'without current user' do
+      subject {
+        get(
+          :preview,
+          type: 'NotificationProfile',
+          subject: "Study_#{@study.id}",
+          template:'Study: <%= @notifications.first.resource.name %>'
+        )
+      }
+      it { expect(subject).to have_http_status(:found) }
+      it { expect(subject).to redirect_to('/users/sign_in') }
+    end
+
+    describe 'for authorized user' do
+      login_user_with_abilities do
+        can :read, EmailTemplate
+        can :read, Study
+      end
+
+      it 'succeeds' do
+        response = get(
+          :preview,
+          type: 'NotificationProfile',
+          subject: "Study_#{@study.id}",
+          template:'Study: <%= notifications.first.resource.name %>'
+        )
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq "{\"preview\":\"Study: #{@study.name}\"}"
+      end
+    end
+
+    describe 'for unauthorized user' do
+      login_user_with_abilities do
+        can :read, EmailTemplate
+      end
+
+      it 'denies access' do
+        response = get(
+          :preview,
+          type: 'NotificationProfile',
+          subject: "Study_#{@study.id}",
+          template:'Study: <%= notifications.first.resource.name %>'
+        )
+        expect(response).to have_http_status(:forbidden)
+        expect(response.body).to eq '{"error":"Access Denied"}'
+      end
+    end
+  end
 end
