@@ -237,6 +237,8 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.4.2'
   gem 'with_model', '~> 1.2.1'
   gem 'shoulda-matchers'
+  # Spec delegation via ActiveSupport's #delegate method.
+  gem 'delegate_matcher'
 
   gem 'turnip'
   gem 'gherkin', '~> 2.5'
