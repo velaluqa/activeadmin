@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/velaluqa/liquid.git
+  revision: 86944fe7b77710b299a5d03fb6ef816f6c09feb4
+  branch: master
+  specs:
+    liquid (4.0.0.rc3)
+
+GIT
   remote: git://github.com/velaluqa/rspec-sidekiq.git
   revision: 5ae1fc9cd060df0d496908e6ea517eabece7033a
   branch: deprecate-have-enqueued-job
@@ -301,6 +308,10 @@ GEM
       letter_opener (~> 1.0)
       rails (>= 3.2)
     libv8 (3.11.8.17)
+    liquid4-rails (0.2.0)
+      kaminari (~> 0.16.1)
+      liquid (>= 4.0.0.rc2)
+      rails (>= 3.2)
     listen (3.0.6)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9.7)
@@ -684,6 +695,8 @@ DEPENDENCIES
   less-rails (~> 2.7.1)
   letter_opener_web (~> 1.2.0)
   libv8 (~> 3.11.8)
+  liquid!
+  liquid4-rails (~> 0.2.0)
   lol_dba
   meta_request (~> 0.4.0)
   mongoid (~> 5.1.2)

@@ -1,3 +1,4 @@
+# coding: utf-8
 if RUBY_VERSION =~ /1.9/
   Encoding.default_external = Encoding::UTF_8
   Encoding.default_internal = Encoding::UTF_8
@@ -33,6 +34,12 @@ gem 'json', '~> 1.8.3'
 # HAML templating engine
 # needs to be added explicitely, otherwise it might not register itself as a templating engine in Rails
 gem 'haml', '~> 4.0.7'
+
+# Liquid Templating Engine for User generated Templates
+# TODO: Liquid is waiting for release since March. Use the released
+# rubygem when it's available.
+gem 'liquid', github: 'velaluqa/liquid', branch: 'master'
+gem 'liquid4-rails', '~> 0.2.0'
 
 # Gems used for assets
 gem 'sass-rails',   '~> 5.0.4'
