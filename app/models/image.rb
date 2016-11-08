@@ -99,6 +99,7 @@ JOIN
     end
   end
 
+  # TODO: Extract into separate PORO.
   def dicom_metadata
     dicom_metadata_doc = self.dicom_metadata_xml
 
