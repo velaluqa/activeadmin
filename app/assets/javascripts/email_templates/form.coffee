@@ -1,9 +1,11 @@
+Range = ace.require('ace/range').Range
+
 $ ->
   editor = ace.edit('editor')
   editor.setValue($('#email_template_template').val())
   editor.setTheme('ace/theme/monokai')
-  editor.session.setMode('ace/mode/html_ruby')
-  editor.getSession().on 'change', (e) ->
+  editor.session.setMode('ace/mode/liquid')
+  editor.session.on 'change', (e) ->
     $('#email_template_template').val(editor.getValue())
 
   $('#preview-resource').select2
@@ -31,3 +33,32 @@ $ ->
       cache: false
     templateResults: (item) ->
       return "#{item.result_type}: #{item.text}"
+
+  refreshPreview = ->
+    success = (response) ->
+      $('#preview').html(response.result)
+      editor.session.setAnnotations([])
+
+    failure = (response) ->
+      annotations = for error in response.responseJSON.errors
+        row: (error.line_number - 1)
+        column: 0
+        text: error.message
+        type: 'error'
+      editor.session.setAnnotations(annotations)
+
+    options =
+      data:
+        type: $('#email_template_email_type').val()
+        subject: $('#preview-resource').val()
+        template: editor.getValue()
+    $.ajax('/admin/email_templates/preview', options).then(success).fail(failure)
+
+  timeout = null
+  schedulePreviewRefresh = ->
+    clearTimeout(timeout)
+    timeout = setTimeout(refreshPreview, 400)
+
+  editor.on('change', schedulePreviewRefresh)
+  $('#email_template_email_type').on('change', schedulePreviewRefresh)
+  $('#preview-resource').on('change', schedulePreviewRefresh)
