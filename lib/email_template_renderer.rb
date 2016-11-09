@@ -34,7 +34,7 @@ class EmailTemplateRenderer # :nodoc:
     )
     result = liquid.render(scope, strict_variables: true).gsub('<p></p>', '')
     raise EmailTemplateRenderer::Error, liquid.errors unless liquid.errors.blank?
-    result
+    ActionController::Base.new.render_to_string(text: result, layout: 'email_template')
   rescue Liquid::Error => e
     raise EmailTemplateRenderer::Error, [e]
   end
