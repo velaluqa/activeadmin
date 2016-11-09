@@ -1,0 +1,71 @@
+@mixin clearfix() {
+  &:after {
+     content: ' '; /* Older browser do not support empty content */
+     visibility: hidden;
+     display: block;
+     height: 0;
+     clear: both;
+  }
+}
+
+body.admin_email_templates {
+  fieldset.headless {
+    padding: 0;
+  }
+
+  .inputs .input label {
+    line-height: 28px;
+  }
+
+  #editor, fieldset.headless {
+    min-height: 600px;
+  }
+
+  #editor {
+    font-size: 1.2em;
+    margin: 0;
+    border-radius: 4px;
+  }
+
+  .iframe-wrapper {
+    position: absolute;
+    top: 45px;
+    left: 15px;
+    right: 0;
+    bottom: 20px;
+
+    background-color: #fff;
+    border-left: 1px solid #e8e8e8;
+    border-right: 1px solid #e8e8e8;
+    border-bottom: 1px solid #e8e8e8;
+    border-radius: 0 0 4px 4px;
+
+    iframe {
+      transition: opacity ease-in-out .3s;
+      opacity: 1;
+    }
+
+    &.loading {
+      iframe {
+	opacity: 0.2;
+      }
+    }
+  }
+
+  .container-fluid {
+    .row {
+      @include clearfix();
+    }
+    .col-md-6 {
+      padding: 0;
+
+      &.padded {
+	fieldset {
+	  margin-left: 15px;
+	}
+      }
+    }
+  }
+
+
+}

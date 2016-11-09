@@ -36,8 +36,9 @@ $ ->
 
   refreshPreview = ->
     success = (response) ->
-      $('#preview').html(response.result)
+      $('#preview')[0].srcdoc = response.result
       editor.session.setAnnotations([])
+      $('.iframe-wrapper').toggleClass('loading', false)
 
     failure = (response) ->
       annotations = for error in response.responseJSON.errors
@@ -46,6 +47,7 @@ $ ->
         text: error.message
         type: 'error'
       editor.session.setAnnotations(annotations)
+      $('.iframe-wrapper').toggleClass('loading', false)
 
     options =
       data:
@@ -56,6 +58,7 @@ $ ->
 
   timeout = null
   schedulePreviewRefresh = ->
+    $('.iframe-wrapper').toggleClass('loading', true)
     clearTimeout(timeout)
     timeout = setTimeout(refreshPreview, 400)
 
