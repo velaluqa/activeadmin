@@ -1,9 +1,6 @@
 require 'email_template_renderer'
 
 describe EmailTemplateRenderer do
-  it 'renders with local variables' do
-  end
-
   describe '::render_preview' do
     it 'renders `NotificationProfile` type templates' do
       user = create(:user)
@@ -13,7 +10,7 @@ describe EmailTemplateRenderer do
         user: user,
         subject: visit,
         template:
-          'My Visit Type: <%= notifications.first.resource.visit_type %>'
+          'My Visit Type: {{ notifications[0].resource.visit_type }}'
       )
       expect(result).to eq 'My Visit Type: foo_type'
     end
@@ -27,9 +24,9 @@ describe EmailTemplateRenderer do
           user: user,
           subject: visit,
           template:
-            'My Visit Type: <%= notifications.first.resource.visit_typ %>'
+            'My Visit Type: {{ notifications[0].resource.visit_typ }}'
         )
-      }.to raise_error EmailTemplateRenderer::CompilationError
+      }.to raise_error EmailTemplateRenderer::Error
     end
   end
 end

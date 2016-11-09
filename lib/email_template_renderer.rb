@@ -1,19 +1,20 @@
-require 'ostruct'
+Liquid::Template.error_mode = :warn
 
 class EmailTemplateRenderer # :nodoc:
-  class CompilationError < StandardError # :nodoc:
-    attr_reader :line_number
-
-    def initialize(msg, line_number)
-      super(msg)
-      @line_number = line_number
+  class Error < StandardError # :nodoc:
+    def initialize(errors)
+      @errors = errors
+      super("#{errors.count} template error(s)")
     end
 
-    def to_h
-      {
-        message: message,
-        line_number: line_number
-      }
+    def errors
+      @errors.map do |error|
+        {
+          message: error.message,
+          line_number: error.line_number,
+          backtrace: error.backtrace
+        }
+      end
     end
   end
 
@@ -21,34 +22,25 @@ class EmailTemplateRenderer # :nodoc:
 
   def initialize(template, scope = {})
     @template = template
-    @scope = scope
+    @scope = scope.deep_stringify_keys
   end
 
   def render
-    ERB.new(template.template).result(template_binding)
-  rescue => e
-    extract_compilation_error(e)
-  end
-
-  private
-
-  def extract_compilation_error(error)
-    line_number = error.backtrace.detect do |line|
-      erb = line.match(/^\(erb\):(?<line_number>\d+)(|:in `(.+)')$/) and break erb[:line_number]
-    end
-    raise CompilationError.new(error.message, line_number) if line_number
-    raise error # otherwise just re-raise the error
-  end
-
-  def template_binding
-    OpenStruct.new(scope).instance_eval { binding }
+    liquid = Liquid::Template.parse(
+      @template.template,
+      error_mode: :strict,
+      line_numbers: true
+    )
+    result = liquid.render(scope, strict_variables: true)
+    raise EmailTemplateRenderer::Error, liquid.errors unless liquid.errors.blank?
+    result
   end
 
   class << self
     def render_preview(options = {})
       template = EmailTemplate.new(
         email_type: options.fetch(:type),
-        template: options.fetch(:template)
+        template: options.fetch(:template).gsub("\n", '<br />')
       )
       EmailTemplateRenderer.new(template, preview_locals(options)).render
     end
@@ -64,12 +56,16 @@ class EmailTemplateRenderer # :nodoc:
     end
 
     def notification_profile_template_locals(options = {})
+      user = options.fetch(:user)
       notification = Notification.new(
-        user: options.fetch(:user),
+        user: user,
         resource: options.fetch(:subject),
         version: options.fetch(:subject).try(:versions).try(:last)
       )
-      { notifications: [notification] }
+      {
+        user: user,
+        notifications: [notification]
+      }
     end
   end
 end

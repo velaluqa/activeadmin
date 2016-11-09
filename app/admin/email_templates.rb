@@ -19,15 +19,15 @@ ActiveAdmin.register EmailTemplate do
     begin
       subject = ActiveRecord::Base.find_by_ref(params.fetch(:subject))
       authorize!(:read, subject)
-      preview = EmailTemplateRenderer.render_preview(
+      result = EmailTemplateRenderer.render_preview(
         type: params.fetch(:type),
         subject: subject,
         user: current_user,
         template: params.fetch(:template)
       )
-      render json: { preview: preview }, status: :ok
-    rescue EmailTemplateRenderer::CompilationError => e
-      render json: { type: 'compilation', error: e.to_h }, status: :unprocessable_entity
+      render json: { result: result }, status: :ok
+    rescue EmailTemplateRenderer::Error => e
+      render json: { type: 'compilation', errors: e.errors }, status: :unprocessable_entity
     rescue ActiveAdmin::AccessDenied => e
       render json: { error: 'Access Denied' }, status: :forbidden
     rescue => e
