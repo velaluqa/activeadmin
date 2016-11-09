@@ -1,0 +1,35 @@
+class UserDrop < Liquid::Rails::Drop # :nodoc:
+  attributes(
+    :id,
+    :email,
+    :username,
+    :name,
+    :email_throttling_delay,
+    :is_root_user,
+    :authentication_token,
+    :failed_attempts,
+    :public_key,
+    :private_key,
+    :encrypted_password,
+    :password_changed_at,
+    :reset_password_sent_at,
+    :reset_password_token,
+    :remember_created_at,
+    :unconfirmed_email,
+    :confirmation_sent_at,
+    :confirmation_token,
+    :confirmed_at,
+    :unlock_token,
+    :locked_at,
+    :sign_in_count,
+    :current_sign_in_at,
+    :current_sign_in_ip,
+    :last_sign_in_at,
+    :last_sign_in_ip,
+    :created_at,
+    :updated_at
+  )
+
+  has_many(:public_keys)
+  has_many(:notifications)
+end

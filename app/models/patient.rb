@@ -110,6 +110,7 @@ JOIN
   def domino_patient_no
     "#{center.code}#{subject_id}"
   end
+  alias_method :domino_patient_number, :domino_patient_no
   def domino_document_form
     'TrialSubject'
   end
