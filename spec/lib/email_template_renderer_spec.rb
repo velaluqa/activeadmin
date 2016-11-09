@@ -9,10 +9,13 @@ describe EmailTemplateRenderer do
         type: 'NotificationProfile',
         user: user,
         subject: visit,
-        template:
-          'My Visit Type: {{ notifications[0].resource.visit_type }}'
+        template: <<TPL
+My Visit Type: {{ notifications[0].resource.visit_type }}
+
+Date: {{ notifications[0].resource.created_at }}
+TPL
       )
-      expect(result).to eq 'My Visit Type: foo_type'
+      expect(result).to include "<p>My Visit Type: foo_type</p><p>Date: #{visit.created_at}</p>"
     end
 
     it 'raises `CompilationError`' do

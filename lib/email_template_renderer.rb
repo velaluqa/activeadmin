@@ -26,12 +26,13 @@ class EmailTemplateRenderer # :nodoc:
   end
 
   def render
+    tpl = "<p>#{@template.template.gsub("\n\n", '</p><p>').strip}</p>"
     liquid = Liquid::Template.parse(
-      @template.template,
+      tpl,
       error_mode: :strict,
       line_numbers: true
     )
-    result = liquid.render(scope, strict_variables: true)
+    result = liquid.render(scope, strict_variables: true).gsub('<p></p>', '')
     raise EmailTemplateRenderer::Error, liquid.errors unless liquid.errors.blank?
     result
   rescue Liquid::Error => e
@@ -42,7 +43,7 @@ class EmailTemplateRenderer # :nodoc:
     def render_preview(options = {})
       template = EmailTemplate.new(
         email_type: options.fetch(:type),
-        template: options.fetch(:template).gsub("\n", '<br />')
+        template: options.fetch(:template)
       )
       EmailTemplateRenderer.new(template, preview_locals(options)).render
     end
