@@ -28,5 +28,19 @@ describe EmailTemplateRenderer do
         )
       }.to raise_error EmailTemplateRenderer::Error
     end
+
+    it 'raises `SyntaxError`' do
+      user = create(:user)
+      visit = create(:visit, visit_type: 'foo_type')
+      expect {
+        EmailTemplateRenderer.render_preview(
+          type: 'NotificationProfile',
+          user: user,
+          subject: visit,
+          template:
+            'My Visit Type: {{ '
+        )
+      }.to raise_error EmailTemplateRenderer::Error
+    end
   end
 end

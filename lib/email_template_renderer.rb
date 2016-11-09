@@ -34,6 +34,8 @@ class EmailTemplateRenderer # :nodoc:
     result = liquid.render(scope, strict_variables: true)
     raise EmailTemplateRenderer::Error, liquid.errors unless liquid.errors.blank?
     result
+  rescue Liquid::Error => e
+    raise EmailTemplateRenderer::Error, [e]
   end
 
   class << self
