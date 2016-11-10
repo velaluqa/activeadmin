@@ -1,4 +1,4 @@
-class ImageSeriesDrop < Liquid::Rails::Drop # :nodoc:
+class ImageSeriesDrop < EricaDrop # :nodoc:
   attributes(
     :id,
     :visit_id,

@@ -1,4 +1,4 @@
-class RoleDrop < Liquid::Rails::Drop # :nodoc:
+class RoleDrop < EricaDrop # :nodoc:
   attributes(
     :id,
     :title,

@@ -1,4 +1,4 @@
-class NotificationDrop < Liquid::Rails::Drop # :nodoc:
+class NotificationDrop < EricaDrop # :nodoc:
   attributes(
     :id,
     :triggering_action,

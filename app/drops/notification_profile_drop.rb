@@ -1,4 +1,4 @@
-class NotificationProfileDrop < Liquid::Rails::Drop # :nodoc:
+class NotificationProfileDrop < EricaDrop # :nodoc:
   attributes(
     :id,
     :title,

@@ -1,4 +1,4 @@
-class VersionDrop < Liquid::Rails::Drop # :nodoc:
+class VersionDrop < EricaDrop # :nodoc:
   attributes(
     :id,
     :event,

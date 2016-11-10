@@ -1,4 +1,4 @@
-class PermissionDrop < Liquid::Rails::Drop # :nodoc:
+class PermissionDrop < EricaDrop # :nodoc:
   attributes(
     :id,
     :activity,

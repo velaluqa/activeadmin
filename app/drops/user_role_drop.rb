@@ -1,4 +1,4 @@
-class UserRoleDrop < Liquid::Rails::Drop # :nodoc:
+class UserRoleDrop < EricaDrop # :nodoc:
   attributes(:id, :created_at, :updated_at)
 
   belongs_to(:user)

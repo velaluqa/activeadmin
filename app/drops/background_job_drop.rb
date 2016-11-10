@@ -1,4 +1,4 @@
-class BackgroundJobDrop < Liquid::Rails::Drop # :nodoc:
+class BackgroundJobDrop < EricaDrop # :nodoc:
   attributes(
     :id,
     :legacy_id,

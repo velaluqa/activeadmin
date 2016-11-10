@@ -1,4 +1,4 @@
-class PatientDrop < Liquid::Rails::Drop # :nodoc:
+class PatientDrop < EricaDrop # :nodoc:
   attributes(
     :id,
     :subject_id,

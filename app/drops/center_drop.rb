@@ -1,4 +1,4 @@
-class CenterDrop < Liquid::Rails::Drop # :nodoc:
+class CenterDrop < EricaDrop # :nodoc:
   attributes(
     :id,
     :study_id,
