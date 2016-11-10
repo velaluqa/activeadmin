@@ -9,6 +9,7 @@ module ApplicationHelper
   end
 
   def admin_url_for(model)
-    Rails.application.routes.url_helpers.send("admin_#{model.class.to_s.underscore}_url", model)
+    method = "admin_#{model.class.to_s.underscore}_url"
+    Rails.application.routes.url_helpers.send(method, model)
   end
 end
