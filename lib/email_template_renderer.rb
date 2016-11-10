@@ -61,6 +61,7 @@ class EmailTemplateRenderer # :nodoc:
     def notification_profile_template_locals(options = {})
       user = options.fetch(:user)
       notification = Notification.new(
+        triggering_action: 'create',
         user: user,
         resource: options.fetch(:subject),
         version: options.fetch(:subject).try(:versions).try(:last)
