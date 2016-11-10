@@ -100,7 +100,6 @@ require 'serializers/string_array_serializer'
 # **`triggering_resource`**             | `string`           | `not null`
 # **`updated_at`**                      | `datetime`         | `not null`
 #
-
 class NotificationProfile < ActiveRecord::Base
   has_paper_trail class_name: 'Version'
 
