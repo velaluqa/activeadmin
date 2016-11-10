@@ -27,7 +27,7 @@ module StudyServer
     end
 
     # Custom directories with classes and modules you want to be autoloadable.
-    config.autoload_paths += %W(#{config.root}/app/workers #{config.root}/app/models/concerns app/drops)
+    config.autoload_paths += %W(#{config.root}/app/workers #{config.root}/app/models/concerns #{config.root}/app/drops)
 
     # Opt-in into the future default behaviour.
     config.active_record.raise_in_transactional_callbacks = true
