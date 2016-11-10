@@ -11,6 +11,7 @@ ActiveAdmin.register NotificationProfile do
     :filters_json,
     :only_authorized_recipients,
     :maximum_email_throttling_delay,
+    :email_template_id,
     triggering_actions: [],
     user_ids: [],
     role_ids: []
@@ -32,6 +33,9 @@ ActiveAdmin.register NotificationProfile do
       profile.triggering_actions.join(', ')
     end
     column :triggering_resource
+    column :email_template do |profile|
+      profile.email_template.name
+    end
     customizable_default_actions(current_ability)
   end
 
@@ -63,6 +67,9 @@ ActiveAdmin.register NotificationProfile do
           .html_safe
       end
       row :only_authorized_recipients
+      row :email_template do
+        profile.email_template.name
+      end
       row :maximum_email_throttling_delay do
         Email::THROTTLING_DELAYS.key(profile.maximum_email_throttling_delay)
       end
@@ -90,6 +97,7 @@ ActiveAdmin.register NotificationProfile do
       f.input :users, type: :select, multiple: true, collection: User.all, input_html: { class: 'initialize-select2' }
       f.input :roles, type: :select, multiple: true, collection: Role.all, input_html: { class: 'initialize-select2' }
       f.input :only_authorized_recipients
+      f.input :email_template_id, as: :select, collection: EmailTemplate.where(email_type: 'NotificationProfile'), input_html: { class: 'initialize-select2' }
       f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2' }
     end
 
