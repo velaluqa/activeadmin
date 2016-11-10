@@ -8,7 +8,7 @@ RSpec.describe NotificationMailer do
       create(
         :email_template,
         email_type: 'NotificationProfile',
-        template: <<TPL
+        template: <<TPL.gsub("\n", "\r\n")
 Dear {{ user.name }},
 
 <table>
@@ -25,6 +25,10 @@ Dear {{ user.name }},
   </tr>
   {% endfor %}
 </table>
+
+Kind Regards,
+
+Your Pharmtrace Team
 TPL
       )
     end
@@ -62,6 +66,10 @@ TPL
     it 'links to the changed resource' do
       expect(mail.body.encoded).to include("test.de/admin/visits/#{notification.resource.id}")
     end
+
+    it 'contains correct paragraphs' do
+      expect(mail.body.encoded).to include('<p>Kind Regards,</p>')
+    end
   end
 
   describe 'throttled_notification_email' do
@@ -81,11 +89,15 @@ Dear {{ user.name }},
   {% for notification in notifications %}
   <tr>
     <td>{{ notification.resource.class_name }}</td>
-    <td>{{ notification.resource }}</td>
+    <td>{{ notification.resource.visit_type }}({{ notification.resource.visit_number }})</td>
     <td>{{ notification.resource | link:'Open in ERICA' }}</td>
   </tr>
   {% endfor %}
 </table>
+
+Kind Regards,
+
+Your Pharmtrace Team
 TPL
       )
     end
@@ -120,16 +132,14 @@ TPL
       expect(mail.body.encoded).to match('Visit')
     end
 
-    it 'lists all notification resources' do
-      notifications.each do |notification|
-        expect(mail.body.encoded).to include(notification.resource.to_s)
-      end
-    end
-
     it 'links to the changed resource' do
       notifications.each do |notification|
         expect(mail.body.encoded).to include("test.de/admin/visits/#{notification.resource.id}")
       end
+    end
+
+    it 'contains correct paragraphs' do
+      expect(mail.body.encoded).to include('<p>Kind Regards,</p>')
     end
   end
 end

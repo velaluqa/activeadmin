@@ -26,7 +26,7 @@ class EmailTemplateRenderer # :nodoc:
   end
 
   def render
-    tpl = "<p>#{@template.template.gsub("\n\n", '</p><p>').strip}</p>"
+    tpl = "<p>#{@template.template.gsub(/(\n\n|\r\n\r\n|\n\r\n\r)/, '</p><p>').strip}</p>"
     liquid = Liquid::Template.parse(
       tpl,
       error_mode: :strict,
