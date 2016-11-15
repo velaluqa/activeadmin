@@ -12,7 +12,216 @@ Other documents:
 - [[file:audit_trail_classification.org][Audit Trail Classification]]
 
 * Server Setup
+** PostgreSQL
 
+The relational database [[http://www.postgresql.org/][PostgreSQL]] is installed via the Ubuntu package
+repositories. No custom configuration was created, the data is stored
+in the default Ubuntu location.
+
+#+BEGIN_SRC sh
+sudo apt-get install postgresql postgresql-contrib libpq-dev
+#+END_SRC
+
+When everything is installed log into the database console as
+administrator (typically the =postgres= user).
+
+First create an =erica= user with a given password. The user should be
+a normal user and should not be able to create databases or users.
+
+#+BEGIN_SRC sh
+sudo -u postgres createuser -D -R -W erica
+#+END_SRC
+
+Create a production database e.g. =erica_remote_production= and
+grant all priviledges for the =erica_remote_production= to this user.
+
+#+BEGIN_SRC sh
+sudo -u postgres createdb -O erica erica_remote_production
+#+END_SRC
+
+The server is accessed via UNIX domain sockets by the Rails App.
+It serves as the main database for the application.
+
+Grant all access to this new database to the ~erica~ user:
+
+#+BEGIN_SRC sh
+sudo -i -u postgres
+psql
+> GRANT ALL PRIVILEGES ON DATABASE erica_remote_production to erica;
+#+END_SRC
+
+** MongoDB
+
+The document-oriented database [[http://www.mongodb.org/][MongoDB]] is installed via the Ubuntu
+package repositories. No custom configuration was created, the data is
+stored in the default Ubuntu location.
+
+For up-to-date information on how to install the latest MongoDB
+version keep an eye on the [[http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/][official MongoDB website]]. It should work
+like this:
+
+Import the MongoDB public key.
+
+#+BEGIN_SRC sh
+$ sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+#+END_SRC
+
+Generate a file with the MongoDB repository URL.
+
+#+BEGIN_SRC sh
+$ echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
+#+END_SRC
+
+Refresh the local database with the packages and install the latest
+version of MongoDB.
+
+#+BEGIN_SRC sh
+sudo apt-get install mongodb-org
+#+END_SRC
+
+When installing everything on the same server we can use the default
+configuration. MongoDB listens only on localhost by default, no
+authentication is currently enabled (the default setup).
+
+The server is accessed via a TCP socket by the Rails App, it serves as
+storage for the form answers as well as supplemental case and patient
+data.
+
+*** Use advised huge-page settings
+
+Create a file named /etc/systemd/system/mongodb-hugepage-fix.service and add the following content:
+
+#+BEGIN_SRC conf
+[Unit]
+Description="Disable Transparent Hugepage before MongoDB boots"
+Before=mongod.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+ExecStart=/bin/bash -c 'echo never > /sys/kernel/mm/transparent_hugepage/defrag'
+
+[Install]
+RequiredBy=mongod.service
+#+END_SRC
+
+To load the file into systemd:
+
+#+BEGIN_SRC sh
+systemctl daemon-reload
+#+END_SRC
+
+To activate the file as a boot-time dependency of MongoDB
+
+#+BEGIN_SRC sh
+systemctl enable mongodb-hugepage-fix
+#+END_SRC
+
+If you want to activate the changes immediately (before the next boot)
+
+#+BEGIN_SRC sh
+systemctl start mongodb-hugepage-fix
+systemctl restart mongod
+#+END_SRC
+
+** Redis
+
+Compile and install Redis. For that, follow this guide:
+
+https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04
+
+#+BEGIN_SRC sh
+apt-get install redis-server
+#+END_SRC
+
+** Ruby
+
+The Ruby Programming Language is installed via the Ubuntu package
+repositories at version 1.9.3.
+
+#+BEGIN_SRC sh
+sudo apt-get install ruby
+#+END_SRC
+
+
+Or if the system does not provide the 1.9.3 ruby anymore, install ruby
+from source:
+
+#+BEGIN_SRC sh
+mkdir /srv/install
+cd /srv/install
+wget http://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p648.tar.gz
+tar -xzvf ruby-2.0.0-p648.tar.gz
+cd ruby-2.0.0-p648/
+./configure
+make
+sudo make install
+ruby -v
+#+END_SRC
+
+It is used to run the Rails App.
+
+In addition to the main language interpreter, the rubygems package
+management system is installed and was itself used to install Bundler.
+Bundler is a tool to manage an up-to-date bundle of all the
+application dependencies.
+
+** ERICA Rails Application
+
+The ERICA Rails application is typically installed to
+=/srv/ERICA/server=. Make sure the path exists and clone the =master=
+branch into this directory.
+
+#+BEGIN_SRC sh
+mkdir -p /srv/ERICA
+git clone --branch master https://git.velalu.qa/pharmtrace/erica-store server
+#+END_SRC
+
+After the code was cloned, change into this directory and install all
+application dependencies for production via Bundler.
+
+#+BEGIN_SRC sh
+bundle install --binstubs --deployment --without test development
+#+END_SRC
+
+#+BEGIN_NOTE
+Installing all application dependencies from scratch can take several
+minutes.
+#+END_NOTE
+
+*** Configure the databases
+**** PostgreSQL
+
+#+BEGIN_SRC yaml
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: erica_remote_production
+  pool: 30
+  timeout: 5000
+  username: erica
+  password: [REDACTED]
+  host: 127.0.0.1
+#+END_SRC
+
+**** MongoDB
+
+#+BEGIN_SRC yaml
+production:
+  sessions:
+    default:
+      database: erica_remote_production
+      hosts:
+        - 127.0.0.1:27017
+      options:
+        safe: true
+#+END_SRC
+
+*** Migrate Database to Latest State
+
+#+BEGIN_SRC sh
+RAILS_ENV=production bundle exec rake db:migrate
+#+END_SRC
 ** Nginx
 
 The webserver [[http://nginx.org][nginx]] is installed via the Ubuntu package repositories.
@@ -68,112 +277,6 @@ server {
   keepalive_timeout 10;
 }
 #+END_SRC
-
-** PostgreSQL
-
-The relational database [[http://www.postgresql.org/][PostgreSQL]] is installed via the Ubuntu package
-repositories. No custom configuration was created, the data is stored
-in the default Ubuntu location.
-
-#+BEGIN_SRC sh
-sudo apt-get install postgresql postgresql-contrib libpq-dev
-#+END_SRC
-
-When everything is installed log into the database console as
-administrator (typically the =postgres= user).
-
-First create an =erica= user with a given password. The user should be
-a normal user and should not be able to create databases or users.
-
-#+BEGIN_SRC sh
-sudo -u postgres createuser -D -R -W erica
-#+END_SRC
-
-Create a production database e.g. =erica_remote_production= and
-grant all priviledges for the =erica_remote_production= to this user.
-
-#+BEGIN_SRC sh
-sudo -u postgres createdb -O erica erica_remote_production
-#+END_SRC
-
-The server is accessed via UNIX domain sockets by the Rails App.
-It serves as the main database for the application.
-
-** MongoDB
-
-The document-oriented database [[http://www.mongodb.org/][MongoDB]] is installed via the Ubuntu
-package repositories. No custom configuration was created, the data is
-stored in the default Ubuntu location.
-
-For up-to-date information on how to install the latest MongoDB
-version keep an eye on the [[http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/][official MongoDB website]]. It should work
-like this:
-
-Import the MongoDB public key.
-
-#+BEGIN_SRC sh
-$ sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-#+END_SRC
-
-Generate a file with the MongoDB repository URL.
-
-#+BEGIN_SRC sh
-$ echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
-#+END_SRC
-
-Refresh the local database with the packages and install the latest
-version of MongoDB.
-
-#+BEGIN_SRC sh
-sudo apt-get install mongodb-org
-#+END_SRC
-
-When installing everything on the same server we can use the default
-configuration. MongoDB listens only on localhost by default, no
-authentication is currently enabled (the default setup).
-
-The server is accessed via a TCP socket by the Rails App, it serves as
-storage for the form answers as well as supplemental case and patient
-data.
-
-** Ruby
-
-The Ruby Programming Language is installed via the Ubuntu package
-repositories at version 1.9.3.
-
-#+BEGIN_SRC sh
-sudo apt-get install ruby
-#+END_SRC
-
-It is used to run the Rails App.
-
-In addition to the main language interpreter, the rubygems package
-management system is installed and was itself used to install Bundler.
-Bundler is a tool to manage an up-to-date bundle of all the
-application dependencies.
-
-** ERICA Rails Application
-
-The ERICA Rails application is typically installed to
-=/srv/ERICA/server=. Make sure the path exists and clone the =master=
-branch into this directory.
-
-#+BEGIN_SRC sh
-mkdir -p /srv/ERICA
-git clone --branch master https://git.velalu.qa/pharmtrace/erica-store server
-#+END_SRC
-
-After the code was cloned, change into this directory and install all
-application dependencies for production via Bundler.
-
-#+BEGIN_SRC sh
-bundle install --binstubs --deployment --without test development
-#+END_SRC
-
-#+BEGIN_NOTE
-Installing all application dependencies from scratch can take several
-minutes.
-#+END_NOTE
 
 ** (Optional) Configure ERICA Remote
 
