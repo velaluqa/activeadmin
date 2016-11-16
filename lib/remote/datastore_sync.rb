@@ -80,6 +80,7 @@ class Remote
         dir: 'mongo_dump'
       )
 
+      cp_r(File.expand_path('../.git', ERICA.form_config_path), export_dir)
       cp_r(ERICA.config_paths, export_dir)
 
       export_dir.join('.state.dumped').touch

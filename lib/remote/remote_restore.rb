@@ -63,6 +63,7 @@ class RemoteRestore
   end
 
   def restore_configs
+    restore_config_dir('.git', ERICA.form_config_path.join('../.git'))
     restore_config_dir('forms', ERICA.form_config_path)
     restore_config_dir('sessions', ERICA.session_config_path)
     restore_config_dir('studies', ERICA.study_config_path)
