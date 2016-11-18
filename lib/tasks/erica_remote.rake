@@ -3,6 +3,9 @@ namespace :erica do
     desc 'Restore from ERICA remote temp data'
     task :restore, [:export_id] => :environment do |_, args|
       fail 'Only available on ERICA remote installation' unless ERICA.remote?
+
+      Rake::Task['erica:remote:cleanup'].invoke
+
       export_id = args[:export_id]
 
       name = "restore-#{export_id}.tar.lrz"
@@ -21,8 +24,11 @@ namespace :erica do
     task sync: ['erica:remote:sync_datastores', 'erica:remote:sync_images']
 
     desc 'Sync images to all ERICA remotes (in erica_remotes.yml)'
-    task :sync_datastores, [:prefix] =>  :environment do |_, args|
+    task :sync_datastores, [:prefix] => :environment do |_, args|
       fail 'Only available on ERICA store installation' if ERICA.remote?
+
+      Rake::Task['erica:remote:cleanup'].invoke
+
       require 'remote/remote_sync'
       RemoteSync.perform_datastore_sync('config/erica_remotes.yml',
                                         export_id_prefix: args[:prefix])
@@ -33,6 +39,25 @@ namespace :erica do
       fail 'Only available on ERICA store installation' if ERICA.remote?
       require 'remote/remote_sync'
       RemoteSync.perform_image_sync('config/erica_remotes.yml')
+    end
+
+    task cleanup: :environment do
+      puts 'Cleaning up old files ...'
+      working_dir = Rails.root.join('tmp', 'remote_sync')
+      files = Dir[working_dir.join('*-*-*-*')]
+
+      groups = files.group_by do |e|
+        match = e.match(/\d+-\d+-\d+-(.+)$/)
+        match[1] if match
+      end
+
+      groups.each_pair do |key, files|
+        puts "  Deleting old #{key} files ..."
+        files.sort[0...-7].each do |file|
+          puts "    Deleting #{file}"
+          FileUtils.rm_rf(file)
+        end
+      end
     end
 
     desc 'Start and keep running the sync process for the day until stopped.'
