@@ -1,3 +1,5 @@
+require 'open-uri'
+
 class Remote
   attr_reader :name, :url, :host, :study_ids
   attr_reader :root, :data_dir, :form_config_dir, :session_config_dir,
@@ -77,12 +79,8 @@ class Remote
   end
 
   def fetch_paths
-    uri = URI.join(url, '/erica_remote/paths.json')
-    response = Net::HTTP.get_response(uri)
-    case response
-    when Net::HTTPSuccess then JSON.parse(response.body)
-    else
-      fail "Failed to retrieve path information ERICA remote at #{uri}: #{response.message}"
-    end
+    paths_url = File.join(url, '/erica_remote/paths.json')
+    data = URI.parse(paths_url).read
+    JSON.parse(data)
   end
 end
