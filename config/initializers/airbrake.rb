@@ -3,7 +3,7 @@ if Rails.env.production?
 
   Airbrake.configure do |config|
     config.api_key = {
-      project: 'pharmtrace-erica-store',
+      project: 'pharmtrace-study-server',
       api_key: 'd96a988c672384ad4924c37ca1f00d59f0e9a953',
       tracker: 'Bug',
       category: 'Development',
