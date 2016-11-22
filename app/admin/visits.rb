@@ -569,7 +569,7 @@ ActiveAdmin.register Visit do
     current_user.ensure_authentication_token!
     @wado_query_urls = [required_series_wado_query_visit_url(@visit, :format => :xml, :authentication_token => current_user.authentication_token)]
 
-    render 'admin/shared/weasis_webstart.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
+    render 'admin/shared/viewer_weasis.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
   end
   action_item :only => [:show, :mqc_form, :mqc_results] do
     link_to('Viewer (RS)', all_required_series_viewer_admin_visit_path(resource))

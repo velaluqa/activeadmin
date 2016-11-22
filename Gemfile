@@ -72,7 +72,7 @@ gem 'coderay'
 gem 'rugged', :github => 'libgit2/rugged', :branch => 'development', :submodules => true
 
 # Airbrake Exception notifier
-gem 'airbrake'
+gem 'airbrake', '4.3'
 
 # Kwalify schema validator
 gem 'kwalify'
