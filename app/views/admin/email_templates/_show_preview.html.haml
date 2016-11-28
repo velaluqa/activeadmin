@@ -1,0 +1,17 @@
+%form
+  %input#email_template_email_type{ type: 'hidden', value: template.email_type }
+  .container-fluid
+    .row
+      .editor.col-md-6
+        %pre#editor= template.template
+      .col-md-6.padded
+        %fieldset.inputs.headless
+          %ol
+            %li.string.input.optional.stringish
+              %label Resource for Preview
+              %select#preview-resource{ name: 'email_template[preview_record]', style: 'width: 200px' }
+          .iframe-wrapper
+            .spinner
+            %iframe#preview{ width: '100%', height: '100%' }
+  = javascript_include_tag '/ace/ace.js'
+  = javascript_include_tag 'email_templates/show'

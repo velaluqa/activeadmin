@@ -5,6 +5,17 @@ ActiveAdmin.register EmailTemplate do
 
   permit_params(:name, :email_type, :template)
 
+  show do |template|
+    attributes_table do
+      row :id
+      row :name
+      row :email_type
+      row :created_at
+      row :updated_at
+    end
+    render partial: 'show_preview', locals: { template: template }
+  end
+
   form do |f|
     f.inputs 'Details' do
       f.input :name
