@@ -5,6 +5,15 @@ ActiveAdmin.register EmailTemplate do
 
   permit_params(:name, :email_type, :template)
 
+  index do
+    selectable_column
+    column :name
+    column :email_type
+    column :created_at
+    column :updated_at
+    customizable_default_actions(current_ability)
+  end
+
   show do |template|
     attributes_table do
       row :id
