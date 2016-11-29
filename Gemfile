@@ -164,6 +164,9 @@ gem 'activerecord_json_validator'
 # Enhanced `Array#dig` and `Hash#dig` for digging nested array/hash structures.
 gem 'ruby_dig2'
 
+# Help pages use markdown to generate markup.
+gem 'rdiscount'
+
 group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
