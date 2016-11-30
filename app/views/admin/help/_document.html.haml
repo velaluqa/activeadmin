@@ -2,7 +2,7 @@
   .row
     .col-sm-2
       %nav#toc.affix
-    #help-document.col-sm-9!= render file: "app/views/admin/help/#{document}"
+    #help-document.col-sm-9!= help_document(document)
 != '<link rel="stylesheet" href="https://cdn.rawgit.com/afeld/bootstrap-toc/v0.4.1/dist/bootstrap-toc.min.css">'
 != '<script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v0.4.1/dist/bootstrap-toc.min.js"></script>'
 :javascript
