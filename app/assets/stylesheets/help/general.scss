@@ -1,0 +1,53 @@
+body.admin_help {
+  #help-document {
+    font-size: 12pt;
+
+    .code-label {
+      padding: 10px;
+      background-color: #dedede;
+      font-size: 0.7em;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 0;
+    }
+
+    pre, div.html-output {
+      padding: 10px;
+      background-color: #efefef;
+    }
+
+    div.html-output {
+      margin: 0 0 1.5em;
+
+      table {
+	border-spacing: 1px;
+	border-collapse: separate;
+	tr {
+	  td {
+	    background-color: #fff;
+	  }
+	}
+      }
+
+      :last-child {
+	margin-bottom: 0;
+      }
+    }
+
+    p.code-label + pre,
+    p.code-label + div.html-output {
+      margin-top: 0;
+    }
+
+    h2, h3, h4, h5, h6 {
+      border-top: 1px solid #aaa;
+      padding-top: 30px;
+      margin: 30px 0;
+
+      &:first-child {
+	border: 0;
+	margin-top: 0;
+      }
+    }
+  }
+}
