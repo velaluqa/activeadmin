@@ -165,7 +165,7 @@ gem 'activerecord_json_validator'
 gem 'ruby_dig2'
 
 # Help pages use markdown to generate markup.
-gem 'rdiscount'
+gem 'redcarpet'
 
 group :development do
   # Hint opimization opportunities while developing.

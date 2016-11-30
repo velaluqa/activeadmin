@@ -1,4 +1,4 @@
-require 'rdiscount'
+require 'redcarpet'
 
 module MarkdownHandler # :nodoc:
   def self.erb
@@ -7,7 +7,7 @@ module MarkdownHandler # :nodoc:
 
   def self.call(template)
     compiled_source = erb.call(template)
-    "RDiscount.new(begin;#{compiled_source};end).to_html"
+    "Redcarpet::Markdown.new( Redcarpet::Render::HTML.new(with_toc_data: false), no_intra_emphasis: true, tables: true, fenced_code_blocks: true, autolink: true, strikethrough: true).render(begin;#{compiled_source};end)"
   end
 end
 

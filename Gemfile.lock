@@ -471,7 +471,7 @@ GEM
     rb-fsevent (0.9.7)
     rb-inotify (0.9.7)
       ffi (>= 0.5.0)
-    rdiscount (2.2.0.1)
+    redcarpet (3.3.4)
     redis (3.2.2)
     redis-namespace (1.5.2)
       redis (~> 3.0, >= 3.0.4)
@@ -731,7 +731,7 @@ DEPENDENCIES
   rails_best_practices
   railties (= 4.2.6)
   raindrops (~> 0.16.0)
-  rdiscount
+  redcarpet
   redis-namespace
   reek
   rest-client
