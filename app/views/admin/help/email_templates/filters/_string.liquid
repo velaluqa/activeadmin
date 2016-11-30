@@ -3,11 +3,12 @@
 Concatenates two strings and returns the concatenated value.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "/my/fancy/url" | append: ".html" }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -17,16 +18,17 @@ Concatenates two strings and returns the concatenated value.
 `append` can also be used with variables:
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
-{% assign filename = "/index.html" %}
+```liquid
+{% assign filename = "/index.html" -%}
 {{ "website.com" | append: filename }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
-{% assign filename = "/index.html" %}
+{% assign filename = "/index.html" -%}
 {{ "website.com" | append: filename }}
 ```
 
@@ -35,11 +37,12 @@ Concatenates two strings and returns the concatenated value.
 Makes the first character of a string capitalized.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "title" | capitalize }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -49,11 +52,12 @@ Title
 `capitalize` only capitalizes the first character of the string, so later words are not affected:
 
  <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "my great title" | capitalize }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -65,11 +69,12 @@ My great title
 Makes each character in a string lowercase. It has no effect on strings which are already all lowercase.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Parker Moore" | downcase }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -77,11 +82,12 @@ Makes each character in a string lowercase. It has no effect on strings which ar
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "apple" | downcase }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -95,11 +101,12 @@ that the string can be used in a URL, for example). It doesn't change
 strings that don't have anything to escape.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Have you read 'James & the Giant Peach'?" | escape }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -107,11 +114,12 @@ strings that don't have anything to escape.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Tetsuro Takara" | escape }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -123,25 +131,26 @@ strings that don't have anything to escape.
 Replaces every newline (`\n`) with an HTML line break (`<br>`).
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
-{% capture string_with_newlines %}
+```liquid
+{% capture string_with_newlines -%}
 Hello
 there
-{% endcapture %}
+{% endcapture -%}
 
-{{ string_with_newlines | newline_to_br }}
-{% endraw %}
+{{ string_with_newlines | newline_to_br -}}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```html
-{% capture string_with_newlines %}
+{% capture string_with_newlines -%}
 Hello
 there
-{% endcapture %}
+{% endcapture -%}
 
-{{ string_with_newlines | newline_to_br }}
+{{ string_with_newlines | newline_to_br -}}
 ```
 
 #### pluralize
@@ -150,11 +159,12 @@ there
 Adds the specified string to the beginning of another string.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "apples, oranges, and bananas" | prepend: "Some fruit: " }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -164,17 +174,18 @@ Adds the specified string to the beginning of another string.
 You can also `prepend` variables:
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
-{% assign url = "liquidmarkup.com" %}
+```liquid
+{% assign url = "liquidmarkup.com" -%}
 
 {{ "/index.html" | prepend: url }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
-{% assign url = "liquidmarkup.com" %}
+{% assign url = "liquidmarkup.com" -%}
 
 {{ "/index.html" | prepend: url }}
 ```
@@ -184,11 +195,12 @@ You can also `prepend` variables:
 Removes every occurrence of the specified substring from a string.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "I strained to see the train through the rain" | remove: "rain" }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -200,11 +212,12 @@ Removes every occurrence of the specified substring from a string.
 Removes only the first occurrence of the specified substring from a string.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "I strained to see the train through the rain" | remove_first: "rain" }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -216,11 +229,12 @@ Removes only the first occurrence of the specified substring from a string.
 Replaces every occurrence of an argument in a string with the second argument.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Take my protein pills and put my helmet on" | replace: "my", "your" }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -232,16 +246,17 @@ Replaces every occurrence of an argument in a string with the second argument.
 Replaces only the first occurrence of the first argument in a string with the second argument.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
-{% assign my_string = "Take my protein pills and put my helmet on" %}
+```liquid
+{% assign my_string = "Take my protein pills and put my helmet on" -%}
 {{ my_string | replace_first: "my", "your" }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
-{% assign my_string = "Take my protein pills and put my helmet on" %}
+{% assign my_string = "Take my protein pills and put my helmet on" -%}
 {{ my_string | replace_first: "my", "your" }}
 ```
 
@@ -252,11 +267,12 @@ Returns a substring of 1 character beginning at the index specified by the argum
 String indices are numbered starting from 0.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Liquid" | slice: 0 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -264,11 +280,12 @@ String indices are numbered starting from 0.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Liquid" | slice: 2 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -276,11 +293,12 @@ String indices are numbered starting from 0.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Liquid" | slice: 2, 5 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -290,11 +308,12 @@ String indices are numbered starting from 0.
 If the first parameter is a negative number, the indices are counted from the end of the string:
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Liquid" | slice: -3, 2 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -306,23 +325,24 @@ If the first parameter is a negative number, the indices are counted from the en
 Divides an input string into an array using the argument as a separator. `split` is commonly used to convert comma-separated items from a string to an array.
 
 <p class="code-label">Input</p>
-```liquid
-{% raw %}
-{% assign beatles = "John, Paul, George, Ringo" | split: ", " %}
 
-{% for member in beatles %}
+{% raw %}
+```liquid
+{% assign beatles = "John, Paul, George, Ringo" | split: ", " -%}
+
+{% for member in beatles -%}
   {{ member }}
-{% endfor %}
-{% endraw %}
+{% endfor -%}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
-{% assign beatles = "John, Paul, George, Ringo" | split: ", " %}
+{% assign beatles = "John, Paul, George, Ringo" | split: ", " -%}
 
-{% for member in beatles %}
+{% for member in beatles -%}
   {{ member }}
-{% endfor %}
+{% endfor -%}
 ```
 
 #### strip
@@ -330,11 +350,12 @@ Divides an input string into an array using the argument as a separator. `split`
 Removes all whitespace (tabs, spaces, and newlines) from both the left and right side of a string. It does not affect spaces between words.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "          So much room for activities!          " | strip }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -346,11 +367,12 @@ Removes all whitespace (tabs, spaces, and newlines) from both the left and right
 Removes all whitespaces (tabs, spaces, and newlines) from the beginning of a string. The filter does not affect spaces between words.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "          So much room for activities!          " | lstrip }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -362,11 +384,12 @@ Removes all whitespaces (tabs, spaces, and newlines) from the beginning of a str
 Removes all whitespace (tabs, spaces, and newlines) from the right side of a string.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "          So much room for activities!          " | rstrip }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -378,11 +401,12 @@ Removes all whitespace (tabs, spaces, and newlines) from the right side of a str
 Removes any HTML tags from a string.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Have <em>you</em> read <strong>Ulysses</strong>?" | strip_html }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -394,23 +418,24 @@ Removes any HTML tags from a string.
 Removes any newline characters (line breaks) from a string.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {% capture string_with_newlines %}
 Hello
 there
 {% endcapture %}
 
 {{ string_with_newlines | strip_newlines }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```html
-{% capture string_with_newlines %}
+{% capture string_with_newlines -%}
 Hello
 there
-{% endcapture %}
+{% endcapture -%}
 
 {{ string_with_newlines | strip_newlines }}
 ```
@@ -421,11 +446,12 @@ there
 Shortens a string down to the number of words passed as the argument. If the specified number of words is less than the number of words in the string, an ellipsis (...) is appended to the string.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Ground control to Major Tom." | truncatewords: 3 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -469,11 +495,12 @@ You can avoid showing trailing characters by passing a blank string as the secon
 Makes each character in a string uppercase. It has no effect on strings which are already all uppercase.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Parker Moore" | upcase }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -481,11 +508,12 @@ Makes each character in a string uppercase. It has no effect on strings which ar
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "APPLE" | upcase }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -497,11 +525,12 @@ Makes each character in a string uppercase. It has no effect on strings which ar
 Converts any URL-unsafe characters in a string into percent-encoded characters.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "john@liquid.com" | url_encode }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -509,11 +538,12 @@ Converts any URL-unsafe characters in a string into percent-encoded characters.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "Tetsuro Takara" | url_encode }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -565,18 +595,18 @@ added to all created paragraphs.
 
 <p class="code-label">Output (HTML)</p>
 ``` html
- {{ "Here is some basic text...\n...with a line break." | to_simple_format }}
- {{ "Here is some basic text...\n...with a line break." | to_simple_format: wrapper_tag: "div" }}
- {{ "We want to put a paragraph...\n\n...right there." | to_simple_format }}
- {{ "<blink>Unblinkable.</blink>" | to_simple_format }}
-```
-
-<p class="code-label">Output (Rendered)</p>
-<p class="html-output">
 {{ "Here is some basic text...\n...with a line break." | to_simple_format }}
 {{ "Here is some basic text...\n...with a line break." | to_simple_format: wrapper_tag: "div" }}
 {{ "We want to put a paragraph...\n\n...right there." | to_simple_format }}
 {{ "<blink>Unblinkable.</blink>" | to_simple_format }}
-</p>
+```
+
+<p class="code-label">Output (Rendered)</p>
+<div class="html-output">
+{{ "Here is some basic text...\n...with a line break." | to_simple_format }}
+{{ "Here is some basic text...\n...with a line break." | to_simple_format: wrapper_tag: "div" }}
+{{ "We want to put a paragraph...\n\n...right there." | to_simple_format }}
+{{ "<blink>Unblinkable.</blink>" | to_simple_format }}
+</div>
 
 

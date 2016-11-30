@@ -31,15 +31,18 @@ Executes a block of code only if a certain condition is `true`.
 <p class="code-label">Input</p>
 {% raw %}
 ```liquid
-{% if product.title == 'Awesome Shoes' %}
+{% if product_title == 'Awesome Shoes' -%}
   These shoes are awesome!
-{% endif %}
+{% endif -%}
 ```
 {% endraw %}
 
 <p class="code-label">Output</p>
 ```text
-These shoes are awesome!
+{% assign product_title = "Awesome Shoes" -%}
+{% if product_title == 'Awesome Shoes' -%}
+  These shoes are awesome!
+{% endif -%}
 ```
 
 #### unless
@@ -49,22 +52,26 @@ The opposite of `if` – executes a block of code only if a certain condition is
 <p class="code-label">Input</p>
 {% raw %}
 ```liquid
-{% unless product.title == 'Awesome Shoes' %}
+{% unless product_title == 'Awesome Shoes' -%}
   These shoes are not awesome.
-{% endunless %}
+{% endunless -%}
 ```
 {% endraw %}
 
 <p class="code-label">Output</p>
 ```text
-These shoes are not awesome.
+{% assign product_title = "Some shoes" %}
+{%- unless product_title == 'Awesome Shoes' -%}
+  These shoes are not awesome.
+{% endunless -%}
 ```
 
 This would be the equivalent of doing the following:
 
 {% raw %}
 ```liquid
-{% if product.title != 'Awesome Shoes' %}
+{% assign product_title = "Some shoes" %}
+{% if product_title != 'Awesome Shoes' %}
   These shoes are not awesome.
 {% endif %}
 ```
@@ -76,7 +83,7 @@ Adds more conditions within an `if` or `unless` block.
 
 <p class="code-label">Input</p>
 {% raw %}
-```liquid
+``` liquid
 <!-- If customer.name = 'anonymous' -->
 {% if customer.name == 'kevin' %}
   Hey Kevin!

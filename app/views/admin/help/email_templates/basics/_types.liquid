@@ -13,7 +13,7 @@ You can initialize Liquid variables with the [assign](#variable_assign) or [capt
 Declare a string by wrapping a variable's value in single or double quotes:
 
 ```liquid
-{% raw %}
+{%- raw -%}
 {% assign my_string = "Hello World!" %}
 {% endraw %}
 ```
@@ -23,7 +23,7 @@ Declare a string by wrapping a variable's value in single or double quotes:
 Numbers include floats and integers:
 
 ```liquid
-{% raw %}
+{%- raw -%}
 {% assign my_int = 25 %}
 {% assign my_float = 39.756 %}
 {% endraw %}
@@ -34,7 +34,7 @@ Numbers include floats and integers:
 Booleans are either `true` or `false`. No quotations are necessary when declaring a boolean:
 
 ```liquid
-{% raw %}
+{%- raw -%}
 {% assign foo = true %}
 {% assign bar = false %}
 {% endraw %}
@@ -49,7 +49,7 @@ Nil is [treated as false](#truthy_and_falsy) in the conditions of `if` blocks an
 In the following example, if the user does not exist (that is, `user` returns `nil`), Liquid will not print the greeting:
 
 ```liquid
-{% raw %}
+{%- raw -%}
 {% if user %}
   Hello {{ user.name }}!
 {% endif %}
@@ -60,7 +60,7 @@ Tags or outputs that return `nil` will not print anything to the page.
 
 <p class="code-label">Input</p>
 ```liquid
-{% raw %}
+{%- raw -%}
 The current user is {{ user.name }}
 {% endraw %}
 ```
@@ -80,7 +80,7 @@ To access all the items in an array, you can loop through each item in the array
 
 <p class="code-label">Input</p>
 ```liquid
-{% raw %}
+{%- raw -%}
 <!-- if site.users = "Tobi", "Laura", "Tetsuro", "Adam" -->
 {% for user in site.users %}
   {{ user }}
@@ -90,7 +90,7 @@ To access all the items in an array, you can loop through each item in the array
 
 <p class="code-label">Output</p>
 ```text
-{% raw %}
+{%- raw -%}
 Tobi Laura Tetsuro Adam
 {% endraw %}
 ```
@@ -101,7 +101,7 @@ You can use square bracket `[` `]` notation to access a specific item in an arra
 
 <p class="code-label">Input</p>
 ```liquid
-{% raw %}
+{%- raw -%}
 <!-- if site.users = "Tobi", "Laura", "Tetsuro", "Adam" -->
 {{ site.users[0] }}
 {{ site.users[1] }}

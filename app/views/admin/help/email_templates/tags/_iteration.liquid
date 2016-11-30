@@ -7,6 +7,7 @@ Repeatedly executes a block of code. For a full list of attributes available wit
 <p class="code-label">Input</p>
 {% raw %}
 ```liquid
+{% assign products = "hat shirt pants" | split: ' ' %}
 {% for product in collection.products %}
   {{ product.title }}
 {% endfor %}
@@ -15,7 +16,10 @@ Repeatedly executes a block of code. For a full list of attributes available wit
 
 <p class="code-label">Output</p>
 ```text
-hat shirt pants
+{% assign products = "hat shirt pants" | split: ' ' -%}
+{%- for product in products -%}
+  {{ product }}
+{% endfor -%}
 ```
 
 ##### break
@@ -62,9 +66,8 @@ Causes the loop to skip the current iteration when it encounters the `continue` 
 1 2 3   5
 ```
 
-#### for (parameters)
-
-##### limit
+##### for (parameters) #####
+###### limit ######
 
 Limits the loop to the specified number of iterations.
 
@@ -84,7 +87,7 @@ Limits the loop to the specified number of iterations.
 {% for item in array limit:2 %}{{ item }} {% endfor %}
 ```
 
-##### offset
+###### offset ######
 
 Begins the loop at the specified index.
 
@@ -104,7 +107,7 @@ Begins the loop at the specified index.
 {% for item in array offset:2 %}{{ item }} {% endfor %}
 ```
 
-##### range
+###### range ######
 
 Defines a range of numbers to loop through. The range can be defined by both literal and variable numbers.
 
@@ -124,7 +127,7 @@ Defines a range of numbers to loop through. The range can be defined by both lit
 {% for i in (1..num) %}{{ i }} {% endfor %}
 ```
 
-##### reversed
+###### reversed ######
 
 Reverses the order of the loop.
 
@@ -172,7 +175,7 @@ Uses for `cycle` include:
 -   applying odd/even classes to rows in a table
 -   applying a unique class to the last product thumbnail in a row
 
-#### cycle (parameters)
+##### cycle (parameters) #####
 
 `cycle` accepts a parameter called `cycle group` in cases where you need multiple `cycle` blocks in one template. If no name is supplied for the cycle group, then it is assumed that multiple calls with the same parameters are one group.
 
@@ -183,43 +186,43 @@ Generates an HTML table. Must be wrapped in opening `<table>` and closing `</tab
 <p class="code-label">Input</p>
 {% raw %}
 ```liquid
-  <table>
-  {% tablerow product in collection.products %}
-    {{ product.title }}
-  {% endtablerow %}
-  </table>
+<table>
+{% tablerow product in collection.products %}
+  {{ product.title }}
+{% endtablerow %}
+</table>
 ```
 {% endraw %}
 
 <p class="code-label">Output</p>
 ```html
-  <table>
-    <tr class="row1">
-      <td class="col1">
-        Cool Shirt
-      </td>
-      <td class="col2">
-        Alien Poster
-      </td>
-      <td class="col3">
-        Batman Poster
-      </td>
-      <td class="col4">
-        Bullseye Shirt
-      </td>
-      <td class="col5">
-        Another Classic Vinyl
-      </td>
-      <td class="col6">
-        Awesome Jeans
-      </td>
-    </tr>
-  </table>
+<table>
+  <tr class="row1">
+    <td class="col1">
+      Cool Shirt
+    </td>
+    <td class="col2">
+      Alien Poster
+    </td>
+    <td class="col3">
+      Batman Poster
+    </td>
+    <td class="col4">
+      Bullseye Shirt
+    </td>
+    <td class="col5">
+      Another Classic Vinyl
+    </td>
+    <td class="col6">
+      Awesome Jeans
+    </td>
+  </tr>
+</table>
 ```
 
-#### tablerow (parameters)
+##### tablerow (parameters) #####
 
-##### cols
+###### cols ######
 
 Defines how many columns the tables should have.
 
@@ -234,69 +237,113 @@ Defines how many columns the tables should have.
 
 <p class="code-label">Output</p>
 ```html
-  <table>
-    <tr class="row1">
-      <td class="col1">
-        Cool Shirt
-      </td>
-      <td class="col2">
-        Alien Poster
-      </td>
-    </tr>
-    <tr class="row2">
-      <td class="col1">
-        Batman Poster
-      </td>
-      <td class="col2">
-        Bullseye Shirt
-      </td>
-    </tr>
-    <tr class="row3">
-      <td class="col1">
-        Another Classic Vinyl
-      </td>
-      <td class="col2">
-        Awesome Jeans
-      </td>
-    </tr>
-  </table>
+<table>
+  <tr class="row1">
+    <td class="col1">
+      Cool Shirt
+    </td>
+    <td class="col2">
+      Alien Poster
+    </td>
+  </tr>
+  <tr class="row2">
+    <td class="col1">
+      Batman Poster
+    </td>
+    <td class="col2">
+      Bullseye Shirt
+    </td>
+  </tr>
+  <tr class="row3">
+    <td class="col1">
+      Another Classic Vinyl
+    </td>
+    <td class="col2">
+      Awesome Jeans
+    </td>
+  </tr>
+</table>
 ```
 
-###### limit
+###### limit ######
 
 Exits the tablerow after a specific index.
 
+<p class="code-label">Input</p>
+
 {% raw %}
 ```liquid
-{% tablerow product in collection.products cols:2 limit:3 %}
-  {{ product.title }}
-{% endtablerow %}
+<table>
+  {% tablerow index in (1..10) cols:2 limit:3 %}
+    {{ index }}
+  {% endtablerow %}
+</table>
 ```
 {% endraw %}
 
-##### offset
+<p class="code-label">Output</p>
+
+``` html
+<table>
+  {% tablerow index in (1..10) cols:2 limit:3 %}
+    {{ index }}
+  {% endtablerow %}
+</table>
+```
+
+<p class="code-label">Output (Rendered)</p>
+<div class="html-output">
+  <table>
+    {% tablerow index in (1..10) cols:2 limit:3 %}
+      {{ index }}
+    {% endtablerow %}
+  </table>
+</div>
+
+###### offset ######
 
 Starts the tablerow after a specific index.
 
 {% raw %}
 ```liquid
-{% tablerow product in collection.products cols:2 offset:3 %}
-  {{ product.title }}
-{% endtablerow %}
+<table>
+  {% tablerow index in (1..10) cols:2 offset:3 %}
+    {{ index }}
+  {% endtablerow %}
+</table>
 ```
 {% endraw %}
 
-##### range
+<p class="code-label">Output</p>
+
+``` html
+<table>
+  {% tablerow index in (1..10) cols:2 offset:3 %}
+    {{ index }}
+  {% endtablerow %}
+</table>
+```
+
+<p class="code-label">Output (Rendered)</p>
+<div class="html-output">
+  <table>
+    {% tablerow index in (1..10) cols:2 offset:3 %}
+      {{ index }}
+    {% endtablerow %}
+  </table>
+</div>
+
+###### range ######
 
 Defines a range of numbers to loop through. The range can be defined by both literal and variable numbers.
 
 ```liquid
-  {% assign num = 4 %}
-  <table>
-    {% tablerow i in (1..num) %}{{ i }}{% endtablerow %}
-  </table>
+{% assign num = 4 %}
+<table>
+  {% tablerow i in (1..num) %}{{ i }}{% endtablerow %}
+</table>
 
-  <table>
-    {% tablerow i in (3..5) %}{{ i }}{% endtablerow %}
-  </table>
+<table>
+  {% tablerow i in (3..5) %}{{ i }}{% endtablerow %}
+</table>
 ```

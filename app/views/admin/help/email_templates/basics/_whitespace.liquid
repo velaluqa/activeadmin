@@ -23,17 +23,20 @@ By including hyphens in your `assign` tag, you can strip the generated whitespac
 <p class="code-label">Input</p>
 {% raw %}
 ``` liquid
-{%- assign my_variable = "tomato" -%}
+{% assign my_variable = "tomato" -%}
 {{ my_variable }}
 ```
 {% endraw %}
 
 <p class="code-label">Output</p>
 ``` text
-tomato
+{% assign my_variable = "tomato" -%}
+{{ my_variable }}
 ```
 
-If you don't want any of your tags to output whitespace, as a general rule you can add hyphens to both sides of all your tags (`{% raw %}{%-{% endraw %}` and `{% raw %}-%}{% endraw %}`):
+If you don't want any of your tags to output whitespace, as a general
+rule you can add hyphens to both sides of all your tags 
+(`{% raw %}{%-{% endraw %}` and `{% raw %}-%}{% endraw %}`):
 
 <p class="code-label">Input</p>
 {% raw %}
@@ -59,6 +62,7 @@ If you don't want any of your tags to output whitespace, as a general rule you c
 
 <p class="code-label">Input</p>
 
+{% raw %}
 ``` liquid
 {%- assign username = "John G. Chalmers-Smith" -%}
 {%- if username and username.size > 10 -%}
@@ -67,7 +71,7 @@ If you don't want any of your tags to output whitespace, as a general rule you c
   Hello there!
 {%- endif -%}
 ```
-
+{% endraw %}
 
 <p class="code-label">Output with whitespace control</p>
 ``` text

@@ -44,7 +44,19 @@ The markup used in tags does not produce any visible text. This means that you c
 
 ### Array Filters
 
-<%= render(partial: 'admin/help/email_templates/filters/array').html_safe %>
+<%=
+  render(
+    partial: 'admin/help/email_templates/filters/array',
+	locals: {
+	  test_studies: [
+		  FactoryGirl.build(:study, name: 'Study 1'),
+		  FactoryGirl.build(:study, name: 'Study 2'),
+		  FactoryGirl.build(:study, name: 'Study 3')
+	  ],
+	  test_study: Study.where(id: 1).first
+	}
+  ).html_safe
+%>
 
 ### Math Filters
 
@@ -56,7 +68,15 @@ The markup used in tags does not produce any visible text. This means that you c
 
 ### URL Filters
 
-<%= render(partial: 'admin/help/email_templates/filters/url', locals: { test_study: Study.where(id: 1).first }).html_safe %>
+<%=
+  render(
+    partial: 'admin/help/email_templates/filters/url',
+	locals: {
+	  test_studies: Study.all,
+	  test_study: Study.where(id: 1).first
+	}
+  ).html_safe
+%>
 
 ### Number Filters
 

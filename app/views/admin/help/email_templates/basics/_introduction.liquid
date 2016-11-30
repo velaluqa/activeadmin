@@ -6,11 +6,11 @@ Liquid code can be categorized into [**objects**](#objects), [**tags**](#tags), 
 
 
 <p class="code-label">Input</p>
-{% raw %}
 ```liquid
+{%- raw -%}
 {{ study.name }}
-```
 {% endraw %}
+```
 
 <p class="code-label">Output</p>
 ```text
@@ -26,13 +26,13 @@ In this case, Liquid is rendering the content of an object called `study.name`, 
 The markup used in tags does not produce any visible text. This means that you can assign variables and create conditions and loops without showing any of the Liquid logic on the page.
 
 <p class="code-label">Input</p>
-{% raw %}
 ```liquid
+{%- raw -%}
 {% if user %}
   Hello {{ user.name }}!
 {% endif %}
-```
 {% endraw %}
+```
 
 <p class="code-label">Output</p>
 ```text
@@ -52,7 +52,7 @@ You can read more about each type of tag in their respective sections.
 **Filters** change the output of a Liquid object. They are used within an output and are separated by a `|`.
 
 <p class="code-label">Input</p>
-{% raw %}
+{%- raw -%}
 ```liquid
 {{ "/my/fancy/url" | append: ".html" }}
 ```

@@ -16,9 +16,9 @@ Given study is a `StudyDrop` for a study with id `1`, the usage could look like:
 {{ test_study | link }}
 ```
 <p class="code-label">Output (Rendered)</p>
-<p class="html-output">
+<div class="html-output">
 {{ test_study | link }}
-</p>
+</div>
 
 You can pass a link text as argument.
 
@@ -34,9 +34,9 @@ You can pass a link text as argument.
 {{ test_study | link: 'Open in ERICA' }}
 ```
 <p class="code-label">Output (Rendered)</p>
-<p class="html-output">
+<div class="html-output">
 {{ test_study | link: 'Open in ERICA' }}
-</p>
+</div>
 
 With liquid it is also easy to use a resources attribute as name for the link: 
 
@@ -52,7 +52,7 @@ With liquid it is also easy to use a resources attribute as name for the link:
 {{ test_study | link: test_study.name }}
 ```
 <p class="code-label">Output (Rendered)</p>
-<p class="html-output">
+<div class="html-output">
 {{ test_study | link: test_study.name }}
-</p>
+</div>
 

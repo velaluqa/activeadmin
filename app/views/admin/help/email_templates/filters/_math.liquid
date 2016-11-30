@@ -3,41 +3,44 @@
 Returns the absolute value of a number.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ -17 | abs }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
-17
+{{ -17 | abs }}
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 4 | abs }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
-4
+{{ 4 | abs }}
 ```
 
 `abs` will also work on a string if the string only contains a number.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "-19.86" | abs }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
-19.86
+{{ "-19.86" | abs }}
 ```
 
 #### ceil
@@ -45,11 +48,12 @@ Returns the absolute value of a number.
 Rounds the input up to the nearest whole number. Liquid tries to convert the input to a number before the filter is applied.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 1.2 | ceil }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -57,11 +61,12 @@ Rounds the input up to the nearest whole number. Liquid tries to convert the inp
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 2.0 | ceil }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -69,11 +74,12 @@ Rounds the input up to the nearest whole number. Liquid tries to convert the inp
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 183.357 | ceil }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -83,11 +89,12 @@ Rounds the input up to the nearest whole number. Liquid tries to convert the inp
 Here the input value is a string:
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "3.5" | ceil }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -99,11 +106,12 @@ Here the input value is a string:
 Rounds a number down to the nearest whole number. Liquid tries to convert the input to a number before the filter is applied.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 1.2 | floor }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -111,11 +119,12 @@ Rounds a number down to the nearest whole number. Liquid tries to convert the in
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 2.0 | floor }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -123,11 +132,12 @@ Rounds a number down to the nearest whole number. Liquid tries to convert the in
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 183.357 | floor }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -137,11 +147,12 @@ Rounds a number down to the nearest whole number. Liquid tries to convert the in
 Here the input value is a string:
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ "3.5" | floor }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -253,11 +264,12 @@ Here, we [multiply](#times) the variable by `1.0` to get a float, then divide by
 Subtracts a number from another number.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 4 | minus: 2 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -265,11 +277,12 @@ Subtracts a number from another number.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 16 | minus: 4 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -277,11 +290,12 @@ Subtracts a number from another number.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 183.357 | minus: 12 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -293,11 +307,12 @@ Subtracts a number from another number.
 Adds a number to another number.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 4 | plus: 2 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -305,11 +320,12 @@ Adds a number to another number.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 16 | plus: 4 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -317,11 +333,12 @@ Adds a number to another number.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 183.357 | plus: 12 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -334,11 +351,12 @@ Adds a number to another number.
 Rounds an input number to the nearest integer or, if a number is specified as an argument, to that number of decimal places.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 1.2 | round }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -346,11 +364,12 @@ Rounds an input number to the nearest integer or, if a number is specified as an
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 2.7 | round }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -358,11 +377,12 @@ Rounds an input number to the nearest integer or, if a number is specified as an
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 183.357 | round: 2 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -374,11 +394,12 @@ Rounds an input number to the nearest integer or, if a number is specified as an
 Multiplies a number by another number.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 3 | times: 2 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -386,11 +407,12 @@ Multiplies a number by another number.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 24 | times: 7 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -398,11 +420,12 @@ Multiplies a number by another number.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 183.357 | times: 12 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -414,11 +437,12 @@ Multiplies a number by another number.
 Returns the remainder of a division operation.
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 3 | modulo: 2 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -426,11 +450,12 @@ Returns the remainder of a division operation.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 24 | modulo: 7 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
@@ -438,11 +463,12 @@ Returns the remainder of a division operation.
 ```
 
 <p class="code-label">Input</p>
-```liquid
+
 {% raw %}
+```liquid
 {{ 183.357 | modulo: 12 }}
-{% endraw %}
 ```
+{% endraw %}
 
 <p class="code-label">Output</p>
 ```text
