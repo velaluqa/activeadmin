@@ -1,0 +1,582 @@
+#### append
+
+Concatenates two strings and returns the concatenated value.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "/my/fancy/url" | append: ".html" }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "/my/fancy/url" | append: ".html" }}
+```
+
+`append` can also be used with variables:
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{% assign filename = "/index.html" %}
+{{ "website.com" | append: filename }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{% assign filename = "/index.html" %}
+{{ "website.com" | append: filename }}
+```
+
+#### capitalize
+
+Makes the first character of a string capitalized.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "title" | capitalize }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+Title
+```
+
+`capitalize` only capitalizes the first character of the string, so later words are not affected:
+
+ <p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "my great title" | capitalize }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+My great title
+```
+
+#### downcase
+
+Makes each character in a string lowercase. It has no effect on strings which are already all lowercase.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Parker Moore" | downcase }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Parker Moore" | downcase }}
+```
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "apple" | downcase }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "apple" | downcase }}
+```
+
+#### escape
+
+Escapes a string by replacing characters with escape sequences (so
+that the string can be used in a URL, for example). It doesn't change
+strings that don't have anything to escape.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Have you read 'James & the Giant Peach'?" | escape }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Have you read 'James & the Giant Peach'?" | escape }}
+```
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Tetsuro Takara" | escape }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Tetsuro Takara" | escape }}
+```
+
+#### newline_to_br
+
+Replaces every newline (`\n`) with an HTML line break (`<br>`).
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{% capture string_with_newlines %}
+Hello
+there
+{% endcapture %}
+
+{{ string_with_newlines | newline_to_br }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```html
+{% capture string_with_newlines %}
+Hello
+there
+{% endcapture %}
+
+{{ string_with_newlines | newline_to_br }}
+```
+
+#### pluralize
+#### prepend
+
+Adds the specified string to the beginning of another string.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "apples, oranges, and bananas" | prepend: "Some fruit: " }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "apples, oranges, and bananas" | prepend: "Some fruit: " }}
+```
+
+You can also `prepend` variables:
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{% assign url = "liquidmarkup.com" %}
+
+{{ "/index.html" | prepend: url }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{% assign url = "liquidmarkup.com" %}
+
+{{ "/index.html" | prepend: url }}
+```
+
+#### remove
+
+Removes every occurrence of the specified substring from a string.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "I strained to see the train through the rain" | remove: "rain" }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "I strained to see the train through the rain" | remove: "rain" }}
+```
+
+#### remove_first
+
+Removes only the first occurrence of the specified substring from a string.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "I strained to see the train through the rain" | remove_first: "rain" }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "I strained to see the train through the rain" | remove_first: "rain" }}
+```
+
+#### replace
+
+Replaces every occurrence of an argument in a string with the second argument.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Take my protein pills and put my helmet on" | replace: "my", "your" }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Take my protein pills and put my helmet on" | replace: "my", "your" }}
+```
+
+#### replace_first
+
+Replaces only the first occurrence of the first argument in a string with the second argument.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{% assign my_string = "Take my protein pills and put my helmet on" %}
+{{ my_string | replace_first: "my", "your" }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{% assign my_string = "Take my protein pills and put my helmet on" %}
+{{ my_string | replace_first: "my", "your" }}
+```
+
+#### slice
+
+Returns a substring of 1 character beginning at the index specified by the argument passed in. An optional second argument specifies the length of the substring to be returned.
+
+String indices are numbered starting from 0.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Liquid" | slice: 0 }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Liquid" | slice: 0 }}
+```
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Liquid" | slice: 2 }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Liquid" | slice: 2 }}
+```
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Liquid" | slice: 2, 5 }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Liquid" | slice: 2, 5 }}
+```
+
+If the first parameter is a negative number, the indices are counted from the end of the string:
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Liquid" | slice: -3, 2 }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Liquid" | slice: -3, 2 }}
+```
+
+#### split
+
+Divides an input string into an array using the argument as a separator. `split` is commonly used to convert comma-separated items from a string to an array.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{% assign beatles = "John, Paul, George, Ringo" | split: ", " %}
+
+{% for member in beatles %}
+  {{ member }}
+{% endfor %}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{% assign beatles = "John, Paul, George, Ringo" | split: ", " %}
+
+{% for member in beatles %}
+  {{ member }}
+{% endfor %}
+```
+
+#### strip
+
+Removes all whitespace (tabs, spaces, and newlines) from both the left and right side of a string. It does not affect spaces between words.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "          So much room for activities!          " | strip }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "          So much room for activities!          " | strip }}
+```
+
+#### lstrip
+
+Removes all whitespaces (tabs, spaces, and newlines) from the beginning of a string. The filter does not affect spaces between words.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "          So much room for activities!          " | lstrip }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "          So much room for activities!          " | lstrip }}
+```
+
+#### rstrip
+
+Removes all whitespace (tabs, spaces, and newlines) from the right side of a string.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "          So much room for activities!          " | rstrip }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "          So much room for activities!          " | rstrip }}
+```
+
+#### strip_html
+
+Removes any HTML tags from a string.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Have <em>you</em> read <strong>Ulysses</strong>?" | strip_html }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Have <em>you</em> read <strong>Ulysses</strong>?" | strip_html }}
+```
+
+#### strip_newlines
+
+Removes any newline characters (line breaks) from a string.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{% capture string_with_newlines %}
+Hello
+there
+{% endcapture %}
+
+{{ string_with_newlines | strip_newlines }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```html
+{% capture string_with_newlines %}
+Hello
+there
+{% endcapture %}
+
+{{ string_with_newlines | strip_newlines }}
+```
+
+#### truncatewords ####
+
+
+Shortens a string down to the number of words passed as the argument. If the specified number of words is less than the number of words in the string, an ellipsis (...) is appended to the string.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Ground control to Major Tom." | truncatewords: 3 }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Ground control to Major Tom." | truncatewords: 3 }}
+```
+
+##### Custom ellipsis #####
+
+`truncatewords` takes an optional second parameter that specifies the sequence of characters to be appended to the truncated string. By default this is an ellipsis (...), but you can specify a different sequence.
+
+<p class="code-label">Input</p>
+{% raw %}
+``` liquid
+{{ "Ground control to Major Tom." | truncatewords: 3, "--" }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+``` text
+{{ "Ground control to Major Tom." | truncatewords: 3, "--" }}
+```
+
+##### No ellipsis #####
+
+You can avoid showing trailing characters by passing a blank string as the second parameter:
+
+<p class="code-label">Input</p>
+{% raw %}
+``` liquid
+{{ "Ground control to Major Tom." | truncatewords: 3, "" }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+``` text
+{{ "Ground control to Major Tom." | truncatewords: 3, "" }}
+```
+
+#### upcase ####
+
+Makes each character in a string uppercase. It has no effect on strings which are already all uppercase.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Parker Moore" | upcase }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Parker Moore" | upcase }}
+```
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "APPLE" | upcase }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "APPLE" | upcase }}
+```
+
+#### url_encode ####
+
+Converts any URL-unsafe characters in a string into percent-encoded characters.
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "john@liquid.com" | url_encode }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "john@liquid.com" | url_encode }}
+```
+
+<p class="code-label">Input</p>
+```liquid
+{% raw %}
+{{ "Tetsuro Takara" | url_encode }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+{{ "Tetsuro Takara" | url_encode }}
+```
+
+#### pluralize
+
+<p class="code-label">Input</p>
+{% raw %}
+```liquid
+{{ 1 | pluralize: 'person' }}
+{{ 2 | pluralize: 'person' }}
+{{ 1 | pluralize: 'person', 'users' }}
+{{ 3 | pluralize: 'person', 'users' }}
+{{ 0 | pluralize: 'person' }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{{ 1 | pluralize: 'person' }}
+{{ 2 | pluralize: 'person' }}
+{{ 1 | pluralize: 'person', 'users' }}
+{{ 3 | pluralize: 'person', 'users' }}
+{{ 0 | pluralize: 'person' }}
+```
+
+#### to_simple_format
+
+Returns text transformed into HTML using simple formatting rules. Two
+or more consecutive newlines (`\n\n`) are considered as a paragraph and
+wrapped in `<p>` tags. One newline (`\n`) is considered as a linebreak and
+a `<br />` tag is appended. This method does not remove the newlines
+from the text.
+
+You can pass any HTML attributes into html_options. These will be
+added to all created paragraphs.
+
+<p class="code-label">Input</p>
+{% raw %}
+``` liquid
+{{ "Here is some basic text...\n...with a line break." | to_simple_format }}
+{{ "Here is some basic text...\n...with a line break." | to_simple_format: wrapper_tag: "div" }}
+{{ "We want to put a paragraph...\n\n...right there." | to_simple_format }}
+{{ "<blink>Unblinkable.</blink>" | to_simple_format }}
+```
+{% endraw %}
+
+<p class="code-label">Output (HTML)</p>
+``` html
+ {{ "Here is some basic text...\n...with a line break." | to_simple_format }}
+ {{ "Here is some basic text...\n...with a line break." | to_simple_format: wrapper_tag: "div" }}
+ {{ "We want to put a paragraph...\n\n...right there." | to_simple_format }}
+ {{ "<blink>Unblinkable.</blink>" | to_simple_format }}
+```
+
+<p class="code-label">Output (Rendered)</p>
+<p class="html-output">
+{{ "Here is some basic text...\n...with a line break." | to_simple_format }}
+{{ "Here is some basic text...\n...with a line break." | to_simple_format: wrapper_tag: "div" }}
+{{ "We want to put a paragraph...\n\n...right there." | to_simple_format }}
+{{ "<blink>Unblinkable.</blink>" | to_simple_format }}
+</p>
+
+

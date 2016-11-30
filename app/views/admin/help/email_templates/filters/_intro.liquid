@@ -1,0 +1,51 @@
+**Filters** are simple methods that modify the output of numbers,
+strings, variables and objects. They are placed within an output tag
+`{% raw %}{{ }}{% endraw %}` and are denoted by a pipe character `|`.
+
+<p class="code-label">Input</p>
+{% raw %}
+```liquid
+{{ "Awesome Shoes" | upcase }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+
+```text
+{{ "Awesome Shoes" | upcase }}
+```
+
+In the example above, product is the object, title is its attribute,
+and upcase is the filter being applied.
+
+Some filters require a parameter to be passed.
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{{ "Awesome Shoes" | remove: "Awesome" }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+
+``` text
+{{ "Awesome Shoes" | remove: "Awesome" }}
+```
+
+Multiple filters can be used on one output. They are applied from left to right.
+
+<p class="code-label">Input</p>
+
+{% raw %}
+``` liquid
+{{ "Awesome Shoes" | upcase | remove: "AWESOME"  }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+
+``` text
+{{ "Awesome Shoes" | upcase | remove: "AWESOME"  }}
+```
