@@ -6,6 +6,8 @@ ActiveAdmin.register_page 'Help' do
   controller do
     def authorize_access!
     end
+
+    helper :help
   end
 
   Dir[Rails.root.join('app/views/admin/help/*.md')].each do |help_page|
