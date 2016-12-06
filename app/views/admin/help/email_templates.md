@@ -1,24 +1,35 @@
+<%-
+  locals = {
+    test_studies: [
+  	  FactoryGirl.build(:study, name: 'Study 1'),
+  	  FactoryGirl.build(:study, name: 'Study 2'),
+  	  FactoryGirl.build(:study, name: 'Study 3')
+  	],
+  	test_study: Study.first || FactoryGirl.build(:study, id: 1, name: 'Sophisticated Test Study', created_at: (DateTime.now - 2.days))
+  }
+-%>
+
 ## Liquid Basics
 
 ### Introduction
 
-<%= render(partial: 'admin/help/email_templates/basics/introduction').html_safe %>
+<%= render(partial: 'admin/help/email_templates/basics/introduction', locals: locals).html_safe %>
 
 ### Operators
 
-<%= render(partial: 'admin/help/email_templates/basics/operators').html_safe %>
+<%= render(partial: 'admin/help/email_templates/basics/operators', locals: locals).html_safe %>
 
 ### Truthy & Falsy
 
-<%= render(partial: 'admin/help/email_templates/basics/truthy_and_falsy').html_safe %>
+<%= render(partial: 'admin/help/email_templates/basics/truthy_and_falsy', locals: locals).html_safe %>
 
 ### Types
 
-<%= render(partial: 'admin/help/email_templates/basics/types').html_safe %>
+<%= render(partial: 'admin/help/email_templates/basics/types', locals: locals).html_safe %>
 
 ### Whitespace
 
-<%= render(partial: 'admin/help/email_templates/basics/whitespace').html_safe %>
+<%= render(partial: 'admin/help/email_templates/basics/whitespace', locals: locals).html_safe %>
 
 ## Liquid Tags
 
@@ -28,63 +39,43 @@ The markup used in tags does not produce any visible text. This means that you c
 
 ### Control Flow Tags
 
-<%= render(partial: 'admin/help/email_templates/tags/control_flow').html_safe %>
+<%= render(partial: 'admin/help/email_templates/tags/control_flow', locals: locals).html_safe %>
 
 ### Iteration Tags
 
-<%= render(partial: 'admin/help/email_templates/tags/iteration').html_safe %>
+<%= render(partial: 'admin/help/email_templates/tags/iteration', locals: locals).html_safe %>
 
 ### Variable Tags
 
-<%= render(partial: 'admin/help/email_templates/tags/variable').html_safe %>
+<%= render(partial: 'admin/help/email_templates/tags/variable', locals: locals).html_safe %>
 
 ## Liquid Filters
 
-<%= render(partial: 'admin/help/email_templates/filters/intro').html_safe %>
+<%= render(partial: 'admin/help/email_templates/filters/intro', locals: locals).html_safe %>
 
 ### Array Filters
 
-<%=
-  render(
-    partial: 'admin/help/email_templates/filters/array',
-	locals: {
-	  test_studies: [
-		  FactoryGirl.build(:study, name: 'Study 1'),
-		  FactoryGirl.build(:study, name: 'Study 2'),
-		  FactoryGirl.build(:study, name: 'Study 3')
-	  ],
-	  test_study: Study.where(id: 1).first
-	}
-  ).html_safe
-%>
+<%= render(partial: 'admin/help/email_templates/filters/array', locals: locals).html_safe %>
 
 ### Math Filters
 
-<%= render(partial: 'admin/help/email_templates/filters/math').html_safe %>
+<%= render(partial: 'admin/help/email_templates/filters/math', locals: locals).html_safe %>
 
 ### String Filters
 
-<%= render(partial: 'admin/help/email_templates/filters/string').html_safe %>
+<%= render(partial: 'admin/help/email_templates/filters/string', locals: locals).html_safe %>
 
 ### URL Filters
 
-<%=
-  render(
-    partial: 'admin/help/email_templates/filters/url',
-	locals: {
-	  test_studies: Study.all,
-	  test_study: Study.where(id: 1).first
-	}
-  ).html_safe
-%>
+<%= render(partial: 'admin/help/email_templates/filters/url', locals: locals).html_safe %>
 
 ### Number Filters
 
-<%= render(partial: 'admin/help/email_templates/filters/number').html_safe %>
+<%= render(partial: 'admin/help/email_templates/filters/number', locals: locals).html_safe %>
 
 ### Other Filters
 
-<%= render(partial: 'admin/help/email_templates/filters/other').html_safe %>
+<%= render(partial: 'admin/help/email_templates/filters/other', locals: locals).html_safe %>
 
 ## Liquid Objects
 
