@@ -28,6 +28,11 @@ module HelpHelper
     doc
   end
 
+  def describe_liquid_drop(drop_name)
+    drop_class = drop_name.constantize
+    render partial: 'admin/help/email_templates/liquid_drop_description', locals: { drop_class: drop_class }
+  end
+
   private
 
   def heading_id_for_path(path)

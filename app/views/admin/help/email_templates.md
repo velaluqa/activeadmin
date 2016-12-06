@@ -84,20 +84,61 @@ templates. The following list of objects defines available attributes
 and relationships accessible from within email templates.
 
 ### BackgroundJob
+
+<%= describe_liquid_drop('BackgroundJobDrop') %>
+
 ### Center
-### Erica
+
+<%= describe_liquid_drop('CenterDrop') %>
+
 ### Image
+
+<%= describe_liquid_drop('ImageDrop') %>
+
 ### ImageSeries
+
+<%= describe_liquid_drop('ImageSeriesDrop') %>
+
 ### Notification
+
+<%= describe_liquid_drop('NotificationDrop') %>
+
 ### NotificationProfile
+
+<%= describe_liquid_drop('NotificationProfileDrop') %>
+
 ### Patient
+
+<%= describe_liquid_drop('PatientDrop') %>
+
 ### Permission
+
+<%= describe_liquid_drop('PermissionDrop') %>
+
 ### Role
+
+<%= describe_liquid_drop('RoleDrop') %>
+
 ### Study
+
+<%= describe_liquid_drop('StudyDrop') %>
+
 ### User
+
+<%= describe_liquid_drop('UserDrop') %>
+
 ### UserRole
+
+<%= describe_liquid_drop('UserRoleDrop') %>
+
 ### Version
+
+<%= describe_liquid_drop('VersionDrop') %>
+
 ### Visit
+
+<%= describe_liquid_drop('VisitDrop') %>
+
 
 ## Accessible Data
 

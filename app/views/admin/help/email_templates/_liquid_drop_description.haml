@@ -1,0 +1,24 @@
+%h4 Attributes
+%table
+  %tr
+    %th Attribute
+    %th Type
+    %th
+  - descriptions = drop_class._attr_descriptions
+  - descriptions.keys.sort.each do |key|
+    %tr
+      %td.mono= key
+      %td= descriptions[key].try(:[], :type)
+      %td.description= descriptions[key].try(:[], :desc)
+%h4 Associations
+%table
+  %tr
+    %th Type
+    %th Name
+    %th
+  - associations = drop_class._associations
+  - associations.keys.sort.each do |key|
+    %tr
+      %td= associations[key][:type]
+      %td.mono= key
+      %td.description= associations[key].try(:[], :description).try(:[], :desc) || "#{associations[key][:type].to_s.humanize} #{key}"
