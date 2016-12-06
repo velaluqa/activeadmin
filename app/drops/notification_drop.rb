@@ -1,15 +1,15 @@
 class NotificationDrop < EricaDrop # :nodoc:
-  attributes(
-    :id,
-    :triggering_action,
-    :created_at,
-    :updated_at,
-    :marked_seen_at,
-    :email_sent_at
-  )
-
-  # belongs_to(:notification_profile)
   belongs_to(:user)
-  # belongs_to(:version)
+
+  desc 'The resource the notification is about.', :polymorphic
   belongs_to(:resource)
+
+  desc 'Which action triggered this notification (e.g. create, update, destroy)?', :string
+  attribute(:triggering_action)
+
+  desc 'Date this notification was marked seen by the user.', :datetime
+  attribute(:marked_seen_at)
+
+  desc 'Date this notification was send via e-mail.', :datetime
+  attribute(:email_sent_at)
 end

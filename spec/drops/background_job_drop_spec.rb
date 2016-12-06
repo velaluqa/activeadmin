@@ -1,10 +1,7 @@
 describe BackgroundJobDrop do
   it { should have_attribute(:id) }
-  it { should have_attribute(:legacy_id) }
   it { should have_attribute(:progress) }
   it { should have_attribute(:error_message) }
-  it { should have_attribute(:completed) }
-  it { should have_attribute(:successful) }
   it { should have_attribute(:results) }
   it { should have_attribute(:created_at) }
   it { should have_attribute(:updated_at) }
