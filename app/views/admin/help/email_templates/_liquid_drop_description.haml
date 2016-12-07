@@ -1,24 +1,28 @@
 %h4 Attributes
-%table
+%table.drop-attributes
   %tr
-    %th Attribute
-    %th Type
-    %th
+    %th.name Attribute
+    %th.type Type
+    %th.desc
   - descriptions = drop_class._attr_descriptions
   - descriptions.keys.sort.each do |key|
     %tr
-      %td.mono= key
-      %td= descriptions[key].try(:[], :type)
-      %td.description= descriptions[key].try(:[], :desc)
+      %td.name
+        %span.mono= key
+      %td.type
+        %span.tag= descriptions[key].try(:[], :type)
+      %td.desc= descriptions[key].try(:[], :desc)
 %h4 Associations
-%table
+%table.drop-associations
   %tr
-    %th Type
-    %th Name
-    %th
+    %th.type Type
+    %th.name Name
+    %th.desc
   - associations = drop_class._associations
   - associations.keys.sort.each do |key|
     %tr
-      %td= associations[key][:type]
-      %td.mono= key
-      %td.description= associations[key].try(:[], :description).try(:[], :desc) || "#{associations[key][:type].to_s.humanize} #{key}"
+      %td.type
+        %span= associations[key][:type]
+      %td.name
+        %span.mono= key
+      %td.desc= associations[key].try(:[], :description).try(:[], :desc) || "#{associations[key][:type].to_s.humanize} #{key}"
