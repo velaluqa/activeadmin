@@ -176,7 +176,6 @@ there
 {{ string_with_newlines | newline_to_br -}}
 ```
 
-#### pluralize
 #### prepend
 
 Adds the specified string to the beginning of another string.
@@ -463,8 +462,7 @@ there
 {{ string_with_newlines | strip_newlines }}
 ```
 
-#### truncatewords ####
-
+#### truncatewords
 
 Shortens a string down to the number of words passed as the argument. If the specified number of words is less than the number of words in the string, an ellipsis (...) is appended to the string.
 
@@ -513,7 +511,7 @@ You can avoid showing trailing characters by passing a blank string as the secon
 {{ "Ground control to Major Tom." | truncatewords: 3, "" }}
 ```
 
-#### upcase ####
+#### upcase
 
 Makes each character in a string uppercase. It has no effect on strings which are already all uppercase.
 
@@ -543,7 +541,7 @@ Makes each character in a string uppercase. It has no effect on strings which ar
 {{ "APPLE" | upcase }}
 ```
 
-#### url_encode ####
+#### url_encode
 
 Converts any URL-unsafe characters in a string into percent-encoded characters.
 
