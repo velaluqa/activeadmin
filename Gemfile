@@ -89,6 +89,11 @@ gem 'activeadmin', '1.0.0.pre2'
 # CodeRay for rendering yaml/json data
 gem 'coderay'
 
+# Ultraviolet allows to use TextMate syntax files, thus enabling easy
+# highlighting of liquid templates.
+gem 'textpow', github: 'velaluqa/textpow', branch: 'master'
+gem 'ultraviolet'
+
 # Rugged for Git-based config versioning
 gem 'rugged', '~> 0.24.0'
 
