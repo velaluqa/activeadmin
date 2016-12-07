@@ -1,4 +1,21 @@
 body.admin_help {
+  nav {
+    .nav > .active:focus > a,
+    .nav > .active:hover > a,
+    .nav > .active > a {
+      color: #333;
+      border-left: 2px solid #666;
+    }
+
+    .nav > .active > .nav > :not(.active) > a {
+      border-left: 1px solid #ccc;
+    }
+
+    a {
+      text-decoration: none;
+    }
+  }
+
   #help-document {
     font-size: 12pt;
 
