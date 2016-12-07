@@ -11,7 +11,7 @@
         %span.mono= key
       %td.type
         %span.tag= descriptions[key].try(:[], :type)
-      %td.desc= descriptions[key].try(:[], :desc)
+      %td.desc= markdown descriptions[key].try(:[], :desc)
 %h4 Associations
 %table.drop-associations
   %tr
@@ -25,4 +25,4 @@
         %span= associations[key][:type]
       %td.name
         %span.mono= key
-      %td.desc= associations[key].try(:[], :description).try(:[], :desc) || "#{associations[key][:type].to_s.humanize} #{key}"
+      %td.desc= markdown associations[key].try(:[], :description).try(:[], :desc) || "#{associations[key][:type].to_s.humanize} #{key}"
