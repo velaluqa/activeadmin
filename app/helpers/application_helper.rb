@@ -24,6 +24,6 @@ module ApplicationHelper
       autolink: true,
       strikethrough: true
     )
-    @renderer.render(str)
+    @renderer.render(str).html_safe
   end
 end
