@@ -39,7 +39,7 @@ module HelpHelper
     path.keys.sort.map do |key|
       path[key]
         .underscore
-        .gsub(' ', '_')
+        .gsub(/[ \\\/_$#]/, '_')
         .gsub(/&(\w+);/, '\1')
     end.join('-')
   end
