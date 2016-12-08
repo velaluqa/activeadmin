@@ -1,7 +1,15 @@
 .container-fluid
   .row
     .editor.col-md-6
-      %pre#editor
+      .wrapper
+        .header
+          %label Template
+          .buttons
+            %a{ href: '/admin/help/email_templates', target: '_blank' }
+              %i.fa.fa-question
+            %a{ href: '/admin/help/editor_keyboard_shortcuts', target: '_blank' }
+              %i.fa.fa-keyboard-o
+        %pre#editor
     .col-md-6.padded
       %fieldset.inputs.headless
         %ol

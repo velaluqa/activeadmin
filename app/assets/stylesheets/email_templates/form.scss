@@ -17,14 +17,55 @@ body.admin_email_templates {
     line-height: 28px;
   }
 
-  #editor, fieldset.headless {
+  .editor .wrapper, fieldset.headless {
     min-height: 600px;
   }
 
+  .editor .wrapper {
+    position: relative;
+    background-color: #272822;
+    border-radius: 4px;
+    overflow: hidden;
+    padding: 0 0 0 15px;
+
+    .header {
+      line-height: 46px;
+      width: 100%;
+      float: left;
+      font-size: 1.0em;
+      font-weight: bold;
+      color: #dedede;
+    }
+
+    .buttons {
+      float: right;
+      margin: 0;
+      a {
+	display: inline-block;
+	width: 46px;
+	height: 46px;
+	line-height: 46px;
+	text-align: center;
+	font-size: 16px;
+	color: #dedede;
+	text-decoration: none;
+	&:hover {
+	  background-color: rgba(255,2555,255, 0.1);
+	}
+      }
+    }
+  }
+
   #editor {
+    position: absolute;
+    top: 46px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     font-size: 1.2em;
     margin: 0;
-    border-radius: 4px;
+    border-top: 1px solid #333;
+    border-radius: 0 0 4px 4px;
   }
 
   .iframe-wrapper {
