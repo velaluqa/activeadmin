@@ -17,7 +17,7 @@ module HelpHelper
       end
 
       before = doc[0...head_start]
-      after = doc[head_start + "<h#{level}>".length...-1]
+      after = doc[head_start + "<h#{level}>".length...doc.length]
 
       doc = before + "<h#{level} id=\"#{heading_id_for_path(path)}\">" + after
 
