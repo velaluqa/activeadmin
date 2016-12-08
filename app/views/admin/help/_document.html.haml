@@ -12,6 +12,7 @@
     var $docScope = $('#help-document');
     Toc.init({$nav: $myNav, $scope: $docScope});
     $('body').scrollspy({
-      target: navSelector
+      target: navSelector,
+      offset: 150
     });
   });
