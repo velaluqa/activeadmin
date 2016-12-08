@@ -51,6 +51,8 @@ gem 'less-rails', '~> 2.7.1'
 gem 'twitter-bootstrap-rails'
 gem 'bootstrap-datepicker-rails', '~> 1.6.0.1'
 
+gem 'font-awesome-sass'
+
 gem 'uglifier', '>= 1.0.3'
 
 # we need these even in production, for server-side judgement functions
