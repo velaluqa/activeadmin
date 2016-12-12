@@ -33,7 +33,6 @@
 # * `index_notifications_on_version_id`:
 #     * **`version_id`**
 #
-
 class Notification < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',

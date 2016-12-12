@@ -40,7 +40,7 @@ end
 
 # Per default, models should not be `notification_observable?`.
 module ActiveRecord
-  class Base
+  class Base # :nodoc:
     def self.notification_observable?
       false
     end

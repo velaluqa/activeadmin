@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161026093633) do
+ActiveRecord::Schema.define(version: 20161110085454) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,10 +42,12 @@ ActiveRecord::Schema.define(version: 20161026093633) do
     t.jsonb    "results",       default: {},    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name",                          null: false
   end
 
   add_index "background_jobs", ["completed"], name: "index_background_jobs_on_completed", using: :btree
   add_index "background_jobs", ["legacy_id"], name: "index_background_jobs_on_legacy_id", using: :btree
+  add_index "background_jobs", ["name"], name: "index_background_jobs_on_name", using: :btree
   add_index "background_jobs", ["results"], name: "index_background_jobs_on_results", using: :gin
   add_index "background_jobs", ["user_id"], name: "index_background_jobs_on_user_id", using: :btree
 
@@ -85,6 +87,14 @@ ActiveRecord::Schema.define(version: 20161026093633) do
 
   add_index "centers", ["study_id", "code"], name: "index_centers_on_study_id_and_code", unique: true, using: :btree
   add_index "centers", ["study_id"], name: "index_centers_on_study_id", using: :btree
+
+  create_table "email_templates", force: :cascade do |t|
+    t.string   "name",       null: false
+    t.string   "email_type", null: false
+    t.text     "template",   null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "forms", force: :cascade do |t|
     t.string   "name"
@@ -154,6 +164,7 @@ ActiveRecord::Schema.define(version: 20161026093633) do
     t.datetime "updated_at",                                     null: false
     t.integer  "maximum_email_throttling_delay"
     t.jsonb    "triggering_actions",             default: [],    null: false
+    t.integer  "email_template_id",                              null: false
   end
 
   create_table "notifications", force: :cascade do |t|

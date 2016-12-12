@@ -15,6 +15,7 @@
 # **`error_message`**  | `text`             |
 # **`id`**             | `integer`          | `not null, primary key`
 # **`legacy_id`**      | `string`           |
+# **`name`**           | `string`           | `not null`
 # **`progress`**       | `float`            | `default(0.0), not null`
 # **`results`**        | `jsonb`            | `not null`
 # **`successful`**     | `boolean`          |
@@ -27,6 +28,8 @@
 #     * **`completed`**
 # * `index_background_jobs_on_legacy_id`:
 #     * **`legacy_id`**
+# * `index_background_jobs_on_name`:
+#     * **`name`**
 # * `index_background_jobs_on_results`:
 #     * **`results`**
 # * `index_background_jobs_on_user_id`:
@@ -41,6 +44,19 @@ class BackgroundJob < ActiveRecord::Base
 
   scope :completed, -> { where(completed: true) }
   scope :running, -> { where(completed: false) }
+
+  scope :granted_for, -> (options = {}) {
+    user = options[:user] || raise("Missing 'user' option")
+    return all if user.is_root_user?
+    where(user_id: options[:user].id)
+  }
+
+  scope :searchable, -> { select(<<SELECT) }
+NULL AS study_id,
+background_jobs.name AS text,
+background_jobs.id AS result_id,
+'BackgroundJob' AS result_type
+SELECT
 
   ##
   # Find out whether this job has finished.

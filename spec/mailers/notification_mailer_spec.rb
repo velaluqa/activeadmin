@@ -4,20 +4,47 @@ RSpec.describe NotificationMailer do
   end
 
   describe 'instant_notification_email' do
-    before(:each) do
-      @notification = create(:notification)
-    end
+    let(:template) do
+      create(
+        :email_template,
+        email_type: 'NotificationProfile',
+        template: <<TPL.gsub("\n", "\r\n")
+Dear {{ user.name }},
 
+<table>
+  <thead>
+    <th>Resource Type</th>
+    <th>Resource</th>
+    <th></th>
+  </thead>
+  {% for notification in notifications %}
+  <tr>
+    <td>{{ notification.resource.class_name }}</td>
+    <td>{{ notification.resource.visit_type }}({{ notification.resource.visit_number }})</td>
+    <td>{{ notification.resource | link:'Open in ERICA' }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+Kind Regards,
+
+Your Pharmtrace Team
+TPL
+      )
+    end
+    let(:user) { create(:user, email: 'some@mail.com') }
+    let(:profile) { create(:notification_profile, email_template: template) }
+    let(:notification) { create(:notification, notification_profile: profile) }
     let(:mail) do
-      NotificationMailer.instant_notification_email(@notification)
+      NotificationMailer.instant_notification_email(notification)
     end
 
     it 'renders the subject' do
-      expect(mail.subject).to eql(@notification.notification_profile.title)
+      expect(mail.subject).to eql(notification.notification_profile.title)
     end
 
     it 'renders the receiver email' do
-      expect(mail.to).to eql([@notification.user.email])
+      expect(mail.to).to eql([notification.user.email])
     end
 
     it 'renders the sender email' do
@@ -25,7 +52,7 @@ RSpec.describe NotificationMailer do
     end
 
     it 'greets the user by name' do
-      expect(mail.body.encoded).to match(@notification.user.name)
+      expect(mail.body.encoded).to match(notification.user.name)
     end
 
     it 'lists all notification resource types' do
@@ -33,17 +60,49 @@ RSpec.describe NotificationMailer do
     end
 
     it 'lists all notification resources' do
-      expect(mail.body.encoded).to include(@notification.resource.to_s)
+      expect(mail.body.encoded).to include(notification.resource.to_s)
     end
 
     it 'links to the changed resource' do
-      expect(mail.body.encoded).to include("test.de/admin/visits/#{@notification.resource.id}")
+      expect(mail.body.encoded).to include("test.de/admin/visits/#{notification.resource.id}")
+    end
+
+    it 'contains correct paragraphs' do
+      expect(mail.body.encoded).to include('<p>Kind Regards,</p>')
     end
   end
 
   describe 'throttled_notification_email' do
+    let(:template) do
+      create(
+        :email_template,
+        email_type: 'NotificationProfile',
+        template: <<TPL
+Dear {{ user.name }},
+
+<table>
+  <thead>
+    <th>Resource Type</th>
+    <th>Resource</th>
+    <th></th>
+  </thead>
+  {% for notification in notifications %}
+  <tr>
+    <td>{{ notification.resource.class_name }}</td>
+    <td>{{ notification.resource.visit_type }}({{ notification.resource.visit_number }})</td>
+    <td>{{ notification.resource | link:'Open in ERICA' }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+Kind Regards,
+
+Your Pharmtrace Team
+TPL
+      )
+    end
     let(:user) { create(:user, email: 'some@mail.com') }
-    let(:profile) { create(:notification_profile) }
+    let(:profile) { create(:notification_profile, email_template: template) }
     let(:notifications) do
       create_list(:notification, 3, notification_profile: profile)
     end
@@ -73,16 +132,14 @@ RSpec.describe NotificationMailer do
       expect(mail.body.encoded).to match('Visit')
     end
 
-    it 'lists all notification resources' do
-      notifications.each do |notification|
-        expect(mail.body.encoded).to include(notification.resource.to_s)
-      end
-    end
-
     it 'links to the changed resource' do
       notifications.each do |notification|
         expect(mail.body.encoded).to include("test.de/admin/visits/#{notification.resource.id}")
       end
+    end
+
+    it 'contains correct paragraphs' do
+      expect(mail.body.encoded).to include('<p>Kind Regards,</p>')
     end
   end
 end

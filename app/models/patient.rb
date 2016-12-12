@@ -44,14 +44,19 @@ class Patient < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
+  scope :searchable, -> { joins(:center).select(<<SELECT) }
+centers.study_id AS study_id,
+centers.code || patients.subject_id AS text,
+patients.id AS result_id,
+'Patient' AS result_type
+SELECT
+
   include ImageStorageCallbacks
 
   include ScopablePermissions
 
   def self.with_permissions
-    joins(<<JOIN)
-INNER JOIN centers ON centers.id = patients.center_id
-INNER JOIN studies ON centers.study_id = studies.id
+    joins(center: :study).joins(<<JOIN)
 INNER JOIN user_roles ON
   (
        (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
@@ -105,6 +110,7 @@ JOIN
   def domino_patient_no
     "#{center.code}#{subject_id}"
   end
+  alias_method :domino_patient_number, :domino_patient_no
   def domino_document_form
     'TrialSubject'
   end

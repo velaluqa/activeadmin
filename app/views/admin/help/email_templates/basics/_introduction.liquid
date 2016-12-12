@@ -1,0 +1,64 @@
+Liquid code can be categorized into [**objects**](#liquid_basics-introduction-objects), [**tags**](#liquid_basics-introduction-tags), and [**filters**](#liquid_basics-introduction-filters).
+
+#### Objects
+
+**Objects** tell Liquid where to show content on a page. Objects and variable names are denoted by double curly braces: `{% raw %}{{{% endraw %}` and `{% raw %}}}{% endraw %}`.
+
+
+<p class="code-label">Input</p>
+```liquid
+{%- raw -%}
+{{ study.name }}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+Test Study
+```
+
+In this case, Liquid is rendering the content of an object called `study.name`, and that object contains the text `Test Study`.
+
+#### Tags
+
+**Tags** create the logic and control flow for templates. They are denoted by curly braces and percent signs: `{% raw %}{%{% endraw %}` and `{% raw %}%}{% endraw %}`.
+
+The markup used in tags does not produce any visible text. This means that you can assign variables and create conditions and loops without showing any of the Liquid logic on the page.
+
+<p class="code-label">Input</p>
+```liquid
+{%- raw -%}
+{% if user %}
+  Hello {{ user.name }}!
+{% endif %}
+{% endraw %}
+```
+
+<p class="code-label">Output</p>
+```text
+Hello Adam!
+```
+
+Tags can be categorized into three types:
+
+- [Control flow](#liquid_tags-control_flow_tags)
+- [Iteration](#liquid_tags-iteration_tags)
+- [Variable assignments](#liquid_tags-variable_tags)
+
+You can read more about each type of tag in their respective sections.
+
+#### Filters
+
+**Filters** change the output of a Liquid object. They are used within an output and are separated by a `|`.
+
+<p class="code-label">Input</p>
+{%- raw -%}
+```liquid
+{{ "/my/fancy/url" | append: ".html" }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{{ "/my/fancy/url" | append: ".html" }}
+```

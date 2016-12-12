@@ -11,6 +11,8 @@ FactoryGirl.define do
 
     only_authorized_recipients true
 
+    email_template
+
     is_enabled true
   end
 end

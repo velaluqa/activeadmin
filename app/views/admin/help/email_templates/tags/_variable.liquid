@@ -1,0 +1,121 @@
+Variable tags create new Liquid variables.
+
+#### assign
+
+Creates a new variable.
+
+<p class="code-label">Input</p>
+{% raw -%}
+```liquid
+{% assign my_variable = false %}
+{% if my_variable != true %}
+  This statement is valid.
+{% endif %}
+```
+{% endraw -%}
+
+<p class="code-label">Output</p>
+```text
+{% assign my_variable = false -%}
+{% if my_variable != true %}This statement is valid.{% endif %}
+```
+
+Wrap a variable in quotations `"` to save it as a string.
+
+<p class="code-label">Input</p>
+{% raw -%}
+```liquid
+{% assign foo = "bar" %}
+{{ foo }}
+```
+{% endraw -%}
+
+<p class="code-label">Output</p>
+```text
+{% assign foo = "bar" -%}
+{{ foo }}
+```
+
+#### capture
+
+Captures the string inside of the opening and closing tags and assigns it to a variable. Variables created through `{% raw %}{% capture %}{% endraw %}` are strings.
+
+<p class="code-label">Input</p>
+{% raw -%}
+```liquid
+{% capture my_variable %}I am being captured.{% endcapture %}
+{{ my_variable }}
+```
+{% endraw -%}
+
+<p class="code-label">Output</p>
+```text
+{% capture my_variable %}I am being captured.{% endcapture -%}
+{{ my_variable }}
+```
+
+#### increment
+
+Creates a new number variable, and increases its value by one every time it is called. The initial value is 0.
+
+<p class="code-label">Input</p>
+{% raw -%}
+```liquid
+{% increment my_counter %}
+{% increment my_counter %}
+{% increment my_counter %}
+```
+{% endraw -%}
+
+<p class="code-label">Output</p>
+```text
+{% increment my_counter %}
+{% increment my_counter %}
+{% increment my_counter %}
+```
+
+Variables created through the `increment` tag are independent from variables created through `assign` or `capture`.
+
+In the example below, a variable named "var" is created through `assign`. The `increment` tag is then used several times on a variable with the same name. Note that the `increment` tag does not affect the value of "var" that was created through `assign`.
+
+<p class="code-label">Input</p>
+{% raw -%}
+```liquid
+{% assign var = 10 %}
+{% increment var %}
+{% increment var %}
+{% increment var %}
+{{ var }}
+```
+{% endraw -%}
+
+<p class="code-label">Output</p>
+```text
+{% assign var = 10 -%}
+{% increment var %}
+{% increment var %}
+{% increment var %}
+{{ var }}
+```
+
+#### decrement
+
+Creates a new number variable, and decreases its value by one every time it is called. The initial value is -1.
+
+<p class="code-label">Input</p>
+{% raw -%}
+```liquid
+{% decrement variable %}
+{% decrement variable %}
+{% decrement variable %}
+```
+{% endraw -%}
+
+<p class="code-label">Output</p>
+```text
+{% decrement variable %}
+{% decrement variable %}
+{% decrement variable %}
+```
+
+Like [increment](#liquid_tags-variable_tags-increment), variables declared inside `decrement` are independent from variables created through `assign` or `capture`.

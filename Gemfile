@@ -1,3 +1,4 @@
+# coding: utf-8
 if RUBY_VERSION =~ /1.9/
   Encoding.default_external = Encoding::UTF_8
   Encoding.default_internal = Encoding::UTF_8
@@ -34,6 +35,12 @@ gem 'json', '~> 1.8.3'
 # needs to be added explicitely, otherwise it might not register itself as a templating engine in Rails
 gem 'haml', '~> 4.0.7'
 
+# Liquid Templating Engine for User generated Templates
+# TODO: Liquid is waiting for release since March. Use the released
+# rubygem when it's available.
+gem 'liquid', github: 'velaluqa/liquid', branch: 'master'
+gem 'liquid4-rails', '~> 0.2.0'
+
 # Gems used for assets
 gem 'sass-rails',   '~> 5.0.4'
 gem 'coffee-rails', '~> 4.1.1'
@@ -43,6 +50,8 @@ gem 'less-rails', '~> 2.7.1'
 
 gem 'twitter-bootstrap-rails'
 gem 'bootstrap-datepicker-rails', '~> 1.6.0.1'
+
+gem 'font-awesome-sass'
 
 gem 'uglifier', '>= 1.0.3'
 
@@ -81,6 +90,11 @@ gem 'activeadmin', '1.0.0.pre2'
 
 # CodeRay for rendering yaml/json data
 gem 'coderay'
+
+# Ultraviolet allows to use TextMate syntax files, thus enabling easy
+# highlighting of liquid templates.
+gem 'textpow', github: 'velaluqa/textpow', branch: 'master'
+gem 'ultraviolet'
 
 # Rugged for Git-based config versioning
 gem 'rugged', '~> 0.24.0'
@@ -157,6 +171,9 @@ gem 'activerecord_json_validator'
 # Enhanced `Array#dig` and `Hash#dig` for digging nested array/hash structures.
 gem 'ruby_dig2'
 
+# Help pages use markdown to generate markup.
+gem 'redcarpet'
+
 group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
@@ -230,6 +247,8 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.4.2'
   gem 'with_model', '~> 1.2.1'
   gem 'shoulda-matchers'
+  # Spec delegation via ActiveSupport's #delegate method.
+  gem 'delegate_matcher'
 
   gem 'turnip'
   gem 'gherkin', '~> 2.5'

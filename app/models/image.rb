@@ -35,16 +35,19 @@ class Image < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
+  scope :searchable, -> { joins(image_series: { patient: :center }).select(<<SELECT) }
+centers.study_id AS study_id,
+image_series.series_number::text || '#' || images.id AS text,
+images.id AS result_id,
+'Image' AS result_type
+SELECT
+
   include NotificationObservable
   include ImageStorageCallbacks
   include ScopablePermissions
 
   def self.with_permissions
-    joins(<<JOIN)
-INNER JOIN image_series ON image_series.id = images.image_series_id
-INNER JOIN patients ON patients.id = image_series.patient_id
-INNER JOIN centers ON centers.id = patients.center_id
-INNER JOIN studies ON centers.study_id = studies.id
+    joins(image_series: { patient: { center: :study } }).joins(<<JOIN)
 INNER JOIN user_roles ON
   (
        (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
@@ -96,6 +99,7 @@ JOIN
     end
   end
 
+  # TODO: Extract into separate PORO.
   def dicom_metadata
     dicom_metadata_doc = self.dicom_metadata_xml
 

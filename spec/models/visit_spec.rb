@@ -1,4 +1,20 @@
 RSpec.describe Visit do
+  describe 'scope ::searchable' do
+    it 'selects search fields' do
+      center = create(:center, code: 'Foo')
+      patient = create(:patient, subject_id: 'Bar', center: center)
+      visit = create(:visit, patient: patient)
+      expect(Visit.joins(patient: :center).searchable.as_json)
+        .to eq [{
+                  'id' => nil,
+                  'study_id' => visit.patient.center.study_id,
+                  'text' => "FooBar##{visit.visit_number}",
+                  'result_id' => visit.id,
+                  'result_type' => 'Visit'
+                }]
+    end
+  end
+
   describe 'image storage' do
     before(:each) do
       @study = create(:study, id: 1)

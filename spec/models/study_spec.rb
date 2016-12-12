@@ -1,4 +1,18 @@
 RSpec.describe Study do
+  describe 'scope ::searchable' do
+    it 'selects search fields' do
+      study = create(:study, name: 'FooStudy')
+      expect(Study.searchable.as_json)
+        .to eq [{
+                  'id' => nil,
+                  'study_id' => study.id,
+                  'text' => 'FooStudy',
+                  'result_id' => study.id,
+                  'result_type' => 'Study'
+                }]
+    end
+  end
+
   describe 'image storage' do
     it 'handles create' do
       expect(File).not_to exist(ERICA.image_storage_path.join('1'))

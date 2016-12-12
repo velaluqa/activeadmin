@@ -1,3 +1,5 @@
+require 'redcarpet_inline_renderer'
+
 module ApplicationHelper
   # used by the mongoid history tracker _changeset partial
   # needs to be defined here to be found
@@ -9,6 +11,19 @@ module ApplicationHelper
   end
 
   def admin_url_for(model)
-    Rails.application.routes.url_helpers.send("admin_#{model.class.to_s.underscore}_url", model)
+    method = "admin_#{model.class.to_s.underscore}_url"
+    Rails.application.routes.url_helpers.send(method, model)
+  end
+
+  def markdown(str)
+    @renderer ||=     Redcarpet::Markdown.new(
+      RedcarpetInlineRenderer,
+      no_intra_emphasis: true,
+      tables: false,
+      fenced_code_blocks: false,
+      autolink: true,
+      strikethrough: true
+    )
+    @renderer.render(str).html_safe
   end
 end

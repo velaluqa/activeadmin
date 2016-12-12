@@ -1,0 +1,58 @@
+#### link
+
+Creates a link to the filtered resource.
+
+Given `text_study` is a `StudyDrop` for a study with id `1`, the usage could look like:
+
+<p class="code-label">Input</p>
+{% raw %}
+``` liquid
+{{ test_study | link }}
+```
+{% endraw %}
+
+<p class="code-label">Output (HTML)</p>
+``` html
+{{ test_study | link }}
+```
+<p class="code-label">Output (Rendered)</p>
+<div class="html-output">
+{{ test_study | link }}
+</div>
+
+You can pass a link text as argument.
+
+<p class="code-label">Input</p>
+{% raw %}
+``` liquid
+{{ test_study | link: 'Open in ERICA' }}
+```
+{% endraw %}
+
+<p class="code-label">Output (HTML)</p>
+``` html
+{{ test_study | link: 'Open in ERICA' }}
+```
+<p class="code-label">Output (Rendered)</p>
+<div class="html-output">
+{{ test_study | link: 'Open in ERICA' }}
+</div>
+
+With liquid it is also easy to use a resources attribute as name for the link: 
+
+<p class="code-label">Input</p>
+{% raw %}
+``` liquid
+{{ test_study | link: test_study.name }}
+```
+{% endraw %}
+
+<p class="code-label">Output (HTML)</p>
+``` html
+{{ test_study | link: test_study.name }}
+```
+<p class="code-label">Output (Rendered)</p>
+<div class="html-output">
+{{ test_study | link: test_study.name }}
+</div>
+

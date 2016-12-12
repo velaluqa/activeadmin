@@ -1,0 +1,248 @@
+- [join](#liquid_filters-array_filters-join)
+- [first](#liquid_filters-array_filters-first)
+- [last](#liquid_filters-array_filters-last)
+- [map](#liquid_filters-array_filters-map)
+- [reverse](#liquid_filters-array_filters-reverse)
+- [size](#liquid_filters-array_filters-size)
+- [sort](#liquid_filters-array_filters-sort)
+- [uniq](#liquid_filters-array_filters-uniq)
+
+#### join
+
+Combines the items in an array into a single string using the argument as a separator.
+
+<p class="code-label">Input</p>
+{% raw %}
+```liquid
+{% assign beatles = "John, Paul, George, Ringo" | split: ", " -%}
+{{ beatles | join: " and " }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{% assign beatles = "John, Paul, George, Ringo" | split: ", " -%}
+{{ beatles | join: " and " }}
+```
+
+#### first
+
+Returns the first item of an array.
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{% assign my_array = "apples, oranges, peaches, plums" | split: ", " -%}
+{{ my_array.first }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{% assign my_array = "apples, oranges, peaches, plums" | split: ", " -%}
+{{ my_array.first }}
+```
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{% assign my_array = "zebra, octopus, giraffe, tiger" | split: ", " -%}
+{{ my_array.first }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+
+```text
+{% assign my_array = "zebra, octopus, giraffe, tiger" | split: ", " -%}
+{{ my_array.first }}
+```
+
+#### last
+
+Returns the last item of an array.
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{% assign my_array = "apples, oranges, peaches, plums" | split: ", " -%}
+{{ my_array.last }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{% assign my_array = "apples, oranges, peaches, plums" | split: ", " -%}
+{{ my_array.last }}
+```
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{% assign my_array = "zebra, octopus, giraffe, tiger" | split: ", " -%}
+{{ my_array.last }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{% assign my_array = "zebra, octopus, giraffe, tiger" | split: ", " -%}
+{{ my_array.last }}
+```
+
+#### map
+
+Creates an array of values by extracting the values of a named property from another object.
+
+In this example, assume the object `site.pages` contains all the metadata for a website. Using `assign` with the `map` filter creates a variable that contains only the values of the `category` properties of everything in the `site.pages` object.
+
+<p class="code-label">Input</p>
+{% raw %}
+```liquid
+{% assign study_names = test_studies | map: "name" -%}
+{% for name in study_names -%}
+{{ name }}
+{% endfor -%}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{% assign study_names = test_studies | map: "name" -%}
+{% for name in study_names -%}
+{{ name }}
+{% endfor -%}
+```
+
+#### reverse
+
+Reverses the order of the items in an array. `reverse` cannot reverse a string.
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{% assign my_array = "apples, oranges, peaches, plums" | split: ", " -%}
+{{ my_array | reverse | join: ", " }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{% assign my_array = "apples, oranges, peaches, plums" | split: ", " -%}
+{{ my_array | reverse | join: ", " }}
+```
+
+`reverse` cannot be used directly on a string, but you can split a string into an array, reverse the array, and rejoin it by chaining together filters:
+
+<p class="code-label">Input</p>
+{% raw %}
+```liquid
+{{ "Ground control to Major Tom." | split: "" | reverse | join: "" }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{{ "Ground control to Major Tom." | split: "" | reverse | join: "" }}
+```
+
+#### size
+
+Returns the number of characters in a string or the number of items in an array. `size` can also be used with dot notation (for example, `{% raw %}{{ my_string.size }}{% endraw %}`). This allows you to use `size` inside tags such as conditionals.
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{{ "Ground control to Major Tom." | size }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{{ "Ground control to Major Tom." | size }}
+```
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{% assign my_array = "apples, oranges, peaches, plums" | split: ", " -%}
+{{ my_array | size }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+
+```text
+{% assign my_array = "apples, oranges, peaches, plums" | split: ", " -%}
+{{ my_array | size }}
+```
+
+Using dot notation:
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+Size = {{ test_studies.size }}
+
+{% if test_studies.size > 2 -%}
+  Many, many studies!
+{% endif -%}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+
+```text
+Size = {{ test_studies.size }}
+
+{% if test_studies.size > 2 -%}
+  Many, many studies!
+{% endif -%}
+```
+
+#### sort
+
+Sorts items in an array by a property of an item in the array. The order of the sorted array is case-sensitive.
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{% assign my_array = "zebra, octopus, giraffe, Sally Snake" | split: ", " -%}
+{{ my_array | sort | join: ", " }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+```text
+{% assign my_array = "zebra, octopus, giraffe, Sally Snake" | split: ", " -%}
+{{ my_array | sort | join: ", " }}
+```
+
+#### uniq
+
+Removes any duplicate elements in an array.
+
+<p class="code-label">Input</p>
+
+{% raw %}
+```liquid
+{% assign my_array = "ants, bugs, bees, bugs, ants" | split: ", " -%}
+{{ my_array | uniq | join: ", " }}
+```
+{% endraw %}
+
+<p class="code-label">Output</p>
+
+```text
+{% assign my_array = "ants, bugs, bees, bugs, ants" | split: ", " -%}
+{{ my_array | uniq | join: ", " }}
+```

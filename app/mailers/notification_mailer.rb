@@ -13,12 +13,11 @@ class NotificationMailer < ActionMailer::Base
   #
   # @return [Mail] The mail that may be delivered
   def throttled_notification_email(user, profile, notifications)
-    @user = user
-    @profile = profile
-    @notifications = notifications
     mail(
-      to: @user.email,
-      subject: @profile.title
+      to: user.email,
+      subject: profile.title,
+      body: render_message(user, profile, notifications),
+      content_type: 'text/html'
     )
   end
 
@@ -28,12 +27,25 @@ class NotificationMailer < ActionMailer::Base
   #
   # @return [Mail] The mail that may be delivered
   def instant_notification_email(notification)
-    @user = notification.user
-    @profile = notification.notification_profile
-    @notifications = [notification]
     mail(
-      to: @user.email,
-      subject: @profile.title
+      to: notification.user.email,
+      subject: notification.notification_profile.title,
+      body: render_message(
+        notification.user,
+        notification.notification_profile,
+        [notification]),
+      content_type: 'text/html'
     )
+  end
+
+  private
+
+  def render_message(user, profile, notifications)
+    EmailTemplateRenderer.new(
+      profile.email_template,
+      user: user,
+      notification_profile: profile,
+      notifications: notifications
+    ).render
   end
 end

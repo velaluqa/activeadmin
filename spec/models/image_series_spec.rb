@@ -1,4 +1,18 @@
 RSpec.describe ImageSeries do
+  describe 'scope ::searchable' do
+    it 'selects search fields' do
+      series = create(:image_series, series_number: '123')
+      expect(ImageSeries.searchable.as_json)
+        .to eq [{
+                  'id' => nil,
+                  'study_id' => series.patient.center.study_id,
+                  'text' => '123',
+                  'result_id' => series.id,
+                  'result_type' => 'ImageSeries'
+                }]
+    end
+  end
+
   describe 'image storage' do
     before(:each) do
       @study = create(:study, id: 1)

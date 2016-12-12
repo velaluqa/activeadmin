@@ -44,8 +44,7 @@ class Center < ActiveRecord::Base
   include ScopablePermissions
 
   def self.with_permissions
-    joins(<<JOIN)
-INNER JOIN studies ON centers.study_id = studies.id
+    joins(:study).joins(<<JOIN)
 INNER JOIN user_roles ON
   (
        (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
@@ -56,6 +55,13 @@ INNER JOIN roles ON user_roles.role_id = roles.id
 INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
+
+  scope :searchable, -> { select(<<SELECT) }
+centers.study_id AS study_id,
+centers.code || ' - ' || centers.name AS text,
+centers.id AS result_id,
+'Center' AS result_type
+SELECT
 
   validates_uniqueness_of :name, :scope => :study_id
   validates_uniqueness_of :code, :scope => :study_id

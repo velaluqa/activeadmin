@@ -1,4 +1,18 @@
 RSpec.describe Center do
+  describe 'scope ::searchable' do
+    it 'selects search fields' do
+      center = create(:center, name: 'FooCenter')
+      expect(Center.searchable.as_json)
+        .to eq [{
+                  'id' => nil,
+                  'study_id' => center.study_id,
+                  'text' => "#{center.code} - FooCenter",
+                  'result_id' => center.id,
+                  'result_type' => 'Center'
+                }]
+    end
+  end
+
   describe 'image storage' do
     before(:each) do
       @study = create(:study, id: 1)

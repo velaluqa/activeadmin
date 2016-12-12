@@ -348,6 +348,7 @@ RSpec.describe NotificationProfile do
     it { should have_many(:notification_profile_roles) }
     it { should have_many(:roles) }
     it { should have_many(:notifications) }
+    it { should belong_to(:email_template) }
 
     it 'validates title' do
       expect(build(:notification_profile, title: nil)).not_to be_valid
@@ -371,6 +372,13 @@ RSpec.describe NotificationProfile do
     it 'validates triggering_resource' do
       expect(build(:notification_profile, triggering_resource: nil)).not_to be_valid
       expect(build(:notification_profile, triggering_resource: '')).not_to be_valid
+    end
+
+    it 'validates email_template type' do
+      template1 = build(:email_template, email_type: 'NotificationProfile')
+      expect(build(:notification_profile, email_template: template1)).to be_valid
+      template2 = build(:email_template, email_type: 'Notification')
+      expect(build(:notification_profile, email_template: template2)).not_to be_valid
     end
 
     describe '#recipients' do

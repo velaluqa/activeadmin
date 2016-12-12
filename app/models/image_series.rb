@@ -56,14 +56,18 @@ class ImageSeries < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
+  scope :searchable, -> { joins(patient: :center).select(<<SELECT) }
+centers.study_id AS study_id,
+image_series.series_number::text AS text,
+image_series.id AS result_id,
+'ImageSeries' AS result_type
+SELECT
+
   include ImageStorageCallbacks
   include ScopablePermissions
 
   def self.with_permissions
-    joins(<<JOIN)
-INNER JOIN patients ON patients.id = image_series.patient_id
-INNER JOIN centers ON centers.id = patients.center_id
-INNER JOIN studies ON centers.study_id = studies.id
+    joins(patient: { center: :study }).joins(<<JOIN)
 INNER JOIN user_roles ON
   (
        (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)

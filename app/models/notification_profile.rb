@@ -88,6 +88,7 @@ require 'serializers/string_array_serializer'
 # ------------------------------------- | ------------------ | ---------------------------
 # **`created_at`**                      | `datetime`         | `not null`
 # **`description`**                     | `text`             |
+# **`email_template_id`**               | `integer`          |
 # **`filters`**                         | `jsonb`            | `not null`
 # **`id`**                              | `integer`          | `not null, primary key`
 # **`is_enabled`**                      | `boolean`          | `default(FALSE), not null`
@@ -99,7 +100,6 @@ require 'serializers/string_array_serializer'
 # **`triggering_resource`**             | `string`           | `not null`
 # **`updated_at`**                      | `datetime`         | `not null`
 #
-
 class NotificationProfile < ActiveRecord::Base
   has_paper_trail class_name: 'Version'
 
@@ -113,6 +113,8 @@ class NotificationProfile < ActiveRecord::Base
 
   has_many :notifications
 
+  belongs_to :email_template
+
   validates :title, presence: true
   validates :is_enabled, inclusion: { in: [true, false] }
   validates :triggering_actions, presence: true
@@ -120,6 +122,7 @@ class NotificationProfile < ActiveRecord::Base
   validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class
   validates :maximum_email_throttling_delay, inclusion: { in: Email.allowed_throttling_delays.values }, if: :maximum_email_throttling_delay
   validate :validate_triggering_actions
+  validate :validate_email_template_type
 
   scope :enabled, -> { where(is_enabled: true) }
 
@@ -254,6 +257,11 @@ JOIN
     if triggering_actions - %w(create update destroy) != []
       errors.add(:triggering_actions, :invalid)
     end
+  end
+
+  def validate_email_template_type
+    return if email_template.email_type == 'NotificationProfile'
+    errors.add(:email_template, :invalid)
   end
 
   def filters_schema
