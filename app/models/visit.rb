@@ -63,6 +63,15 @@ class Visit < ActiveRecord::Base
       .where(studies: { id: Array[ids].flatten })
   }
 
+  scope :with_state, lambda { |state|
+    index =
+      case state
+      when Fixnum then state
+      else Visit::STATE_SYMS.index(state.to_sym)
+      end
+    where(state: index)
+  }
+
   scope :searchable, -> { joins(patient: :center).select(<<SELECT) }
 centers.study_id AS study_id,
 centers.code || patients.subject_id || '#' || visits.visit_number AS text,

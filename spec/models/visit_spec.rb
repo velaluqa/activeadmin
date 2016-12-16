@@ -15,6 +15,41 @@ RSpec.describe Visit do
     end
   end
 
+  describe 'scope ::with_state' do
+    let!(:study) { create(:study) }
+    let!(:center) { create(:center, study: study) }
+    let!(:patient1) { create(:patient, center: center) }
+    let!(:visit0) { create(:visit, patient: patient1, state: 0) }
+    let!(:visit1) { create(:visit, patient: patient1, state: 1) }
+    let!(:visit2) { create(:visit, patient: patient1, state: 2) }
+    let!(:visit3) { create(:visit, patient: patient1, state: 3) }
+    let!(:visit4) { create(:visit, patient: patient1, state: 4) }
+
+    it 'filters by Fixnum state' do
+      expect(Visit.with_state(0)).to include(visit0)
+      expect(Visit.with_state(1)).to include(visit1)
+      expect(Visit.with_state(2)).to include(visit2)
+      expect(Visit.with_state(3)).to include(visit3)
+      expect(Visit.with_state(4)).to include(visit4)
+    end
+
+    it 'filters by Symbol state' do
+      expect(Visit.with_state(:incomplete_na)).to include(visit0)
+      expect(Visit.with_state(:complete_tqc_passed)).to include(visit1)
+      expect(Visit.with_state(:incomplete_queried)).to include(visit2)
+      expect(Visit.with_state(:complete_tqc_pending)).to include(visit3)
+      expect(Visit.with_state(:complete_tqc_issues)).to include(visit4)
+    end
+
+    it 'filters by String state' do
+      expect(Visit.with_state('incomplete_na')).to include(visit0)
+      expect(Visit.with_state('complete_tqc_passed')).to include(visit1)
+      expect(Visit.with_state('incomplete_queried')).to include(visit2)
+      expect(Visit.with_state('complete_tqc_pending')).to include(visit3)
+      expect(Visit.with_state('complete_tqc_issues')).to include(visit4)
+    end
+  end
+
   describe 'image storage' do
     before(:each) do
       @study = create(:study, id: 1)
