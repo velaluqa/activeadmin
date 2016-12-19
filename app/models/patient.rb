@@ -51,6 +51,8 @@ patients.id AS result_id,
 'Patient' AS result_type
 SELECT
 
+  scope :join_study, -> { joins(center: :study) }
+
   include ImageStorageCallbacks
 
   include ScopablePermissions

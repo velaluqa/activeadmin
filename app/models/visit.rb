@@ -119,6 +119,8 @@ JOIN
     where(conditions, *terms)
   }
 
+  scope :join_study, -> { joins(patient: { center: :study }) }
+
   def name
     if(patient.nil?)
       '#'+visit_number.to_s
