@@ -121,6 +121,13 @@ JOIN
 
   scope :join_study, -> { joins(patient: { center: :study }) }
 
+  scope :join_required_series, lambda {
+    joins(<<JOIN_QUERY)
+JOIN json_each(visits.required_series::json) visits_required_series_hash ON true
+JOIN json_to_record(visits_required_series_hash.value) as visits_required_series(tqc_state int) ON true
+JOIN_QUERY
+  }
+
   def name
     if(patient.nil?)
       '#'+visit_number.to_s
