@@ -76,6 +76,8 @@ StudyServer::Application.routes.draw do
     resources :visits
 
     resources :search
+
+    get 'report' => 'report#index'
   end
 
   authenticate :user, ->(user) { user.can?(:manage, Sidekiq) } do
