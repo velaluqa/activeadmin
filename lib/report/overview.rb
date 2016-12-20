@@ -105,15 +105,15 @@ module Report
     end
 
     def required_series_state_pending_column_value(study)
-      required_series(study)[0]
+      required_series(study)[0] || 0
     end
 
     def required_series_state_issues_column_value(study)
-      required_series(study)[1]
+      required_series(study)[1] || 0
     end
 
     def required_series_state_passed_column_value(study)
-      required_series(study)[2]
+      required_series(study)[2] || 0
     end
   end
 end
