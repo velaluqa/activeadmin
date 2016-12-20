@@ -26,7 +26,21 @@ module Report
     end
 
     def result
-      @result ||= study_scope.map do |study|
+      {
+        columns: columns,
+        studies: study_results
+      }
+    end
+
+    def columns
+      return @columns if @columns.is_a?(Array)
+      AVAILABLE_COLUMNS
+    end
+
+    private
+
+    def study_results
+      @study_results ||= study_scope.map do |study|
         {
           study_id: study.id,
           study_name: study.name,
@@ -35,13 +49,6 @@ module Report
           end
         }
       end
-    end
-
-    private
-
-    def columns
-      return @columns if @columns.is_a?(Array)
-      AVAILABLE_COLUMNS
     end
 
     # If the report is generated for a given user, we want to limit
@@ -58,10 +65,7 @@ module Report
 
     def column_value(study, column)
       return unless AVAILABLE_COLUMNS.include?(column)
-      {
-        name: column,
-        value: send("#{column}_column_value", study)
-      }
+      send("#{column}_column_value", study)
     end
 
     def patients_column_value(study)

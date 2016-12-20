@@ -12,19 +12,8 @@ describe Report::Overview do
     let!(:report) { Report::Overview.new(columns: 'all', user: user) }
 
     it 'returns all available columns' do
-      result = report.result.first[:columns]
-      expect(result).to include(name: 'patients', value: 1)
-      expect(result).to include(name: 'visits', value: 1)
-      expect(result).to include(name: 'visits_state_incomplete_na', value: 1)
-      expect(result).to include(name: 'visits_state_incomplete_queried', value: 0)
-      expect(result).to include(name: 'visits_state_complete_tqc_pending', value: 0)
-      expect(result).to include(name: 'visits_state_complete_tqc_issues', value: 0)
-      expect(result).to include(name: 'visits_state_complete_tqc_passed', value: 0)
-      expect(result).to include(name: 'image_series', value: 1)
-      expect(result).to include(name: 'required_series', value: 0)
-      expect(result).to include(name: 'required_series_state_pending', value: 0)
-      expect(result).to include(name: 'required_series_state_issues', value: 0)
-      expect(result).to include(name: 'required_series_state_passed', value: 0)
+      result = report.result[:studies].first[:columns]
+      expect(result).to eq [1,1,1,0,0,0,0,1,0,0,0,0]
     end
   end
 
@@ -44,7 +33,7 @@ describe Report::Overview do
       let!(:report) { Report::Overview.new(columns: %w(patients), user: user) }
 
       it 'shows all studies' do
-        report_studies = report.result.map { |study| study[:study_id] }
+        report_studies = report.result[:studies].map { |study| study[:study_id] }
         expect(report_studies).to include(study1.id)
         expect(report_studies).to include(study2.id)
       end
@@ -56,7 +45,7 @@ describe Report::Overview do
       let!(:report) { Report::Overview.new(columns: %w(patients), user: user) }
 
       it 'shows all studies' do
-        report_studies = report.result.map { |study| study[:study_id] }
+        report_studies = report.result[:studies].map { |study| study[:study_id] }
         expect(report_studies).to include(study1.id)
         expect(report_studies).not_to include(study2.id)
       end
@@ -68,7 +57,7 @@ describe Report::Overview do
       let!(:report) { Report::Overview.new(columns: %w(patients), user: user) }
 
       it 'shows all studies' do
-        report_studies = report.result.map { |study| study[:study_id] }
+        report_studies = report.result[:studies].map { |study| study[:study_id] }
         expect(report_studies).not_to include(study1.id)
         expect(report_studies).not_to include(study2.id)
       end
@@ -80,7 +69,7 @@ describe Report::Overview do
       let!(:report) { Report::Overview.new(columns: %w(patients), user: user) }
 
       it 'shows all studies' do
-        report_studies = report.result.map { |study| study[:study_id] }
+        report_studies = report.result[:studies].map { |study| study[:study_id] }
         expect(report_studies).to include(study1.id)
         expect(report_studies).not_to include(study2.id)
       end
@@ -92,17 +81,18 @@ describe Report::Overview do
     let!(:center) { create(:center, study: study) }
     let!(:patient1) { create(:patient, center: center) }
     let!(:patient2) { create(:patient, center: center) }
+    let!(:result) do
+      report = Report::Overview.new(columns: %w(patients))
+      report.result[:studies]
+    end
 
     it 'it displays the current patient count' do
-      report = Report::Overview.new(
-        columns: %w(patients)
-      )
       study_report = {
         study_id: study.id,
         study_name: study.name,
-        columns: [{ name: 'patients', value: 2 }]
+        columns: [2]
       }
-      expect(report.result).to include(study_report)
+      expect(result).to include(study_report)
     end
   end
 
@@ -114,17 +104,18 @@ describe Report::Overview do
     let!(:patient2) { create(:patient, center: center) }
     let!(:visit2) { create(:visit, patient: patient2) }
     let!(:visit3) { create(:visit, patient: patient2) }
+    let!(:result) do
+      report = Report::Overview.new(columns: %w(visits))
+      report.result[:studies]
+    end
 
     it 'it displays the current visits count' do
-      report = Report::Overview.new(
-        columns: %w(visits)
-      )
       study_report = {
         study_id: study.id,
         study_name: study.name,
-        columns: [{ name: 'visits', value: 3 }]
+        columns: [3]
       }
-      expect(report.result).to include(study_report)
+      expect(result).to include(study_report)
     end
   end
 
@@ -141,23 +132,20 @@ describe Report::Overview do
       let!(:patient2) { create(:patient, center: center) }
       let!(:visit6) { create(:visit, patient: patient2, state: :incomplete_na) }
       let!(:visit7) { create(:visit, patient: patient2, state: :incomplete_queried) }
-
-      it 'it displays the current visit state counts' do
+      let!(:result) do
         report = Report::Overview.new(
           columns: %w(visits_state_incomplete_na visits_state_incomplete_queried visits_state_complete_tqc_pending visits_state_complete_tqc_issues visits_state_complete_tqc_passed)
         )
+        report.result[:studies]
+      end
+
+      it 'it displays the current visit state counts' do
         study_report = {
           study_id: study.id,
           study_name: study.name,
-          columns: [
-            { name: 'visits_state_incomplete_na', value: 2 },
-            { name: 'visits_state_incomplete_queried', value: 1 },
-            { name: 'visits_state_complete_tqc_pending', value: 1 },
-            { name: 'visits_state_complete_tqc_issues', value: 1 },
-            { name: 'visits_state_complete_tqc_passed', value: 2 }
-          ]
+          columns: [2,1,1,1,2]
         }
-        expect(report.result).to include(study_report)
+        expect(result).to include(study_report)
       end
     end
   end
@@ -169,17 +157,18 @@ describe Report::Overview do
     let!(:image_series1) { create(:image_series, patient: patient1)}
     let!(:patient2) { create(:patient, center: center) }
     let!(:image_series2) { create(:image_series, patient: patient2)}
+    let!(:result) do
+      report = Report::Overview.new(columns: %w(image_series))
+      report.result[:studies]
+    end
 
     it 'it displays the current image_series count' do
-      report = Report::Overview.new(
-        columns: %w(image_series)
-      )
       study_report = {
         study_id: study.id,
         study_name: study.name,
-        columns: [{ name: 'image_series', value: 2 }]
+        columns: [2]
       }
-      expect(report.result).to include(study_report)
+      expect(result).to include(study_report)
     end
   end
 
@@ -213,17 +202,18 @@ describe Report::Overview do
         required_series: required_series
       )
     end
+    let!(:result) do
+      report = Report::Overview.new(columns: %w(required_series))
+      report.result[:studies]
+    end
 
     it 'displays the correct required series count' do
-      report = Report::Overview.new(
-        columns: %w(required_series)
-      )
       expected_result = {
         study_id: study.id,
         study_name: study.name,
-        columns: [{ name: 'required_series', value: 2 }]
+        columns: [2]
       }
-      expect(report.result).to include(expected_result)
+      expect(result).to include(expected_result)
     end
   end
 
@@ -282,21 +272,20 @@ describe Report::Overview do
         }
       )
     end
-
-    it 'displays the correct required series count' do
+    let!(:result) do
       report = Report::Overview.new(
         columns: %w(required_series_state_pending required_series_state_issues required_series_state_passed)
       )
+      report.result[:studies]
+    end
+
+    it 'displays the correct required series count' do
       expected_result = {
         study_id: study.id,
         study_name: study.name,
-        columns: [
-          { name: 'required_series_state_pending', value: 1 },
-          { name: 'required_series_state_issues', value: 2 },
-          { name: 'required_series_state_passed', value: 3 }
-        ]
+        columns: [1,2,3]
       }
-      expect(report.result).to include(expected_result)
+      expect(result).to include(expected_result)
     end
   end
 end
