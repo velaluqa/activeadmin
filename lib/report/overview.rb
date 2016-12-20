@@ -26,7 +26,7 @@ module Report
     end
 
     def result
-      study_scope.map do |study|
+      @result ||= study_scope.map do |study|
         {
           study_id: study.id,
           study_name: study.name,
