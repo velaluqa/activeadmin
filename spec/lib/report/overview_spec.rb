@@ -1,6 +1,33 @@
 require 'report/overview'
 
 describe Report::Overview do
+  describe 'given columns: "all"' do
+    let!(:study1) { create(:study) }
+    let!(:center1) { create(:center, study: study1) }
+    let!(:patient1) { create(:patient, center: center1) }
+    let!(:visit1) { create(:visit, patient: patient1) }
+    let!(:image_series1) { create(:image_series, patient: patient1)}
+    let!(:role) { create(:role, with_permissions: { Study => :read_reports }) }
+    let!(:user) { create(:user, with_user_roles: [role]) }
+    let!(:report) { Report::Overview.new(columns: 'all', user: user) }
+
+    it 'returns all available columns' do
+      result = report.result.first[:columns]
+      expect(result).to include(name: 'patients', value: 1)
+      expect(result).to include(name: 'visits', value: 1)
+      expect(result).to include(name: 'visits_state_incomplete_na', value: 1)
+      expect(result).to include(name: 'visits_state_incomplete_queried', value: 0)
+      expect(result).to include(name: 'visits_state_complete_tqc_pending', value: 0)
+      expect(result).to include(name: 'visits_state_complete_tqc_issues', value: 0)
+      expect(result).to include(name: 'visits_state_complete_tqc_passed', value: 0)
+      expect(result).to include(name: 'image_series', value: 1)
+      expect(result).to include(name: 'required_series', value: 0)
+      expect(result).to include(name: 'required_series_state_pending', value: 0)
+      expect(result).to include(name: 'required_series_state_issues', value: 0)
+      expect(result).to include(name: 'required_series_state_passed', value: 0)
+    end
+  end
+
   describe 'user report' do
     let!(:study1) { create(:study) }
     let!(:center1) { create(:center, study: study1) }

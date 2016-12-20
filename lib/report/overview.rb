@@ -17,7 +17,7 @@ module Report
       'required_series_state_passed'
     ].freeze
 
-    attr_reader :columns, :study_ids, :user
+    attr_reader :study_ids, :user
 
     def initialize(options)
       @columns = options[:columns]
@@ -38,6 +38,11 @@ module Report
     end
 
     private
+
+    def columns
+      return @columns if @columns.is_a?(Array)
+      AVAILABLE_COLUMNS
+    end
 
     # If the report is generated for a given user, we want to limit
     # the study list to only those studies the user has appropriate
