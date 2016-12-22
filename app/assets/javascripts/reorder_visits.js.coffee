@@ -5,5 +5,5 @@ update_visits = ->
   $('#new_visits_list').val(new_visits_list.join(','))
 
 $(document).ready ->
-  $('#visits_sortable').sortable().bind 'sortupdate', () ->
+  $('#visits_sortable').html_sortable().bind 'sortupdate', () ->
     update_visits()

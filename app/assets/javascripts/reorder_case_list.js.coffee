@@ -6,5 +6,5 @@ update_case_list = ->
   console.log($('#case_list').val())
 
 $(document).ready ->
-  $('#case_list_sortable').sortable().bind 'sortupdate', () ->
+  $('#case_list_sortable').html_sortable().bind 'sortupdate', () ->
     update_case_list()
