@@ -2,6 +2,7 @@
 #= require ../vendor/underscore
 #= require ../vendor/backbone
 #= require ../vendor/backbone.collectionView
+#= require ../vendor/backbone.fetching
 #= require_tree ./templates
 #= require ./models/widget
 #= require ./models/row
