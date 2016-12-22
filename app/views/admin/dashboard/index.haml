@@ -1,481 +1,157 @@
+#dashboard-container.container-fluid
+= javascript_include_tag "dashboard/main"
 :coffeescript
   $ ->
-    Chart.defaults.global.legend.position = 'bottom'
-    Chart.defaults.global.tooltips.mode = 'index'
-    Chart.defaults.global.tooltips.intersect = false
-#dashboard.container-fluid
-  .row
-    .col-lg-2.col-md-4
-      #w1.widget.sm
-        .buttons
-          %i.fa.fa-edit
-        %h3 # of Patients
-        .content-wrapper
-          .chart.content
-            %canvas{ width: "200", height: "110" }
-        :coffeescript
-          $ ->
-            ctx = $('#w1 canvas')
-            chart = new Chart ctx,
-              type: 'bar'
-              data:
-                labels: ['Study 1', 'Study 2']
-                datasets: [
-                  {
-                    label: '# of Patients',
-                    backgroundColor: '#aaa',
-                    data: [1236, 992]
-                  }
-                ]
-              options:
-                legend:
-                  display: false
-    .col-lg-2.col-md-4
-      #w2.widget.sm
-        .buttons
-          %i.fa.fa-edit
-        %h3 # of Visits
-        .content-wrapper
-          .chart.content
-            %canvas{ width: "200", height: "110" }
-        :coffeescript
-          $ ->
-            ctx = $('#w2 canvas')
-            chart = new Chart ctx,
-              type: 'bar'
-              data:
-                labels: ['Study 1', 'Study 2']
-                datasets: [
-                  {
-                    label: "incomplete_na"
-                    backgroundColor: '#336699',
-                    data: [123, 42]
-                  }
-                  {
-                    label: "complete_tqc_passed"
-                    backgroundColor: '#336699',
-                    data: [43, 10]
-                  }
-                  {
-                    label: "incomplete_queried"
-                    backgroundColor: '#336699',
-                    data: [10, 21]
-                  }
-                  {
-                    label: "complete_tqc_pending"
-                    backgroundColor: '#336699',
-                    data: [101, 63]
-                  }
-                  {
-                    label: "complete_tqc_issues"
-                    backgroundColor: '#336699',
-                    data: [23, 12]
-                  }
-                ]
-              options:
-                legend:
-                  display: false
-                tooltips:
-                  mode: 'x'
-    .col-lg-2.col-md-4
-      #w3.widget.sm
-        .buttons
-          %i.fa.fa-edit
-        %h3 # of Image Series
-        .content-wrapper
-          .content
-            %canvas{ width: "200", height: "110" }
-    .col-lg-2.col-md-4
-      #w4.widget.sm
-        .buttons
-          %i.fa.fa-edit
-        %h3 # of Required Series
-        .content-wrapper
-          .chart.content
-            %canvas{ width: "200", height: "110" }
-        :coffeescript
-          $ ->
-            ctx = $('#w4 canvas')
-            chart = new Chart ctx,
-              type: 'bar'
-              data:
-                labels: ['Study 1', 'Study 2']
-                datasets: [
-                  {
-                    label: 'TQC passed',
-                    backgroundColor: 'rgba(0,100,0,0.2)',
-                    data: [1236, 992]
-                  },
-                  {
-                    label: 'TQC failed',
-                    backgroundColor: 'rgba(100,0,0,0.2)',
-                    data: [421, 101]
-                  }
-                ]
-              options:
-                legend:
-                  display: false
-    .col-lg-2.col-md-4
-      #w5.widget.sm
-        .buttons
-          %i.fa.fa-edit
-        %h3 # of Required Series
-        .content-wrapper
-          .chart.content
-            %canvas{ width: "200", height: "110" }
-        :coffeescript
-          $ ->
-            ctx = $('#w5 canvas')
-            chart = new Chart ctx,
-              type: 'doughnut'
-              data:
-                labels: ['Study 1', 'Study 2'],
-                datasets: [
-                  {
-                    label: 'TQC failed',
-                    backgroundColor: [
-                      'rgba(100,0,0,0.2)',
-                      'rgba(100,0,0,0.2)',
-                      'rgba(0,100,0,0.2)',
-                      'rgba(0,100,0,0.2)',
-                    ]
-                    data: [1236, 992, 500, 222]
-                  },
-                  {
-                    label: 'TQC passed',
-                    backgroundColor: ['#900','#090'],
-                    data: [2228, 722]
-                  }
-                ]
-              options:
-                legend:
-                  position: 'left'
-    .col-lg-2.col-md-4
-      #w6.widget.sm
-        .buttons
-          %i.fa.fa-edit
-        %h3 # of Image Series
-        .content-wrapper
-          .table.content
-            %table.values
-              %tr
-                %td
-                  %span.label Study 1
-                %td
-                  %span.value 2043
-              %tr
-                %td
-                  %span.label Study 2
-                %td
-                  %span.value 1144
-  .row
-    .col-md-4
-      #w11.widget.md
-        .buttons
-          %i.fa.fa-edit
-        %h3 Patients Trend
-        .content-wrapper
-          .chart.content
-            %canvas{ width: "200", height: "110" }
-        :coffeescript
-          $ ->
-            ctx = $('#w11 canvas')
-            chart = new Chart ctx,
-              type: 'line'
-              data:
-                labels: [
-                  '2016-12-01',
-                  '2016-12-02',
-                  '2016-12-03',
-                  '2016-12-04',
-                  '2016-12-05',
-                  '2016-12-06',
-                  '2016-12-07',
-                  '2016-12-08',
-                  '2016-12-09',
-                  '2016-12-10',
-                  '2016-12-11',
-                  '2016-12-12',
-                  '2016-12-13',
-                  '2016-12-14'
-                ]
-                datasets: [
-                  {
-                    label: 'Study 1',
-                    borderColor: 'rgba(0,200,0,1)',
-                    pointBorderColor: 'rgba(0,200,0,1)',
-                    pointBackgroundColor: 'rgba(0,200,0,1)',
-                    data: [19, 32, 32, 32, 39, 58, 92, 92, 92, 92, 92, 121, 121, 121],
-                    lineTension: 0,
-                    fill: false
-                  },
-                  {
-                    label: 'Study 2',
-                    borderColor: 'rgba(200,0,0,1)',
-                    pointBorderColor: 'rgba(200,0,0,1)',
-                    pointBackgroundColor: 'rgba(200,0,0,1)',
-                    data: [0, 0, 0, 0, 0, 11, 23, 82, 98, 98, 121, 121, 156,  156],
-                    lineTension: 0,
-                    fill: false
-                  }
-                ]
-              options:
-                legend:
-                  display: false
-                scales:
-                  xAxes: [
-                    {type: 'time'}
-                  ]
-                tooltips:
-                  mode: 'index'
-    .col-md-4
-      #w12.widget.md
-        .buttons
-          %i.fa.fa-edit
-        %h3 Image Series Trend
-        .content-wrapper
-          .chart.content
-            %canvas{ width: "200", height: "110" }
-        :coffeescript
-          $ ->
-            ctx = $('#w12 canvas')
-            chart = new Chart ctx,
-              type: 'bar'
-              data:
-                labels: [
-                  '2016-12-01',
-                  '2016-12-02',
-                  '2016-12-03',
-                  '2016-12-04',
-                  '2016-12-05',
-                  '2016-12-06',
-                  '2016-12-07',
-                  '2016-12-08',
-                  '2016-12-09',
-                  '2016-12-10',
-                  '2016-12-11',
-                  '2016-12-12',
-                  '2016-12-13',
-                  '2016-12-14'
-                ]
-                datasets: [
-                  {
-                    label: 'Study 1',
-                    backgroundColor: 'rgba(0,100,0,0.5)',
-                    data: [19, 32, 32, 32, 39, 58, 92, 92, 92, 92, 92, 121, 121, 121],
-                    lineTension: 0,
-                    fill: false
-                  },
-                  {
-                    label: 'Study 2',
-                    backgroundColor: 'rgba(100,0,0,0.5)',
-                    data: [0, 0, 0, 0, 0, 11, 23, 82, 98, 98, 121, 121, 156,  156],
-                    lineTension: 0,
-                    fill: false
-                  }
-                ]
-              options:
-                legend:
-                  display: false
-                scales:
-                  xAxes: [
-                    {type: 'time'}
-                  ]
-                tooltips:
-                  mode: 'index'
-    .col-md-4
-      #w13.widget.md
-        .buttons
-          %i.fa.fa-edit
-        %h3 Required Series Trend
-        .content-wrapper
-          .chart.content
-            %canvas{ width: "200", height: "110" }
-        :coffeescript
-          $ ->
-            ctx = $('#w13 canvas')
-            chart = new Chart ctx,
-              type: 'line'
-              data:
-                labels: [
-                  '2016-12-01',
-                  '2016-12-02',
-                  '2016-12-03',
-                  '2016-12-04',
-                  '2016-12-05',
-                  '2016-12-06',
-                  '2016-12-07',
-                  '2016-12-08',
-                  '2016-12-09',
-                  '2016-12-10',
-                  '2016-12-11',
-                  '2016-12-12',
-                  '2016-12-13',
-                  '2016-12-14'
-                 ]
-                datasets: [
-                  {
-                    label: 'Study 1',
-                    borderColor: 'rgba(0,200,0,1)',
-                    pointBorderColor: 'rgba(0,200,0,1)',
-                    pointBackgroundColor: 'rgba(0,200,0,1)',
-                    backgroundColor: 'rgba(0,100,0,0.05)',
-                    data: [19, 32, 32, 32, 39, 58, 92, 92, 92, 92, 92, 121, 121, 121],
-                    lineTension: 0,
-                  },
-                  {
-                    label: 'Study 2',
-                    borderColor: 'rgba(200,0,0,1)',
-                    pointBorderColor: 'rgba(200,0,0,1)',
-                    pointBackgroundColor: 'rgba(200,0,0,1)',
-                    backgroundColor: 'rgba(100,0,0,0.05)',
-                    data: [0, 0, 0, 0, 0, 11, 23, 82, 98, 98, 121, 121, 156,  156],
-                    lineTension: 0,
-                  }
-                ]
-              options:
-                legend:
-                  display: false
-                scales:
-                  xAxes: [
-                    {type: 'time'}
-                  ]
-                tooltips:
-                  mode: 'index'
-  .row
-    .col-md-6
-      .widget.lg
-        .buttons
-          %i.fa.fa-edit
-        %h3 Visit Trend
-        .content-wrapper
-          .table.content
-            %table.trend
-              %tr
-                %th Date
-                %th Study
-                %th incomplete n/A
-                %th incomplete queried
-                %th complete tqc pending
-                %th complete tqc issues
-                %th complete tqc passed
-                %th Total
-              %tr
-                %td 2016-11-06
-                %td
-                  %a{ href: '/admin/studies/1' } Study 1
-                %td.rem 45
-                %td.dec 0
-                %td.rem 0
-                %td.rem 8
-                %td.inc 42
-                %td.rem 95
-              %tr
-                %td 2016-11-05
-                %td
-                  %a{ href: '/admin/studies/1' } Study 1
-                %td.rem 45
-                %td.rem 10
-                %td.dec 0
-                %td.rem 8
-                %td.inc 32
-                %td.rem 95
-              %tr
-                %td 2016-11-04
-                %td
-                  %a{ href: '/admin/studies/1' } Study 1
-                %td.rem 45
-                %td.rem 10
-                %td.dec 5
-                %td.inc 8
-                %td.inc 27
-                %td.rem 95
-              %tr
-                %td 2016-11-03
-                %td
-                  %a{ href: '/admin/studies/1' } Study 1
-                %td.inc 45
-                %td.inc 10
-                %td.rem 10
-                %td.rem 5
-                %td.rem 25
-                %td.inc 95
-              %tr
-                %td 2016-11-02
-                %td
-                  %a{ href: '/admin/studies/1' } Study 1
-                %td.inc 40
-                %td.rem 6
-                %td.rem 10
-                %td.rem 5
-                %td.rem 25
-                %td.inc 86
-              %tr
-                %td 2016-11-01
-                %td
-                  %a{ href: '/admin/studies/1' } Study 1
-                %td.rem 20
-                %td.rem 6
-                %td.inc 10
-                %td.rem 5
-                %td.inc 25
-                %td.rem 66
-    .col-md-6
-      #w22.widget.lg
-        .buttons
-          %i.fa.fa-edit
-        %h3 Required Series Trend
-        .content-wrapper
-          .chart.content
-            %canvas{ width: "200", height: "110" }
-        :coffeescript
-          $ ->
-            ctx = $('#w22 canvas')
-            chart = new Chart ctx,
-              type: 'line'
-              data:
-                labels: [
-                  '2016-12-01',
-                  '2016-12-02',
-                  '2016-12-03',
-                  '2016-12-04',
-                  '2016-12-05',
-                  '2016-12-06',
-                  '2016-12-07',
-                  '2016-12-08',
-                  '2016-12-09',
-                  '2016-12-10',
-                  '2016-12-11',
-                  '2016-12-12',
-                  '2016-12-13',
-                  '2016-12-14'
-                 ]
-                datasets: [
-                  {
-                    label: 'Study 1',
-                    borderColor: 'rgba(0,200,0,1)',
-                    pointBorderColor: 'rgba(0,200,0,1)',
-                    pointBackgroundColor: 'rgba(0,200,0,1)',
-                    backgroundColor: 'rgba(0,100,0,0.05)',
-                    data: [19, 32, 32, 32, 39, 58, 92, 92, 92, 92, 92, 121, 121, 121],
-                    lineTension: 0,
-                  },
-                  {
-                    label: 'Study 2',
-                    borderColor: 'rgba(200,0,0,1)',
-                    pointBorderColor: 'rgba(200,0,0,1)',
-                    pointBackgroundColor: 'rgba(200,0,0,1)',
-                    backgroundColor: 'rgba(100,0,0,0.05)',
-                    data: [0, 0, 0, 0, 0, 11, 23, 82, 98, 98, 121, 121, 156,  156],
-                    lineTension: 0,
-                  }
-                ]
-              options:
-                legend:
-                  display: false
-                scales:
-                  xAxes: [
-                    {type: 'time'}
-                  ]
-                tooltips:
-                  mode: 'index'
+    window.dashboard = new Dashboard.Models.Main
+      config:
+        rows: [
+          {
+            size: 'small',
+            widgets: [
+              {
+                type: 'overview',
+                params: {
+                  columns: ['patients']
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: ['visits']
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+            ]
+          },
+          {
+            size: 'small',
+            widgets: [
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              }
+            ]
+          },
+          {
+            size: 'small',
+            widgets: [
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              }
+            ]
+          },
+          {
+            size: 'medium',
+            widgets: [
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              }
+            ]
+          },
+          {
+            size: 'large',
+            widgets: [
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              },
+              {
+                type: 'overview',
+                params: {
+                  columns: 'all'
+                }
+              }
+            ]
+          }
+        ]
+    window.dashboard_view = new Dashboard.Views.Main
+      model: window.dashboard
+      el: $('#dashboard-container')
+    window.dashboard_view.render()

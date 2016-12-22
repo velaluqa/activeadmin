@@ -1,12 +1,102 @@
-#dashboard {
+#dashboard-container {
   * {
     box-sizing: border-box;
   }
 
-  .row {
+  div.row {
     margin-left: -30px;
     margin-right: -30px;
-    margin-bottom: 15px;
+
+    li {
+      list-style-type: none;
+      outline: none;
+      cursor: pointer;
+      float: left;
+      position: relative;
+      min-height: 1px;
+      padding-left: 15px;
+      padding-right: 15px;
+      margin-bottom: 15px;
+    }
+
+    &.size-6 {
+      li {
+	width: 16.6666666666%;
+
+	@media (max-width: 1190px) {
+	  width: 33.333333333333%;
+	}
+	@media (max-width: 991px) {
+	  width: 33.333333333333%;
+	}
+	@media (max-width: 767px) {
+	  width: 100%;
+	}
+      }
+    }
+
+    &.size-5 {
+      li {
+	width: 20%;
+	@media (max-width: 1199px) {
+	  width: 33.33333333%;
+	}
+	@media (max-width: 991px) {
+	  width: 33.3333333333%;
+	}
+	@media (max-width: 767px) {
+	  width: 100%;
+	}
+      }
+    }
+
+    &.size-4 {
+      li {
+	width: 25%;
+
+	// @media (max-width: 1199) {
+	//   width: 33.33333333%;
+	// }
+	@media (max-width: 991px) {
+	  width: 50%;
+	}
+	@media (max-width: 767px) {
+	  width: 100%;
+	}
+      }
+    }
+
+    &.size-3 {
+      li {
+	width: 33.333333333333%;
+
+	@media (max-width: 1199px) {
+	  width: 33.33333333%;
+	}
+	@media (max-width: 991px) {
+	  width: 50%;
+	}
+	@media (max-width: 767px) {
+	  width: 100%;
+	}
+      }
+    }
+
+    &.size-2 {
+      li {
+	width: 50%;
+
+	@media (max-width: 767px) {
+	  width: 100%;
+	}
+      }
+    }
+
+    &.size-1 {
+      li {
+	width: 100%;
+      }
+    }
   }
 
   .widget {

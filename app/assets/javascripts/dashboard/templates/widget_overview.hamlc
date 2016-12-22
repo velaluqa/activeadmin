@@ -1,0 +1,15 @@
+- if @report.studies?
+  %table
+    %tr
+      %th Study
+      - for column in @report.columns
+        %th= column
+    %tbody
+      - for study in @report.studies
+        %tr
+          %td
+            %a{ href: "/admin/studies/#{study.study_id}" }= study.study_name
+          - for column in study.columns
+            %td= column
+- else
+  No studies found.
