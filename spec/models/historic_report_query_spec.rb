@@ -1,3 +1,165 @@
 # coding: utf-8
 RSpec.describe HistoricReportQuery do
+  describe '#current_count' do
+    let!(:query) do
+      HistoricReportQuery.create(resource_type: 'Visit', group_by: 'state')
+    end
+
+    let!(:study) { create(:study) }
+    let!(:center) { create(:center, study: study) }
+    let!(:patient) { create(:patient, center: center) }
+    let!(:visit1) { create(:visit, patient: patient, state: 0) }
+    let!(:visit2) { create(:visit, patient: patient, state: 1) }
+    let!(:visit3) { create(:visit, patient: patient, state: 2) }
+    let!(:visit4) { create(:visit, patient: patient, state: 2) }
+
+    let!(:count) { query.current_count(study.id) }
+
+    it 'counts the total' do
+      expect(count).to include(total: 4)
+    end
+
+    it 'counts the groups' do
+      expect(count[:group]).to be_a(Hash)
+      expect(count[:group]).to include(0 => 1)
+      expect(count[:group]).to include(1 => 1)
+      expect(count[:group]).to include(2 => 2)
+    end
+  end
+
+  describe '#entry_values' do
+    let!(:query) { HistoricReportQuery.create(resource_type: 'Patient') }
+
+    it 'returns the correct values' do
+      count       = { total: 15, group: { new: 3,  succeeded: 10, failed: 2 } }
+      delta       = { total: 0,  group: { new: -1, succeeded: +1, failed: 0 } }
+      expectation = [
+        { group: nil,         count: 15, delta: 0 },
+        { group: 'new',       count: 3,  delta: -1 },
+        { group: 'succeeded', count: 10, delta: +1 },
+        { group: 'failed',    count: 2,  delta: 0 }
+      ]
+      expect(query.entry_values(count, delta)).to eq(expectation)
+    end
+  end
+
+  describe '#apply_delta' do
+    let!(:query) { HistoricReportQuery.create(resource_type: 'Patient') }
+
+    describe 'reverse: false' do
+      it 'applies total delta' do
+        count = { total: 15 }
+        delta = { total: -1 }
+        expect(query.apply_delta(count, delta)).to eq(total: 14)
+      end
+
+      it 'applies group deltas' do
+        count       = { total: 15, group: { new: 3,  succeeded: 10, failed: 2 } }
+        delta       = { total: 0,  group: { new: -1, succeeded: +1, failed: 0 } }
+        expectation = { total: 15, group: { new: 2,  succeeded: 11, failed: 2 } }
+        expect(query.apply_delta(count, delta)).to eq(expectation)
+      end
+    end
+
+    describe 'reverse: true' do
+      it 'applies total delta' do
+        count = { total: 15 }
+        delta = { total: -1 }
+        expect(query.apply_delta(count, delta, reverse: true)).to eq(total: 16)
+      end
+
+      it 'applies group deltas' do
+        count       = { total: 15, group: { new: 3,  succeeded: 10, failed: 2 } }
+        delta       = { total: 0,  group: { new: -1, succeeded: +1, failed: 0 } }
+        expectation = { total: 15, group: { new: 4,  succeeded:  9, failed: 2 } }
+        expect(query.apply_delta(count, delta, reverse: true)).to eq(expectation)
+      end
+    end
+  end
+
+  describe '#calculate_delta' do
+
+  end
+
+  describe '#calculate_cache' do
+    describe 'for ungrouped resource_type `Patient`' do
+      describe 'with empty cache' do
+        let(:six_hours_ago) { 6.hours.ago.round }
+        let(:four_hours_ago) { 4.hours.ago.round }
+        let(:three_hours_ago) { 3.hours.ago.round }
+        let(:one_hour_ago) { 1.hour.ago.round }
+
+        before(:each) do
+          @study = create(:study)
+          Version.last.update_attributes!(created_at: six_hours_ago, updated_at: six_hours_ago)
+          center = create(:center, study: @study)
+          Version.last.update_attributes!(created_at: six_hours_ago, updated_at: six_hours_ago)
+          patient1 = create(:patient, center: center)
+          Version.last.update_attributes!(created_at: four_hours_ago, updated_at: four_hours_ago)
+          create(:patient, center: center)
+          Version.last.update_attributes!(created_at: three_hours_ago, updated_at: three_hours_ago)
+          patient1.destroy
+          Version.last.update_attributes!(created_at: one_hour_ago, updated_at: one_hour_ago)
+        end
+
+        it 'creates full cache' do
+          query = HistoricReportQuery.create(resource_type: 'Patient')
+          query.calculate_cache(@study.id)
+          query.calculate_cache(@study.id)
+          entries = HistoricReportCacheEntry.order('"date" ASC').last(3)
+          expect(entries[0].date).to eq four_hours_ago
+          expect(entries[0].values.length).to eq(1)
+          expect(entries[0].values[0]).to eq(group: nil, count: 1, delta: 1)
+          expect(entries[1].date).to eq three_hours_ago
+          expect(entries[1].values.length).to eq(1)
+          expect(entries[1].values[0]).to eq(group: nil, count: 2, delta: 1)
+          expect(entries[2].date).to eq one_hour_ago
+          expect(entries[2].values.length).to eq(1)
+          expect(entries[2].values[0]).to eq(group: nil, count: 1, delta: -1)
+        end
+      end
+
+      describe 'with existing cache values' do
+        let(:six_hours_ago) { 6.hours.ago.round }
+        let(:four_hours_ago) { 4.hours.ago.round }
+        let(:three_hours_ago) { 3.hours.ago.round }
+        let(:one_hour_ago) { 1.hour.ago.round }
+
+        before(:each) do
+          @study = create(:study)
+          Version.last.update_attributes!(created_at: six_hours_ago, updated_at: six_hours_ago)
+          center = create(:center, study: @study)
+          Version.last.update_attributes!(created_at: six_hours_ago, updated_at: six_hours_ago)
+          patient1 = create(:patient, center: center)
+          Version.last.update_attributes!(created_at: four_hours_ago, updated_at: four_hours_ago)
+          create(:patient, center: center)
+          Version.last.update_attributes!(created_at: three_hours_ago, updated_at: three_hours_ago)
+          patient1.destroy
+          Version.last.update_attributes!(created_at: one_hour_ago, updated_at: one_hour_ago)
+        end
+
+        it 'completes the full cache' do
+          query = HistoricReportQuery.create(resource_type: 'Patient')
+          HistoricReportCacheEntry.ensure_cache_entry(
+            query,
+            @study.id,
+            three_hours_ago,
+            [{ group: nil, count: 2, delta: 1 }]
+          )
+          query.calculate_cache(@study.id)
+          query.calculate_cache(@study.id)
+          entries = HistoricReportCacheEntry.order(:date).last(3)
+          expect(entries[0].date).to eq four_hours_ago
+          expect(entries[0].values.length).to eq(1)
+          expect(entries[0].values[0]).to eq(group: nil, count: 1, delta: 1)
+          expect(entries[1].date).to eq three_hours_ago
+          expect(entries[1].values.length).to eq(1)
+          expect(entries[1].values[0]).to eq(group: nil, count: 2, delta: 1)
+          expect(entries[2].date).to eq one_hour_ago
+          expect(entries[2].values.length).to eq(1)
+          expect(entries[2].values[0]).to eq(group: nil, count: 1, delta: -1)
+        end
+      end
+    end
+  end
 end
