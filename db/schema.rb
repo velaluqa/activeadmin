@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161110085454) do
+ActiveRecord::Schema.define(version: 20170105144442) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -107,6 +107,32 @@ ActiveRecord::Schema.define(version: 20161110085454) do
   end
 
   add_index "forms", ["session_id"], name: "index_forms_on_session_id", using: :btree
+
+  create_table "historic_report_cache_entries", force: :cascade do |t|
+    t.integer  "historic_report_query_id", null: false
+    t.integer  "study_id",                 null: false
+    t.datetime "date",                     null: false
+  end
+
+  add_index "historic_report_cache_entries", ["date"], name: "index_historic_report_cache_entries_on_date", using: :btree
+  add_index "historic_report_cache_entries", ["historic_report_query_id"], name: "index_historic_report_cache_entries_on_historic_report_query_id", using: :btree
+  add_index "historic_report_cache_entries", ["study_id"], name: "index_historic_report_cache_entries_on_study_id", using: :btree
+
+  create_table "historic_report_cache_values", force: :cascade do |t|
+    t.integer "historic_report_cache_entry_id", null: false
+    t.string  "group"
+    t.integer "count",                          null: false
+    t.integer "delta",                          null: false
+  end
+
+  add_index "historic_report_cache_values", ["historic_report_cache_entry_id"], name: "index_historic_report_cache_values_on_entry_id", using: :btree
+
+  create_table "historic_report_queries", force: :cascade do |t|
+    t.string   "resource_type"
+    t.string   "group_by"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
 
   create_table "image_series", force: :cascade do |t|
     t.string   "name"
