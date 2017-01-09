@@ -9,6 +9,7 @@ module Report
 
     case type
     when 'overview' then Report::Overview.new(params)
+    when 'historic_count' then Report::HistoricCount.new(params)
     else raise UnknownReportType, "Unknown type: #{type}"
     end
   end
