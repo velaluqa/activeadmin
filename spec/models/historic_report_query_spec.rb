@@ -78,7 +78,76 @@ RSpec.describe HistoricReportQuery do
   end
 
   describe '#calculate_delta' do
+    describe 'for ungrouped report' do
+      let!(:query) do
+        HistoricReportQuery.create(resource_type: 'Visit')
+      end
 
+      it 'calculates create' do
+        version = build(:version, event: 'create')
+        expect(query.calculate_delta(version)).to eq(total: +1)
+      end
+
+      it 'calculates destroy' do
+        version = build(:version, event: 'destroy')
+        expect(query.calculate_delta(version)).to eq(total: -1)
+      end
+
+      it 'ignores update' do
+        version = build(:version, event: 'update')
+        expect(query.calculate_delta(version)).to eq(nil)
+      end
+    end
+
+    describe 'for grouped report' do
+      let!(:query) do
+        HistoricReportQuery.create(resource_type: 'Visit', group_by: 'state')
+      end
+
+      it 'calculates create' do
+        version = build(
+          :version,
+          event: 'create',
+          object_changes: {
+            state: [nil, 0]
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: +1, group: {'0' => +1})
+      end
+
+      it 'calculates destroy' do
+        version = build(
+          :version,
+          event: 'destroy',
+          object: {
+            state: 0
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: -1, group: {'0' => -1})
+      end
+
+      it 'calculates update of state column' do
+        version = build(
+          :version,
+          event: 'update',
+          object_changes: {
+            state: [0, 1]
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: 0, group: {'0' => -1, '1' => +1})
+      end
+
+      it 'calculates update of state column' do
+        version = build(
+          :version,
+          event: 'update',
+          object_changes: {
+            visit_number: [123, 321]
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(nil)
+      end
+    end
   end
 
   describe '#calculate_cache' do

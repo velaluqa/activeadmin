@@ -86,13 +86,47 @@ class HistoricReportQuery < ActiveRecord::Base
     count
   end
 
+  def calculate_ungrouped_delta(version)
+    case version.event
+    when 'create' then { total: +1 }
+    when 'destroy' then { total: -1 }
+    when 'update' then nil
+    end
+  end
+
+  def calculate_grouped_delta(version)
+    case version.event
+    when 'create' then
+      {
+        total: +1,
+        group: {
+          version.object_changes[group_by][1].to_s => +1
+        }
+      }
+    when 'destroy' then
+      {
+        total: -1,
+        group: {
+          version.object[group_by].to_s => -1
+        }
+      }
+    when 'update' then
+      return nil unless version.object_changes.key?(group_by)
+      {
+        total: 0,
+        group: {
+          version.object_changes[group_by][0].to_s => -1,
+          version.object_changes[group_by][1].to_s => +1
+        }
+      }
+    end
+  end
+
   def calculate_delta(version)
-    delta =
-      case version.event
-      when 'create' then +1
-      when 'destroy' then -1
-      when 'update' then 0
-      end
-    { total: delta }
+    if group_by.blank?
+      calculate_ungrouped_delta(version)
+    else
+      calculate_grouped_delta(version)
+    end
   end
 end
