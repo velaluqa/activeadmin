@@ -19,4 +19,15 @@ module Report
       Visit => { 'state' => Visit::STATE_SYMS }
     }
   end
+
+  def self.map_group_label(resource_class, column, value)
+    mapping = mappings[resource_class].andand[column]
+    case mapping
+    when Array then mapping[value.to_i]
+    when Hash then mapping[value.to_sym]
+    else value
+    end
+  rescue
+    value
+  end
 end
