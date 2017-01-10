@@ -28,7 +28,7 @@ class Version < PaperTrail::Version
   class << self
     # Scopes all versions for a given `study` and `item_type`.
     def of_study_resource(study, resource_type)
-      study = Study.find(study) if study.is_a?(Fixnum)
+      study = Study.find(study) unless study.is_a?(Study)
       rel = Version.where(item_type: resource_type)
       case resource_type
       when 'Patient' then patient_query(rel, study)
