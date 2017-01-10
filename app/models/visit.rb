@@ -156,10 +156,17 @@ JOIN_QUERY
   def self.int_to_state_sym(sym)
     return Visit::STATE_SYMS[sym]
   end
+
   def state
     return -1 if read_attribute(:state).nil?
-    return Visit::STATE_SYMS[read_attribute(:state)]
+    read_attribute(:state)
   end
+
+  def state_sym
+    return -1 if read_attribute(:state).nil?
+    Visit::STATE_SYMS[read_attribute(:state)]
+  end
+
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
     if sym.is_a? Fixnum
@@ -337,7 +344,7 @@ JOIN_QUERY
 
     properties.merge!(mqc_to_domino)
 
-    properties['Status'] = case self.state
+    properties['Status'] = case self.state_sym
                                 when :incomplete_na then 'Incomplete, not available'
                                 when :complete_tqc_passed then 'Complete, tQC of all series passed'
                                 when :incomplete_queried then 'Incomplete, queried'
