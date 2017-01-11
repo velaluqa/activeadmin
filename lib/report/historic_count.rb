@@ -7,8 +7,7 @@ module Report
       @study_id = options[:study_id]
 
       @resource_type = options[:resource_type]
-      @group_by = options[:group_by]
-      @include_groups = options[:include_groups]
+      @group_by = options[:group_by].blank? ? nil : options[:group_by]
 
       @start_at = options[:starts_at]
       @end_at = options[:ends_at]
