@@ -97,10 +97,11 @@ class HistoricReportQuery < ActiveRecord::Base
   def calculate_grouped_delta(version)
     case version.event
     when 'create' then
+      group = version.object_changes[group_by].andand[1] || resource_class.column_defaults[group_by]
       {
         total: +1,
         group: {
-          version.object_changes[group_by].andand[1] => +1
+          group => +1
         }
       }
     when 'destroy' then
