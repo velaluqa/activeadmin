@@ -32,6 +32,7 @@ class HistoricReportQuery < ActiveRecord::Base
                  .order('"versions"."created_at" DESC')
     versions.each do |version|
       delta = calculate_delta(version)
+      next if delta.nil?
       HistoricReportCacheEntry.ensure_cache_entry(
         self,
         study_id,
