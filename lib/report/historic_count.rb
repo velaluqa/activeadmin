@@ -65,8 +65,14 @@ SELECT
     end
 
     def transform_group(group, entries)
+      label =
+        if @group_by.blank?
+          'total'
+        else
+          Report.map_group_label(resource_class, @group_by, group)
+        end
       {
-        label: Report.map_group_label(resource_class, @group_by, group),
+        label: label,
         data: entries.map(&method(:transform_entry))
       }
     end
