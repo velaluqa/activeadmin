@@ -30,12 +30,16 @@ module Report
     private
 
     def historic_query
-      @query
-        .cache_entries
-        .joins(:historic_report_cache_values)
-        .where(study_id: @study_id)
-        .where('"historic_report_cache_values"."group" IS NOT NULL')
-        .group(<<GROUP)
+      rel =
+        @query.cache_entries
+          .joins(:historic_report_cache_values)
+          .where(study_id: @study_id)
+      if @group_by.blank?
+        rel = rel.where('"historic_report_cache_values"."group" IS NULL')
+      else
+        rel = rel.where('"historic_report_cache_values"."group" IS NOT NULL')
+      end
+      rel.group(<<GROUP)
 date_trunc('#{@resolution}', "historic_report_cache_entries"."date")::date,
 "historic_report_cache_values"."group"
 GROUP
