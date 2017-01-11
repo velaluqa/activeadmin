@@ -63,6 +63,8 @@ image_series.id AS result_id,
 'ImageSeries' AS result_type
 SELECT
 
+  scope :join_study, -> { joins(patient: { center: :study }) }
+
   include ImageStorageCallbacks
   include ScopablePermissions
 
