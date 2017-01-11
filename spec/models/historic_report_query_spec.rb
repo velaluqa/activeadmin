@@ -230,5 +230,72 @@ RSpec.describe HistoricReportQuery do
         end
       end
     end
+
+    describe 'for resource_type `Visit` grouped by `state`' do
+      describe 'with empty cache' do
+        before(:each) do
+          @study = create(:study)
+          center = create(:center, study: @study)
+          patient = create(:patient, center: center)
+          @visit1 = create(:visit, patient: patient)
+          @version1 = Version.last
+          @visit2 = create(:visit, patient: patient)
+          @version2 = Version.last
+          @visit2.state += 1
+          @visit2.save
+          @version3 = Version.last
+          @visit3 = create(:visit, patient: patient)
+          @version4 = Version.last
+          @visit3.state += 1
+          @visit3.save
+          @version5 = Version.last
+          @visit4 = create(:visit, patient: patient)
+          @version6 = Version.last
+          @visit2.state += 1
+          @visit2.save
+          @version7 = Version.last
+        end
+
+        it 'creates full cache' do
+          query = HistoricReportQuery.create(
+            resource_type: 'Visit',
+            group_by: 'state'
+          )
+          query.calculate_cache(@study.id)
+          query.calculate_cache(@study.id)
+          expect(query.cache_entries.count).to eq(7)
+          entries = HistoricReportCacheEntry.order('"date" ASC').last(7)
+          expect(entries[0].date).to eq @version1.created_at
+          expect(entries[0].values).to include(group: nil, count: 1, delta: +1)
+          expect(entries[0].values).to include(group: '0', count: 1, delta: +1)
+          expect(entries[0].values).to include(group: '1', count: 0, delta: 0)
+          expect(entries[1].date).to eq @version2.created_at
+          expect(entries[1].values).to include(group: nil, count: 2, delta: +1)
+          expect(entries[1].values).to include(group: '0', count: 2, delta: +1)
+          expect(entries[1].values).to include(group: '1', count: 0, delta: 0)
+          expect(entries[2].date).to eq @version3.created_at
+          expect(entries[2].values).to include(group: nil, count: 2, delta: 0)
+          expect(entries[2].values).to include(group: '0', count: 1, delta: -1)
+          expect(entries[2].values).to include(group: '1', count: 1, delta: +1)
+          expect(entries[3].date).to eq @version4.created_at
+          expect(entries[3].values).to include(group: nil, count: 3, delta: +1)
+          expect(entries[3].values).to include(group: '0', count: 2, delta: +1)
+          expect(entries[3].values).to include(group: '1', count: 1, delta: 0)
+          expect(entries[4].date).to eq @version5.created_at
+          expect(entries[4].values).to include(group: nil, count: 3, delta: 0)
+          expect(entries[4].values).to include(group: '0', count: 1, delta: -1)
+          expect(entries[4].values).to include(group: '1', count: 2, delta: +1)
+          expect(entries[5].date).to eq @version6.created_at
+          expect(entries[5].values).to include(group: nil, count: 4, delta: +1)
+          expect(entries[5].values).to include(group: '0', count: 2, delta: +1)
+          expect(entries[5].values).to include(group: '1', count: 2, delta: 0)
+          expect(entries[6].date).to eq @version7.created_at
+          expect(entries[6].values).to include(group: nil, count: 4, delta: 0)
+          expect(entries[6].values).to include(group: '0', count: 2, delta: 0)
+          expect(entries[6].values).to include(group: '1', count: 1, delta: -1)
+          expect(entries[6].values).to include(group: '2', count: 1, delta: +1)
+        end
+      end
+    end
   end
 end
