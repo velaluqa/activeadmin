@@ -29,12 +29,12 @@ class Version < PaperTrail::Version
     # Scopes all versions for a given `study` and `item_type`.
     def of_study_resource(study, resource_type)
       study = Study.find(study) unless study.is_a?(Study)
-      rel = Version.where(item_type: resource_type)
       case resource_type
-      when 'Patient' then patient_query(rel, study)
-      when 'Visit' then visit_query(rel, study)
-      when 'ImageSeries' then image_series_query(rel, study)
-      else rel
+      when 'Patient' then patient_query(study)
+      when 'Visit' then visit_query(study)
+      when 'ImageSeries' then image_series_query(study)
+      when 'RequiredSeries' then required_series_query(study)
+      else Version.where(item_type: resource_type)
       end
     end
 
@@ -52,22 +52,37 @@ class Version < PaperTrail::Version
 
     private
 
-    def patient_query(rel, study)
-      rel.where(<<QUERY)
+    def patient_query(study)
+      Version
+        .where(item_type: 'Patient')
+        .where(<<QUERY)
    (object_changes -> 'center_id' ->> 1)::integer IN (#{study.centers.select(:id).to_sql})
 OR (object ->> 'center_id')::integer IN (#{study.centers.select(:id).to_sql})
 QUERY
     end
 
-    def visit_query(rel, study)
-      rel.where(<<QUERY)
+    def visit_query(study)
+      Version
+        .where(item_type: 'Visit')
+        .where(<<QUERY)
    (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
 OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
 QUERY
     end
 
-    def image_series_query(rel, study)
-      rel.where(<<QUERY)
+    def image_series_query(study)
+      Version
+        .where(item_type: 'ImageSeries')
+        .where(<<QUERY)
+   (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
+OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
+QUERY
+    end
+
+    def required_series_query(study)
+      Version
+        .where(item_type: 'Visit')
+        .where(<<QUERY)
    (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
 OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
 QUERY

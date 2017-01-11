@@ -38,5 +38,13 @@ RSpec.describe Version do
         expect(Version.of_study_resource(@study, 'ImageSeries')).to include(@image_series_version)
       end
     end
+
+    describe 'with resource `RequiredSeries`' do
+      it 'includes required_series version' do
+        expect(Version.of_study_resource(@study, 'RequiredSeries')).not_to include(@patient_version)
+        expect(Version.of_study_resource(@study, 'RequiredSeries')).to include(@visit_version)
+        expect(Version.of_study_resource(@study, 'RequiredSeries')).not_to include(@image_series_version)
+      end
+    end
   end
 end
