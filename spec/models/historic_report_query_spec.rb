@@ -112,7 +112,7 @@ RSpec.describe HistoricReportQuery do
             state: [nil, 0]
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: +1, group: {'0' => +1})
+        expect(query.calculate_delta(version)).to eq(total: +1, group: {0 => +1})
       end
 
       it 'calculates destroy' do
@@ -123,7 +123,7 @@ RSpec.describe HistoricReportQuery do
             state: 0
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: -1, group: {'0' => -1})
+        expect(query.calculate_delta(version)).to eq(total: -1, group: {0 => -1})
       end
 
       it 'calculates update of state column' do
@@ -134,7 +134,7 @@ RSpec.describe HistoricReportQuery do
             state: [0, 1]
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: 0, group: {'0' => -1, '1' => +1})
+        expect(query.calculate_delta(version)).to eq(total: 0, group: {0 => -1, 1 => +1})
       end
 
       it 'calculates update of state column' do
