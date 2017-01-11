@@ -100,14 +100,14 @@ class HistoricReportQuery < ActiveRecord::Base
       {
         total: +1,
         group: {
-          version.object_changes[group_by][1].to_s => +1
+          version.object_changes[group_by].andand[1] => +1
         }
       }
     when 'destroy' then
       {
         total: -1,
         group: {
-          version.object[group_by].to_s => -1
+          version.object[group_by] => -1
         }
       }
     when 'update' then
@@ -115,8 +115,8 @@ class HistoricReportQuery < ActiveRecord::Base
       {
         total: 0,
         group: {
-          version.object_changes[group_by][0].to_s => -1,
-          version.object_changes[group_by][1].to_s => +1
+          version.object_changes[group_by][0] => -1,
+          version.object_changes[group_by][1] => +1
         }
       }
     end
