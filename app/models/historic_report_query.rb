@@ -48,13 +48,12 @@ class HistoricReportQuery < ActiveRecord::Base
       total: resource_class.join_study.where(studies: { id: study_id }).count,
       group: {}
     }
-    if group_by
-      count[:group] =
-        resource_class.join_study
-          .where(studies: { id: study_id })
-          .group("\"#{resource_class.table_name}\".\"#{group_by}\"")
-          .count
-    end
+    return count if group_by.blank?
+    count[:group] =
+      resource_class.join_study
+        .where(studies: { id: study_id })
+        .group("\"#{resource_class.table_name}\".\"#{group_by}\"")
+        .count
     count
   end
 
