@@ -1,4 +1,5 @@
 require 'report/overview'
+require 'report/historic_count'
 
 module Report
   class UnknownReportType < StandardError; end
