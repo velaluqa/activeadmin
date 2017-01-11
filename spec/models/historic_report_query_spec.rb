@@ -34,10 +34,8 @@ RSpec.describe HistoricReportQuery do
       count       = { total: 15, group: { new: 3,  succeeded: 10, failed: 2 } }
       delta       = { total: 0,  group: { new: -1, succeeded: +1, failed: 0 } }
       expectation = [
-        { group: nil,         count: 15, delta: 0 },
         { group: 'new',       count: 3,  delta: -1 },
         { group: 'succeeded', count: 10, delta: +1 },
-        { group: 'failed',    count: 2,  delta: 0 }
       ]
       expect(query.entry_values(count, delta)).to eq(expectation)
     end
@@ -268,30 +266,30 @@ RSpec.describe HistoricReportQuery do
           expect(entries[0].date).to eq @version1.created_at
           expect(entries[0].values).to include(group: nil, count: 1, delta: +1)
           expect(entries[0].values).to include(group: '0', count: 1, delta: +1)
-          expect(entries[0].values).to include(group: '1', count: 0, delta: 0)
+          expect(entries[0].values).not_to include(group: '1', count: 0, delta: 0)
           expect(entries[1].date).to eq @version2.created_at
           expect(entries[1].values).to include(group: nil, count: 2, delta: +1)
           expect(entries[1].values).to include(group: '0', count: 2, delta: +1)
-          expect(entries[1].values).to include(group: '1', count: 0, delta: 0)
+          expect(entries[1].values).not_to include(group: '1', count: 0, delta: 0)
           expect(entries[2].date).to eq @version3.created_at
-          expect(entries[2].values).to include(group: nil, count: 2, delta: 0)
+          expect(entries[2].values).not_to include(group: nil, count: 2, delta: 0)
           expect(entries[2].values).to include(group: '0', count: 1, delta: -1)
           expect(entries[2].values).to include(group: '1', count: 1, delta: +1)
           expect(entries[3].date).to eq @version4.created_at
           expect(entries[3].values).to include(group: nil, count: 3, delta: +1)
           expect(entries[3].values).to include(group: '0', count: 2, delta: +1)
-          expect(entries[3].values).to include(group: '1', count: 1, delta: 0)
+          expect(entries[3].values).not_to include(group: '1', count: 1, delta: 0)
           expect(entries[4].date).to eq @version5.created_at
-          expect(entries[4].values).to include(group: nil, count: 3, delta: 0)
+          expect(entries[4].values).not_to include(group: nil, count: 3, delta: 0)
           expect(entries[4].values).to include(group: '0', count: 1, delta: -1)
           expect(entries[4].values).to include(group: '1', count: 2, delta: +1)
           expect(entries[5].date).to eq @version6.created_at
           expect(entries[5].values).to include(group: nil, count: 4, delta: +1)
           expect(entries[5].values).to include(group: '0', count: 2, delta: +1)
-          expect(entries[5].values).to include(group: '1', count: 2, delta: 0)
+          expect(entries[5].values).not_to include(group: '1', count: 2, delta: 0)
           expect(entries[6].date).to eq @version7.created_at
-          expect(entries[6].values).to include(group: nil, count: 4, delta: 0)
-          expect(entries[6].values).to include(group: '0', count: 2, delta: 0)
+          expect(entries[6].values).not_to include(group: nil, count: 4, delta: 0)
+          expect(entries[6].values).not_to include(group: '0', count: 2, delta: 0)
           expect(entries[6].values).to include(group: '1', count: 1, delta: -1)
           expect(entries[6].values).to include(group: '2', count: 1, delta: +1)
         end

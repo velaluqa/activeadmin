@@ -58,9 +58,12 @@ class HistoricReportQuery < ActiveRecord::Base
   end
 
   def entry_values(count, delta)
-    values = [{ group: nil, count: count[:total], delta: delta[:total] }]
+    values = []
+    values.push(group: nil, count: count[:total], delta: delta[:total]) unless delta[:total] == 0
     (count[:group] || {}).each_pair do |key, val|
-      values.push(group: key.to_s, count: val,  delta: delta[:group][key])
+      d = delta[:group].andand[key] || 0
+      next if d.nil? || d == 0
+      values.push(group: key.to_s, count: val, delta: d)
     end
     values
   end
