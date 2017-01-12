@@ -21,9 +21,9 @@ RSpec.describe HistoricReportQuery do
 
     it 'counts the groups' do
       expect(count[:group]).to be_a(Hash)
-      expect(count[:group]).to include(0 => 1)
-      expect(count[:group]).to include(1 => 1)
-      expect(count[:group]).to include(2 => 2)
+      expect(count[:group]).to include('0' => 1)
+      expect(count[:group]).to include('1' => 1)
+      expect(count[:group]).to include('2' => 2)
     end
   end
 
@@ -31,13 +31,26 @@ RSpec.describe HistoricReportQuery do
     let!(:query) { HistoricReportQuery.create(resource_type: 'Patient') }
 
     it 'returns the correct values' do
+      count       = { total: 15 }
+      delta       = { total: 1 }
+      result = query.entry_values(count, delta)
+      expect(result).to include(group: nil, count: 15, delta: 1)
+    end
+
+    it 'returns the correct values' do
       count       = { total: 15, group: { new: 3,  succeeded: 10, failed: 2 } }
       delta       = { total: 0,  group: { new: -1, succeeded: +1, failed: 0 } }
-      expectation = [
-        { group: 'new',       count: 3,  delta: -1 },
-        { group: 'succeeded', count: 10, delta: +1 },
-      ]
-      expect(query.entry_values(count, delta)).to eq(expectation)
+      result = query.entry_values(count, delta)
+      expect(result).to include(group: 'new',       count: 3,  delta: -1)
+      expect(result).to include(group: 'succeeded', count: 10, delta: +1)
+    end
+
+    it 'returns the correct values for missing group count' do
+      count       = { total: 15, group: { succeeded: 10, failed: 2 } }
+      delta       = { total: 0,  group: { new: -1, succeeded: +1, failed: 0 } }
+      result      = query.entry_values(count, delta)
+      expect(result).to include(group: 'new', count: 0,  delta: -1)
+      expect(result).to include(group: 'succeeded', count: 10, delta: +1)
     end
   end
 
@@ -76,7 +89,7 @@ RSpec.describe HistoricReportQuery do
   end
 
   describe '#calculate_delta' do
-    describe 'for ungrouped report' do
+    describe 'for ungrouped `Visit` report' do
       let!(:query) do
         HistoricReportQuery.create(resource_type: 'Visit')
       end
@@ -97,7 +110,7 @@ RSpec.describe HistoricReportQuery do
       end
     end
 
-    describe 'for grouped report' do
+    describe 'for `Visit` report grouped by `state`' do
       let!(:query) do
         HistoricReportQuery.create(resource_type: 'Visit', group_by: 'state')
       end
@@ -110,7 +123,7 @@ RSpec.describe HistoricReportQuery do
             state: [nil, 0]
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: +1, group: {0 => +1})
+        expect(query.calculate_delta(version)).to eq(total: +1, group: {'0' => +1})
       end
 
       it 'calculates destroy' do
@@ -121,7 +134,7 @@ RSpec.describe HistoricReportQuery do
             state: 0
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: -1, group: {0 => -1})
+        expect(query.calculate_delta(version)).to eq(total: -1, group: {'0' => -1})
       end
 
       it 'calculates update of state column' do
@@ -132,7 +145,7 @@ RSpec.describe HistoricReportQuery do
             state: [0, 1]
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: 0, group: {0 => -1, 1 => +1})
+        expect(query.calculate_delta(version)).to eq(total: 0, group: {'0' => -1, '1' => +1})
       end
 
       it 'calculates update of state column' do

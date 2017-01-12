@@ -1,3 +1,4 @@
+# coding: utf-8
 # ## Schema Information
 #
 # Table name: `historic_report_queries`
@@ -65,15 +66,23 @@ class HistoricReportQuery < ActiveRecord::Base
       .where(studies: { id: study_id })
       .group("\"#{resource_class.table_name}\".\"#{group_by}\"")
       .count
+      .stringify_keys
   end
 
   def entry_values(count, delta)
+    count = count.with_indifferent_access
+    delta = delta.with_indifferent_access
     values = []
     values.push(group: nil, count: count[:total], delta: delta[:total]) unless delta[:total] == 0
-    (count[:group] || {}).each_pair do |key, val|
-      d = delta[:group].andand[key] || 0
-      next if d.nil? || d == 0
-      values.push(group: key.to_s, count: val, delta: d)
+    count_keys = count[:group].andand.keys || []
+    delta_keys = delta[:group].andand.keys || []
+    (count_keys + delta_keys)
+      .uniq
+      .each do |group|
+      group_count = count[:group].andand[group] || 0
+      group_delta = delta[:group].andand[group] || 0
+      next if group_delta == 0
+      values.push(group: group, count: group_count, delta: group_delta)
     end
     values
   end
@@ -91,8 +100,10 @@ class HistoricReportQuery < ActiveRecord::Base
     (delta[:group] || {}).each_pair do |key, delta_val|
       next unless delta_val.is_a?(Fixnum)
       if options[:reverse]
+        count[:group][key] ||= 0
         count[:group][key] -= delta_val
       else
+        count[:group][key] ||= 0
         count[:group][key] += delta_val
       end
     end
@@ -114,14 +125,14 @@ class HistoricReportQuery < ActiveRecord::Base
       {
         total: +1,
         group: {
-          group => +1
+          group.to_s => +1
         }
       }
     when 'destroy' then
       {
         total: -1,
         group: {
-          version.object[group_by] => -1
+          version.object[group_by].to_s => -1
         }
       }
     when 'update' then
@@ -129,8 +140,8 @@ class HistoricReportQuery < ActiveRecord::Base
       {
         total: 0,
         group: {
-          version.object_changes[group_by][0] => -1,
-          version.object_changes[group_by][1] => +1
+          version.object_changes[group_by][0].to_s => -1,
+          version.object_changes[group_by][1].to_s => +1
         }
       }
     end
