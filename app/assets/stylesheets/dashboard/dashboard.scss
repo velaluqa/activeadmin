@@ -17,6 +17,12 @@
   }
 }
 
+body.admin_dashboard {
+  div#title_bar {
+    display: none;
+  }
+}
+
 #dashboard-container {
   * {
     box-sizing: border-box;
