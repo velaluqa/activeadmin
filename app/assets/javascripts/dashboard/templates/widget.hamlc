@@ -1,5 +1,4 @@
 .buttons
   %i.fa.fa-edit
 %h3 Overview
-.content-wrapper
-  .table.content
+.content
