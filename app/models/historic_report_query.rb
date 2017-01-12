@@ -148,10 +148,116 @@ class HistoricReportQuery < ActiveRecord::Base
   end
 
   def calculate_delta(version)
+    return calculate_rs_delta(version) if resource_type == 'RequiredSeries'
     if group_by.blank?
       calculate_ungrouped_delta(version)
     else
       calculate_grouped_delta(version)
+    end
+  end
+
+  # TODO: Refactor in the process of moving required_series
+  # associations out of a JSON field into single relations.
+  #
+  # Apologies to anyone who has to maintain this stuff.
+  # Deadline is pressing.
+  def calculate_rs_delta(version)
+    if group_by.blank?
+      calculate_ungrouped_rs_delta(version)
+    else
+      calculate_grouped_rs_delta(version)
+    end
+  end
+
+  def calculate_grouped_rs_delta(version)
+    changed = false
+    delta = {
+      total: 0,
+      group: {}
+    }
+    case version.event
+    when 'create'
+      rs = version.object_changes['required_series'].andand[1] || {}
+      rs.each_pair do |_, data|
+        next if data['image_series_id'].nil?
+        changed = true
+        delta[:total] += 1
+        delta[:group][data[group_by].to_s] ||= 0
+        delta[:group][data[group_by].to_s] += 1
+      end
+    when 'destroy' then
+      rs = version.object['required_series'] || {}
+      rs.each_pair do |_, data|
+        next if data['image_series_id'].nil?
+        changed = true
+        delta[:total] -= 1
+        delta[:group][data[group_by].to_s] ||= 0
+        delta[:group][data[group_by].to_s] -= 1
+      end
+    when 'update'
+      old, new = version.object_changes['required_series']
+      old_count = { total: 0, group: {} }
+      (old || {}).each_pair do |_, data|
+        next if data['image_series_id'].nil?
+        old_count[:total] += 1
+        old_count[:group][data[group_by].to_s] ||= 0
+        old_count[:group][data[group_by].to_s] += 1
+      end
+
+      new_count = { total: 0, group: {} }
+      (new || {}).each_pair do |_, data|
+        next if data['image_series_id'].nil?
+        new_count[:total] += 1
+        new_count[:group][data[group_by].to_s] ||= 0
+        new_count[:group][data[group_by].to_s] += 1
+      end
+      changed = true if new_count[:total] != old_count[:total]
+      delta = {
+        total: new_count[:total] - old_count[:total],
+        group: (old_count[:group].keys + new_count[:group].keys)
+          .uniq
+          .map do |group|
+          old_group_count = old_count[:group][group] || 0
+          new_group_count = new_count[:group][group] || 0
+          changed = true if old_group_count != new_group_count
+          [
+            group.to_s,
+            new_group_count - old_group_count
+          ]
+        end.to_h
+      }
+    end
+    delta if changed
+  end
+
+  def calculate_ungrouped_rs_delta(version)
+    case version.event
+    when 'create'
+      delta = 0
+      rs = version.object_changes['required_series'].andand[1] || {}
+      rs.each_pair do |_, data|
+        delta += 1 if data['image_series_id']
+      end
+      { total: delta } if delta != 0
+    when 'destroy' then
+      delta = 0
+      rs = version.object['required_series'] || {}
+      rs.each_pair do |_, data|
+        delta -= 1 if data['image_series_id']
+      end
+      { total: delta } if delta != 0
+    when 'update'
+      old, new = version.object_changes['required_series']
+      old_count = 0
+      (old || {}).each_pair do |_, data|
+        old_count += 1 if data['image_series_id']
+      end
+      new_count = 0
+      (new || {}).each_pair do |_, data|
+        new_count += 1 if data['image_series_id']
+      end
+      delta = new_count - old_count
+      { total: delta } if delta != 0
     end
   end
 end

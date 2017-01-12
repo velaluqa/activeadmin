@@ -159,6 +159,170 @@ RSpec.describe HistoricReportQuery do
         expect(query.calculate_delta(version)).to eq(nil)
       end
     end
+
+    describe 'for ungrouped `RequiredSeries` report' do
+      let!(:query) do
+        HistoricReportQuery.create(resource_type: 'RequiredSeries')
+      end
+
+      it 'calculates create without required series' do
+        version = build(
+          :version,
+          event: 'create',
+          object_changes: {
+            'required_series' => [nil, {}]
+          }
+        )
+        expect(query.calculate_delta(version)).to be_nil
+      end
+
+      it 'calculates create with required series' do
+        version = build(
+          :version,
+          event: 'create',
+          object_changes: {
+            'required_series' => [
+              nil,
+              {
+                'baseline' => { 'image_series_id' => '1', 'tqc_state' => 0 }
+              }
+            ]
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: +1)
+      end
+
+      it 'calculates destroy without required series' do
+        version = build(
+          :version,
+          event: 'destroy',
+          object: {
+            'required_series' => {}
+          }
+        )
+        expect(query.calculate_delta(version)).to be_nil
+      end
+
+      it 'calculates destroy with required series' do
+        version = build(
+          :version,
+          event: 'destroy',
+          object: {
+            'required_series' => {
+              'baseline' => { 'image_series_id' => '1', 'tqc_state' => 0 }
+            }
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: -1)
+      end
+
+      it 'calculates destroy with two required series' do
+        version = build(
+          :version,
+          event: 'destroy',
+          object: {
+            'required_series' => {
+              'baseline' => { 'image_series_id' => '1', 'tqc_state' => 0 },
+              'extra' => { 'image_series_id' => '1', 'tqc_state' => 0 }
+            }
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: -2)
+      end
+
+      it 'calculates update' do
+        version = build(
+          :version,
+          event: 'update',
+          object_changes: {
+            'required_series' => [
+              {},
+              {
+                'baseline' => { 'image_series_id' => '1', 'tqc_state' => 0 },
+                'extra' => { 'image_series_id' => '1', 'tqc_state' => 0 }
+              }
+            ]
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: +2)
+      end
+    end
+
+    describe 'for `RequiredSeries` report grouped by `tqc_state`' do
+      let!(:query) do
+        HistoricReportQuery.create(resource_type: 'RequiredSeries', group_by: 'tqc_state')
+      end
+
+      it 'calculates create' do
+        version = build(
+          :version,
+          event: 'create',
+          object_changes: {
+            'required_series' => [
+              nil,
+              {
+                'baseline' => {
+                  'image_series_id' => '1',
+                  'tqc_state' => 0
+                }
+              }
+            ]
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: +1, group: {'0' => +1})
+      end
+
+      it 'calculates destroy' do
+        version = build(
+          :version,
+          event: 'destroy',
+          object: {
+            'required_series' => {
+              'baseline' => {
+                'image_series_id' => '1',
+                'tqc_state' => 0
+              }
+            }
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: -1, group: {'0' => -1})
+      end
+
+      it 'calculates update' do
+        version = build(
+          :version,
+          event: 'update',
+          object_changes: {
+            'required_series' => [
+              {
+                'baseline' => {
+                  'image_series_id' => '1',
+                  'tqc_state' => 0
+                }
+              },
+              {
+                'baseline' => {
+                  'image_series_id' => '1',
+                  'tqc_state' => 1
+                }
+              }
+            ]
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(total: 0, group: {'0' => -1, '1' => +1})
+      end
+
+      it 'ignores update of irrelevant columns' do
+        version = build(
+          :version,
+          event: 'update',
+          object_changes: {
+            visit_number: [123, 321]
+          }
+        )
+        expect(query.calculate_delta(version)).to eq(nil)
+      end
+    end
   end
 
   describe '#calculate_cache' do
@@ -305,6 +469,155 @@ RSpec.describe HistoricReportQuery do
           expect(entries[6].values).not_to include(group: '0', count: 2, delta: 0)
           expect(entries[6].values).to include(group: '1', count: 1, delta: -1)
           expect(entries[6].values).to include(group: '2', count: 1, delta: +1)
+        end
+      end
+    end
+
+    describe 'for ungrouped resource_type `RequiredSeries`' do
+      describe 'with empty cache' do
+        before(:each) do
+          @study = create(:study)
+          @center = create(:center, study: @study)
+          @patient = create(:patient, center: @center)
+          @image_series1 = create(:image_series, patient: @patient)
+          @image_series2 = create(:image_series, patient: @patient)
+          @visit = create(:visit, patient: @patient)
+          @version1 = Version.last
+          @visit.required_series = {
+            'baseline' => {
+              'image_series_id' => @image_series1.id.to_s,
+              'tqc_state' => 0
+            }
+          }
+          @visit.assigned_image_series_index = {
+            @image_series1.id.to_s => ['baseline']
+          }
+          @visit.save
+          @version2 = Version.last
+          @visit.required_series = {
+            'baseline' => {
+              'image_series_id' => @image_series1.id.to_s,
+              'tqc_state' => 0
+            },
+            'extra' => {
+              'image_series_id' => @image_series2.id.to_s,
+              'tqc_state' => 0
+            }
+          }
+          @visit.assigned_image_series_index = {
+            @image_series1.id.to_s => ['baseline'],
+            @image_series2.id.to_s => ['extra']
+          }
+          @visit.save
+          @version3 = Version.last
+          @visit.required_series = {
+            'baseline' => {
+              'image_series_id' => @image_series1.id.to_s,
+              'tqc_state' => 1
+            },
+            'extra' => {
+              'image_series_id' => @image_series2.id.to_s,
+              'tqc_state' => 0
+            }
+          }
+          @visit.save
+          @version4 = Version.last
+          @visit.destroy
+          @version5 = Version.last
+        end
+
+        it 'creates full cache' do
+          query = HistoricReportQuery.create(resource_type: 'RequiredSeries')
+          query.calculate_cache(@study.id)
+          query.calculate_cache(@study.id)
+          entries = HistoricReportCacheEntry.order('"date" ASC').last(3)
+          expect(entries.length).to eq(3)
+          expect(entries[0].date).to eq @version2.created_at
+          expect(entries[0].values).to include(group: nil, count: 1, delta: 1)
+          expect(entries[1].date).to eq @version3.created_at
+          expect(entries[1].values).to include(group: nil, count: 2, delta: 1)
+          expect(entries[2].date).to eq @version5.created_at
+          expect(entries[2].values).to include(group: nil, count: 0, delta: -2)
+        end
+      end
+    end
+
+    describe 'for resource_type `RequiredSeries` grouped by `tqc_state`' do
+      describe 'with empty cache' do
+        before(:each) do
+          @study = create(:study)
+          @center = create(:center, study: @study)
+          @patient = create(:patient, center: @center)
+          @image_series1 = create(:image_series, patient: @patient)
+          @image_series2 = create(:image_series, patient: @patient)
+          @visit = create(:visit, patient: @patient)
+          @version1 = Version.last
+          @visit.required_series = {
+            'baseline' => {
+              'image_series_id' => @image_series1.id.to_s,
+              'tqc_state' => 0
+            }
+          }
+          @visit.assigned_image_series_index = {
+            @image_series1.id.to_s => ['baseline']
+          }
+          @visit.save
+          @version2 = Version.last
+          @visit.required_series = {
+            'baseline' => {
+              'image_series_id' => @image_series1.id.to_s,
+              'tqc_state' => 0
+            },
+            'extra' => {
+              'image_series_id' => @image_series2.id.to_s,
+              'tqc_state' => 0
+            }
+          }
+          @visit.assigned_image_series_index = {
+            @image_series1.id.to_s => ['baseline'],
+            @image_series2.id.to_s => ['extra']
+          }
+          @visit.save
+          @version3 = Version.last
+          @visit.required_series = {
+            'baseline' => {
+              'image_series_id' => @image_series1.id.to_s,
+              'tqc_state' => 1
+            },
+            'extra' => {
+              'image_series_id' => @image_series2.id.to_s,
+              'tqc_state' => 0
+            }
+          }
+          @visit.save
+          @version4 = Version.last
+          @visit.destroy
+          @version5 = Version.last
+        end
+
+        it 'creates full cache' do
+          query = HistoricReportQuery.create(
+            resource_type: 'RequiredSeries',
+            group_by: 'tqc_state'
+          )
+          query.calculate_cache(@study.id)
+          query.calculate_cache(@study.id)
+          entries = HistoricReportCacheEntry.order('"date" ASC').last(4)
+          expect(entries.length).to eq(4)
+          expect(entries[0].date).to eq @version2.created_at
+          expect(entries[0].values).to include(group: nil, count: 1, delta: +1)
+          expect(entries[0].values).to include(group: '0', count: 1, delta: +1)
+          expect(entries[1].date).to eq @version3.created_at
+          expect(entries[1].values).to include(group: nil, count: 2, delta: +1)
+          expect(entries[1].values).to include(group: '0', count: 2, delta: +1)
+          expect(entries[2].date).to eq @version4.created_at
+          expect(entries[2].values).not_to include(group: nil, count: 2, delta: 0)
+          expect(entries[2].values).to include(group: '0', count: 1, delta: -1)
+          expect(entries[2].values).to include(group: '1', count: 1, delta: +1)
+          expect(entries[3].date).to eq @version5.created_at
+          expect(entries[3].values).to include(group: nil, count: 0, delta: -2)
+          expect(entries[3].values).to include(group: '0', count: 0, delta: -1)
+          expect(entries[3].values).to include(group: '1', count: 0, delta: -1)
         end
       end
     end
