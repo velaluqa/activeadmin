@@ -29,8 +29,14 @@ body.admin_dashboard {
   }
 
   div.row {
-    margin-left: -30px;
-    margin-right: -30px;
+    margin-left: -25px;
+    margin-right: -25px;
+
+    ul.row {
+      margin-bottom: 0;
+      padding: 0;
+      margin: 0;
+    }
 
     li {
       list-style-type: none;
@@ -39,8 +45,8 @@ body.admin_dashboard {
       float: left;
       position: relative;
       min-height: 1px;
-      padding-left: 15px;
-      padding-right: 15px;
+      padding-left: 7.5px;
+      padding-right: 7.5px;
       margin-bottom: 15px;
 
       .widget {
@@ -70,9 +76,8 @@ body.admin_dashboard {
       li {
 	width: 16.6666666666%;
 
-	.widget {
-	  position: relative;
-	  width: 100%;
+	.widget,
+	&.sortable-placeholder:after {
 	  padding-bottom: 55%;
 	}
 
@@ -180,7 +185,7 @@ body.admin_dashboard {
   .widget {
     position: relative;
     background-color: #fff;
-    box-shadow: 0px 1px 4px rgba(0,0,0,0.2);
+    box-shadow: 0px 1px 4px rgba(0,0,0,0.1);
     border: 1px solid rgba(0,0,0,0.1);
     border-radius: 4px;
 
