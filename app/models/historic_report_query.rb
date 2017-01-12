@@ -44,17 +44,27 @@ class HistoricReportQuery < ActiveRecord::Base
   end
 
   def current_count(study_id)
-    count = {
-      total: resource_class.join_study.where(studies: { id: study_id }).count,
-      group: {}
-    }
-    return count if group_by.blank?
-    count[:group] =
-      resource_class.join_study
-        .where(studies: { id: study_id })
-        .group("\"#{resource_class.table_name}\".\"#{group_by}\"")
-        .count
+    count = { total: ungrouped_count(study_id) }
+    count[:group] = grouped_count(study_id) unless group_by.blank?
     count
+  end
+
+  def ungrouped_count(study_id)
+    if resource_class.respond_to?(:count_for_study)
+      return resource_class.count_for_study(study_id)
+    end
+    resource_class.join_study.where(studies: { id: study_id }).count
+  end
+
+  def grouped_count(study_id)
+    if resource_class.respond_to?(:grouped_count_for_study)
+      return resource_class.grouped_count_for_study(study_id, group_by)
+    end
+    resource_class
+      .join_study
+      .where(studies: { id: study_id })
+      .group("\"#{resource_class.table_name}\".\"#{group_by}\"")
+      .count
   end
 
   def entry_values(count, delta)
