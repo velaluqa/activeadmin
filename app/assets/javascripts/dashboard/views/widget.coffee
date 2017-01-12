@@ -7,7 +7,7 @@ class Dashboard.Views.Widget extends Backbone.View
 
   initialize: ->
     @model.report.on 'change', @renderReport
-    @model.report.on 'fetching sync', @renderLoading
+    @model.report.on 'fetching fetched', @renderLoading
 
   renderLoading: =>
     @$el.toggleClass('loading', @model.report.isFetching)
