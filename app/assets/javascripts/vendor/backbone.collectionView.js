@@ -865,15 +865,11 @@
 				receive : _.bind( this._receive, this ),
 				over : _.bind( this._over, this )
 			}, _.result( this, "sortableOptions" ) );
-
-		    console.log('setup sortable');
-		    console.log(sortableOptions);
 			this.$el = this.$el.sortable( sortableOptions );
 			//this.$el.sortable( "enable" ); // in case it was disabled previously
 		},
 
 		_sortStart : function( event, ui ) {
-		    console.log("sort start", this.collection, arguments)
 			var modelBeingSorted = this.collection.get( ui.item.attr( "data-model-cid" ) );
 			if( this._isBackboneCourierAvailable() )
 				this.spawn( "sortStart", { modelBeingSorted : modelBeingSorted } );
@@ -881,7 +877,6 @@
 		},
 
 		_sortChange : function( event, ui ) {
-		    console.log("sort change", this.collection, arguments)
 			var modelBeingSorted = this.collection.get( ui.item.attr( "data-model-cid" ) );
 			
 			if( this._isBackboneCourierAvailable() )
@@ -890,7 +885,6 @@
 		},
 
 		_sortStop : function( event, ui ) {
-		    console.log("sort stop", this.collection, arguments)
 			var modelBeingSorted = this.collection.get( ui.item.attr( "data-model-cid" ) );
 			var modelViewContainerEl = this._getContainerEl();
 			var newIndex = modelViewContainerEl.children().index( ui.item );
