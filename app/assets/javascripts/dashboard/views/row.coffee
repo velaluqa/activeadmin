@@ -4,21 +4,34 @@ class Dashboard.Views.Row extends Backbone.View
   className: 'row'
   template: JST['dashboard/templates/row']
 
+  events:
+    'sortout': 'sortOut'
+    'sortover': 'sortOver'
+
+  sortOut: =>
+    len = @$('ul.row li:not(.ui-sortable-helper):not(.sortable-placeholder)').length
+    @setSizeClass(len)
+
+  sortOver: =>
+    len = @$('ul.row li:not(.ui-sortable-helper)').length
+    @setSizeClass(len)
+
   initialize: ->
     @subviews ||= {}
+    @listenTo @model.widgets, 'add remove', =>
+      @setSizeClass(@model.widgets.length)
 
-    @listenTo @model.widgets, 'add remove', @setSizeClass
-
-  setSizeClass: =>
-    if @model.widgets.length > 6
+  setSizeClass: (count) =>
+    items = @model.widgets.length
+    if count > 6
       @$el.attr(class: 'row size-6')
-    else if @model.widgets.length < 1
-      @$el.attr(class: 'row size-1')
+    else if count < 1
+      @$el.attr(class: 'row empty')
     else
-      @$el.attr(class: "row size-#{@model.widgets.length}")
+      @$el.attr(class: "row size-#{count}")
 
   render: =>
-    @setSizeClass()
+    @setSizeClass(@model.widgets.length)
     @$el.html(@template())
     collectionView = new Backbone.CollectionView
       el: @$('ul')
