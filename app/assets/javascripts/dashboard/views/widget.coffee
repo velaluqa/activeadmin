@@ -18,11 +18,14 @@ class Dashboard.Views.Widget extends Backbone.View
       when 'historic_count' then @renderHistoricCount(model)
 
   renderOverview: (model) ->
+    return unless model.get('studies')?
+    @$('h3').html('Overview')
     @$('.content').attr(class: 'content table')
     @$('.content').html(@overviewTemplate(report: model.toJSON()))
 
   renderHistoricCount: (model) ->
     return unless model.get('datasets')?
+    @$('h3').html(model.title())
     @$('.content').attr(class: 'content graph')
     $canvas = $('<canvas></canvas>', attr: { width: '100%', height: '100%' })
     @$('.content').html($canvas)
@@ -61,6 +64,6 @@ class Dashboard.Views.Widget extends Backbone.View
 
   render: =>
     @$el.html(@template())
-    @renderReport(@model.report, null) if @model.report?
     @renderLoading()
+    @renderReport(@model.report, null) if @model.report?
     this

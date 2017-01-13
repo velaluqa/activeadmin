@@ -16,3 +16,6 @@ class Dashboard.Models.Report extends Backbone.Model
       data:
         type: @type
         params: @params
+
+  title: ->
+    @get('title') or @type
