@@ -5,11 +5,17 @@ class Dashboard.Views.Main extends Backbone.View
     @subviews ||= {}
 
   events:
+    'click button.add-row': 'addRow'
     'sortstart': 'sortstart'
+
   sortstart: (_, ui) ->
     return unless ui.placeholder.hasClass('sortable-row-placeholder')
     height = ui.item.outerHeight()
     ui.placeholder.css height: "#{height}px"
+
+  addRow: =>
+    @model.addEmptyRow()
+
   render: =>
     @$el.html('<ul class="rows"></ul>')
     collectionView = new Backbone.CollectionView
