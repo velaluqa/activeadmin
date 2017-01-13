@@ -10,4 +10,5 @@ class Dashboard.Views.Main extends Backbone.View
       @subviews[i] = view = new Dashboard.Views.Row
         model: row
       @$el.append(view.render().el)
+    @$el.append('<button class="add-row">Add Row</button>')
     this

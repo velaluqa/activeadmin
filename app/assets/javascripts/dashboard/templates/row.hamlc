@@ -1,1 +1,3 @@
 %ul.row
+%button.add-widget +
+.row-sortable-handle

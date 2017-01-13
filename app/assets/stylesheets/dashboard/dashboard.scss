@@ -28,7 +28,13 @@ body.admin_dashboard {
     box-sizing: border-box;
   }
 
-  div.row {
+  button.add-row {
+    margin: 15px auto 0 auto;
+    display: block;
+  }
+
+  .row {
+    position: relative;
     margin-left: -25px;
     margin-right: -25px;
 
@@ -36,6 +42,38 @@ body.admin_dashboard {
       margin-bottom: 0;
       padding: 0;
       margin: 0;
+    }
+
+    button.add-widget {
+      position: absolute;
+      right: -10px;
+      top: 48%;
+      transform: translateY(-50%);
+      content: '+';
+    }
+
+    .row-sortable-handle {
+      position: absolute;
+      left: -10px;
+      top: 48%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 60px;
+      opacity: 0.5;
+      background: url(
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAECAYAAABP2FU6AAAAEUlEQVQIW2NgYGDwAWIIAQEACBgAmQgR82IAAAAASUVORK5CYII=
+) repeat;
+    }
+
+    &.empty {
+      padding: 0 7.5px;
+
+      ul.row {
+	position: relative;
+	width: 100%;
+	padding-bottom: 10%;
+	border: 1px dashed rgba(0,0,0,0.2);
+      }
     }
 
     li {
