@@ -84,7 +84,7 @@ describe Report::HistoricCount do
 
       describe '#result' do
         it 'returns correct values' do
-          expected_results = {
+          expected_datasets = {
             datasets: [
               {
                 label: :incomplete_na,
@@ -105,7 +105,8 @@ describe Report::HistoricCount do
               }
             ]
           }
-          expect(report.result).to eq(expected_results)
+          expect(report.result).to include(expected_datasets)
+          expect(report.result).to include(title: "Visit history for #{study.name}")
         end
       end
     end
@@ -124,7 +125,7 @@ describe Report::HistoricCount do
 
       describe '#result' do
         it 'returns correct values' do
-          expected_results = {
+          expected_datasets = {
             datasets: [
               {
                 label: :incomplete_na,
@@ -143,7 +144,8 @@ describe Report::HistoricCount do
               }
             ]
           }
-          expect(report.result).to eq(expected_results)
+          expect(report.result).to include(expected_datasets)
+          expect(report.result).to include(title: "Visit history for #{study.name}")
         end
       end
     end
@@ -162,7 +164,7 @@ describe Report::HistoricCount do
 
       describe '#result' do
         it 'returns correct values' do
-          expected_results = {
+          expected_datasets = {
             datasets: [
               {
                 label: :incomplete_na,
@@ -179,7 +181,8 @@ describe Report::HistoricCount do
               }
             ]
           }
-          expect(report.result).to eq(expected_results)
+          expect(report.result).to include(expected_datasets)
+          expect(report.result).to include(title: "Visit history for #{study.name}")
         end
       end
     end
@@ -236,7 +239,7 @@ describe Report::HistoricCount do
 
       describe '#result' do
         it 'returns correct values' do
-          expected_results = {
+          expected_datasets = {
             datasets: [
               {
                 label: 'total',
@@ -249,7 +252,8 @@ describe Report::HistoricCount do
               }
             ]
           }
-          expect(report.result).to eq(expected_results)
+          expect(report.result).to include(expected_datasets)
+          expect(report.result).to include(title: "Visit history for #{study.name}")
         end
       end
     end
@@ -267,7 +271,7 @@ describe Report::HistoricCount do
 
       describe '#result' do
         it 'returns correct values' do
-          expected_results = {
+          expected_datasets = {
             datasets: [
               {
                 label: 'total',
@@ -279,7 +283,8 @@ describe Report::HistoricCount do
               }
             ]
           }
-          expect(report.result).to eq(expected_results)
+          expect(report.result).to include(expected_datasets)
+          expect(report.result).to include(title: "Visit history for #{study.name}")
         end
       end
     end
@@ -297,7 +302,7 @@ describe Report::HistoricCount do
 
       describe '#result' do
         it 'returns correct values' do
-          expected_results = {
+          expected_datasets = {
             datasets: [
               {
                 label: 'total',
@@ -308,7 +313,8 @@ describe Report::HistoricCount do
               }
             ]
           }
-          expect(report.result).to eq(expected_results)
+          expect(report.result).to include(expected_datasets)
+          expect(report.result).to include(title: "Visit history for #{study.name}")
         end
       end
     end

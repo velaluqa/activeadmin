@@ -19,8 +19,14 @@ module Report
           .first_or_create
     end
 
+    def study
+      Study.find(@study_id)
+    end
+
     def result
+      # @query.calculate_cache(@study_id)
       {
+        title: "#{@resource_type.titlecase} history for #{study.name}",
         datasets: grouped_cache_result.map do |group, entries|
           transform_group(group, entries)
         end
