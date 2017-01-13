@@ -40,7 +40,7 @@ class Dashboard.Views.Row extends Backbone.View
       sortableOptions:
         axis: 'xy'
         connectWith: '.row'
-        forcePlaceholderSize: true
+        forcePlaceholderSize: false
         opacity: 0.6
         placeholder: 'sortable-placeholder'
       collection: @model.widgets
