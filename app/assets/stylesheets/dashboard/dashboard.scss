@@ -30,9 +30,15 @@ body.admin_dashboard {
     box-sizing: border-box;
   }
 
+  .buttons {
+    button.edit-dashboard { display: block; }
+    button.save-dashboard { display: none; }
+  }
+
   button.add-row {
     margin: 15px auto 0 auto;
     display: block;
+    display: none;
   }
 
   ul.rows {
@@ -74,6 +80,7 @@ body.admin_dashboard {
 	  line-height: 30px;
 	  width: 30px;
 	  height: 30px;
+	  display: none;
 	}
 
 	.row-sortable-handle {
@@ -88,11 +95,13 @@ body.admin_dashboard {
 	  background: url(
 	    data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkYGDwAeItQAwGjDAGTAImMBMokI6uAsSfCQB7SwOeZMuRYgAAAABJRU5ErkJggg==
 	  ) repeat;
+	  display: none;
 	}
 
 	&.empty {
 	  padding: 0 7.5px;
 	  margin-bottom: 15px;
+	  display: none;
 
 	  ul.row {
 	    position: relative;
@@ -248,6 +257,35 @@ body.admin_dashboard {
     }
   }
 
+  &.editing {
+    .buttons {
+      button.edit-dashboard { display: none; }
+      button.save-dashboard { display: block; }
+    }
+
+    button.add-row {
+      display: block;
+    }
+
+    ul.rows > li div.row {
+      ul.row {
+	margin-bottom: 0;
+	margin: 0;
+      }
+
+      button.add-widget {
+	display: block;
+      }
+
+      .row-sortable-handle {
+	display: block;
+      }
+
+      &.empty {
+	display: block;
+      }
+    }
+  }
 
   .widget {
     position: relative;

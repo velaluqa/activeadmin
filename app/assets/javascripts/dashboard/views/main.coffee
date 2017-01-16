@@ -1,12 +1,23 @@
 @Dashboard ?= {}
 @Dashboard.Views ?= {}
 class Dashboard.Views.Main extends Backbone.View
+  template: JST['dashboard/templates/main']
+
   initialize: ->
     @subviews ||= {}
+    @model.on 'change:editing', @renderEditing
 
   events:
+    'click button.edit-dashboard': 'editDashboard'
+    'click button.save-dashboard': 'saveDashboard'
     'click button.add-row': 'addRow'
     'sortstart': 'sortstart'
+
+  editDashboard: =>
+    @model.set(editing: true)
+
+  saveDashboard: =>
+    @model.set(editing: false)
 
   sortstart: (_, ui) ->
     return unless ui.placeholder.hasClass('sortable-row-placeholder')
@@ -16,8 +27,11 @@ class Dashboard.Views.Main extends Backbone.View
   addRow: =>
     @model.addEmptyRow()
 
+  renderEditing: =>
+    @$el.toggleClass('editing', @model.get('editing'))
+
   render: =>
-    @$el.html('<ul class="rows"></ul>')
+    @$el.html(@template())
     collectionView = new Backbone.CollectionView
       el: @$('ul.rows')
       selectable: false
@@ -32,5 +46,5 @@ class Dashboard.Views.Main extends Backbone.View
       modelView: Dashboard.Views.Row
     collectionView.render()
     @$('ul.rows').disableSelection()
-    @$el.append('<button class="add-row">Add Row</button>')
+    @renderEditing()
     this

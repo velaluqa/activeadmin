@@ -1,0 +1,5 @@
+.buttons
+  %button.edit-dashboard Edit
+  %button.save-dashboard Save
+%ul.rows
+%button.add-row Add Row
