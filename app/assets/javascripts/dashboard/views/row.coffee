@@ -31,9 +31,8 @@ class Dashboard.Views.Row extends Backbone.View
     else
       @$el.attr(class: "row size-#{count}")
 
-  setSortableOptions: =>
-    @collectionView.setOptions
-      sortable: window.dashboard.get('editing')
+  setSortableOptions: (_, editing) =>
+    @collectionView.setOptions(sortable: editing)
 
   render: =>
     @setSizeClass(@model.widgets.length)

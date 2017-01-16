@@ -31,9 +31,8 @@ class Dashboard.Views.Main extends Backbone.View
   renderEditing: =>
     @$el.toggleClass('editing', @model.get('editing'))
 
-  setSortableOptions: =>
-    @collectionView.setOptions
-      sortable: window.dashboard.get('editing')
+  setSortableOptions: (_, editing) =>
+    @collectionView.setOptions(sortable: editing)
 
   render: =>
     @$el.html(@template())
