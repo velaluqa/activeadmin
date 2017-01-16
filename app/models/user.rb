@@ -167,6 +167,11 @@ class User < ActiveRecord::Base
     return signature
   end
 
+  def dashboard_configuration
+    read_attribute(:dashboard_configuration) ||
+      ERICA.default_dashboard_configuration
+  end
+
   def self.classify_audit_trail_event(c)
     if(c.include?('sign_in_count') and
        c['sign_in_count'][1] == c['sign_in_count'][0]+1
