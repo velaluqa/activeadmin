@@ -35,7 +35,10 @@ body.admin_dashboard {
   }
 
   .buttons {
-    button.edit-dashboard { display: block; }
+    margin-bottom: 10px;
+    text-align: right;
+
+    button.edit-dashboard { display: inline-block; }
     button.save-dashboard { display: none; }
   }
 
@@ -267,7 +270,7 @@ body.admin_dashboard {
   &.editing {
     .buttons {
       button.edit-dashboard { display: none; }
-      button.save-dashboard { display: block; }
+      button.save-dashboard { display: inline-block; }
     }
 
     button.add-row {
