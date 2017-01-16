@@ -20,6 +20,7 @@ class Dashboard.Views.Row extends Backbone.View
     @subviews ||= {}
     @listenTo @model.widgets, 'add remove', =>
       @setSizeClass(@model.widgets.length)
+    @listenTo window.dashboard, 'change:editing', @setSortableOptions
 
   setSizeClass: (count) =>
     items = @model.widgets.length
@@ -30,13 +31,17 @@ class Dashboard.Views.Row extends Backbone.View
     else
       @$el.attr(class: "row size-#{count}")
 
+  setSortableOptions: =>
+    @collectionView.setOptions
+      sortable: window.dashboard.get('editing')
+
   render: =>
     @setSizeClass(@model.widgets.length)
     @$el.html(@template())
-    collectionView = new Backbone.CollectionView
+    @collectionView = new Backbone.CollectionView
       el: @$('ul')
       selectable: false
-      sortable: true
+      sortable: window.dashboard.get('editing')
       sortableOptions:
         axis: 'xy'
         connectWith: '.row'
@@ -45,6 +50,6 @@ class Dashboard.Views.Row extends Backbone.View
         placeholder: 'sortable-placeholder'
       collection: @model.widgets
       modelView: Dashboard.Views.Widget
-    collectionView.render()
+    @collectionView.render()
     @$('ul').disableSelection()
     this

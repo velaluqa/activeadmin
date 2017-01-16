@@ -6,6 +6,7 @@ class Dashboard.Views.Main extends Backbone.View
   initialize: ->
     @subviews ||= {}
     @model.on 'change:editing', @renderEditing
+    @listenTo window.dashboard, 'change:editing', @setSortableOptions
 
   events:
     'click button.edit-dashboard': 'editDashboard'
@@ -30,12 +31,16 @@ class Dashboard.Views.Main extends Backbone.View
   renderEditing: =>
     @$el.toggleClass('editing', @model.get('editing'))
 
+  setSortableOptions: =>
+    @collectionView.setOptions
+      sortable: window.dashboard.get('editing')
+
   render: =>
     @$el.html(@template())
-    collectionView = new Backbone.CollectionView
+    @collectionView = new Backbone.CollectionView
       el: @$('ul.rows')
       selectable: false
-      sortable: true
+      sortable: window.dashboard.get('editing')
       sortableOptions:
         axis: 'y'
         handle: '.row-sortable-handle'
@@ -44,7 +49,7 @@ class Dashboard.Views.Main extends Backbone.View
         placeholder: 'sortable-row-placeholder'
       collection: @model.rows
       modelView: Dashboard.Views.Row
-    collectionView.render()
+    @collectionView.render()
     @$('ul.rows').disableSelection()
     @renderEditing()
     this
