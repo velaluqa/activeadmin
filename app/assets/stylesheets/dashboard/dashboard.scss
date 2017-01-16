@@ -21,6 +21,10 @@ body.admin_dashboard {
   div#title_bar {
     display: none;
   }
+
+  #active_admin_content {
+    padding: 15px;
+  }
 }
 
 #dashboard-container {
@@ -51,8 +55,8 @@ body.admin_dashboard {
       outline: none;
       position: relative;
       min-height: 1px;
-      padding-left: 7.5px;
-      padding-right: 7.5px;
+      padding-left: 17.5px;
+      padding-right: 17.5px;
 
       &.sortable-row-placeholder {
 	height: 200px;
