@@ -5,3 +5,6 @@ class Dashboard.Models.Row extends Backbone.Model
     @widgets = new Dashboard.Collections.Widgets(attributes.widgets)
     delete attributes['widgets']
     super
+
+  toJSON: ->
+    return widgets: @widgets.toJSON()
