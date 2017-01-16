@@ -101,7 +101,8 @@ module Report
     end
 
     def required_series(study)
-      @required_series ||=
+      @required_series ||= {}
+      @required_series[study.id] ||=
         study.visits
           .join_required_series
           .where('visits_required_series.tqc_state IS NOT NULL')
