@@ -32,6 +32,9 @@ class Dashboard.Views.Row extends Backbone.View
       @$el.attr(class: "row size-#{count}")
 
   setSortableOptions: (_, editing) =>
+    # Do not set options for rows that have been removed from the rows
+    # collection (due to emptiness or similar cases).
+    return unless @model.collection?
     @collectionView.setOptions(sortable: editing)
 
   render: =>
