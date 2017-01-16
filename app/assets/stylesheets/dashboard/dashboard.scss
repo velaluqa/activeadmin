@@ -114,13 +114,16 @@ body.admin_dashboard {
 	li {
 	  list-style-type: none;
 	  outline: none;
-	  cursor: pointer;
 	  float: left;
 	  position: relative;
 	  min-height: 1px;
 	  padding-left: 7.5px;
 	  padding-right: 7.5px;
 	  margin-bottom: 15px;
+
+	  &.ui-sortable-handle {
+	    cursor: pointer;
+	  }
 
 	  .widget {
 	    position: relative;
