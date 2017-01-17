@@ -150,6 +150,11 @@ body.admin_dashboard {
 	  .widget {
 	    position: relative;
 	    width: 100%;
+
+	    .buttons i.fa-trash-o,
+	    .buttons i.fa-edit {
+	      display: none;
+	    }
 	  }
 
 	  &.sortable-placeholder {
@@ -296,6 +301,13 @@ body.admin_dashboard {
       ul.row {
 	margin-bottom: 0;
 	margin: 0;
+
+	.widget {
+	  .buttons i.fa-trash-o,
+	  .buttons i.fa-edit {
+	    display: inline-block;
+	  }
+	}
       }
 
       button.add-widget {
@@ -431,9 +443,25 @@ body.admin_dashboard {
     }
 
     .buttons {
-      float: right;
-      margin: 10px;
-      color: #a9a9a9;
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 1;
+
+      i {
+	margin-left: 5px;
+	opacity: 0.3;
+	transition: opacity ease-in-out .25s;
+	cursor: pointer;
+	height: 30px;
+	width: 30px;
+	line-height: 30px;
+	text-align: center;
+
+	&:hover {
+	  opacity: 1;
+	}
+      }
     }
 
     &.loading {
