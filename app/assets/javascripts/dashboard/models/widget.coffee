@@ -1,6 +1,12 @@
 @Dashboard ?= {}
 @Dashboard.Models ?= {}
 class Dashboard.Models.Widget extends Backbone.Model
+  defaults:
+    type: 'overview'
+    params:
+      display: 'line'
+      resolution: 'day'
+
   constructor: (options) ->
     @forRow = options.forRow
     delete options.forRow

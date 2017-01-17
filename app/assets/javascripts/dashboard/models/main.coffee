@@ -34,3 +34,11 @@ class Dashboard.Models.Main extends Backbone.Model
 
   newWidget: (row) ->
     @set editWidget: new Dashboard.Models.Widget(forRow: row)
+
+  saveWidget: ->
+    widget = @get('editWidget')
+    row = widget.forRow
+    row.widgets.add(widget) if row?
+    widget.report.load()
+    delete widget.forRow
+    @unset('editWidget')

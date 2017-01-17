@@ -1,0 +1,54 @@
+%form
+  .form-group
+    %label{ for: 'type', class: 'control-label' } Type:
+    %select#type{ name: 'type', type: 'text', class: 'form-control' }
+      %option{ value: 'overview' } Overview
+      %option{ value: 'historic_count' } Historic Count
+  %div.type-group{ 'data-for-type': 'overview' }
+    .form-group
+      %label{ for: 'columns', class: 'control-label' } Columns:
+      %select#columns{ name: 'columns', type: 'text', class: 'form-control', multiple: 'multiple' }
+        %option
+        %option{ value: 'patients' } Patients
+        %option{ value: 'visits' } Visits
+        %option{ value: 'visits_state_incomplete_na' } Visits (incomplete_na)
+        %option{ value: 'visits_state_incomplete_queried' } Visits (incomplete_queried)
+        %option{ value: 'visits_state_complete_tqc_pending' } Visits (complete_tqc_pending)
+        %option{ value: 'visits_state_complete_tqc_issues' } Visits (complete_tqc_issues)
+        %option{ value: 'visits_state_complete_tqc_passed' } Visits (complete_tqc_passed)
+        %option{ value: 'image_series' } ImageSeries
+        %option{ value: 'required_series' } RequiredSeries
+        %option{ value: 'required_series_state_pending' } RequiredSeries (pending)
+        %option{ value: 'required_series_state_issues' } RequiredSeries (issues)
+        %option{ value: 'required_series_state_passe' } RequiredSeries (passe)
+    .form-group
+      %label{ for: 'exclude_studies', class: 'control-label' } Exclude Studies:
+      %select#exclude_studies{ name: 'exclude_studies', type: 'text', class: 'form-control', multiple: 'multiple' }
+  %div.type-group{ 'data-for-type': 'historic_count' }
+    .form-group
+      %label{ for: 'study_id', class: 'control-label' } Study:
+      %select#study_id{ name: 'study_id', type: 'text', class: 'form-control', placeholder: 'Select Study' }
+        %option
+    .form-group
+      %label{ for: 'resource_type', class: 'control-label' } Resource:
+      %select#resource_type{ name: 'resource_type', type: 'text', class: 'form-control', placeholder: 'Select Resource' }
+        %option
+        %option{ value: 'Patient' } Patient
+        %option{ value: 'Visit' } Visit
+        %option{ value: 'ImageSeries' } ImageSeries
+        %option{ value: 'RequiredSeries' } RequiredSeries
+    .form-group
+      %label{ for: 'group_by', class: 'control-label' } Group by:
+      %select#group_by{ name: 'group_by', type: 'text', class: 'form-control' }
+    .form-group
+      %label{ for: 'display', class: 'control-label' } Display:
+      %select#display{ name: 'display', type: 'text', class: 'form-control' }
+        %option{ value: 'line' } Line Chart
+        %option{ value: 'bar' } Bar Chart
+    .form-group
+      %label{ for: 'resolution', class: 'control-label' } Resolution:
+      %select#resolution{ name: 'resolution', type: 'text', class: 'form-control' }
+        %option{ value: 'day' } Day
+        %option{ value: 'month' } Month
+        %option{ value: 'quarter' } Quarter
+        %option{ value: 'year' } Year
