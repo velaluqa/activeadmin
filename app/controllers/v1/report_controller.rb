@@ -10,7 +10,7 @@ class V1::ReportController < V1::ApiController # :nodoc:
 
     report = Report.create(
       type: report_type,
-      params: report_params,
+      params: params[:params] || {},
       user: current_user
     )
 
@@ -22,9 +22,5 @@ class V1::ReportController < V1::ApiController # :nodoc:
 
   def report_type
     params.require(:type)
-  end
-
-  def report_params
-    params.require(:params).permit!
   end
 end
