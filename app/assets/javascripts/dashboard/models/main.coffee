@@ -35,10 +35,18 @@ class Dashboard.Models.Main extends Backbone.Model
   newWidget: (row) ->
     @set editWidget: new Dashboard.Models.Widget(forRow: row)
 
-  saveWidget: ->
+  editWidget: (widget) ->
+    @set editWidget: widget
+
+  saveWidget: (attributes) ->
     widget = @get('editWidget')
+    # Reset widget attributes
+    widget.clear(silent: true)
+    widget.set(attributes)
+    # Add widget if it not already part of a row
     row = widget.forRow
     row.widgets.add(widget) if row?
-    widget.report.load()
     delete widget.forRow
+    # Reset editWidget state
     @unset('editWidget')
+    widget.report.load()

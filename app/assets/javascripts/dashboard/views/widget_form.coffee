@@ -28,7 +28,10 @@ class Dashboard.Views.WidgetForm extends Backbone.View
     window.dashboard.unset('editWidget')
 
   saveWidget: ->
-    window.dashboard.saveWidget()
+    if @model.isValid()
+      window.dashboard.saveWidget(@model.validAttributes())
+    else
+      alert('Please make sure you specified all necessary values.')
 
   updateFromSelect: (e) =>
     $select = $(e.currentTarget)
@@ -40,24 +43,29 @@ class Dashboard.Views.WidgetForm extends Backbone.View
       params = _.clone(@model.get('params'))
       params[key] = val
       @model.set(params: params)
+    if key is 'resource_type'
+      @updateGroupBy()
 
-  modelChanged: (model) =>
+  modelChanged: =>
     @$('select#columns').select2(placeholder: 'All Columns')
     @renderTypeGroups()
-    type = model.changed.params?.resource_type
-    prev_type = model.previousAttributes().params?.resource_type
-    if type? and prev_type isnt type
+
+  updateGroupBy: (initializing = false) ->
+    type = @model.attributes.params?.resource_type
+    if type?
       groupable = @RESOURCE_TYPES[type]?.groupable
       if groupable?
-        @model.unset('group_by')
         @$('select#group_by').prop('disabled', false)
         @$('select#group_by').html('').select2
           data: [''].concat _.keys(groupable)
           minimumResultsForSearch: Infinity
           placeholder: 'Not grouped'
           allowClear: true
+        if @rendering
+          @$('select#group_by').val(@model.get('params').group_by).trigger('change')
+        else
+          @model.unset('group_by')
       else
-        @model.unset('group_by')
         @$('select#group_by')
           .prop("disabled", true)
           .html('')
@@ -65,6 +73,10 @@ class Dashboard.Views.WidgetForm extends Backbone.View
             data: ['']
             placeholder: 'Not groupable'
             allowClear: false
+        if @rendering
+          @$('select#group_by').val(@model.get('params').group_by).trigger('change')
+        else
+          @model.unset('group_by')
 
   renderTypeGroups: ->
     type = @model.get('type')
@@ -82,4 +94,13 @@ class Dashboard.Views.WidgetForm extends Backbone.View
       data: for study in window.dashboard.reportableStudies
         { id: study.id, text: study.name }
       placeholder: 'Select Study'
+    @$('#type').val(@model.get('type')).trigger('change')
+    @rendering = true
+    for key in ['resource_type']
+      val = @model.get('params')[key]
+      @$("##{key}").val(val).trigger('change') if val?
+      @updateGroupBy()
+    for key, val of (@model.attributes.params or {}) when not ['resource_type', 'group_by'].includes(key)
+      @$("##{key}").val(val).trigger('change')
+    @rendering = false
     this

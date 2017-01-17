@@ -6,11 +6,15 @@ class Dashboard.Views.Widget extends Backbone.View
   overviewTemplate: JST['dashboard/templates/widget_overview']
 
   events:
+    'click .buttons i.fa-edit': 'editWidget'
     'click .buttons i.fa-trash-o': 'removeWidget'
 
   initialize: ->
     @model.report.on 'change', @renderReport
     @model.report.on 'fetching fetched', @renderLoading
+
+  editWidget: =>
+    window.dashboard.editWidget(@model)
 
   removeWidget: =>
     return unless confirm('Do you really want to remove this widget?')
