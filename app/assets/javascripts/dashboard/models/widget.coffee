@@ -33,7 +33,6 @@ class Dashboard.Models.Widget extends Backbone.Model
 
   isValid: ->
     type = @get('type')
-    console.log @, @attributes
     if type is 'historic_count'
       return false unless _.keys(@get('params')).includes('study_id', 'resource_type', 'display', 'resolution')
     true
