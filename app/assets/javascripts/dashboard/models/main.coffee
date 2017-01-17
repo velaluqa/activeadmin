@@ -4,8 +4,14 @@ class Dashboard.Models.Main extends Backbone.Model
   url: ->
     '/admin/dashboard/save'
 
-  initialize: (options = {}) ->
+  constructor: (options) ->
     @rows = new Dashboard.Collections.Rows(options.config.rows)
+    delete options.config
+    @reportableStudies = options.reportableStudies
+    delete options.reportableStudies
+    super
+
+  initialize: (options = {}) ->
     @on 'change:editing', @saveDashboardConfiguration
 
   defaults:
