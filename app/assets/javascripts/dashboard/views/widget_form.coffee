@@ -84,7 +84,8 @@ class Dashboard.Views.WidgetForm extends Backbone.View
     @$(".type-group[data-for-type=#{type}]").css('display', 'block')
 
   render: =>
-    @$('.modal-body').html(@template())
+    @$('.modal-content').html @template
+      action: if @model.collection? then 'edit' else 'add'
     @$('select').select2
       minimumResultsForSearch: Infinity
       placeholder: 'Select'

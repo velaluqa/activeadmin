@@ -37,8 +37,10 @@ class Dashboard.Views.Main extends Backbone.View
 
   renderWidgetForm: (model, widget) =>
     if widget?
+      tempWidget = new Dashboard.Models.Widget(widget.attributes)
+      tempWidget.collection = widget.collection
       @widget_form_view = new Dashboard.Views.WidgetForm
-        model: new Dashboard.Models.Widget(widget.attributes)
+        model: tempWidget
         el: $('#widget-form-modal')
       @widget_form_view.render()
       $('#widget-form-modal').modal('show')
