@@ -4,18 +4,22 @@ class Dashboard.Models.Report extends Backbone.Model
   url: ->
     '/v1/report.json'
 
-  constructor: (attributes) ->
-    @type = attributes.type
-    @params = attributes.params
-    delete attributes.type
-    delete attributes.params
+  constructor: (options) ->
+    @widget = options.widget
+    delete options.widget
     super
 
   load: ->
     @fetch
       data:
-        type: @type
-        params: @params
+        type: @type()
+        params: @params()
 
   title: ->
-    @get('title') or @type
+    @get('title') or @type()
+
+  type: ->
+    @widget.get('type')
+
+  params: ->
+    @widget.get('params')

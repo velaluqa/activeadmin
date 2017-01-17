@@ -13,7 +13,7 @@ class Dashboard.Views.Widget extends Backbone.View
     @$el.toggleClass('loading', @model.report.isFetching)
 
   renderReport: (model, value) =>
-    switch model.type
+    switch model.type()
       when 'overview' then @renderOverview(model)
       when 'historic_count' then @renderHistoricCount(model)
 
