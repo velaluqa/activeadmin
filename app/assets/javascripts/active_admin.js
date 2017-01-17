@@ -21,3 +21,4 @@
 //= require shared/user
 //= require select2-initializers
 //= require twitter/bootstrap/scrollspy
+//= require twitter/bootstrap/modal
