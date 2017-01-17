@@ -5,9 +5,16 @@ class Dashboard.Views.Widget extends Backbone.View
   template: JST['dashboard/templates/widget']
   overviewTemplate: JST['dashboard/templates/widget_overview']
 
+  events:
+    'click .buttons i.fa-trash-o': 'removeWidget'
+
   initialize: ->
     @model.report.on 'change', @renderReport
     @model.report.on 'fetching fetched', @renderLoading
+
+  removeWidget: =>
+    return unless confirm('Do you really want to remove this widget?')
+    @model.collection.remove(@model)
 
   renderLoading: =>
     @$el.toggleClass('loading', @model.report.isFetching)
