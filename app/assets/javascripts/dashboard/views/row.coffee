@@ -7,6 +7,10 @@ class Dashboard.Views.Row extends Backbone.View
   events:
     'sortout': 'sortOut'
     'sortover': 'sortOver'
+    'click .add-widget': 'newWidget'
+
+  newWidget: =>
+    window.dashboard.newWidget(@model)
 
   sortOut: =>
     len = @$('ul.row li:not(.ui-sortable-helper):not(.sortable-placeholder)').length

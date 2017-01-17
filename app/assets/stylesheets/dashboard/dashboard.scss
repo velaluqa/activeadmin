@@ -25,6 +25,21 @@ body.admin_dashboard {
   #active_admin_content {
     padding: 15px;
   }
+
+  .modal {
+    select {
+      width: 280px;
+    }
+
+    .form-group {
+      margin-bottom: 5px;
+
+      label {
+	display: inline-block;
+	width: 130px;
+      }
+    }
+  }
 }
 
 #dashboard-container {

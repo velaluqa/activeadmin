@@ -31,3 +31,6 @@ class Dashboard.Models.Main extends Backbone.Model
 
   addEmptyRow: ->
     @rows.add(new Dashboard.Models.Row(widgets: []))
+
+  newWidget: (row) ->
+    @set editWidget: new Dashboard.Models.Widget(forRow: row)

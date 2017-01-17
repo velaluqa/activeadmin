@@ -7,6 +7,7 @@ class Dashboard.Views.Main extends Backbone.View
     @subviews ||= {}
     @model.on 'change:editing', @renderEditing
     @listenTo window.dashboard, 'change:editing', @setSortableOptions
+    @listenTo window.dashboard, 'change:editWidget', @renderWidgetForm
 
   events:
     'click button.edit-dashboard': 'editDashboard'
@@ -33,6 +34,12 @@ class Dashboard.Views.Main extends Backbone.View
 
   setSortableOptions: (_, editing) =>
     @collectionView.setOptions(sortable: editing)
+
+  renderWidgetForm: (model, widget) =>
+    if widget?
+      $('#widget-form-modal').modal('show')
+    else
+      $('#widget-form-modal').modal('hide')
 
   render: =>
     @$el.html(@template())

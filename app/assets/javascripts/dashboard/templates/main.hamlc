@@ -3,3 +3,13 @@
   %button.save-dashboard Save
 %ul.rows
 %button.add-row Add Row
+#widget-form-modal.modal.fade{ role: 'dialog', tabindex: '-1' }
+  .modal-dialog{ role: 'document' }
+    .modal-content
+      .modal-header
+        %h4.modal-title New Widget
+      .modal-body
+        Test
+      .modal-footer
+        %button.btn.btn.primary{ type: 'button' } Add Widget
+        %button.btn.btn.default{ type: 'button', 'data-dismiss': 'modal' } Close
