@@ -12,4 +12,4 @@
         Test
       .modal-footer
         %button.btn.btn.primary{ type: 'button' } Add Widget
-        %button.btn.btn.default{ type: 'button', 'data-dismiss': 'modal' } Close
+        %button.btn.btn.default{ type: 'button' } Close
