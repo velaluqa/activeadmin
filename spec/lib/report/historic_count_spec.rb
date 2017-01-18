@@ -233,6 +233,39 @@ describe Report::HistoricCount do
           resource_type: 'Visit',
           starts_at: 180.days.ago,
           ends_at: DateTime.now,
+          resolution: 'hour'
+        )
+      end
+
+      describe '#result' do
+        it 'returns correct values' do
+          expected_datasets = {
+            datasets: [
+              {
+                label: 'total',
+                data: [
+                  { x: '2016-12-31 12:00:00', y: 1 },
+                  { x: '2017-01-03 14:00:00', y: 2 },
+                  { x: '2017-01-08 11:00:00', y: 3 },
+                  { x: '2017-01-08 14:00:00', y: 4 },
+                  { x: '2017-01-11 13:00:00', y: 5 }
+                ]
+              }
+            ]
+          }
+          expect(report.result).to include(expected_datasets)
+          expect(report.result).to include(title: "Visit history for #{study.name}")
+        end
+      end
+    end
+
+    describe 'with resolution `day`' do
+      let!(:report) do
+        Report::HistoricCount.new(
+          study_id: study.id,
+          resource_type: 'Visit',
+          starts_at: 180.days.ago,
+          ends_at: DateTime.now,
           resolution: 'day'
         )
       end

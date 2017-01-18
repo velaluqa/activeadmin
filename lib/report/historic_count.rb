@@ -35,6 +35,10 @@ module Report
 
     private
 
+    def date_resolution?
+      %q(day week month quarter year).include?(@resolution)
+    end
+
     def historic_query
       rel =
         @query.cache_entries
@@ -46,11 +50,11 @@ module Report
         rel = rel.where('"historic_report_cache_values"."group" IS NOT NULL')
       end
       rel.group(<<GROUP)
-date_trunc('#{@resolution}', "historic_report_cache_entries"."date")::date,
+date_trunc('#{@resolution}', "historic_report_cache_entries"."date")#{date_resolution? ? '::date' : ''},
 "historic_report_cache_values"."group"
 GROUP
         .select(<<SELECT)
-date_trunc('#{@resolution}', "historic_report_cache_entries"."date")::date AS date,
+date_trunc('#{@resolution}', "historic_report_cache_entries"."date")#{date_resolution? ? '::date' : ''} AS date,
 "historic_report_cache_values"."group" AS group,
 MAX("historic_report_cache_values"."count") AS max
 SELECT

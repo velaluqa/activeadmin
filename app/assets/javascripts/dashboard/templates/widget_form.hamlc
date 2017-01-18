@@ -55,6 +55,7 @@
       .form-group
         %label{ for: 'resolution', class: 'control-label' } Resolution:
         %select#resolution{ name: 'resolution', type: 'text', class: 'form-control' }
+          %option{ value: 'hour' } Hour
           %option{ value: 'day' } Day
           %option{ value: 'month' } Month
           %option{ value: 'quarter' } Quarter
