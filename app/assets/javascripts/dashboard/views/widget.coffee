@@ -48,6 +48,7 @@ class Dashboard.Views.Widget extends Backbone.View
       options:
         maintainAspectRatio: false
         legend:
+          display: model.get('datasets').length > 1
           position: 'bottom'
         scales:
           yAxes: [
