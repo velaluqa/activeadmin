@@ -33,9 +33,10 @@ class HistoricReportQuery < ActiveRecord::Base
   def calculate_cache(study_id)
     current_count = current_count(study_id)
     versions = Version
+                 .where('"versions"."id" <= ?', Version.last.id)
                  .of_study_resource(study_id, resource_type)
-                 .order('"versions"."created_at" DESC')
-    versions.each do |version|
+                 .order('"versions"."id" DESC')
+    versions.ordered_find_each do |version|
       delta = calculate_delta(version)
       next if delta.nil?
       HistoricReportCacheEntry.ensure_cache_entry(
