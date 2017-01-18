@@ -24,8 +24,19 @@
 class Version < PaperTrail::Version
   has_many :notifications
 
-
   class << self
+    # The provided method `find_each` of ActiveRecord is based on
+    # `find_in_batches` which strips existing `order` filters and
+    # orders by `id ASC` by default.
+    #
+    # This function keeps existing ordering intact.
+    def ordered_find_each(&block)
+      ids = all.pluck(:id)
+      ids.in_groups_of(200) do |group_ids|
+        all.where(id: group_ids).each(&block)
+      end
+    end
+
     # Scopes all versions for a given `study` and `item_type`.
     def of_study_resource(study, resource_type)
       study = Study.find(study) unless study.is_a?(Study)
