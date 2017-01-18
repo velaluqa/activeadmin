@@ -58,11 +58,16 @@ class Dashboard.Views.Widget extends Backbone.View
           xAxes: [
             type: 'time'
             time:
+              unit: model.widget.get('params').resolution
               displayFormats:
-                hour: 'hh:mm'
-                minute: 'hh:mm'
-                second: 'hh:mm'
-                quarter: 'MMM YYYY'
+                year: 'YYYY'
+                quarter: '[Q]Q.YYYY'
+                month: 'MMM YYYY'
+                week: 'ww gggg'
+                day: 'DD.MM.YYYY'
+                hour: 'DD.MM.YYYY hh:mm'
+                minute: 'DD.MM.YYYY hh:mm'
+                second: 'DD.MM.YYYY hh:mm:ss'
           ]
 
   transformDataSets: (datasets) ->
