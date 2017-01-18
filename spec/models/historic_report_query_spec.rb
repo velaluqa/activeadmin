@@ -410,23 +410,32 @@ RSpec.describe HistoricReportQuery do
       describe 'with empty cache' do
         before(:each) do
           @study = create(:study)
+          sleep 0.05
           center = create(:center, study: @study)
+          sleep 0.05
           patient = create(:patient, center: center)
+          sleep 0.05
           @visit1 = create(:visit, patient: patient)
           @version1 = Version.last
+          sleep 0.05
           @visit2 = create(:visit, patient: patient)
           @version2 = Version.last
           @visit2.state += 1
+          sleep 0.05
           @visit2.save
           @version3 = Version.last
+          sleep 0.05
           @visit3 = create(:visit, patient: patient)
           @version4 = Version.last
           @visit3.state += 1
+          sleep 0.05
           @visit3.save
           @version5 = Version.last
+          sleep 0.05
           @visit4 = create(:visit, patient: patient)
           @version6 = Version.last
           @visit2.state += 1
+          sleep 0.05
           @visit2.save
           @version7 = Version.last
         end
