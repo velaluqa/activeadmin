@@ -26,6 +26,10 @@ class HistoricReportQuery < ActiveRecord::Base
     resource_type.constantize
   end
 
+  def calculate_cache_async(study_id)
+    HistoricReportCacheWorker.perform_async(id, study_id)
+  end
+
   def calculate_cache(study_id)
     current_count = current_count(study_id)
     versions = Version

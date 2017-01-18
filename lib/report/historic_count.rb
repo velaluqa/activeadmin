@@ -24,7 +24,7 @@ module Report
     end
 
     def result
-      # @query.calculate_cache(@study_id)
+      @query.calculate_cache_async(@study_id)
       {
         title: "#{@resource_type.titlecase} history for #{study.name}",
         datasets: grouped_cache_result.map do |group, entries|
