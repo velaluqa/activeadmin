@@ -14,6 +14,59 @@ RSpec.describe Patient do
     end
   end
 
+  describe '::granted_for' do
+    let!(:study1) { create(:study) }
+    let!(:center1) { create(:center, study: study1) }
+    let!(:patient1) { create(:patient, center: center1) }
+    let!(:study2) { create(:study) }
+    let!(:center2) { create(:center, study: study2) }
+    let!(:patient2) { create(:patient, center: center2) }
+
+    context 'ability read Patient system-wide' do
+      let!(:role) { create(:role, with_permissions: { Patient => :read }) }
+      let!(:user) { create(:user, with_user_roles: [role]) }
+      let(:granted_patients) { Patient.granted_for(user: user, activity: :read) }
+
+      it 'returns all centers' do
+        expect(granted_patients).to include(patient1)
+        expect(granted_patients).to include(patient2)
+      end
+    end
+
+    context 'ability read patient1' do
+      let!(:role) { create(:role, with_permissions: { Patient => :read }) }
+      let!(:user) { create(:user, with_user_roles: [[role, patient1]]) }
+      let(:granted_patients) { Patient.granted_for(user: user, activity: :read) }
+
+      it 'returns only patient1' do
+        expect(granted_patients).to include(patient1)
+        expect(granted_patients).not_to include(patient2)
+      end
+    end
+
+    context 'ability read Patient and study1' do
+      let!(:role) { create(:role, with_permissions: { Study => :read, Patient => :read }) }
+      let!(:user) { create(:user, with_user_roles: [[role, study1]]) }
+      let(:granted_patients) { Patient.granted_for(user: user, activity: :read) }
+
+      it 'returns only patient1' do
+        expect(granted_patients).to include(patient1)
+        expect(granted_patients).not_to include(patient2)
+      end
+    end
+
+    context 'ability read Patient and center1' do
+      let!(:role) { create(:role, with_permissions: { Center => :read, Patient => :read }) }
+      let!(:user) { create(:user, with_user_roles: [[role, center1]]) }
+      let(:granted_patients) { Patient.granted_for(user: user, activity: :read) }
+
+      it 'returns only patient1' do
+        expect(granted_patients).to include(patient1)
+        expect(granted_patients).not_to include(patient2)
+      end
+    end
+  end
+
   describe 'image storage' do
     before(:each) do
       @study = create(:study, id: 1)
