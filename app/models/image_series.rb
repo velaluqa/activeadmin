@@ -100,10 +100,17 @@ JOIN
   def self.int_to_state_sym(sym)
     return ImageSeries::STATE_SYMS[sym]
   end
+
   def state
     return -1 if read_attribute(:state).nil?
-    return ImageSeries::STATE_SYMS[read_attribute(:state)]
+    read_attribute(:state)
   end
+
+  def state_sym
+    return -1 if read_attribute(:state).nil?
+    STATE_SYMS[read_attribute(:state)]
+  end
+
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
     if sym.is_a? Fixnum
@@ -241,6 +248,13 @@ JOIN
     end
 
     return result
+  end
+
+  alias_method :original_to_json, :to_json
+  def to_json
+    attributes.merge(
+      state: state_sym
+    ).to_json
   end
 
   protected
