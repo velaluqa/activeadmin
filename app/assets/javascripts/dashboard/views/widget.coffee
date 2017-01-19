@@ -65,9 +65,9 @@ class Dashboard.Views.Widget extends Backbone.View
                 month: 'MMM YYYY'
                 week: 'ww gggg'
                 day: 'DD.MM.YYYY'
-                hour: 'DD.MM.YYYY hh:mm'
-                minute: 'DD.MM.YYYY hh:mm'
-                second: 'DD.MM.YYYY hh:mm:ss'
+                hour: 'DD.MM.YYYY HH:mm'
+                minute: 'DD.MM.YYYY HH:mm'
+                second: 'DD.MM.YYYY HH:mm:ss'
           ]
 
   transformDataSets: (datasets) ->
