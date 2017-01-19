@@ -188,10 +188,17 @@ JOIN_QUERY
   def self.int_to_mqc_state_sym(sym)
     return Visit::MQC_STATE_SYMS[sym]
   end
+
   def mqc_state
-    return -1 if read_attribute(:state).nil?
-    return Visit::MQC_STATE_SYMS[read_attribute(:mqc_state)]
+    return -1 if read_attribute(:mqc_state).nil?
+    read_attribute(:mqc_state)
   end
+
+  def mqc_state_sym
+    return -1 unless read_attribute(:mqc_state)
+    MQC_STATE_SYMS[read_attribute(:mqc_state)]
+  end
+
   def mqc_state=(sym)
     sym = sym.to_sym if sym.is_a? String
     if sym.is_a? Fixnum
@@ -539,7 +546,7 @@ JOIN_QUERY
       all_passed &&= (not result.nil? and result[spec['id']] == true)
     end
 
-    self.mqc_state = all_passed ? :passed : :issues
+    self.mqc_state_sym = all_passed ? :passed : :issues
     self.mqc_user_id = mqc_user.is_a?(User) ? mqc_user.id : mqc_user
     self.mqc_date = mqc_date || Time.now
     self.mqc_results = result
@@ -714,7 +721,7 @@ JOIN_QUERY
     result['QCdate'] = {'data' => (self.mqc_date.nil? ? '01-01-0001' : self.mqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime'}
     result['QCperson'] = (self.mqc_user.nil? ? nil : self.mqc_user.name)
 
-    result['QCresult'] = case mqc_state
+    result['QCresult'] = case mqc_state_sym
                          when :pending then 'Pending'
                          when :issues then 'Performed, issues present'
                          when :passed then 'Performed, no issues present'

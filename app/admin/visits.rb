@@ -110,7 +110,7 @@ ActiveAdmin.register Visit do
       column 'mQC State', :mqc_state, :sortable => :mqc_state do |visit|
         next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
 
-        case(visit.mqc_state)
+        case(visit.mqc_state_sym)
         when :pending then status_tag('Pending')
         when :issues then status_tag('Performed, issues present', :error)
         when :passed then status_tag('Performed, passed', :ok)
@@ -152,7 +152,7 @@ ActiveAdmin.register Visit do
           end
         end
         row 'mQC State' do
-          case(visit.mqc_state)
+          case(visit.mqc_state_sym)
           when :pending then status_tag('Pending')
           when :issues then status_tag('Performed, issues present', :error)
           when :passed then status_tag('Performed, passed', :ok)
@@ -231,7 +231,7 @@ ActiveAdmin.register Visit do
     column :description
     column('State') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.state_sym : ''}
     column('Mqc Date') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.mqc_date : ''}
-    column('Mqc State') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.mqc_state : ''}
+    column('Mqc State') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.mqc_state_sym : ''}
     column('Patient') {|v| v.patient.nil? ? '' : v.patient.name}
     column('Visit Date') {|v| v.visit_date}
   end
@@ -441,7 +441,7 @@ ActiveAdmin.register Visit do
     link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(resource.state_sym) and (can? :mqc, resource or can? :manage, resource))
   end
   action_item :edit, :only => :show do
-    link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.mqc_state != :pending and (
+    link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.mqc_state_sym != :pending and (
                                                                             (Rails.application.config.is_erica_remote and can? :read_qc, resource) or
                                                                             (can? :mqc, resource or can? :manage, resource))
                                                                          )

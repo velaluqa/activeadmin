@@ -1,4 +1,50 @@
 RSpec.describe Visit do
+  describe '#state=' do
+    context 'when saving' do
+      let!(:visit) { create(:visit) }
+
+      before(:each) do
+        visit.state = :complete_tqc_passed
+        visit.save
+      end
+
+      let!(:version) { Version.last }
+
+      it 'has the new state' do
+        visit = Visit.last
+        expect(visit.state).to eq(1)
+        expect(visit.state_sym).to eq(:complete_tqc_passed)
+      end
+
+      it 'saved the correct version object_changes for state' do
+        expect(version.object_changes.dig2('state', 1)).to eq(1)
+      end
+    end
+  end
+
+  describe '#mqc_state=' do
+    context 'after save' do
+      let!(:visit) { create(:visit) }
+
+      before(:each) do
+        visit.mqc_state = :issues
+        visit.save
+      end
+
+      let!(:version) { Version.last }
+
+      it 'has the new mqc_state' do
+        visit = Visit.last
+        expect(visit.mqc_state).to eq(1)
+        expect(visit.mqc_state_sym).to eq(:issues)
+      end
+
+      it 'saved the correct version object_changes for mqc_state' do
+        expect(version.object_changes.dig2('mqc_state', 1)).to eq(1)
+      end
+    end
+  end
+
   describe 'scope ::searchable' do
     it 'selects search fields' do
       center = create(:center, code: 'Foo')
