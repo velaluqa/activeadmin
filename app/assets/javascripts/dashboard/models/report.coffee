@@ -10,6 +10,7 @@ class Dashboard.Models.Report extends Backbone.Model
     super
 
   load: ->
+    @clear(slient: true)
     @fetch
       data:
         type: @type()
