@@ -121,9 +121,19 @@ body.admin_dashboard {
 	}
 
 	&.empty {
+	  position: relative;
 	  padding: 0 7.5px;
 	  margin-bottom: 15px;
 	  display: none;
+	  &:after {
+	    content: 'Move widgets here. Empty rows will be removed when saving dashboard.';
+	    display: block;
+	    position: absolute;
+	    top: 50%;
+	    left: 50%;
+	    transform: translate(-50%,-50%);
+	    color: #b0b0b0;
+	  }
 
 	  ul.row {
 	    position: relative;
