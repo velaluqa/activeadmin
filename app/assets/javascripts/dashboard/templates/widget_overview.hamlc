@@ -2,6 +2,7 @@
   %table
     %tr
       %th Study
+      %th.links
       - for column in @report.columns
         %th= column
     %tbody
@@ -9,6 +10,11 @@
         %tr
           %td
             %a{ href: "/admin/studies/#{study.study_id}" }= study.study_name
+          %td.links
+            %a{ href: "/admin/studies/#{study.study_id}/select_for_session" } Select
+            - if currentUser.can('upload', 'ImageSeries')
+              |
+              %a{ href: "/admin/image_upload?study_id=#{study.study_id}" } Upload
           - for column in study.columns
             %td= column
 - else
