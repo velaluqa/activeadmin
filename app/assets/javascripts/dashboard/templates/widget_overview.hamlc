@@ -1,4 +1,4 @@
-- if @report.studies?
+- if @report.studies?.length > 0
   %table
     %tr
       %th Study
@@ -12,4 +12,4 @@
           - for column in study.columns
             %td= column
 - else
-  No studies found.
+  %div.empty-widget-notice No studies found.
