@@ -247,4 +247,40 @@ RSpec.describe Ability do
       end
     end
   end
+
+  context 'without any study record' do
+    let!(:study) { create(:study) }
+
+    describe 'for user with mixed permissions, it' do
+      let!(:role1) { create(:role, with_permissions: { [Study, Patient] => :read }) }
+      let!(:role2) { create(:role, with_permissions: { Version => :read }) }
+      let!(:role3) { create(:role, with_permissions: { User => :manage }) }
+      let!(:user) { create(:user, with_user_roles: [[role1, study], role2, role3]) }
+      let!(:ability) { Ability.new(user) }
+
+      it 'allows reading all studies' do
+        expect(ability.can?(:read, Study)).to be_truthy
+      end
+
+      it 'allows reading all patients' do
+        expect(ability.can?(:read, Patient)).to be_truthy
+      end
+
+      it 'denies updating image 1' do
+        expect(ability.can?(:update, Patient)).to be_falsy
+      end
+
+      it 'denies non-authorized activity and subjects' do
+        expect(ability.can?(:update, ImageSeries)).to be_falsy
+      end
+
+      it 'denies managing users, since its role is scoped' do
+        expect(ability.can?(:manage, User)).to be_truthy
+      end
+
+      it 'allows reading unscopable version records system-wide' do
+        expect(ability.can?(:read, Version)).to be_truthy
+      end
+    end
+  end
 end

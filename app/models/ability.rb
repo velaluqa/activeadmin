@@ -73,9 +73,10 @@ class Ability
   end
 
   def define_scopable_ability(subject, activity)
-    return define_unscopable_ability(subject, activity) if unscopable?(activity, subject)
-    return unless subject.granted_for(user: current_user, activity: activity).exists?
-
+    if unscopable?(activity, subject) || !subject.granted_for(user: current_user, activity: activity).exists?
+      define_unscopable_ability(subject, activity)
+      return
+    end
     can activity, subject do |subject_instance|
       subject
         .granted_for(user: current_user, activity: activity)
