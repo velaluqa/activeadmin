@@ -30,6 +30,11 @@ class Permission < ActiveRecord::Base
   belongs_to :role
   has_many :users, through: :role
 
+  # Returns true if a UserRole exists with given activity for subject.
+  def self.allow?(activity, subject)
+    all.where(subject: subject.to_s, activity: activity.to_s).exists?
+  end
+
   # Initializes a new instance from a given ability string.
   #
   # @param [String] ability The ability in the form of
