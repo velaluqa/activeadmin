@@ -1,3 +1,47 @@
+.table_tools {
+  margin: 15px 0;
+}
+
+.batch_actions_selector {
+  display: inline-block;
+}
+
+.dropdown_menu_button {
+  @extend .btn;
+  @extend .btn-primary;
+  @extend .dropdown-toggle;
+  &:after {
+    @extend .caret;
+  }
+}
+
+.dropdown_menu_list_wrapper {
+  @extend .dropdown-menu;
+  margin: -6px 0 0;
+
+  ul {
+    margin: 2px 0;
+    list-style: none;
+    padding: 0;
+  }
+  ul>li>a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: $line-height-base;
+    color: $dropdown-link-color;
+    white-space: nowrap; // prevent links from randomly breaking onto new lines
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: $dropdown-link-hover-color;
+      background-color: $dropdown-link-hover-bg;
+    }
+  }
+}
+
 #active_admin_content {
   @extend .row;
 
