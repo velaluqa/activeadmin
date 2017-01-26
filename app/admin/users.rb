@@ -1,5 +1,8 @@
 ActiveAdmin.register User do
-  menu if: proc { can? :read, User }
+  menu(
+    parent: 'users',
+    priority: 10
+  )
 
   config.comments = false
 

@@ -1,7 +1,11 @@
 ActiveAdmin.register BackgroundJob do
+  menu(
+    parent: 'admin',
+    priority: 10
+  )
+
   before_filter { @skip_sidebar = true }
 
-  menu priority: 22
   config.filters = false
   config.comments = false
   actions :index, :show, :destroy

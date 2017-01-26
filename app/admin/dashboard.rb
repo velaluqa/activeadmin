@@ -1,5 +1,5 @@
 ActiveAdmin.register_page 'Dashboard' do
-  menu priority: 1, label: proc { I18n.t('active_admin.dashboard') }
+  menu(priority: 0, parent: 'immediate')
 
   content title: proc { I18n.t('active_admin.dashboard') } do
     render file: 'admin/dashboard/index'

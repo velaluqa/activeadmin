@@ -3,6 +3,8 @@ require 'aa_erica_comment'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register ImageSeries do
+  menu(parent: 'store', priority: 30)
+
   actions :index, :show if Rails.application.config.is_erica_remote
 
   scope :all, :default => true

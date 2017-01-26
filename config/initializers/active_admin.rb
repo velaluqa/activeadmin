@@ -245,11 +245,50 @@ ActiveAdmin.setup do |config|
   #
   # If you wanted to add a static menu item to the default menu provided:
   #
-  #   config.namespace :admin do |admin|
-  #     admin.build_menu :default do |menu|
-  #       menu.add label: "My Great Website", url: "http://www.mygreatwebsite.com", html_options: { target: :blank }
-  #     end
-  #   end
+  config.namespace :admin do |admin|
+    admin.build_menu :default do |menu|
+      menu.add(
+        label: 'immediate',
+        priority: 0,
+        if: proc { !menu['immediate'].children.empty? }
+      )
+      menu.add(
+        label: 'store',
+        priority: 10,
+        if: proc { !menu['store'].children.empty? }
+      )
+      menu.add(
+        label: 'meta_store',
+        priority: 20,
+        if: proc { !menu['meta_store'].children.empty? }
+      )
+      menu.add(
+        label: 'read',
+        priority: 30,
+        if: proc { !menu['read'].children.empty? }
+      )
+      menu.add(
+        label: 'users',
+        priority: 40,
+        if: proc { !menu['users'].children.empty? }
+      )
+      menu.add(
+        label: 'notifications',
+        priority: 50,
+        if: proc { !menu['notifications'].children.empty? }
+      )
+      menu.add(
+        label: 'admin',
+        priority: 60,
+        if: proc { !menu['admin'].children.empty? }
+      )
+      menu.add(
+        label: 'versions',
+        priority: 1000,
+        if: proc { !menu['versions'].children.empty? }
+      )
+    end
+  end
 
   # == Download Links
   #

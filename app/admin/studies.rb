@@ -3,6 +3,7 @@ require 'schema_validation'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register Study do
+  menu(parent: 'store', priority: 0)
 
   actions :index, :show if ERICA.remote?
 

@@ -1,5 +1,10 @@
 # coding: utf-8
 ActiveAdmin.register Role do
+  menu(
+    parent: 'users',
+    priority: 20
+  )
+
   filter :title
   filter :user
 

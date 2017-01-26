@@ -2,6 +2,7 @@ require 'aa_domino'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register Visit do
+  menu(parent: 'store', priority: 40)
 
   actions :index, :show if Rails.application.config.is_erica_remote
 

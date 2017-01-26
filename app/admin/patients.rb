@@ -3,8 +3,8 @@ require 'aa_domino'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register Patient do
+  menu(parent: 'store', priority: 20)
 
-  menu if: proc { can? :read, Patient }
   actions :index, :show if Rails.application.config.is_erica_remote
 
   config.per_page = 100

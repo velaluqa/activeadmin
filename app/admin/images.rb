@@ -1,13 +1,14 @@
 require 'rexml/document'
 
 ActiveAdmin.register Image do
-
   menu false
+
   if Rails.application.config.is_erica_remote
     actions :index, :show
   else
     actions :index, :show, :destroy
   end
+
   config.filters = false
 
   config.per_page = 100

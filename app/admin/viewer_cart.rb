@@ -1,5 +1,5 @@
 ActiveAdmin.register_page 'Viewer Cart' do
-  menu :priority => 23
+  menu(priority: 10, parent: 'immediate')
 
   content do
     cart = session[:viewer_cart] || []
