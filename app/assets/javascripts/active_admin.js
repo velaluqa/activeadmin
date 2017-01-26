@@ -20,5 +20,6 @@
 //= require shared/promise_queue
 //= require shared/user
 //= require select2-initializers
-//= require twitter/bootstrap/scrollspy
-//= require twitter/bootstrap/modal
+//= require bootstrap-sprockets
+//= require bootstrap/scrollspy
+//= require bootstrap/modal

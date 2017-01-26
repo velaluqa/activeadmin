@@ -12,8 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require twitter/bootstrap
-//= require twitter/bootstrap/scrollspy
+//= require bootstrap
+//= require bootstrap/scrollspy
 //= require bootstrap
 //= require jqBootstrapValidation
 //= require jquery.formparams
