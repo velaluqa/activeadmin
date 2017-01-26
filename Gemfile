@@ -53,7 +53,7 @@ gem 'coffee-rails', '~> 4.1.1'
 gem 'haml-rails', '~> 0.9.0'
 gem 'less-rails', '~> 2.7.1'
 
-gem 'twitter-bootstrap-rails'
+gem 'bootstrap-sass'
 gem 'bootstrap-datepicker-rails', '~> 1.6.0.1'
 
 gem 'font-awesome-sass'
