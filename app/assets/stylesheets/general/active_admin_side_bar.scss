@@ -1,0 +1,12 @@
+.filter_form {
+  .filter_form_field {
+    @extend .form-group;
+
+    input,select { @extend .form-control; }
+  }
+
+  .buttons {
+    input, a { @extend .btn; @extend .btn-default; }
+    input[type="submit"] { @extend .btn-primary; }
+  }
+}

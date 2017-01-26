@@ -1,0 +1,62 @@
+#active_admin_content {
+  @extend .row;
+
+  padding-bottom: 30px;
+
+  &.without_sidebar {
+    #main_content_wrapper { @extend .col-md-12; }
+  }
+
+  &.with_sidebar {
+    #main_content_wrapper { @extend .col-md-10; }
+    #sidebar              { @extend .col-md-2;  }
+  }
+}
+
+/* Tables */
+.index_table      { @extend .table; }
+.attributes_table table { @extend .table; }
+
+/* Forms */
+form {
+  @extend form[role="form"] !optional;
+
+  .inputs, .actions {
+    ol {
+      padding-left: 0;
+      list-style: none;
+    }
+  }
+
+  .inputs {
+    li {
+      @extend .form-group;
+
+      input,select,textarea { @extend .form-control; }
+    }
+  }
+
+  .actions {
+    li {
+      display: inline-block;
+
+      input, a { @extend .btn; @extend .btn-default; }
+      input[type="submit"] { @extend .btn-primary; }
+    }
+  }
+
+  label.label {
+    /* The label class has a different meaning in bootstrap */
+    display: inline-block;
+    font-weight: bold;
+
+    padding: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    text-align: inherit;
+    white-space: inherit;
+    vertical-align: inherit;
+    border-radius: inherit;
+  }
+}

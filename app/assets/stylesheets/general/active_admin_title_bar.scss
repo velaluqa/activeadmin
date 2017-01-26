@@ -1,0 +1,25 @@
+#title_bar {
+  @extend .clearfix;
+
+  .breadcrumb {
+    display: none;
+
+    a[href="/admin"],
+    a[href="/admin"] + .breadcrumb_sep {
+      display: none;
+    }
+  }
+
+  #titlebar_left {
+    @extend .pull-left;
+  }
+
+  #titlebar_right {
+    @extend .pull-right;
+  }
+
+  .action_item a {
+    @extend .btn;
+    @extend .btn-primary;
+  }
+}

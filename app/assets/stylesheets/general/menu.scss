@@ -1,0 +1,185 @@
+#header {
+  z-index: 100000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  overflow: hidden;
+  background-color: $brand-primary;
+  padding-bottom: $menu-width;
+
+  .site_title {
+    position: absolute;
+    width: 100%;
+    height: $menu-width;
+    Background-color: $alizarin;
+    color: $clouds;
+    font-size: 30px;
+    text-align: center;
+    z-index: 1000;
+
+    line-height: $menu-width;
+
+    .wide {
+      font-weight: bold;
+      font-size: 1.2em;
+      letter-spacing: 0.1em;
+    }
+
+    .menu.bars.icon {
+      display: inline-block;
+      width: $menu-width;
+
+      &:before {
+	font-family: FontAwesome;
+	content: "\f0c9";
+      }
+    }
+  }
+
+  .navigation-wrapper {
+    position: relative;
+    height: 100%;
+    margin-top: $menu-width;
+    padding-top: 5px;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &::-webkit-scrollbar {
+      width: 4px;  /* for vertical scrollbars */
+      height: 4px; /* for horizontal scrollbars */
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.5);
+    }
+
+    .growing-wrapper {
+      position: relative;
+      min-height: 100%;
+    }
+  }
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    &#tabs {
+      padding-bottom: 2*45px;
+    }
+
+    &#utility_nav {
+      position: absolute;
+      bottom: 0;
+    }
+
+    li {
+      white-space: nowrap;
+
+      &:before {
+	font-family: FontAwesome;
+        font-size: 20px;
+        line-height: 45px;
+        color: $clouds;
+        width: $menu-width;
+        text-align: center;
+        cursor: pointer;
+	display: inline-block;
+	content: " ";
+      }
+
+      &.has_nested {
+	border-top: 2px solid rgba($clouds, 0.1);
+
+	&:first-child {
+	  border-top: 0;
+	}
+
+	ul li {
+	  // padding: 0;
+	}
+
+	&:before {
+	  display: none;
+	}
+	&> a {
+	  display: none;
+	}
+      }
+
+      &#dashboard:before { content: "\f0e4"; }
+      &#viewer_cart:before { content: "\f07a"; }
+
+      &#studies:before { content: "\f02d"; }
+      &#centers:before { content: "\f19c"; }
+      &#patients:before { content: "\f193"; }
+      &#image_series:before { content: "\f03e"; }
+      &#visits:before { content: "\f0f1"; }
+
+      &#image_upload:before { content: "\f0ee"; }
+      &#image_hierarchy:before { content: "\f0e8"; }
+
+      &#users:before { content: "\f007"; }
+      &#roles:before { content: "\f0c0"; }
+
+      &#notification_profiles:before { content: "\f122"; }
+      &#email_templates:before { content: "\f003"; }
+
+      &#notifications:before { content: "\f0a2"; }
+      &#background_jobs:before { content: "\f253"; }
+      &#sidekiq:before { content: "\f013"; }
+      &#versions:before { content: "\f1da"; }
+
+      &#current_user:before { content: "\f2bd"; }
+      &#logout:before { content: "\f08b"; }
+
+      a {
+	padding: 0 20px 0 0;
+	color: $clouds;
+	text-decoration: none;
+      }
+
+      &:hover {
+        > a, &:before { color: $turquoise; }
+      }
+
+      .current {
+	background-color: rgba(0,0,0,0.2);
+        > a, &:before { color: $turquoise; }
+      }
+
+      &.spacer {
+        background-color: rgba($clouds, 0.1);
+        height: 2px;
+      }
+    }
+  }
+}
+
+body {
+  padding-left: $menu-width;
+}
+
+#header {
+  max-width: $menu-width;
+
+  .site_title {
+    .wide   { display: none; }
+    .narrow { display: inline-block; }
+  }
+  
+  &:hover {
+    max-width: 1000px;
+    
+    .site_title {
+      .wide   { display: inline-block; }
+      .narrow { display: none; }
+    }
+  }
+}
