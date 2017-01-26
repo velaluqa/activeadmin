@@ -161,25 +161,3 @@
     }
   }
 }
-
-body {
-  padding-left: $menu-width;
-}
-
-#header {
-  max-width: $menu-width;
-
-  .site_title {
-    .wide   { display: none; }
-    .narrow { display: inline-block; }
-  }
-  
-  &:hover {
-    max-width: 1000px;
-    
-    .site_title {
-      .wide   { display: inline-block; }
-      .narrow { display: none; }
-    }
-  }
-}
