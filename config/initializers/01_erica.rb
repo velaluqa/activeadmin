@@ -34,6 +34,22 @@ class ERICA
       [form_config_path, session_config_path, study_config_path]
     end
 
+    def site_title
+      Rails.application.config.try(:erica).andand['site_title'] || 'ERICA'
+    end
+
+    def site_title_image
+      Rails.application.config.try(:erica).andand['site_title']
+    end
+
+    def narrow_site_title_image
+      Rails.application.config.try(:erica).andand['narrow_site_title_image']
+    end
+
+    def narrow_site_title
+      Rails.application.config.try(:erica).andand['narrow_site_title']
+    end
+
     def default_dashboard_configuration
       {
         general: {
