@@ -336,5 +336,6 @@ ActiveAdmin.setup do |config|
   #
   config.view_factory.header = Pharmtrace::ActiveAdmin::Header
   config.view_factory.site_title = Pharmtrace::ActiveAdmin::SiteTitle
+  config.view_factory.action_items = Pharmtrace::ActiveAdmin::ActionItems
   config.view_factory.footer = PharmTraceERICAFooter
 end
