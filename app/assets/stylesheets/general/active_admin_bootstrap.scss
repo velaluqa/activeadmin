@@ -43,6 +43,8 @@ $brand-info: $peter-river;
 
 $menu-width: 53px;
 
+$title-bar-background: $clouds;
+
 @import "bootstrap";
 
 html,
@@ -61,3 +63,4 @@ body {
 @import "active_admin_side_bar";
 @import "active_admin_content";
 @import "active_admin_footer";
+@import "responsive";
