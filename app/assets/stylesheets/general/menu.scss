@@ -6,15 +6,15 @@
   bottom: 0;
   height: 100%;
   overflow: hidden;
-  background-color: $brand-primary;
+  background-color: $menu-background;
   padding-bottom: $menu-width;
 
   .site_title {
     position: absolute;
     width: 100%;
     height: $menu-width;
-    Background-color: $alizarin;
-    color: $clouds;
+    background-color: $brand-background;
+    color: $brand-color;
     font-size: 30px;
     text-align: center;
     z-index: 900;
@@ -86,7 +86,7 @@
 	font-family: FontAwesome;
         font-size: 20px;
         line-height: 45px;
-        color: $clouds;
+        color: $menu-link-color;
         width: $menu-width;
         text-align: center;
         cursor: pointer;
@@ -95,7 +95,7 @@
       }
 
       &.has_nested {
-	border-top: 2px solid rgba($clouds, 0.1);
+	border-top: 2px solid $menu-spacer-color;
 
 	&:first-child {
 	  border-top: 0;
@@ -141,22 +141,17 @@
 
       a {
 	padding: 0 20px 0 0;
-	color: $clouds;
+	color: $menu-link-color;
 	text-decoration: none;
       }
 
       &:hover {
-        > a, > a:before { color: $turquoise; }
+        > a, > a:before { color: $menu-link-hover-color; }
       }
 
       .current {
 	background-color: rgba(0,0,0,0.2);
-        > a, > a:before { color: $turquoise; }
-      }
-
-      &.spacer {
-        background-color: rgba($clouds, 0.1);
-        height: 2px;
+        > a, > a:before { color: $menu-link-hover-color; }
       }
     }
   }
