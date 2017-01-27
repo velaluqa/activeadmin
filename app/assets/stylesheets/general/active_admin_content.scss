@@ -79,8 +79,6 @@
 }
 
 #active_admin_content {
-  @extend .row;
-
   padding-bottom: 30px;
 
   &.without_sidebar {
