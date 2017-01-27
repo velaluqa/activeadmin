@@ -262,6 +262,7 @@ group :development, :test do
 
   gem 'guard', '~> 2.13.0'
   gem 'guard-rspec'
+  gem 'guard-livereload'
 
   gem 'test-unit'
   gem 'redis-namespace'
