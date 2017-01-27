@@ -80,7 +80,8 @@
 
 #active_admin_content {
   @extend .clearfix;
-  padding-bottom: 30px;
+  padding-top: 15px;
+  padding-bottom: 90px;
 
   &.without_sidebar {
     #main_content_wrapper { @extend .col-md-12; }

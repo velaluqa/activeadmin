@@ -1,12 +1,13 @@
 #footer {
   position: absolute;
-  font-size: 10px;
-  bottom: 0;
-  height: 30px;
-  line-height: 30px;
+  font-size: 12px;
+  bottom: 1px;
+  height: 45px;
+  line-height: 45px;
   text-align: center;
   width: 100%;
-  opacity: 0.3;
+  border: 1px solid $clouds;
+  color: $gray-light;
 
   p { margin: 0; }
 }
