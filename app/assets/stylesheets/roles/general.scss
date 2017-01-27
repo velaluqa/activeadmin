@@ -9,11 +9,12 @@
   */
   -ms-user-select: none;
   user-select: none;
-  
+
   li {
     list-style-type: none;
+    margin-bottom: 0 !important;
   }
-  
+
   li label {
     display: block;
     width: 20%;
@@ -22,6 +23,7 @@
     font-weight: bold;
     color: #5E6469;
     cursor: pointer;
+    margin-bottom: 0;
   }
 
   li.permission {
@@ -31,17 +33,17 @@
       background: rgba(#999, 0.1);
     }
   }
-  
+
   .activities {
     .activity {
       margin-right: 20px;
     }
-    
+
     .activity label {
       position: relative;
       top: -3px;
     }
-    
+
     .activity, .activity label {
       display: inline-block;
       width: auto;
