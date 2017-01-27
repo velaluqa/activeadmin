@@ -20,6 +20,7 @@
 .dropdown_menu_list_wrapper {
   @extend .dropdown-menu;
   margin: -6px 0 0;
+  z-index: 800;
 
   ul {
     margin: 2px 0;
