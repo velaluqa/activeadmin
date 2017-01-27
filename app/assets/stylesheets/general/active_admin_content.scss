@@ -95,49 +95,81 @@
 }
 
 /* Tables */
-.index_table      { @extend .table; }
-.attributes_table table { @extend .table; }
+.index_table {
+  @extend .table, .table-striped, .table-hover;
 
-/* Forms */
-form {
-  @extend form[role="form"] !optional;
+  border-bottom: 1px solid $table-border-color;
 
-  .inputs, .actions {
-    ol {
-      padding-left: 0;
-      list-style: none;
+  th.sortable {
+    &:before {
+      font-family: FontAwesome;
+      content: $fa-var-sort;
+      color: $gray-light;
+      margin-right: 5px;
+    }
+
+    &.sorted-desc:before {
+      content: $fa-var-sort-desc;
+      color: $text-color;
+    }
+    &.sorted-asc:before {
+      content: $fa-var-sort-asc;
+      color: $text-color;
     }
   }
 
-  .inputs {
-    li {
-      @extend .form-group;
+  tr.selected {
+    color: $table-selected-row-color;
 
-      input,select,textarea { @extend .form-control; }
+    &:nth-of-type(odd) {
+      background-color: $table-selected-row-background !important;
     }
+    &:nth-of-type(even) {
+      background-color: rgba($table-selected-row-background, 0.9) !important;
+    }
+
+    a { color: $table-selected-row-color; }
+  }
+}
+#index_footer {
+  @extend .clearfix;
+  font-size: 0.8em;
+
+  .pagination_information {
+    color: $gray;
+    float: right;
+  }
+}
+
+.attributes_table table {
+  @extend .table;
+
+  th {
+    width: 10%;
+    white-space: nowrap;
+  }
+}
+
+.panel:not(.panel-default)
+.panel:not(.panel-primary),
+.panel:not(.panel-success),
+.panel:not(.panel-info),
+.panel:not(.panel-warning),
+.panel:not(.panel-danger) {
+  @extend .panel-default;
+}
+
+.panel {
+  > h3 {
+    @extend .panel-heading;
+    margin: 0;
   }
 
-  .actions {
-    li {
-      display: inline-block;
-
-      input, a { @extend .btn; @extend .btn-default; }
-      input[type="submit"] { @extend .btn-primary; }
-    }
+  > .panel_contents {
+    // @extend .panel-body;
   }
 
-  label.label {
-    /* The label class has a different meaning in bootstrap */
-    display: inline-block;
-    font-weight: bold;
-
-    padding: inherit;
-    font-size: inherit;
-    line-height: inherit;
-    color: inherit;
-    text-align: inherit;
-    white-space: inherit;
-    vertical-align: inherit;
-    border-radius: inherit;
+  table:last-child {
+    margin-bottom: 0;
   }
 }
