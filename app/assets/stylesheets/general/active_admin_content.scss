@@ -67,6 +67,17 @@
   margin-top: 10px;
 }
 
+.blank_slate_container {
+  @extend .panel, .panel-default;
+  text-align: center;
+
+  .blank_slate {
+    @extend .panel-body;
+
+    a { display: block; }
+  }
+}
+
 #active_admin_content {
   @extend .row;
 
