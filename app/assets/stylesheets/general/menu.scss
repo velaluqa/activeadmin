@@ -82,7 +82,7 @@
     li {
       white-space: nowrap;
 
-      &:before {
+      a:before {
 	font-family: FontAwesome;
         font-size: 20px;
         line-height: 45px;
@@ -113,31 +113,31 @@
 	}
       }
 
-      &#dashboard:before { content: "\f0e4"; }
-      &#viewer_cart:before { content: "\f07a"; }
+      &#dashboard a:before { content: "\f0e4"; }
+      &#viewer_cart a:before { content: "\f07a"; }
 
-      &#studies:before { content: "\f02d"; }
-      &#centers:before { content: "\f19c"; }
-      &#patients:before { content: "\f193"; }
-      &#image_series:before { content: "\f03e"; }
-      &#visits:before { content: "\f0f1"; }
+      &#studies a:before { content: "\f02d"; }
+      &#centers a:before { content: "\f19c"; }
+      &#patients a:before { content: "\f193"; }
+      &#image_series a:before { content: "\f03e"; }
+      &#visits a:before { content: "\f0f1"; }
 
-      &#image_upload:before { content: "\f0ee"; }
-      &#image_hierarchy:before { content: "\f0e8"; }
+      &#image_upload a:before { content: "\f0ee"; }
+      &#image_hierarchy a:before { content: "\f0e8"; }
 
-      &#users:before { content: "\f007"; }
-      &#roles:before { content: "\f0c0"; }
+      &#users a:before { content: "\f007"; }
+      &#roles a:before { content: "\f0c0"; }
 
-      &#notification_profiles:before { content: "\f122"; }
-      &#email_templates:before { content: "\f003"; }
+      &#notification_profiles a:before { content: "\f122"; }
+      &#email_templates a:before { content: "\f003"; }
 
-      &#notifications:before { content: "\f0a2"; }
-      &#background_jobs:before { content: "\f253"; }
-      &#sidekiq:before { content: "\f013"; }
-      &#versions:before { content: "\f1da"; }
+      &#notifications a:before { content: "\f0a2"; }
+      &#background_jobs a:before { content: "\f253"; }
+      &#sidekiq a:before { content: "\f013"; }
+      &#versions a:before { content: "\f1da"; }
 
-      &#current_user:before { content: "\f2bd"; }
-      &#logout:before { content: "\f08b"; }
+      &#current_user a:before { content: "\f2bd"; }
+      &#logout a:before { content: "\f08b"; }
 
       a {
 	padding: 0 20px 0 0;
@@ -146,12 +146,12 @@
       }
 
       &:hover {
-        > a, &:before { color: $turquoise; }
+        > a, > a:before { color: $turquoise; }
       }
 
       .current {
 	background-color: rgba(0,0,0,0.2);
-        > a, &:before { color: $turquoise; }
+        > a, > a:before { color: $turquoise; }
       }
 
       &.spacer {
