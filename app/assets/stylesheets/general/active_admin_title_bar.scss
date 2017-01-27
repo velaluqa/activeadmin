@@ -7,6 +7,7 @@
   z-index: 500;
   height: $menu-width;
   background: $title-bar-background;
+  color: $title-bar-color;
 
   @extend .clearfix;
 
@@ -36,6 +37,8 @@
       text-decoration: none;
       display: inline-block;
       height: $menu-width;
+      color: $title-bar-link-color;
+      &:hover { color: $title-bar-link-hover-color; }
     }
     a:before { 
       font-size: 1.2em;
