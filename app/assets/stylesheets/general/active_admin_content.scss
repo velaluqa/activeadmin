@@ -42,6 +42,28 @@
   }
 }
 
+.scopes {
+  @extend .btn-group;
+  float: right;
+
+  .scope {
+    @extend .btn, .btn-default;
+
+    a { text-decoration: none; }
+
+    &.selected {
+      @extend .btn-primary;
+      a {
+	color: $btn-primary-color;
+      }
+    }
+  }
+}
+
+.paginated_collection:first-child {
+  margin-top: 10px;
+}
+
 #active_admin_content {
   @extend .row;
 
