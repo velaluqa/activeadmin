@@ -33,19 +33,59 @@ $gray: $concrete;
 $gray-light: $silver;
 $inverse: white;
 
+$text-color: $wet-asphalt;
+
 // Brand colors
-$brand-primary: $wet-asphalt;
+$brand-primary: $pomegranate;
 $brand-secondary: $turquoise;
 $brand-success: $emerald;
-$brand-warning: $sun-flower;
+$brand-warning: $pumpkin;
 $brand-danger: $alizarin;
 $brand-info: $peter-river;
 
+$border-radius-base: 2px;
+$border-radius-large: 2px;
+$border-radius-small: 2px;
+
 $menu-width: 53px;
 
+$brand-background: $alizarin;
+$brand-color: $clouds;
+
+$menu-background: $wet-asphalt;
+$menu-link-color: $clouds;
+$menu-link-hover-color: lighten($turquoise, 10%);
+$menu-spacer-color: rgba($clouds, 0.1);
+
 $title-bar-background: $clouds;
+$title-bar-color: $wet-asphalt;
+$title-bar-link-color: $wet-asphalt;
+$title-bar-link-hover-color: $wet-asphalt;
+
+$panel-heading-padding: 10px;
+/* $panel-default-heading-bg: #fff; */
+
+@import "bootstrap/variables";
+
+$table-selected-row-background: lighten($wet-asphalt, 30%);
+$table-selected-row-color: $clouds;
+
+$btn-default-color: #333;
+$btn-default-bg: $clouds;
+$btn-default-border: $btn-default-bg;
+$btn-primary-border: $btn-primary-bg;
+$btn-success-border: $btn-success-bg;
+$btn-info-border: $btn-info-bg;
+$btn-warning-border: $btn-warning-bg;
+$btn-danger-border: $btn-danger-bg;
 
 @import "bootstrap";
+
+.panel-heading {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 15px;
+}
 
 html,
 body {
@@ -61,5 +101,6 @@ body {
 @import "active_admin_title_bar";
 @import "active_admin_side_bar";
 @import "active_admin_content";
+@import "active_admin_forms";
 @import "active_admin_footer";
 @import "responsive";
