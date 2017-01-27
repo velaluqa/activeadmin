@@ -403,6 +403,18 @@ body.admin_dashboard {
 
       &.table {
 	overflow: auto;
+	&::-webkit-scrollbar {
+	  width: 4px;  /* for vertical scrollbars */
+	  height: 4px; /* for horizontal scrollbars */
+	}
+
+	&::-webkit-scrollbar-track {
+	  background: rgba($wet-asphalt,0.1);
+	}
+
+	&::-webkit-scrollbar-thumb {
+	  background: rgba($wet-asphalt,0.5);
+	}
 
 	.empty.note {
 	  text-align: center;
