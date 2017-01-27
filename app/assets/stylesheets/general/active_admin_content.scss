@@ -11,7 +11,9 @@
   @extend .btn-primary;
   @extend .dropdown-toggle;
   &:after {
-    @extend .caret;
+    margin-left: 5px;
+    font-family: FontAwesome;
+    content: $fa-var-caret-down;
   }
 }
 
