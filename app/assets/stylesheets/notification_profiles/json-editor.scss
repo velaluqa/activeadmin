@@ -1,4 +1,23 @@
+body.admin_notification_profiles {
+  fieldset.filters {
+    padding-top: 40px;
+  }
+}
+
 #filters-jsoneditor {
+  button {
+    @extend .btn, .btn-default;
+  }
+
+  button + button {
+    margin-left: 5px;
+  }
+
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
   margin: 0 10px;
 
   label {display: none;}
@@ -6,54 +25,45 @@
   .header.button-holder {
     float: right;
     font-size: 0.7em;
+
+    &:first-of-type {
+      display: none;
+    }
   }
 
   .content {
     [data-schematype='array'] {
-      border: 1px solid #aeaeae;
-      border-radius: 3px;
+      border: 1px solid $panel-default-border;
+      border-radius: 2px;
       overflow: hidden;
     } /**/
   }
 
-  .tab {
-    border: 1px solid #ccc;
-    border-width: 1px 0 1px 1px;
-    text-align: center;
-    line-height: 30px;
-    border-radius: 5px;
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
-    font-weight: bold;
-    cursor: pointer;
+  .content > div {
+    margin-top: 10px;
+  }
 
+  .tab {
+    @extend .btn;
     &.active {
-      color: #333;
-      background-color: rgba(#999, 0.0);
+      @extend .btn-primary;
     }
     &.inactive {
-      color: #aaa;
-      background-color: rgba(#999, 0.2);
+      @extend .btn-default;
     }
+
+    margin-bottom: 5px;
+    width: 120px;
   }
 
-  select {
-    min-width: 220px;
-    padding: 5px;
-    line-height: 28px;
-    border-radius: 3px;
-    border: 1px solid #999;
-    margin-bottom: 3px;
-    background-color: #fff;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: #444;
-  }
+  select,
   input {
-    width: 100%;
-    max-width: 220px;
-    box-sizing: border-box;
+    @extend .form-control, .col-xs-4;
+    z-index: 500;
+    margin-bottom: 5px;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   [data-schemaid='root'] > h3 {
@@ -61,7 +71,6 @@
     span { display: none; }
     .button-holder {
       float: none;
-      margin-bottom: 10px;
     }
   }
 
@@ -74,7 +83,7 @@
 
     > div > .button-holder {
       padding: 10px;
-      background-color: #ddd;
+      background-color: $clouds;
       display: block !important;
     }
   }
@@ -85,5 +94,21 @@
   [data-schemapath$='changes.from'] > label,
   [data-schemapath$='changes.to'] > label {
     display: block;
+  }
+
+  h3 {
+    margin: 0;
+
+    + div p {
+      padding: 5px 10px;
+    }
+  }
+
+  [data-schemapath] {
+    margin-bottom: 0;
+
+    .footer.button-holder {
+      margin-top: 5px;
+    }
   }
 }
