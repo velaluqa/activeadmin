@@ -52,7 +52,10 @@
   .scope {
     @extend .btn, .btn-default;
 
-    a { text-decoration: none; }
+    a {
+      text-decoration: none;
+      color: $btn-default-color;
+    }
 
     &.selected {
       @extend .btn-primary;
