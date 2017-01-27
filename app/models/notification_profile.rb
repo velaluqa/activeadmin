@@ -260,6 +260,7 @@ JOIN
   end
 
   def validate_email_template_type
+    return if email_template.blank?
     return if email_template.email_type == 'NotificationProfile'
     errors.add(:email_template, :invalid)
   end
