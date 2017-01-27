@@ -44,6 +44,28 @@
 
 @font-face {
     font-family: 'Roboto';
+    src: font-url('roboto-mediumitalic.eot');
+    src: font-url('roboto-mediumitalic.eot?#iefix') format('embedded-opentype'),
+         font-url('roboto-mediumitalic.woff2') format('woff2'),
+         font-url('roboto-mediumitalic.woff') format('woff'),
+         font-url('roboto-mediumitalic.ttf') format('truetype');
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: font-url('roboto-medium.eot');
+    src: font-url('roboto-medium.eot?#iefix') format('embedded-opentype'),
+         font-url('roboto-medium.woff2') format('woff2'),
+         font-url('roboto-medium.woff') format('woff'),
+         font-url('roboto-medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto';
     src: font-url('roboto-bolditalic.eot');
     src: font-url('roboto-bolditalic.eot?#iefix') format('embedded-opentype'),
          font-url('roboto-bolditalic.woff2') format('woff2'),
