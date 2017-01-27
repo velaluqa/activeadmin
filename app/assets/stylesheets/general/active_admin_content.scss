@@ -79,6 +79,7 @@
 }
 
 #active_admin_content {
+  @extend .clearfix;
   padding-bottom: 30px;
 
   &.without_sidebar {
