@@ -1,12 +1,94 @@
+#sidebar {
+  padding-top: 15px;
+}
+
+.sidebar_section.panel {
+  @extend .panel, .panel-default;
+
+  h3 {
+    @extend .panel-heading;
+    margin: 0;
+  }
+
+  .panel_contents {
+    @extend .panel-body;
+  }
+}
+
 .filter_form {
   .filter_form_field {
     @extend .form-group;
 
-    input,select { @extend .form-control; }
+    input[type=text],
+    select {
+      @extend .form-control;
+    }
   }
 
   .buttons {
-    input, a { @extend .btn; @extend .btn-default; }
+    @extend .clearfix;
+    input, a {
+      @extend .btn; @extend .btn-default;
+      margin-right: 5px;
+    }
     input[type="submit"] { @extend .btn-primary; }
+  }
+
+  .select_and_search,
+  .filter_date_range {
+    @extend .clearfix;
+    label {
+      display: block;
+    }
+  }
+
+  .filter_date_range {
+    span {
+      display: block;
+      width: 4%;
+      float: left;
+      height: $input-height-base;
+      line-height: $input-height-base;
+      text-align: center;
+    }
+
+    input[type=text] {
+      width: 48%;
+      float: left;
+    }
+  }
+
+  .select_and_search {
+    input[type=text], select { width: 49%; }
+    input[type=text] { float: right; }
+    select { float: left; }
+  }
+
+  .filter_check_boxes {
+    fieldset {
+      legend {
+	margin: 0;
+	border: none;
+	&.label {
+	  /* The label class has a different meaning in bootstrap */
+	  display: inline-block;
+	  font-weight: bold;
+
+	  padding: inherit;
+	  font-size: inherit;
+	  line-height: inherit;
+	  color: inherit;
+	  text-align: inherit;
+	  white-space: inherit;
+	  vertical-align: inherit;
+	  border-radius: inherit;
+	}
+      }
+
+      > label {
+	font-weight: normal;
+	display: block !important;
+      }
+    }
   }
 }
