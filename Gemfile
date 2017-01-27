@@ -67,6 +67,7 @@ gem 'therubyracer', :platforms => :ruby
 gem 'execjs'
 
 gem 'jquery-rails', '~> 3.1.4'
+gem 'jquery-ui-rails', '~> 5.0.0'
 
 # To use ActiveModel has_secure_password
 gem 'bcrypt-ruby', '~> 3.0.0'
@@ -91,7 +92,7 @@ gem 'cancancan', '~> 1.13.1'
 gem 'paper_trail', '~> 4.1.0'
 
 # ActiveAdmin
-gem 'activeadmin', '1.0.0.pre2'
+gem 'activeadmin', '1.0.0.pre3'
 
 # CodeRay for rendering yaml/json data
 gem 'coderay'
