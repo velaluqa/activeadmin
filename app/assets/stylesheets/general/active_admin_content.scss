@@ -88,7 +88,10 @@
   }
 
   &.with_sidebar {
-    #main_content_wrapper { @extend .col-md-10; }
+    #main_content_wrapper {
+      @extend .col-md-10;
+      padding-right: 0;
+    }
     #sidebar              { @extend .col-md-2;  }
   }
 }
