@@ -13,7 +13,8 @@
 
 .filter_form {
   .filter_form_field {
-    @extend .form-group;
+    @extend .form-group-sm;
+    margin-bottom: 10px;
 
     input[type=text],
     select {
@@ -24,7 +25,7 @@
   .buttons {
     @extend .clearfix;
     input, a {
-      @extend .btn; @extend .btn-default;
+      @extend .btn, .btn-sm, .btn-default;
       margin-right: 5px;
     }
     input[type="submit"] { @extend .btn-primary; }
@@ -97,6 +98,6 @@
     li { @extend .list-group-item; }
   }
   .viewer_cart_button {
-    @extend .btn, .btn-default;
+    @extend .btn, .btn-sm, .btn-default;
   }
 }

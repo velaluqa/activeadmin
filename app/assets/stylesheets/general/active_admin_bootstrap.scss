@@ -65,6 +65,18 @@ $title-bar-link-hover-color: $wet-asphalt;
 $panel-heading-padding: 10px;
 /* $panel-default-heading-bg: #fff; */
 
+$padding-base-vertical:     6px !default;
+$padding-base-horizontal:   8px !default;
+
+$padding-large-vertical:    10px !default;
+$padding-large-horizontal:  12px !default;
+
+$padding-small-vertical:    5px !default;
+$padding-small-horizontal:  6px !default;
+
+$padding-xs-vertical:       1px !default;
+$padding-xs-horizontal:     5px !default;
+
 @import "bootstrap/variables";
 
 $table-selected-row-background: lighten($wet-asphalt, 30%);
