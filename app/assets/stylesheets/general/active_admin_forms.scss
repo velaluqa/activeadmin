@@ -77,14 +77,24 @@ form {
 	@extend .col-sm-2;
 	line-height: $input-height-base;
       }
-      input[type=text],
-      input[type=url],
-      input[type=email],
-      input[type=password],
-      input[type=date],
+      input[type="text"],
+      input[type="password"],
+      input[type="datetime"],
+      input[type="datetime-local"],
+      input[type="date"],
+      input[type="month"],
+      input[type="time"],
+      input[type="week"],
+      input[type="number"],
+      input[type="email"],
+      input[type="url"],
+      input[type="search"],
+      input[type="tel"],
+      input[type="color"],
       select,
       textarea {
-	@extend .col-sm-5, .form-control;
+	@extend .col-sm-5;
+	padding: $padding-base-vertical $padding-base-horizontal;
 	width: 83.33333333%; // col-sm-10
 	max-width: 300px;
       }
