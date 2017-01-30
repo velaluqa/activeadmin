@@ -66,6 +66,19 @@
   }
 }
 
+.status_tag {
+  text-transform: uppercase;
+  &.error {
+    @extend .label, .label-danger;
+  }
+  &.warning {
+    @extend .label, .label-warning;
+  }
+  &.ok {
+    @extend .label, .label-success;
+  }
+}
+
 .blank_slate_container {
   text-align: center;
 
