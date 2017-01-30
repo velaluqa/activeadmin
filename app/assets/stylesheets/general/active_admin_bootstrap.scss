@@ -77,6 +77,8 @@ $padding-small-horizontal:  6px !default;
 $padding-xs-vertical:       1px !default;
 $padding-xs-horizontal:     5px !default;
 
+$input-border-focus: $brand-primary;
+
 @import "bootstrap/variables";
 
 $table-selected-row-background: lighten($wet-asphalt, 30%);
