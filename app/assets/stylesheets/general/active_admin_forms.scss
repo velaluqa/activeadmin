@@ -126,6 +126,10 @@ form {
 	width: 83.33333333%; // col-sm-10
 	max-width: 300px;
       }
+      .select2 {
+	@extend .col-sm-5;
+	padding: 0;
+      }
 
       textarea {
 	height: 100px;
