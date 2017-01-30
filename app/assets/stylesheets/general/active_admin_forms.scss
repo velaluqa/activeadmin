@@ -109,6 +109,16 @@ form {
 	line-height: $input-height-base;
       }
 
+      p.inline-hints {
+	@extend .col-sm-10;
+	@extend .col-sm-offset-2;
+	@extend small;
+
+	position: relative;
+	display: block;
+	padding: 0;
+      }
+
       &.boolean {
 	label {
 	  @extend .col-sm-offset-2;
