@@ -9,7 +9,7 @@
 //= require reorder_case_list
 //= require reorder_visits
 
-//= require vendor/select2.full
+//= require select2-full
 //= require vendor/jsoneditor
 //= require vendor/jsoneditor.erica-theme
 //= require cases_advanced_filters
@@ -28,3 +28,6 @@
 //= require bootstrap-sprockets
 //= require bootstrap/scrollspy
 //= require bootstrap/modal
+//= require_self
+
+$.fn.select2.defaults.set( "theme", "bootstrap" );
