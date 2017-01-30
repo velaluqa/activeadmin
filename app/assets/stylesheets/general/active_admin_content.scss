@@ -130,6 +130,10 @@
 
     a { color: $table-selected-row-color; }
   }
+
+  .member_link + .member_link {
+    margin-left: 7px;
+  }
 }
 #index_footer {
   @extend .clearfix;
