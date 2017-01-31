@@ -20,4 +20,11 @@ ActiveAdmin.register_page 'Dashboard' do
     current_user.save
     render json: {}
   end
+
+  action_item :edit_dashboard do
+    link_to('Edit Dashboard', '#')
+  end
+  action_item :save_dashboard do
+    link_to('Save Dashboard', '#')
+  end
 end

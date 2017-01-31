@@ -61,9 +61,9 @@
           %option{ value: 'quarter' } Quarter
           %option{ value: 'year' } Year
 .modal-footer
-  %button.btn.btn.primary{ type: 'button' }
+  %button.btn.btn-primary{ type: 'button' }
     - if @action is 'add'
       Add Widget
     - else
       Save Widget
-  %button.btn.btn.default{ type: 'button' } Close
+  %button.btn.btn-default{ type: 'button' } Close

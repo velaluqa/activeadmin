@@ -7,5 +7,5 @@
       reportableStudies: #{Study.granted_for(user: current_user, activity: :read_reports).select(:id, :name).to_json}
     window.dashboard_view = new Dashboard.Views.Main
       model: window.dashboard
-      el: $('#dashboard-container')
+      el: $('body.admin_dashboard')
     window.dashboard_view.render()

@@ -18,8 +18,8 @@ class Dashboard.Views.WidgetForm extends Backbone.View
 
   events:
     'change select': 'updateFromSelect'
-    'click button.primary': 'saveWidget'
-    'click button.default': 'closeForm'
+    'click button.btn-primary': 'saveWidget'
+    'click button.btn-default': 'closeForm'
 
   initialize: ->
     @listenTo @model, 'change', @modelChanged

@@ -10,8 +10,8 @@ class Dashboard.Views.Main extends Backbone.View
     @listenTo window.dashboard, 'change:editWidget', @renderWidgetForm
 
   events:
-    'click button.edit-dashboard': 'editDashboard'
-    'click button.save-dashboard': 'saveDashboard'
+    'click .action_item.edit_dashboard': 'editDashboard'
+    'click .action_item.save_dashboard': 'saveDashboard'
     'click button.add-row': 'addRow'
     'sortstart': 'sortstart'
 
@@ -50,7 +50,7 @@ class Dashboard.Views.Main extends Backbone.View
       @widget_form_view.stopListening()
 
   render: =>
-    @$el.html(@template())
+    @$('#dashboard-container').html(@template())
     @collectionView = new Backbone.CollectionView
       el: @$('ul.rows')
       selectable: false

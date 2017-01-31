@@ -60,5 +60,7 @@
     &.download_images a:before { content: $fa-var-download; }
     &.reorder_visits a:before { content: $fa-var-sort; }
 
+    &.edit_dashboard a:before { content: $fa-var-pencil; }
+    &.save_dashboard a:before { content: $fa-var-check; }
   }
 }
