@@ -31,7 +31,7 @@ class Dashboard.Views.WidgetForm extends Backbone.View
     if @model.isValid()
       window.dashboard.saveWidget(@model.validAttributes())
     else
-      alert('Please make sure you specified all necessary values.')
+      bootbox.alert('Please make sure you specified all necessary values.')
 
   updateFromSelect: (e) =>
     $select = $(e.currentTarget)
