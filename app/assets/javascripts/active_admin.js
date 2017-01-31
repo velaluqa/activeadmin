@@ -28,6 +28,8 @@
 //= require bootstrap-sprockets
 //= require bootstrap/scrollspy
 //= require bootstrap/modal
+//= require bootbox
 //= require_self
 
+bootbox.setDefaults({ size: 'small' });
 $.fn.select2.defaults.set( "theme", "bootstrap" );
