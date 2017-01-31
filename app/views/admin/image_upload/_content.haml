@@ -21,11 +21,11 @@
       %label.btn.btn-default{ for: 'folders'} Choose Directory
       %input#folders{ name: 'folders', type: 'file',  webkitdirectory: 'webkitdirectory',  mozdirectory: 'mozdirectory',  msdirectory: 'msdirectory',  odirectory: 'odirectory',  directory: 'directory',  multiple: 'multiple', style: 'visibility: hidden; position: absolute;' }
     .progress-container.panel_contents
-      .progress-bar
+      .progress
         .label
-        .progress{ style: "width: 0%" }
+        .progress-bar.progress-bar-striped.active{ style: "width: 0%" }
           .label
   .panel#image-series
     .panel_contents
   .button-group
-    %button Upload Image Series
+    %button.btn.btn-primary Upload Image Series

@@ -43,10 +43,10 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
   updateUploadState: =>
     state = @model.get('uploadState')
     progress = @model.get('uploadProgress')
-    @$('.upload-state .progress-bar').toggleClass('parsed', state is 'parsed')
-    @$('.upload-state .progress-bar').toggleClass('uploading', state is 'uploading')
-    @$('.upload-state .progress-bar').toggleClass('uploaded', state is 'uploaded')
-    @$('.upload-state .progress').css width: "#{progress}%"
+    @$('.upload-state .progress').toggleClass('parsed', state is 'parsed')
+    @$('.upload-state .progress').toggleClass('uploading', state is 'uploading')
+    @$('.upload-state .progress').toggleClass('uploaded', state is 'uploaded')
+    @$('.upload-state .progress-bar').css width: "#{progress}%"
     @$('.upload-state .label').html(@model.getUploadStateLabel())
 
   stopPropagation: (e) ->
@@ -94,6 +94,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
 
   renderVisitsSelectbox: =>
     @$('select.visit').select2
+      width: '200px'
       placeholder: 'No visit assigned'
       allowClear: true
       ajax:
@@ -139,6 +140,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @$('select.required-series')
       .select2
         placeholder: 'No required series assigned'
+        width: '250px'
     @$('select.required-series')
       .prop('disabled', not @model.get('markedForUpload') or not @model.get('assignVisitId')?)
       .trigger('change')
@@ -152,9 +154,11 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
         $select.html('').select2
           placeholder: 'No required series assigned'
           data: @visits[changed.assignVisitId]?.required_series or []
+          width: '250px'
       else
         $select.html('').select2
           placeholder: 'No required series assigned'
+          width: '250px'
       $select.val([])
 
     $select.prop('disabled', not @model.get('markedForUpload') or not @model.get('assignVisitId')?)

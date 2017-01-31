@@ -76,6 +76,7 @@ class ImageUploader.Views.ImageSeriesTable extends Backbone.View
 
   renderVisitsSelectbox: ->
     @$('select.mass-assign-visit').select2
+      width: '200px'
       placeholder: 'Mass-assign visit'
       allowClear: true
       ajax:
