@@ -145,6 +145,10 @@ JOIN
     self.ensure_domino_document_exists
   end
 
+  def to_s
+    name
+  end
+
   protected
 
   def ensure_study_is_unchanged

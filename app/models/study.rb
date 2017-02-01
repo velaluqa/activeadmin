@@ -202,7 +202,7 @@ JOIN
   end
 
   def to_s
-    "Study — #{name} (#{id})"
+    name
   end
   
   protected
