@@ -132,7 +132,7 @@
 
       &#studies > a:before { content: "\f02d"; }
       &#centers > a:before { content: "\f19c"; }
-      &#patients > a:before { content: "\f193"; }
+      &#patients > a:before { content: $fa-var-vcard-o; }
       &#image_series > a:before { content: "\f03e"; }
       &#visits > a:before { content: "\f0f1"; }
 
