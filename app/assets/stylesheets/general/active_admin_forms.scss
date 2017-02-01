@@ -9,6 +9,12 @@
   margin-bottom: 0;
 }
 
+.flash_error,
+.flash_alert {
+  @extend .alert, .alert-danger;
+  margin-bottom: 0;
+}
+
 input[type="text"],
 input[type="password"],
 input[type="datetime"],
