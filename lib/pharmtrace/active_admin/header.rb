@@ -12,6 +12,14 @@ module Pharmtrace
         build_site_title
         div class: 'navigation-wrapper' do
           div class: 'growing-wrapper' do
+            if session[:selected_study_name].present?
+              ul class: 'tabs study-selection' do
+                li id: 'study-selection' do
+                  text = "Study: #{session[:selected_study_name]}"
+                  link_to(text, admin_study_path(id: session[:selected_study_id]))
+                end
+              end
+            end
             build_global_navigation
             build_utility_navigation
           end

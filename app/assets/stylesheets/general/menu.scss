@@ -42,7 +42,6 @@
     position: relative;
     height: 100%;
     margin-top: $menu-width;
-    padding-top: 5px;
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -65,6 +64,19 @@
     }
   }
 
+  .study-selection {
+    border-bottom: 2px solid $menu-spacer-color;
+
+    li {
+      padding: 4px 0;
+      background-color: rgba(255,255,255,0.25);
+    }
+
+    a {
+      color: $menu-link-color;
+    }
+  }
+
   ul {
     list-style-type: none;
     margin: 0;
@@ -72,6 +84,7 @@
 
     &#tabs {
       padding-bottom: 2*45px;
+      padding-top: 5px;
     }
 
     &#utility_nav {
@@ -113,6 +126,7 @@
 	}
       }
 
+      &#study-selection > a:before { content: $fa-var-hand-o-right; }
       &#dashboard > a:before { content: "\f0e4"; }
       &#viewer_cart > a:before { content: "\f07a"; }
 
@@ -128,7 +142,7 @@
       &#users > a:before { content: "\f007"; }
       &#roles > a:before { content: "\f0c0"; }
 
-      &#notification_profiles > a:before { content: "\f122"; }
+      &#notification_profiles > a:before { content: $fa-var-envelope-square; }
       &#email_templates > a:before { content: "\f003"; }
 
       &#notifications > a:before { content: "\f0a2"; }
