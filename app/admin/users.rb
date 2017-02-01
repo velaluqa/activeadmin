@@ -176,7 +176,7 @@ ActiveAdmin.register User do
   end
 
   action_item :generate_keypair, :only => :show do
-    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will disable the old signature of this user. Are you sure you want to do this?' if can? :manage, resource
+    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will disable the old signature of this user. Are you sure you want to do this?' if can? :generate_keypair, resource
   end
 
   member_action :unlock, :method => :get do

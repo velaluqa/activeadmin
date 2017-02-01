@@ -14,7 +14,7 @@ class Ability
     Image => %i(manage read update create destroy),
     NotificationProfile => %i(manage read update create destroy),
     Notification => %i(manage read update create destroy),
-    User => %i(manage read update create destroy),
+    User => %i(manage read update create destroy generate_keypair),
     UserRole => %i(manage read update create destroy),
     PublicKey => %i(manage read update create destroy),
     Role => %i(manage read update create destroy),
@@ -96,13 +96,13 @@ class Ability
   # permitted to manage his own user account and his own public keys.
   def define_basic_abilities
     unless can?(:manage, User)
-      can :manage, User, ['users.id = ?', current_user.id] do |user|
+      can [:read, :update, :generate_keypair], User, ['users.id = ?', current_user.id] do |user|
         user == current_user
       end
     end
 
     unless can?(:manage, PublicKey)
-      can :manage, PublicKey, ['public_keys.user_id = ?', current_user.id] do |public_key|
+      can [:read, :update, :generate_keypair], PublicKey, ['public_keys.user_id = ?', current_user.id] do |public_key|
         public_key.user == current_user
       end
     end
