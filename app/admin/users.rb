@@ -132,8 +132,23 @@ ActiveAdmin.register User do
     if f.object != current_user && can?(%i(create update destroy), UserRole)
       inputs 'Roles' do
         has_many :user_roles, allow_destroy: true do |ur|
-          ur.input :role
-          ur.input :scope_object_identifier, collection: [['*system-wide*', 'systemwide']] + UserRole.accessible_scope_object_identifiers(current_ability)
+          collection = [['*system-wide*', 'systemwide']]
+          unless ur.object.scope_object_identifier == 'systemwide'
+            collection.push([ur.object.scope_object.to_s, ur.object.scope_object_identifier])
+          end
+
+          ur.input :role, collection: Role.order('title'), input_html: { class: 'initialize-select2' }
+          ur.input(
+            :scope_object_identifier,
+            collection: collection,
+            input_html: {
+              class: 'select2-record-search',
+              'data-models' => 'Study,Center,Patient',
+              'data-placeholder' => '*system-wide*',
+              'data-clear-value' => 'systemwide',
+              'data-allow-clear' => true
+            }
+          )
         end
       end
     end
