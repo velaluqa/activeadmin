@@ -62,5 +62,8 @@
 
     &.edit_dashboard a:before { content: $fa-var-pencil; }
     &.save_dashboard a:before { content: $fa-var-check; }
+
+    &.start_viewer a:before { content: $fa-var-eye; }
+    &.clear_cart a:before { content: $fa-var-remove; }
   }
 }

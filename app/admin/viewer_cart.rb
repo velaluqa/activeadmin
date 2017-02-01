@@ -35,6 +35,14 @@ ActiveAdmin.register_page 'Viewer Cart' do
     render 'admin/viewer_cart/viewer_cart', :cart => cart
   end
 
+  action_item :start_viewer, unless: -> { session[:viewer_cart].empty? } do
+    link_to('Start Viewer', admin_viewer_cart_start_path)
+  end
+
+  action_item :clear_cart, unless: -> { session[:viewer_cart].empty? } do
+    link_to('Clear Cart', admin_viewer_cart_clear_path, :'data-confirm' => 'This will remove all items from the cart. Are you sure?')
+  end
+
   page_action :empty, :method => :get do
     session[:viewer_cart] = []
     redirect_to :back
