@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   before_filter :authenticate_user!
   before_filter :set_user
 
-  layout 'application'
+  layout 'devise'
 
   def change_password
     @dont_display_navbar = true
