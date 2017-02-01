@@ -1,7 +1,8 @@
 ActiveAdmin.register User do
   menu(
     parent: 'users',
-    priority: 10
+    priority: 10,
+    if: -> { current_user.is_root_user? || User.accessible_by(current_ability, :read).count > 1 }
   )
 
   config.comments = false
