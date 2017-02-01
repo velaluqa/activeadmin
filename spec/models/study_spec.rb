@@ -1,4 +1,16 @@
 RSpec.describe Study do
+  describe 'destroy' do
+    let!(:study) { create(:study) }
+    let!(:user) { create(:user) }
+    let!(:user_role) { create(:user_role, scope_object: study, user: user) }
+
+    it 'destroys related user roles' do
+      expect {
+        study.destroy
+      }.to change(UserRole, :count).by(-1)
+    end
+  end
+
   describe 'scope ::searchable' do
     it 'selects search fields' do
       study = create(:study, name: 'FooStudy')

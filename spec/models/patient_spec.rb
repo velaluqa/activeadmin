@@ -1,4 +1,16 @@
 RSpec.describe Patient do
+  describe 'destroy' do
+    let!(:patient) { create(:patient) }
+    let!(:user) { create(:user) }
+    let!(:user_role) { create(:user_role, scope_object: patient, user: user) }
+
+    it 'destroys related user roles' do
+      expect {
+        patient.destroy
+      }.to change(UserRole, :count).by(-1)
+    end
+  end
+
   describe 'scope ::searchable' do
     it 'selects search fields' do
       center = create(:center, code: 'Foo')

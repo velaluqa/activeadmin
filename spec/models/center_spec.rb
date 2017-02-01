@@ -1,4 +1,16 @@
 RSpec.describe Center do
+  describe 'destroy' do
+    let!(:center) { create(:center) }
+    let!(:user) { create(:user) }
+    let!(:user_role) { create(:user_role, scope_object: center, user: user) }
+
+    it 'destroys related user roles' do
+      expect {
+        center.destroy
+      }.to change(UserRole, :count).by(-1)
+    end
+  end
+
   describe 'scope ::searchable' do
     it 'selects search fields' do
       center = create(:center, name: 'FooCenter')
