@@ -80,6 +80,8 @@ $padding-xs-horizontal:     5px !default;
 $input-border-focus: $brand-primary;
 $input-color: $text-color;
 
+$font-family-sans-serif: 'Roboto', sans-serif;
+
 @import "bootstrap/variables";
 
 $table-selected-row-background: lighten($wet-asphalt, 30%);
