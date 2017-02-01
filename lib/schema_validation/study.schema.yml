@@ -3,7 +3,7 @@ name: root
 mapping:
   "domino_integration":
     type: map
-    required: yes
+    required: no
     mapping:
       "dicom_tags":
         type: seq
