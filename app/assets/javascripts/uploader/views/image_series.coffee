@@ -104,7 +104,8 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
           return { filter: params.term }
         processResults: (data, params) =>
           @visits = {}
-          results = [{ id: 'create', text: 'Create New Visit' }]
+          results = []
+          results.push(id: 'create', text: 'Create New Visit') if currentUser.can('create', 'Visit')
           results = results.concat _.map data, (visit) =>
             @visits[visit.id] = visit
             {
