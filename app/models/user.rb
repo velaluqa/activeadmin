@@ -172,6 +172,12 @@ class User < ActiveRecord::Base
       ERICA.default_dashboard_configuration
   end
 
+  # This method is called by Devise whenever it needs to send a mail.
+  # By overriding it we use an ActionJob via Sidekiq.
+  def send_devise_notification(notification, *args)
+    devise_mailer.send(notification, self, *args).deliver_later
+  end
+
   def self.classify_audit_trail_event(c)
     if(c.include?('sign_in_count') and
        c['sign_in_count'][1] == c['sign_in_count'][0]+1
