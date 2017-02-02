@@ -181,6 +181,9 @@ gem 'ruby_dig2'
 # Help pages use markdown to generate markup.
 gem 'redcarpet'
 
+# Used for inlining mail assets into sent mails.
+gem 'premailer'
+
 group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
