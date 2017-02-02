@@ -1,3 +1,7 @@
+class DeviseMailer < Devise::Mailer
+  layout 'mailer'
+end
+
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
@@ -15,7 +19,7 @@ Devise.setup do |config|
   config.mailer_sender = 'no-reply@pharmtrace.com'
 
   # Configure the class responsible to send e-mails.
-  # config.mailer = 'Devise::Mailer'
+  config.mailer = 'DeviseMailer'
 
   # ==> ORM configuration
   # Load and configure the ORM. Supports :active_record (default) and

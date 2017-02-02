@@ -1,0 +1,48 @@
+@import "general/font_roboto";
+@import "general/active_admin_bootstrap_variables";
+@import "bootstrap/mixins";
+@import "bootstrap/normalize";
+@import "bootstrap/print";
+@import "bootstrap/scaffolding";
+@import "bootstrap/type";
+@import "bootstrap/code";
+@import "bootstrap/tables";
+@import "bootstrap/forms";
+@import "bootstrap/buttons";
+@import "bootstrap/panels";
+@import "bootstrap/alerts";
+
+body {
+  margin: 15px;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+
+  .panel {
+    padding: 15px;
+  }
+
+  .p:last-child {
+    margin: 0;
+  }
+}
+
+a {
+  color: $link-color;
+}
+
+p.center {
+  text-align: center;
+}
+
+p.large {
+  padding: 15px 0;
+}
+
+.alert {
+  margin-top: 30px;
+  margin-bottom: 0;
+}
