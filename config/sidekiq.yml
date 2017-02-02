@@ -2,3 +2,4 @@
 :queues:
   - default
   - notifications
+  - mailers
