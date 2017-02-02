@@ -52,6 +52,7 @@ ActiveAdmin.register Center do
   end
 
   form do |f|
+    f.object.study_id = params[:study_id] if params.key?(:study_id)
     f.inputs 'Details' do
       f.input :study, :collection => (session[:selected_study_id].nil? ? Study.accessible_by(current_ability) : Study.where(:id => session[:selected_study_id]).accessible_by(current_ability)) unless f.object.persisted?
       f.input :name
