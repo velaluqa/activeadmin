@@ -1,0 +1,97 @@
+$turquoise: #1abc9c;
+$green-sea: #16a085;
+
+$emerald: #2ecc71;
+$nephritis: #27ae60;
+
+$peter-river: #3498db;
+$belize-hole: #2980b9;
+
+$amethyst: #9b59b6;
+$wisteria: #8e44ad;
+
+$wet-asphalt: #34495e;
+$midnight-blue: #2c3e50;
+
+$sun-flower: #f1c40f;
+$orange: #f39c12;
+
+$carrot: #e67e22;
+$pumpkin: #d35400;
+
+$alizarin: #e74c3c;
+$pomegranate: #c0392b;
+
+$clouds: #ecf0f1;
+$silver: #bdc3c7;
+
+$concrete: #95a5a6;
+$asbestos: #7f8c8d;
+
+// Grays
+$gray: $concrete;
+$gray-light: $silver;
+$inverse: white;
+
+$text-color: $wet-asphalt;
+
+// Brand colors
+$brand-primary: $pomegranate;
+$brand-secondary: $turquoise;
+$brand-success: $emerald;
+$brand-warning: $pumpkin;
+$brand-danger: $alizarin;
+$brand-info: $peter-river;
+
+$border-radius-base: 2px;
+$border-radius-large: 2px;
+$border-radius-small: 2px;
+
+$menu-width: 53px;
+
+$brand-background: $alizarin;
+$brand-color: $clouds;
+
+$menu-background: $wet-asphalt;
+$menu-link-color: $clouds;
+$menu-link-hover-color: lighten($turquoise, 10%);
+$menu-spacer-color: rgba($clouds, 0.1);
+
+$title-bar-background: $clouds;
+$title-bar-color: $wet-asphalt;
+$title-bar-link-color: $wet-asphalt;
+$title-bar-link-hover-color: $wet-asphalt;
+
+$panel-heading-padding: 10px;
+/* $panel-default-heading-bg: #fff; */
+
+$padding-base-vertical:     6px !default;
+$padding-base-horizontal:   8px !default;
+
+$padding-large-vertical:    10px !default;
+$padding-large-horizontal:  12px !default;
+
+$padding-small-vertical:    5px !default;
+$padding-small-horizontal:  6px !default;
+
+$padding-xs-vertical:       1px !default;
+$padding-xs-horizontal:     5px !default;
+
+$input-border-focus: $brand-primary;
+$input-color: $text-color;
+
+$font-family-sans-serif: 'Roboto', sans-serif;
+
+@import "bootstrap/variables";
+
+$table-selected-row-background: lighten($wet-asphalt, 30%);
+$table-selected-row-color: $clouds;
+
+$btn-default-color: #333;
+$btn-default-bg: $clouds;
+$btn-default-border: $btn-default-bg;
+$btn-primary-border: $btn-primary-bg;
+$btn-success-border: $btn-success-bg;
+$btn-info-border: $btn-info-bg;
+$btn-warning-border: $btn-warning-bg;
+$btn-danger-border: $btn-danger-bg;
