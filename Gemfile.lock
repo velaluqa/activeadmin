@@ -423,6 +423,9 @@ GEM
     premailer (1.9.1)
       css_parser (>= 1.4.5)
       htmlentities (>= 4.0.0)
+    premailer-rails (1.9.5)
+      actionmailer (>= 3, < 6)
+      premailer (~> 1.7, >= 1.7.9)
     proc_extensions (0.2)
       sourcify (~> 0.5)
     protected_attributes (1.1.3)
@@ -752,10 +755,11 @@ DEPENDENCIES
   meta_request (~> 0.4.0)
   mongoid (~> 5.1.2)
   mongoid-history (~> 0.5.0)
+  nokogiri
   paper_trail (~> 4.1.0)
   pg
   poltergeist
-  premailer
+  premailer-rails
   protected_attributes
   pry
   pry-byebug

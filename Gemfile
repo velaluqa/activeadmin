@@ -182,7 +182,8 @@ gem 'ruby_dig2'
 gem 'redcarpet'
 
 # Used for inlining mail assets into sent mails.
-gem 'premailer'
+gem 'premailer-rails'
+gem 'nokogiri'
 
 group :development do
   # Hint opimization opportunities while developing.
