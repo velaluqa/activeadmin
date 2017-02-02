@@ -29,6 +29,9 @@ class ImageUploader.Views.App extends Backbone.View
       selectableAttribute: 'center'
       selectableCollection: 'centers'
       dependentAttribute: 'study'
+      creatableResource: 'Center'
+      creationUrl: (model) ->
+        "/admin/centers/new?study_id=#{model.get('study').id}"
     view.render()
 
     @subviews.patientSelect = view = new ImageUploader.Views.ResourceSelect
@@ -37,6 +40,9 @@ class ImageUploader.Views.App extends Backbone.View
       selectableAttribute: 'patient'
       selectableCollection: 'patients'
       dependentAttribute: 'center'
+      creatableResource: 'Patient'
+      creationUrl: (model) ->
+        "/admin/patients/new?center_id=#{model.get('center').id}"
     view.render()
 
     @subviews.parsingProgress = view = new ImageUploader.Views.ParsingProgress

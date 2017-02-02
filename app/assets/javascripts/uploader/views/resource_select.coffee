@@ -3,6 +3,7 @@
 class ImageUploader.Views.ResourceSelect extends Backbone.View
   events:
     'change select': 'change'
+    'click .select2': 'reload'
 
   state: 'reset'
 
@@ -11,6 +12,7 @@ class ImageUploader.Views.ResourceSelect extends Backbone.View
     @selectableCollection = options.selectableCollection
     @dependentAttribute = options.dependentAttribute
 
+    @creatableResource = options.creatableResource
     @creationUrl = options.creationUrl
 
     @collection = @model[@selectableCollection]
@@ -30,6 +32,16 @@ class ImageUploader.Views.ResourceSelect extends Backbone.View
       @state = 'reset'
       @render()
 
+  reload: =>
+    @collection.fetch(silent: true).then =>
+      @$select.select2('open')
+
+  create: =>
+    url = @creationUrl
+    url = url(@model) if _.isFunction(url)
+    window.open(url, "Create New #{@creatableResource}")
+    @$select.val('').trigger('change')
+
   change: =>
     value = @$select.val()
     return @create() if value is 'create'
@@ -39,6 +51,8 @@ class ImageUploader.Views.ResourceSelect extends Backbone.View
 
   data: =>
     options = []
+    if @creatableResource? and currentUser.can('create', @creatableResource)
+      options.push(id: 'create', text: "Create New #{@creatableResource}")
     options.concat @collection.map (resource) ->
       { id: resource.get('id'), text: resource.text() }
 
