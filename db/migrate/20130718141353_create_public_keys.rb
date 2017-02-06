@@ -6,7 +6,7 @@ class CreatePublicKeys < ActiveRecord::Migration
       t.boolean :active, null: false
       t.datetime :deactivated_at
 
-      t.timestamps
+      t.timestamps :null => true
     end
 
     add_index :public_keys, :user_id

@@ -4,7 +4,7 @@ class CreateCenters < ActiveRecord::Migration
       t.string :name
       t.integer :study_id
 
-      t.timestamps
+      t.timestamps :null => true
     end
   end
 end

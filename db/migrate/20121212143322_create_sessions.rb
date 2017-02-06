@@ -4,7 +4,7 @@ class CreateSessions < ActiveRecord::Migration
       t.string :name
       t.references :study
 
-      t.timestamps
+      t.timestamps :null => true
     end
   end
 end

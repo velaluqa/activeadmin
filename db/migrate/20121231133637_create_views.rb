@@ -7,7 +7,7 @@ class CreateViews < ActiveRecord::Migration
       t.references :form
       t.string :images
 
-      t.timestamps
+      t.timestamps :null => true
     end
     add_index :views, :session_id
     add_index :views, :patient_id

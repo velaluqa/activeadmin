@@ -5,7 +5,7 @@ class CreateRoles < ActiveRecord::Migration
       t.references :user
       t.integer :role
 
-      t.timestamps
+      t.timestamps :null => true
     end
   end
 end

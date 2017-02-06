@@ -5,7 +5,7 @@ class CreatePatients < ActiveRecord::Migration
       t.string :images_folder
       t.references :session
 
-      t.timestamps
+      t.timestamps :null => true
     end
   end
 end

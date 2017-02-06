@@ -4,7 +4,7 @@ class CreateForms < ActiveRecord::Migration
       t.string :name, :unique => true
       t.text :description
 
-      t.timestamps
+      t.timestamps :null => true
     end
   end
 end

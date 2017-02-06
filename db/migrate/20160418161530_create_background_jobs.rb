@@ -10,7 +10,7 @@ class CreateBackgroundJobs < ActiveRecord::Migration
       t.text :error_message
       t.jsonb :results, null: false, default: '{}'
 
-      t.timestamps
+      t.timestamps :null => true
     end
     add_index :background_jobs, :legacy_id
     add_index :background_jobs, :user_id
