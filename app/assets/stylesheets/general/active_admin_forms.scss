@@ -97,6 +97,10 @@ form {
     ol {
       @extend .panel-body;
 
+      &:first-child {
+	margin-top: -45px;
+      }
+
       &:last-of-type {
 	margin-bottom: 0;
       }
@@ -110,6 +114,7 @@ form {
       label {
 	@extend .col-sm-2;
 	line-height: $input-height-base;
+	margin-bottom: 0;
       }
       input[type="text"],
       input[type="password"],
