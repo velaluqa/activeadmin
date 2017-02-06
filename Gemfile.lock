@@ -1,12 +1,12 @@
 GIT
-  remote: git://github.com/velaluqa/liquid.git
+  remote: https://github.com/velaluqa/liquid.git
   revision: 86944fe7b77710b299a5d03fb6ef816f6c09feb4
   branch: master
   specs:
     liquid (4.0.0.rc3)
 
 GIT
-  remote: git://github.com/velaluqa/rspec-sidekiq.git
+  remote: https://github.com/velaluqa/rspec-sidekiq.git
   revision: 5ae1fc9cd060df0d496908e6ea517eabece7033a
   branch: deprecate-have-enqueued-job
   specs:
@@ -15,7 +15,7 @@ GIT
       sidekiq (>= 2.4.0)
 
 GIT
-  remote: git://github.com/velaluqa/textpow.git
+  remote: https://github.com/velaluqa/textpow.git
   revision: 46005ff8fdfe0108c45f98fc0be0c6bf170b27ec
   branch: master
   specs:
@@ -23,7 +23,7 @@ GIT
       plist (>= 3.0.1)
 
 GIT
-  remote: git://github.com/velaluqa/yard-activerecord.git
+  remote: https://github.com/velaluqa/yard-activerecord.git
   revision: dc2d9c1ea0a0fc9a0f9ab35d76a3208e51be506e
   specs:
     yard-activerecord (0.0.16)
