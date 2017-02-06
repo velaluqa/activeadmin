@@ -1,7 +1,8 @@
-$ ->
-  $('.initialize-select2').select2()
+initializeSimpleSelects = ($elements = $('.initialize-select2')) ->
+  $elements.select2()
 
-  $('.select2-record-search').each (i, el) ->
+initializeRecordSearch = ($elements = $('.select2-record-search')) ->
+  $elements.each (i, el) ->
     $el = $(el)
     $el.select2
       placeholder: $el.data('placeholder')
@@ -31,6 +32,14 @@ $ ->
           return { results: results }
     $el.on 'change', ->
       $el.val($el.data('clear-value')).trigger('change') if $el.val() == ''
+
+$ ->
+  $(document).on 'has_many_add:after', (event, $fieldset) ->
+    initializeSimpleSelects($fieldset.find('.initialize-select2'))
+    initializeRecordSearch($fieldset.find('.select2-record-search'))
+
+  initializeSimpleSelects()
+  initializeRecordSearch()
 
   $('body').on 'select2:open', (e) ->
     if $(e.target).parents('#sidebar').length
