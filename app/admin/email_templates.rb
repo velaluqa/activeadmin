@@ -1,6 +1,11 @@
 require 'email_template_renderer'
 
 ActiveAdmin.register EmailTemplate do
+  menu(
+    parent: 'notifications',
+    priority: 20
+  )
+
   config.filters = false
 
   permit_params(:name, :email_type, :template)

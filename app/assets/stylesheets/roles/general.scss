@@ -1,0 +1,81 @@
+.permissions_matrix {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+
+  /*
+   Introduced in IE 10.
+   See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+  */
+  -ms-user-select: none;
+  user-select: none;
+
+  li {
+    list-style-type: none;
+    margin-bottom: 0 !important;
+  }
+
+  li label {
+    display: block;
+    width: 20%;
+    float: left;
+    font-size: 1.0em;
+    font-weight: bold;
+    color: #5E6469;
+    cursor: pointer;
+    margin-bottom: 0;
+  }
+
+  li.permission {
+    padding: 8px 5px 4px 10px;
+
+    &:hover {
+      background: rgba(#999, 0.1);
+    }
+  }
+
+  .activities {
+    .activity {
+      margin-right: 20px;
+    }
+
+    .activity label {
+      position: relative;
+      top: -3px;
+    }
+
+    .activity, .activity label {
+      display: inline-block;
+      width: auto;
+      float: none;
+    }
+
+    input + label {
+      color: #bbb;
+    }
+
+    input:checked + label {
+      color: #666;
+    }
+
+    input:disabled + label {
+      color: #999;
+    }
+  }
+}
+
+.permissions_matrix.show {
+  .activities {
+    input + label {
+      color: #bbb;
+    }
+
+    input:checked + label {
+      color: #666;
+    }
+  }
+}
+
+.permissions .panel_contents {
+  padding: 0 0 15px 0;
+}

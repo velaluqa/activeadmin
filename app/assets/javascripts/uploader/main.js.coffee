@@ -1,5 +1,5 @@
-#= require twitter/bootstrap/tooltip
-#= require twitter/bootstrap/popover
+#= require bootstrap/tooltip
+#= require bootstrap/popover
 #= require hamlcoffee
 #= require ../vendor/underscore
 #= require ../vendor/backbone

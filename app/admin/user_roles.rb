@@ -25,8 +25,23 @@ ActiveAdmin.register UserRole do
 
   form do |f|
     f.inputs do
-      f.input :role
-      f.input :scope_object_identifier, collection: UserRole.accessible_scope_object_identifiers(current_ability)
+      collection = [['*system-wide*', 'systemwide']]
+      unless f.object.scope_object_identifier == 'systemwide'
+        collection.push([f.object.scope_object.to_s, f.object.scope_object_identifier])
+      end
+
+      f.input :role, collection: Role.order('title'), input_html: { class: 'initialize-select2' }
+      f.input(
+        :scope_object_identifier,
+        collection: collection,
+        input_html: {
+          class: 'select2-record-search',
+          'data-models' => 'Study,Center,Patient',
+          'data-placeholder' => '*system-wide*',
+          'data-clear-value' => 'systemwide',
+          'data-allow-clear' => true
+        }
+      )
     end
     f.actions
   end

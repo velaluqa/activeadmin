@@ -1,0 +1,15 @@
+%p
+  Dear
+  = succeed "," do
+    = @resource.name
+%p
+  To gain access to ERICA, you need to confirm your e-mail address.
+%p.center.large
+  = link_to 'Click Here To Confirm Your Address', confirmation_url(@resource, confirmation_token: @token), class: 'btn btn-primary'
+%p
+  Or copy this link to your browser window:
+%p.center.large
+  = link_to confirmation_url(@resource, confirmation_token: @token), confirmation_url(@resource, confirmation_token: @token)
+.alert.alert-info
+  This is an automated e-mail. Please do not reply to this e-mail. If you need to contact us, please look at:
+  = link_to root_url, root_url

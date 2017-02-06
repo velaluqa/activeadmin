@@ -1,0 +1,114 @@
+body.admin_notification_profiles {
+  fieldset.filters {
+    padding-top: 40px;
+  }
+}
+
+#filters-jsoneditor {
+  button {
+    @extend .btn, .btn-default;
+  }
+
+  button + button {
+    margin-left: 5px;
+  }
+
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  margin: 0 10px;
+
+  label {display: none;}
+
+  .header.button-holder {
+    float: right;
+    font-size: 0.7em;
+
+    &:first-of-type {
+      display: none;
+    }
+  }
+
+  .content {
+    [data-schematype='array'] {
+      border: 1px solid $panel-default-border;
+      border-radius: 2px;
+      overflow: hidden;
+    } /**/
+  }
+
+  .content > div {
+    margin-top: 10px;
+  }
+
+  .tab {
+    @extend .btn;
+    &.active {
+      @extend .btn-primary;
+    }
+    &.inactive {
+      @extend .btn-default;
+    }
+
+    margin-bottom: 5px;
+    width: 120px;
+  }
+
+  select,
+  input {
+    @extend .form-control, .col-xs-4;
+    z-index: 500;
+    margin-bottom: 5px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  [data-schemaid='root'] > h3 {
+    margin: 0;
+    span { display: none; }
+    .button-holder {
+      float: none;
+    }
+  }
+
+  [data-schemaid='root'] > h3 > span { display: none; }
+  [data-schematype='object'] > h3 { display: none; }
+  .content [data-schematype='array'] {
+    > h3 {
+      padding: 10px;
+    }
+
+    > div > .button-holder {
+      padding: 10px;
+      background-color: $clouds;
+      display: block !important;
+    }
+  }
+  .content [data-schematype='array'] > div > div > [data-schemapath] {
+    margin: 10px 0 10px 0;
+    padding: 0 10px;
+  }
+  [data-schemapath$='changes.from'] > label,
+  [data-schemapath$='changes.to'] > label {
+    display: block;
+  }
+
+  h3 {
+    margin: 0;
+
+    + div p {
+      padding: 5px 10px;
+    }
+  }
+
+  [data-schemapath] {
+    margin-bottom: 0;
+
+    .footer.button-holder {
+      margin-top: 5px;
+    }
+  }
+}

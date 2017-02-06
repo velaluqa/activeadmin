@@ -18,7 +18,6 @@ JSONEditor.defaults.themes.custom = JSONEditor.AbstractTheme.extend({
   },
   getChildEditorHolder: function() {
     var el = this._super();
-    el.style.marginBottom = '8px';
     return el;
   },
   getHeaderButtonHolder: function() {
@@ -42,7 +41,7 @@ JSONEditor.defaults.themes.custom = JSONEditor.AbstractTheme.extend({
     input.style.borderColor = 'red';
 
     if(!input.errmsg) {
-      var group = this.closest(input,'.form-control');
+      var group = this.closest(input,'.input-row');
       input.errmsg = document.createElement('div');
       input.errmsg.setAttribute('class','errmsg');
       input.errmsg.style = input.errmsg.style || {};
@@ -61,6 +60,20 @@ JSONEditor.defaults.themes.custom = JSONEditor.AbstractTheme.extend({
     switcher.style = {};
     switcher.className = "select";
     return switcher;
+  },
+  getFormControl: function(label, input, description) {
+    var el = document.createElement('div');
+    el.className = 'input-row';
+    if(label) el.appendChild(label);
+    if(input.type === 'checkbox') {
+      label.insertBefore(input,label.firstChild);
+    }
+    else {
+      el.appendChild(input);
+    }
+
+    if(description) el.appendChild(description);
+    return el;
   },
   removeInputError: function(input) {
     input.style.borderColor = '';
@@ -83,7 +96,7 @@ JSONEditor.defaults.themes.custom = JSONEditor.AbstractTheme.extend({
     progressBar.removeAttribute('value');
   },
   getTab: function(span) {
-    var el = document.createElement('div');
+    var el = document.createElement('li');
     el.appendChild(span);
     el.style = el.style || {};
     return el;

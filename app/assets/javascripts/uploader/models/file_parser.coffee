@@ -36,7 +36,7 @@ class ImageUploader.Models.FileParser extends Backbone.Model
       @set state: 'idle'
       fileNames = _.map @failed, (image) -> image.get('fileName')
       unless _.isEmpty(@failed)
-        alert("Failed parsing some files: #{fileNames.join(', ')}")
+        bootbox.alert("Failed parsing files: #{fileNames.join(', ')}")
         @failed = []
 
   handleStateChange: (model, state) =>

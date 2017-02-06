@@ -17,28 +17,15 @@
   }
 }
 
-body.admin_dashboard {
-  div#title_bar {
-    display: none;
-  }
-
-  #active_admin_content {
-    padding: 15px;
-  }
-
-  .modal {
-    select {
-      width: 280px;
-    }
-
-    .form-group {
-      margin-bottom: 5px;
-
-      label {
-	display: inline-block;
-	width: 130px;
-      }
-    }
+#dashboard-container .widget {
+  background-color: $panel-bg;
+  border: 1px solid transparent;
+  border-radius: $panel-border-radius;
+  @include box-shadow(0 1px 1px rgba(0,0,0,.05));
+  @include panel-variant($panel-default-border, $panel-default-text, $panel-default-heading-bg, $panel-default-border);
+  h3 {
+    border-bottom: 1px solid transparent;
+    @include border-top-radius(($panel-border-radius - 1));
   }
 }
 
@@ -49,18 +36,8 @@ body.admin_dashboard {
     box-sizing: border-box;
   }
 
-  .buttons {
-    margin-bottom: 10px;
-    text-align: right;
-
-    button.edit-dashboard { display: inline-block; }
-    button.save-dashboard { display: none; }
-  }
-
   button.add-row {
     margin: 15px auto 0 auto;
-    display: block;
-    display: none;
   }
 
   ul.rows {
@@ -96,7 +73,6 @@ body.admin_dashboard {
 	  right: -8px;
 	  top: 48%;
 	  transform: translateY(-50%);
-	  content: '+';
 	  padding: 0;
 	  text-align: center;
 	  line-height: 30px;
@@ -339,49 +315,8 @@ body.admin_dashboard {
     }
   }
 
-  &.editing {
-    .buttons {
-      button.edit-dashboard { display: none; }
-      button.save-dashboard { display: inline-block; }
-    }
-
-    button.add-row {
-      display: block;
-    }
-
-    ul.rows > li div.row {
-      ul.row {
-	margin-bottom: 0;
-	margin: 0;
-
-	.widget {
-	  .buttons i.fa-trash-o,
-	  .buttons i.fa-edit {
-	    display: inline-block;
-	  }
-	}
-      }
-
-      button.add-widget {
-	display: block;
-      }
-
-      .row-sortable-handle {
-	display: block;
-      }
-
-      &.empty {
-	display: block;
-      }
-    }
-  }
-
   .widget {
     position: relative;
-    background-color: #fff;
-    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-    border: 1px solid rgba(0,0,0,0.15);
-    border-radius: 4px;
 
     .empty-widget-notice {
       &:before {
@@ -397,7 +332,7 @@ body.admin_dashboard {
 
     .content {
       position: absolute;
-      top: 30px;
+      top: 35px;
       left: 0;
       right: 0;
       bottom: 0;
@@ -407,6 +342,20 @@ body.admin_dashboard {
 
       &.table {
 	overflow: auto;
+	margin-bottom: 0;
+
+	&::-webkit-scrollbar {
+	  width: 4px;  /* for vertical scrollbars */
+	  height: 4px; /* for horizontal scrollbars */
+	}
+
+	&::-webkit-scrollbar-track {
+	  background: rgba($wet-asphalt,0.1);
+	}
+
+	&::-webkit-scrollbar-thumb {
+	  background: rgba($wet-asphalt,0.5);
+	}
 
 	.empty.note {
 	  text-align: center;
@@ -500,7 +449,7 @@ body.admin_dashboard {
       right: 0;
       font-weight: bold;
       text-transform: uppercase;
-      font-size: 10px;
+      font-size: 12px;
       color: #a9a9a9;
       margin: 10px;
       white-space: nowrap;
@@ -547,6 +496,70 @@ body.admin_dashboard {
 
       .content {
 	opacity: 0;
+      }
+    }
+  }
+}
+
+body.admin_dashboard {
+  .modal {
+    select {
+      width: 280px;
+    }
+
+    .select2 {
+      display: inline-block;
+    }
+
+    .form-group {
+      margin-bottom: 5px;
+
+      label {
+	display: inline-block;
+	width: 130px;
+      }
+    }
+  }
+
+  .action_items {
+    .action_item.edit_dashboard { display: inline-block; }
+    .action_item.save_dashboard { display: none; }
+  }
+  button.add-row { display: none; }
+
+  &.editing {
+    .action_items {
+      .action_item.edit_dashboard { display: none; }
+      .action_item.save_dashboard { display: inline-block; }
+    }
+
+    button.add-row { display: block; }
+
+    #dashboard-container {
+      ul.rows > li div.row {
+	ul.row {
+	  margin-bottom: 0;
+	  margin: 0;
+
+	  .widget {
+	    .buttons i.fa-trash-o,
+	    .buttons i.fa-edit {
+	      display: inline-block;
+	    }
+	  }
+	}
+
+	button.add-widget {
+	  display: block;
+	}
+
+	.row-sortable-handle {
+	  display: block;
+	}
+
+	&.empty {
+	  display: block;
+	}
       }
     }
   }

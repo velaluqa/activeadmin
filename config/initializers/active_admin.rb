@@ -1,3 +1,6 @@
+# ActiveAdmin extensions like components and mixins
+require_dependency 'pharmtrace/active_admin'
+
 require 'aa_footer'
 require 'aa_site_title'
 require 'aa_viewer_cart_mixin'
@@ -22,15 +25,11 @@ ActiveAdmin.setup do |config|
   # Set the title that is displayed on the main layout
   # for each of the active admin pages.
   #
-  if(Rails.application.config.is_erica_remote)
-    if(Rails.application.config.erica_remote['sponsor'].blank?)
-      config.site_title = "pharmtrace ERICA Remote"
-    else
-      config.site_title = "pharmtrace ERICA Remote :: #{Rails.application.config.erica_remote['sponsor']}"
-    end
-  else
-    config.site_title = "pharmtrace ERICA"
-  end
+  title = Rails.application.config.try(:erica).andand['title']
+  config.site_title = title || "ERICA"
+
+  # narrow_title = Rails.application.config.try(:erica).andand['narrow_title']
+  # config.narrow_site_title = narrow_title || "E"
 
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.
@@ -246,11 +245,50 @@ ActiveAdmin.setup do |config|
   #
   # If you wanted to add a static menu item to the default menu provided:
   #
-  #   config.namespace :admin do |admin|
-  #     admin.build_menu :default do |menu|
-  #       menu.add label: "My Great Website", url: "http://www.mygreatwebsite.com", html_options: { target: :blank }
-  #     end
-  #   end
+  config.namespace :admin do |admin|
+    admin.build_menu :default do |menu|
+      menu.add(
+        label: 'immediate',
+        priority: 0,
+        if: proc { !menu['immediate'].children.empty? }
+      )
+      menu.add(
+        label: 'store',
+        priority: 10,
+        if: proc { !menu['store'].children.empty? }
+      )
+      menu.add(
+        label: 'meta_store',
+        priority: 20,
+        if: proc { !menu['meta_store'].children.empty? }
+      )
+      menu.add(
+        label: 'read',
+        priority: 30,
+        if: proc { !menu['read'].children.empty? }
+      )
+      menu.add(
+        label: 'users',
+        priority: 40,
+        if: proc { !menu['users'].children.empty? }
+      )
+      menu.add(
+        label: 'notifications',
+        priority: 50,
+        if: proc { !menu['notifications'].children.empty? }
+      )
+      menu.add(
+        label: 'admin',
+        priority: 60,
+        if: proc { !menu['admin'].children.empty? }
+      )
+      menu.add(
+        label: 'versions',
+        priority: 1000,
+        if: proc { !menu['versions'].children.empty? }
+      )
+    end
+  end
 
   # == Download Links
   #
@@ -296,6 +334,8 @@ ActiveAdmin.setup do |config|
   #
   # Render custom ERICA footer and title.
   #
+  config.view_factory.header = Pharmtrace::ActiveAdmin::Header
+  config.view_factory.site_title = Pharmtrace::ActiveAdmin::SiteTitle
+  config.view_factory.action_items = Pharmtrace::ActiveAdmin::ActionItems
   config.view_factory.footer = PharmTraceERICAFooter
-  config.view_factory.site_title = PharmTraceERICASiteTitle
 end

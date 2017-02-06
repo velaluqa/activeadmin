@@ -53,7 +53,7 @@ gem 'coffee-rails', '~> 4.1.1'
 gem 'haml-rails', '~> 0.9.0'
 gem 'less-rails', '~> 2.7.1'
 
-gem 'twitter-bootstrap-rails'
+gem 'bootstrap-sass'
 gem 'bootstrap-datepicker-rails', '~> 1.6.0.1'
 
 gem 'font-awesome-sass'
@@ -67,6 +67,7 @@ gem 'therubyracer', :platforms => :ruby
 gem 'execjs'
 
 gem 'jquery-rails', '~> 3.1.4'
+gem 'jquery-ui-rails', '~> 5.0.0'
 
 # To use ActiveModel has_secure_password
 gem 'bcrypt-ruby', '~> 3.0.0'
@@ -91,7 +92,7 @@ gem 'cancancan', '~> 1.13.1'
 gem 'paper_trail', '~> 4.1.0'
 
 # ActiveAdmin
-gem 'activeadmin', '1.0.0.pre2'
+gem 'activeadmin', '1.0.0.pre3'
 
 # CodeRay for rendering yaml/json data
 gem 'coderay'
@@ -180,6 +181,10 @@ gem 'ruby_dig2'
 # Help pages use markdown to generate markup.
 gem 'redcarpet'
 
+# Used for inlining mail assets into sent mails.
+gem 'premailer-rails'
+gem 'nokogiri'
+
 group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
@@ -261,6 +266,7 @@ group :development, :test do
 
   gem 'guard', '~> 2.13.0'
   gem 'guard-rspec'
+  gem 'guard-livereload'
 
   gem 'test-unit'
   gem 'redis-namespace'

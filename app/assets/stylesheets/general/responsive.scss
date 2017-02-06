@@ -1,0 +1,25 @@
+body {
+  padding: $menu-width 0 0 $menu-width;
+}
+
+#header {
+  max-width: $menu-width;
+
+  .site_title {
+    .wide   { display: none; }
+    .narrow { display: inline-block; }
+  }
+
+  &:hover {
+    max-width: 1000px;
+
+    .site_title {
+      .wide   { display: inline-block; }
+      .narrow { display: none; }
+    }
+  }
+}
+
+#title_bar {
+  padding-left: $menu-width;
+}

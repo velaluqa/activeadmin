@@ -1,0 +1,71 @@
+#title_bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 500;
+  height: $menu-width;
+  background: $title-bar-background;
+  color: $title-bar-color;
+
+  @extend .clearfix;
+
+  .breadcrumb { display: none; }
+  h2 {
+    line-height: $menu-width;
+    margin: 0 15px;
+    font-size: 24px;
+  }
+
+  #titlebar_left {
+    @extend .pull-left;
+  }
+
+  #titlebar_right {
+    @extend .pull-right;
+  }
+
+  .action_items {
+    font-size: 1.2em;
+    margin-right: 15px;
+  }
+
+  .action_item {
+    a {
+      line-height: $menu-width;
+      margin: 0 7.5px;
+      text-decoration: none;
+      display: inline-block;
+      height: $menu-width;
+      color: $title-bar-link-color;
+      &:hover { color: $title-bar-link-hover-color; }
+    }
+    a:before { 
+      font-size: 1.2em;
+      font-family: FontAwesome; 
+      margin: 0 7.5px 0 0;
+    }
+    &.new a:before { content: $fa-var-plus; }
+    &.edit a:before { content: $fa-var-pencil; }
+    &.destroy a:before { content: $fa-var-trash-o; }
+    &.configure a:before { content: $fa-var-cogs; }
+    &.select a:before { content: $fa-var-hand_pointer-o; }
+    &.generate_keypair a:before { content: $fa-var-key; }
+    &.lock a:before { content: $fa-var-lock; }
+    &.unlock a:before { content: $fa-var-unlock; }
+    &.audit_trail a:before { content: $fa-var-history; }
+
+    &.export_for_erica1 a:before { content: $fa-var-share; }
+    &.download_images a:before { content: $fa-var-download; }
+    &.reorder_visits a:before { content: $fa-var-sort; }
+
+    &.edit_dashboard a:before { content: $fa-var-pencil; }
+    &.save_dashboard a:before { content: $fa-var-check; }
+
+    &.start_viewer a:before { content: $fa-var-eye; }
+    &.clear_cart a:before { content: $fa-var-remove; }
+
+    &.deselect a:before { content: $fa-var-remove; }
+  }
+}

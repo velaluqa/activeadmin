@@ -46,13 +46,6 @@ module StudyServer
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
 
-    # Prior to Rails 4, we had to activate this security measure
-    # manually. With Rails 4 we have:
-    #
-    #     ActiveSupport.escape_html_entities_in_json == true
-    #
-    # To change this configuration use:
-    #
-    #     config.active_support.escape_html_entities_in_json = false
+    config.assets.paths << Rails.root.join('vendor', 'assets', 'fonts')
   end
 end

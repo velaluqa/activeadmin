@@ -1,4 +1,4 @@
 %ul.row
-%button.add-widget
+%button.add-widget.btn.btn-primary
   %i.fa.fa-plus
 .row-sortable-handle

@@ -1,4 +1,9 @@
 ActiveAdmin.register NotificationProfile do
+  menu(
+    parent: 'notifications',
+    priority: 10
+  )
+
   config.filters = false
 
   config.per_page = 100

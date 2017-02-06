@@ -1,11 +1,15 @@
 ActiveAdmin.register_page 'Image Hierarchy' do
-  menu(if: lambda do
-    authorized?(:read, Study) &&
+  menu(
+    parent: 'meta_store',
+    priority: 20,
+    if: lambda do
+      authorized?(:read, Study) &&
       authorized?(:read, Center) &&
       authorized?(:read, Patient) &&
       authorized?(:read, Visit) &&
       authorized?(:read, ImageSeries)
-  end)
+    end
+  )
 
   content do
     render 'content'

@@ -35,6 +35,8 @@ class Center < ActiveRecord::Base
   belongs_to :study
   has_many :patients
 
+  has_many :user_roles, :as => :scope_object, dependent: :destroy
+
   scope :by_study_ids, lambda { |*ids|
     where(study_id: Array[ids].flatten)
   }

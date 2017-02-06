@@ -1,5 +1,5 @@
 ActiveAdmin.register_page 'Viewer Cart' do
-  menu :priority => 23
+  menu(priority: 10, parent: 'immediate')
 
   content do
     cart = session[:viewer_cart] || []
@@ -33,6 +33,14 @@ ActiveAdmin.register_page 'Viewer Cart' do
     end
 
     render 'admin/viewer_cart/viewer_cart', :cart => cart
+  end
+
+  action_item :start_viewer, unless: -> { session[:viewer_cart].empty? } do
+    link_to('Start Viewer', admin_viewer_cart_start_path)
+  end
+
+  action_item :clear_cart, unless: -> { session[:viewer_cart].empty? } do
+    link_to('Clear Cart', admin_viewer_cart_clear_path, :'data-confirm' => 'This will remove all items from the cart. Are you sure?')
   end
 
   page_action :empty, :method => :get do

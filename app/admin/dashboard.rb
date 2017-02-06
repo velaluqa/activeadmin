@@ -1,5 +1,5 @@
 ActiveAdmin.register_page 'Dashboard' do
-  menu priority: 1, label: proc { I18n.t('active_admin.dashboard') }
+  menu(priority: 0, parent: 'immediate')
 
   content title: proc { I18n.t('active_admin.dashboard') } do
     render file: 'admin/dashboard/index'
@@ -19,5 +19,12 @@ ActiveAdmin.register_page 'Dashboard' do
     }
     current_user.save
     render json: {}
+  end
+
+  action_item :edit_dashboard do
+    link_to('Edit Dashboard', '#')
+  end
+  action_item :save_dashboard do
+    link_to('Save Dashboard', '#')
   end
 end

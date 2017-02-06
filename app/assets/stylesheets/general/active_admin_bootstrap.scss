@@ -1,0 +1,26 @@
+@import "active_admin_bootstrap_variables";
+@import "bootstrap";
+
+.panel-heading {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+#wrapper {
+  position: relative;
+  min-height: 100%;
+}
+
+@import "menu";
+@import "active_admin_title_bar";
+@import "active_admin_side_bar";
+@import "active_admin_content";
+@import "active_admin_forms";
+@import "active_admin_footer";
+@import "responsive";

@@ -1,0 +1,13 @@
+Dear <%= @resource.name %>,
+
+To gain access to ERICA, you need to confirm your e-mail address.
+
+Please follow this link to do this:
+
+<%= confirmation_url(@resource, confirmation_token: @token) %>
+
+---
+
+This is an automated e-mail. Please do not reply to this e-mail. 
+If you need to contact us, please look at:
+<%= root_url %>

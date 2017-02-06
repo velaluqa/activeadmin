@@ -3,6 +3,8 @@ require 'aa_domino'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register Center do
+  menu(parent: 'store', priority: 10)
+
   actions :index, :show if Rails.application.config.is_erica_remote
 
   config.sort_order = 'code_asc'
@@ -71,7 +73,7 @@ ActiveAdmin.register Center do
   viewer_cartable(:center)
   erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-  action_item :edit, :only => :show do
+  action_item :audit_trail, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'center', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

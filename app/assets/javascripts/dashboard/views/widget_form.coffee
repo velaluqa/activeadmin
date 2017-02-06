@@ -18,8 +18,8 @@ class Dashboard.Views.WidgetForm extends Backbone.View
 
   events:
     'change select': 'updateFromSelect'
-    'click button.primary': 'saveWidget'
-    'click button.default': 'closeForm'
+    'click button.btn-primary': 'saveWidget'
+    'click button.btn-default': 'closeForm'
 
   initialize: ->
     @listenTo @model, 'change', @modelChanged
@@ -31,7 +31,7 @@ class Dashboard.Views.WidgetForm extends Backbone.View
     if @model.isValid()
       window.dashboard.saveWidget(@model.validAttributes())
     else
-      alert('Please make sure you specified all necessary values.')
+      bootbox.alert('Please make sure you specified all necessary values.')
 
   updateFromSelect: (e) =>
     $select = $(e.currentTarget)

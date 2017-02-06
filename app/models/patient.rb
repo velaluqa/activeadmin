@@ -35,6 +35,8 @@ class Patient < ActiveRecord::Base
   has_many :visits, :dependent => :destroy
   has_many :image_series, :dependent => :destroy
 
+  has_many :user_roles, :as => :scope_object, dependent: :destroy
+
   validates_uniqueness_of :subject_id, :scope => :center_id
   validates_presence_of :subject_id
   validates_presence_of :center_id
@@ -141,6 +143,10 @@ JOIN
   end
   def domino_sync
     self.ensure_domino_document_exists
+  end
+
+  def to_s
+    name
   end
 
   protected

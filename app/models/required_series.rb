@@ -32,7 +32,8 @@
 # WHERE
 #   image_series_id IS NOT NULL
 
-class RequiredSeries < ActiveRecord::Base
+class RequiredSeries
+  extend ActiveModel::Naming
   include DominoDocument
 
   attr_reader :visit, :name

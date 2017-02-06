@@ -6,6 +6,9 @@
   %td.image-count= @imageCount
   %td.datetime
     = JSON.stringify(@seriesDateTime)
+  %td.warnings
+    %a{ tabindex: '0', role: 'button', 'data-toggle' => 'popover', 'data-trigger' => 'focus' }
+      %span.glyphicon.glyphicon-exclamation-sign
   %td.upload-flag
     %input{ type: 'checkbox' }
   - if currentUser.can('assign_visit', 'ImageSeries')
@@ -17,13 +20,10 @@
       %select.required-series{ multiple: 'multiple', disabled: true }
         %option
   %td.upload-state
-    .progress-bar
+    .progress
       .label
-      .progress{ style: "width: 0%" }
+      .progress-bar{ style: "width: 0%" }
         .label
-  %td.warnings
-    %a{ tabindex: '0', role: 'button', 'data-toggle' => 'popover', 'data-trigger' => 'focus' }
-      %span.glyphicon.glyphicon-exclamation-sign
 %tr.images
   - colspan = 7
   - colspan += 1 if currentUser.can('assign_visit', 'ImageSeries')

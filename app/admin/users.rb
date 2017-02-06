@@ -1,5 +1,9 @@
 ActiveAdmin.register User do
-  menu if: proc { can? :read, User }
+  menu(
+    parent: 'users',
+    priority: 10,
+    if: -> { current_user.is_root_user? || User.accessible_by(current_ability, :read).count > 1 }
+  )
 
   config.comments = false
 
@@ -128,8 +132,23 @@ ActiveAdmin.register User do
     if f.object != current_user && can?(%i(create update destroy), UserRole)
       inputs 'Roles' do
         has_many :user_roles, allow_destroy: true do |ur|
-          ur.input :role
-          ur.input :scope_object_identifier, collection: [['*system-wide*', 'systemwide']] + UserRole.accessible_scope_object_identifiers(current_ability)
+          collection = [['*system-wide*', 'systemwide']]
+          unless ur.object.scope_object_identifier == 'systemwide'
+            collection.push([ur.object.scope_object.to_s, ur.object.scope_object_identifier])
+          end
+
+          ur.input :role, collection: Role.order('title'), input_html: { class: 'initialize-select2' }
+          ur.input(
+            :scope_object_identifier,
+            collection: collection,
+            input_html: {
+              class: 'select2-record-search',
+              'data-models' => 'Study,Center,Patient',
+              'data-placeholder' => '*system-wide*',
+              'data-clear-value' => 'systemwide',
+              'data-allow-clear' => true
+            }
+          )
         end
       end
     end
@@ -171,8 +190,8 @@ ActiveAdmin.register User do
     render 'admin/users/generate_keypair'
   end
 
-  action_item :edit, :only => :show do
-    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will disable the old signature of this user. Are you sure you want to do this?' if can? :manage, resource
+  action_item :generate_keypair, :only => :show do
+    link_to 'Generate new keypair', generate_keypair_form_admin_user_path(resource), :confirm => 'Generating a new keypair will disable the old signature of this user. Are you sure you want to do this?' if can? :generate_keypair, resource
   end
 
   member_action :unlock, :method => :get do
@@ -182,11 +201,11 @@ ActiveAdmin.register User do
     redirect_to({:action => :show}, :notice => 'User unlocked!')
   end
 
-  action_item :edit, :only => :show do
-    link_to 'Unlock', unlock_admin_user_path(resource) if(can? :manage, :system and resource.access_locked?)
+  action_item :unlock, :only => :show, if: -> { can?(:manage, User) && resource.access_locked? } do
+    link_to 'Unlock', unlock_admin_user_path(resource)
   end
 
-  action_item :edit, :only => :show do
+  action_item :audit_trail, :only => :show do
     link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'user', :audit_trail_view_id => resource.id)) if can? :read, Version
   end
 end

@@ -1,0 +1,260 @@
+.flashes {
+  padding: 15px 15px 0 15px;
+
+  &:empty { padding: 0; }
+}
+
+.flash_notice {
+  @extend .alert, .alert-info;
+  margin-bottom: 0;
+}
+
+.flash_error,
+.flash_alert {
+  @extend .alert, .alert-danger;
+  margin-bottom: 0;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+select,
+textarea {
+  @extend .form-control;
+  @include box-shadow(0 0 !important);
+
+  &:focus {
+    @include box-shadow(0 0 !important);
+    box-shadow: 0 0 !important;
+    outline: 0 !important;
+  }
+}
+
+.field_with_errors {
+  label {
+    color: $brand-warning !important;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="datetime"],
+  input[type="datetime-local"],
+  input[type="date"],
+  input[type="month"],
+  input[type="time"],
+  input[type="week"],
+  input[type="number"],
+  input[type="email"],
+  input[type="url"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="color"],
+  select,
+  textarea {
+    border-color: $brand-warning;
+    &:focus {
+      border-color: $input-border-focus;
+    }
+  }
+}
+
+form {
+  @extend .form-horizontal;
+
+  .inputs, .actions {
+    ol {
+      padding-left: 0;
+      list-style: none;
+    }
+  }
+
+  fieldset.inputs {
+    position: relative;
+    padding-top: 45px;
+    legend {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+  }
+
+  .inputs {
+    @extend .panel, .panel-default;
+    margin-bottom: 10px;
+
+    ol {
+      @extend .panel-body;
+
+      &:first-child {
+	margin-top: -45px;
+      }
+
+      &:last-of-type {
+	margin-bottom: 0;
+      }
+    }
+
+    li {
+      @extend .form-group;
+      margin-left: 0;
+      margin-right: 0;
+
+      label {
+	@extend .col-sm-2;
+	line-height: $input-height-base;
+	margin-bottom: 0;
+      }
+      input[type="text"],
+      input[type="password"],
+      input[type="datetime"],
+      input[type="datetime-local"],
+      input[type="date"],
+      input[type="month"],
+      input[type="time"],
+      input[type="week"],
+      input[type="number"],
+      input[type="email"],
+      input[type="url"],
+      input[type="search"],
+      input[type="tel"],
+      input[type="color"],
+      select,
+      textarea {
+	@extend .col-sm-5;
+	padding: $padding-base-vertical $padding-base-horizontal;
+	width: 83.33333333%; // col-sm-10
+	max-width: 300px;
+      }
+      .select2 {
+	@extend .col-sm-5;
+	padding: 0;
+      }
+
+      textarea {
+	height: 100px;
+	max-width: 83.3333333%;
+      }
+
+      .select2.select2-container {
+	margin-right: -3px;
+
+	li {
+	  margin-bottom: 0;
+	}
+      }
+
+      p.inline-errors {
+	color: $brand-warning;
+	display: inline-block;
+	margin: 0px 10px;
+	line-height: $input-height-base;
+      }
+
+      p.inline-hints {
+	@extend .col-sm-10;
+	@extend .col-sm-offset-2;
+	@extend small;
+
+	position: relative;
+	display: block;
+	padding: 0;
+      }
+
+      &.boolean {
+	label {
+	  @extend .col-sm-offset-2;
+	  padding: 0;
+	  input { margin-right: 5px; }
+	}
+      }
+
+      &:last-of-type {
+	margin-bottom: 0;
+      }
+    }
+
+    legend {
+      @extend .panel-heading;
+      margin: 0;
+
+      &.label {
+	/* The label class has a different meaning in bootstrap */
+	display: inline-block;
+	font-weight: inherit;
+	padding: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	color: inherit;
+	text-align: inherit;
+	white-space: inherit;
+	vertical-align: inherit;
+	border-radius: inherit;
+      }
+    }
+
+    > label {
+      font-weight: normal;
+      display: block !important;
+    }
+  }
+
+  .actions {
+    @extend .clearfix;
+
+    ol {
+      float: right;
+    }
+
+    li {
+      display: inline-block;
+
+      input, a { @extend .btn; @extend .btn-default; }
+      input[type="submit"] { @extend .btn-primary; margin-right: 5px; }
+    }
+  }
+
+  label.label {
+    /* The label class has a different meaning in bootstrap */
+    display: inline-block;
+    font-weight: bold;
+
+    padding: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    text-align: inherit;
+    white-space: inherit;
+    vertical-align: inherit;
+    border-radius: inherit;
+  }
+
+  .has_many_container {
+    > h3 { display: none; }
+
+    > fieldset {
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+
+      .button.has_many_remove {
+	@extend .btn, .btn-warning, .col-sm-offset-2;
+      }
+    }
+  }
+  .button.has_many_add {
+    @extend .btn, .btn-default;
+    margin-left: 15px;
+  }
+}

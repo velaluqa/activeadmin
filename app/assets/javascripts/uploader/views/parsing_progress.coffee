@@ -34,16 +34,21 @@ class ImageUploader.Views.ParsingProgress extends Backbone.View
     parsedFiles = @parser.parsedFiles
     totalFiles = @parser.totalFiles
     if state is 'idle'
-      @$('.progress-bar .label').html("Parsed #{totalFiles} files")
+      requestAnimationFrame =>
+        @$('.progress .progress-bar').css width: "#{progress}%"
+        @$el.toggleClass('parsing', true)
+        @$el.toggleClass('parsed', true)
+        @$('.progress .label').html("Parsed #{totalFiles} files")
       setTimeout =>
         @$el.toggleClass('parsing', false)
-        @$('.progress-bar .progress').css width: "0%"
+        @$el.toggleClass('parsed', false)
+        @$('.progress .progress-bar').css width: "0%"
       , 1000
     else
       requestAnimationFrame =>
-        @$('.progress-bar .progress').css width: "#{progress}%"
+        @$('.progress .progress-bar').css width: "#{progress}%"
         @$el.toggleClass('parsing', true)
-        @$('.progress-bar .label').html("Parsing #{parsedFiles} / #{totalFiles} files")
+        @$('.progress .label').html("Parsing #{parsedFiles} / #{totalFiles} files")
 
   renderDisabled: =>
     @$el.toggleClass('disabled', not ImageUploader.app.get('patient')?)

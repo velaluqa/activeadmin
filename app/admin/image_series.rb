@@ -3,7 +3,9 @@ require 'aa_erica_comment'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register ImageSeries do
-  actions :index, :show if Rails.application.config.is_erica_remote
+  menu(parent: 'store', priority: 30)
+
+  actions :index, :show, :update, :destroy
 
   scope :all, :default => true
   scope :not_assigned
@@ -171,7 +173,7 @@ ActiveAdmin.register ImageSeries do
       link_to('List', admin_images_path(:'q[image_series_id_eq]' => image_series.id))
     end
     column :state, :sortable => :state do |image_series|
-      case image_series.state
+      case image_series.state_sym
       when :importing
         status_tag('Importing', :note)
       when :imported
@@ -224,7 +226,7 @@ ActiveAdmin.register ImageSeries do
         pretty_format(image_series.created_at)
       end
       row :state do
-        case image_series.state
+        case image_series.state_sym
         when :imported
           status_tag('Imported', :error)
         when :visit_assigned

@@ -95,7 +95,7 @@ class ImageUploader.Models.App extends Backbone.Model
     uploadQueue = new PromiseQueue(5)
 
     if @imageSeries.some((series) -> series.hasWarnings('validation'))
-      return alert('Some image series have validation warnings. Please check them and try again.')
+      return bootbox.alert('Some image series have validation warnings. Please check them and try again.')
 
     seriesSaved = []
     for series in @imageSeries.where(markedForUpload: true)
@@ -133,6 +133,6 @@ class ImageUploader.Models.App extends Backbone.Model
       .then =>
         someWarnings = @imageSeries.some (series) -> series.hasWarnings()
         if someWarnings
-          alert('Something went wrong with the upload. Please check the error messages.')
+          bootbox.alert('Something went wrong with the upload. Please check the error messages.')
         else
-          alert('Upload complete!')
+          bootbox.alert('Upload complete!')

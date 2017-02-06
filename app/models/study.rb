@@ -30,7 +30,7 @@ class Study < ActiveRecord::Base
 
   attr_accessible :name, :locked_version, :domino_db_url, :domino_server_name, :notes_links_base_uri, :state
 
-  has_many :roles, :as => :subject
+  has_many :user_roles, :as => :scope_object, dependent: :destroy
 
   has_many :centers
   has_many :patients, :through => :centers
@@ -202,7 +202,7 @@ JOIN
   end
 
   def to_s
-    "Study — #{name} (#{id})"
+    name
   end
   
   protected

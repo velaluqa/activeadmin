@@ -51,7 +51,9 @@ class UserRole < ActiveRecord::Base
   # @return [Array<[String, String]>] The identifier in the form of
   #   [[title, identifier]].
   def self.accessible_scope_object_identifiers(ability)
-    Study.accessible_by(ability).pluck(:name, "CONCAT('study_', studies.id)")
+    Study.accessible_by(ability).pluck(:name, "CONCAT('study_', studies.id)") +
+      Center.accessible_by(ability).pluck(:name, "CONCAT('center_', centers.id)") +
+      Patient.accessible_by(ability).pluck(:subject_id, "CONCAT('patient_', patients.id)")
   end
 
   # A helper to allow polymorphic associations with ActiveAdmin.

@@ -1,7 +1,12 @@
 require 'git_config_repository'
 
 ActiveAdmin.register Version do
-  menu :label => 'Audit Trail', :priority => 99, :if => proc { can?(:read, Version) }
+  menu(
+    label: 'Audit Trail',
+    parent: 'versions',
+    priority: 0,
+    if: -> { can?(:read, Version) }
+  )
 
   config.comments = false
   config.batch_actions = false

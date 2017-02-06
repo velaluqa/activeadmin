@@ -1,0 +1,35 @@
+@import "font-awesome-sprockets";
+@import "font-awesome";
+@import "general/font_roboto";
+@import "general/active_admin_bootstrap";
+@import "general/spinner";
+@import "general/active_admin_bootstrap_select2";
+
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+table {
+  width: 100%;
+  th, td, caption {
+    padding: 4px 10px 4px 5px;
+  }
+}
+
+* {
+  outline: none;
+}
+
+@import "dashboard/dashboard";
+@import "roles/general";
+@import "notification_profiles/json-editor";
+@import "email_templates/form";
+@import "help/general";
+@import "image_upload/general";
+@import "sidekiq/general";
+@import "viewer_cart/general";
+@import "image_hierarchy/general";
+
+@import "coderay.default";
+@import "diffy";
