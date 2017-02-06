@@ -27,6 +27,28 @@ step 'I can :activity :subject' do |activity, subject|
   @current_user_role.add_permission(activity, subject)
 end
 
+step 'I cannot :activity :subject' do |activity, subject|
+  expect(@current_user_role.allows?(activity, subject)).to be_falsy
+end
+
 step 'I browse to the dashboard' do
   visit('/admin/dashboard')
+end
+
+step 'I browse to :string' do |path|
+  visit(path)
+end
+
+step 'I see the unauthorized page' do
+  expect(page.status_code).to eq(403)
+  expect(page).to have_content('Not authorized')
+end
+
+step 'I have following abilities:' do |table|
+  table.to_a.each do |subject, activities|
+    activities = activities.split(/, ?/)
+    activities.each do |activity|
+      @current_user_role.add_permission(activity, subject)
+    end
+  end
 end
