@@ -29,9 +29,11 @@ ERROR
 
       return all if user.is_root_user?
 
-      with_permissions
-        .where(permissions: { activity: activities, subject: subject })
-        .where('user_roles.user_id = ?', user.id)
+      sql = with_permissions
+              .select(:id)
+              .where(permissions: { activity: activities, subject: subject })
+              .where('user_roles.user_id = ?', user.id)
+      where(id: sql)
     end
 
     ##
