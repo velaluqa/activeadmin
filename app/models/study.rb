@@ -58,9 +58,15 @@ SELECT
 
   def self.with_permissions
     joins(<<JOIN)
+LEFT JOIN "centers" ON "centers"."study_id" = "studies"."id"
+LEFT JOIN "patients" ON "patients"."center_id" = "centers"."id"
 INNER JOIN user_roles ON
-  ((user_roles.scope_object_type = 'Study' AND user_roles.scope_object_id = studies.id)
-    OR user_roles.scope_object_id IS NULL)
+  (
+       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+    OR user_roles.scope_object_id IS NULL
+  )
 INNER JOIN roles ON user_roles.role_id = roles.id
 INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN

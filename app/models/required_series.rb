@@ -1,8 +1,38 @@
 # note: this is not a proper activerecord model
 # it is a simple container class implementing the bare bones needed by the view components of activeadmin
 
-class RequiredSeries
-  extend ActiveModel::Naming
+# TODO: Use a (materialized?) view via postgres to allow readonly
+# access to required series via ActiveRecord:
+#     tqc_state int,
+# SELECT
+#  json_build_array(visits.id, visits_required_series_hash.key) AS id,
+#  visits.id AS visit_id,
+#  visits_required_series_hash.key AS name,
+#  image_series_id,
+#  tqc_state,
+#  tqc_user_id,
+#  tqc_date,
+#  tqc_version,
+#  tqc_results,
+#  tqc_comment
+# FROM visits
+# JOIN json_each(visits.required_series::json) visits_required_series_hash ON true
+# JOIN json_to_record(visits_required_series_hash.value)
+#   AS visits_required_series(
+#     image_series_id int,
+#     tqc_state int,
+#     tqc_user_id int,
+#     tqc_date timestamp,
+#     tqc_version text,
+#     tqc_results json,
+#     tqc_comment text
+# ) ON true
+# INNER JOIN patients p ON p.id = visits.patient_id
+# INNER JOIN centers c ON c.id = p.center_id
+# WHERE
+#   image_series_id IS NOT NULL
+
+class RequiredSeries < ActiveRecord::Base
   include DominoDocument
 
   attr_reader :visit, :name
@@ -14,6 +44,50 @@ class RequiredSeries
   def self.find(id)
     visit = Visit.find(id[0])
     return RequiredSeries.new(visit, id[1])
+  end
+
+  def self.count_for_study(study_id)
+    res = ActiveRecord::Base.connection.execute(<<QUERY)
+SELECT
+  COUNT(image_series_id) AS count
+FROM visits
+JOIN json_each(visits.required_series::json) visits_required_series_hash ON true
+JOIN json_to_record(visits_required_series_hash.value)
+  AS visits_required_series(
+    image_series_id int,
+    tqc_state int
+) ON true
+INNER JOIN patients p ON p.id = visits.patient_id
+INNER JOIN centers c ON c.id = p.center_id
+WHERE
+  image_series_id IS NOT NULL AND tqc_state IS NOT NULL
+QUERY
+    res.first['count'].to_i
+  end
+
+  def self.grouped_count_for_study(study_id, group)
+    res = ActiveRecord::Base.connection.execute(<<QUERY)
+SELECT
+  tqc_state AS group,
+  COUNT(image_series_id) AS count
+FROM visits
+JOIN json_each(visits.required_series::json) visits_required_series_hash ON true
+JOIN json_to_record(visits_required_series_hash.value)
+  AS visits_required_series(
+    image_series_id int,
+    tqc_state int
+) ON true
+INNER JOIN patients p ON p.id = visits.patient_id
+INNER JOIN centers c ON c.id = p.center_id
+WHERE
+  image_series_id IS NOT NULL
+  AND tqc_state IS NOT NULL
+GROUP BY
+  tqc_state
+QUERY
+    res
+      .map { |result| [result['group'], result['count'].to_i] }
+      .to_h
   end
 
   def initialize(visit, name)

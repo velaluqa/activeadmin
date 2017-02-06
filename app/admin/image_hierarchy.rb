@@ -13,7 +13,7 @@ ActiveAdmin.register_page 'Image Hierarchy' do
 
   controller do
     def visit_css_class(visit)
-      'status_tag '+ case visit.state
+      'status_tag '+ case visit.state_sym
                      when :incomplete then ''
                      when :complete then 'warning'
                      when :mqc_issues then 'error'

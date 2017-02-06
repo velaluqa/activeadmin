@@ -1,4 +1,34 @@
 RSpec.describe ImageSeries do
+  describe '#state=' do
+    context 'after save' do
+      let!(:image_series) { create(:image_series) }
+
+      before(:each) do
+        image_series.state = :imported
+        image_series.save
+      end
+
+      let!(:version) { Version.last }
+
+      it 'has the new state' do
+        image_series = ImageSeries.last
+        expect(image_series.state).to eq(1)
+        expect(image_series.state_sym).to eq(:imported)
+      end
+
+      it 'saved the correct version object_changes for state' do
+        expect(version.object_changes.dig2('state', 1)).to eq(1)
+      end
+    end
+  end
+
+  describe '#to_json' do
+    let(:image_series) { create(:image_series) }
+    it 'gathers the `state` symbol instead of the `state` index' do
+      expect(image_series.to_json).to include('"state":"importing"')
+    end
+  end
+
   describe 'scope ::searchable' do
     it 'selects search fields' do
       series = create(:image_series, series_number: '123')

@@ -1,0 +1,11 @@
+#dashboard-container.container-fluid
+= javascript_include_tag "dashboard/main"
+:coffeescript
+  $ ->
+    window.dashboard = new Dashboard.Models.Main
+      config: #{current_user.dashboard_configuration['general'].to_json}
+      reportableStudies: #{Study.granted_for(user: current_user, activity: :read_reports).select(:id, :name).to_json}
+    window.dashboard_view = new Dashboard.Views.Main
+      model: window.dashboard
+      el: $('#dashboard-container')
+    window.dashboard_view.render()

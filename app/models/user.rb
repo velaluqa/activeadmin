@@ -5,36 +5,37 @@ require 'email_validator'
 #
 # ### Columns
 #
-# Name                          | Type               | Attributes
-# ----------------------------- | ------------------ | ---------------------------
-# **`authentication_token`**    | `string`           |
-# **`confirmation_sent_at`**    | `datetime`         |
-# **`confirmation_token`**      | `string`           |
-# **`confirmed_at`**            | `datetime`         |
-# **`created_at`**              | `datetime`         |
-# **`current_sign_in_at`**      | `datetime`         |
-# **`current_sign_in_ip`**      | `string`           |
-# **`email`**                   | `string`           | `default(""), not null`
-# **`email_throttling_delay`**  | `integer`          |
-# **`encrypted_password`**      | `string`           | `default(""), not null`
-# **`failed_attempts`**         | `integer`          | `default(0)`
-# **`id`**                      | `integer`          | `not null, primary key`
-# **`is_root_user`**            | `boolean`          | `default(FALSE), not null`
-# **`last_sign_in_at`**         | `datetime`         |
-# **`last_sign_in_ip`**         | `string`           |
-# **`locked_at`**               | `datetime`         |
-# **`name`**                    | `string`           |
-# **`password_changed_at`**     | `datetime`         |
-# **`private_key`**             | `text`             |
-# **`public_key`**              | `text`             |
-# **`remember_created_at`**     | `datetime`         |
-# **`reset_password_sent_at`**  | `datetime`         |
-# **`reset_password_token`**    | `string`           |
-# **`sign_in_count`**           | `integer`          | `default(0)`
-# **`unconfirmed_email`**       | `string`           |
-# **`unlock_token`**            | `string`           |
-# **`updated_at`**              | `datetime`         |
-# **`username`**                | `string`           |
+# Name                           | Type               | Attributes
+# ------------------------------ | ------------------ | ---------------------------
+# **`authentication_token`**     | `string`           |
+# **`confirmation_sent_at`**     | `datetime`         |
+# **`confirmation_token`**       | `string`           |
+# **`confirmed_at`**             | `datetime`         |
+# **`created_at`**               | `datetime`         |
+# **`current_sign_in_at`**       | `datetime`         |
+# **`current_sign_in_ip`**       | `string`           |
+# **`dashboard_configuration`**  | `jsonb`            |
+# **`email`**                    | `string`           | `default(""), not null`
+# **`email_throttling_delay`**   | `integer`          |
+# **`encrypted_password`**       | `string`           | `default(""), not null`
+# **`failed_attempts`**          | `integer`          | `default(0)`
+# **`id`**                       | `integer`          | `not null, primary key`
+# **`is_root_user`**             | `boolean`          | `default(FALSE), not null`
+# **`last_sign_in_at`**          | `datetime`         |
+# **`last_sign_in_ip`**          | `string`           |
+# **`locked_at`**                | `datetime`         |
+# **`name`**                     | `string`           |
+# **`password_changed_at`**      | `datetime`         |
+# **`private_key`**              | `text`             |
+# **`public_key`**               | `text`             |
+# **`remember_created_at`**      | `datetime`         |
+# **`reset_password_sent_at`**   | `datetime`         |
+# **`reset_password_token`**     | `string`           |
+# **`sign_in_count`**            | `integer`          | `default(0)`
+# **`unconfirmed_email`**        | `string`           |
+# **`unlock_token`**             | `string`           |
+# **`updated_at`**               | `datetime`         |
+# **`username`**                 | `string`           |
 #
 # ### Indexes
 #
@@ -164,6 +165,11 @@ class User < ActiveRecord::Base
     signature = private_key.sign(OpenSSL::Digest::RIPEMD160.new, data)
     pp OpenSSL.errors
     return signature
+  end
+
+  def dashboard_configuration
+    read_attribute(:dashboard_configuration) ||
+      ERICA.default_dashboard_configuration
   end
 
   def self.classify_audit_trail_event(c)

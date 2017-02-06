@@ -1,4 +1,50 @@
 RSpec.describe Visit do
+  describe '#state=' do
+    context 'when saving' do
+      let!(:visit) { create(:visit) }
+
+      before(:each) do
+        visit.state = :complete_tqc_passed
+        visit.save
+      end
+
+      let!(:version) { Version.last }
+
+      it 'has the new state' do
+        visit = Visit.last
+        expect(visit.state).to eq(1)
+        expect(visit.state_sym).to eq(:complete_tqc_passed)
+      end
+
+      it 'saved the correct version object_changes for state' do
+        expect(version.object_changes.dig2('state', 1)).to eq(1)
+      end
+    end
+  end
+
+  describe '#mqc_state=' do
+    context 'after save' do
+      let!(:visit) { create(:visit) }
+
+      before(:each) do
+        visit.mqc_state = :issues
+        visit.save
+      end
+
+      let!(:version) { Version.last }
+
+      it 'has the new mqc_state' do
+        visit = Visit.last
+        expect(visit.mqc_state).to eq(1)
+        expect(visit.mqc_state_sym).to eq(:issues)
+      end
+
+      it 'saved the correct version object_changes for mqc_state' do
+        expect(version.object_changes.dig2('mqc_state', 1)).to eq(1)
+      end
+    end
+  end
+
   describe 'scope ::searchable' do
     it 'selects search fields' do
       center = create(:center, code: 'Foo')
@@ -12,6 +58,41 @@ RSpec.describe Visit do
                   'result_id' => visit.id,
                   'result_type' => 'Visit'
                 }]
+    end
+  end
+
+  describe 'scope ::with_state' do
+    let!(:study) { create(:study) }
+    let!(:center) { create(:center, study: study) }
+    let!(:patient1) { create(:patient, center: center) }
+    let!(:visit0) { create(:visit, patient: patient1, state: 0) }
+    let!(:visit1) { create(:visit, patient: patient1, state: 1) }
+    let!(:visit2) { create(:visit, patient: patient1, state: 2) }
+    let!(:visit3) { create(:visit, patient: patient1, state: 3) }
+    let!(:visit4) { create(:visit, patient: patient1, state: 4) }
+
+    it 'filters by Fixnum state' do
+      expect(Visit.with_state(0)).to include(visit0)
+      expect(Visit.with_state(1)).to include(visit1)
+      expect(Visit.with_state(2)).to include(visit2)
+      expect(Visit.with_state(3)).to include(visit3)
+      expect(Visit.with_state(4)).to include(visit4)
+    end
+
+    it 'filters by Symbol state' do
+      expect(Visit.with_state(:incomplete_na)).to include(visit0)
+      expect(Visit.with_state(:complete_tqc_passed)).to include(visit1)
+      expect(Visit.with_state(:incomplete_queried)).to include(visit2)
+      expect(Visit.with_state(:complete_tqc_pending)).to include(visit3)
+      expect(Visit.with_state(:complete_tqc_issues)).to include(visit4)
+    end
+
+    it 'filters by String state' do
+      expect(Visit.with_state('incomplete_na')).to include(visit0)
+      expect(Visit.with_state('complete_tqc_passed')).to include(visit1)
+      expect(Visit.with_state('incomplete_queried')).to include(visit2)
+      expect(Visit.with_state('complete_tqc_pending')).to include(visit3)
+      expect(Visit.with_state('complete_tqc_issues')).to include(visit4)
     end
   end
 

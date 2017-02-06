@@ -16,7 +16,9 @@
 //= require vendor/polyfill_setAsap
 //= require vendor/polyfill_promise
 //= require vendor/naturalSort
+//= require vendor/Chart.bundle
 //= require shared/promise_queue
 //= require shared/user
 //= require select2-initializers
 //= require twitter/bootstrap/scrollspy
+//= require twitter/bootstrap/modal

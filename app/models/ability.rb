@@ -6,7 +6,7 @@ class Ability
   ACTIVITIES = {
     BackgroundJob => %i(manage read update create destroy),
     Sidekiq => %i(manage),
-    Study  => %i(manage read update create destroy),
+    Study  => %i(manage read update create destroy read_reports),
     Center => %i(manage read update create destroy),
     Patient => %i(manage read update create destroy),
     EmailTemplate => %i(manage read update create destroy),
@@ -22,6 +22,11 @@ class Ability
     Version => %i(manage read update create destroy)
   }.freeze
 
+  UNSCOPABLE_ACTIVITIES = {
+    ImageSeries => %i(upload assign_patient assign_visit),
+    Visit => %i(assign_required_series technical_qc medical_qc)
+  }.freeze
+
   def initialize(current_user)
     @current_user = current_user
     return unless @current_user
@@ -35,6 +40,10 @@ class Ability
     end
 
     define_page_abilities
+  end
+
+  def unscopable?(activity, subject)
+    UNSCOPABLE_ACTIVITIES[subject].andand.include?(activity)
   end
 
   private
@@ -64,14 +73,21 @@ class Ability
   end
 
   def define_scopable_ability(subject, activity)
-    return unless subject.granted_for(user: current_user, activity: activity).exists?
-
+    if unscopable?(activity, subject) || !subject.granted_for(user: current_user, activity: activity).exists?
+      define_unscopable_ability(subject, activity)
+      return
+    end
     can activity, subject do |subject_instance|
       subject
         .granted_for(user: current_user, activity: activity)
         .where(id: subject_instance.id)
         .exists?
     end
+  end
+
+  def define_unscopable_ability(subject, activity)
+    return unless current_user.permissions.allow?(activity, subject)
+    can(activity, subject)
   end
 
   ##

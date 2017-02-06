@@ -37,7 +37,22 @@ RSpec.describe User do
   end
 
   describe '#permission_matrix' do
-    describe 'user with two roles' do
+    context 'user with scoped role' do
+      let!(:study) { create(:study) }
+      let!(:role) { create(:role, with_permissions: { Study => :read, ImageSeries => :upload }) }
+      let!(:user) { create(:user, with_user_roles: [[role, study]]) }
+
+      it 'to contain unscopable permissions' do
+        expect(user.permission_matrix).to eq(
+                                            'Study' => %i(read),
+                                            'ImageSeries' => %i(upload),
+                                            'User' => %i(manage),
+                                            'PublicKey' => %i(manage)
+                                          )
+      end
+    end
+
+    context 'user with two roles' do
       before(:each) do
         @role1 = create(:role, with_permissions: {
                           Study => %i(manage read),

@@ -1,0 +1,8 @@
+.buttons
+  %button.edit-dashboard Edit
+  %button.save-dashboard Save
+%ul.rows
+%button.add-row Add Row
+#widget-form-modal.modal.fade{ role: 'dialog', tabindex: '-1' }
+  .modal-dialog{ role: 'document' }
+    .modal-content

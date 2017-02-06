@@ -2,6 +2,8 @@ postgres:
   image: postgres
   ports:
     - 5432:5432
+  volumes:
+    - ./tmp/postgres:/var/lib/postgres/data
 redis:
   image: redis
   ports:

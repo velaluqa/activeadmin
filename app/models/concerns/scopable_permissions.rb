@@ -25,11 +25,12 @@ ERROR
     def self.granted_for(options)
       activities = extract_permissible_activities(options)
       user = options[:user] || raise("Missing 'user' option")
+      subject = options[:subject].andand.to_s || to_s
 
       return all if user.is_root_user?
 
       with_permissions
-        .where(permissions: { activity: activities, subject: to_s })
+        .where(permissions: { activity: activities, subject: subject })
         .where('user_roles.user_id = ?', user.id)
     end
 

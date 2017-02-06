@@ -13,6 +13,57 @@ RSpec.describe Study do
     end
   end
 
+  describe '::granted_for' do
+    let!(:study1) { create(:study) }
+    let!(:center1) { create(:center, study: study1) }
+    let!(:patient1) { create(:patient, center: center1) }
+    let!(:study2) { create(:study) }
+    let!(:center2) { create(:center, study: study2) }
+    let!(:patient2) { create(:patient, center: center2) }
+
+    context 'ability read study system-wide' do
+      let!(:role) { create(:role, with_permissions: { Study => :read }) }
+      let!(:user) { create(:user, with_user_roles: [role]) }
+
+      it 'returns study' do
+        expect(Study.granted_for(user: user, activity: :read)).to include(study1)
+      end
+    end
+
+    context 'ability read study1' do
+      let!(:role) { create(:role, with_permissions: { Study => :read }) }
+      let!(:user) { create(:user, with_user_roles: [[role, study1]]) }
+      let(:granted_studies) { Study.granted_for(user: user, activity: :read) }
+
+      it 'returns study' do
+        expect(granted_studies).to include(study1)
+        expect(granted_studies).not_to include(study2)
+      end
+    end
+
+    context 'ability read study and center1' do
+      let!(:role) { create(:role, with_permissions: { Study => :read, Center => :read }) }
+      let!(:user) { create(:user, with_user_roles: [[role, center1]]) }
+      let(:granted_studies) { Study.granted_for(user: user, activity: :read) }
+
+      it 'returns study' do
+        expect(granted_studies).to include(study1)
+        expect(granted_studies).not_to include(study2)
+      end
+    end
+
+    context 'ability read study and patient1' do
+      let!(:role) { create(:role, with_permissions: { Study => :read, Patient => :read }) }
+      let!(:user) { create(:user, with_user_roles: [[role, patient1]]) }
+      let(:granted_studies) { Study.granted_for(user: user, activity: :read) }
+
+      it 'returns study' do
+        expect(granted_studies).to include(study1)
+        expect(granted_studies).not_to include(study2)
+      end
+    end
+  end
+
   describe 'image storage' do
     it 'handles create' do
       expect(File).not_to exist(ERICA.image_storage_path.join('1'))

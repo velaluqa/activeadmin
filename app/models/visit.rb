@@ -63,6 +63,15 @@ class Visit < ActiveRecord::Base
       .where(studies: { id: Array[ids].flatten })
   }
 
+  scope :with_state, lambda { |state|
+    index =
+      case state
+      when Fixnum then state
+      else Visit::STATE_SYMS.index(state.to_sym)
+      end
+    where(state: index)
+  }
+
   scope :searchable, -> { joins(patient: :center).select(<<SELECT) }
 centers.study_id AS study_id,
 centers.code || patients.subject_id || '#' || visits.visit_number AS text,
@@ -110,6 +119,15 @@ JOIN
     where(conditions, *terms)
   }
 
+  scope :join_study, -> { joins(patient: { center: :study }) }
+
+  scope :join_required_series, lambda {
+    joins(<<JOIN_QUERY)
+JOIN json_each(visits.required_series::json) visits_required_series_hash ON true
+JOIN json_to_record(visits_required_series_hash.value) as visits_required_series(tqc_state int) ON true
+JOIN_QUERY
+  }
+
   def name
     if(patient.nil?)
       '#'+visit_number.to_s
@@ -138,10 +156,17 @@ JOIN
   def self.int_to_state_sym(sym)
     return Visit::STATE_SYMS[sym]
   end
+
   def state
     return -1 if read_attribute(:state).nil?
-    return Visit::STATE_SYMS[read_attribute(:state)]
+    read_attribute(:state)
   end
+
+  def state_sym
+    return -1 if read_attribute(:state).nil?
+    Visit::STATE_SYMS[read_attribute(:state)]
+  end
+
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
     if sym.is_a? Fixnum
@@ -163,10 +188,17 @@ JOIN
   def self.int_to_mqc_state_sym(sym)
     return Visit::MQC_STATE_SYMS[sym]
   end
+
   def mqc_state
-    return -1 if read_attribute(:state).nil?
-    return Visit::MQC_STATE_SYMS[read_attribute(:mqc_state)]
+    return -1 if read_attribute(:mqc_state).nil?
+    read_attribute(:mqc_state)
   end
+
+  def mqc_state_sym
+    return -1 unless read_attribute(:mqc_state)
+    MQC_STATE_SYMS[read_attribute(:mqc_state)]
+  end
+
   def mqc_state=(sym)
     sym = sym.to_sym if sym.is_a? String
     if sym.is_a? Fixnum
@@ -319,7 +351,7 @@ JOIN
 
     properties.merge!(mqc_to_domino)
 
-    properties['Status'] = case self.state
+    properties['Status'] = case self.state_sym
                                 when :incomplete_na then 'Incomplete, not available'
                                 when :complete_tqc_passed then 'Complete, tQC of all series passed'
                                 when :incomplete_queried then 'Incomplete, queried'
@@ -514,7 +546,7 @@ JOIN
       all_passed &&= (not result.nil? and result[spec['id']] == true)
     end
 
-    self.mqc_state = all_passed ? :passed : :issues
+    self.mqc_state_sym = all_passed ? :passed : :issues
     self.mqc_user_id = mqc_user.is_a?(User) ? mqc_user.id : mqc_user
     self.mqc_date = mqc_date || Time.now
     self.mqc_results = result
@@ -689,7 +721,7 @@ JOIN
     result['QCdate'] = {'data' => (self.mqc_date.nil? ? '01-01-0001' : self.mqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime'}
     result['QCperson'] = (self.mqc_user.nil? ? nil : self.mqc_user.name)
 
-    result['QCresult'] = case mqc_state
+    result['QCresult'] = case mqc_state_sym
                          when :pending then 'Pending'
                          when :issues then 'Performed, issues present'
                          when :passed then 'Performed, no issues present'
