@@ -23,6 +23,28 @@ step 'I sign in as a user' do
   click_button 'Sign in'
 end
 
+step 'I sign in as a user with role scoped to :model :string' do |model, str|
+  scoped =
+    case model
+    when Study then Study.find_by(name: str)
+    when Center then Center.find_by(name: str)
+    when Patient then Patient.find_by(subject_id: str)
+    end
+  @current_user_role = FactoryGirl.create(:role)
+  @current_user = FactoryGirl.create(
+    :user,
+    password: 'foobar',
+    password_changed_at: Time.now,
+    with_user_roles: [[@current_user_role, scoped]]
+  )
+  visit('/users/sign_in')
+  within('#new_user') do
+    fill_in 'Username', with: @current_user.username
+    fill_in 'Password', with: 'foobar'
+  end
+  click_button 'Sign in'
+end
+
 step 'I can :activity :subject' do |activity, subject|
   @current_user_role.add_permission(activity, subject)
 end
@@ -51,4 +73,8 @@ step 'I have following abilities:' do |table|
       @current_user_role.add_permission(activity, subject)
     end
   end
+end
+
+step 'I see :string' do |content|
+  expect(page).to have_content(content)
 end
