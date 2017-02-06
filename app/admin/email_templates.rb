@@ -33,7 +33,7 @@ ActiveAdmin.register EmailTemplate do
   form do |f|
     f.inputs 'Details' do
       f.input :name
-      f.input :email_type, as: :select, collection: %w(NotificationProfile), input_html: { class: 'initialize-select2' }
+      f.input :email_type, as: :select, collection: %w(NotificationProfile), input_html: { class: 'initialize-select2', 'data-placeholder': 'Select e-mail type' }
       f.input :template, as: :hidden
     end
     f.render partial: 'editor'

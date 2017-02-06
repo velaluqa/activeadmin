@@ -89,8 +89,8 @@ ActiveAdmin.register NotificationProfile do
     end
 
     f.inputs 'Triggers' do
-      f.input :triggering_actions, as: :select, multiple: true, collection: %w(create update destroy), input_html: { class: 'initialize-select2' }
-      f.input :triggering_resource, as: :select, collection: NotificationObservable.resources.map(&:to_s).sort.uniq, input_html: { class: 'initialize-select2' }
+      f.input :triggering_actions, as: :select, multiple: true, collection: %w(create update destroy), input_html: { class: 'initialize-select2', 'data-placeholder': 'Select triggering actions' }
+      f.input :triggering_resource, as: :select, collection: NotificationObservable.resources.map(&:to_s).sort.uniq, input_html: { class: 'initialize-select2', 'data-placeholder': 'Select triggering resource' }
     end
 
     f.inputs 'Filters', class: 'filters' do
@@ -99,11 +99,11 @@ ActiveAdmin.register NotificationProfile do
     end
 
     f.inputs 'Recipients' do
-      f.input :users, type: :select, multiple: true, collection: User.all, input_html: { class: 'initialize-select2' }
-      f.input :roles, type: :select, multiple: true, collection: Role.all, input_html: { class: 'initialize-select2' }
+      f.input :users, type: :select, multiple: true, collection: User.order(:name), input_html: { class: 'initialize-select2', 'data-placeholder': 'Choose user or users' }
+      f.input :roles, type: :select, multiple: true, collection: Role.order(:title), input_html: { class: 'initialize-select2', 'data-placeholder': 'Choose role or roles' }
       f.input :only_authorized_recipients
-      f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2' }
-      f.input :email_template_id, as: :select, collection: EmailTemplate.where(email_type: 'NotificationProfile'), input_html: { class: 'initialize-select2' }
+      f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2', 'data-placeholder': 'Select maximum email throttling delay' }
+      f.input :email_template_id, as: :select, collection: EmailTemplate.where(email_type: 'NotificationProfile'), input_html: { class: 'initialize-select2', 'data-placeholder': 'Select template' }
     end
 
     f.actions
