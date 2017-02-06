@@ -56,7 +56,18 @@ ActiveAdmin.register Center do
   form do |f|
     f.object.study_id = params[:study_id] if params.key?(:study_id)
     f.inputs 'Details' do
-      f.input :study, :collection => (session[:selected_study_id].nil? ? Study.accessible_by(current_ability) : Study.where(:id => session[:selected_study_id]).accessible_by(current_ability)) unless f.object.persisted?
+      unless f.object.persisted?
+        studies = Study.accessible_by(current_ability).order(:name, :id)
+        studies = studies.where(id: session[:selected_study_id]) if session[:selected_study_id].present?
+        f.input(
+          :study,
+          collection: studies,
+          input_html: {
+            class: 'initialize-select2',
+            'data-placeholder': 'Select a Study'
+          }
+        )
+      end
       f.input :name
       f.input :code, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to problems in project management, because the code is used to identify centers across documents.' : '')
     end

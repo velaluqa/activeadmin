@@ -128,6 +128,12 @@ JOIN json_to_record(visits_required_series_hash.value) as visits_required_series
 JOIN_QUERY
   }
 
+  scope :of_study, lambda { |study|
+    study_id = study
+    study_id = study.id if study.is_a?(ActiveRecord::Base)
+    joins(patient: :center).where(centers: { study_id: study_id })
+  }
+
   def name
     if(patient.nil?)
       '#'+visit_number.to_s

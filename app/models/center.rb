@@ -67,6 +67,13 @@ centers.id AS result_id,
 'Center' AS result_type
 SELECT
 
+
+  scope :of_study, lambda { |study|
+    study_id = study
+    study_id = study.id if study.is_a?(ActiveRecord::Base)
+    where(study_id: study_id)
+  }
+
   validates_uniqueness_of :name, :scope => :study_id
   validates_uniqueness_of :code, :scope => :study_id
   validates_presence_of :name, :code, :study_id

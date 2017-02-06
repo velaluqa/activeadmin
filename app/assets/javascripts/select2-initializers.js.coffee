@@ -1,5 +1,9 @@
 initializeSimpleSelects = ($elements = $('.initialize-select2')) ->
-  $elements.select2()
+  $elements.each (i, el) ->
+    $el = $(el)
+    $el.select2
+      placeholder: $el.data('placeholder')
+      allowClear: $el.data('allow-clear') or false
 
 initializeRecordSearch = ($elements = $('.select2-record-search')) ->
   $elements.each (i, el) ->

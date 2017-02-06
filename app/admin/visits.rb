@@ -201,22 +201,41 @@ ActiveAdmin.register Visit do
   end
 
   form do |f|
-    patients = (session[:selected_study_id].nil? ? Patient.accessible_by(current_ability) : Study.find(session[:selected_study_id]).patients.accessible_by(current_ability))
-    visit_types = if(f.object.persisted? and not f.object.study.nil?)
-                    f.object.study.visit_types
-                  elsif(not session[:selected_study_id].nil?)
-                    Study.find(session[:selected_study_id]).visit_types
-                  else
-                    nil
-                  end
+    visit_types =
+      if(f.object.persisted? and not f.object.study.nil?)
+        f.object.study.visit_types
+      elsif(not session[:selected_study_id].nil?)
+        Study.find(session[:selected_study_id]).visit_types
+      else
+        nil
+      end
     f.object.patient_id = params[:patient_id] if params.key?(:patient_id)
-
     f.inputs 'Details' do
-      f.input :patient, :collection => (f.object.persisted? ? f.object.study.patients : patients), :include_blank => (not f.object.persisted?)
+      patients = Patient.accessible_by(current_ability).order(:subject_id, :id)
+      if f.object.persisted?
+        patients = patients.joins(:center).where(centers: { study_id: f.object.study.id })
+      elsif session[:selected_study_id].present?
+        patients = patients.joins(:center).where(centers: { study_id: session[:selected_study_id] })
+      end
+      f.input(
+        :patient,
+        collection: patients,
+        input_html: {
+          class: 'initialize-select2',
+          'data-placeholder': 'Select a Patient'
+        }
+      )
       f.input :visit_number, :hint => (visit_types.nil? ? 'A visit type can only be assigned once the visit was created. Please click on "Edit Visit" after this step to assign a visit type.' : nil)
       f.input :description
       unless(visit_types.nil?)
-        f.input :visit_type, :collection => visit_types, :include_blank => false
+        f.input(
+          :visit_type,
+          collection: visit_types,
+          input_html: {
+            class: 'initialize-select2',
+            'data-placeholder': 'none'
+          }
+        )
       end
     end
 

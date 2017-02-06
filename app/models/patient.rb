@@ -73,6 +73,12 @@ INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
+  scope :of_study, lambda { |study|
+    study_id = study
+    study_id = study.id if study.is_a?(ActiveRecord::Base)
+    joins(:center).where(centers: { study_id: study_id })
+  }
+
   before_save :ensure_study_is_unchanged
 
   def form_answers
