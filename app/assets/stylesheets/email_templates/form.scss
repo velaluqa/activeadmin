@@ -1,24 +1,21 @@
-@mixin clearfix() {
-  &:after {
-     content: ' '; /* Older browser do not support empty content */
-     visibility: hidden;
-     display: block;
-     height: 0;
-     clear: both;
-  }
-}
-
 body.admin_email_templates {
   fieldset.headless {
     padding: 0;
   }
 
-  .inputs .input label {
-    line-height: 28px;
-  }
-
   .editor .wrapper, fieldset.headless {
     min-height: 600px;
+  }
+
+  fieldset.headless {
+    > ol {
+      margin-top: 0;
+      padding: 5px 0;
+      label {
+	white-space: nowrap;
+	margin-right: 15px;
+      }
+    }
   }
 
   .editor .wrapper {
@@ -65,15 +62,18 @@ body.admin_email_templates {
     font-size: 1.2em;
     margin: 0;
     border-top: 1px solid #333;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
     border-radius: 0 0 4px 4px;
   }
 
   .iframe-wrapper {
     position: absolute;
     top: 45px;
-    left: 15px;
+    left: 0;
     right: 0;
-    bottom: 20px;
+    bottom: 0;
 
     @media screen and (max-width: 992px) {
       left: 0;
@@ -81,14 +81,13 @@ body.admin_email_templates {
     }
 
     background-color: #fff;
-    border-left: 1px solid #e8e8e8;
-    border-right: 1px solid #e8e8e8;
-    border-bottom: 1px solid #e8e8e8;
+    border-top: 1px solid $panel-default-border;
     border-radius: 0 0 4px 4px;
 
     iframe {
       transition: opacity ease-in-out .3s;
       opacity: 1;
+      border: 0;
     }
 
     &.loading {
