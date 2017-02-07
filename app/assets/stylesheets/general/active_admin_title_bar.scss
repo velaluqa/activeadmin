@@ -11,15 +11,42 @@
 
   @extend .clearfix;
 
-  .breadcrumb { display: none; }
-  h2 {
-    line-height: $menu-width;
-    margin: 0 15px;
-    font-size: 24px;
+  #selected_study {
+    padding: 5px 0 0 0;
+    font-size: 13px;
+    color: $gray;
+    a {
+      color: $gray;
+    }
   }
 
   #titlebar_left {
     @extend .pull-left;
+    padding: 0 0 0 15px;
+
+    .breadcrumb,
+    h2 {
+      background-color: transparent;
+      line-height: $menu-width;
+      margin: 0;
+      font-size: 20px;
+      padding: 0;
+      display: inline-block;
+    }
+
+    &.with_selected_study {
+      padding: 0 0 0 10px;
+
+      .breadcrumb,
+      h2 {
+	background-color: transparent;
+	line-height: 20px;
+	margin: 0;
+	font-size: 18px;
+	padding: 0;
+	display: inline-block;
+      }
+    }
   }
 
   #titlebar_right {
@@ -41,9 +68,9 @@
       color: $title-bar-link-color;
       &:hover { color: $title-bar-link-hover-color; }
     }
-    a:before { 
+    a:before {
       font-size: 1.2em;
-      font-family: FontAwesome; 
+      font-family: FontAwesome;
       margin: 0 7.5px 0 0;
     }
     &.new a:before { content: $fa-var-plus; }
