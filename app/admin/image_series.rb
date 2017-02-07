@@ -5,7 +5,7 @@ require 'aa_erica_keywords'
 ActiveAdmin.register ImageSeries do
   menu(parent: 'store', priority: 30)
 
-  actions :index, :show, :update, :destroy
+  actions :all, except: [:create]
 
   scope :all, :default => true
   scope :not_assigned
