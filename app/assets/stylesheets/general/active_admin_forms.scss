@@ -190,6 +190,9 @@ form {
 
       &:last-of-type {
 	margin-bottom: 0;
+	p.inline-hints {
+	  margin-bottom: 0;
+	}
       }
     }
 
