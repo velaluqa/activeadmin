@@ -68,6 +68,7 @@
 
 .status_tag {
   text-transform: uppercase;
+  @extend .label, .label-default;
   &.error {
     @extend .label, .label-danger;
   }
