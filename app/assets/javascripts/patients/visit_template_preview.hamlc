@@ -3,8 +3,8 @@
     %th Number
     %th Type
     %th Description
-  %tr
-    - for visit in @visits
+  - for visit in @visits
+    %tr
       %td= visit.number
       %td= visit.type
       %td= visit.description
