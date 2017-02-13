@@ -29,7 +29,7 @@ class Patient < ActiveRecord::Base
   acts_as_taggable
 
   attr_accessible :center, :subject_id, :domino_unid
-  attr_accessible :center_id, :data, :export_history
+  attr_accessible :center_id, :data, :export_history, :visit_template
 
   belongs_to :center
   has_many :visits, :dependent => :destroy
@@ -54,6 +54,8 @@ patients.id AS result_id,
 SELECT
 
   scope :join_study, -> { joins(center: :study) }
+
+  before_create :create_visits_from_template
 
   include ImageStorageCallbacks
 
@@ -117,6 +119,20 @@ JOIN
     }
   end
 
+  # Used as getter by ActiveAdmin form.
+  #
+  # @return [String] visit template to set upon save
+  def visit_template
+    @visit_template
+  end
+
+  # Used as setter by ActiveAdmin form.
+  #
+  # @param [String] visit template to create visits from upon save
+  def visit_template=(template)
+    @visit_template = template
+  end
+
   def domino_patient_no
     "#{center.code}#{subject_id}"
   end
@@ -168,6 +184,21 @@ JOIN
     end
 
     return true
+  end
+
+  # When a visit template is set at create, all visits from the
+  # template are created.
+  def create_visits_from_template
+    return unless @visit_template
+    template = study.visit_templates[@visit_template]
+    return unless template
+    self.visits = template['visits'].map do |visit|
+      Visit.new(
+        visit_type: visit['type'],
+        visit_number: visit['number'],
+        description: visit['description']
+      )
+    end
   end
 
   def self.classify_audit_trail_event(c)
