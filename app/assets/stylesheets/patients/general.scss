@@ -1,6 +1,8 @@
 body.admin_patients {
-  #visit_template_preview .panel {
+  #visit_template_preview {
     margin-top: 15px;
-    margin-bottom: 0;
+  }
+  #visit_template_preview:empty {
+    margin-top: 0px;
   }
 }
