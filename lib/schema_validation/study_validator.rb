@@ -11,6 +11,12 @@ module SchemaValidation
       super(@@schema)
     end
 
+    alias_method :original_validate, :validate
+    def validate(value)
+      @document = value
+      original_validate(value)
+    end
+
     def validate_hook(value, rule, path, errors)
       case rule.name
       when 'field_values'
