@@ -15,11 +15,13 @@ renderVisitTemplates = (templates, options = {}) ->
         allowClear: true
         disabled: false
     else
-      $('#patient_visit_template').html('').select2
+      data = for key, tpl of visit_templates
+        { id: key, text: (tpl.label or key) }
+      $('#patient_visit_template').html('<option></option>').select2
         placeholder: 'Do not create any visits'
         allowClear: true
         disabled: false
-        data: [''].concat(_.keys(visit_templates))
+        data: data
   else
     if not selected_study? and $('#patient_center_id').val() is ''
       $('#patient_visit_template').html('').select2

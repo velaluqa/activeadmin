@@ -136,8 +136,11 @@ ActiveAdmin.register Patient do
       if session[:selected_study_id].present?
         templates = Study.find(session[:selected_study_id]).visit_templates
       end
+      collection = (templates || {}).map do |key, template|
+        [(template['label'] || key), key]
+      end
       f.inputs 'Visits' do
-        f.input(:visit_template, collection: templates.try(:keys) || [])
+        f.input(:visit_template, collection: collection)
         render(
           partial: 'visit_templates',
           locals: {
