@@ -43,7 +43,7 @@ window.visitTemplatesForm = (options = {}) ->
   visit_templates = options.visit_templates
 
   # All possible templates are already loaded if study selected
-  unless study_selected?
+  unless selected_study?
     $('#patient_center_id').on 'change', (e) ->
       $.ajax
         url: '/admin/patients/visit_templates.json',
