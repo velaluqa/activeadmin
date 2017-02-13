@@ -1,0 +1,7 @@
+#visit_template_preview
+= javascript_include_tag 'patients/visit_templates'
+:coffeescript
+  $ ->
+    visitTemplatesForm
+      selected_study: #{selected_study}
+      visit_templates: #{templates}

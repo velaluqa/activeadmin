@@ -131,6 +131,24 @@ ActiveAdmin.register Patient do
       f.input :subject_id, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to problems in project management, because the Subject ID is used to identify patients across documents.' : '')
     end
 
+    if f.object.new_record? && can?(:create, Visit)
+      templates = f.object.study.andand.visit_templates
+      if session[:selected_study_id].present?
+        templates = Study.find(session[:selected_study_id]).visit_templates
+      end
+      f.inputs 'Visits' do
+        f.input(:visit_template, collection: templates.try(:keys) || [])
+        render(
+          partial: 'visit_templates',
+          locals: {
+            f: f,
+            selected_study: session[:selected_study_id] || 'null',
+            templates: templates.to_json
+          }
+        )
+      end
+    end
+
     f.actions
   end
 
