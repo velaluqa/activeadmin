@@ -236,6 +236,11 @@ ActiveAdmin.register Patient do
     link_to('Reorder Visits', reorder_visits_form_admin_patient_path(resource)) unless(resource.visits.empty? or cannot? :manage, resource)
   end
 
+  collection_action :visit_templates, method: :get do
+    @center = Center.find(params[:center_id])
+    render json: @center.study.visit_templates
+  end
+
   viewer_cartable(:patient)
   erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 end
