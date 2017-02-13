@@ -97,3 +97,34 @@ mapping:
                     type: str
                     required: yes
                     
+  "visit_templates":
+    type: map
+    required: false
+    mapping:
+      =:
+        type: map
+        mapping:
+          "label":
+            type: str
+            required: false
+          "repeatable":
+            type: bool
+            required: false
+          "visits":
+            type: seq
+            sequence:
+              - type: map
+                name: visit
+                mapping:
+                  "number":
+                    type: number
+                    required: true
+                    unique: true
+                  "type":
+                    type: str
+                    required: true
+                  "description":
+                    type: str
+                    required: false
+
+

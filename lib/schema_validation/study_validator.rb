@@ -42,6 +42,10 @@ module SchemaValidation
         errors << Kwalify::ValidationError.new('Only type \'select\' can have \'values\'', path) unless (value['type'] == 'select' or value['values'].nil?)
       when 'dicom_tag'
         errors << Kwalify::ValidationError.new("Key must be a string containing a valid DICOM tag in the format 'xxxx,yyyy'", path) unless(value.is_a?(String) and value =~ /\h{4},\h{4}/)
+      when 'visit'
+        unless @document['visit_types'].andand.key?(value['type'])
+          errors << Kwalify::ValidationError.new("Visit type not found in map of /visit_types", path)
+        end
       end
     end
   end
