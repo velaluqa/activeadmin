@@ -187,6 +187,11 @@ JOIN
     Array(current_configuration['visit_types'].andand.keys)
   end
 
+  def visit_templates
+    return {} unless has_configuration?
+    current_configuration['visit_templates']
+  end
+
   def wado_query
     self.patients.map {|patient| patient.wado_query}
   end
