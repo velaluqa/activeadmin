@@ -45,6 +45,7 @@ visit_templates:
   first_template:
     label: 'My Visit Template'
     repeatable: true
+    hide_on_create_patient: yes
     visits:
       - number: 1
         type: baseline
