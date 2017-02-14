@@ -81,7 +81,7 @@ YAML
       expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/first_template/visits/1/number] '1': is already used at '/visit_templates/first_template/visits/0/number'.")
     end
 
-    it 'validates existence of only one `patientDefault`' do
+    it 'validates existence of only one `create_patient_default`' do
       config['visit_templates']['third_template'] = {
         'create_patient_default' => true,
         'visits' => [{'number' => 1, 'type' => 'baseline'}]
