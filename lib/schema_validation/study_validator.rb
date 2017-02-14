@@ -53,6 +53,13 @@ module SchemaValidation
             validation_cache[:create_patient_default] = path
           end
         end
+        if value['create_patient_enforce']
+          if validation_cache[:create_patient_enforce].present?
+            errors << Kwalify::ValidationError.new("Already defined `create_patient_enforce` for visit template in #{validation_cache[:create_patient_enforce]}", path)
+          else
+            validation_cache[:create_patient_enforce] = path
+          end
+        end
       when 'visit'
         unless @document['visit_types'].andand.key?(value['type'])
           errors << Kwalify::ValidationError.new("Visit type not found in map of /visit_types", path)

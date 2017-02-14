@@ -93,5 +93,18 @@ YAML
       expect(validator.validate(config)).not_to be_empty
       expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/fourth_template] Already defined `create_patient_default` for visit template in /visit_templates/third_template")
     end
+
+    it 'validates existence of only one `create_patient_enforce`' do
+      config['visit_templates']['third_template'] = {
+        'create_patient_enforce' => true,
+        'visits' => [{'number' => 1, 'type' => 'baseline'}]
+      }
+      config['visit_templates']['fourth_template'] = {
+        'create_patient_enforce' => true,
+        'visits' => [{'number' => 1, 'type' => 'baseline'}]
+      }
+      expect(validator.validate(config)).not_to be_empty
+      expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/fourth_template] Already defined `create_patient_enforce` for visit template in /visit_templates/third_template")
+    end
   end
 end
