@@ -103,11 +103,15 @@ mapping:
     mapping:
       =:
         type: map
+        name: visit_template
         mapping:
           "label":
             type: str
             required: false
           "repeatable":
+            type: bool
+            required: false
+          "create_patient_default":
             type: bool
             required: false
           "visits":

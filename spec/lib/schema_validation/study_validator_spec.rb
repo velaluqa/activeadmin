@@ -42,13 +42,17 @@ visit_types:
         type: bool
         label: mQC Check
 visit_templates:
-  my_visit_template:
+  first_template:
     label: 'My Visit Template'
     repeatable: true
     visits:
       - number: 1
         type: baseline
         description: 'Some description'
+  second_template:
+    visits:
+      - number: 1
+        type: baseline
 YAML
   let!(:config) { YAML.load(config_yaml) }
   let!(:validator) { SchemaValidation::StudyValidator.new }
@@ -59,21 +63,34 @@ YAML
 
   describe 'validating visit templates' do
     it 'validates existence of visit types' do
-      config['visit_templates']['my_visit_template']['visits'] << {
+      config['visit_templates']['first_template']['visits'] << {
         'number' => 2,
         'type'   => 'baseline2'
       }
       expect(validator.validate(config)).not_to be_empty
-      expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/my_visit_template/visits/1] Visit type not found in map of /visit_types")
+      expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/first_template/visits/1] Visit type not found in map of /visit_types")
     end
 
     it 'validates uniqueness of visit number' do
-      config['visit_templates']['my_visit_template']['visits'] << {
+      config['visit_templates']['first_template']['visits'] << {
         'number' => 1,
         'type'   => 'baseline'
       }
       expect(validator.validate(config)).not_to be_empty
-      expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/my_visit_template/visits/1/number] '1': is already used at '/visit_templates/my_visit_template/visits/0/number'.")
+      expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/first_template/visits/1/number] '1': is already used at '/visit_templates/first_template/visits/0/number'.")
+    end
+
+    it 'validates existence of only one `patientDefault`' do
+      config['visit_templates']['third_template'] = {
+        'create_patient_default' => true,
+        'visits' => [{'number' => 1, 'type' => 'baseline'}]
+      }
+      config['visit_templates']['fourth_template'] = {
+        'create_patient_default' => true,
+        'visits' => [{'number' => 1, 'type' => 'baseline'}]
+      }
+      expect(validator.validate(config)).not_to be_empty
+      expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/fourth_template] Already defined `create_patient_default` for visit template in /visit_templates/third_template")
     end
   end
 end

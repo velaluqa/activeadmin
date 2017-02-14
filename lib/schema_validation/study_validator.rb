@@ -7,12 +7,15 @@ module SchemaValidation
     ## load schema definition
     @@schema = YAML.load_file('lib/schema_validation/study.schema.yml') #HC
 
+    attr_reader :validation_cache
+
     def initialize
       super(@@schema)
     end
 
     alias_method :original_validate, :validate
     def validate(value)
+      @validation_cache = {}
       @document = value
       original_validate(value)
     end
@@ -42,6 +45,14 @@ module SchemaValidation
         errors << Kwalify::ValidationError.new('Only type \'select\' can have \'values\'', path) unless (value['type'] == 'select' or value['values'].nil?)
       when 'dicom_tag'
         errors << Kwalify::ValidationError.new("Key must be a string containing a valid DICOM tag in the format 'xxxx,yyyy'", path) unless(value.is_a?(String) and value =~ /\h{4},\h{4}/)
+      when 'visit_template'
+        if value['create_patient_default']
+          if validation_cache[:create_patient_default].present?
+            errors << Kwalify::ValidationError.new("Already defined `create_patient_default` for visit template in #{validation_cache[:create_patient_default]}", path)
+          else
+            validation_cache[:create_patient_default] = path
+          end
+        end
       when 'visit'
         unless @document['visit_types'].andand.key?(value['type'])
           errors << Kwalify::ValidationError.new("Visit type not found in map of /visit_types", path)
