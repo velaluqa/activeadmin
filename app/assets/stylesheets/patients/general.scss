@@ -1,4 +1,7 @@
 body.admin_patients {
+  ol li p:last-child {
+    margin-bottom: 0;
+  }
   #visit_template_select {
     margin-bottom: 0;
   }
@@ -6,6 +9,9 @@ body.admin_patients {
     margin-top: 15px;
   }
   #visit_template_preview:empty {
-    margin-top: 0px;
+    margin-top: 0;
+  }
+  #visit_template_select:empty + #visit_template_preview {
+    margin-top: 0;
   }
 }
