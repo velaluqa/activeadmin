@@ -162,9 +162,10 @@ RSpec.describe Patient do
   end
 
   describe '#create' do
-    let!(:study) { create(:study) }
-    let!(:center) { create(:center, study: study) }
-    let!(:config_yaml) { <<YAML }
+    describe 'for study with visit template' do
+      let!(:study) { create(:study) }
+      let!(:center) { create(:center, study: study) }
+      let!(:config_yaml) { <<YAML }
 image_series_properties: []
 visit_types:
   baseline:
@@ -181,24 +182,25 @@ visit_templates:
         description: 'Some preset for a visit'
 YAML
 
-    before(:each) do
-      # TODO: #2644 - Refactor configuring Study
-      tempfile = Tempfile.new('test.yml')
-      tempfile.write(config_yaml)
-      tempfile.close
-      repo = GitConfigRepository.new
-      repo.update_config_file(study.relative_config_file_path, tempfile, nil, "New configuration file for study #{study.id}")
-      tempfile.unlink
-    end
+      before(:each) do
+        # TODO: #2644 - Refactor configuring Study
+        tempfile = Tempfile.new('test.yml')
+        tempfile.write(config_yaml)
+        tempfile.close
+        repo = GitConfigRepository.new
+        repo.update_config_file(study.relative_config_file_path, tempfile, nil, "New configuration file for study #{study.id}")
+        tempfile.unlink
+      end
 
-    it 'creates visits from template' do
-      patient = Patient.new(
-        center: center,
-        subject_id: '1234'
-      )
-      patient.visit_template = 'template'
-      patient.save!
-      expect(patient.visits.count).to eq 1
+      it 'creates visits from template' do
+        patient = Patient.new(
+          center: center,
+          subject_id: '1234'
+        )
+        patient.visit_template = 'template'
+        patient.save!
+        expect(patient.visits.count).to eq 1
+      end
     end
   end
 end
