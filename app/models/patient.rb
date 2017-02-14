@@ -189,9 +189,7 @@ JOIN
   # When a visit template is set at create, all visits from the
   # template are created.
   def create_visits_from_template
-    return unless @visit_template
-    template = study.visit_templates[@visit_template]
-    return unless template
+    template = visit_template_hash or return
     self.visits = template['visits'].map do |visit|
       Visit.new(
         visit_type: visit['type'],
@@ -199,6 +197,12 @@ JOIN
         description: visit['description']
       )
     end
+  end
+
+  def visit_template_hash
+    enforced_template = study.visit_templates.find { |name, tpl| tpl['create_patient_enforce'] }
+    return enforced_template.second if enforced_template
+    study.visit_templates[visit_template]
   end
 
   def self.classify_audit_trail_event(c)
