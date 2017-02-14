@@ -1,7 +1,14 @@
-#visit_template_preview
+%fieldset#visit_templates.inputs
+  %legend
+    %span Visit Preset
+  %ol
+    %li#visit_template_select
+    %li#visit_template_preview
+
 = javascript_include_tag 'patients/visit_templates'
 :coffeescript
   $ ->
     visitTemplatesForm
-      selected_study: #{selected_study}
-      visit_templates: #{templates}
+      selected_study: #{selected_study.to_json}
+      visit_templates: #{templates.to_json}
+      preselect: #{preselect.to_json}

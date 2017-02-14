@@ -132,24 +132,21 @@ ActiveAdmin.register Patient do
     end
 
     if f.object.new_record? && can?(:create, Visit)
-      templates = f.object.study.andand.visit_templates
-      if session[:selected_study_id].present?
-        templates = Study.find(session[:selected_study_id]).visit_templates
-      end
-      collection = (templates || {}).map do |key, template|
-        [(template['label'] || key), key]
-      end
-      f.inputs 'Visits' do
-        f.input(:visit_template, collection: collection)
-        render(
-          partial: 'visit_templates',
-          locals: {
-            f: f,
-            selected_study: session[:selected_study_id] || 'null',
-            templates: templates.to_json
-          }
-        )
-      end
+      templates =
+        if session[:selected_study_id].present?
+          Study.find(session[:selected_study_id]).visit_templates
+        else
+          f.object.study.andand.visit_templates
+        end
+      render(
+        partial: 'visit_templates',
+        locals: {
+          f: f,
+          selected_study: session[:selected_study_id],
+          preselect: f.object.visit_template,
+          templates: templates
+        }
+      )
     end
 
     f.actions
