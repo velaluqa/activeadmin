@@ -42,11 +42,11 @@ class Ability
     define_page_abilities
   end
 
-  def unscopable?(activity, subject)
+  private
+
+  def unscopable?(subject, activity)
     UNSCOPABLE_ACTIVITIES[subject].andand.include?(activity)
   end
-
-  private
 
   ##
   # System-wide abilities allow activities on any instance of a given
