@@ -6,6 +6,10 @@ end
 require 'turnip'
 require 'turnip/capybara'
 Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
+require 'capybara/rails'
+
+require 'capybara/poltergeist'
+Capybara.default_driver = :poltergeist
 
 require 'yarjuf'
 
@@ -96,6 +100,14 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :deletion
     example.run
     DatabaseCleaner.strategy = :transaction
+  end
+
+  # Disable webmock in feature test.
+  config.before(type: :feature) do
+    WebMock.allow_net_connect!
+  end
+  config.after(type: :feature) do
+    WebMock.disable_net_connect!
   end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
