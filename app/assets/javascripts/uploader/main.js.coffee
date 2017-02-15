@@ -1,5 +1,3 @@
-#= require bootstrap/tooltip
-#= require bootstrap/popover
 #= require hamlcoffee
 #= require ../vendor/underscore
 #= require ../vendor/backbone

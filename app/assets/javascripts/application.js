@@ -14,7 +14,8 @@
 //= require jquery_ujs
 //= require bootstrap
 //= require bootstrap/scrollspy
-//= require bootstrap
+//= require bootstrap/tooltip
+//= require bootstrap/popover
 //= require jqBootstrapValidation
 //= require jquery.formparams
 //= require underscore
