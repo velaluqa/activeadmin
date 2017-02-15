@@ -40,12 +40,29 @@ RSpec.describe Ability do
         @ability = Ability.new(@current_user)
       end
 
-      it 'allows the user to manage his own user account' do
-        expect(@ability.can?(:manage, @current_user)).to be_truthy
+      it 'allows the user to read his own user account' do
+        expect(@ability.can?(:read, @current_user)).to be_truthy
       end
 
-      it 'allows the user to manage his own public keys' do
-        expect(@ability.can?(:manage, @public_key)).to be_truthy
+      it 'allows the user to update his own user account' do
+        expect(@ability.can?(:update, @current_user)).to be_truthy
+      end
+
+      it 'allows the user to generate_keypair his own user account' do
+        expect(@ability.can?(:generate_keypair, @current_user)).to be_truthy
+      end
+
+      it 'allows the user to read his own public key' do
+        expect(@ability.can?(:read, @public_key)).to be_truthy
+      end
+
+      it 'allows the user to update his own public key' do
+        expect(@ability.can?(:update, @public_key)).to be_truthy
+      end
+
+      it 'allows the user to generate_keypair his own public key' do
+        expect(@ability.can?(:generate_keypair, @public_key)).to be_truthy
+      end
       end
     end
 
@@ -192,7 +209,7 @@ RSpec.describe Ability do
                                           [@role1, @study1],
                                           @role2,
                                           @role3,
-                                          [@role3, @study1]
+                                          [@role4, @study1]
                                         ])
         @ability = Ability.new(@current_user)
       end
@@ -228,9 +245,15 @@ RSpec.describe Ability do
       end
 
       it 'denies managing users, since its role is scoped' do
-        expect(@ability.can?(:manage, User)).to be_truthy
+        expect(@ability.can?(:manage, User)).to be_falsy
         expect(@ability.can?(:manage, @user)).to be_falsy
-        expect(@ability.can?(:manage, @current_user)).to be_truthy
+        expect(@ability.can?(:manage, @current_user)).to be_falsy
+      end
+
+      it 'allows updating current users account' do
+        expect(@ability.can?(:update, User)).to be_truthy
+        expect(@ability.can?(:update, @user)).to be_falsy
+        expect(@ability.can?(:update, @current_user)).to be_truthy
       end
 
       it 'allows reading unscopable version records system-wide' do
