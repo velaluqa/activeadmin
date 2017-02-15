@@ -98,7 +98,7 @@ RSpec.describe V1::ImageSeriesController do
         response = post(:finish_import, id: @image_series.id, format: :json, expected_image_count: 0)
         expect(response).to have_http_status(:ok)
         @image_series.reload
-        expect(@image_series.state).to eq :imported
+        expect(@image_series.state_sym).to eq :imported
       end
     end
 
