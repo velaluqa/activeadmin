@@ -131,7 +131,7 @@ ActiveAdmin.register Patient do
       f.input :subject_id, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to problems in project management, because the Subject ID is used to identify patients across documents.' : '')
     end
 
-    if f.object.new_record? && can?(:create, Visit)
+    if f.object.new_record?
       templates =
         if session[:selected_study_id].present?
           Study.find(session[:selected_study_id]).visit_templates
@@ -256,7 +256,18 @@ ActiveAdmin.register Patient do
 
   collection_action :visit_templates, method: :get do
     @center = Center.find(params[:center_id])
-    render json: @center.study.visit_templates
+    templates = @center.study.visit_templates
+    enforced = (templates || {}).select { |name, tpl| tpl['create_patient_enforce'] }
+    if enforced.empty?
+      allowed = @center.hierarchy_grants?(
+        user: current_user,
+        activity: %i(create create_from_template),
+        subject: Visit
+      )
+      render json: allowed ? templates : {}
+    else
+      render json: enforced.to_hash
+    end
   end
 
   viewer_cartable(:patient)
