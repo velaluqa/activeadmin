@@ -16,6 +16,7 @@ app:
     - .:/app
     - ./config/database.yml.dev:/app/config/database.yml
     - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
+    - ./tmp:/app/tmp
   ports:
     - 3000:3000
   environment: &environment
