@@ -31,6 +31,11 @@ class Ability
     @current_user = current_user
     return unless @current_user
 
+    @permissions =
+      @current_user.permissions
+        .map { |p| [p.ability, true] }
+        .to_h
+
     if current_user.is_root_user?
       can :manage, ACTIVITIES.keys
     else
@@ -46,6 +51,12 @@ class Ability
 
   def unscopable?(subject, activity)
     UNSCOPABLE_ACTIVITIES[subject].andand.include?(activity)
+  end
+
+  # Returns true if any permission associated with the user matches
+  # given attributes.
+  def any_permission?(subject, activity)
+    @permissions["#{activity}_#{subject.to_s.downcase}"]
   end
 
   ##
@@ -73,15 +84,20 @@ class Ability
   end
 
   def define_scopable_ability(subject, activity)
+    return unless any_permission?(subject, activity)
     if unscopable?(subject, activity)
       define_unscopable_ability(subject, activity)
       return
     end
     can activity, subject do |subject_instance|
-      subject
-        .granted_for(user: current_user, activity: activity)
-        .where(id: subject_instance.id)
-        .exists?
+      if subject_instance.new_record?
+        can?(activity, subject_instance.class)
+      else
+        subject
+          .granted_for(user: current_user, activity: activity)
+          .where(id: subject_instance.id)
+          .exists?
+      end
     end
   end
 

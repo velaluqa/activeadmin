@@ -63,6 +63,10 @@ RSpec.describe Ability do
       it 'allows the user to generate_keypair his own public key' do
         expect(@ability.can?(:generate_keypair, @public_key)).to be_truthy
       end
+
+      it 'denies other permissions' do
+        expect(@ability.can?(:create, Patient)).to be_falsy
+        expect(@ability.can?(:create, Patient.new)).to be_falsy
       end
     end
 
