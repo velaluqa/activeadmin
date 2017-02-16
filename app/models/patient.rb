@@ -55,7 +55,7 @@ SELECT
 
   scope :join_study, -> { joins(center: :study) }
 
-  before_create :create_visits_from_template
+  before_create :add_visits_from_template
 
   include ImageStorageCallbacks
 
@@ -188,7 +188,7 @@ JOIN
 
   # When a visit template is set at create, all visits from the
   # template are created.
-  def create_visits_from_template
+  def add_visits_from_template
     template = visit_template_hash or return
     self.visits = template['visits'].map do |visit|
       Visit.new(
