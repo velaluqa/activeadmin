@@ -51,6 +51,7 @@ visit_templates:
         type: baseline
         description: 'Some description'
   second_template:
+    only_on_create_patient: yes
     visits:
       - number: 1
         type: baseline
@@ -105,6 +106,16 @@ YAML
       }
       expect(validator.validate(config)).not_to be_empty
       expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/fourth_template] Already defined `create_patient_enforce` for visit template in /visit_templates/third_template")
+    end
+
+    it 'validates existence of either `only_on_create_patient` or `hide_on_create_patient`' do
+      config['visit_templates']['third_template'] = {
+        'only_on_create_patient' => true,
+        'hide_on_create_patient' => true,
+        'visits' => [{'number' => 1, 'type' => 'baseline'}]
+      }
+      expect(validator.validate(config)).not_to be_empty
+      expect(validator.validate(config).map(&:to_s)).to include("[/visit_templates/third_template] Choose either `only_on_create_patient` or `hide_on_create_patient`")
     end
   end
 end

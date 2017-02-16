@@ -46,6 +46,9 @@ module SchemaValidation
       when 'dicom_tag'
         errors << Kwalify::ValidationError.new("Key must be a string containing a valid DICOM tag in the format 'xxxx,yyyy'", path) unless(value.is_a?(String) and value =~ /\h{4},\h{4}/)
       when 'visit_template'
+        if value['only_on_create_patient'] && value['hide_on_create_patient']
+          errors << Kwalify::ValidationError.new("Choose either `only_on_create_patient` or `hide_on_create_patient`", path)
+        end
         if value['create_patient_default']
           if validation_cache[:create_patient_default].present?
             errors << Kwalify::ValidationError.new("Already defined `create_patient_default` for visit template in #{validation_cache[:create_patient_default]}", path)

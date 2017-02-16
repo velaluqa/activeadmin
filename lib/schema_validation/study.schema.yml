@@ -120,6 +120,9 @@ mapping:
           "hide_on_create_patient":
             type: bool
             required: false
+          "only_on_create_patient":
+            type: bool
+            required: false
           "visits":
             type: seq
             sequence:
