@@ -78,6 +78,24 @@ step 'I browse to :string' do |path|
   visit(path)
 end
 
+step 'I browse to :model :string' do |model, identifier|
+  resource =
+    case model
+    when "Patient" then Patient.find_by(subject_id: identifier)
+    end
+  path = send("admin_#{model.downcase}_path", resource)
+  visit(path)
+end
+
+step 'I browse to :model :string :' do |model, identifier|
+  resource =
+    case model
+    when "Patient" then Patient.find_by(subject_id: identifier)
+    end
+  path = send("admin_#{model.downcase}_path", resource)
+  visit(path)
+end
+
 step 'I see the unauthorized page' do
   expect(page).to have_content('Not authorized')
 end
@@ -95,10 +113,18 @@ step 'I see :string' do |content|
   expect(page).to have_content(content)
 end
 
+step 'I don\'t see :string' do |content|
+  expect(page).not_to have_content(content)
+end
+
 step 'I am redirected to patient :string' do |subject_id|
   @patient = Patient.where(subject_id: subject_id).first
   expect(@patient).not_to be_nil
   expect(page.current_path).to eq(admin_patient_path(@patient))
+end
+
+step 'I click link :string' do |locator|
+  click_link(locator)
 end
 
 step 'I pry' do

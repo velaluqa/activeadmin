@@ -141,10 +141,11 @@ ActiveAdmin.register Patient do
       render(
         partial: 'visit_templates',
         locals: {
-          f: f,
           selected_study: session[:selected_study_id],
           preselect: f.object.visit_template,
-          templates: templates
+          templates: templates,
+          allow_clear: true,
+          create_patient: true
         }
       )
     end
@@ -268,6 +269,34 @@ ActiveAdmin.register Patient do
     else
       render json: enforced.to_hash
     end
+  end
+
+  member_action :perform_create_visits_from_template, method: :post do
+    @page_title = 'Create Visits'
+    # TODO: Refactor using trailblazer, command objects or similar.
+    authorize!(:create_from_template, Visit)
+    @patient = Patient.find(params[:id])
+    @template = params[:patient].andand[:visit_template]
+    if @template.blank?
+      flash[:error] = 'Please provide a visit template.'
+    elsif !@patient.visit_template_applicable?(@template)
+      flash[:error] = 'Visits with the same visit number for this patient already exist and selected visit template is not repeatable.'
+    else
+      @patient.create_visits_from_template!(@template)
+      flash[:notice] = 'Visits created successfully.'
+      return redirect_to(admin_patient_path(@patient))
+    end
+    @templates = @patient.study.andand.visit_templates
+    render(:create_visits_from_template)
+  end
+  member_action :create_visits_from_template, method: :get do
+    @page_title = 'Create Visits'
+    authorize!(:create_from_template, Visit)
+    @patient = Patient.find(params[:id])
+    @templates = @patient.study.andand.visit_templates
+  end
+  action_item :create_visits_from_template, only: :show, if: -> { !resource.study.visit_templates.blank? } do
+    link_to('Visits From Template', create_visits_from_template_admin_patient_path(resource))
   end
 
   viewer_cartable(:patient)

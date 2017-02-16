@@ -9,6 +9,8 @@
 :coffeescript
   $ ->
     visitTemplatesForm
-      selected_study: #{selected_study.to_json}
-      visit_templates: #{templates.to_json}
-      preselect: #{preselect.to_json}
+      selected_study: #{local_assigns.fetch(:selected_study, nil).to_json}
+      visit_templates: #{local_assigns.fetch(:templates, {}).to_json}
+      preselect: #{local_assigns.fetch(:preselect, nil).to_json}
+      allow_clear: #{local_assigns.fetch(:allow_clear, nil).to_json}
+      create_patient: #{local_assigns.fetch(:create_patient, nil).to_json}

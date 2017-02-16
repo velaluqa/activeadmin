@@ -171,6 +171,25 @@ JOIN
     name
   end
 
+  def visit_template_applicable?(template)
+    template = study.visit_templates[template] or return false
+    existing_visits_numbers = visits.map(&:visit_number)
+    new_visit_numbers = template['visits'].map { |visit| visit['number'] }
+    existing_visits_numbers & new_visit_numbers == []
+  end
+
+  def create_visits_from_template!(template)
+    template = study.visit_templates[template] or return false
+    template['visits'].each do |visit|
+      visits << Visit.create!(
+        visit_number: visit['number'],
+        visit_type: visit['type'],
+        description: visit['description'],
+        patient: self
+      )
+    end
+  end
+
   protected
 
   def ensure_study_is_unchanged

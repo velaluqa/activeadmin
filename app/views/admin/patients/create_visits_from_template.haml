@@ -1,0 +1,5 @@
+= semantic_form_for @patient, url: perform_create_visits_from_template_admin_patient_path(@patient), method: :post do |f|
+  = render(partial: 'visit_templates', locals: { preselect: @template, templates: @templates, allow_clear: false, create_patient: false })
+  = f.actions do
+    = f.action :submit, label: 'Create Visits', as: :input
+    = f.action :cancel, label: 'Cancel', url: admin_patient_path(@patient), as: :link, wrapper_html: { class: 'cancel' }
