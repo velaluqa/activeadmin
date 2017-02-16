@@ -20,6 +20,7 @@ require 'git_config_repository'
 # **`mqc_user_id`**                  | `integer`          |
 # **`mqc_version`**                  | `string`           |
 # **`patient_id`**                   | `integer`          |
+# **`repeatable_count`**             | `integer`          | `default(0), not null`
 # **`required_series`**              | `jsonb`            | `not null`
 # **`state`**                        | `integer`          | `default(0)`
 # **`updated_at`**                   | `datetime`         |
