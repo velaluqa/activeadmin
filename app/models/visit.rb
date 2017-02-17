@@ -141,11 +141,7 @@ JOIN_QUERY
   }
 
   def name
-    if(patient.nil?)
-      '#'+visit_number.to_s
-    else
-      patient.name+'#'+visit_number.to_s
-    end
+    "#{patient.andand.name}##{visit_number}"
   end
 
   def original_visit_number
