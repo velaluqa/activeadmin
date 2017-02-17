@@ -85,7 +85,7 @@ visits.id AS result_id,
 'Visit' AS result_type
 SELECT
 
-  validates_uniqueness_of :visit_number, :scope => :patient_id
+  validates_uniqueness_of :visit_number, :scope => [:patient_id, :repeatable_count]
   validates_presence_of :visit_number, :patient_id
 
   before_destroy do
