@@ -251,6 +251,13 @@ form {
     border-radius: inherit;
   }
 
+  .inputs .inputs {
+    margin: -15px -15px 0 -15px;
+    ol:first-child {
+      margin-top: 0;
+    }
+  }
+
   .has_many_container {
     > h3 { display: none; }
 
@@ -266,6 +273,5 @@ form {
   }
   .button.has_many_add {
     @extend .btn, .btn-default;
-    margin-left: 15px;
   }
 }
