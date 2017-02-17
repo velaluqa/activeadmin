@@ -71,15 +71,15 @@ Feature: Create Visits From Template
       | Visit   | read, create_from_template |
     When I browse to patient "PatientWith"
     And I click link "Visits From Template"
-    When I select "Repeatable Preset" from "From Template"
-    Then I see "Repeatable Visit Description"
+    When I select "Additional Preset" from "From Template"
+    Then I see "Additional Visit Description"
     When I click the "Create Visits" button
     Then I see "Visits created successfully."
     When I browse to "/admin/visits"
-    Then I see "Repeatable Visit Description"
+    Then I see "Additional Visit Description"
 
   @javascript
-  Scenario: Create Existing non-repeatable Visit Templates
+  Scenario: Create non-repeatable visit template repeatedly
     And I sign in as a user
     And I have following abilities:
       | Patient | read, update, create       |
@@ -95,4 +95,25 @@ Feature: Create Visits From Template
     Then I see "Additional Visit Description"
     When I click the "Create Visits" button
     Then I see "Visits with the same visit number for this patient already exist and selected visit template is not repeatable."
+
+  @javascript @focus
+  Scenario: Create repeatable visit template repeatedly
+    And I sign in as a user
+    And I have following abilities:
+      | Patient | read, update, create       |
+      | Visit   | read, create_from_template |
+    When I browse to patient "PatientWith"
+    And I click link "Visits From Template"
+    When I select "Repeatable Preset" from "From Template"
+    Then I see "Repeatable Visit Description"
+    When I click the "Create Visits" button
+    When I browse to patient "PatientWith"
+    And I click link "Visits From Template"
+    When I select "Repeatable Preset" from "From Template"
+    Then I see "Repeatable Visit Description"
+    When I click the "Create Visits" button
+    Then I see "Visits created successfully."
+    When I browse to "/admin/visits"
+    Then I see "1.1"
+    And I see "Repeatable Visit Description"
 
