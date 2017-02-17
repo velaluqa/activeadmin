@@ -201,6 +201,14 @@ ActiveAdmin.register Visit do
   end
 
   form do |f|
+    if f.object.original_visit_number.present? && f.object.repeatable_count.present?
+      # ActiveAdmin is asking for `f.object[:visit_number]` which
+      # holds only the integer value, not the concatenation of
+      # `Visit#visit_number`. Thus - as a work around - we set it
+      # explicitly.
+      # TODO: Find a cleaner way solve this.
+      f.object[:visit_number] = f.object.visit_number
+    end
     visit_types =
       if(f.object.persisted? and not f.object.study.nil?)
         f.object.study.visit_types
