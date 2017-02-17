@@ -183,11 +183,8 @@ JOIN
   end
 
   def visit_types
-    return [] unless self.has_configuration?
-
-    config = current_configuration
-    
-    return (config['visit_types'].nil? ? []: config['visit_types'].keys)
+    return [] unless has_configuration?
+    Array(current_configuration['visit_types'].andand.keys)
   end
 
   def wado_query
