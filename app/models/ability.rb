@@ -31,11 +31,6 @@ class Ability
     @current_user = current_user
     return unless @current_user
 
-    @permissions =
-      @current_user.permissions
-        .map { |p| [p.ability, true] }
-        .to_h
-
     if current_user.is_root_user?
       can :manage, ACTIVITIES.keys
     else
@@ -47,6 +42,13 @@ class Ability
     define_page_abilities
   end
 
+  def permissions
+    @permissions ||=
+      @current_user.permissions
+        .map { |p| [p.ability, true] }
+        .to_h
+  end
+
   private
 
   def unscopable?(subject, activity)
@@ -56,7 +58,7 @@ class Ability
   # Returns true if any permission associated with the user matches
   # given attributes.
   def any_permission?(subject, activity)
-    @permissions["#{activity}_#{subject.to_s.underscore}"]
+    permissions["#{activity}_#{subject.to_s.underscore}"]
   end
 
   ##
