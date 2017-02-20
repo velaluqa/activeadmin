@@ -646,6 +646,8 @@ GEM
     thread_safe (0.3.5)
     tilt (2.0.2)
     tins (1.12.0)
+    transactional_capybara (0.1.0)
+      capybara
     trollop (2.1.2)
     turnip (2.0.1)
       gherkin (>= 2.5)
@@ -807,6 +809,7 @@ DEPENDENCIES
   test-unit
   textpow!
   therubyracer
+  transactional_capybara
   turnip
   uglifier (>= 1.0.3)
   ultraviolet

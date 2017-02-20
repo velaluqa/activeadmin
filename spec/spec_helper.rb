@@ -12,6 +12,12 @@ require 'capybara/poltergeist'
 Capybara.javascript_driver = :poltergeist
 Capybara.default_driver = :poltergeist
 
+# Capybara starts the webserver in another thread. Running feature
+# specs/steps with AJAX requests may result in race conditions.
+# The gem `transaction_capybara` configures a shared database
+# connection and means to wait for pending ajax requests.
+require 'transactional_capybara/rspec'
+
 require 'yarjuf'
 
 require 'webmock/rspec'
@@ -89,12 +95,12 @@ RSpec.configure do |config|
     DatabaseCleaner.clean_with(:truncation)
     clear_data
   end
-  config.before(:each) do
-    DatabaseCleaner.start
+
+  config.around(:each) do |example|
     clear_data
-  end
-  config.after(:each) do
-    DatabaseCleaner.clean
+    DatabaseCleaner.cleaning do
+      example.run
+    end
   end
 
   config.around(:each, transactional_spec: true) do |example|
