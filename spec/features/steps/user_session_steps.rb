@@ -47,6 +47,11 @@ step 'I sign in as a user with role :role_instance' do |role|
   send('I belong to role :role_instance', role)
 end
 
+step 'I sign in as a user with role :role_instance scoped to :model_instance' do |role, scope_object|
+  send('I sign in as a user')
+  send('I belong to role :role_instance scoped to :model_instance', role, scope_object)
+end
+
 step 'a role :string with permissions:' do |title, permissions|
   role = FactoryGirl.create(:role, title: title)
   permissions.to_a.each do |subject, activities|
@@ -59,6 +64,14 @@ end
 
 step 'I belong to role :role_instance' do |role|
   UserRole.create(user: @current_user, role: role)
+end
+
+step 'I belong to role :role_instance scoped to :model_instance' do |role, scope_object|
+  expect(scope_object).to be_present
+  UserRole.create(user: @current_user, role: role, scope_object: scope_object)
+  user_role = @current_user.user_roles.where(role: role).first
+  expect(user_role).not_to be_nil
+  expect(user_role.scope_object).to eq(scope_object)
 end
 
 step 'I have a role scoped to :model_instance' do |scope_object|
