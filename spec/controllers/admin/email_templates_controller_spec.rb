@@ -177,7 +177,7 @@ RSpec.describe Admin::EmailTemplatesController do
           :preview,
           type: 'NotificationProfile',
           subject: "Study_#{@study.id}",
-          template:'Study: <%= @notifications.first.resource.name %>'
+          template:'Study: {{notifications.first.resource.name}}'
         )
       }
       it { expect(subject).to have_http_status(:found) }
@@ -195,10 +195,10 @@ RSpec.describe Admin::EmailTemplatesController do
           :preview,
           type: 'NotificationProfile',
           subject: "Study_#{@study.id}",
-          template:'Study: <%= notifications.first.resource.name %>'
+          template:'Study: {{notifications.first.resource.name}}'
         )
         expect(response).to have_http_status(:ok)
-        expect(response.body).to eq "{\"preview\":\"Study: #{@study.name}\"}"
+        expect(JSON.parse(response.body)['result']).to include "Study: #{@study.name}"
       end
     end
 
