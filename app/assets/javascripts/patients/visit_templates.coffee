@@ -67,8 +67,6 @@ window.visitTemplatesForm = (options = {}) ->
   allow_clear = options.allow_clear ? true
   create_patient = options.create_patient ? true
 
-  console.log
-
   # All possible templates are already loaded if study selected
   unless selected_study?
     $('#patient_center_id').on 'change', (e) ->
