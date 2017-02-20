@@ -1,5 +1,7 @@
 class NotificationDrop < EricaDrop # :nodoc:
   belongs_to(:user)
+  belongs_to(:version)
+  belongs_to(:notification_profile)
 
   desc 'The resource the notification is about.', :polymorphic
   belongs_to(:resource)
