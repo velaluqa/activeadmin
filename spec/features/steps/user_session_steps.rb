@@ -58,7 +58,6 @@ end
 
 step 'I can :activity :subject' do |activity, subject|
   @current_user_role.add_permission(activity, subject)
-  expect(@current_user.can?(activity, subject)).to be_truthy
 end
 
 step 'I cannot :activity :subject' do |activity, subject|
