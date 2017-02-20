@@ -56,7 +56,7 @@ class Ability
   # Returns true if any permission associated with the user matches
   # given attributes.
   def any_permission?(subject, activity)
-    @permissions["#{activity}_#{subject.to_s.downcase}"]
+    @permissions["#{activity}_#{subject.to_s.underscore}"]
   end
 
   ##

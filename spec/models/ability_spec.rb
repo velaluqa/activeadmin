@@ -310,4 +310,15 @@ RSpec.describe Ability do
       end
     end
   end
+
+  describe 'unscopable permission' do
+    let!(:study) { create(:study) }
+    let!(:role) { create(:role, with_permissions: { ImageSeries => :upload }) }
+    let!(:user) { create(:user, with_user_roles: [[role, study]]) }
+    let!(:ability) { Ability.new(user) }
+
+    it 'allows uploading images' do
+      expect(ability.can?(:upload, ImageSeries)).to be_truthy
+    end
+  end
 end
