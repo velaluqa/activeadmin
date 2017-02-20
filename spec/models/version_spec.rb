@@ -5,22 +5,26 @@ RSpec.describe Version do
     before(:each) do
       expect(Version.count).to eq(0)
       250.times { create(:study) }
+      expect(Version.count).to eq(250)
+      @last_id = Version.last.id
+      @first_id = Version.first.id
     end
 
     it 'finds all ordered' do
       versions = Version
                    .select(:id)
-                   .where('"versions"."id" <= ?', 245)
+                   .where('"versions"."id" >= ?', @first_id)
+                   .where('"versions"."id" <= ?', @last_id - 5)
                    .order('"versions"."id" DESC')
       ids = []
       versions.ordered_find_each do |version|
         ids.push(version.id)
-        # ensure event when a new version is added, that the batches
-        # are found correctly
+        # Ensure that the batches are ordered correctly even when a
+        # new version is added.
         create(:user) if version.id == 50
       end
-      expect(ids.length).to eq(245)
-      expect(ids).to eq((1..245).to_a.reverse)
+      # expect(ids.length).to eq(245)
+      expect(ids).to eq((@first_id..(@last_id - 5)).to_a.reverse)
     end
   end
 
