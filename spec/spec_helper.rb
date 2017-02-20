@@ -3,11 +3,15 @@ if ENV['COVERAGE']
   SimpleCov.command_name 'RSpec'
 end
 
+# Turnip is a Gherkin language and runner implementation with better
+# formats for step definitions.
 require 'turnip'
 require 'turnip/capybara'
 Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
 require 'capybara/rails'
 
+# Poltergeist is a headless webkit implementation and can be plugged
+# into capybara.
 require 'capybara/poltergeist'
 Capybara.javascript_driver = :poltergeist
 Capybara.default_driver = :poltergeist
