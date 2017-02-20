@@ -17,6 +17,8 @@ module Report
         HistoricReportQuery
           .where(resource_type: @resource_type, group_by: @group_by)
           .first_or_create
+
+      @user = options[:user]
     end
 
     def study
@@ -34,6 +36,14 @@ module Report
     end
 
     private
+
+    def authorized?
+      return true unless @user
+      Study
+        .where(id: @study_id)
+        .granted_for(activity: :read_reports, user: @user)
+        .exists?
+    end
 
     def date_resolution?
       %q(day week month quarter year).include?(@resolution)
@@ -63,6 +73,7 @@ SELECT
     end
 
     def grouped_cache_result
+      return {} unless authorized?
       res = ActiveRecord::Base.connection.execute(historic_query)
       res.group_by { |set| set['group'] }
     end

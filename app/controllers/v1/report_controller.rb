@@ -6,8 +6,6 @@ class V1::ReportController < V1::ApiController # :nodoc:
   # The route GET /v1/report returns the results of the queried report
   # type and parameters.
   def index
-    authorize!(:read_reports, Study)
-
     report = Report.create(
       type: report_type,
       params: params[:params] || {},
@@ -16,7 +14,6 @@ class V1::ReportController < V1::ApiController # :nodoc:
 
     render json: report.result
   end
-
 
   protected
 
