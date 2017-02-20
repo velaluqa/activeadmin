@@ -100,17 +100,17 @@ RSpec.configure do |config|
     clear_data
   end
 
+  config.around(:each, transactional_spec: true) do |example|
+    DatabaseCleaner.strategy = :deletion
+    example.run
+    DatabaseCleaner.strategy = :transaction
+  end
+
   config.around(:each) do |example|
     clear_data
     DatabaseCleaner.cleaning do
       example.run
     end
-  end
-
-  config.around(:each, transactional_spec: true) do |example|
-    DatabaseCleaner.strategy = :deletion
-    example.run
-    DatabaseCleaner.strategy = :transaction
   end
 
   # Disable webmock in feature test.
