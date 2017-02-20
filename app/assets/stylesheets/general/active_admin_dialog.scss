@@ -1,0 +1,46 @@
+.ui-dialog {
+  @extend .modal-content;
+  z-index: $zindex-modal;
+
+  .ui-dialog-titlebar {
+    margin-right: 20px;
+  }
+
+  .ui-dialog-titlebar,
+  .ui-dialog-buttonset {
+    padding: $modal-inner-padding;
+  }
+
+  .ui-dialog-buttonset {
+    text-align: right;
+    button {
+      @extend .btn, .btn-default;
+    }
+
+    button + button {
+      margin-left: 4px;
+    }
+  }
+
+  .ui-dialog-titlebar-close {
+    position: absolute;
+    top: $modal-inner-padding - 3px;
+    right: $modal-inner-padding - 3px;
+    background: transparent;
+    border: 0;
+
+    &:hover {
+      background: rgba(0,0,0,0.05)
+    }
+
+    &:after {
+      font-family: FontAwesome;
+      content: $fa-var-close;
+    }
+  }
+}
+
+.ui-widget-overlay {
+  @extend .modal-backdrop;
+  @include opacity($modal-backdrop-opacity);
+}
