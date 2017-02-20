@@ -50,7 +50,7 @@ renderVisitTemplateSelect = (templates) ->
       placeholder: select_placeholder()
       allowClear: allow_clear
       disabled: false
-    renderVisitTemplatePreview(preselect or '')
+    renderVisitTemplatePreview(select_preselect() or '')
     $('#patient_visit_template').on 'change', (e) ->
       renderVisitTemplatePreview($(e.currentTarget).val())
 
