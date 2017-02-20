@@ -46,8 +46,8 @@ RSpec.describe User do
         expect(user.permission_matrix).to eq(
                                             'Study' => %i(read),
                                             'ImageSeries' => %i(upload),
-                                            'User' => %i(manage),
-                                            'PublicKey' => %i(manage)
+                                            'User' => %i(read update generate_keypair),
+                                            'PublicKey' => %i(read update)
                                           )
       end
     end
@@ -72,15 +72,11 @@ RSpec.describe User do
           'Center' => %i(manage),
           'Image' => %i(read),
           'Visit' => %i(assign_required_series),
-          'User' => %i(manage),
-          'PublicKey' => %i(manage)
+          'User' => %i(read update generate_keypair),
+          'PublicKey' => %i(read update)
         }
         expect(@user.permission_matrix).to eq(expected)
       end
-    end
-
-    describe 'user with scoped roles' do
-
     end
   end
 
