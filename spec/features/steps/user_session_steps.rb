@@ -37,13 +37,31 @@ step 'I sign in as a user' do
   expect(page).to have_content('Signed in successfully')
 end
 
-step 'I have a role scoped to :model :string' do |model, identifier|
-  scope_object =
-    case model
-    when 'Study' then Study.find_by(name: identifier)
-    when 'Center' then Center.find_by(name: identifier)
-    when 'Patient' then Patient.find_by(subject_id: identifier)
+step 'I sign in as a user with role scoped to :model_instance' do |record|
+  send('I sign in as a user')
+  send('I have a role scoped to :model_instance', record)
+end
+
+step 'I sign in as a user with role :role_instance' do |role|
+  send('I sign in as a user')
+  send('I belong to role :role_instance', role)
+end
+
+step 'a role :string with permissions:' do |title, permissions|
+  role = FactoryGirl.create(:role, title: title)
+  permissions.to_a.each do |subject, activities|
+    activities = activities.split(/, ?/)
+    activities.each do |activity|
+      role.add_permission(activity, subject)
     end
+  end
+end
+
+step 'I belong to role :role_instance' do |role|
+  UserRole.create(user: @current_user, role: role)
+end
+
+step 'I have a role scoped to :model_instance' do |scope_object|
   expect(scope_object).to be_present
 
   @current_user_role = FactoryGirl.create(:role)
@@ -55,11 +73,6 @@ step 'I have a role scoped to :model :string' do |model, identifier|
   user_role = @current_user.user_roles.where(role: @current_user_role).first
   expect(user_role).not_to be_nil
   expect(user_role.scope_object).to eq(scope_object)
-end
-
-step 'I sign in as a user with role scoped to :model :string' do |model, identifier|
-  send('I sign in as a user')
-  send('I have a role scoped to :model :string', model, identifier)
 end
 
 step 'I can :activity :subject' do |activity, subject|
@@ -78,21 +91,8 @@ step 'I browse to :string' do |path|
   visit(path)
 end
 
-step 'I browse to :model :string' do |model, identifier|
-  resource =
-    case model
-    when "Patient" then Patient.find_by(subject_id: identifier)
-    end
-  path = send("admin_#{model.downcase}_path", resource)
-  visit(path)
-end
-
-step 'I browse to :model :string :' do |model, identifier|
-  resource =
-    case model
-    when "Patient" then Patient.find_by(subject_id: identifier)
-    end
-  path = send("admin_#{model.downcase}_path", resource)
+step 'I browse to :model_instance' do |record|
+  path = send("admin_#{record.class.to_s.underscore}_path", record)
   visit(path)
 end
 

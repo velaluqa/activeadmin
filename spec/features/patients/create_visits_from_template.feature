@@ -5,10 +5,8 @@ Feature: Create Visits From Template
 
   Background:
     Given a study "StudyWithout"
-    And a center "CenterWithout" with:
-      | study | StudyWithout |
-    And a patient "PatientWithout" with:
-      | center | CenterWithout |
+    And a center "CenterWithout" for "StudyWithout"
+    And a patient "PatientWithout" for "CenterWithout"
     Given a study "StudyWith" with configuration
       """
       visit_types:
@@ -39,36 +37,30 @@ Feature: Create Visits From Template
               type: baseline
               description: Repeatable Visit Description
       """
-    And a center "CenterWith" with:
-      | study | StudyWith |
-    And a patient "PatientWith" with:
-      | center | CenterWith |
+    And a center "CenterWith" for "StudyWith"
+    And a patient "PatientWith" for "CenterWith"
+    Given a role "Image Manager" with permissions:
+      | Patient | read, update, create       |
+      | Visit   | read, create_from_template |
 
   Scenario: Not authenticated
     When I browse to "/admin/patients/new"
     Then I see "PLEASE SIGN IN"
 
   Scenario: Not authorized
-    Given a patient "FooPatient"
-    And I sign in as a user
-    And I cannot create patients
+    Given I sign in as a user
+    And I cannot create_from_template visits
     When I browse to "/admin/patients/1/create_visits_from_template"
     Then I see the unauthorized page
 
   Scenario: No Visit Templates available
-    And I sign in as a user
-    And I have following abilities:
-      | Patient | read, update, create       |
-      | Visit   | read, create_from_template |
+    Given I sign in as a user with role "Image Manager"
     When I browse to patient "PatientWithout"
     And I don't see "Visits From Template"
   
   @javascript
   Scenario: Create Available Visit Templates
-    And I sign in as a user
-    And I have following abilities:
-      | Patient | read, update, create       |
-      | Visit   | read, create_from_template |
+    Given I sign in as a user with role "Image Manager"
     When I browse to patient "PatientWith"
     And I click link "Visits From Template"
     When I select "Additional Preset" from "From Template"
@@ -80,10 +72,7 @@ Feature: Create Visits From Template
 
   @javascript
   Scenario: Create non-repeatable visit template repeatedly
-    And I sign in as a user
-    And I have following abilities:
-      | Patient | read, update, create       |
-      | Visit   | read, create_from_template |
+    Given I sign in as a user with role "Image Manager"
     When I browse to patient "PatientWith"
     And I click link "Visits From Template"
     When I select "Additional Preset" from "From Template"
@@ -96,12 +85,9 @@ Feature: Create Visits From Template
     When I click the "Create Visits" button
     Then I see "Visits with the same visit number for this patient already exist and selected visit template is not repeatable."
 
-  @javascript @focus
+  @javascript
   Scenario: Create repeatable visit template repeatedly
-    And I sign in as a user
-    And I have following abilities:
-      | Patient | read, update, create       |
-      | Visit   | read, create_from_template |
+    Given I sign in as a user with role "Image Manager"
     When I browse to patient "PatientWith"
     And I click link "Visits From Template"
     When I select "Repeatable Preset" from "From Template"
@@ -114,6 +100,6 @@ Feature: Create Visits From Template
     When I click the "Create Visits" button
     Then I see "Visits created successfully."
     When I browse to "/admin/visits"
-    Then I see "1.1"
-    And I see "Repeatable Visit Description"
+    Then I see "PatientWith 1 Repeatable Visit Description baseline"
+    And I see "PatientWith 1.1 Repeatable Visit Description baseline"
 
