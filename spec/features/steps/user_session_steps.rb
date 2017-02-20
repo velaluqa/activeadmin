@@ -62,7 +62,6 @@ step 'I can :activity :subject' do |activity, subject|
 end
 
 step 'I cannot :activity :subject' do |activity, subject|
-  binding.pry
   expect(@current_user.can?(activity, subject)).to be_falsy
 end
 
