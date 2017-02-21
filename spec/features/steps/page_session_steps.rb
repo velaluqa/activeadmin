@@ -58,8 +58,7 @@ step 'I browse to :string' do |path|
   visit(path)
 end
 
-step 'I browse to :model_instance' do |record|
-  path = send("admin_#{record.class.to_s.underscore}_path", record)
+step 'I browse to :admin_path' do |path|
   visit(path)
 end
 
