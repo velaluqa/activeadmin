@@ -160,4 +160,87 @@ RSpec.describe Patient do
         ]
     end
   end
+
+  describe '#create' do
+    describe 'for study with visit template' do
+      let!(:study) { create(:study) }
+      let!(:center) { create(:center, study: study) }
+      let!(:config_yaml) { <<YAML }
+image_series_properties: []
+visit_types:
+  baseline:
+    description: Some simple visit type
+    required_series:
+      series1:
+        tqc: []
+    mqc: []
+visit_templates:
+  template:
+    visits:
+      - number: 1
+        type: baseline
+        description: 'Some preset for a visit'
+YAML
+
+      before(:each) do
+        # TODO: #2644 - Refactor configuring Study
+        tempfile = Tempfile.new('test.yml')
+        tempfile.write(config_yaml)
+        tempfile.close
+        repo = GitConfigRepository.new
+        repo.update_config_file(study.relative_config_file_path, tempfile, nil, "New configuration file for study #{study.id}")
+        tempfile.unlink
+      end
+
+      it 'creates visits from template' do
+        patient = Patient.new(
+          center: center,
+          subject_id: '1234'
+        )
+        patient.visit_template = 'template'
+        patient.save!
+        expect(patient.visits.count).to eq 1
+      end
+    end
+
+    describe 'for study with enforced visit template' do
+      let!(:study) { create(:study) }
+      let!(:center) { create(:center, study: study) }
+      let!(:config_yaml) { <<YAML }
+image_series_properties: []
+visit_types:
+  baseline:
+    description: Some simple visit type
+    required_series:
+      series1:
+        tqc: []
+    mqc: []
+visit_templates:
+  template:
+    create_patient_enforce: yes
+    visits:
+      - number: 1
+        type: baseline
+        description: 'Some preset for a visit'
+YAML
+
+      before(:each) do
+        # TODO: #2644 - Refactor configuring Study
+        tempfile = Tempfile.new('test.yml')
+        tempfile.write(config_yaml)
+        tempfile.close
+        repo = GitConfigRepository.new
+        repo.update_config_file(study.relative_config_file_path, tempfile, nil, "New configuration file for study #{study.id}")
+        tempfile.unlink
+      end
+
+      it 'creates visits from template' do
+        patient = Patient.create!(
+          center: center,
+          subject_id: '1234'
+        )
+        expect(patient.visits.count).to eq 1
+      end
+    end
+  end
 end

@@ -20,6 +20,7 @@ require 'git_config_repository'
 # **`mqc_user_id`**                  | `integer`          |
 # **`mqc_version`**                  | `string`           |
 # **`patient_id`**                   | `integer`          |
+# **`repeatable_count`**             | `integer`          | `default(0), not null`
 # **`required_series`**              | `jsonb`            | `not null`
 # **`state`**                        | `integer`          | `default(0)`
 # **`updated_at`**                   | `datetime`         |
@@ -74,12 +75,17 @@ class Visit < ActiveRecord::Base
 
   scope :searchable, -> { joins(patient: :center).select(<<SELECT) }
 centers.study_id AS study_id,
-centers.code || patients.subject_id || '#' || visits.visit_number AS text,
+centers.code ||
+patients.subject_id ||
+'#' ||
+visits.visit_number ||
+CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END 
+AS text,
 visits.id AS result_id,
 'Visit' AS result_type
 SELECT
 
-  validates_uniqueness_of :visit_number, :scope => :patient_id
+  validates_uniqueness_of :visit_number, :scope => [:patient_id, :repeatable_count]
   validates_presence_of :visit_number, :patient_id
 
   before_destroy do
@@ -135,12 +141,23 @@ JOIN_QUERY
   }
 
   def name
-    if(patient.nil?)
-      '#'+visit_number.to_s
-    else
-      patient.name+'#'+visit_number.to_s
-    end
+    "#{patient.andand.name}##{visit_number}"
   end
+
+  def original_visit_number
+    read_attribute(:visit_number)
+  end
+
+  def visit_number
+    original_visit_number.to_s + (repeatable_count > 0 ? ".#{repeatable_count}" : '')
+  end
+
+  def visit_number=(visit_number)
+    number, count = visit_number.to_s.split('.')
+    self[:visit_number] = number
+    self[:repeatable_count] = count || 0
+  end
+
   def visit_date
     self.image_series.map {|is| is.imaging_date}.reject {|date| date.nil? }.min
   end

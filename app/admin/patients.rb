@@ -131,6 +131,25 @@ ActiveAdmin.register Patient do
       f.input :subject_id, :hint => (f.object.persisted? ? 'Do not change this unless you are absolutely sure you know what you do. This can lead to problems in project management, because the Subject ID is used to identify patients across documents.' : '')
     end
 
+    if f.object.new_record?
+      templates =
+        if session[:selected_study_id].present?
+          Study.find(session[:selected_study_id]).visit_templates
+        else
+          f.object.study.andand.visit_templates
+        end
+      render(
+        partial: 'visit_templates',
+        locals: {
+          selected_study: session[:selected_study_id],
+          preselect: f.object.visit_template,
+          templates: templates,
+          allow_clear: true,
+          create_patient: true
+        }
+      )
+    end
+
     f.actions
   end
 
@@ -234,6 +253,50 @@ ActiveAdmin.register Patient do
   end
   action_item :reorder_visits, :only => :show do
     link_to('Reorder Visits', reorder_visits_form_admin_patient_path(resource)) unless(resource.visits.empty? or cannot? :manage, resource)
+  end
+
+  collection_action :visit_templates, method: :get do
+    @center = Center.find(params[:center_id])
+    templates = @center.study.visit_templates
+    enforced = (templates || {}).select { |name, tpl| tpl['create_patient_enforce'] }
+    if enforced.empty?
+      allowed = @center.hierarchy_grants?(
+        user: current_user,
+        activity: %i(create create_from_template),
+        subject: Visit
+      )
+      render json: allowed ? templates : {}
+    else
+      render json: enforced.to_hash
+    end
+  end
+
+  member_action :perform_create_visits_from_template, method: :post do
+    @page_title = 'Create Visits'
+    # TODO: Refactor using trailblazer, command objects or similar.
+    authorize!(:create_from_template, Visit)
+    @patient = Patient.find(params[:id])
+    @template = params[:patient].andand[:visit_template]
+    if @template.blank?
+      flash[:error] = 'Please provide a visit template.'
+    elsif !@patient.visit_template_applicable?(@template)
+      flash[:error] = 'Visits with the same visit number for this patient already exist and selected visit template is not repeatable.'
+    else
+      @patient.create_visits_from_template!(@template)
+      flash[:notice] = 'Visits created successfully.'
+      return redirect_to(admin_patient_path(@patient))
+    end
+    @templates = @patient.study.andand.visit_templates
+    render(:create_visits_from_template)
+  end
+  member_action :create_visits_from_template, method: :get do
+    @page_title = 'Create Visits'
+    authorize!(:create_from_template, Visit)
+    @patient = Patient.find(params[:id])
+    @templates = @patient.study.andand.visit_templates
+  end
+  action_item :create_visits_from_template, only: :show, if: -> { !resource.study.visit_templates.blank? } do
+    link_to('Visits From Template', create_visits_from_template_admin_patient_path(resource))
   end
 
   viewer_cartable(:patient)

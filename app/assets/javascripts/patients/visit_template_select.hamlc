@@ -1,0 +1,12 @@
+- if _.isEmpty(@options)
+  - if not @selected_study? and @selected_center is ''
+    %p Select a center to load available visit preset information.
+  - else
+    %p No presets for selected center or study available.
+    %p Creating patient without any predefined visits.
+- else
+  %label.label{ for: 'patient_visit_template' } From Template
+  %select#patient_visit_template{ name: 'patient[visit_template]' }
+    %option
+    - for option in @options
+      %option{ value: option.id, selected: option.id is @preselect }= option.text

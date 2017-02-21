@@ -37,6 +37,33 @@ ERROR
     end
 
     ##
+    # Returns `true` if the hierarchy for `self` allows given abilities.
+    #
+    # @param [Hash] options The options to extract activities from
+    # @option options [User] :user The user object to filter by
+    # @option options [String] :activity The activity
+    # @option options [String] :activities The activities
+    # @option options [Boolean] :include_manage (true) Whether to include the
+    #   :manage activity.
+    #
+    # @return [Boolean] Whether the activity is granted
+    #
+    def hierarchy_grants?(options)
+      activities = self.class.extract_permissible_activities(options)
+      user = options[:user] || raise("Missing 'user' option")
+      subject = options[:subject].andand.to_s || to_s
+
+      return true if user.is_root_user?
+
+      self.class.with_permissions
+        .select(:id)
+        .where(permissions: { activity: activities, subject: subject })
+        .where(self.class.table_name => { id: id })
+        .where('user_roles.user_id = ?', user.id)
+        .exists?
+    end
+
+    ##
     # ~cancancan~ provides model additions like the ~accessible_by~
     # scope. The scoped records are those, which the current user's
     # roles grant certain access to. But ~cancancan~ tries to merge

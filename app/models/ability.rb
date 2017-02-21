@@ -18,7 +18,7 @@ class Ability
     UserRole => %i(manage read update create destroy),
     PublicKey => %i(manage read update create destroy),
     Role => %i(manage read update create destroy),
-    Visit => %i(manage read update create destroy assign_required_series technical_qc medical_qc),
+    Visit => %i(manage read update create destroy create_from_template assign_required_series technical_qc medical_qc),
     Version => %i(manage read update create destroy)
   }.freeze
 

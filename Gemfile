@@ -247,6 +247,7 @@ group :development, :test do
   gem 'yarjuf', '~> 2.0.0'
   gem 'webmock'
   gem 'capybara'
+  gem 'transactional_capybara'
   gem 'poltergeist'
   gem 'database_cleaner'
 

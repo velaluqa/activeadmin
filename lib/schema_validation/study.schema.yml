@@ -97,3 +97,47 @@ mapping:
                     type: str
                     required: yes
                     
+  "visit_templates":
+    type: map
+    required: false
+    mapping:
+      =:
+        type: map
+        name: visit_template
+        mapping:
+          "label":
+            type: str
+            required: false
+          "repeatable":
+            type: bool
+            required: false
+          "create_patient_default":
+            type: bool
+            required: false
+          "create_patient_enforce":
+            type: bool
+            required: false
+          "hide_on_create_patient":
+            type: bool
+            required: false
+          "only_on_create_patient":
+            type: bool
+            required: false
+          "visits":
+            type: seq
+            sequence:
+              - type: map
+                name: visit
+                mapping:
+                  "number":
+                    type: number
+                    required: true
+                    unique: true
+                  "type":
+                    type: str
+                    required: true
+                  "description":
+                    type: str
+                    required: false
+
+

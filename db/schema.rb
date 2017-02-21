@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170116120438) do
+ActiveRecord::Schema.define(version: 20170217114017) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -386,6 +386,7 @@ ActiveRecord::Schema.define(version: 20170116120438) do
     t.jsonb    "mqc_results",                 default: {}, null: false
     t.string   "mqc_comment"
     t.string   "mqc_version"
+    t.integer  "repeatable_count",            default: 0,  null: false
   end
 
   add_index "visits", ["assigned_image_series_index"], name: "index_visits_on_assigned_image_series_index", using: :gin

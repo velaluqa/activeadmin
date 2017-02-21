@@ -1,5 +1,5 @@
 step 'I select :string from :string' do |value, field|
-  select(value, from: field)
+  find(:select, field).find(:option, text: /#{value}/).select_option
 end
 
 step 'I fill in :string for :string' do |value, field|

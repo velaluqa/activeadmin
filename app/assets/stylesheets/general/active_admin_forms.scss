@@ -75,7 +75,6 @@ form {
 
   .inputs, .actions {
     ol {
-      padding-left: 0;
       list-style: none;
     }
   }
@@ -116,6 +115,7 @@ form {
 	@extend .col-sm-2;
 	line-height: $input-height-base;
 	margin-bottom: 0;
+	padding-left: 0;
       }
       input[type="text"],
       input[type="password"],

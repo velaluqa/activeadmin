@@ -120,4 +120,37 @@ RSpec.describe Study do
         .to eq [@study1, @study3]
     end
   end
+
+  describe '#visit_templates' do
+    let(:study) { create(:study) }
+    let(:config_yaml) { <<YAML }
+image_series_properties: []
+visit_types:
+  baseline:
+    description: Some simple visit type
+    required_series:
+      series1:
+        tqc: []
+    mqc: []
+visit_templates:
+  template:
+    visits:
+      - number: 1
+        type: baseline
+YAML
+
+    before(:each) do
+      tempfile = Tempfile.new('test.yml')
+      tempfile.write(config_yaml)
+      tempfile.close
+      repo = GitConfigRepository.new
+      repo.update_config_file(study.relative_config_file_path, tempfile, nil, "New configuration file for study #{study.id}")
+      tempfile.unlink
+    end
+
+    it 'returns visit templates of the configuration' do
+      expect(study.visit_templates).
+        to eq({'template' => {'visits' => [{ 'number' => 1, 'type' => 'baseline' }]}})
+    end
+  end
 end

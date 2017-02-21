@@ -29,7 +29,7 @@ class Patient < ActiveRecord::Base
   acts_as_taggable
 
   attr_accessible :center, :subject_id, :domino_unid
-  attr_accessible :center_id, :data, :export_history
+  attr_accessible :center_id, :data, :export_history, :visit_template
 
   belongs_to :center
   has_many :visits, :dependent => :destroy
@@ -54,6 +54,8 @@ patients.id AS result_id,
 SELECT
 
   scope :join_study, -> { joins(center: :study) }
+
+  before_create :add_visits_from_template
 
   include ImageStorageCallbacks
 
@@ -117,6 +119,20 @@ JOIN
     }
   end
 
+  # Used as getter by ActiveAdmin form.
+  #
+  # @return [String] visit template to set upon save
+  def visit_template
+    @visit_template
+  end
+
+  # Used as setter by ActiveAdmin form.
+  #
+  # @param [String] visit template to create visits from upon save
+  def visit_template=(template)
+    @visit_template = template
+  end
+
   def domino_patient_no
     "#{center.code}#{subject_id}"
   end
@@ -155,6 +171,32 @@ JOIN
     name
   end
 
+  def visit_template_applicable?(template)
+    template = study.visit_templates[template] or return false
+    return true if template['repeatable']
+    existing_visits_numbers = visits.map(&:original_visit_number)
+    new_visit_numbers = template['visits'].map { |visit| visit['number'] }
+    existing_visits_numbers & new_visit_numbers == []
+  end
+
+  def create_visits_from_template!(template)
+    template = study.visit_templates[template] or return false
+    Visit.transaction do
+      template['visits'].each do |visit|
+        max = visits
+                .where(visit_number: visit['number'])
+                .maximum(:repeatable_count) || -1
+        postfix = (max > -1 ? ".#{max + 1}" : '')
+        visits << Visit.create!(
+          visit_number: "#{visit['number']}#{postfix}",
+          visit_type: visit['type'],
+          description: visit['description'],
+          patient: self
+        )
+      end
+    end
+  end
+
   protected
 
   def ensure_study_is_unchanged
@@ -168,6 +210,25 @@ JOIN
     end
 
     return true
+  end
+
+  # When a visit template is set at create, all visits from the
+  # template are created.
+  def add_visits_from_template
+    template = visit_template_hash or return
+    self.visits = template['visits'].map do |visit|
+      Visit.new(
+        visit_type: visit['type'],
+        visit_number: visit['number'],
+        description: visit['description']
+      )
+    end
+  end
+
+  def visit_template_hash
+    enforced_template = study.visit_templates.find { |name, tpl| tpl['create_patient_enforce'] }
+    return enforced_template.second if enforced_template
+    study.visit_templates[visit_template]
   end
 
   def self.classify_audit_trail_event(c)

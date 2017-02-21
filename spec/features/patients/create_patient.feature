@@ -3,6 +3,14 @@ Feature: Create Patient
   As authorized user,
   I want to create patients with specific subject_id.
 
+  Background:
+    Given a study "FooStudy"
+    And a center "FooCenter" for "FooStudy"
+    And a role "Image Manager" with permissions:
+      | Study   | read                 |
+      | Center  | read, update         |
+      | Patient | read, update, create |
+
   Scenario: Not logged in
     When I browse to "/admin/patients/new"
     Then I see "PLEASE SIGN IN"
@@ -14,14 +22,7 @@ Feature: Create Patient
     Then I see the unauthorized page
 
   Scenario: Image Import Role System-Wide
-    Given a study "FooStudy"
-    And a center "FooCenter" with:
-      | study | FooStudy |
-    And I sign in as a user
-    And I have following abilities:
-      | Study   | read                 |
-      | Center  | read, update         |
-      | Patient | read, update, create |
+    Given I sign in as a user with role "Image Manager"
     When I browse to "/admin/patients/new"
     Then I see "New Patient"
     When I select "FooCenter" from "Center"
@@ -31,14 +32,7 @@ Feature: Create Patient
     And I see "Patient was successfully created"
 
   Scenario: Image Import Role Scoped to Study
-    Given a study "FooStudy"
-    And a center "FooCenter" with:
-      | study | FooStudy |
-    Given I sign in as a user with role scoped to Study "FooStudy"
-    And I have following abilities:
-      | Study   | read                 |
-      | Center  | read, update         |
-      | Patient | read, update, create |
+    Given I sign in as a user with role "Image Manager" scoped to study "FooStudy"
     When I browse to "/admin/patients/new"
     Then I see "New Patient"
     When I select "FooCenter" from "Center"
@@ -48,14 +42,7 @@ Feature: Create Patient
     And I see "Patient was successfully created"
 
   Scenario: Image Import Role Scoped to Center
-    Given a study "FooStudy"
-    And a center "FooCenter" with:
-      | study | FooStudy |
-    Given I sign in as a user with role scoped to Center "FooCenter"
-    And I have following abilities:
-      | Study   | read                 |
-      | Center  | read, update         |
-      | Patient | read, update, create |
+    Given I sign in as a user with role "Image Manager" scoped to center "FooCenter"
     When I browse to "/admin/patients/new"
     Then I see "New Patient"
     When I select "FooCenter" from "Center"
@@ -63,17 +50,5 @@ Feature: Create Patient
     And I click the "Create Patient" button
     Then I am redirected to patient "FooPatient"
     And I see "Patient was successfully created"
-
-  # Scenario: Image Import Role Scoped to Patient
-  #   Given a patient "FooPatient":
-  #   And a patient "BarPatient":
-  #   And I sign in as a user with role scoped to Patient "FooPatient"
-  #   And I have following abilities:
-  #     | Study   | read                 |
-  #     | Center  | read, update         |
-  #     | Patient | read, update, create |
-  #   When I browse to "/admin/patients"
-  #   Then I see "FooPatient"
-  #   And I don't see "BarPatient"
 
 

@@ -74,6 +74,9 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
       when 'create'
         window.open("/admin/visits/new?patient_id=#{patientId}", 'Create Visit')
         @$('select.visit').val('').trigger('change')
+      when 'create_from_template'
+        window.open("/admin/patients/#{patientId}/create_visits_from_template", 'Create Visits From Template')
+        @$('select.visit').val('').trigger('change')
       when ''
         @model.set assignVisitId: null
       else
@@ -106,7 +109,8 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
         processResults: (data, params) =>
           @visits = {}
           results = []
-          results.push(id: 'create', text: 'Create New Visit') if currentUser.can('create', 'Visit')
+          results.push(id: 'create', text: 'Create Visit') if currentUser.can('create', 'Visit')
+          results.push(id: 'create_from_template', text: 'Create From Template') if currentUser.can('create_from_template', 'Visit')
           results = results.concat _.map data, (visit) =>
             @visits[visit.id] = visit
             {
