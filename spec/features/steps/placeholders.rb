@@ -1,3 +1,26 @@
+placeholder :activity do
+  activities = Ability::ACTIVITIES.values.flatten.uniq
+  match(/([^ $\n]+)/) do |activity|
+    sym = activity.to_sym
+    unless activities.include?(sym)
+      fail "Activity `#{sym}` not defined in `Ability`"
+    end
+    sym
+  end
+end
+
+placeholder :subject do
+  match(/([^ $\n]+)/) do |subject|
+    subject.classify.constantize
+  end
+end
+
+placeholder :model do
+  match(/([^ $\n]+)/) do |model_name|
+    model_name.classify
+  end
+end
+
 placeholder :model_instance do
   match(/([^ $]+) "([^$\n]+)"/) do |model_name, identifier|
     model_name = model_name.classify

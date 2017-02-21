@@ -8,6 +8,7 @@ end
 require 'turnip'
 require 'turnip/capybara'
 Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
+load 'spec/features/steps/placeholders.rb', true
 require 'capybara/rails'
 
 # Poltergeist is a headless webkit implementation and can be plugged

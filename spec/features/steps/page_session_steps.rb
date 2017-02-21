@@ -1,26 +1,3 @@
-placeholder :activity do
-  activities = Ability::ACTIVITIES.values.flatten.uniq
-  match(/([^ $\n]+)/) do |activity|
-    sym = activity.to_sym
-    unless activities.include?(sym)
-      fail "Activity `#{sym}` not defined in `Ability`"
-    end
-    sym
-  end
-end
-
-placeholder :subject do
-  match(/([^ $\n]+)/) do |subject|
-    subject.classify.constantize
-  end
-end
-
-placeholder :model do
-  match(/([^ $\n]+)/) do |model_name|
-    model_name.classify
-  end
-end
-
 step 'I sign in as a user' do
   @current_user_role = FactoryGirl.create(:role)
   @current_user = FactoryGirl.create(:user,
@@ -52,40 +29,17 @@ step 'I sign in as a user with role :role_instance scoped to :model_instance' do
   send('I belong to role :role_instance scoped to :model_instance', role, scope_object)
 end
 
-step 'a role :string with permissions:' do |title, permissions|
-  role = FactoryGirl.create(:role, title: title)
-  permissions.to_a.each do |subject, activities|
-    activities = activities.split(/, ?/)
-    activities.each do |activity|
-      role.add_permission(activity, subject)
-    end
-  end
-end
-
 step 'I belong to role :role_instance' do |role|
-  UserRole.create(user: @current_user, role: role)
+  send('user :user_instance belongs to role :role_instance', @current_user, role)
 end
 
 step 'I belong to role :role_instance scoped to :model_instance' do |role, scope_object|
-  expect(scope_object).to be_present
-  UserRole.create(user: @current_user, role: role, scope_object: scope_object)
-  user_role = @current_user.user_roles.where(role: role).first
-  expect(user_role).not_to be_nil
-  expect(user_role.scope_object).to eq(scope_object)
+  send('user :user_instance belongs to role :role_instance scoped to :model_instance', @current_user, role, scope_object)
 end
 
 step 'I have a role scoped to :model_instance' do |scope_object|
-  expect(scope_object).to be_present
-
   @current_user_role = FactoryGirl.create(:role)
-  UserRole.create(
-    user: @current_user,
-    role: @current_user_role,
-    scope_object: scope_object
-  )
-  user_role = @current_user.user_roles.where(role: @current_user_role).first
-  expect(user_role).not_to be_nil
-  expect(user_role.scope_object).to eq(scope_object)
+  send('user :user_instance belongs to role :role_instance scoped to :model_instance', @current_user, @current_user_role, scope_object)
 end
 
 step 'I can :activity :subject' do |activity, subject|
