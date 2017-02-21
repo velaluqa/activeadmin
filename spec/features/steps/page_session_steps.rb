@@ -93,6 +93,12 @@ step 'I click link :string' do |locator|
   click_link(locator)
 end
 
+step 'I click link :string in :string' do |locator, selector|
+  within(selector) do
+    click_link(locator)
+  end
+end
+
 step 'I pry' do
   binding.pry
 end
