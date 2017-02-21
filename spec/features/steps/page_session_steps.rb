@@ -1,6 +1,7 @@
 step 'I sign in as a user' do
   @current_user_role = FactoryGirl.create(:role)
   @current_user = FactoryGirl.create(:user,
+                                     name: 'Test User',
                                      username: 'testuser',
                                      password: 'password',
                                      password_changed_at: Time.now,
