@@ -117,7 +117,6 @@ class NotificationProfile < ActiveRecord::Base
   belongs_to :email_template
 
   validates :title, presence: true
-  validates :is_enabled, inclusion: { in: [true, false] }
   validates :triggering_actions, presence: true
   validates :triggering_resource, presence: true
   validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class

@@ -355,11 +355,6 @@ RSpec.describe NotificationProfile do
       expect(build(:notification_profile, title: '')).not_to be_valid
     end
 
-    it 'validates is_enabled' do
-      expect(build(:notification_profile, is_enabled: nil)).not_to be_valid
-      expect(build(:notification_profile, is_enabled: '')).not_to be_valid
-    end
-
     it 'validates triggering_action' do
       expect(build(:notification_profile, triggering_actions: nil)).not_to be_valid
       expect(build(:notification_profile, triggering_actions: %w(some))).not_to be_valid
