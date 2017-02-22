@@ -202,7 +202,7 @@ JOIN
   #   performed on.
   # @return [Array<Notification>] array of created `Notification`
   #   records.
-  def trigger(action, record)
+  def trigger(action, record, triggering_user)
     version = record.try(:versions).andand.last
     recipients.map do |user|
       next if user == ::PaperTrail.whodunnit

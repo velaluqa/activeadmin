@@ -687,7 +687,7 @@ RSpec.describe NotificationProfile do
     it 'creates notification for system actions' do
       allow(::PaperTrail).to receive(:whodunnit) { nil }
       expect do
-        @profile1.trigger(:create, @record)
+        @profile1.trigger(:create, @record, nil)
       end.to change(Notification, :count).by(2)
       expect(Notification.where(user: @user1)).to exist
       expect(Notification.where(user: @user2)).to exist
@@ -698,7 +698,7 @@ RSpec.describe NotificationProfile do
     it 'creates notification for others actions' do
       allow(::PaperTrail).to receive(:whodunnit) { @user2 }
       expect do
-        @profile1.trigger(:create, @record)
+        @profile1.trigger(:create, @record, @user2)
       end.to change(Notification, :count).by(1)
       expect(Notification.where(user: @user1, triggering_action: 'create')).to exist
     end
@@ -706,7 +706,7 @@ RSpec.describe NotificationProfile do
     it 'does not create a notification for my own action' do
       allow(::PaperTrail).to receive(:whodunnit) { @user2 }
       expect do
-        @profile1.trigger(:create, @record)
+        @profile1.trigger(:create, @record, @user2)
       end.to change(Notification, :count).by(1)
       expect(Notification.where(user: @user2)).not_to exist
     end
@@ -716,7 +716,7 @@ RSpec.describe NotificationProfile do
         ability.current_user == @user1
       }
       expect do
-        @profile2.trigger(:create, @record)
+        @profile2.trigger(:create, @record, nil)
       end.to change(Notification, :count).by(1)
       expect(Notification.where(user: @user1)).to exist
       expect(Notification.where(user: @user2)).not_to exist
@@ -732,7 +732,7 @@ RSpec.describe NotificationProfile do
 
       it 'creates a notification with a version after create' do
         expect do
-          @profile.trigger(:create, @record)
+          @profile.trigger(:create, @record, nil)
         end.to change(Notification, :count).by(1)
         notification = Notification.last
         expect(notification.version).to eq @record.versions.last
@@ -742,7 +742,7 @@ RSpec.describe NotificationProfile do
         @record.foo = 'bar'
         @record.save!
         expect do
-          @profile.trigger(:update, @record)
+          @profile.trigger(:update, @record, nil)
         end.to change(Notification, :count).by(1)
         notification = Notification.last
         expect(notification.version).to eq @record.versions.last

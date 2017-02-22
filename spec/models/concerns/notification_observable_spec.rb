@@ -28,15 +28,19 @@ RSpec.describe NotificationObservable, transactional_spec: true do
       it 'executes triggers on triggerable notification profiles' do
         model = NotificationObservableModel.create(title: 'foo')
         expect(TriggerNotificationProfiles)
-          .to have_enqueued_sidekiq_job(:create, model.class.to_s, model.id,
-                                        YAML.dump(
-                                          {
-                                            'title' => [nil, 'foo'],
-                                            'created_at' => [nil, model.created_at],
-                                            'updated_at' => [nil, model.created_at],
-                                            'id' => [nil, 1]
-                                          }.with_indifferent_access
-                                        ))
+          .to have_enqueued_sidekiq_job(
+                :create,
+                model.class.to_s,
+                model.id,
+                YAML.dump(
+                  {
+                    'title' => [nil, 'foo'],
+                    'created_at' => [nil, model.created_at],
+                    'updated_at' => [nil, model.created_at],
+                    'id' => [nil, 1]
+                  }.with_indifferent_access
+                ),
+                nil)
       end
     end
 
@@ -46,14 +50,18 @@ RSpec.describe NotificationObservable, transactional_spec: true do
         model.title = 'bar'
         model.save
         expect(TriggerNotificationProfiles)
-          .to have_enqueued_sidekiq_job('update', model.class.to_s,
-                                        model.id,
-                                        YAML.dump(
-                                          {
-                                            'title' => ['foo', 'bar'],
-                                            'updated_at' => [model.created_at, model.updated_at]
-                                          }.with_indifferent_access
-                                       ))
+          .to have_enqueued_sidekiq_job(
+                'update',
+                model.class.to_s,
+                model.id,
+                YAML.dump(
+                  {
+                    'title' => ['foo', 'bar'],
+                    'updated_at' => [model.created_at, model.updated_at]
+                  }.with_indifferent_access
+                ),
+                nil
+              )
       end
     end
 
@@ -62,7 +70,7 @@ RSpec.describe NotificationObservable, transactional_spec: true do
         model = NotificationObservableModel.create(title: 'foo')
         model.destroy
         expect(TriggerNotificationProfiles)
-          .to have_enqueued_sidekiq_job('destroy', model.class.to_s, model.id, YAML.dump({}.with_indifferent_access))
+          .to have_enqueued_sidekiq_job('destroy', model.class.to_s, model.id, YAML.dump({}.with_indifferent_access), nil)
       end
     end
   end

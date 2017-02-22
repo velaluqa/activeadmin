@@ -3,13 +3,13 @@ class TriggerNotificationProfiles
 
   sidekiq_options(queue: :notifications, retry: 5)
 
-  def perform(action, record_klass, record_id, changes)
+  def perform(action, record_klass, record_id, changes, user)
     changes = YAML.load(changes)
     record = record_klass.constantize.find(record_id)
     triggered_profiles =
       NotificationProfile.triggered_by(action, record, changes)
     triggered_profiles.each do |profile|
-      profile.trigger(action.to_sym, record)
+      profile.trigger(action.to_sym, record, user)
     end
   end
 end
