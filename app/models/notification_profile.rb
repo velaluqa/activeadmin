@@ -121,6 +121,7 @@ class NotificationProfile < ActiveRecord::Base
   validates :triggering_resource, presence: true
   validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class
   validates :maximum_email_throttling_delay, inclusion: { in: Email.allowed_throttling_delays.values }, if: :maximum_email_throttling_delay
+  validates :filter_triggering_user, inclusion: { in: %w(exclude include only) }
   validate :validate_triggering_actions
   validate :validate_email_template_type
 
