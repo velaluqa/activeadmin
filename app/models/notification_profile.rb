@@ -204,8 +204,7 @@ JOIN
   #   records.
   def trigger(action, record, triggering_user)
     version = record.try(:versions).andand.last
-    recipients.map do |user|
-      next if user == ::PaperTrail.whodunnit
+    recipient_candidates(triggering_user).map do |user|
       next if only_authorized_recipients && !user.can?(:read, record)
       Notification.create(
         notification_profile: self,
@@ -215,6 +214,18 @@ JOIN
         version: version
       )
     end.compact
+  end
+
+  # TODO: Extract triggering profiles into separate Operation object.
+  #
+  # Gives a filtered recipients relation for given triggering_user.
+  def recipient_candidates(triggering_user)
+    return recipients if triggering_user.blank?
+    case filter_triggering_user
+    when 'only' then recipients.where(id: triggering_user.id)
+    when 'exclude' then recipients.where.not(id: triggering_user.id)
+    when 'include' then recipients
+    end
   end
 
   # Helper method used by ActiveAdmin to set the filters from JSON
