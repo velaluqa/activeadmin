@@ -88,7 +88,8 @@ require 'serializers/string_array_serializer'
 # ------------------------------------- | ------------------ | ---------------------------
 # **`created_at`**                      | `datetime`         | `not null`
 # **`description`**                     | `text`             |
-# **`email_template_id`**               | `integer`          |
+# **`email_template_id`**               | `integer`          | `not null`
+# **`filter_triggering_user`**          | `string`           | `default("exclude"), not null`
 # **`filters`**                         | `jsonb`            | `not null`
 # **`id`**                              | `integer`          | `not null, primary key`
 # **`is_enabled`**                      | `boolean`          | `default(FALSE), not null`
