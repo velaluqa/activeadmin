@@ -130,8 +130,11 @@ class NotificationProfile < ActiveRecord::Base
 
   # Returns all distinct recipients from `users` and `roles` associations.
   #
+  # If no `users` or `roles` are available, all available users are presumed recipients.
+  #
   # @return [ActiveRecord::Relation<User>] the relation specifying all users
   def recipients
+    return User.all if all_users?
     relation = User.joins(<<JOIN)
 LEFT JOIN "notification_profile_users" AS "np_u" ON "np_u"."user_id" = "users"."id"
 LEFT JOIN "user_roles" AS "u_r" ON "u_r"."user_id" = "users"."id"
@@ -291,6 +294,10 @@ JOIN
     users.each { |user| coll << ["User: #{user.name}", "User_#{user.id}"] }
     roles.each { |role| coll << ["Role: #{role.title}", "Role_#{role.id}"] }
     coll
+  end
+
+  def all_users?
+    users.empty? && roles.empty?
   end
 
   protected
