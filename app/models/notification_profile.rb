@@ -207,14 +207,13 @@ JOIN
   #   performed on.
   # @return [Array<Notification>] array of created `Notification`
   #   records.
-  def trigger(action, record, triggering_user)
-    version = record.try(:versions).andand.last
-    recipient_candidates(triggering_user).map do |user|
-      next if only_authorized_recipients && !user.can?(:read, record)
+  def trigger(version)
+    recipient_candidates(version.triggering_user).map do |user|
+      next if only_authorized_recipients && !user.can?(:read, version.item || version.reify)
       Notification.create(
         notification_profile: self,
-        triggering_action: action,
-        resource: record,
+        triggering_action: version.event,
+        resource: version.item,
         user: user,
         version: version
       )
