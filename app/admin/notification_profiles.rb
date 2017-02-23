@@ -19,8 +19,7 @@ ActiveAdmin.register NotificationProfile do
     :maximum_email_throttling_delay,
     :email_template_id,
     triggering_actions: [],
-    user_ids: [],
-    role_ids: []
+    recipient_refs: []
   )
 
   controller do
@@ -102,10 +101,23 @@ ActiveAdmin.register NotificationProfile do
     end
 
     f.inputs 'Recipients' do
-      f.input :users, type: :select, multiple: true, collection: User.order(:name), input_html: { class: 'initialize-select2', 'data-placeholder': 'Choose user or users' }
-      f.input :roles, type: :select, multiple: true, collection: Role.order(:title), input_html: { class: 'initialize-select2', 'data-placeholder': 'Choose role or roles' }
-      f.input :only_authorized_recipients
+      f.input(
+        :recipient_refs,
+        label: 'Recipients',
+        type: :select,
+        multiple: true,
+        collection: f.object.preload_recipient_refs,
+        input_html: {
+          class: 'select2-record-search',
+          'data-models' => 'User,Role',
+          'data-placeholder' => 'All Users',
+          'data-clear-value' => 'all',
+          'data-allow-clear' => true
+        }
+      )
+
       f.input :filter_triggering_user, as: :select, collection: ['exclude', 'include', 'only'], input_html: { class: 'initialize-select2', 'data-placeholder' => 'Choose filter for triggering user' }
+      f.input :only_authorized_recipients
       f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2', 'data-placeholder': 'Select maximum email throttling delay' }
       f.input :email_template_id, as: :select, collection: EmailTemplate.where(email_type: 'NotificationProfile'), input_html: { class: 'initialize-select2', 'data-placeholder': 'Select template' }
     end
