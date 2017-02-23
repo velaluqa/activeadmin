@@ -22,6 +22,10 @@ placeholder :model do
 end
 
 placeholder :admin_path do
+  match(/the dashboard/) do
+    "/admin/dashboard"
+  end
+
   match(/([^ $\n]+) ([^ $]+) "([^$\n]+)"/) do |action, model_name, identifier|
     method = "admin_#{model_name.underscore}_path"
     method = "#{action}_#{method}" if action != 'show'

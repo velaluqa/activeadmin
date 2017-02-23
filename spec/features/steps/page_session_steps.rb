@@ -51,10 +51,6 @@ step 'I cannot :activity :subject' do |activity, subject|
   expect(@current_user.can?(activity, subject)).to be_falsy
 end
 
-step 'I browse to the dashboard' do
-  visit('/admin/dashboard')
-end
-
 step 'I browse to :string' do |path|
   visit(path)
 end
