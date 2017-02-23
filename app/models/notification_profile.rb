@@ -179,14 +179,14 @@ JOIN
   # @param [Hash] changes format of `{ attribute: [old, new] }`
   #
   # @return [Array] an array of matched `NotificationProfile` instances
-  def self.triggered_by(action, record, changes = {})
+  def self.triggered_by(action, resource_type, resource, changes = {})
     relation = enabled.where(
       'triggering_actions ? :action AND triggering_resource = :resource',
       action: action,
-      resource: record.class.to_s
+      resource: resource_type
     )
     relation.to_a.keep_if do |profile|
-      profile.filter.match?(record, changes)
+      profile.filter.match?(resource, changes)
     end
   end
 
