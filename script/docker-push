@@ -1,0 +1,15 @@
+#!/bin/bash
+
+BRANCH=$(git symbolic-ref --short -q HEAD)
+URL="registry.velalu.qa:443/pharmtrace/ericastore:$BRANCH"
+
+echo "Building & Pushing to $URL ..."
+
+read -r -p "Are you sure? [y/N] " RESPONSE
+if [[ "$RESPONSE" =~ ^([yY][eE][sS]|[yY])+$ ]]
+then
+  docker build -t $URL .
+  docker push $URL
+# else
+#     do_something_else
+fi
