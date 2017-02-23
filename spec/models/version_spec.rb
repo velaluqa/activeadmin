@@ -74,4 +74,38 @@ RSpec.describe Version do
       end
     end
   end
+
+  describe 'callback' do
+    with_model :ObservableModel do
+      table do |t|
+        t.string :title
+        t.timestamps null: false
+      end
+      model do
+        has_paper_trail class_name: 'Version'
+      end
+    end
+
+    describe 'on create' do
+      it 'triggers notification profiles' do
+        model = ObservableModel.create(title: 'foo')
+        expect(TriggerNotificationProfiles).to have_enqueued_sidekiq_job(model.versions.last.id)
+      end
+    end
+    describe 'on update' do
+      it 'triggers notification profiles' do
+        model = ObservableModel.create(title: 'foo')
+        model.title = 'bar'
+        model.save!
+        expect(TriggerNotificationProfiles).to have_enqueued_sidekiq_job(model.versions.last.id)
+      end
+    end
+    describe 'on destroy' do
+      it 'triggers notification profiles' do
+        model = ObservableModel.create(title: 'foo')
+        model.destroy
+        expect(TriggerNotificationProfiles).to have_enqueued_sidekiq_job(Version.last.id)
+      end
+    end
+  end
 end

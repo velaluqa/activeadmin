@@ -24,8 +24,16 @@
 class Version < PaperTrail::Version
   has_many :notifications
 
+  after_create :trigger_notification_profiles
+
   def triggering_user
     User.find(whodunnit) if whodunnit.present?
+  end
+
+  private
+
+  def trigger_notification_profiles
+    TriggerNotificationProfiles.perform_async(id)
   end
 
   class << self
