@@ -43,7 +43,6 @@ require 'git_config_repository'
 #     * **`visit_number`**
 #
 class Visit < ActiveRecord::Base
-  include NotificationObservable
   include DominoDocument
 
   has_paper_trail class_name: 'Version'

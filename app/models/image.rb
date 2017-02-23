@@ -44,7 +44,6 @@ SELECT
 
   scope :join_study, -> { joins(image_series: { patient: { center: :study } }) }
 
-  include NotificationObservable
   include ImageStorageCallbacks
   include ScopablePermissions
 
