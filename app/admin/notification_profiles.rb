@@ -112,6 +112,7 @@ ActiveAdmin.register NotificationProfile do
           'data-models' => 'User,Role',
           'data-placeholder' => 'All Users',
           'data-clear-value' => 'all',
+          'data-template-prepend-type' => true,
           'data-allow-clear' => true
         }
       )

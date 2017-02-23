@@ -12,6 +12,11 @@ initializeRecordSearch = ($elements = $('.select2-record-search')) ->
     $el.select2
       placeholder: $el.data('placeholder')
       allowClear: $el.data('allow-clear') or false
+      templateSelection: (data, container) ->
+        if $el.data('template-prepend-type') and data.result_type?
+          "#{data.result_type}: #{data.text}"
+        else
+          data.text
       ajax:
         url: $el.data('url') or '/v1/search.json'
         data: (params) ->
