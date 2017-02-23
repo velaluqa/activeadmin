@@ -24,6 +24,10 @@
 class Version < PaperTrail::Version
   has_many :notifications
 
+  def triggering_user
+    User.find(whodunnit) if whodunnit.present?
+  end
+
   class << self
     # The provided method `find_each` of ActiveRecord is based on
     # `find_in_batches` which strips existing `order` filters and
