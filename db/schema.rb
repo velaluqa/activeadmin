@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170217114017) do
+ActiveRecord::Schema.define(version: 20170222104349) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -179,18 +179,19 @@ ActiveRecord::Schema.define(version: 20170217114017) do
   add_index "notification_profile_users", ["user_id"], name: "index_notification_profile_users_on_user_id", using: :btree
 
   create_table "notification_profiles", force: :cascade do |t|
-    t.string   "title",                                          null: false
+    t.string   "title",                                              null: false
     t.text     "description"
     t.string   "notification_type"
-    t.string   "triggering_resource",                            null: false
-    t.jsonb    "filters",                        default: [],    null: false
-    t.boolean  "only_authorized_recipients",     default: true,  null: false
-    t.boolean  "is_enabled",                     default: false, null: false
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
+    t.string   "triggering_resource",                                null: false
+    t.jsonb    "filters",                        default: [],        null: false
+    t.boolean  "only_authorized_recipients",     default: true,      null: false
+    t.boolean  "is_enabled",                     default: false,     null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
     t.integer  "maximum_email_throttling_delay"
-    t.jsonb    "triggering_actions",             default: [],    null: false
-    t.integer  "email_template_id",                              null: false
+    t.jsonb    "triggering_actions",             default: [],        null: false
+    t.integer  "email_template_id",                                  null: false
+    t.string   "filter_triggering_user",         default: "exclude", null: false
   end
 
   create_table "notifications", force: :cascade do |t|

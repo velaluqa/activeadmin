@@ -88,7 +88,8 @@ require 'serializers/string_array_serializer'
 # ------------------------------------- | ------------------ | ---------------------------
 # **`created_at`**                      | `datetime`         | `not null`
 # **`description`**                     | `text`             |
-# **`email_template_id`**               | `integer`          |
+# **`email_template_id`**               | `integer`          | `not null`
+# **`filter_triggering_user`**          | `string`           | `default("exclude"), not null`
 # **`filters`**                         | `jsonb`            | `not null`
 # **`id`**                              | `integer`          | `not null, primary key`
 # **`is_enabled`**                      | `boolean`          | `default(FALSE), not null`
@@ -116,11 +117,11 @@ class NotificationProfile < ActiveRecord::Base
   belongs_to :email_template
 
   validates :title, presence: true
-  validates :is_enabled, inclusion: { in: [true, false] }
   validates :triggering_actions, presence: true
   validates :triggering_resource, presence: true
   validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class
   validates :maximum_email_throttling_delay, inclusion: { in: Email.allowed_throttling_delays.values }, if: :maximum_email_throttling_delay
+  validates :filter_triggering_user, inclusion: { in: %w(exclude include only) }
   validate :validate_triggering_actions
   validate :validate_email_template_type
 
@@ -202,10 +203,9 @@ JOIN
   #   performed on.
   # @return [Array<Notification>] array of created `Notification`
   #   records.
-  def trigger(action, record)
+  def trigger(action, record, triggering_user)
     version = record.try(:versions).andand.last
-    recipients.map do |user|
-      next if user == ::PaperTrail.whodunnit
+    recipient_candidates(triggering_user).map do |user|
       next if only_authorized_recipients && !user.can?(:read, record)
       Notification.create(
         notification_profile: self,
@@ -215,6 +215,18 @@ JOIN
         version: version
       )
     end.compact
+  end
+
+  # TODO: Extract triggering profiles into separate Operation object.
+  #
+  # Gives a filtered recipients relation for given triggering_user.
+  def recipient_candidates(triggering_user)
+    return recipients if triggering_user.blank?
+    case filter_triggering_user
+    when 'only' then recipients.where(id: triggering_user.id)
+    when 'exclude' then recipients.where.not(id: triggering_user.id)
+    when 'include' then recipients
+    end
   end
 
   # Helper method used by ActiveAdmin to set the filters from JSON

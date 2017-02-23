@@ -1,6 +1,7 @@
 require 'notification_observable/filter'
 require 'notification_observable/filter/schema'
 
+# TODO: Use Version callbacks for notifications.
 module NotificationObservable
   extend ActiveSupport::Concern
 
@@ -21,15 +22,18 @@ module NotificationObservable
     after_commit(:notification_observable_destroy, on: :destroy)
 
     def notification_observable_create
-      TriggerNotificationProfiles.perform_async(:create, self.class, id, YAML.dump(previous_changes))
+      TriggerNotificationProfiles
+        .perform_async(:create, self.class, id, YAML.dump(previous_changes), ::PaperTrail.whodunnit)
     end
 
     def notification_observable_update
-      TriggerNotificationProfiles.perform_async(:update, self.class, id, YAML.dump(previous_changes))
+      TriggerNotificationProfiles
+        .perform_async(:update, self.class, id, YAML.dump(previous_changes), ::PaperTrail.whodunnit)
     end
 
     def notification_observable_destroy
-      TriggerNotificationProfiles.perform_async(:destroy, self.class, id, YAML.dump({}.with_indifferent_access))
+      TriggerNotificationProfiles
+        .perform_async(:destroy, self.class, id, YAML.dump({}.with_indifferent_access), ::PaperTrail.whodunnit)
     end
 
     def self.notification_observable?

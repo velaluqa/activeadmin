@@ -15,6 +15,7 @@ ActiveAdmin.register NotificationProfile do
     :triggering_resource,
     :filters_json,
     :only_authorized_recipients,
+    :filter_triggering_user,
     :maximum_email_throttling_delay,
     :email_template_id,
     triggering_actions: [],
@@ -104,6 +105,7 @@ ActiveAdmin.register NotificationProfile do
       f.input :users, type: :select, multiple: true, collection: User.order(:name), input_html: { class: 'initialize-select2', 'data-placeholder': 'Choose user or users' }
       f.input :roles, type: :select, multiple: true, collection: Role.order(:title), input_html: { class: 'initialize-select2', 'data-placeholder': 'Choose role or roles' }
       f.input :only_authorized_recipients
+      f.input :filter_triggering_user, as: :select, collection: ['exclude', 'include', 'only'], input_html: { class: 'initialize-select2', 'data-placeholder' => 'Choose filter for triggering user' }
       f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2', 'data-placeholder': 'Select maximum email throttling delay' }
       f.input :email_template_id, as: :select, collection: EmailTemplate.where(email_type: 'NotificationProfile'), input_html: { class: 'initialize-select2', 'data-placeholder': 'Select template' }
     end
