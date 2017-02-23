@@ -2,6 +2,9 @@
 require 'serializers/hash_array_serializer'
 require 'serializers/string_array_serializer'
 
+require 'notification_observable/filter'
+require 'notification_observable/filter/schema'
+
 # Notification Profiles describe which actions within the ERICA system
 # trigger notifications.
 #
@@ -54,7 +57,7 @@ require 'serializers/string_array_serializer'
 # resource. For that, see the ~only_authorized_users~ attribute.
 #
 # ## Throttling
-#
+p#
 # We do not want the user to be spammed by e-mails for each and every
 # action done in the ERICA system. Thus sending e-mails can be
 # throttled on a per-profile basis.
