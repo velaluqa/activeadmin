@@ -12,6 +12,11 @@ initializeRecordSearch = ($elements = $('.select2-record-search')) ->
     $el.select2
       placeholder: $el.data('placeholder')
       allowClear: $el.data('allow-clear') or false
+      templateSelection: (data, container) ->
+        if $el.data('template-prepend-type') and data.result_type?
+          "#{data.result_type}: #{data.text}"
+        else
+          data.text
       ajax:
         url: $el.data('url') or '/v1/search.json'
         data: (params) ->
@@ -20,7 +25,7 @@ initializeRecordSearch = ($elements = $('.select2-record-search')) ->
           query.models = $el.data('models') if $el.data('models')?
           query
         processResults: (data, params) ->
-          groups = ['Study', 'Center', 'Patient', 'Visit', 'ImageSeries', 'Image', 'BackgroundJob']
+          groups = ['Study', 'Center', 'Patient', 'Visit', 'ImageSeries', 'Image', 'BackgroundJob', 'Role', 'User']
           grouped = _
             .chain(data)
             .map (obj) ->

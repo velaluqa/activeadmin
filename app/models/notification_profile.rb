@@ -123,14 +123,18 @@ class NotificationProfile < ActiveRecord::Base
   validates :maximum_email_throttling_delay, inclusion: { in: Email.allowed_throttling_delays.values }, if: :maximum_email_throttling_delay
   validates :filter_triggering_user, inclusion: { in: %w(exclude include only) }
   validate :validate_triggering_actions
+  validates :email_template, presence: true
   validate :validate_email_template_type
 
   scope :enabled, -> { where(is_enabled: true) }
 
   # Returns all distinct recipients from `users` and `roles` associations.
   #
+  # If no `users` or `roles` are available, all available users are presumed recipients.
+  #
   # @return [ActiveRecord::Relation<User>] the relation specifying all users
   def recipients
+    return User.all if all_users?
     relation = User.joins(<<JOIN)
 LEFT JOIN "notification_profile_users" AS "np_u" ON "np_u"."user_id" = "users"."id"
 LEFT JOIN "user_roles" AS "u_r" ON "u_r"."user_id" = "users"."id"
@@ -260,6 +264,40 @@ JOIN
   # @param [Array<String>] ary The triggering actions to set.
   def triggering_actions=(ary)
     write_attribute(:triggering_actions, Array(ary).reject(&:blank?))
+  end
+
+  # Getter for ActiveAdmin form field that holds recipient users and
+  # roles.
+  def recipient_refs
+    refs = []
+    users.each { |user| refs.push("User_#{user.id}") }
+    roles.each { |role| refs.push("Role_#{role.id}") }
+    refs
+  end
+
+  # Setter for ActiveAdmin form field that holds recipient users and
+  # roles.
+  def recipient_refs=(refs)
+    if refs.include?('all')
+      self.users = []
+      self.roles = []
+    else
+      self.users = refs.select { |ref| ref.include?('User') }.map { |ref| User.find_by_ref(ref) }
+      self.roles = refs.select { |ref| ref.include?('Role') }.map { |ref| Role.find_by_ref(ref) }
+    end
+  end
+
+  # Collection for ActiveAdmin to use as preloaded set of options for
+  # current values.
+  def preload_recipient_refs
+    coll = []
+    users.each { |user| coll << ["User: #{user.name}", "User_#{user.id}"] }
+    roles.each { |role| coll << ["Role: #{role.title}", "Role_#{role.id}"] }
+    coll
+  end
+
+  def all_users?
+    users.empty? && roles.empty?
   end
 
   protected

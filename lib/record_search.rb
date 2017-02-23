@@ -8,7 +8,8 @@
 # TODO: Use a more performant, sophisticated full-text search (maybe
 # something like Apache SOLR or similar...)
 class RecordSearch
-  MODELS = %w(BackgroundJob Study Center Patient Visit ImageSeries Image).freeze
+  MODELS =
+    %w(BackgroundJob Study Center Patient Visit ImageSeries Image User Role).freeze
 
   attr_accessor :user, :query, :models
 
@@ -30,7 +31,7 @@ class RecordSearch
   end
 
   def unioned_queries
-    record_queries.join(' UNION ')
+    record_queries.reject(&:blank?).join(' UNION ')
   end
 
   def record_queries
