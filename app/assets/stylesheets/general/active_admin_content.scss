@@ -68,15 +68,24 @@
 
 .status_tag {
   text-transform: uppercase;
+  display: inline-block;
+  line-height: 1.5em;
+  border-radius: $border-radius-base;
   @extend .label, .label-default;
   &.error {
-    @extend .label, .label-danger;
+    @extend .label-danger;
   }
   &.warning {
-    @extend .label, .label-warning;
+    @extend .label-warning;
   }
   &.ok {
-    @extend .label, .label-success;
+    @extend .label-success;
+  }
+
+  ul {
+    list-style-type: none;
+    margin-bottom: 0;
+    padding: 0;
   }
 }
 

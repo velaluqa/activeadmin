@@ -349,7 +349,7 @@ JOIN
 
       if(not old_visit_id.nil? and new_visit_id.nil?)
         self.state = :imported
-      elsif( (old_visit_id.nil? and not new_visit_id.nil? and state == :imported))
+      elsif( (old_visit_id.nil? and not new_visit_id.nil? and state_sym == :imported))
         self.state = :visit_assigned
       end
     end

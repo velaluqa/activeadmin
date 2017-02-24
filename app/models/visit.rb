@@ -479,14 +479,14 @@ JOIN_QUERY
     new_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
     (old_assigned_image_series - new_assigned_image_series).uniq.each do |unassigned_series_id|
       unassigned_series = ImageSeries.where(:id => unassigned_series_id).first
-      if(unassigned_series and unassigned_series.state == :required_series_assigned)
-        unassigned_series.state = (unassigned_series.visit.nil? ? :imported : :visit_assigned)
+      if(unassigned_series and unassigned_series.state_sym == :required_series_assigned)
+        unassigned_series.state_sym = (unassigned_series.visit.nil? ? :imported : :visit_assigned)
         unassigned_series.save
       end
     end
     (new_assigned_image_series - old_assigned_image_series).uniq.each do |assigned_series_id|
       assigned_series = ImageSeries.where(:id => assigned_series_id).first
-      if(assigned_series and assigned_series.state == :visit_assigned || assigned_series.state == :not_required)
+      if(assigned_series and assigned_series.state_sym == :visit_assigned || assigned_series.state_sym == :not_required)
         assigned_series.state = :required_series_assigned
         assigned_series.save
       end
