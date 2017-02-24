@@ -1,6 +1,6 @@
 class V1::ImagesController < V1::ApiController
   def create
-    authorize! :create, Image
+    authorize_combination! [:create, Image], [:upload, ImageSeries]
 
     @image = Image.new(image_params)
 

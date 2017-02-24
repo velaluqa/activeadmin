@@ -1,7 +1,7 @@
 module V1
   class ImageSeriesController < V1::ApiController
     def create
-      authorize! :create, ImageSeries
+      authorize_one! [:create, :upload], ImageSeries
 
       series_params = image_series_params
       series_params[:state] = :importing unless series_params[:state]
@@ -22,7 +22,7 @@ module V1
     def update
       @series = ImageSeries.find(params[:id])
 
-      authorize! :update, @series
+      authorize_one! [:update, :upload], ImageSeries
 
       @series.assign_attributes(image_series_params)
 
