@@ -25,7 +25,7 @@ describe TriggerNotificationProfiles do
     let(:version) { Version.last }
 
     it 'creates respective notifications' do
-      TriggerNotificationProfiles.new.perform(version)
+      TriggerNotificationProfiles.new.perform(version.id)
       expect(Notification.all.map(&:attributes)).to include(include('version_id' => version.id))
     end
   end
@@ -55,7 +55,7 @@ describe TriggerNotificationProfiles do
     let(:version) { Version.last }
 
     it 'creates respective notifications' do
-      TriggerNotificationProfiles.new.perform(version)
+      TriggerNotificationProfiles.new.perform(version.id)
       expect(Notification.all.map(&:attributes)).to include(include('version_id' => version.id))
     end
   end
@@ -84,7 +84,7 @@ describe TriggerNotificationProfiles do
     let(:version) { Version.last }
 
     it 'creates respective notifications' do
-      TriggerNotificationProfiles.new.perform(version)
+      TriggerNotificationProfiles.new.perform(version.id)
       expect(Notification.all.map(&:attributes)).to include(include('version_id' => version.id))
     end
   end
