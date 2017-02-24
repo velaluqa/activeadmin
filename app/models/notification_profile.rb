@@ -228,7 +228,7 @@ JOIN
       Notification.create!(
         notification_profile: self,
         triggering_action: version.event,
-        resource: version.item || version.reify,
+        resource: version.item,
         user: user,
         version: version
       )

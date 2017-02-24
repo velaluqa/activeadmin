@@ -87,5 +87,10 @@ describe TriggerNotificationProfiles do
       TriggerNotificationProfiles.new.perform(version.id)
       expect(Notification.all.map(&:attributes)).to include(include('version_id' => version.id))
     end
+
+    it 'does not recreate new record' do
+      TriggerNotificationProfiles.new.perform(version.id)
+      expect(Study.count).to eq(0)
+    end
   end
 end
