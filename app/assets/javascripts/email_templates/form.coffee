@@ -11,7 +11,7 @@ $ ->
   $('#preview-resource').select2
     placeholder: 'Please select a resource'
     allowClear: false
-    minimumInputLength: 2
+    minimumInputLength: 1
     ajax:
       url: '/v1/search'
       dataType: 'json'
