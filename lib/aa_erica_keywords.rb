@@ -12,7 +12,7 @@ module ActiveAdmin
             link_to('Add '+label, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath)) if can_edit
           else
             tag_list = resource.tag_list_on(context).map {|t| link_to(t, action: :index, q: {context.to_s.singularize + '_taggings_tag_name_eq' => t})}.join(', ')
-            tag_list += link_to(glyph(:pen), url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link') if can_edit
+            tag_list += link_to(' <i class="fa fa-pencil"></i>'.html_safe, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link') if can_edit
 
             tag_list.html_safe
           end
@@ -31,7 +31,7 @@ module ActiveAdmin
             link_to('Add '+label, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath)) if can_edit
           else
             tag_list = resource.tag_list_on(context).map {|t| link_to(t, action: :index, q: {context.to_s.singularize + '_taggings_tag_name_eq' => t})}.join(', ')
-            tag_list += link_to(glyph(:pen), url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link') if can_edit
+            tag_list += link_to(' <i class="fa fa-pencil"></i>'.html_safe, url_for(:action => :edit_erica_keywords_form, :id => resource.id, :return_url => request.fullpath), :class => 'member_link') if can_edit
 
             tag_list.html_safe
           end
