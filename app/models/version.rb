@@ -24,6 +24,31 @@
 class Version < PaperTrail::Version
   has_many :notifications
 
+  after_commit(:trigger_notification_profiles, on: :create)
+
+  def triggering_user
+    case whodunnit
+    when User then whodunnit
+    when String then User.find(whodunnit)
+    end
+  end
+
+  def complete_changes
+    if event == 'destroy'
+      object.map do |key, val|
+        [key, [val, nil]] unless val.nil?
+      end.compact.to_h
+    else
+      object_changes
+    end
+  end
+
+  private
+
+  def trigger_notification_profiles
+    TriggerNotificationProfiles.perform_async(id)
+  end
+
   class << self
     # The provided method `find_each` of ActiveRecord is based on
     # `find_in_batches` which strips existing `order` filters and

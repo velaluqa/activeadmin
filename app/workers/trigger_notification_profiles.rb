@@ -3,13 +3,19 @@ class TriggerNotificationProfiles
 
   sidekiq_options(queue: :notifications, retry: 5)
 
-  def perform(action, record_klass, record_id, changes, user)
-    changes = YAML.load(changes)
-    record = record_klass.constantize.find(record_id)
-    triggered_profiles =
-      NotificationProfile.triggered_by(action, record, changes)
-    triggered_profiles.each do |profile|
-      profile.trigger(action.to_sym, record, user)
+  def perform(version_id)
+    version = Version.find(version_id)
+    triggered_profiles(version).each do |profile|
+      profile.trigger(version)
     end
+  end
+
+  def triggered_profiles(version)
+    NotificationProfile.triggered_by(
+      version.event,
+      version.item_type,
+      version.item || version.reify,
+      version.complete_changes
+    )
   end
 end

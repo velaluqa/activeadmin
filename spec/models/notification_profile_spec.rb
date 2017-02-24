@@ -193,7 +193,9 @@ RSpec.shared_examples 'filters changes' do |options|
       before(:each) do
         @record = TestModel.create(foobar: 'bar', foobaz: 'buz')
         @profiles = NotificationProfile.triggered_by(
-          event_action, @record,
+          event_action,
+          'TestModel',
+          @record,
           foobar: [nil, 'bar'],
           foobaz: [nil, 'buz']
         )
@@ -243,7 +245,9 @@ RSpec.shared_examples 'filters changes' do |options|
       before(:each) do
         @record = TestModel.create(foobar: 'bar', foobaz: 'buz')
         @profiles = NotificationProfile.triggered_by(
-          event_action, @record,
+          event_action,
+          'TestModel',
+          @record,
           foobar: ['foo', 'bar'],
           foobaz: ['bar', 'buz']
         )
@@ -293,7 +297,9 @@ RSpec.shared_examples 'filters changes' do |options|
       before(:each) do
         @record = TestModel.create(foobar: nil)
         @profiles = NotificationProfile.triggered_by(
-          event_action, @record,
+          event_action,
+          'TestModel',
+          @record,
           foobar: ['foo', nil]
         )
       end
@@ -530,6 +536,8 @@ RSpec.describe NotificationProfile do
       t.references :extra_model
     end
     model do
+      has_paper_trail class_name: 'Version'
+
       has_many :multi_models
       belongs_to :extra_model
     end
@@ -563,7 +571,7 @@ RSpec.describe NotificationProfile do
 
     describe ':create TestModel' do
       before(:each) do
-        @profiles = NotificationProfile.triggered_by(:create, @record)
+        @profiles = NotificationProfile.triggered_by(:create, 'TestModel', @record)
       end
       it 'does not return disabled profiles triggered for all actions' do
         expect(@profiles).not_to include(@p0)
@@ -598,7 +606,7 @@ RSpec.describe NotificationProfile do
 
     describe ':update TestModel' do
       before(:each) do
-        @profiles = NotificationProfile.triggered_by(:update, @record)
+        @profiles = NotificationProfile.triggered_by(:update, 'TestModel', @record)
       end
       it 'does not return disabled profiles triggered for all actions' do
         expect(@profiles).not_to include(@p0)
@@ -632,7 +640,7 @@ RSpec.describe NotificationProfile do
 
     describe ':destroy TestModel' do
       before(:each) do
-        @profiles = NotificationProfile.triggered_by(:destroy, @record)
+        @profiles = NotificationProfile.triggered_by(:destroy, 'TestModel', @record)
       end
       it 'does not return disabled profiles triggered for all actions' do
         expect(@profiles).not_to include(@p0)
@@ -676,12 +684,13 @@ RSpec.describe NotificationProfile do
 
       @profile1 = create(:notification_profile, users: [@user1, @user2], triggering_resource: 'TestModel', only_authorized_recipients: false)
       @profile2 = create(:notification_profile, users: [@user1, @user2], triggering_resource: 'TestModel', only_authorized_recipients: true)
-      @record = TestModel.create(foobar: 'foo')
     end
 
     it 'creates notification for system actions' do
+      ::PaperTrail.whodunnit = nil
+      @record = TestModel.create(foobar: 'foo')
       expect do
-        @profile1.trigger(:create, @record, nil)
+        @profile1.trigger(@record.versions.last)
       end.to change(Notification, :count).by(2)
       expect(Notification.where(user: @user1)).to exist
       expect(Notification.where(user: @user2)).to exist
@@ -693,18 +702,21 @@ RSpec.describe NotificationProfile do
       before(:each) do
         @profile1.filter_triggering_user = 'exclude'
         @profile1.save!
+
+        ::PaperTrail.whodunnit = @user2.id
+        @record = TestModel.create(foobar: 'foo')
       end
 
       it 'creates notification for other users actions' do
         expect do
-          @profile1.trigger(:create, @record, @user2)
+          @profile1.trigger(@record.versions.last)
         end.to change(Notification, :count).by(1)
         expect(Notification.where(user: @user1)).to exist
       end
 
       it 'does not create a notification for my own action' do
         expect do
-          @profile1.trigger(:create, @record, @user2)
+          @profile1.trigger(@record.versions.last)
         end.to change(Notification, :count).by(1)
         expect(Notification.where(user: @user2)).not_to exist
       end
@@ -714,18 +726,21 @@ RSpec.describe NotificationProfile do
       before(:each) do
         @profile1.filter_triggering_user = 'include'
         @profile1.save!
+
+        ::PaperTrail.whodunnit = @user2.id
+        @record = TestModel.create(foobar: 'foo')
       end
 
       it 'creates notification for other users actions' do
         expect do
-          @profile1.trigger(:create, @record, @user2)
+          @profile1.trigger(@record.versions.last)
         end.to change(Notification, :count).by(2)
         expect(Notification.where(user: @user1)).to exist
       end
 
       it 'creates a notification for my own action' do
         expect do
-          @profile1.trigger(:create, @record, @user2)
+          @profile1.trigger(@record.versions.last)
         end.to change(Notification, :count).by(2)
         expect(Notification.where(user: @user2)).to exist
       end
@@ -735,59 +750,37 @@ RSpec.describe NotificationProfile do
       before(:each) do
         @profile1.filter_triggering_user = 'only'
         @profile1.save!
+
+        ::PaperTrail.whodunnit = @user2.id
+        @record = TestModel.create(foobar: 'foo')
       end
 
       it 'does not create notification for other users actions' do
         expect do
-          @profile1.trigger(:create, @record, @user2)
+          @profile1.trigger(@record.versions.last)
         end.to change(Notification, :count).by(1)
         expect(Notification.where(user: @user1)).not_to exist
       end
 
       it 'creates a notification for my own action' do
         expect do
-          @profile1.trigger(:create, @record, @user2)
+          @profile1.trigger(@record.versions.last)
         end.to change(Notification, :count).by(1)
         expect(Notification.where(user: @user2)).to exist
       end
     end
 
     it 'creates notification only for authorized users' do
+      ::PaperTrail.whodunnit = nil
+      @record = TestModel.create(foobar: 'foo')
       allow_any_instance_of(Ability).to receive(:can?) { |ability, activity, subject|
         ability.current_user == @user1
       }
       expect do
-        @profile2.trigger(:create, @record, nil)
+        @profile2.trigger(@record.versions.last)
       end.to change(Notification, :count).by(1)
       expect(Notification.where(user: @user1)).to exist
       expect(Notification.where(user: @user2)).not_to exist
-    end
-
-    describe 'for model with versions' do
-      before(:each) do
-        @user = create(:user)
-        @profile = create(:notification_profile, users: [@user], triggering_resource: 'ExtraModel')
-        @record = ExtraModel.create(foo: 'foo')
-        allow_any_instance_of(Ability).to receive(:can?).and_return(true)
-      end
-
-      it 'creates a notification with a version after create' do
-        expect do
-          @profile.trigger(:create, @record, nil)
-        end.to change(Notification, :count).by(1)
-        notification = Notification.last
-        expect(notification.version).to eq @record.versions.last
-      end
-
-      it 'creates a notification with a version after update' do
-        @record.foo = 'bar'
-        @record.save!
-        expect do
-          @profile.trigger(:update, @record, nil)
-        end.to change(Notification, :count).by(1)
-        notification = Notification.last
-        expect(notification.version).to eq @record.versions.last
-      end
     end
   end
 end

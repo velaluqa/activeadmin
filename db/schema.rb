@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170222104349) do
+ActiveRecord::Schema.define(version: 20170224123049) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -196,8 +196,8 @@ ActiveRecord::Schema.define(version: 20170222104349) do
 
   create_table "notifications", force: :cascade do |t|
     t.integer  "notification_profile_id", null: false
-    t.integer  "resource_id",             null: false
-    t.string   "resource_type",           null: false
+    t.integer  "resource_id"
+    t.string   "resource_type"
     t.integer  "version_id"
     t.integer  "user_id",                 null: false
     t.datetime "email_sent_at"

@@ -92,7 +92,7 @@ ActiveAdmin.register NotificationProfile do
 
     f.inputs 'Triggers' do
       f.input :triggering_actions, as: :select, multiple: true, collection: %w(create update destroy), input_html: { class: 'initialize-select2', 'data-placeholder': 'Select triggering actions' }
-      f.input :triggering_resource, as: :select, collection: NotificationObservable.resources.map(&:to_s).sort.uniq, input_html: { class: 'initialize-select2', 'data-placeholder': 'Select triggering resource' }
+      f.input :triggering_resource, as: :select, collection: NotificationProfile::TRIGGERING_RESOURCES, input_html: { class: 'initialize-select2', 'data-placeholder': 'Select triggering resource' }
     end
 
     f.inputs 'Filters', class: 'filters' do

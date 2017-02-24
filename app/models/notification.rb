@@ -16,8 +16,8 @@
 # **`id`**                       | `integer`          | `not null, primary key`
 # **`marked_seen_at`**           | `datetime`         |
 # **`notification_profile_id`**  | `integer`          | `not null`
-# **`resource_id`**              | `integer`          | `not null`
-# **`resource_type`**            | `string`           | `not null`
+# **`resource_id`**              | `integer`          |
+# **`resource_type`**            | `string`           |
 # **`triggering_action`**        | `string`           | `not null`
 # **`updated_at`**               | `datetime`         |
 # **`user_id`**                  | `integer`          | `not null`
@@ -40,7 +40,7 @@ class Notification < ActiveRecord::Base
     versions: :paper_trail_versions
   )
 
-  after_create :send_instant_notification_email
+  after_commit(:send_instant_notification_email, on: :create)
 
   belongs_to :notification_profile
   belongs_to :user
@@ -49,7 +49,6 @@ class Notification < ActiveRecord::Base
 
   validates :user, presence: true
   validates :notification_profile, presence: true
-  validates :resource, presence: true
 
   # All notifications that have not yet been sent.
   scope :pending, -> { where(email_sent_at: nil) }

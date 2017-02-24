@@ -4,7 +4,9 @@ class NotificationDrop < EricaDrop # :nodoc:
   belongs_to(:notification_profile)
 
   desc 'The resource the notification is about.', :polymorphic
-  belongs_to(:resource)
+  def resource
+    object.version.item || object.version.reify
+  end
 
   desc 'Which action triggered this notification (e.g. create, update, destroy)?', :string
   attribute(:triggering_action)

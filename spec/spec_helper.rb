@@ -112,6 +112,7 @@ RSpec.configure do |config|
     DatabaseCleaner.cleaning do
       example.run
     end
+    ::PaperTrail.whodunnit = nil
   end
 
   # Disable webmock in feature test.

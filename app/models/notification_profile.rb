@@ -2,6 +2,9 @@
 require 'serializers/hash_array_serializer'
 require 'serializers/string_array_serializer'
 
+require 'notification_observable/filter'
+require 'notification_observable/filter/schema'
+
 # Notification Profiles describe which actions within the ERICA system
 # trigger notifications.
 #
@@ -54,7 +57,7 @@ require 'serializers/string_array_serializer'
 # resource. For that, see the ~only_authorized_users~ attribute.
 #
 # ## Throttling
-#
+p#
 # We do not want the user to be spammed by e-mails for each and every
 # action done in the ERICA system. Thus sending e-mails can be
 # throttled on a per-profile basis.
@@ -102,6 +105,15 @@ require 'serializers/string_array_serializer'
 # **`updated_at`**                      | `datetime`         | `not null`
 #
 class NotificationProfile < ActiveRecord::Base
+  TRIGGERING_RESOURCES = %w(
+    Study
+    Center
+    Patient
+    ImageSeries
+    Image
+    Visit
+  ).freeze
+
   has_paper_trail class_name: 'Version'
 
   serialize :triggering_actions, StringArraySerializer
@@ -119,6 +131,9 @@ class NotificationProfile < ActiveRecord::Base
   validates :title, presence: true
   validates :triggering_actions, presence: true
   validates :triggering_resource, presence: true
+  # TODO: Add inclusion: { in: -> (a) { NotificationProfile::TRIGGERING_RESOURCES } }
+  # Currently a LOT of tests break, when adding inclusion, because
+  # tests are adding a TestModel which is not allowed...
   validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class
   validates :maximum_email_throttling_delay, inclusion: { in: Email.allowed_throttling_delays.values }, if: :maximum_email_throttling_delay
   validates :filter_triggering_user, inclusion: { in: %w(exclude include only) }
@@ -179,14 +194,14 @@ JOIN
   # @param [Hash] changes format of `{ attribute: [old, new] }`
   #
   # @return [Array] an array of matched `NotificationProfile` instances
-  def self.triggered_by(action, record, changes = {})
+  def self.triggered_by(action, resource_type, resource, changes = {})
     relation = enabled.where(
       'triggering_actions ? :action AND triggering_resource = :resource',
       action: action,
-      resource: record.class.to_s
+      resource: resource_type
     )
     relation.to_a.keep_if do |profile|
-      profile.filter.match?(record, changes)
+      profile.filter.match?(resource, changes)
     end
   end
 
@@ -207,14 +222,13 @@ JOIN
   #   performed on.
   # @return [Array<Notification>] array of created `Notification`
   #   records.
-  def trigger(action, record, triggering_user)
-    version = record.try(:versions).andand.last
-    recipient_candidates(triggering_user).map do |user|
-      next if only_authorized_recipients && !user.can?(:read, record)
-      Notification.create(
+  def trigger(version)
+    recipient_candidates(version.triggering_user).map do |user|
+      next if only_authorized_recipients && !user.can?(:read, version.item || version.reify)
+      Notification.create!(
         notification_profile: self,
-        triggering_action: action,
-        resource: record,
+        triggering_action: version.event,
+        resource: version.item,
         user: user,
         version: version
       )

@@ -74,4 +74,131 @@ RSpec.describe Version do
       end
     end
   end
+
+  describe '#complete_changes' do
+    describe 'for create' do
+      let!(:version) do
+        Version.create(
+          event: 'create',
+          item_type: 'Study',
+          item_id: 8,
+          object: nil,
+          object_changes: {
+            'id'         => [nil, 8],
+            'name'       => [nil, 'Study 1'],
+            'created_at' => [nil, '2017-02-24T09:37:31.984Z'],
+            'updated_at' => [nil, '2017-02-24T09:37:31.984Z']
+          }
+        )
+      end
+
+      it 'returns complete changes' do
+        expected_changes = {
+          'id'         => [nil, 8],
+          'name'       => [nil, 'Study 1'],
+          'created_at' => [nil, '2017-02-24T09:37:31.984Z'],
+          'updated_at' => [nil, '2017-02-24T09:37:31.984Z']
+        }
+        expect(version.complete_changes).to eq(expected_changes)
+      end
+    end
+    describe 'for update' do
+      let!(:version) do
+        Version.create(
+          event: 'update',
+          item_type: 'Study',
+          item_id: 8,
+          object: {
+            'id'                   => 8,
+            'name'                 => 'Study 1',
+            'state'                => 0,
+            'created_at'           => '2017-02-24T09:37:31.984Z',
+            'updated_at'           => '2017-02-24T09:37:31.984Z',
+            'domino_db_url'        => nil,
+            'locked_version'       => nil,
+            'domino_server_name'   => nil,
+            'notes_links_base_uri' => nil
+          },
+          object_changes: {
+            'name'       => ['Study 1', 'Foo Study'],
+            'updated_at' => ['2017-02-24T09:37:31.984Z', '2017-02-24T09:41:31.675Z']
+          }
+        )
+      end
+
+      it 'returns complete changes' do
+        expected_changes = {
+          'name'       => ['Study 1', 'Foo Study'],
+          'updated_at' => ['2017-02-24T09:37:31.984Z', '2017-02-24T09:41:31.675Z']
+        }
+        expect(version.complete_changes).to eq(expected_changes)
+      end
+    end
+    describe 'for destroy' do
+      let!(:version) do
+        Version.create(
+          event: 'destroy',
+          item_type: 'Study',
+          item_id: 8,
+          object: {
+            'id'                   => 8,
+            'name'                 => 'Study 1',
+            'state'                => 0,
+            'created_at'           => '2017-02-24T09:37:31.984Z',
+            'updated_at'           => '2017-02-24T09:37:31.984Z',
+            'domino_db_url'        => nil,
+            'locked_version'       => nil,
+            'domino_server_name'   => nil,
+            'notes_links_base_uri' => nil
+          },
+          object_changes: nil
+        )
+      end
+
+      it 'returns complete changes' do
+        expected_changes = {
+          'id'         => [8, nil],
+          'name'       => ['Study 1', nil],
+          'state'      => [0, nil],
+          'created_at' => ['2017-02-24T09:37:31.984Z', nil],
+          'updated_at' => ['2017-02-24T09:37:31.984Z', nil]
+        }
+        expect(version.complete_changes).to eq(expected_changes)
+      end
+    end
+  end
+
+  describe 'callback', transactional_spec: true do
+    with_model :ObservableModel do
+      table do |t|
+        t.string :title
+        t.timestamps null: false
+      end
+      model do
+        has_paper_trail class_name: 'Version'
+      end
+    end
+
+    describe 'on create' do
+      it 'triggers notification profiles' do
+        model = ObservableModel.create(title: 'foo')
+        expect(TriggerNotificationProfiles).to have_enqueued_sidekiq_job(model.versions.last.id)
+      end
+    end
+    describe 'on update' do
+      it 'triggers notification profiles' do
+        model = ObservableModel.create(title: 'foo')
+        model.title = 'bar'
+        model.save!
+        expect(TriggerNotificationProfiles).to have_enqueued_sidekiq_job(model.versions.last.id)
+      end
+    end
+    describe 'on destroy' do
+      it 'triggers notification profiles' do
+        model = ObservableModel.create(title: 'foo')
+        model.destroy
+        expect(TriggerNotificationProfiles).to have_enqueued_sidekiq_job(Version.last.id)
+      end
+    end
+  end
 end
