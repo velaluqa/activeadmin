@@ -225,10 +225,10 @@ JOIN
   def trigger(version)
     recipient_candidates(version.triggering_user).map do |user|
       next if only_authorized_recipients && !user.can?(:read, version.item || version.reify)
-      Notification.create(
+      Notification.create!(
         notification_profile: self,
         triggering_action: version.event,
-        resource: version.item,
+        resource: version.item || version.reify,
         user: user,
         version: version
       )
