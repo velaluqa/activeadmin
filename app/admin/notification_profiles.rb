@@ -82,7 +82,7 @@ ActiveAdmin.register NotificationProfile do
   end
 
   form do |f|
-    f.object.maximum_email_throttling_delay = ERICA.maximum_email_throttling_delay
+    f.object.maximum_email_throttling_delay ||= ERICA.maximum_email_throttling_delay
 
     f.inputs 'Details' do
       f.input :title
