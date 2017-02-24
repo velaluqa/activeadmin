@@ -15,7 +15,7 @@ class TriggerNotificationProfiles
       version.event,
       version.item_type,
       version.item || version.reify,
-      version.object_changes
+      version.complete_changes
     )
   end
 end
