@@ -24,7 +24,7 @@
 class Version < PaperTrail::Version
   has_many :notifications
 
-  after_create :trigger_notification_profiles
+  after_commit(:trigger_notification_profiles, on: :create)
 
   def triggering_user
     User.find(whodunnit) if whodunnit.present?

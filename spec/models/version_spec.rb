@@ -75,7 +75,7 @@ RSpec.describe Version do
     end
   end
 
-  describe 'callback' do
+  describe 'callback', transactional_spec: true do
     with_model :ObservableModel do
       table do |t|
         t.string :title
