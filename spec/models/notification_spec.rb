@@ -108,7 +108,7 @@ RSpec.describe Notification do
     end
   end
 
-  describe 'non-throttled notification' do
+  describe 'non-throttled notification', transactional_spec: true do
     describe 'on create' do
       before(:each) do
         @user = create(:user)

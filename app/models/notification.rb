@@ -40,7 +40,7 @@ class Notification < ActiveRecord::Base
     versions: :paper_trail_versions
   )
 
-  after_create :send_instant_notification_email
+  after_commit(:send_instant_notification_email, on: :create)
 
   belongs_to :notification_profile
   belongs_to :user
