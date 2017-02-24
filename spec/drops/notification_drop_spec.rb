@@ -9,5 +9,8 @@ describe NotificationDrop do
   it { should belongs_to(:notification_profile) }
   it { should belongs_to(:user) }
   it { should belongs_to(:version) }
-  it { should belongs_to(:resource) }
+
+  describe '#resource' do
+    it { should respond_to(:resource) }
+  end
 end
