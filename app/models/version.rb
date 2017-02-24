@@ -27,7 +27,10 @@ class Version < PaperTrail::Version
   after_commit(:trigger_notification_profiles, on: :create)
 
   def triggering_user
-    User.find(whodunnit) if whodunnit.present?
+    case whodunnit
+    when User then whodunnit
+    when String then User.find(whodunnit)
+    end
   end
 
   def complete_changes
