@@ -12,10 +12,6 @@ RSpec.describe Notification do
     it 'is invalid without profile' do
       expect(build(:notification, notification_profile: nil)).not_to be_valid
     end
-
-    it 'is invalid without resource' do
-      expect(build(:notification, resource: nil)).not_to be_valid
-    end
   end
 
   describe 'scope ::pending' do
