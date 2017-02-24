@@ -184,7 +184,8 @@ JOIN
 
   def visit_types
     return [] unless has_configuration?
-    Array(current_configuration['visit_types'].andand.keys)
+    return [] unless current_configuration['visit_types'].is_a?(Hash)
+    current_configuration['visit_types'].keys
   end
 
   def visit_templates

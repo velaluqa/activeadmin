@@ -158,7 +158,12 @@ ActiveAdmin.register Study do
       redirect_to({:action => :show})
     else
       current_config = @study.current_configuration
-      old_visit_types = ((current_config.nil? || current_config['visit_types'].nil?) ? [] : current_config['visit_types'].keys)
+      old_visit_types =
+        if current_config && current_config['visit_types'].is_a?(Hash)
+          current_config['visit_types'].keys
+        else
+          []
+        end
 
       begin
         new_config = YAML.load_file(params[:study][:file].tempfile)
@@ -172,7 +177,13 @@ ActiveAdmin.register Study do
       # if the new config is invalid YAML, we won't apply any changed
       nullified_visits = 0
       unless(new_config.nil?)
-        new_visit_types = (new_config['visit_types'].nil? ? [] : new_config['visit_types'].keys)
+        new_visit_types =
+          if new_config['visit_types'].is_a?(Hash)
+            new_config['visit_types'].keys
+          else
+            []
+          end
+
         removed_visit_types = (old_visit_types - new_visit_types).uniq
 
         @study.visits.where(:visit_type => removed_visit_types).each do |visit|

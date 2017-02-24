@@ -153,4 +153,32 @@ YAML
         to eq({'template' => {'visits' => [{ 'number' => 1, 'type' => 'baseline' }]}})
     end
   end
+
+  describe '#visit_types' do
+    describe 'wrongly configured' do
+      let(:study) { create(:study) }
+      let(:config_yaml) { <<YAML }
+image_series_properties: []
+visit_types:
+  pre-intervention
+  post-intervention
+YAML
+
+      before(:each) do
+        tempfile = Tempfile.new('test.yml')
+        tempfile.write(config_yaml)
+        tempfile.close
+        repo = GitConfigRepository.new
+        repo.update_config_file(study.relative_config_file_path, tempfile, nil, "New configuration file for study #{study.id}")
+        tempfile.unlink
+      end
+
+      it 'returns an empty array' do
+        expect(study.visit_types).to eq([])
+      end
+    end
+    describe 'configured as mapping' do
+
+    end
+  end
 end
