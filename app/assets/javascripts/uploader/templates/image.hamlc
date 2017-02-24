@@ -3,4 +3,4 @@
 %td.status
 %td.warnings
   %a{ tabindex: '0', role: 'button', 'data-toggle' => 'popover', 'data-trigger' => 'focus' }
-    %span.glyphicon.glyphicon-exclamation-sign
+    %i.fa.fa-exclamation-triangle
