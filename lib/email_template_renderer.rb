@@ -25,15 +25,15 @@ class EmailTemplateRenderer # :nodoc:
     @scope = scope.deep_stringify_keys
   end
 
-  def render
+  def render(options = {})
     tpl = "<p>#{@template.template.gsub(/(\n\n|\r\n\r\n|\n\r\n\r)/, '</p><p>').strip}</p>"
     liquid = Liquid::Template.parse(
       tpl,
-      error_mode: :strict,
+      error_mode: options[:preview] ? :strict : :lax,
       line_numbers: true
     )
     result = liquid.render(scope, strict_variables: true).gsub('<p></p>', '')
-    raise EmailTemplateRenderer::Error, liquid.errors unless liquid.errors.blank?
+    raise EmailTemplateRenderer::Error, liquid.errors if options[:preview] && liquid.errors.present?
     ActionController::Base.new.render_to_string(text: result, layout: 'email_template')
   rescue Liquid::Error => e
     raise EmailTemplateRenderer::Error, [e]
@@ -45,7 +45,7 @@ class EmailTemplateRenderer # :nodoc:
         email_type: options.fetch(:type),
         template: options.fetch(:template)
       )
-      EmailTemplateRenderer.new(template, preview_locals(options)).render
+      EmailTemplateRenderer.new(template, preview_locals(options)).render(preview: true)
     end
 
     private
