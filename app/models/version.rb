@@ -30,6 +30,16 @@ class Version < PaperTrail::Version
     User.find(whodunnit) if whodunnit.present?
   end
 
+  def complete_changes
+    if event == 'destroy'
+      object.map do |key, val|
+        [key, [val, nil]] unless val.nil?
+      end.compact.to_h
+    else
+      object_changes
+    end
+  end
+
   private
 
   def trigger_notification_profiles
