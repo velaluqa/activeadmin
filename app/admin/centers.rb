@@ -22,12 +22,10 @@ ActiveAdmin.register Center do
       end
     end
 
-    def index
-      if ERICA.remote? && params[:format].present?
-        authorize! :download_status_files, Center
-      end
-
-      index!
+    before_filter :authorize_erica_remote, only: :index
+    def authorize_erica_remote
+      return unless !ERICA.remote? || params[:format].blank?
+      authorize! :download_status_files, Center
     end
   end
 

@@ -16,12 +16,10 @@ ActiveAdmin.register Study do
       1_000_000
     end
 
-    def index
-      if ERICA.remote? && !params[:format].blank?
-        authorize! :download_status_files, Study
-      end
-
-      index!
+    before_filter :authorize_erica_remote, only: :index
+    def authorize_erica_remote
+      return unless !ERICA.remote? || params[:format].blank?
+      authorize! :download_status_files, Study
     end
   end
 

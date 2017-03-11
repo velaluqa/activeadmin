@@ -34,52 +34,52 @@ ActiveAdmin.register Visit do
       return selected_filters
     end
 
-    def index
-      authorize! :download_status_files, Visit if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+    before_filter :authorize_erica_remote, only: :index
+    def authorize_erica_remote
+      return unless !ERICA.remote? || params[:format].blank?
+      authorize! :download_status_files, Visit
+    end
 
-      session[:current_images_filter] = nil if(params[:clear_filter] == 'true')
+    before_filter :transform_filter_params, only: :index
+    def transform_filter_params
+      session[:current_images_filter] = nil if params[:clear_filter] == 'true'
 
-      if(params[:q] and params[:q][:patient_id_in] == [""])
+      if params[:q] && params[:q][:patient_id_in] == [""]
         params[:q].delete(:patient_id_in)
-
-        params[:q][:patient_id_in] = session[:current_images_filter] unless session[:current_images_filter].blank?
-      elsif(params[:q].nil? or params[:q][:patient_id_in].nil?)
-        params[:q] = {} if params[:q].nil?
-        params[:q][:patient_id_in] = session[:current_images_filter] unless session[:current_images_filter].blank?
-      elsif(params[:q] and
-         params[:q][:patient_id_in].respond_to?(:length) and
-         params[:q][:patient_id_in].length == 1 and
-         params[:q][:patient_id_in][0].include?(',')
-            )
+        params[:q][:patient_id_in] = session[:current_images_filter] if session[:current_images_filter].present?
+      elsif params[:q].nil? || params[:q][:patient_id_in].nil?
+        params[:q] ||= {}
+        params[:q][:patient_id_in] = session[:current_images_filter] if session[:current_images_filter].present?
+      elsif params[:q] &&
+            params[:q][:patient_id_in].respond_to?(:length) &&
+            params[:q][:patient_id_in].length == 1 &&
+            params[:q][:patient_id_in][0].include?(',')
         params[:q][:patient_id_in] = params[:q][:patient_id_in][0].split(',')
       end
-      session[:current_images_filter] = params[:q][:patient_id_in] unless params[:q].nil? or params[:q][:patient_id_in].nil?
+      session[:current_images_filter] = params[:q][:patient_id_in] if params[:q].andand[:patient_id_in]
 
-      if(params[:q] and params[:q][:patient_id_in].respond_to?(:each))
+      if params[:q] && params[:q][:patient_id_in].respond_to?(:each)
         patient_id_in = []
 
         params[:q][:patient_id_in].each do |id|
-          if(id =~ /^center_([0-9]*)/)
+          if id =~ /^center_([0-9]*)/
             params[:q][:patient_center_id_in] ||= []
             params[:q][:patient_center_id_in] << $1
-          elsif(id =~ /^study_([0-9]*)/)
+          elsif id =~ /^study_([0-9]*)/
             params[:q][:patient_center_study_id_in] ||= []
             params[:q][:patient_center_study_id_in] << $1
-          elsif(id =~ /^patient_([0-9]*)/)
+          elsif id =~ /^patient_([0-9]*)/
             patient_id_in << $1
-          elsif(id =~ /^visit_([0-9]*)/)
+          elsif id =~ /^visit_([0-9]*)/
             params[:q][:id_in] ||= []
             params[:q][:id_in] << $1
-          elsif(id =~ /^([0-9]*)/)
+          elsif id =~ /^([0-9]*)/
             patient_id_in << $1
           end
         end
 
         params[:q][:patient_id_in] = patient_id_in
       end
-      pp params
-
-      index!
     end
   end
 
@@ -470,9 +470,9 @@ ActiveAdmin.register Visit do
   end
   action_item :edit, :only => :show do
     link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.mqc_state_sym != :pending and (
-                                                                            (Rails.application.config.is_erica_remote and can? :read_qc, resource) or
-                                                                            (can? :mqc, resource or can? :manage, resource))
-                                                                         )
+                                                                        (Rails.application.config.is_erica_remote and can? :read_qc, resource) or
+                                                                        (can? :mqc, resource or can? :manage, resource))
+                                                                     )
   end
 
   member_action :edit_state, :method => :post do

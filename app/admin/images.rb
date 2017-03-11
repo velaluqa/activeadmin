@@ -26,10 +26,10 @@ ActiveAdmin.register Image do
       end
     end
 
-    def index
-      authorize! :download_status_files, Image if(Rails.application.config.is_erica_remote and not params[:format].blank?)
-
-      index!
+    before_filter :authorize_erica_remote, only: :index
+    def authorize_erica_remote
+      return unless !ERICA.remote? || params[:format].blank?
+      authorize! :download_status_files, Image
     end
   end
 

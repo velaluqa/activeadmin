@@ -100,52 +100,52 @@ ActiveAdmin.register ImageSeries do
       return selected_filters
     end
 
-    def index
-      authorize! :download_status_files, ImageSeries if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+    before_filter :authorize_erica_remote, only: :index
+    def authorize_erica_remote
+      return unless !ERICA.remote? || params[:format].blank?
+      authorize! :download_status_files, ImageSeries
+    end
 
-      session[:current_images_filter] = nil if(params[:clear_filter] == 'true')
+    before_filter :transform_filter_params, only: :index
+    def transform_filter_params
+      session[:current_images_filter] = nil if params[:clear_filter] == 'true'
 
-      if(params[:q] and params[:q][:visit_id_in] == [""])
+      if params[:q] && params[:q][:visit_id_in] == [""]
         params[:q].delete(:visit_id_in)
-
-        params[:q][:visit_id_in] = session[:current_images_filter] unless session[:current_images_filter].blank?
-      elsif(params[:q].nil? or params[:q][:visit_id_in].nil?)
-        params[:q] = {} if params[:q].nil?
-        params[:q][:visit_id_in] = session[:current_images_filter] unless session[:current_images_filter].blank?
-      elsif(params[:q] and
-         params[:q][:visit_id_in].respond_to?(:length) and
-         params[:q][:visit_id_in].length == 1 and
-         params[:q][:visit_id_in][0].include?(',')
-            )
+        params[:q][:visit_id_in] = session[:current_images_filter] if session[:current_images_filter].present?
+      elsif params[:q].nil? || params[:q][:visit_id_in].nil?
+        params[:q] ||= {}
+        params[:q][:visit_id_in] = session[:current_images_filter] if session[:current_images_filter].present?
+      elsif params[:q] &&
+            params[:q][:visit_id_in].respond_to?(:length) &&
+            params[:q][:visit_id_in].length == 1 &&
+            params[:q][:visit_id_in][0].include?(',')
         params[:q][:visit_id_in] = params[:q][:visit_id_in][0].split(',')
       end
-      session[:current_images_filter] = params[:q][:visit_id_in] unless params[:q].nil? or params[:q][:visit_id_in].nil?
+      session[:current_images_filter] = params[:q][:visit_id_in] if params[:q].andand[:visit_id_in]
 
-      if(params[:q] and params[:q][:visit_id_in].respond_to?(:each))
+      if params[:q] && params[:q][:visit_id_in].respond_to?(:each)
         visit_id_in = []
 
         params[:q][:visit_id_in].each do |id|
-          if(id =~ /^center_([0-9]*)/)
+          if id =~ /^center_([0-9]*)/
             params[:q][:patient_center_id_in] ||= []
             params[:q][:patient_center_id_in] << $1
-          elsif(id =~ /^study_([0-9]*)/)
+          elsif id =~ /^study_([0-9]*)/
             params[:q][:patient_center_study_id_in] ||= []
             params[:q][:patient_center_study_id_in] << $1
-          elsif(id =~ /^patient_([0-9]*)/)
+          elsif id =~ /^patient_([0-9]*)/
             params[:q][:patient_id_in] ||= []
             params[:q][:patient_id_in] << $1
-          elsif(id =~ /^visit_([0-9]*)/)
+          elsif id =~ /^visit_([0-9]*)/
             visit_id_in << $1
-          elsif(id =~ /^([0-9]*)/)
+          elsif id =~ /^([0-9]*)/
             visit_id_in << $1
           end
         end
 
         params[:q][:visit_id_in] = visit_id_in
       end
-      pp params
-
-      index!
     end
   end
 

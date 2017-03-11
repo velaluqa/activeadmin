@@ -33,27 +33,31 @@ ActiveAdmin.register Patient do
       return selected_filters
     end
 
-    def index
-      authorize! :download_status_files, Patient if(Rails.application.config.is_erica_remote and not params[:format].blank?)
+    before_filter :authorize_erica_remote, only: :index
+    def authorize_erica_remote
+      return unless !ERICA.remote? || params[:format].blank?
+      authorize! :download_status_files, Patient
+    end
 
-      session[:current_images_filter] = nil if(params[:clear_filter] == 'true')
+    before_filter :transform_filter_params, only: :index
+    def transform_filter_params
+      session[:current_images_filter] = nil if params[:clear_filter] == 'true'
 
-      if(params[:q] and params[:q][:center_id_in] == [""])
+      if params[:q] && params[:q][:center_id_in] == [""]
         params[:q].delete(:center_id_in)
-
-        params[:q][:center_id_in] = session[:current_images_filter] unless session[:current_images_filter].blank?
-      elsif(params[:q].nil? or params[:q][:center_id_in].nil?)
+        params[:q][:center_id_in] = session[:current_images_filter] if session[:current_images_filter].present?
+      elsif params[:q].nil? || params[:q][:center_id_in].nil?
         params[:q] = {} if params[:q].nil?
-        params[:q][:center_id_in] = session[:current_images_filter] unless session[:current_images_filter].blank?
-      elsif(params[:q] and
-         params[:q][:center_id_in].respond_to?(:length) and
-         params[:q][:center_id_in].length == 1 and
-         params[:q][:center_id_in][0].include?(','))
+        params[:q][:center_id_in] = session[:current_images_filter] if session[:current_images_filter].present?
+      elsif params[:q] &&
+            params[:q][:center_id_in].respond_to?(:length) &&
+            params[:q][:center_id_in].length == 1 &&
+            params[:q][:center_id_in][0].include?(',')
         params[:q][:center_id_in] = params[:q][:center_id_in][0].split(',')
       end
-      session[:current_images_filter] = params[:q][:center_id_in] unless params[:q].nil? or params[:q][:center_id_in].nil?
+      session[:current_images_filter] = params[:q][:center_id_in] if params[:q].andand[:center_id_in]
 
-      if(params[:q] and params[:q][:center_id_in].respond_to?(:each))
+      if params[:q] && params[:q][:center_id_in].respond_to?(:each)
         center_id_in = []
 
         params[:q][:center_id_in].each do |id|
@@ -73,9 +77,6 @@ ActiveAdmin.register Patient do
 
         params[:q][:center_id_in] = center_id_in
       end
-      pp params
-
-      index!
     end
   end
 
