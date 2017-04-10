@@ -631,6 +631,8 @@ JOIN_QUERY
     # ignore Domino UNID changes that happened along with a property change
     c.delete('domino_unid')
 
+    return if c.empty?
+
     if(c.keys == ['visit_number'])
       :visit_number_change
     elsif(c.keys == ['patient_id'])
