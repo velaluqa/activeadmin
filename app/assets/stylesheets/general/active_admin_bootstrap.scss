@@ -17,6 +17,10 @@ body {
   min-height: 100%;
 }
 
+.text-error {
+  color: $pomegranate;
+}
+
 @import "menu";
 @import "active_admin_title_bar";
 @import "active_admin_side_bar";
