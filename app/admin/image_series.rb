@@ -8,7 +8,7 @@ ActiveAdmin.register ImageSeries do
   actions :all, except: [:create]
 
   scope :all, :default => true
-  scope :not_assigned
+  scope 'No Visit Assigned', :not_assigned
 
   config.per_page = 100
 
