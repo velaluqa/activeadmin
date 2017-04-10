@@ -3,8 +3,6 @@
     %ol
       %li.input.check_boxes
         %fieldset.choices
-          %legend.label            
-            %label Assigned Required Series
           = hidden_field_tag('image_series_assigned_required_series_none', nil, :name => 'image_series[assigned_required_series][]')
           %ol.choices-group
             - @required_series.each do |required_series_name|
