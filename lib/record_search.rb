@@ -11,12 +11,13 @@ class RecordSearch
   MODELS =
     %w(BackgroundJob Study Center Patient Visit ImageSeries Image User Role).freeze
 
-  attr_accessor :user, :query, :models
+  attr_accessor :user, :query, :study_id, :models
 
   def initialize(options = {})
     @user = options[:user] or fail 'missing :user options'
     @query = options[:query] or fail 'missing :query options'
     @models = (options[:models].blank? ? MODELS : options[:models] & MODELS)
+    @study_id = options[:study_id]
   end
 
   def results
@@ -27,7 +28,9 @@ class RecordSearch
   private
 
   def merged_query
-    "SELECT * FROM (#{unioned_queries}) q WHERE q.text LIKE '%#{query}%'"
+    q = "SELECT * FROM (#{unioned_queries}) q WHERE q.text LIKE '%#{query}%'"
+    q << " AND q.study_id = '#{study_id}'" if study_id
+    q
   end
 
   def unioned_queries
