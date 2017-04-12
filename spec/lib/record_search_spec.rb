@@ -2,111 +2,107 @@ require 'record_search'
 
 describe RecordSearch do
   describe '#new' do
-    before(:each) do
-      @user = create(:user)
-      @search = RecordSearch.new(
-        user: @user,
+    let!(:user) { create(:user) }
+    let!(:search) do
+      RecordSearch.new(
+        user: user,
         query: 'foo',
         models: %w(Notification BackgroundJob Study Center Patient Visit ImageSeries Image)
       )
     end
 
     it 'initializes user, query and only allowed models' do
-      expect(@search.user).to eq @user
-      expect(@search.query).to eq 'foo'
-      expect(@search.models).to eq %w(BackgroundJob Study Center Patient Visit ImageSeries Image)
+      expect(search.user).to eq user
+      expect(search.query).to eq 'foo'
+      expect(search.models).to eq %w(BackgroundJob Study Center Patient Visit ImageSeries Image)
     end
   end
 
   describe '#results' do
-    before(:each) do
-      @study = create(:study, name: 'TestStudy')
-      @center = create(:center, code: 'TestCenter', study: @study)
-      @patient = create(:patient, subject_id: 'TestPatient', center: @center)
-      @visit = create(:visit, visit_number: 2, patient: @patient)
-      @user = create(:user, is_root_user: true)
-    end
+    let!(:study1) { create(:study, name: 'TestStudy1') }
+    let!(:center1) { create(:center, code: 'TestCenter1', study: study1) }
+    let!(:patient1) { create(:patient, subject_id: 'TestPatient1', center: center1) }
+    let!(:visit1) { create(:visit, visit_number: 2, patient: patient1) }
+    let!(:user) { create(:user, is_root_user: true) }
 
     describe 'not filtering models' do
-      before(:each) do
-        @search = RecordSearch.new(
-          user: @user,
+      let!(:search) do
+        RecordSearch.new(
+          user: user,
           query: 'Test'
         )
-        @results = @search.results
       end
 
       it 'returns matched records' do
-        expect(@results)
+        expect(search.results)
           .to include(
-                'study_id' => @study.id.to_s,
-                'text' => 'TestStudy',
-                'result_id' => @study.id.to_s,
+                'study_id' => study1.id.to_s,
+                'text' => 'TestStudy1',
+                'result_id' => study1.id.to_s,
                 'result_type' => 'Study'
               )
-        expect(@results)
+        expect(search.results)
           .to include(
-                'study_id' => @study.id.to_s,
-                'text' => "TestCenter - #{@center.name}",
-                'result_id' => @center.id.to_s,
+                'study_id' => study1.id.to_s,
+                'text' => "TestCenter1 - #{center1.name}",
+                'result_id' => center1.id.to_s,
                 'result_type' => 'Center'
               )
-        expect(@results)
+        expect(search.results)
           .to include(
-                'study_id' => @study.id.to_s,
-                'text' => 'TestCenterTestPatient',
-                'result_id' => @patient.id.to_s,
+                'study_id' => study1.id.to_s,
+                'text' => 'TestCenter1TestPatient1',
+                'result_id' => patient1.id.to_s,
                 'result_type' => 'Patient'
               )
-        expect(@results)
+        expect(search.results)
           .to include(
-                'study_id' =>  @study.id.to_s,
-                'text'=> "TestCenterTestPatient##{@visit.visit_number}",
-                'result_id' => @visit.id.to_s,
+                'study_id' =>  study1.id.to_s,
+                'text'=> "TestCenter1TestPatient1##{visit1.visit_number}",
+                'result_id' => visit1.id.to_s,
                 'result_type' => 'Visit'
               )
       end
     end
 
     describe 'filtering models' do
-      before(:each) do
-        @search = RecordSearch.new(
-          user: @user,
+      let!(:search) do
+        RecordSearch.new(
+          user: user,
           query: 'Test',
           models: %w(Study)
         )
-        @results = @search.results
       end
 
       it 'returns matched records' do
-        expect(@results)
+        expect(search.results)
           .to include(
-                'study_id' => @study.id.to_s,
-                'text' => 'TestStudy',
-                'result_id' => @study.id.to_s,
+                'study_id' => study1.id.to_s,
+                'text' => 'TestStudy1',
+                'result_id' => study1.id.to_s,
                 'result_type' => 'Study'
               )
-        expect(@results)
+        expect(search.results)
           .not_to include(
-                'study_id' => @study.id.to_s,
-                'text' => "TestCenter - #{@center.name}",
-                'result_id' => @center.id.to_s,
-                'result_type' => 'Center'
-              )
-        expect(@results)
+                    'study_id' => study1.id.to_s,
+                    'text' => "TestCenter1 - #{center1.name}",
+                    'result_id' => center1.id.to_s,
+                    'result_type' => 'Center'
+                  )
+        expect(search.results)
           .not_to include(
-                'study_id' => @study.id.to_s,
-                'text' => 'TestCenterTestPatient',
-                'result_id' => @patient.id.to_s,
-                'result_type' => 'Patient'
-              )
-        expect(@results)
+                    'study_id' => study1.id.to_s,
+                    'text' => 'TestCenter1TestPatient1',
+                    'result_id' => patient1.id.to_s,
+                    'result_type' => 'Patient'
+                  )
+        expect(search.results)
           .not_to include(
-                'study_id' =>  @study.id.to_s,
-                'text'=> "TestCenterTestPatient##{@visit.visit_number}",
-                'result_id' => @visit.id.to_s,
-                'result_type' => 'Visit'
-              )
+                    'study_id' => study1.id.to_s,
+                    'text' => "TestCenter1TestPatient1##{visit1.visit_number}",
+                    'result_id' => visit1.id.to_s,
+                    'result_type' => 'Visit'
+                  )
       end
     end
   end
