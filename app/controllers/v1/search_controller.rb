@@ -7,7 +7,8 @@ class V1::SearchController < ApplicationController
     @search = RecordSearch.new(
       user: current_user,
       query: params['query'],
-      models: Array(params['models'].try(:split, ','))
+      models: Array(params['models'].try(:split, ',')),
+      study_id: session['selected_study_id']
     )
     render status: :ok, json: @search.results
   rescue => e
