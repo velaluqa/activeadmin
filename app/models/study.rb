@@ -188,6 +188,7 @@ JOIN
 
   def visit_templates
     return {} unless has_configuration?
+    return {} unless current_configuration['visit_templates'].is_a?(Hash)
     current_configuration['visit_templates']
   end
 
