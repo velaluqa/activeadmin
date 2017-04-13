@@ -17,11 +17,12 @@ window.initializeRecordSearch = ($elements = $('.select2-record-search')) ->
           "#{data.result_type}: #{data.text}"
         else
           data.text
-      templateResult: (state) ->
-        if state.study_name
+      templateResult: if window.selectedStudyId? or window.accessibleStudyCount is 1
+        (state) -> $('<span>' + state.text + '</span>')
+      else
+        (state) ->
+          return $('<span>' + state.text + '</span>') unless state.study_name?
           $('<span>' + state.text + ' <span class="select2-study-note">(' +  state.study_name +  ')</span></span>')
-        else
-          $('<span>' + state.text + '</span>')
       ajax:
         url: $el.data('url') or '/v1/search.json'
         data: (params) ->
