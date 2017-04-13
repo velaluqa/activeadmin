@@ -64,7 +64,7 @@ class User < ActiveRecord::Base
   # Fake attributes for form fields and validation
   attr_accessible :signature_password, :signature_password_confirmation
   attr_accessor :signature_password, :signature_password_confirmation
-  
+
   validates :username, :uniqueness => true, :presence => true
   validates :name, :uniqueness => true, :presence => true
   validates :email, :uniqueness => true, :presence => true, :email => true
@@ -107,7 +107,7 @@ class User < ActiveRecord::Base
 
     generate_keypair(signature_password, false)
   end
-  
+
   def permission_matrix
     matrix = {}
     Ability::ACTIVITIES.each_pair do |subject, activities|
@@ -125,6 +125,7 @@ class User < ActiveRecord::Base
 
   scope :searchable, -> { select(<<SELECT) }
 NULL::integer AS study_id,
+NULL::varchar AS study_name,
 users.name AS text,
 users.id AS result_id,
 'User'::varchar AS result_type
@@ -141,7 +142,7 @@ SELECT
     @ability ||= Ability.new(self)
     @ability.can?(activity, subject)
   end
-  
+
   # hack to allow mongoid-history to store the modifier using an ActiveRecord model (this model)
   def self.using_object_ids?
     false

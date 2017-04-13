@@ -72,8 +72,9 @@ class Visit < ActiveRecord::Base
     where(state: index)
   }
 
-  scope :searchable, -> { joins(patient: :center).select(<<SELECT) }
+  scope :searchable, -> { join_study.select(<<SELECT) }
 centers.study_id AS study_id,
+studies.name AS study_name,
 centers.code ||
 patients.subject_id ||
 '#' ||

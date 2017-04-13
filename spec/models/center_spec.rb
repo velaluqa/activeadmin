@@ -18,6 +18,7 @@ RSpec.describe Center do
         .to eq [{
                   'id' => nil,
                   'study_id' => center.study_id,
+                  'study_name' => center.study.name,
                   'text' => "#{center.code} - FooCenter",
                   'result_id' => center.id,
                   'result_type' => 'Center'

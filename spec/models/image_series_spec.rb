@@ -36,7 +36,8 @@ RSpec.describe ImageSeries do
         .to eq [{
                   'id' => nil,
                   'study_id' => series.patient.center.study_id,
-                  'text' => '123',
+                  'study_name' => series.patient.center.study.name,
+                  'text' => 'image_series22 (123)',
                   'result_id' => series.id,
                   'result_type' => 'ImageSeries'
                 }]

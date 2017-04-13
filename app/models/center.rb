@@ -59,8 +59,9 @@ INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
-  scope :searchable, -> { select(<<SELECT) }
+  scope :searchable, -> { joins(:study).select(<<SELECT) }
 centers.study_id AS study_id,
+studies.name AS study_name,
 centers.code || ' - ' || centers.name AS text,
 centers.id AS result_id,
 'Center'::varchar AS result_type

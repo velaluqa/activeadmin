@@ -54,6 +54,7 @@ RSpec.describe Visit do
         .to eq [{
                   'id' => nil,
                   'study_id' => visit.patient.center.study_id,
+                  'study_name' => visit.patient.center.study.name,
                   'text' => "FooBar##{visit.visit_number}",
                   'result_id' => visit.id,
                   'result_type' => 'Visit'

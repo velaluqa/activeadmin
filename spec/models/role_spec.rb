@@ -92,4 +92,20 @@ RSpec.describe Role do
       expect(@role.abilities).to match_array %w(manage_role manage_user)
     end
   end
+
+  describe 'scope ::searchable' do
+    let!(:role) { create(:role) }
+
+    it 'selects search fields' do
+      expect(Role.searchable.as_json)
+        .to eq [{
+                  'id' => nil,
+                  'study_id' => nil,
+                  'study_name' => nil,
+                  'text' => role.title,
+                  'result_id' => role.id,
+                  'result_type' => 'Role'
+                }]
+    end
+  end
 end
