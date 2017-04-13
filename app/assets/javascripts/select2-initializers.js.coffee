@@ -1,4 +1,4 @@
-initializeSimpleSelects = ($elements = $('.initialize-select2')) ->
+window.initializeSimpleSelects = ($elements = $('.initialize-select2')) ->
   $elements.each (i, el) ->
     $el = $(el)
     $el.select2
@@ -6,7 +6,7 @@ initializeSimpleSelects = ($elements = $('.initialize-select2')) ->
       allowClear: $el.data('allow-clear') or false
       minimumResultsForSearch: if $el.data('hide-search') then Infinity else 5
 
-initializeRecordSearch = ($elements = $('.select2-record-search')) ->
+window.initializeRecordSearch = ($elements = $('.select2-record-search')) ->
   $elements.each (i, el) ->
     $el = $(el)
     $el.select2
