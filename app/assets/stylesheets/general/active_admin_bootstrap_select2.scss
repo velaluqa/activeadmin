@@ -35,3 +35,15 @@
 .select2--small {
   font-size: $font-size-small;
 }
+
+.select2-study-note {
+  font-size: 0.8em;
+  color: $gray;
+}
+
+.select2-results__option--highlighted {
+  .select2-study-note {
+    font-size: 0.8em;
+    color: $white;
+  }
+}

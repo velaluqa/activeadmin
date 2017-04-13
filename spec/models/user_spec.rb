@@ -3,6 +3,22 @@ RSpec.describe User do
   it { should have_many(:notification_profiles) }
   it { should have_many(:notifications) }
 
+  describe 'scope ::searchable' do
+    let!(:user) { create(:user) }
+
+    it 'selects search fields' do
+      expect(User.searchable.as_json)
+        .to eq [{
+                  'id' => nil,
+                  'study_id' => nil,
+                  'study_name' => nil,
+                  'text' => user.name,
+                  'result_id' => user.id,
+                  'result_type' => 'User'
+                }]
+    end
+  end
+
   it 'validates the email address' do
     user = build(:user, email: nil)
     expect(user).to_not be_valid

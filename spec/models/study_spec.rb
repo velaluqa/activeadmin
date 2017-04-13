@@ -18,6 +18,7 @@ RSpec.describe Study do
         .to eq [{
                   'id' => nil,
                   'study_id' => study.id,
+                  'study_name' => study.name,
                   'text' => 'FooStudy',
                   'result_id' => study.id,
                   'result_type' => 'Study'

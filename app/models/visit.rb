@@ -72,8 +72,9 @@ class Visit < ActiveRecord::Base
     where(state: index)
   }
 
-  scope :searchable, -> { joins(patient: :center).select(<<SELECT) }
+  scope :searchable, -> { join_study.select(<<SELECT) }
 centers.study_id AS study_id,
+studies.name AS study_name,
 centers.code ||
 patients.subject_id ||
 '#' ||
@@ -81,7 +82,7 @@ visits.visit_number ||
 CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END 
 AS text,
 visits.id AS result_id,
-'Visit' AS result_type
+'Visit'::varchar AS result_type
 SELECT
 
   validates_uniqueness_of :visit_number, :scope => [:patient_id, :repeatable_count]

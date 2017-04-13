@@ -1,4 +1,4 @@
-initializeSimpleSelects = ($elements = $('.initialize-select2')) ->
+window.initializeSimpleSelects = ($elements = $('.initialize-select2')) ->
   $elements.each (i, el) ->
     $el = $(el)
     $el.select2
@@ -6,7 +6,7 @@ initializeSimpleSelects = ($elements = $('.initialize-select2')) ->
       allowClear: $el.data('allow-clear') or false
       minimumResultsForSearch: if $el.data('hide-search') then Infinity else 5
 
-initializeRecordSearch = ($elements = $('.select2-record-search')) ->
+window.initializeRecordSearch = ($elements = $('.select2-record-search')) ->
   $elements.each (i, el) ->
     $el = $(el)
     $el.select2
@@ -17,6 +17,12 @@ initializeRecordSearch = ($elements = $('.select2-record-search')) ->
           "#{data.result_type}: #{data.text}"
         else
           data.text
+      templateResult: if window.selectedStudyId? or window.accessibleStudyCount is 1
+        (state) -> $('<span>' + state.text + '</span>')
+      else
+        (state) ->
+          return $('<span>' + state.text + '</span>') unless state.study_name?
+          $('<span>' + state.text + ' <span class="select2-study-note">(' +  state.study_name +  ')</span></span>')
       ajax:
         url: $el.data('url') or '/v1/search.json'
         data: (params) ->

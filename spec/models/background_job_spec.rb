@@ -1,11 +1,13 @@
 RSpec.describe BackgroundJob do
   describe 'scope ::searchable' do
+    let!(:job) { create(:background_job, name: 'FooJob') }
+
     it 'selects search fields' do
-      job = create(:background_job, name: 'FooJob')
       expect(BackgroundJob.searchable.as_json)
         .to eq [{
                   'id' => nil,
                   'study_id' => nil,
+                  'study_name' => nil,
                   'text' => 'FooJob',
                   'result_id' => job.id,
                   'result_type' => 'BackgroundJob'

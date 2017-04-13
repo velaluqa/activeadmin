@@ -55,11 +55,12 @@ class ImageSeries < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
-  scope :searchable, -> { joins(patient: :center).select(<<SELECT) }
+  scope :searchable, -> { join_study.select(<<SELECT) }
 centers.study_id AS study_id,
+studies.name AS study_name,
 image_series.name || ' (' || image_series.series_number::text || ')' AS text,
 image_series.id AS result_id,
-'ImageSeries' AS result_type
+'ImageSeries'::varchar AS result_type
 SELECT
 
   scope :join_study, -> { joins(patient: { center: :study }) }
