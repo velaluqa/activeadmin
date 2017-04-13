@@ -8,6 +8,7 @@ module ActiveAdmin
 
           within @head do
             render partial: 'layouts/script_current_user'
+            render partial: 'layouts/script_studies'
           end
         end
       end

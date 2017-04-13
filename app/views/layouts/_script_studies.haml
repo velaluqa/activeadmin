@@ -1,0 +1,10 @@
+- if current_user
+  :coffeescript
+    @selectedStudyId = #{session[:selected_study_id].to_json}
+    @selectedStudyName = #{session[:selected_study_name].to_json}
+    @accessibleStudyCount = #{Study.accessible_by(current_ability).count}
+- else
+  :coffeescript
+    @selectedStudyId = null
+    @selectedStudyName = null
+    @accessibleStudyCount = 0
