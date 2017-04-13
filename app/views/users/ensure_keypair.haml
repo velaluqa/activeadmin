@@ -1,0 +1,10 @@
+.row-fluid
+  .offset4.span4
+    = form_for(@user, url: users_create_keypair_path, html: { class: 'form-login' }) do |f|
+      %h3.form-signin-heading Generate Keypair
+      %p To use all features of the ERICA system, you need to create a keypair with its own password. This keypair is used to sign certain actions you perform within the ERICA system.
+      .form-group.form-group-lg
+        = f.password_field(:signature_password, :class => 'form-control', :placeholder => 'Signature Password')
+      .form-group.form-group-lg
+        = f.password_field(:signature_password_confirmation, :class => 'form-control', :placeholder => 'Signature Password Confirmation')
+      .pull-right= f.submit("Create Keypair", :class => 'btn btn-primary btn-lg')

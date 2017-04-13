@@ -7,7 +7,6 @@ class UsersController < ApplicationController
   layout 'devise'
 
   def change_password
-    @dont_display_navbar = true
   end
 
   def update_password
@@ -34,8 +33,35 @@ class UsersController < ApplicationController
       respond_to do |format|
         format.html { redirect_to users_change_password_path }
         format.json { render :json => {:success => false, :error_code => 1, :error => @user.errors.full_messages.join("\n")}, :status => :bad_request }
-      end      
-    end    
+      end
+    end
+  end
+
+  def ensure_keypair
+  end
+
+  def create_keypair
+    password = params[:user][:signature_password]
+    confirmation = params[:user][:signature_password_confirmation]
+
+    if password != confirmation
+      flash[:error] = 'Password and confirmation do not match.'
+      respond_to do |format|
+        format.html { redirect_to users_ensure_keypair_path }
+        format.json { render json: { success: false, error_code: 1, error: flash[:error] }, status: :bad_request }
+      end
+    elsif password.length < 6
+      flash[:error] = 'Password too short (must be at least 6 characters).'
+      respond_to do |format|
+        format.html { redirect_to users_ensure_keypair_path }
+        format.json { render json: { success: false, error_code: 1, error: flash[:error] }, status: :bad_request }
+      end
+    else
+      current_user.generate_keypair(password)
+
+      redirect_path = session.delete(:after_validity_check_path)
+      redirect_to(redirect_path || root_path)
+    end
   end
 
   def uploader_rights

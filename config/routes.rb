@@ -12,6 +12,8 @@ StudyServer::Application.routes.draw do
     post 'users/authenticate', to: 'users/sessions#authenticate_user'
     get 'users/change_password', to: 'users#change_password'
     patch 'users/update_password', to: 'users#update_password'
+    get 'users/ensure_keypair', to: 'users#ensure_keypair'
+    patch 'users/create_keypair', to: 'users#create_keypair'
     get 'users/uploader_rights', to: 'users#uploader_rights'
   end
 

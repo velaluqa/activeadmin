@@ -151,6 +151,14 @@ SELECT
     [:id]
   end
 
+  def has_valid_password?
+    !(password_changed_at.nil? || password_changed_at < Rails.application.config.max_allowed_password_age.ago)
+  end
+
+  def has_valid_keypair?
+    private_key && public_keys.where(active: true).exists?
+  end
+
   def is_erica_remote_user?
     # TODO: this is filthy, dirty hack territory...
     self.id >= 1000 and roles.all? {|role| role.erica_remote_role? }
