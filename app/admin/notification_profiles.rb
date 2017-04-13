@@ -32,7 +32,11 @@ ActiveAdmin.register NotificationProfile do
     selectable_column
     column :title
     column :is_enabled do |profile|
-      profile.is_enabled ? 'enabled' : ''
+      if profile.is_enabled
+        status_tag('Enabled', :ok)
+      else
+        status_tag('Disabled', :error)
+      end
     end
     column :triggering_actions do |profile|
       profile.triggering_actions.join(', ')
