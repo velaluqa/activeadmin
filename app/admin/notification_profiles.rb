@@ -42,9 +42,6 @@ ActiveAdmin.register NotificationProfile do
       profile.triggering_actions.join(', ')
     end
     column :triggering_resource
-    column :email_template do |profile|
-      profile.email_template.name
-    end
     customizable_default_actions(current_ability)
   end
 
