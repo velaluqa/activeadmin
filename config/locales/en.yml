@@ -30,3 +30,10 @@ en:
             what you do. This can lead to problems in project
             management, because the code is used to identify centers
             across documents.
+
+  model:
+    notification_profile:
+      filter_triggering_user:
+        exclude: Exclude triggering user
+        include: Include triggering user
+        only: Only target triggering user

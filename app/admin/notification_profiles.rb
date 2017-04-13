@@ -46,37 +46,63 @@ ActiveAdmin.register NotificationProfile do
 
   show do |profile|
     attributes_table do
-      row :id
       row :title
       row :description
-      row :is_enabled do
-        profile.is_enabled ? 'enabled' : ''
-      end
-      row :triggering_actions do
-        profile.triggering_actions.join(', ')
-      end
-      row :triggering_resource
-      row :filters do
-        profile.filter.to_s
-      end
-      row :users do
-        profile.users
-          .map { |user| link_to(user.username, admin_url_for(user)) }
-          .join(', ')
-          .html_safe
-      end
-      row :roles do
-        profile.roles
-          .map { |role| link_to(role.title, admin_url_for(role)) }
-          .join(', ')
-          .html_safe
-      end
-      row :only_authorized_recipients
+      row :is_enabled
       row :email_template do
         profile.email_template.name
       end
       row :maximum_email_throttling_delay do
-        Email::THROTTLING_DELAYS.key(profile.maximum_email_throttling_delay)
+        delay = Email::THROTTLING_DELAYS.key(profile.maximum_email_throttling_delay)
+        status_tag(delay, :note)
+      end
+    end
+
+    panel 'Triggering Settings' do
+      attributes_table_for profile do
+        row :triggering_actions do
+          profile.triggering_actions.each do |action|
+            case action
+            when 'create' then status_tag(action, :ok)
+            when 'update' then status_tag(action, :warning)
+            when 'destroy' then status_tag(action, :error)
+            end
+          end
+          ""
+        end
+        row :triggering_resource
+        row :filters do
+          profile.filter.to_s
+        end
+      end
+    end
+
+    panel 'Recipients' do
+      attributes_table_for profile do
+        row :users do
+          if profile.all_users?
+            "All users"
+          else
+            profile.users
+              .map { |user| link_to(user.username, admin_url_for(user)) }
+              .join(', ')
+              .html_safe
+          end
+        end
+        row :roles do
+          if profile.all_users?
+            "All roles"
+          else
+            profile.roles
+              .map { |role| link_to(role.title, admin_url_for(role)) }
+              .join(', ')
+              .html_safe
+          end
+        end
+        row :filter_triggering_user do
+          t("model.notification_profile.filter_triggering_user.#{profile.filter_triggering_user}")
+        end
+        row :only_authorized_recipients
       end
     end
   end
@@ -117,7 +143,17 @@ ActiveAdmin.register NotificationProfile do
         }
       )
 
-      f.input :filter_triggering_user, as: :select, collection: ['exclude', 'include', 'only'], input_html: { class: 'initialize-select2', 'data-placeholder' => 'Choose filter for triggering user' }
+      f.input(
+        :filter_triggering_user,
+        as: :select,
+        collection: ['exclude', 'include', 'only'].map do |value|
+          [t("model.notification_profile.filter_triggering_user.#{value}"), value]
+        end,
+        input_html: {
+          class: 'initialize-select2',
+          'data-placeholder' => 'Choose filter for triggering user'
+        }
+      )
       f.input :only_authorized_recipients
       f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2', 'data-placeholder': 'Select maximum email throttling delay' }
       f.input :email_template_id, as: :select, collection: EmailTemplate.where(email_type: 'NotificationProfile'), input_html: { class: 'initialize-select2', 'data-placeholder': 'Select template' }
