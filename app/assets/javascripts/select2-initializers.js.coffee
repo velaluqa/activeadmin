@@ -17,6 +17,11 @@ window.initializeRecordSearch = ($elements = $('.select2-record-search')) ->
           "#{data.result_type}: #{data.text}"
         else
           data.text
+      templateResult: (state) ->
+        if state.study_name
+          $('<span>' + state.text + ' <span class="select2-study-note">(' +  state.study_name +  ')</span></span>')
+        else
+          $('<span>' + state.text + '</span>')
       ajax:
         url: $el.data('url') or '/v1/search.json'
         data: (params) ->
