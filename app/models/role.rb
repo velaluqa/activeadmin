@@ -32,10 +32,10 @@ class Role < ActiveRecord::Base
   validates :title, presence: true, uniqueness: true
 
   scope :searchable, -> { select(<<SELECT) }
-NULL AS study_id,
+NULL::integer AS study_id,
 roles.title AS text,
 roles.id AS result_id,
-'Role' AS result_type
+'Role'::varchar AS result_type
 SELECT
 
   def self.granted_for(options = {})

@@ -124,10 +124,10 @@ class User < ActiveRecord::Base
   end
 
   scope :searchable, -> { select(<<SELECT) }
-NULL AS study_id,
+NULL::integer AS study_id,
 users.name AS text,
 users.id AS result_id,
-'User' AS result_type
+'User'::varchar AS result_type
 SELECT
 
   def self.granted_for(options = {})

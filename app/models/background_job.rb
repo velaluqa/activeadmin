@@ -50,10 +50,10 @@ class BackgroundJob < ActiveRecord::Base
   }
 
   scope :searchable, -> { select(<<SELECT) }
-NULL AS study_id,
+NULL::integer AS study_id,
 background_jobs.name AS text,
 background_jobs.id AS result_id,
-'BackgroundJob' AS result_type
+'BackgroundJob'::varchar AS result_type
 SELECT
 
   ##

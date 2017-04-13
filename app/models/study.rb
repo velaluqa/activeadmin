@@ -47,7 +47,7 @@ class Study < ActiveRecord::Base
 studies.id AS study_id,
 studies.name AS text,
 studies.id AS result_id,
-'Study' AS result_type
+'Study'::varchar AS result_type
 SELECT
 
   include ImageStorageCallbacks

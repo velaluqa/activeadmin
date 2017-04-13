@@ -49,7 +49,7 @@ class Patient < ActiveRecord::Base
 centers.study_id AS study_id,
 centers.code || patients.subject_id AS text,
 patients.id AS result_id,
-'Patient' AS result_type
+'Patient'::varchar AS result_type
 SELECT
 
   scope :join_study, -> { joins(center: :study) }

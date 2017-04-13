@@ -39,7 +39,7 @@ class Image < ActiveRecord::Base
 centers.study_id AS study_id,
 image_series.series_number::text || '#' || images.id AS text,
 images.id AS result_id,
-'Image' AS result_type
+'Image'::varchar AS result_type
 SELECT
 
   scope :join_study, -> { joins(image_series: { patient: { center: :study } }) }

@@ -63,7 +63,7 @@ JOIN
 centers.study_id AS study_id,
 centers.code || ' - ' || centers.name AS text,
 centers.id AS result_id,
-'Center' AS result_type
+'Center'::varchar AS result_type
 SELECT
 
 
