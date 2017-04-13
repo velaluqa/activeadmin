@@ -114,13 +114,13 @@ class Ability
   # permitted to manage his own user account and his own public keys.
   def define_basic_abilities
     unless can?(:manage, User)
-      can [:read, :update, :generate_keypair], User, ['users.id = ?', current_user.id] do |user|
+      can [:read, :update, :generate_keypair, :change_password], User, ['users.id = ?', current_user.id] do |user|
         user == current_user
       end
     end
 
     unless can?(:manage, PublicKey)
-      can [:read, :update, :generate_keypair], PublicKey, ['public_keys.user_id = ?', current_user.id] do |public_key|
+      can [:read, :update, :generate_keypair, :change_password], PublicKey, ['public_keys.user_id = ?', current_user.id] do |public_key|
         public_key.user == current_user
       end
     end
