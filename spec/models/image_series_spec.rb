@@ -31,13 +31,13 @@ RSpec.describe ImageSeries do
 
   describe 'scope ::searchable' do
     it 'selects search fields' do
-      series = create(:image_series, series_number: '123')
+      series = create(:image_series, name: 'FooSeries', series_number: '123')
       expect(ImageSeries.searchable.as_json)
         .to eq [{
                   'id' => nil,
                   'study_id' => series.patient.center.study_id,
                   'study_name' => series.patient.center.study.name,
-                  'text' => 'image_series22 (123)',
+                  'text' => 'FooSeries (123)',
                   'result_id' => series.id,
                   'result_type' => 'ImageSeries'
                 }]
