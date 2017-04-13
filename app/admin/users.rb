@@ -118,11 +118,14 @@ ActiveAdmin.register User do
       input :name
       input :email
       if object.new_record? || can?(:change_password, object)
-        input :password, :required => object.new_record?
+        input :password, required: object.new_record?
         input :password_confirmation
       end
-      if object.new_record?
-        input :signature_password, :required => true
+    end
+    if object.new_record?
+      inputs 'Signature Password' do
+        para 'If you do not set a signature password for a new user, the user will be asked to specify a password upon first login to the ERICA system.'
+        input :signature_password
         input :signature_password_confirmation
       end
     end
