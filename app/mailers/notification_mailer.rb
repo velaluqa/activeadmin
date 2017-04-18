@@ -13,6 +13,7 @@ class NotificationMailer < ActionMailer::Base
   #
   # @return [Mail] The mail that may be delivered
   def throttled_notification_email(user, profile, notifications)
+    headers 'X-Notification-IDs' => notifications.map(&:id).join(';')
     mail(
       to: user.email,
       subject: profile.title,
@@ -27,6 +28,7 @@ class NotificationMailer < ActionMailer::Base
   #
   # @return [Mail] The mail that may be delivered
   def instant_notification_email(notification)
+    headers 'X-Notification-IDs' => notification.id.to_s
     mail(
       to: notification.user.email,
       subject: notification.notification_profile.title,

@@ -1,0 +1,3 @@
+require 'observers/notification_mailer_observer'
+
+NotificationMailer.register_observer(NotificationMailerObserver)
