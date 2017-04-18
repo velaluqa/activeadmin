@@ -17,7 +17,8 @@ module Report
 
   def self.mappings
     @mappings ||= {
-      Visit => { 'state' => Visit::STATE_SYMS }
+      Visit => { 'state' => Visit::STATE_SYMS },
+      ImageSeries => { 'state' => ImageSeries::STATE_SYMS }
     }
   end
 
