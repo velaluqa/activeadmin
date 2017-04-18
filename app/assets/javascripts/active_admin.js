@@ -22,6 +22,7 @@
 //= require vendor/polyfill_promise
 //= require vendor/naturalSort
 //= require vendor/Chart.bundle
+//= require vendor/Chart.even-tick-distribution
 //= require shared/promise_queue
 //= require shared/user
 //= require select2-initializers
