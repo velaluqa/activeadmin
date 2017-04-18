@@ -9,6 +9,8 @@ FactoryGirl.define do
     # When building notifications with factory_girl, we do not want to
     # run the callbacks for instant notification emails.
     after(:build) do |notification|
+      notification.version = notification.resource.versions.last
+
       class << notification
         def send_instant_notification_email
           true
