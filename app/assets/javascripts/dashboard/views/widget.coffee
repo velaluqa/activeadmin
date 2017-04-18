@@ -68,6 +68,9 @@ class Dashboard.Views.Widget extends Backbone.View
                 hour: 'DD.MM.YYYY HH:mm'
                 minute: 'DD.MM.YYYY HH:mm'
                 second: 'DD.MM.YYYY HH:mm:ss'
+            ticks:
+              autoSkip: true
+              maxTicksLimit: 6
           ]
 
   transformDataSets: (datasets) ->
