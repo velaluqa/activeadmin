@@ -59,16 +59,18 @@ module Report
       else
         rel = rel.where('"historic_report_cache_values"."group" IS NOT NULL')
       end
-      rel.group(<<GROUP)
-date_trunc('#{@resolution}', "historic_report_cache_entries"."date")#{date_resolution? ? '::date' : ''},
-"historic_report_cache_values"."group"
-GROUP
+      rel
         .select(<<SELECT)
+DISTINCT ON(date_trunc('#{@resolution}', "historic_report_cache_entries"."date")#{date_resolution? ? '::date' : ''}, "historic_report_cache_values"."group")
 date_trunc('#{@resolution}', "historic_report_cache_entries"."date")#{date_resolution? ? '::date' : ''} AS date,
 "historic_report_cache_values"."group" AS group,
-MAX("historic_report_cache_values"."count") AS max
+count AS max
 SELECT
-        .order('date')
+        .order(<<ORDER)
+date_trunc('#{@resolution}', "historic_report_cache_entries"."date")#{date_resolution? ? '::date' : ''} ASC,
+"historic_report_cache_values"."group" ASC,
+"historic_report_cache_entries"."date" DESC
+ORDER
         .to_sql
     end
 
