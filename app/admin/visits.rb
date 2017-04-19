@@ -107,7 +107,7 @@ ActiveAdmin.register Visit do
         when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
         when :incomplete_queried then status_tag('Incomplete, queried', :warning)
         when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
-        when :complete_tqc_issues then stauts_tag('Complete, tQC finished, not all series passed', :error)
+        when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', :error)
         end
       end
       column 'mQC State', :mqc_state, :sortable => :mqc_state do |visit|
@@ -151,7 +151,7 @@ ActiveAdmin.register Visit do
           when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
           when :incomplete_queried then status_tag('Incomplete, queried', :warning)
           when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
-          when :complete_tqc_issues then stauts_tag('Complete, tQC finished, not all series passed', :error)
+          when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', :error)
           end
         end
         row 'mQC State' do
