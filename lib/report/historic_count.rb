@@ -50,28 +50,70 @@ module Report
     end
 
     def historic_query
-      rel =
-        @query.cache_entries
-          .joins(:historic_report_cache_values)
-          .where(study_id: @study_id)
+      date_trunc = "date_trunc('#{@resolution}', entries.\"date\")#{date_resolution? ? '::date' : ''}"
       if @group_by.blank?
-        rel = rel.where('"historic_report_cache_values"."group" IS NULL')
-      else
-        rel = rel.where('"historic_report_cache_values"."group" IS NOT NULL')
-      end
-      rel
-        .select(<<SELECT)
-DISTINCT ON(date_trunc('#{@resolution}', "historic_report_cache_entries"."date")#{date_resolution? ? '::date' : ''}, "historic_report_cache_values"."group")
-date_trunc('#{@resolution}', "historic_report_cache_entries"."date")#{date_resolution? ? '::date' : ''} AS date,
-"historic_report_cache_values"."group" AS group,
-count AS max
+        return <<QUERY
 SELECT
-        .order(<<ORDER)
-date_trunc('#{@resolution}', "historic_report_cache_entries"."date")#{date_resolution? ? '::date' : ''} ASC,
-"historic_report_cache_values"."group" ASC,
-"historic_report_cache_entries"."date" DESC
-ORDER
-        .to_sql
+  DISTINCT ON (#{date_trunc})
+  #{date_trunc} AS date,
+  values."group" AS "group",
+  values.count AS max
+FROM
+  historic_report_cache_entries entries,
+  historic_report_cache_values values
+WHERE
+  values.historic_report_cache_entry_id = entries.id AND
+  entries.historic_report_query_id = #{@query.id} AND
+  entries.study_id = #{@study_id}
+ORDER BY #{date_trunc}, entries.date DESC;
+QUERY
+      end
+      <<QUERY
+WITH
+  groups AS (
+    SELECT DISTINCT _hcv."group"
+    FROM
+      historic_report_cache_entries _hce,
+      historic_report_cache_values _hcv
+    WHERE
+      _hce.id = _hcv.historic_report_cache_entry_id AND
+      _hce.historic_report_query_id = #{@query.id} AND
+      _hcv."group" IS NOT NULL
+  ),
+  date_anchor AS (
+    SELECT * FROM (VALUES ('2000-01-01 00:00:00'::timestamp, 0::integer)) AS anchor(date, value)
+  ),
+  values AS (
+    SELECT
+      _hce.date,
+      _hcv.group,
+      _hcv.count
+    FROM
+      historic_report_cache_entries _hce,
+      historic_report_cache_values _hcv
+    WHERE
+      _hce.id = _hcv.historic_report_cache_entry_id AND
+      _hce.historic_report_query_id = #{@query.id} AND
+      _hce.study_id = #{@study_id}
+
+    UNION
+
+    SELECT date, "group", value FROM groups, date_anchor
+  )
+SELECT
+  DISTINCT ON (#{date_trunc}, groups."group")
+  #{date_trunc} AS date,
+  groups."group" AS group,
+  values.count AS max
+FROM historic_report_cache_entries entries
+CROSS JOIN groups
+INNER JOIN values ON values."group" = groups."group"
+WHERE
+  entries.historic_report_query_id = #{@query.id} AND
+  entries.study_id = #{@study_id} AND
+  values.date <= entries.date
+ORDER BY #{date_trunc}, groups."group", values.date DESC;
+QUERY
     end
 
     def grouped_cache_result
