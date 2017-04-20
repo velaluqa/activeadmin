@@ -54,6 +54,8 @@ class Dashboard.Views.Widget extends Backbone.View
         legend:
           display: model.get('datasets').length > 1
           position: 'bottom'
+        tooltips:
+          mode: 'x'
         scales:
           yAxes: [
             ticks:
