@@ -58,6 +58,7 @@ class Dashboard.Views.Widget extends Backbone.View
           yAxes: [
             ticks:
               min: 0
+            stacked: true
           ]
           xAxes: [
             type: 'time'
