@@ -23,7 +23,12 @@ require 'domino_integration_client'
 # **`updated_at`**            | `datetime`         |
 #
 class Study < ActiveRecord::Base
-  has_paper_trail class_name: 'Version'
+  has_paper_trail(
+    class_name: 'Version',
+    meta: {
+      study_id: :id
+    }
+  )
   acts_as_taggable
 
   attr_accessible :name, :locked_version, :domino_db_url, :domino_server_name, :notes_links_base_uri, :state
@@ -207,7 +212,7 @@ JOIN
   def to_s
     name
   end
-  
+
   protected
 
   def run_schema_validation(config)
@@ -220,7 +225,7 @@ JOIN
   # Notes://<server>/<replica id>/<view id>/<document unid>
   def update_notes_links_base_uri
     return true if self.domino_db_url.blank?
-    
+
     new_notes_links_base_uri = URI(self.domino_db_url)
     begin
       new_notes_links_base_uri.host = self.domino_server_name unless self.domino_server_name.blank?
@@ -246,7 +251,7 @@ JOIN
     else
       new_notes_links_base_uri.path = "/#{replica_id}/#{collection_unid}/"
       self.notes_links_base_uri = new_notes_links_base_uri.to_s
-      true      
+      true
     end
   end
 
