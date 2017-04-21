@@ -13,6 +13,7 @@
 # **`item_type`**       | `string`           | `not null`
 # **`object`**          | `jsonb`            |
 # **`object_changes`**  | `jsonb`            |
+# **`study_id`**        | `integer`          |
 # **`whodunnit`**       | `string`           |
 #
 # ### Indexes
