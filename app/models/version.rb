@@ -25,6 +25,8 @@
 class Version < PaperTrail::Version
   has_many :notifications
 
+  attr_accessible(:study_id)
+
   after_commit(:trigger_notification_profiles, on: :create)
 
   def triggering_user
