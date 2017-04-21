@@ -46,6 +46,19 @@ class Version < PaperTrail::Version
     end
   end
 
+  # TODO: When updated to Ruby 2.4 use `Hash#transform_values`.
+  def complete_attributes
+    if event == 'destroy'
+      object
+    else
+      (object || {}).merge(
+        complete_changes
+          .map { |k, v| [k, v[1]] }
+          .to_h
+      )
+    end
+  end
+
   private
 
   def trigger_notification_profiles
