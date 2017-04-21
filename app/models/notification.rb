@@ -37,7 +37,10 @@ class Notification < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',
     version: :paper_trail_version,
-    versions: :paper_trail_versions
+    versions: :paper_trail_versions,
+    meta: {
+      study_id: -> (notification) { notification.study.andand.id }
+    }
   )
 
   after_commit(:send_instant_notification_email, on: :create)
@@ -49,6 +52,7 @@ class Notification < ActiveRecord::Base
 
   validates :user, presence: true
   validates :notification_profile, presence: true
+  validates :version, presence: true
 
   # All notifications that have not yet been sent.
   scope :pending, -> { where(email_sent_at: nil) }
@@ -69,6 +73,11 @@ class Notification < ActiveRecord::Base
     (options[:joins] ? joins(:notification_profile, :user) : all)
       .where('least(?, notification_profiles.maximum_email_throttling_delay, users.email_throttling_delay) = ?',
              ERICA.maximum_email_throttling_delay, throttle)
+  end
+
+  def study
+    return if version.study_id.blank?
+    Study.find(version.study_id)
   end
 
   # Returns the delay to which this notification is throttled.

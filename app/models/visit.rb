@@ -45,7 +45,12 @@ require 'git_config_repository'
 class Visit < ActiveRecord::Base
   include DominoDocument
 
-  has_paper_trail class_name: 'Version'
+  has_paper_trail(
+    class_name: 'Version',
+    meta: {
+      study_id: -> (visit) { visit.study.andand.id }
+    }
+  )
   acts_as_taggable
 
   attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid

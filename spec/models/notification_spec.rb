@@ -114,8 +114,54 @@ RSpec.describe Notification do
 
       it 'schedules an instant notification job' do
         expect(SendInstantNotificationEmail).not_to have_enqueued_sidekiq_job
-        notification = @profile.notifications.create(user: @user, triggering_action:'create', resource: @visit)
+        notification = @profile.notifications.create!(
+          user: @user,
+          triggering_action: 'create',
+          resource: @visit,
+          version: @visit.versions.last
+        )
         expect(SendInstantNotificationEmail).to have_enqueued_sidekiq_job(notification.id)
+      end
+    end
+  end
+
+  describe 'versioning' do
+    describe 'create' do
+      before(:each) do
+        @notification = create(:notification)
+        @study_id = @notification.study.id
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Notification').last
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'update' do
+      before(:each) do
+        @notification = create(:notification)
+        @study_id = @notification.study.id
+        @notification.updated_at = DateTime.now
+        @notification.save!
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Notification').last
+        expect(version.event).to eq 'update'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'destroy' do
+      before(:each) do
+        @notification = create(:notification)
+        @study_id = @notification.study.id
+        @notification.destroy
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Notification').last
+        expect(version.event).to eq 'destroy'
+        expect(version.study_id).to eq @study_id
       end
     end
   end

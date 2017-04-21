@@ -141,4 +141,45 @@ RSpec.describe Center do
         .to match_array [@center11, @center12, @center31, @center32]
     end
   end
+
+  describe 'versioning' do
+    describe 'create' do
+      before(:each) do
+        @center = create(:center)
+        @study_id = @center.study_id
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Center').last
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'update' do
+      before(:each) do
+        @center = create(:center)
+        @study_id = @center.study_id
+        @center.name = 'New Name'
+        @center.save!
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Center').last
+        expect(version.event).to eq 'update'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'destroy' do
+      before(:each) do
+        @center = create(:center)
+        @study_id = @center.study_id
+        @center.destroy
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Center').last
+        expect(version.event).to eq 'destroy'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+  end
 end

@@ -13,6 +13,7 @@
 # **`item_type`**       | `string`           | `not null`
 # **`object`**          | `jsonb`            |
 # **`object_changes`**  | `jsonb`            |
+# **`study_id`**        | `integer`          |
 # **`whodunnit`**       | `string`           |
 #
 # ### Indexes
@@ -23,6 +24,8 @@
 #
 class Version < PaperTrail::Version
   has_many :notifications
+
+  attr_accessible(:study_id)
 
   after_commit(:trigger_notification_profiles, on: :create)
 
@@ -40,6 +43,19 @@ class Version < PaperTrail::Version
       end.compact.to_h
     else
       object_changes
+    end
+  end
+
+  # TODO: When updated to Ruby 2.4 use `Hash#transform_values`.
+  def complete_attributes
+    if event == 'destroy'
+      object
+    else
+      (object || {}).merge(
+        complete_changes
+          .map { |k, v| [k, v[1]] }
+          .to_h
+      )
     end
   end
 

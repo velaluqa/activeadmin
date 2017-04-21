@@ -25,7 +25,12 @@
 class Center < ActiveRecord::Base
   include DominoDocument
 
-  has_paper_trail class_name: 'Version'
+  has_paper_trail(
+    class_name: 'Version',
+    meta: {
+      study_id: -> (center) { center.study.andand.id }
+    }
+  )
   acts_as_taggable
 
   attr_accessible :name, :study, :code, :domino_unid
@@ -80,7 +85,7 @@ SELECT
 
   before_destroy do
     unless patients.empty?
-      errors.add :base, 'You cannot delete a center which has patients associated.' 
+      errors.add :base, 'You cannot delete a center which has patients associated.'
       return false
     end
   end
@@ -90,7 +95,7 @@ SELECT
   def full_name
     self.code + ' - ' + self.name
   end
-  
+
   def image_storage_path
     "#{study.image_storage_path}/#{id}"
   end
@@ -115,7 +120,7 @@ SELECT
     {
       'ericaID' => self.id,
       'CenterNo' => self.code,
-    }.merge!(action == :create ? {'CenterShortName' => self.name} : {})    
+    }.merge!(action == :create ? {'CenterShortName' => self.name} : {})
   end
   def domino_sync
     self.ensure_domino_document_exists
@@ -141,8 +146,13 @@ SELECT
            end
   end
 
+  def read_study_id
+    binding.pry
+    read_attribute(:study_id)
+  end
+
   protected
-  
+
   def ensure_study_is_unchanged
     if persisted? && study_id_changed?
       errors[:study] << 'A center cannot be reassigned to a different study.'

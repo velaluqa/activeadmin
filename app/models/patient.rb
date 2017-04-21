@@ -24,7 +24,12 @@
 class Patient < ActiveRecord::Base
   include DominoDocument
 
-  has_paper_trail class_name: 'Version'
+  has_paper_trail(
+    class_name: 'Version',
+    meta: {
+      study_id: -> (patient) { patient.study.andand.id }
+    }
+  )
   acts_as_taggable
 
   attr_accessible :center, :subject_id, :domino_unid

@@ -191,4 +191,45 @@ RSpec.describe Visit do
         ]
     end
   end
+
+  describe 'versioning' do
+    describe 'create' do
+      before(:each) do
+        @visit = create(:visit)
+        @study_id = @visit.study.id
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Visit').last
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'update' do
+      before(:each) do
+        @visit = create(:visit)
+        @study_id = @visit.study.id
+        @visit.description = 'New Name'
+        @visit.save!
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Visit').last
+        expect(version.event).to eq 'update'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'destroy' do
+      before(:each) do
+        @visit = create(:visit)
+        @study_id = @visit.study.id
+        @visit.destroy
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Visit').last
+        expect(version.event).to eq 'destroy'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+  end
 end

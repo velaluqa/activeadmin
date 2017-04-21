@@ -182,4 +182,45 @@ YAML
 
     end
   end
+
+  describe 'versioning' do
+    describe 'create' do
+      before(:each) do
+        @study = create(:study)
+        @study_id = @study.id
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Study').last
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'update' do
+      before(:each) do
+        @study = create(:study)
+        @study_id = @study.id
+        @study.name = 'New Name'
+        @study.save!
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Study').last
+        expect(version.event).to eq 'update'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'destroy' do
+      before(:each) do
+        @study = create(:study)
+        @study_id = @study.id
+        @study.destroy
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Study').last
+        expect(version.event).to eq 'destroy'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+  end
 end
