@@ -481,7 +481,7 @@ JOIN_QUERY
     (old_assigned_image_series - new_assigned_image_series).uniq.each do |unassigned_series_id|
       unassigned_series = ImageSeries.where(:id => unassigned_series_id).first
       if(unassigned_series and unassigned_series.state_sym == :required_series_assigned)
-        unassigned_series.state_sym = (unassigned_series.visit.nil? ? :imported : :visit_assigned)
+        unassigned_series.state = (unassigned_series.visit.nil? ? :imported : :visit_assigned)
         unassigned_series.save
       end
     end
@@ -569,7 +569,7 @@ JOIN_QUERY
       all_passed &&= (not result.nil? and result[spec['id']] == true)
     end
 
-    self.mqc_state_sym = all_passed ? :passed : :issues
+    self.mqc_state = all_passed ? :passed : :issues
     self.mqc_user_id = mqc_user.is_a?(User) ? mqc_user.id : mqc_user
     self.mqc_date = mqc_date || Time.now
     self.mqc_results = result
