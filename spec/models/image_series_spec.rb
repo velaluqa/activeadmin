@@ -148,4 +148,45 @@ RSpec.describe ImageSeries do
         ]
     end
   end
+
+  describe 'versioning' do
+    describe 'create' do
+      before(:each) do
+        @image_series = create(:image_series)
+        @study_id = @image_series.study.id
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'ImageSeries').last
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'update' do
+      before(:each) do
+        @image_series = create(:image_series)
+        @study_id = @image_series.study.id
+        @image_series.name = 'New Name'
+        @image_series.save!
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'ImageSeries').last
+        expect(version.event).to eq 'update'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'destroy' do
+      before(:each) do
+        @image_series = create(:image_series)
+        @study_id = @image_series.study.id
+        @image_series.destroy
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'ImageSeries').last
+        expect(version.event).to eq 'destroy'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+  end
 end
