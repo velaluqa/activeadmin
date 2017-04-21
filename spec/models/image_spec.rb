@@ -128,4 +128,45 @@ RSpec.describe Image do
       expect(dicom.patients_name.value).to eq "#{@image.image_series.patient.center_id}#{@image.image_series.patient.subject_id}"
     end
   end
+
+  describe 'versioning' do
+    describe 'create' do
+      before(:each) do
+        @image = create(:image)
+        @study_id = @image.study.id
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Image').last
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'update' do
+      before(:each) do
+        @image = create(:image)
+        @study_id = @image.study.id
+        @image.updated_at = DateTime.now
+        @image.save!
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Image').last
+        expect(version.event).to eq 'update'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+    describe 'destroy' do
+      before(:each) do
+        @image = create(:image)
+        @study_id = @image.study.id
+        @image.destroy
+      end
+
+      it 'saves the `study_id` to the version' do
+        version = Version.where(item_type: 'Image').last
+        expect(version.event).to eq 'destroy'
+        expect(version.study_id).to eq @study_id
+      end
+    end
+  end
 end
