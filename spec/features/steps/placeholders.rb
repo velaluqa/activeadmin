@@ -1,6 +1,6 @@
 placeholder :activity do
-  activities = Ability::ACTIVITIES.values.flatten.uniq
   match(/([^ $\n]+)/) do |activity|
+    activities = Ability::ACTIVITIES.values.flatten.uniq
     sym = activity.to_sym
     unless activities.include?(sym)
       fail "Activity `#{sym}` not defined in `Ability`"
