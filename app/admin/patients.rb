@@ -33,9 +33,9 @@ ActiveAdmin.register Patient do
       return selected_filters
     end
 
-    before_filter :authorize_erica_remote, only: :index
+    before_filter :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
     def authorize_erica_remote
-      return unless !ERICA.remote? || params[:format].blank?
+      return if params[:format].blank?
       authorize! :download_status_files, Patient
     end
 
