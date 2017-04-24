@@ -100,7 +100,11 @@ QUERY
       @image_series_id = data['image_series_id']
       @tqc_results = data['tqc_results']
       @tqc_comment = data['tqc_comment']
-      @tqc_date = data['tqc_date']
+      @tqc_date =
+        case data['tqc_date']
+        when Time then data['tqc_date']
+        when String then Time.parse(data['tqc_date'])
+        end
       @tqc_version = data['tqc_version']
       @tqc_user_id = data['tqc_user_id']
       @tqc_state = data['tqc_state'] || RequiredSeries.tqc_state_sym_to_int(:pending)
