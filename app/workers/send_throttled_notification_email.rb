@@ -11,7 +11,8 @@ class SendThrottledNotificationEmail
   def perform(user_id, profile_id, notification_ids)
     user = User.find_by(id: user_id)
     profile = NotificationProfile.find_by(id: profile_id)
-    notifications = Notification.where(id: notification_ids)
+    notifications =
+      Notification.joins(:version).order('"versions"."study_id" ASC').where(id: notification_ids)
 
     NotificationMailer
       .throttled_notification_email(user, profile, notifications)
