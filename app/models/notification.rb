@@ -75,9 +75,13 @@ class Notification < ActiveRecord::Base
              ERICA.maximum_email_throttling_delay, throttle)
   end
 
+  # Returns the study of the notifications version.
+  # If no study found, `nil` is returned.
+  #
+  # @return [nil, Study] the study or `nil`
   def study
     return if version.study_id.blank?
-    Study.find(version.study_id)
+    Study.where(id: version.study_id).first
   end
 
   # Returns the delay to which this notification is throttled.
