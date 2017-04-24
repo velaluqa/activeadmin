@@ -549,7 +549,7 @@ JOIN_QUERY
       all_passed &&= (not result.nil? and result[spec['id']] == true)
     end
 
-    required_series = required_series[required_series_name]
+    required_series = self.required_series[required_series_name]
     return 'No assignment for this required series exists.' if required_series.nil?
 
     required_series['tqc_state'] = RequiredSeries.tqc_state_sym_to_int((all_passed ? :passed : :issues))
@@ -559,7 +559,7 @@ JOIN_QUERY
     required_series['tqc_results'] = result
     required_series['tqc_comment'] = tqc_comment
 
-    required_series[required_series_name] = required_series
+    self.required_series[required_series_name] = required_series
     save
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
