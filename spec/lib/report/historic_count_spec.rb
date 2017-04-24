@@ -91,7 +91,7 @@ describe Report::HistoricCount do
                 data: [
                   { x: '2016-12-31', y: 1 },
                   { x: '2017-01-03', y: 2 },
-                  { x: '2017-01-08', y: 4 },
+                  { x: '2017-01-08', y: 3 },
                   { x: '2017-01-11', y: 4 }
                 ]
               }, {
@@ -131,7 +131,7 @@ describe Report::HistoricCount do
                 label: :incomplete_na,
                 data: [
                   { x: '2016-12-26', y: 1 },
-                  { x: '2017-01-02', y: 4 },
+                  { x: '2017-01-02', y: 3 },
                   { x: '2017-01-09', y: 4 }
                 ]
               }, {
