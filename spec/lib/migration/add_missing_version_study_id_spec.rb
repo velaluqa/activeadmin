@@ -31,7 +31,7 @@ describe Migration::AddMissingVersionStudyId do
     describe '::run' do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
-        expect(Version.pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
+        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
       end
     end
 
