@@ -271,3 +271,50 @@ Kind Regards,
 
 Your Pharmtrace-Team
 ```
+
+#### Example: Displaying tQC results
+
+
+
+```liquid
+study - center - patient no - visit - image series - tQC result - details
+```liquid
+Dear {{user.name}},
+
+you receive this message because you are configured as recipient for
+notifications about study changes at http://study.pharmtrace.eu.
+
+<table>
+  <thead>
+	<tr>
+  	  <th>Study</th>
+	  <th>Center</th>
+	  <th>Patient Number</th>
+	  <th>Image Series</th>
+	  <th>State</th>
+	  <th>Failed Checks</th>
+	  <th></th>
+	</tr>
+  </thead>
+  <tbody>
+  {% for notification in notifications %}
+	{% assign visit = notification.resource %}
+	{% for series in visit.required_series %}
+    <tr>
+      <td>{{ visit.patient.center.study.name }}</td>
+      <td>{{ visit.patient.center.name }}</td>
+      <td>{{ visit.patient.subject_id }}</td>
+      <td>{{ series.name }}</td>
+      <td>{{ series.tqc_state }}</td>
+      <td>{{ series.failed_tqc_checks | join: ', ' }}</td>
+      <td>{{ notification.resource | link: 'Open in ERICA' }}</td>
+    </tr>
+	{% endfor %}
+  {% endfor %}
+  </tbody>
+</table>
+
+Kind Regards,
+
+Your Pharmtrace-Team
+```

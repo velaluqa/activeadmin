@@ -18,7 +18,11 @@ class VisitDrop < EricaDrop # :nodoc:
   attributes(:description)
 
   desc 'Required Series information.', :json
-  attributes(:required_series)
+  def required_series
+    object.required_series.keys.map do |name|
+      RequiredSeriesDrop.new(RequiredSeries.new(object, name))
+    end
+  end
 
   desc 'Index of the assigned image series.', :json
   attributes(:assigned_image_series_index)
