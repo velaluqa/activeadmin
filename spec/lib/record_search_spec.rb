@@ -41,6 +41,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' => study1.id.to_s,
+                'study_name' => study1.name,
                 'text' => 'TestStudy1',
                 'result_id' => study1.id.to_s,
                 'result_type' => 'Study'
@@ -48,6 +49,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' => study1.id.to_s,
+                'study_name' => study1.name,
                 'text' => "TestCenter1 - #{center1.name}",
                 'result_id' => center1.id.to_s,
                 'result_type' => 'Center'
@@ -55,6 +57,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' => study1.id.to_s,
+                'study_name' => study1.name,
                 'text' => 'TestCenter1TestPatient1',
                 'result_id' => patient1.id.to_s,
                 'result_type' => 'Patient'
@@ -62,6 +65,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' =>  study1.id.to_s,
+                'study_name' =>  study1.name,
                 'text'=> "TestCenter1TestPatient1##{visit1.visit_number}",
                 'result_id' => visit1.id.to_s,
                 'result_type' => 'Visit'
@@ -69,6 +73,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' => study2.id.to_s,
+                'study_name' => study2.name,
                 'text' => 'TestStudy2',
                 'result_id' => study2.id.to_s,
                 'result_type' => 'Study'
@@ -76,6 +81,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' => study2.id.to_s,
+                'study_name' => study2.name,
                 'text' => "TestCenter2 - #{center2.name}",
                 'result_id' => center2.id.to_s,
                 'result_type' => 'Center'
@@ -83,6 +89,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' => study2.id.to_s,
+                'study_name' => study2.name,
                 'text' => 'TestCenter2TestPatient2',
                 'result_id' => patient2.id.to_s,
                 'result_type' => 'Patient'
@@ -90,6 +97,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' =>  study2.id.to_s,
+                'study_name' =>  study2.name,
                 'text'=> "TestCenter2TestPatient2##{visit2.visit_number}",
                 'result_id' => visit2.id.to_s,
                 'result_type' => 'Visit'
@@ -110,6 +118,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' => study1.id.to_s,
+                'study_name' => study1.name,
                 'text' => 'TestStudy1',
                 'result_id' => study1.id.to_s,
                 'result_type' => 'Study'
@@ -117,6 +126,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                     'study_id' => study1.id.to_s,
+                    'study_name' => study1.name,
                     'text' => "TestCenter1 - #{center1.name}",
                     'result_id' => center1.id.to_s,
                     'result_type' => 'Center'
@@ -124,6 +134,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                     'study_id' => study1.id.to_s,
+                    'study_name' => study1.name,
                     'text' => 'TestCenter1TestPatient1',
                     'result_id' => patient1.id.to_s,
                     'result_type' => 'Patient'
@@ -131,6 +142,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                     'study_id' => study1.id.to_s,
+                    'study_name' => study1.name,
                     'text' => "TestCenter1TestPatient1##{visit1.visit_number}",
                     'result_id' => visit1.id.to_s,
                     'result_type' => 'Visit'
@@ -138,6 +150,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' => study2.id.to_s,
+                'study_name' => study2.name,
                 'text' => 'TestStudy2',
                 'result_id' => study2.id.to_s,
                 'result_type' => 'Study'
@@ -145,6 +158,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                     'study_id' => study2.id.to_s,
+                    'study_name' => study2.name,
                     'text' => "TestCenter2 - #{center2.name}",
                     'result_id' => center2.id.to_s,
                     'result_type' => 'Center'
@@ -152,6 +166,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                     'study_id' => study2.id.to_s,
+                    'study_name' => study2.name,
                     'text' => 'TestCenter2TestPatient2',
                     'result_id' => patient2.id.to_s,
                     'result_type' => 'Patient'
@@ -159,6 +174,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                     'study_id' => study2.id.to_s,
+                    'study_name' => study2.name,
                     'text' => "TestCenter2TestPatient2##{visit2.visit_number}",
                     'result_id' => visit2.id.to_s,
                     'result_type' => 'Visit'
@@ -179,6 +195,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                 'study_id' => study1.id.to_s,
+                'study_name' => study1.name,
                 'text' => 'TestStudy1',
                 'result_id' => study1.id.to_s,
                 'result_type' => 'Study'
@@ -186,6 +203,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                     'study_id' => study1.id.to_s,
+                    'study_name' => study1.name,
                     'text' => "TestCenter1 - #{center1.name}",
                     'result_id' => center1.id.to_s,
                     'result_type' => 'Center'
@@ -193,6 +211,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                     'study_id' => study1.id.to_s,
+                    'study_name' => study1.name,
                     'text' => 'TestCenter1TestPatient1',
                     'result_id' => patient1.id.to_s,
                     'result_type' => 'Patient'
@@ -200,6 +219,7 @@ describe RecordSearch do
         expect(search.results)
           .to include(
                     'study_id' => study1.id.to_s,
+                    'study_name' => study1.name,
                     'text' => "TestCenter1TestPatient1##{visit1.visit_number}",
                     'result_id' => visit1.id.to_s,
                     'result_type' => 'Visit'
@@ -207,6 +227,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                 'study_id' => study2.id.to_s,
+                'study_name' => study2.name,
                 'text' => 'TestStudy2',
                 'result_id' => study2.id.to_s,
                 'result_type' => 'Study'
@@ -214,6 +235,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                     'study_id' => study2.id.to_s,
+                    'study_name' => study2.name,
                     'text' => "TestCenter2 - #{center2.name}",
                     'result_id' => center2.id.to_s,
                     'result_type' => 'Center'
@@ -221,6 +243,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                     'study_id' => study2.id.to_s,
+                    'study_name' => study2.name,
                     'text' => 'TestCenter2TestPatient2',
                     'result_id' => patient2.id.to_s,
                     'result_type' => 'Patient'
@@ -228,6 +251,7 @@ describe RecordSearch do
         expect(search.results)
           .not_to include(
                     'study_id' => study2.id.to_s,
+                    'study_name' => study2.name,
                     'text' => "TestCenter2TestPatient2##{visit2.visit_number}",
                     'result_id' => visit2.id.to_s,
                     'result_type' => 'Visit'
