@@ -2,16 +2,23 @@ module ControllerMacros
   def login_user(role = :manage, subject_type = nil)
     before(:each) do
       @request.env['devise.mapping'] = Devise.mappings[:user]
-      sign_in FactoryGirl.create(:user, :changed_password, :with_role,
-                                 role: role,
-                                 subject_type: subject_type)
+      user =
+        FactoryGirl.create(
+          :user,
+          :changed_password,
+          :with_keypair,
+          :with_role,
+          role: role,
+          subject_type: subject_type
+        )
+      sign_in(user)
     end
   end
 
   def login_user_with_abilities(&block)
     before(:each) do
       @request.env['devise.mapping'] = Devise.mappings[:user]
-      @current_user = FactoryGirl.create(:user, :changed_password)
+      @current_user = FactoryGirl.create(:user, :changed_password, :with_keypair)
       sign_in @current_user
 
       ability = Class.new { attr_accessor :current_user }.new

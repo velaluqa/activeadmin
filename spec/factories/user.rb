@@ -15,6 +15,12 @@ FactoryGirl.define do
       password_changed_at DateTime.now
     end
 
+    trait :with_keypair do
+      after(:create) do |user|
+        user.generate_keypair('password')
+      end
+    end
+
     before(:create) do |user, evaluator|
       evaluator.with_user_roles.each do |role_obj|
         case role_obj
