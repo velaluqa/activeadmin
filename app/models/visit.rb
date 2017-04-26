@@ -44,6 +44,7 @@ require 'git_config_repository'
 #
 class Visit < ActiveRecord::Base
   include DominoDocument
+  include NotificationFilter
 
   has_paper_trail(
     class_name: 'Version',
@@ -144,6 +145,14 @@ JOIN_QUERY
     study_id = study.id if study.is_a?(ActiveRecord::Base)
     joins(patient: :center).where(centers: { study_id: study_id })
   }
+
+  notification_attribute_filter(:required_series, :changes_tqc_state) do |old, new|
+    return false if new.blank? || !new.is_a?(Hash)
+    new.map do |name, _|
+      next if old.blank? || old[name].blank? || !old[name].is_a?(Hash) || !new[name].is_a?(Hash)
+      old[name]['tqc_state'] != new[name]['tqc_state']
+    end.any?
+  end
 
   def name
     "#{patient.andand.name}##{visit_number}"
