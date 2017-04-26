@@ -59,7 +59,7 @@ class Visit < ActiveRecord::Base
   attr_accessible :mqc_date, :mqc_user_id, :mqc_state
   attr_accessible :assigned_image_series_index, :required_series
   attr_accessible :mqc_user, :mqc_results
-  
+
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
   belongs_to :mqc_user, :class_name => 'User'
@@ -85,7 +85,7 @@ centers.code ||
 patients.subject_id ||
 '#' ||
 visits.visit_number ||
-CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END 
+CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END
 AS text,
 visits.id AS result_id,
 'Visit'::varchar AS result_type
@@ -264,7 +264,7 @@ JOIN_QUERY
     required_series_specs_for_configuration(self.study.locked_configuration)
   end
   def required_series_specs_at_version(version)
-    return nil if(self.visit_type.nil? or self.study.nil? or not self.study.semantically_valid_at_version?(version))    
+    return nil if(self.visit_type.nil? or self.study.nil? or not self.study.semantically_valid_at_version?(version))
 
     required_series_specs_for_configuration(self.study.configuration_at_version(version))
   end
@@ -351,12 +351,12 @@ JOIN_QUERY
   end
 
   def wado_query
-    {:id => self.id, :name => "Visit No. #{visit_number}", :image_series => 
+    {:id => self.id, :name => "Visit No. #{visit_number}", :image_series =>
       self.image_series.map {|i_s| i_s.wado_query}
     }
   end
   def required_series_wado_query
-    {:id => self.id, :name => "Visit No. #{visit_number}", :image_series => 
+    {:id => self.id, :name => "Visit No. #{visit_number}", :image_series =>
       self.required_series_objects.reject {|rs| not rs.assigned?}.map {|rs| rs.wado_query}.reject {|query| query.blank?}
     }
   end
@@ -426,7 +426,7 @@ JOIN_QUERY
         assignment << new_name
       end
     end
-    
+
     image_storage_root = Rails.application.config.image_storage_root
     image_storage_root += '/' unless(image_storage_root.end_with?('/')
                                     )
@@ -448,7 +448,7 @@ JOIN_QUERY
     image_storage_root += '/' unless(image_storage_root.end_with?('/'))
 
     domino_sync_series_ids = []
-    
+
     changed_assignments.each do |required_series_name, series_id|
       series_id = (series_id.blank? ? nil : series_id)
       old_series_id = nil
@@ -490,7 +490,7 @@ JOIN_QUERY
       domino_sync_series_ids << old_series_id unless old_series_id.blank?
       domino_sync_series_ids << series_id unless series_id.blank?
     end
-    
+
     new_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
     (old_assigned_image_series - new_assigned_image_series).uniq.each do |unassigned_series_id|
       unassigned_series = ImageSeries.where(:id => unassigned_series_id).first
@@ -521,7 +521,7 @@ JOIN_QUERY
 
   def reconstruct_assignment_index
     new_index = {}
-    
+
     required_series.each do |rs_name, data|
       next if data['image_series_id'].blank?
 
@@ -531,7 +531,7 @@ JOIN_QUERY
 
     self.assigned_image_series_index = new_index
   end
-  
+
   def reset_tqc_result(required_series_name)
     return unless required_series.andand[required_series_name]
 
@@ -615,7 +615,7 @@ JOIN_QUERY
   def mqc_spec_at_version(version)
     config = study.configuration_at_version(version)
     return nil if config.nil? or config['visit_types'].nil? or config['visit_types'][self.visit_type].nil?
-    
+
     return config['visit_types'][self.visit_type]['mqc']
   end
 

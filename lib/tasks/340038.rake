@@ -3,15 +3,15 @@ namespace :erica do
   task :migrate_340038_visit_types => [:environment] do
     study = Study.find(2)
     next if study.nil?
-   
+
     visits_count = study.visits.count
 
     puts "Attempting to migrate #{visits_count} visits to the new schema"
- 
+
     study.visits.each_with_index do |visit, index|
       visit.required_series.keys.each do |old_rs_name|
         new_rs_name = nil
-        
+
         if(old_rs_name.start_with?('abdomen_liver_scan_'))
           new_rs_name = 'abdomen_liver'
         elsif(old_rs_name.start_with?('lung_scan_'))
@@ -42,14 +42,14 @@ namespace :erica do
   task :fix_assignment_indices => [:environment] do
     study = Study.find(2)
     next if study.nil?
-   
+
     visits_count = study.visits.count
 
     puts "Attempting to fix assignment indices for #{visits_count} visits"
- 
+
     study.visits.each_with_index do |visit, index|
       new_index = {}
-      
+
       visit.required_series.each do |rs_name, data|
         next if data['image_series_id'].blank?
 

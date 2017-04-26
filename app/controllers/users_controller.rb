@@ -21,11 +21,11 @@ class UsersController < ApplicationController
 
     if @user.update_with_password({:current_password => params[:user][:current_password], :password => params[:user][:password], :password_confirmation => params[:user][:password_confirmation], :password_changed_at => Time.now})
       sign_in @user, :bypass => true
-      
+
       respond_to do |format|
         format.html { redirect_to root_path, :notice => 'Your password was changed successfully.' }
         format.json { render :json => {:success => true, :user => @user} }
-      end      
+      end
     else
       error_messages = '<ul>'+@user.errors.full_messages.map {|msg| '<li>'+msg+'</li>'}.join('')+'<ul>'
       flash[:error] = ('Your password could not be updated:'+error_messages).html_safe
@@ -69,14 +69,14 @@ class UsersController < ApplicationController
       'upload' => current_ability.can?(:upload, ImageSeries),
       'modify_properties' => current_ability.can?(:update, ImageSeries)
     }
-    
+
     respond_to do |format|
       format.json { render :json => permissions }
     end
   end
 
   protected
-  
+
   def set_user
     @user = current_user
   end

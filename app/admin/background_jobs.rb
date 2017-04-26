@@ -25,7 +25,7 @@ ActiveAdmin.register BackgroundJob do
         redirect_to :back
         return
       end
-      
+
       destroy!
     end
   end

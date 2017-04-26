@@ -25,7 +25,7 @@ class ImagesController < ApplicationController
         return
       end
     end
-    
+
     render :json => {:success => (not image.nil? and image.file_is_present?), :image => image}
   end
 

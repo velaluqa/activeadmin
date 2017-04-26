@@ -42,9 +42,9 @@ ActiveAdmin.register Image do
         status_tag('Present', :ok)
       else
         status_tag('Missing', :error)
-      end      
+      end
     end
-    
+
     customizable_default_actions(current_ability)
   end
 

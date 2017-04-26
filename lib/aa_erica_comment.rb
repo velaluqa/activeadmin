@@ -1,10 +1,10 @@
 module ActiveAdmin
   module Views
 
-    class IndexAsTable     
+    class IndexAsTable
       def comment_column(field, label)
         label ||= resource_class.human_attribute_name(field)
-        
+
         column label do |resource|
           if(resource[field].blank?)
             link_to('Add '+label, url_for(:action => :edit_erica_comment_form, :id => resource.id, :return_url => request.fullpath))
@@ -18,19 +18,19 @@ module ActiveAdmin
     class AttributesTable
       def comment_row(resource, field, label)
         label ||= resource_class.human_attribute_name(field)
-        
+
         row label do
           if(resource[field].blank?)
             link_to('Add '+label, url_for(:action => :edit_erica_comment_form, :return_url => request.fullpath))
           else
             (resource[field] + link_to(' <i class="fa fa-pencil"></i>'.html_safe, url_for(:action => :edit_erica_comment_form, :return_url => request.fullpath), :class => 'member_link')).html_safe
           end
-        end        
+        end
       end
     end
 
   end
-  
+
   module ERICACommentMixin
     module DSL
       def erica_commentable(field, label)

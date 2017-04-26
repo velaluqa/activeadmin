@@ -30,7 +30,7 @@ class Users::SessionsController < Devise::SessionsController
   protected
 
   def generate_csrf_token
-    form_authenticity_token 
+    form_authenticity_token
   end
 
 end

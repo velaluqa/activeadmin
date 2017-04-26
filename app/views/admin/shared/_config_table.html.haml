@@ -1,12 +1,12 @@
 %table
   %thead
     %tr
-      %th Current    
+      %th Current
       - unless locked.nil?
         %th Locked
   %tbody
     %tr
-      %td        
+      %td
         - if current[:configuration].nil?
           %span.status_tag.Missing.error Missing
         - else
@@ -15,7 +15,7 @@
         %td
           - if locked[:configuration].nil?
             %span.status_tag.Missing.error Missing
-          - else        
+          - else
             = link_to 'Download', locked[:download_link]
     %tr
       %td

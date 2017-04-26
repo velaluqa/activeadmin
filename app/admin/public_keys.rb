@@ -55,7 +55,7 @@ ActiveAdmin.register PublicKey do
   member_action :download, :method => :get do
     @public_key = PublicKey.find(params[:id])
     authorize! :read, @public_key
-    
+
     if(@public_key.public_key.nil?)
       flash[:error] = 'The public key is not present.'
       redirect_to :back

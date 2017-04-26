@@ -37,7 +37,7 @@ module SchemaValidation
             else
               errors << Kwalify::ValidationError.new('Only \'select\',\'select_multiple\' and \'roi\' fields can have a \'selected_option\'', path)
             end
-          end              
+          end
         elsif not value['include'].nil?
           # no custom checks for includes yet, 'repeat' is not required
         elsif value['type'] == 'section'

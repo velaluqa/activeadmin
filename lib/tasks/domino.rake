@@ -47,7 +47,7 @@ namespace :erica do
     end
     study_id = args[:study_id]
     study = Study.find(study_id)
-    
+
     count = 0
     puts "Syncing #{study.centers.count} centers..."
     study.centers.find_each do |center|

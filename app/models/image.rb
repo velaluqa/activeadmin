@@ -125,11 +125,11 @@ JOIN
     unless(dicom_metadata_doc.root.elements['data-set'].nil?)
       dicom_metadata_doc.root.elements['data-set'].each_element('element') do |e|
         dicom_metadata[e.attributes['tag']] = {:tag => e.attributes['tag'], :name => e.attributes['name'], :vr => e.attributes['vr'], :value => e.text} unless e.text.blank?
-      end    
+      end
     end
 
     return [dicom_meta_header, dicom_metadata]
-    
+
   end
 
   def dicom_metadata_as_arrays
@@ -151,7 +151,7 @@ JOIN
     unless(dicom_metadata_doc.root.elements['data-set'].nil?)
       dicom_metadata_doc.root.elements['data-set'].each_element('element') do |e|
         dicom_metadata << {:tag => e.attributes['tag'], :name => e.attributes['name'], :vr => e.attributes['vr'], :value => e.text} unless e.text.blank?
-      end    
+      end
     end
 
     return [dicom_meta_header, dicom_metadata]
@@ -169,7 +169,7 @@ JOIN
   end
 
   protected
-  
+
   def dicom_metadata_xml
     file_path = self.absolute_image_storage_path
     dicom_xml = `#{Rails.application.config.dcm2xml} --quiet '#{file_path}'`

@@ -2,7 +2,7 @@
 .controls
   - value, fixed_value_hash = fixed_value(field, data_hash)
   - if(@case.state == :reopened_in_progress)
-    - value = value_for_reopened_case(field, @case)  
+    - value = value_for_reopened_case(field, @case)
   - elsif value.nil?
     - value = field['selected_option']
   - else

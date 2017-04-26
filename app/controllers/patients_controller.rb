@@ -15,10 +15,10 @@ class PatientsController < ApplicationController
     authorize! :create, Patient
 
     patient = Patient.create(:subject_id => params[:patient][:subject_id], :center => @center)
-    
+
     respond_to do |format|
       format.json { render :json => {:success => !patient.nil?, :patient => patient} }
-    end    
+    end
   end
 
   def wado_query

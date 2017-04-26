@@ -34,7 +34,7 @@ ActiveAdmin.register_page 'Image Hierarchy' do
                      end
     end
     def required_series_css_class(rs)
-      'status_tag '+ case rs.tqc_state 
+      'status_tag '+ case rs.tqc_state
                      when :pending then 'warning'
                      when :issues then 'error'
                      when :passed then 'ok'

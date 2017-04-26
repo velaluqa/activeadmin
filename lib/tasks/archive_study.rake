@@ -155,7 +155,7 @@ namespace :erica do
 
     postgresql_drop_database(archive_db_name)
   end
-  
+
   desc 'Archive a study and all its contents, removing them from ERICAv2.'
   task :archive_study, [:study_id, :archive_path] => [:environment] do |t, args|
     study_id = args[:study_id]

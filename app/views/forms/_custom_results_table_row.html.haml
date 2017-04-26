@@ -21,7 +21,7 @@
         - answer_spec = form_answer_field_maps[answer_case.id][0][answer_key]
       - else
         - answer_spec = form_answer_field_maps[answer_case.id][1][repeatable[:prefixes][answer_case.case_type]][answer_key]
-      %td        
+      %td
         = results_table_format_answer(answer, answer_spec)
         - if(answer_spec and answer_spec['type'] == 'roi' and roi_links and not (answer['location'].nil? or answer['location']['seriesUID'].nil? or answer['location']['imageIndex'].nil?))
           %a.roi_link{:href => '#', :onclick => "PharmTraceAPI.jumpToImage('#{answer['location']['seriesUID']}', #{answer['location']['imageIndex']}); return false;"} Jump to ROI

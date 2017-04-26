@@ -4,7 +4,7 @@ namespace :erica do
     tasq = Study.where(:name => '340047').first
     next if tasq.nil?
     pp tasq
-    
+
     visits = tasq.visits
     puts visits.count
 

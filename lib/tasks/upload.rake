@@ -15,7 +15,7 @@ namespace :erica do
 
     image_series = ImageSeries.where('created_at >= ?', start_time)
     $stderr.puts "Found #{image_series.count} created since #{start_time.to_s}..."
-    
+
     puts '"Study Number","ERICA Patient Name","DICOM Patient Name","ERICA DoI","DICOM DoI","ERICA Series Name","Images Count","Created at","URL","Patient Mismatch"'
 
     count = 0

@@ -5,7 +5,7 @@ module Legacy
     include Mongoid::History::Trackable
 
     store_in collection: 'visit_data'
-    
+
     field :visit_id, type: Integer
     field :assigned_image_series_index, type: Hash, default: {}
     field :required_series, type: Hash, default: {}

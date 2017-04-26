@@ -61,7 +61,7 @@ class DominoIntegrationClient
   end
 
   def collection_unid(collection_name)
-    collections = list_collections 
+    collections = list_collections
     return nil if collections.nil?
 
     target_collection = collections.find {|collection| collection['@title'] == collection_name}
@@ -88,7 +88,7 @@ class DominoIntegrationClient
       else
         nil
       end
-    end    
+    end
   end
 
   # query is a hash, specifying field name / value pairs
@@ -141,7 +141,7 @@ class DominoIntegrationClient
         nil
       end
     end
-  end  
+  end
 
   def list_collections
     return @collections_resource.get() do |response|
@@ -155,5 +155,5 @@ class DominoIntegrationClient
         nil
       end
     end
-  end  
+  end
 end

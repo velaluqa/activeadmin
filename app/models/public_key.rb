@@ -24,7 +24,7 @@
 class PublicKey < ActiveRecord::Base
   attr_accessible :public_key, :user_id, :active, :deactivated_at
   attr_accessible :user
-  
+
   belongs_to :user
 
   validates :user_id, :public_key, :presence => true

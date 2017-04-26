@@ -41,7 +41,7 @@ class CentersController < ApplicationController
     authorize! :read, Center
     @centers = @study.centers.accessible_by(current_ability).order('code asc')
   end
-  
+
   def load_the_center
     @center = Center.find(params[:id])
     authorize! :manage, @center

@@ -44,13 +44,13 @@ class GitConfigRepository
 
     walker.sorting(Rugged::SORT_DATE)
     walker.push(version)
-    
+
     return walker
   end
   def lookup(oid)
     @repo.lookup(oid)
   end
-  
+
   def update_config_file(path, new_file, author, commit_message)
     FileUtils.cp(new_file, @repo.workdir+'/'+path)
     update_path(path, author, commit_message)
@@ -61,7 +61,7 @@ class GitConfigRepository
     index.write
 
     tree = index.write_tree
-    
+
     if(author.nil?)
       author_hash = {:email => '-1', :name => 'no_author_given', :time => Time.now}
     else
@@ -111,10 +111,10 @@ class GitConfigRepository
   end
 
   protected
-  
+
   def file_at_version(path, version)
     begin
-      return nil unless @repo.exists?(version)      
+      return nil unless @repo.exists?(version)
     rescue Rugged::InvalidError => e
       return nil
     end
@@ -127,7 +127,7 @@ class GitConfigRepository
 
     return file_blob
   end
-  
+
   def access_tree_by_path(tree, path)
     return tree if (path.nil? or tree.nil?)
 
@@ -140,7 +140,7 @@ class GitConfigRepository
     return nil unless @repo.exists?(target_oid)
 
     target = @repo.lookup(target_oid)
-    
+
     return access_tree_by_path(target, path_components[1])
   end
 end

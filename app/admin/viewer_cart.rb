@@ -17,7 +17,7 @@ ActiveAdmin.register_page 'Viewer Cart' do
       rescue ActiveRecord::RecordNotFound => e
         resource = nil
       end
-      
+
       if resource.nil?
         nil
       else
@@ -62,7 +62,7 @@ ActiveAdmin.register_page 'Viewer Cart' do
 
       session[:viewer_cart] = session[:viewer_cart].reject {|cart_item| cart_item[:type] == type and cart_item[:id] == id}
     end
-    
+
     redirect_to({:action => :index}, :notice => 'Item removed from cart.')
   end
 

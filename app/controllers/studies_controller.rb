@@ -18,10 +18,10 @@ class StudiesController < ApplicationController
   end
 
   protected
-  
+
   def load_studies
     authorize! :read, Study
-    @studies = Study.accessible_by(current_ability)    
+    @studies = Study.accessible_by(current_ability)
   end
 
   def load_the_study

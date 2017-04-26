@@ -13,7 +13,7 @@ module ActiveAdminCommentPaperTrailPatch
         "#{self.resource_type} '#{self.resource.name}'"
       end
     end
-    
+
     def name
       "Comment on #{resource_name}"
     end

@@ -11,7 +11,7 @@ class PatientReadExportWorker
       job.fail('The export target folder '+export_root_path.to_s+' exists, but isn\'t a folder.')
       return
     end
-    
+
     begin
       patients = Patient.find(patient_ids)
     rescue ActiveRecord::RecordNotFound => e
@@ -31,7 +31,7 @@ class PatientReadExportWorker
       patient_export_path.rmtree if patient_export_path.exist?
       patient_export_path.mkpath
       export_log_entry[:export_path] = patient_export_path.to_s
-      
+
       patient.visits.each do |visit|
         next if visit.visit_number.blank?
 
@@ -91,7 +91,7 @@ class PatientReadExportWorker
       :headers => true,
       :converters => [:all, :date],
       :unconverted_fields => true,
-    }    
+    }
     case_list_csv = CSV.generate(csv_options) do |csv|
       csv << ['patient', 'images', 'type']
       case_list.each do |c|

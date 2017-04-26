@@ -120,7 +120,7 @@ QUERY
   def to_key
     nil
   end
-  
+
   def study
     @visit.study
   end
@@ -217,7 +217,7 @@ QUERY
                           'DateImaging' => '01-01-0001',
                           'SeriesDescription' => nil,
                           'DICOMTagNames' => nil,
-                          'DICOMValues' => nil,                          
+                          'DICOMValues' => nil,
                         })
     else
       properties.merge!({
@@ -226,10 +226,10 @@ QUERY
                           'DateImaging' => {'data' => self.assigned_image_series.imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime'},
                           'SeriesDescription' => self.assigned_image_series.name,
                         })
-      properties.merge!(self.assigned_image_series.dicom_metadata_to_domino)      
+      properties.merge!(self.assigned_image_series.dicom_metadata_to_domino)
     end
     properties.merge!(tqc_to_domino)
-    
+
     return properties
   end
 
