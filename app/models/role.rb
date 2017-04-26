@@ -19,7 +19,7 @@
 class Role < ActiveRecord::Base
   has_paper_trail class_name: 'Version'
 
-  attr_accessible :title, :abilities
+  attr_accessible(:title, :abilities)
 
   has_many :user_roles
   has_many :users, through: :user_roles

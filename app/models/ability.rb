@@ -44,9 +44,7 @@ class Ability
 
   def permissions
     @permissions ||=
-      @current_user.permissions
-        .map { |p| [p.ability, true] }
-        .to_h
+      @current_user.permissions.map { |p| [p.ability, true] }.to_h
   end
 
   private

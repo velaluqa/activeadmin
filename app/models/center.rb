@@ -33,15 +33,20 @@ class Center < ActiveRecord::Base
   )
   acts_as_taggable
 
-  attr_accessible :name, :study, :code, :domino_unid
-  attr_accessible :study_id
+  attr_accessible(
+    :name,
+    :study,
+    :code,
+    :domino_unid,
+    :study_id
+  )
 
   belongs_to :study
   has_many :patients
 
-  has_many :user_roles, :as => :scope_object, dependent: :destroy
+  has_many :user_roles, as: :scope_object, dependent: :destroy
 
-  scope :by_study_ids, lambda { |*ids|
+  scope :by_study_ids, -> (*ids) {
     where(study_id: Array[ids].flatten)
   }
 
@@ -72,15 +77,14 @@ centers.id AS result_id,
 'Center'::varchar AS result_type
 SELECT
 
-
-  scope :of_study, lambda { |study|
+  scope :of_study, -> (study) {
     study_id = study
     study_id = study.id if study.is_a?(ActiveRecord::Base)
     where(study_id: study_id)
   }
 
-  validates_uniqueness_of :name, :scope => :study_id
-  validates_uniqueness_of :code, :scope => :study_id
+  validates_uniqueness_of :name, scope: :study_id
+  validates_uniqueness_of :code, scope: :study_id
   validates_presence_of :name, :code, :study_id
 
   before_destroy do
@@ -93,7 +97,7 @@ SELECT
   before_save :ensure_study_is_unchanged
 
   def full_name
-    self.code + ' - ' + self.name
+    "#{code} - #{name}"
   end
 
   def image_storage_path
@@ -101,53 +105,57 @@ SELECT
   end
 
   def wado_query
-    self.patients.map {|patient| patient.wado_query}
+    patients.map(&:wado_query)
   end
 
   def lotus_notes_url
-    self.study.notes_links_base_uri + self.domino_unid unless (self.domino_unid.nil? or self.study.nil? or self.study.notes_links_base_uri.nil?)
+    study.notes_links_base_uri + domino_unid unless domino_unid.nil? || study.nil? || study.notes_links_base_uri.nil?
   end
+
   def domino_document_form
     'Center'
   end
+
   def domino_document_query
-    {'docCode' => 10005, 'CenterNo' => self.code}
+    { 'docCode' => 10_005, 'CenterNo' => code }
   end
+
   def domino_document_fields
-    ['id', 'code', 'name']
+    %w(id code name)
   end
+
   def domino_document_properties(action = :update)
-    {
-      'ericaID' => self.id,
-      'CenterNo' => self.code,
-    }.merge!(action == :create ? {'CenterShortName' => self.name} : {})
+    hash = { 'ericaID' => id,  'CenterNo' => code }
+    hash['CenterShortName'] = name if action == :create
+    hash
   end
+
   def domino_sync
-    self.ensure_domino_document_exists
+    ensure_domino_document_exists
   end
 
   def self.classify_audit_trail_event(c)
     # ignore Domino UNID changes that happened along with a property change
     c.delete('domino_unid')
 
-    if(c.keys == ['name'])
+    if c.keys == ['name']
       :name_change
-    elsif(c.keys == ['study_id'])
+    elsif c.keys == ['study_id']
       :study_change
-    elsif(c.keys == ['code'])
+    elsif c.keys == ['code']
       :code_change
     end
   end
+
   def self.audit_trail_event_title_and_severity(event_symbol)
-    return case event_symbol
-           when :name_change then ['Name Change', :ok]
-           when :study_change then ['Study Change', :warning]
-           when :code_change then ['Center Code Change', :warning]
-           end
+    case event_symbol
+    when :name_change then ['Name Change', :ok]
+    when :study_change then ['Study Change', :warning]
+    when :code_change then ['Center Code Change', :warning]
+    end
   end
 
   def read_study_id
-    binding.pry
     read_attribute(:study_id)
   end
 
