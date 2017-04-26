@@ -184,6 +184,8 @@ ActiveAdmin.register Study do
 
         removed_visit_types = (old_visit_types - new_visit_types).uniq
 
+        # TODO: This should go into a routine in the study model or a
+        # specific study operation, which takes care of consistency checks.
         @study.visits.where(:visit_type => removed_visit_types).each do |visit|
           pp visit
           visit.visit_type = nil
