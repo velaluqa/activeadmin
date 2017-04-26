@@ -48,14 +48,27 @@ module NotificationObservable
     # @param [ActiveRecord::Base] model The attribute's model
     # @param [Hash] changes The changes to filter
     def match_attribute(attr, condition, model, changes = {})
-      condition.map do |name, filter|
-        case name
+      condition.map do |filter_name, filter|
+        case filter_name
         when :equal then model.attributes[attr] == filter
         when :notEqual then model.attributes[attr] != filter
         when :changes then match_change(attr, filter, previous_attributes(model, changes), model.attributes)
-        else false
+        else match_custom(attr, filter_name, model, changes)
         end
       end.all?
+    end
+
+    # Returns true if custom filter matches given attribute.
+    #
+    # @param [String] attr Name of the attribute
+    # @param [String] filter Name of the custom filter
+    # @param [ActiveRecord::Base] model The attribute's model
+    # @param [Hash] changes The changes to filter
+    def match_custom(attr, filter, model, changes)
+      return false unless model.respond_to?(:match_notification_attribute_filter)
+      old_value = previous_attributes(model, changes)[attr]
+      new_value = model.attributes[attr]
+      model.match_notification_attribute_filter(attr, filter, old_value, new_value)
     end
 
     # Returns true if change filter matches given attribute.

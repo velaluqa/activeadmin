@@ -3,9 +3,19 @@ RSpec.describe NotificationObservable::Filter do
     table do |t|
       t.string :foo
       t.string :fu
+      t.json :json_field
       t.references :sub_model
     end
     model do
+      include NotificationFilter
+
+      notification_attribute_filter(:json_field, :changed_subvalue) do |old, new|
+        new.map do |key, _|
+          next if old.blank? || old[key].blank? || !old[key].is_a?(Hash) || !new[key].is_a?(Hash)
+          old[key]['subval'] != new[key]['subval']
+        end.any?
+      end
+
       belongs_to :sub_model
     end
   end
@@ -141,6 +151,24 @@ RSpec.describe NotificationObservable::Filter do
       it 'handles change' do
         expect(@filter.match_attribute('foo', { changes: { from: 'home' } }, @model, @changes)).to be_truthy
         expect(@filter.match_attribute('foo', { changes: { from: 'office' } }, @model, @changes)).to be_falsy
+      end
+
+      it 'handles custom filter' do
+        @model = TestModel.create(json_field: { 'baseline' => { 'subval' => 1 } })
+        @new_subhash = {
+          'json_field' => [
+            {},
+            { 'baseline' => { 'subval' => 1 } }
+          ]
+        }
+        @changed_subval = {
+          'json_field' => [
+            { 'baseline' => { 'subval' => 0 } },
+            { 'baseline' => { 'subval' => 1 } }
+          ]
+        }
+        expect(@filter.match_attribute('json_field', { changed_subvalue: true }, @model, @new_subhash)).to be_falsy
+        expect(@filter.match_attribute('json_field', { changed_subvalue: true }, @model, @changed_subval)).to be_truthy
       end
     end
   end
