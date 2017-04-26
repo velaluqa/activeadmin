@@ -533,13 +533,24 @@ RSpec.describe NotificationProfile do
     table do |t|
       t.string :foobar, null: true
       t.string :foobaz, null: true
+      t.json :required_series
       t.references :extra_model
     end
     model do
+      include NotificationFilter
+
       has_paper_trail class_name: 'Version'
 
       has_many :multi_models
       belongs_to :extra_model
+
+      notification_attribute_filter(:required_series, :changes_tqc_state) do |old, new|
+        return false if new.blank? || !new.is_a?(Hash)
+        new.map do |name, _|
+          next if old.blank? || old[name].blank? || !old[name].is_a?(Hash) || !new[name].is_a?(Hash)
+          old[name]['tqc_state'] != new[name]['tqc_state']
+        end.any?
+      end
     end
   end
 
@@ -670,6 +681,23 @@ RSpec.describe NotificationProfile do
 
       include_examples 'filters changes', triggering_actions: %w(create update destroy), event_action: :destroy
       include_examples 'filters changes', triggering_actions: %w(destroy), event_action: :destroy
+    end
+
+    describe ':update custom filter attribute', focus: true do
+      before(:each) do
+        @record = TestModel.create(required_series: { 'abc' => { 'tqc_state' => 0 } })
+        @record.required_series = { 'abc' => { 'tqc_state' => 1 } }
+        @record.save!
+        @pcustom = create(:notification_profile, title: 'Filtered Profile', triggering_actions: %w(update), triggering_resource: 'TestModel', filters: [[{"required_series" => {'changes_tqc_state' => true}}]], is_enabled: true)
+      end
+
+      before(:each) do
+        @profiles = NotificationProfile.triggered_by(:update, 'TestModel', @record, @record.versions.last.object_changes)
+      end
+
+      it 'matches custom filter' do
+        expect(@profiles).to include(@pcustom)
+      end
     end
   end
 
