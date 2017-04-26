@@ -2,7 +2,7 @@ module NotificationObservable
   class Filter
     class Schema
       class Attribute
-        FILTERS = %i(equality changes).freeze
+        FILTERS = %i(equality changes custom).freeze
 
         def initialize(model, column)
           @model = model
@@ -25,7 +25,7 @@ module NotificationObservable
         def filters(options = {})
           (FILTERS & options[:filters]).map do |filter|
             send("#{filter}_filter")
-          end.flatten
+          end.compact.flatten
         end
 
         def equality_filter
@@ -121,6 +121,25 @@ module NotificationObservable
               }
             }
           }
+        end
+
+        def custom_filter
+          return unless @model.respond_to?(:notification_attribute_filters)
+          filters = @model.notification_attribute_filters[@column.name.to_sym]
+          return unless filters.is_a?(Hash)
+          (filters || {}).map do |filter, _|
+            {
+              title: filter.to_s.humanize,
+              type: 'object',
+              required: [filter.to_s],
+              properties: {
+                filter.to_sym => {
+                  type: 'boolean',
+                  enum: [true]
+                }
+              }
+            }
+          end
         end
 
         def validation

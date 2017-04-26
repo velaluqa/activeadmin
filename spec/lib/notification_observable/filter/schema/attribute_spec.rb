@@ -16,8 +16,18 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       t.boolean :boolean_field
       t.string :enum_field
       t.string :notnull_field, null: false
+      t.json :json_field
     end
     model do
+      include NotificationFilter
+
+      notification_attribute_filter(:json_field, :changed_subvalue) do |old, new|
+        new.map do |key, _|
+          next if old.blank? || old[key].blank? || !old[key].is_a?(Hash) || !new[key].is_a?(Hash)
+          old[key]['subval'] != new[key]['subval']
+        end.any?
+      end
+
       validates :integer_field, numericality: { greater_than_or_equal_to: 5, less_than_or_equal_to: 10 }
       validates :bigint_field, numericality: { greater_than: 5, less_than: 10 }
       validates :float_field, numericality: { greater_than_or_equal_to: 1.1, less_than_or_equal_to: 1.8 }
@@ -189,6 +199,19 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
 
     it 'validates the to value' do
       expect(@filter.dig2(:properties, :changes, :properties, :to)).to eq @attr.validation
+    end
+  end
+
+  describe '#custom_filter' do
+    before(:each) do
+      @column = TestModel.columns.last
+      @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+      @filter = @attr.custom_filter
+    end
+
+    it 'validates changed subvalue' do
+      expect(@filter).to include(include(title: 'Changed subvalue', required: %w(changed_subvalue)))
+      expect(@filter).to include(include(properties: have_key(:changed_subvalue)))
     end
   end
 
