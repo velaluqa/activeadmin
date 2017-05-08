@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/velaluqa/rspec-sidekiq.git
-  revision: 5ae1fc9cd060df0d496908e6ea517eabece7033a
+  revision: 538cb9d4802d936d660f47df8c1841a2a8d51960
   branch: deprecate-have-enqueued-job
   specs:
-    rspec-sidekiq (3.0.0)
+    rspec-sidekiq (3.0.1)
       rspec-core (~> 3.0, >= 3.0.0)
       sidekiq (>= 2.4.0)
 
