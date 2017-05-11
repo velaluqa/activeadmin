@@ -683,7 +683,7 @@ RSpec.describe NotificationProfile do
       include_examples 'filters changes', triggering_actions: %w[destroy], event_action: :destroy
     end
 
-    describe ':update custom filter attribute', focus: true do
+    describe ':update custom filter attribute' do
       before(:each) do
         @record = TestModel.create(required_series: { 'abc' => { 'tqc_state' => 0 } })
         @record.required_series = { 'abc' => { 'tqc_state' => 1 } }
