@@ -10,4 +10,4 @@ Feature: User Audit Trail
     And I click link "Audit Trail" in "#title_bar"
     Then I see "Test User"
     And I see "Test Role"
-    And I see "User role #1"
+    And I see "User role"
