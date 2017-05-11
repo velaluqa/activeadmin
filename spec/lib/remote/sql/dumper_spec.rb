@@ -99,7 +99,7 @@ SQL
       it 'dumps found records to given io' do
         io = StringIO.new
         @dumper.dump_upserts(io)
-        expect(io.string).to eq <<SQL.strip_heredoc
+        expect(io.string).to eq <<-SQL.strip_heredoc
           BEGIN;
           WITH "new_values" ("code", "created_at", "domino_unid", "id", "name", "study_id", "updated_at") as (
             values
@@ -126,7 +126,7 @@ SQL
           FROM "new_values"
           WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
           COMMIT;
-SQL
+        SQL
       end
     end
   end

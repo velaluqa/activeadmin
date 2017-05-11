@@ -60,16 +60,16 @@ class Sql
     def update_setters
       update_columns
         .map { |column| "#{column} = #{column.with_reftype(ref: 'nv')}" }
-        .join(",\n    ")
+        .join(",\n              ")
     end
 
     def dump_upserts(io)
       io.puts 'BEGIN;'
       new_values.each_slice(25_000) do |new_values|
-        io.puts <<SQL.strip_heredoc
+        io.puts <<-SQL.strip_heredoc
           WITH "new_values" (#{columns.map(&:to_s).join(', ')}) as (
             values
-          #{new_values.join(",\n")}
+          #{new_values.join(",\n          ")}
           ),
           "upsert" AS
           (
@@ -84,7 +84,7 @@ class Sql
           SELECT #{insert_columns.map(&:with_type).join(', ')}
           FROM "new_values"
           WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
-SQL
+        SQL
       end
       io.puts 'COMMIT;'
     end
