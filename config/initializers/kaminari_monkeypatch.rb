@@ -18,7 +18,6 @@ module Kaminari
       #   ::DataMapper::Model.append_extensions Kaminari::DataMapperExtension::Model
       #   # ::DataMapper::Model.send :extend, Kaminari::DataMapperExtension::Model
       # end
-
       begin; require 'mongoid'; rescue LoadError; end
       if defined? ::Mongoid
         require 'kaminari/models/mongoid_extension'

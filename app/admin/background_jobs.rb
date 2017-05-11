@@ -10,7 +10,7 @@ ActiveAdmin.register BackgroundJob do
   config.comments = false
   actions :index, :show, :destroy
 
-  scope :all, :default => true
+  scope :all, default: true
   scope :completed
   scope :running
 
@@ -20,7 +20,7 @@ ActiveAdmin.register BackgroundJob do
     end
 
     def destroy
-      if(not BackgroundJob.find(params[:id]).finished?)
+      unless BackgroundJob.find(params[:id]).finished?
         flash[:error] = 'Running jobs cannot be deleted!'
         redirect_to :back
         return
@@ -35,13 +35,13 @@ ActiveAdmin.register BackgroundJob do
 
     column :name
     column :created_at
-    column 'State', :sortable => :completed do |background_job|
-      if(background_job.finished? and not background_job.failed?)
+    column 'State', sortable: :completed do |background_job|
+      if background_job.finished? && !background_job.failed?
         status_tag('Completed', :ok)
-      elsif(background_job.failed?)
+      elsif background_job.failed?
         status_tag('Failed', :error)
       else
-        status_tag('Running', :warning, :label => 'Running: '+ ('%.2f' % (background_job.progress*100))+ '% completed')
+        status_tag('Running', :warning, label: 'Running: ' + ('%.2f' % (background_job.progress * 100)) + '% completed')
       end
     end
     column :completed_at
@@ -56,24 +56,24 @@ ActiveAdmin.register BackgroundJob do
       row :name
       row :user
       row 'State' do
-        if(background_job.finished? and not background_job.failed?)
+        if background_job.finished? && !background_job.failed?
           status_tag('Completed', :ok)
-        elsif(background_job.failed?)
+        elsif background_job.failed?
           status_tag('Failed', :error)
         else
-          status_tag('Running', :warning, :label => 'Running: '+ ('%.2f' % (background_job.progress*100))+ '% completed')
+          status_tag('Running', :warning, label: 'Running: ' + ('%.2f' % (background_job.progress * 100)) + '% completed')
         end
       end
-      row :error_message if(background_job.failed? and not background_job.error_message.blank?)
+      row :error_message if background_job.failed? && !background_job.error_message.blank?
       row :created_at
       row :updated_at
       row :completed_at
     end
 
-    if(background_job.results and background_job.results['zipfile'])
+    if background_job.results && background_job.results['zipfile']
       panel 'Download' do
-        div(:class => 'attributes_table') do
-          table(:border => 0, :cellspacing => 0, :cellpadding => 0) do
+        div(class: 'attributes_table') do
+          table(border: 0, cellspacing: 0, cellpadding: 0) do
             tr do
               th { 'Zip file' }
               td { link_to('Download', download_zip_admin_background_job_path(resource)) }
@@ -82,10 +82,10 @@ ActiveAdmin.register BackgroundJob do
         end
       end
     else
-      unless(background_job.results.blank?)
+      unless background_job.results.blank?
         panel 'Results' do
-          div(:class => 'attributes_table') do
-            table(:border => 0, :cellspacing => 0, :cellpadding => 0) do
+          div(class: 'attributes_table') do
+            table(border: 0, cellspacing: 0, cellpadding: 0) do
               background_job.results.each do |label, value|
                 tr do
                   th { label }
@@ -103,11 +103,11 @@ ActiveAdmin.register BackgroundJob do
     background_job = BackgroundJob.find(params[:id])
     authorize! :read, background_job
 
-    unless(background_job.results and background_job.results['zipfile'])
+    unless background_job.results && background_job.results['zipfile']
       redirect_to :back, alert: 'No download available'
       return
     end
-    unless(File.readable?(background_job.results['zipfile']))
+    unless File.readable?(background_job.results['zipfile'])
       redirect_to :back, alert: 'File not found'
       return
     end

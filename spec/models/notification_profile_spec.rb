@@ -1,5 +1,5 @@
 RSpec.shared_examples 'filters changes' do |options|
-  triggering_actions = options[:triggering_actions].andand.map(&:to_s) || %w(create update destroy)
+  triggering_actions = options[:triggering_actions].andand.map(&:to_s) || %w[create update destroy]
   event_action = options[:event_action].andand.to_sym || :update
 
   context 'changing' do
@@ -8,89 +8,89 @@ RSpec.shared_examples 'filters changes' do |options|
                     triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
-                                 foobar: {
-                                   changes: {
-                                     to: 'baz'
-                                   }
-                                 }
-                               }]])
+                      foobar: {
+                        changes: {
+                          to: 'baz'
+                        }
+                      }
+                    }]])
       @pc2 = create(:notification_profile,
                     triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
-                                 foobar: {
-                                   changes: {
-                                     to: 'bar'
-                                   }
-                                 }
-                               }]])
+                      foobar: {
+                        changes: {
+                          to: 'bar'
+                        }
+                      }
+                    }]])
       @pc3 = create(:notification_profile,
                     triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
-                                 foobar: {
-                                   changes: {
-                                     from: 'foo',
-                                     to: 'baz'
-                                   }
-                                 }
-                               }]])
+                      foobar: {
+                        changes: {
+                          from: 'foo',
+                          to: 'baz'
+                        }
+                      }
+                    }]])
       @pc4 = create(:notification_profile,
                     triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
-                                 foobar: {
-                                   changes: {
-                                     from: 'foo',
-                                     to: 'bar'
-                                   }
-                                 }
-                               }]])
+                      foobar: {
+                        changes: {
+                          from: 'foo',
+                          to: 'bar'
+                        }
+                      }
+                    }]])
       @pc5 = create(:notification_profile,
                     triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
-                                 foobar: {
-                                   changes: {
-                                     from: 'fu',
-                                     to: 'baz'
-                                   }
-                                 }
-                               }]])
+                      foobar: {
+                        changes: {
+                          from: 'fu',
+                          to: 'baz'
+                        }
+                      }
+                    }]])
       @pc6 = create(:notification_profile,
                     triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [
                       [{
-                         foobar: {
-                           changes: {
-                             from: 'fu',
-                             to: 'bar'
-                           }
-                         }
-                       }]
+                        foobar: {
+                          changes: {
+                            from: 'fu',
+                            to: 'bar'
+                          }
+                        }
+                      }]
                     ])
       @pc7 = create(:notification_profile,
                     triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [[{
-                                 foobar: {
-                                   changes: {
-                                     from: 'foo'
-                                   }
-                                 }
-                               }]])
+                      foobar: {
+                        changes: {
+                          from: 'foo'
+                        }
+                      }
+                    }]])
       @pc8 = create(:notification_profile,
                     triggering_actions: triggering_actions,
                     triggering_resource: 'TestModel',
                     filters: [
                       [{
-                         foobar: {
-                           changes: {
-                             from: 'fu'
-                           }
-                         }
-                       }]
+                        foobar: {
+                          changes: {
+                            from: 'fu'
+                          }
+                        }
+                      }]
                     ])
       @pc9 = create(:notification_profile,
                     triggering_actions: triggering_actions,
@@ -144,19 +144,19 @@ RSpec.shared_examples 'filters changes' do |options|
                      triggering_resource: 'TestModel',
                      filters: [
                        [{
-                          foobar: {
-                            changes: {
-                              to: 'baz'
-                            }
-                          }
-                        }],
+                         foobar: {
+                           changes: {
+                             to: 'baz'
+                           }
+                         }
+                       }],
                        [{
-                          foobar: {
-                            changes: {
-                              to: 'bar'
-                            }
-                          }
-                        }]
+                         foobar: {
+                           changes: {
+                             to: 'bar'
+                           }
+                         }
+                       }]
                      ])
       @pc13 = create(:notification_profile,
                      triggering_actions: triggering_actions,
@@ -248,8 +248,8 @@ RSpec.shared_examples 'filters changes' do |options|
           event_action,
           'TestModel',
           @record,
-          foobar: ['foo', 'bar'],
-          foobaz: ['bar', 'buz']
+          foobar: %w[foo bar],
+          foobaz: %w[bar buz]
         )
       end
 
@@ -363,11 +363,11 @@ RSpec.describe NotificationProfile do
 
     it 'validates triggering_action' do
       expect(build(:notification_profile, triggering_actions: nil)).not_to be_valid
-      expect(build(:notification_profile, triggering_actions: %w(some))).not_to be_valid
-      expect(build(:notification_profile, triggering_actions: %w(create update destroy))).to be_valid
-      expect(build(:notification_profile, triggering_actions: %w(create))).to be_valid
-      expect(build(:notification_profile, triggering_actions: %w(update))).to be_valid
-      expect(build(:notification_profile, triggering_actions: %w(destroy))).to be_valid
+      expect(build(:notification_profile, triggering_actions: %w[some])).not_to be_valid
+      expect(build(:notification_profile, triggering_actions: %w[create update destroy])).to be_valid
+      expect(build(:notification_profile, triggering_actions: %w[create])).to be_valid
+      expect(build(:notification_profile, triggering_actions: %w[update])).to be_valid
+      expect(build(:notification_profile, triggering_actions: %w[destroy])).to be_valid
     end
 
     it 'validates triggering_resource' do
@@ -425,10 +425,10 @@ RSpec.describe NotificationProfile do
     describe 'with throttled option and' do
       describe 'profiles maximum throttling delay is minimum' do
         before(:each) do
-          allow(Rails.application.config).to receive(:maximum_email_throttling_delay).and_return(24*60*60)
-          @user1 = create(:user, email_throttling_delay: 24*60*60)
+          allow(Rails.application.config).to receive(:maximum_email_throttling_delay).and_return(24 * 60 * 60)
+          @user1 = create(:user, email_throttling_delay: 24 * 60 * 60)
           @user2 = create(:user)
-          @profile1 = create(:notification_profile, users: [@user1, @user2], maximum_email_throttling_delay: 60*60)
+          @profile1 = create(:notification_profile, users: [@user1, @user2], maximum_email_throttling_delay: 60 * 60)
           @profile2 = create(:notification_profile, users: [@user1, @user2])
           create(:notification, notification_profile: @profile1, user: @user1)
           create(:notification, notification_profile: @profile1, user: @user1)
@@ -438,24 +438,24 @@ RSpec.describe NotificationProfile do
         end
 
         it 'returns only users with pending notifications matching the throttling settings for the profile-user-combination' do
-          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user1, count: 1)
-          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user2, count: 1)
+          expect(@profile1.recipients_with_pending(throttle: 60 * 60)).to contain(@user1, count: 1)
+          expect(@profile1.recipients_with_pending(throttle: 60 * 60)).to contain(@user2, count: 1)
 
-          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user1)
-          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user2)
+          expect(@profile1.recipients_with_pending(throttle: 24 * 60 * 60)).not_to include(@user1)
+          expect(@profile1.recipients_with_pending(throttle: 24 * 60 * 60)).not_to include(@user2)
 
-          expect(@profile2.recipients_with_pending(throttle: 60*60)).to_not include(@user1)
-          expect(@profile2.recipients_with_pending(throttle: 60*60)).to_not include(@user2)
+          expect(@profile2.recipients_with_pending(throttle: 60 * 60)).to_not include(@user1)
+          expect(@profile2.recipients_with_pending(throttle: 60 * 60)).to_not include(@user2)
 
-          expect(@profile2.recipients_with_pending(throttle: 24*60*60)).to contain(@user1, count: 1)
-          expect(@profile2.recipients_with_pending(throttle: 24*60*60)).to contain(@user2, count: 1)
+          expect(@profile2.recipients_with_pending(throttle: 24 * 60 * 60)).to contain(@user1, count: 1)
+          expect(@profile2.recipients_with_pending(throttle: 24 * 60 * 60)).to contain(@user2, count: 1)
         end
       end
 
       describe 'user throttling delay is minimum' do
         before(:each) do
-          allow(Rails.application.config).to receive(:maximum_email_throttling_delay).and_return(24*60*60)
-          @user1 = create(:user, email_throttling_delay: 60*60)
+          allow(Rails.application.config).to receive(:maximum_email_throttling_delay).and_return(24 * 60 * 60)
+          @user1 = create(:user, email_throttling_delay: 60 * 60)
           @user2 = create(:user)
           @profile1 = create(:notification_profile, users: [@user1, @user2])
           create(:notification, notification_profile: @profile1, user: @user1)
@@ -463,21 +463,21 @@ RSpec.describe NotificationProfile do
         end
 
         it 'returns only users with pending notifications matching the throttling settings for the profile-user-combination' do
-          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user1, count: 1)
-          expect(@profile1.recipients_with_pending(throttle: 60*60)).not_to include(@user2)
+          expect(@profile1.recipients_with_pending(throttle: 60 * 60)).to contain(@user1, count: 1)
+          expect(@profile1.recipients_with_pending(throttle: 60 * 60)).not_to include(@user2)
 
-          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user1)
-          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).to contain(@user2, count: 1)
+          expect(@profile1.recipients_with_pending(throttle: 24 * 60 * 60)).not_to include(@user1)
+          expect(@profile1.recipients_with_pending(throttle: 24 * 60 * 60)).to contain(@user2, count: 1)
         end
       end
 
       describe 'system maximum throttling delay is minimum' do
         before(:each) do
-          allow(Rails.application.config).to receive(:maximum_email_throttling_delay).and_return(60*60)
-          @user1 = create(:user, email_throttling_delay: 7*24*60*60)
+          allow(Rails.application.config).to receive(:maximum_email_throttling_delay).and_return(60 * 60)
+          @user1 = create(:user, email_throttling_delay: 7 * 24 * 60 * 60)
           @user2 = create(:user)
           @profile1 = create(:notification_profile, users: [@user1])
-          @profile2 = create(:notification_profile, users: [@user1, @user2], maximum_email_throttling_delay: 24*60*60)
+          @profile2 = create(:notification_profile, users: [@user1, @user2], maximum_email_throttling_delay: 24 * 60 * 60)
           create(:notification, notification_profile: @profile1, user: @user1)
           create(:notification, notification_profile: @profile1, user: @user1)
           create(:notification, notification_profile: @profile1, user: @user2)
@@ -486,23 +486,23 @@ RSpec.describe NotificationProfile do
         end
 
         it 'returns only users with pending notifications matching the throttling settings for the profile-user-combination' do
-          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user1, count: 1)
-          expect(@profile1.recipients_with_pending(throttle: 60*60)).to contain(@user2, count: 1)
+          expect(@profile1.recipients_with_pending(throttle: 60 * 60)).to contain(@user1, count: 1)
+          expect(@profile1.recipients_with_pending(throttle: 60 * 60)).to contain(@user2, count: 1)
 
-          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user1)
-          expect(@profile1.recipients_with_pending(throttle: 24*60*60)).not_to include(@user2)
+          expect(@profile1.recipients_with_pending(throttle: 24 * 60 * 60)).not_to include(@user1)
+          expect(@profile1.recipients_with_pending(throttle: 24 * 60 * 60)).not_to include(@user2)
 
-          expect(@profile1.recipients_with_pending(throttle: 7*24*60*60)).not_to include(@user1)
-          expect(@profile1.recipients_with_pending(throttle: 7*24*60*60)).not_to include(@user2)
+          expect(@profile1.recipients_with_pending(throttle: 7 * 24 * 60 * 60)).not_to include(@user1)
+          expect(@profile1.recipients_with_pending(throttle: 7 * 24 * 60 * 60)).not_to include(@user2)
 
-          expect(@profile2.recipients_with_pending(throttle: 60*60)).to contain(@user1, count: 1)
-          expect(@profile2.recipients_with_pending(throttle: 60*60)).to contain(@user2, count: 1)
+          expect(@profile2.recipients_with_pending(throttle: 60 * 60)).to contain(@user1, count: 1)
+          expect(@profile2.recipients_with_pending(throttle: 60 * 60)).to contain(@user2, count: 1)
 
-          expect(@profile2.recipients_with_pending(throttle: 24*60*60)).not_to include(@user1)
-          expect(@profile2.recipients_with_pending(throttle: 24*60*60)).not_to include(@user2)
+          expect(@profile2.recipients_with_pending(throttle: 24 * 60 * 60)).not_to include(@user1)
+          expect(@profile2.recipients_with_pending(throttle: 24 * 60 * 60)).not_to include(@user2)
 
-          expect(@profile2.recipients_with_pending(throttle: 7*24*60*60)).not_to include(@user1)
-          expect(@profile2.recipients_with_pending(throttle: 7*24*60*60)).not_to include(@user2)
+          expect(@profile2.recipients_with_pending(throttle: 7 * 24 * 60 * 60)).not_to include(@user1)
+          expect(@profile2.recipients_with_pending(throttle: 7 * 24 * 60 * 60)).not_to include(@user2)
         end
       end
     end
@@ -556,21 +556,21 @@ RSpec.describe NotificationProfile do
 
   describe '::triggered_by' do
     before(:each) do
-      @p0 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'TestModel', is_enabled: false)
+      @p0 = create(:notification_profile, triggering_actions: %w[create update destroy], triggering_resource: 'TestModel', is_enabled: false)
 
-      @p1 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'TestModel')
-      @p2 = create(:notification_profile, triggering_actions: %w(create), triggering_resource: 'TestModel')
-      @p3 = create(:notification_profile, triggering_actions: %w(update), triggering_resource: 'TestModel')
-      @p4 = create(:notification_profile, triggering_actions: %w(destroy), triggering_resource: 'TestModel')
-      @p5 = create(:notification_profile, triggering_actions: %w(create update), triggering_resource: 'TestModel')
+      @p1 = create(:notification_profile, triggering_actions: %w[create update destroy], triggering_resource: 'TestModel')
+      @p2 = create(:notification_profile, triggering_actions: %w[create], triggering_resource: 'TestModel')
+      @p3 = create(:notification_profile, triggering_actions: %w[update], triggering_resource: 'TestModel')
+      @p4 = create(:notification_profile, triggering_actions: %w[destroy], triggering_resource: 'TestModel')
+      @p5 = create(:notification_profile, triggering_actions: %w[create update], triggering_resource: 'TestModel')
 
-      @pe0 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'ExtraModel', is_enabled: false)
+      @pe0 = create(:notification_profile, triggering_actions: %w[create update destroy], triggering_resource: 'ExtraModel', is_enabled: false)
 
-      @pe1 = create(:notification_profile, triggering_actions: %w(create update destroy), triggering_resource: 'ExtraModel')
-      @pe2 = create(:notification_profile, triggering_actions: %w(create), triggering_resource: 'ExtraModel')
-      @pe3 = create(:notification_profile, triggering_actions: %w(update), triggering_resource: 'ExtraModel')
-      @pe4 = create(:notification_profile, triggering_actions: %w(destroy), triggering_resource: 'ExtraModel')
-      @pe5 = create(:notification_profile, triggering_actions: %w(create update), triggering_resource: 'ExtraModel')
+      @pe1 = create(:notification_profile, triggering_actions: %w[create update destroy], triggering_resource: 'ExtraModel')
+      @pe2 = create(:notification_profile, triggering_actions: %w[create], triggering_resource: 'ExtraModel')
+      @pe3 = create(:notification_profile, triggering_actions: %w[update], triggering_resource: 'ExtraModel')
+      @pe4 = create(:notification_profile, triggering_actions: %w[destroy], triggering_resource: 'ExtraModel')
+      @pe5 = create(:notification_profile, triggering_actions: %w[create update], triggering_resource: 'ExtraModel')
 
       @record = TestModel.create
       @record2 = ExtraModel.create
@@ -611,8 +611,8 @@ RSpec.describe NotificationProfile do
         expect(@profiles).not_to include(@pe5)
       end
 
-      include_examples 'filters changes', triggering_actions: %w(create update destroy), event_action: :create
-      include_examples 'filters changes', triggering_actions: %w(create), event_action: :create
+      include_examples 'filters changes', triggering_actions: %w[create update destroy], event_action: :create
+      include_examples 'filters changes', triggering_actions: %w[create], event_action: :create
     end
 
     describe ':update TestModel' do
@@ -645,8 +645,8 @@ RSpec.describe NotificationProfile do
         expect(@profiles).not_to include(@pe4)
       end
 
-      include_examples 'filters changes', triggering_actions: %w(create update destroy), event_action: :update
-      include_examples 'filters changes', triggering_actions: %w(update), event_action: :update
+      include_examples 'filters changes', triggering_actions: %w[create update destroy], event_action: :update
+      include_examples 'filters changes', triggering_actions: %w[update], event_action: :update
     end
 
     describe ':destroy TestModel' do
@@ -679,8 +679,8 @@ RSpec.describe NotificationProfile do
         expect(@profiles).not_to include(@pe4)
       end
 
-      include_examples 'filters changes', triggering_actions: %w(create update destroy), event_action: :destroy
-      include_examples 'filters changes', triggering_actions: %w(destroy), event_action: :destroy
+      include_examples 'filters changes', triggering_actions: %w[create update destroy], event_action: :destroy
+      include_examples 'filters changes', triggering_actions: %w[destroy], event_action: :destroy
     end
 
     describe ':update custom filter attribute', focus: true do
@@ -688,7 +688,7 @@ RSpec.describe NotificationProfile do
         @record = TestModel.create(required_series: { 'abc' => { 'tqc_state' => 0 } })
         @record.required_series = { 'abc' => { 'tqc_state' => 1 } }
         @record.save!
-        @pcustom = create(:notification_profile, title: 'Filtered Profile', triggering_actions: %w(update), triggering_resource: 'TestModel', filters: [[{"required_series" => {'changes_tqc_state' => true}}]], is_enabled: true)
+        @pcustom = create(:notification_profile, title: 'Filtered Profile', triggering_actions: %w[update], triggering_resource: 'TestModel', filters: [[{ 'required_series' => { 'changes_tqc_state' => true } }]], is_enabled: true)
       end
 
       before(:each) do
@@ -801,7 +801,7 @@ RSpec.describe NotificationProfile do
     it 'creates notification only for authorized users' do
       ::PaperTrail.whodunnit = nil
       @record = TestModel.create(foobar: 'foo')
-      allow_any_instance_of(Ability).to receive(:can?) { |ability, activity, subject|
+      allow_any_instance_of(Ability).to receive(:can?) { |ability, _activity, _subject|
         ability.current_user == @user1
       }
       expect do

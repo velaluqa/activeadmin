@@ -24,7 +24,7 @@ class Image < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',
     meta: {
-      study_id: -> (image) { image.study.andand.id }
+      study_id: ->(image) { image.study.andand.id }
     }
   )
 
@@ -39,12 +39,12 @@ class Image < ActiveRecord::Base
       .where(centers: { study_id: Array[ids].flatten })
   }
 
-  scope :searchable, -> { join_study.select(<<SELECT) }
-centers.study_id AS study_id,
-studies.name AS study_name,
-image_series.series_number::text || '#' || images.id AS text,
-images.id AS result_id,
-'Image'::varchar AS result_type
+  scope :searchable, -> { join_study.select(<<SELECT.strip_heredoc) }
+    centers.study_id AS study_id,
+    studies.name AS study_name,
+    image_series.series_number::text || '#' || images.id AS text,
+    images.id AS result_id,
+    'Image'::varchar AS result_type
 SELECT
 
   scope :join_study, -> { joins(image_series: { patient: { center: :study } }) }
@@ -53,16 +53,16 @@ SELECT
   include ScopablePermissions
 
   def self.with_permissions
-    joins(image_series: { patient: { center: :study } }).joins(<<JOIN)
-INNER JOIN user_roles ON
-  (
-       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
-    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
-    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
-    OR user_roles.scope_object_id IS NULL
-  )
-INNER JOIN roles ON user_roles.role_id = roles.id
-INNER JOIN permissions ON roles.id = permissions.role_id
+    joins(image_series: { patient: { center: :study } }).joins(<<JOIN.strip_heredoc)
+      INNER JOIN user_roles ON
+        (
+             (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+          OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+          OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+          OR user_roles.scope_object_id IS NULL
+        )
+      INNER JOIN roles ON user_roles.role_id = roles.id
+      INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 

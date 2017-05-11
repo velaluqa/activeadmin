@@ -28,7 +28,7 @@ class Center < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',
     meta: {
-      study_id: -> (center) { center.study.andand.id }
+      study_id: ->(center) { center.study.andand.id }
     }
   )
   acts_as_taggable
@@ -46,7 +46,7 @@ class Center < ActiveRecord::Base
 
   has_many :user_roles, as: :scope_object, dependent: :destroy
 
-  scope :by_study_ids, -> (*ids) {
+  scope :by_study_ids, ->(*ids) {
     where(study_id: Array[ids].flatten)
   }
 
@@ -55,29 +55,29 @@ class Center < ActiveRecord::Base
   include ScopablePermissions
 
   def self.with_permissions
-    joins(:study).joins(<<JOIN)
-LEFT JOIN "patients" ON "patients"."center_id" = "centers"."id"
-INNER JOIN user_roles ON
-  (
-       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
-    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
-    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
-    OR user_roles.scope_object_id IS NULL
-  )
-INNER JOIN roles ON user_roles.role_id = roles.id
-INNER JOIN permissions ON roles.id = permissions.role_id
+    joins(:study).joins(<<JOIN.strip_heredoc)
+      LEFT JOIN "patients" ON "patients"."center_id" = "centers"."id"
+      INNER JOIN user_roles ON
+        (
+             (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+          OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+          OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+          OR user_roles.scope_object_id IS NULL
+        )
+      INNER JOIN roles ON user_roles.role_id = roles.id
+      INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
-  scope :searchable, -> { joins(:study).select(<<SELECT) }
-centers.study_id AS study_id,
-studies.name AS study_name,
-centers.code || ' - ' || centers.name AS text,
-centers.id AS result_id,
-'Center'::varchar AS result_type
+  scope :searchable, -> { joins(:study).select(<<SELECT.strip_heredoc) }
+    centers.study_id AS study_id,
+    studies.name AS study_name,
+    centers.code || ' - ' || centers.name AS text,
+    centers.id AS result_id,
+    'Center'::varchar AS result_type
 SELECT
 
-  scope :of_study, -> (study) {
+  scope :of_study, ->(study) {
     study_id = study
     study_id = study.id if study.is_a?(ActiveRecord::Base)
     where(study_id: study_id)
@@ -121,11 +121,11 @@ SELECT
   end
 
   def domino_document_fields
-    %w(id code name)
+    %w[id code name]
   end
 
   def domino_document_properties(action = :update)
-    hash = { 'ericaID' => id,  'CenterNo' => code }
+    hash = { 'ericaID' => id, 'CenterNo' => code }
     hash['CenterShortName'] = name if action == :create
     hash
   end
@@ -164,7 +164,7 @@ SELECT
   def ensure_study_is_unchanged
     if persisted? && study_id_changed?
       errors[:study] << 'A center cannot be reassigned to a different study.'
-      return false
+      false
     end
   end
 end

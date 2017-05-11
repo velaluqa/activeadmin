@@ -11,10 +11,10 @@ describe TriggerNotificationProfiles do
         triggering_resource: 'Study',
         is_enabled: true,
         filters: [[{
-                     name: {
-                       equal: 'Bar Study'
-                     }
-                   }]],
+          name: {
+            equal: 'Bar Study'
+          }
+        }]],
         users: [user],
         only_authorized_recipients: false
       )
@@ -39,10 +39,10 @@ describe TriggerNotificationProfiles do
         triggering_resource: 'Study',
         is_enabled: true,
         filters: [[{
-                     name: {
-                       equal: 'Bar Study'
-                     }
-                   }]],
+          name: {
+            equal: 'Bar Study'
+          }
+        }]],
         users: [user],
         only_authorized_recipients: false
       )
@@ -69,10 +69,10 @@ describe TriggerNotificationProfiles do
         triggering_resource: 'Study',
         is_enabled: true,
         filters: [[{
-                     name: {
-                       equal: 'Bar Study'
-                     }
-                   }]],
+          name: {
+            equal: 'Bar Study'
+          }
+        }]],
         users: [user],
         only_authorized_recipients: false
       )

@@ -32,10 +32,8 @@ module ActiveAdmin::ImagesHelper
   end
 
   def parse_datetime(value, format)
-    begin
-      return DateTime.strptime(value, format)
-    rescue ArgumentError
-      return nil
-    end
+    return DateTime.strptime(value, format)
+  rescue ArgumentError
+    return nil
   end
 end

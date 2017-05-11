@@ -23,7 +23,8 @@ class Sql
           column,
           override: options[:override_values]
             .andand.stringify_keys
-            .andand[column.name])
+            .andand[column.name]
+        )
       end
       @columns.sort_by!(&:name)
     end
@@ -65,24 +66,24 @@ class Sql
     def dump_upserts(io)
       io.puts 'BEGIN;'
       new_values.each_slice(25_000) do |new_values|
-        io.puts <<SQL
-WITH "new_values" (#{columns.map(&:to_s).join(', ')}) as (
-  values
-#{new_values.join(",\n")}
-),
-"upsert" AS
-(
-  UPDATE "#{table_name}" "m"
-  SET
-    #{update_setters}
-  FROM "new_values" "nv"
-  WHERE "m"."id" = "nv"."id"
-  RETURNING "m".*
-)
-INSERT INTO "#{table_name}" (#{insert_columns.map(&:to_s).join(', ')})
-SELECT #{insert_columns.map(&:with_type).join(', ')}
-FROM "new_values"
-WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
+        io.puts <<SQL.strip_heredoc
+          WITH "new_values" (#{columns.map(&:to_s).join(', ')}) as (
+            values
+          #{new_values.join(",\n")}
+          ),
+          "upsert" AS
+          (
+            UPDATE "#{table_name}" "m"
+            SET
+              #{update_setters}
+            FROM "new_values" "nv"
+            WHERE "m"."id" = "nv"."id"
+            RETURNING "m".*
+          )
+          INSERT INTO "#{table_name}" (#{insert_columns.map(&:to_s).join(', ')})
+          SELECT #{insert_columns.map(&:with_type).join(', ')}
+          FROM "new_values"
+          WHERE NOT EXISTS (SELECT 1 FROM "upsert" "up" WHERE "up"."id" = "new_values"."id");
 SQL
       end
       io.puts 'COMMIT;'

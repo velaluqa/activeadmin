@@ -1,23 +1,23 @@
 class PatientsController < ApplicationController
-  before_filter :load_center, :only => [:index, :create]
-  before_filter :load_patients, :only => [:index]
-  before_filter :load_the_patient, :only => [:wado_query]
+  before_filter :load_center, only: %i[index create]
+  before_filter :load_patients, only: [:index]
+  before_filter :load_the_patient, only: [:wado_query]
 
-  skip_before_filter :verify_authenticity_token, :only => [:create]
+  skip_before_filter :verify_authenticity_token, only: [:create]
 
   def index
     respond_to do |format|
-      format.json { render :json => @patients}
+      format.json { render json: @patients }
     end
   end
 
   def create
     authorize! :create, Patient
 
-    patient = Patient.create(:subject_id => params[:patient][:subject_id], :center => @center)
+    patient = Patient.create(subject_id: params[:patient][:subject_id], center: @center)
 
     respond_to do |format|
-      format.json { render :json => {:success => !patient.nil?, :patient => patient} }
+      format.json { render json: { success: !patient.nil?, patient: patient } }
     end
   end
 

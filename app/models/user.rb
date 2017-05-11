@@ -122,7 +122,7 @@ class User < ActiveRecord::Base
     matrix = {}
     Ability::ACTIVITIES.each_pair do |subject, activities|
       if can?(:manage, subject)
-        matrix[subject.to_s] = %i(manage)
+        matrix[subject.to_s] = %i[manage]
         next
       end
       granted = activities.map do |activity|
@@ -133,12 +133,12 @@ class User < ActiveRecord::Base
     matrix
   end
 
-  scope :searchable, -> { select(<<SELECT) }
-NULL::integer AS study_id,
-NULL::varchar AS study_name,
-users.name AS text,
-users.id AS result_id,
-'User'::varchar AS result_type
+  scope :searchable, -> { select(<<SELECT.strip_heredoc) }
+    NULL::integer AS study_id,
+    NULL::varchar AS study_name,
+    users.name AS text,
+    users.id AS result_id,
+    'User'::varchar AS result_type
 SELECT
 
   def self.granted_for(options = {})
@@ -244,26 +244,26 @@ SELECT
     if c.include?('sign_in_count') &&
        c['sign_in_count'][1] == c['sign_in_count'][0] + 1
 
-      return :sign_in
+      :sign_in
     elsif c.keys == ['remember_created_at']
-      return :remember_token_updated
+      :remember_token_updated
     elsif c.include?('encrypted_password') &&
           c.include?('password_changed_at')
-      return :password_change
+      :password_change
     elsif c.include?('failed_attempts')
       if c['failed_attempts'][1] > c['failed_attempts'][0]
         if c.include?('locked_at') && !c['locked_at'][1].blank?
-          return :user_locked
+          :user_locked
         else
-          return :failed_login
+          :failed_login
         end
       elsif c['failed_attempts'][1] == 0 && c.include?('locked_at') && c['locked_at'][1].blank?
-        return :user_unlocked
+        :user_unlocked
       elsif c['failed_attempts'][1] == 0
-        return :failed_attempts_reset
+        :failed_attempts_reset
       end
     elsif c.include?('private_key') && c.include?('public_key')
-      return :key_change
+      :key_change
     end
   end
 

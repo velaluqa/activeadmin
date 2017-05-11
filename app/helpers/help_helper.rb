@@ -10,7 +10,7 @@ module HelpHelper
       head_end = doc.index(/<\/h#{level}>/, head_start)
       title = doc[head_start + "<h#{level}>".length...head_end]
       if level < last_level
-        path.delete_if { |key,_| (level..last_level).include?(key) }
+        path.delete_if { |key, _| (level..last_level).cover?(key) }
         path[level] = title
       else
         path[level] = title

@@ -9,13 +9,13 @@
 # something like Apache SOLR or similar...)
 class RecordSearch
   MODELS =
-    %w(BackgroundJob Study Center Patient Visit ImageSeries Image User Role).freeze
+    %w[BackgroundJob Study Center Patient Visit ImageSeries Image User Role].freeze
 
   attr_accessor :user, :query, :study_id, :models
 
   def initialize(options = {})
-    @user = options[:user] or fail 'missing :user options'
-    @query = options[:query] or fail 'missing :query options'
+    (@user = options[:user]) || raise('missing :user options')
+    (@query = options[:query]) || raise('missing :query options')
     @models = (options[:models].blank? ? MODELS : options[:models] & MODELS)
     @study_id = options[:study_id]
   end

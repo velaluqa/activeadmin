@@ -25,7 +25,7 @@ module NotificationObservable
             uniqueItems: true,
             minItems: 1,
             items: {
-              title: 'Condition',
+              title: 'Condition'
             }.merge(definition)
           }
         }.deep_stringify_keys

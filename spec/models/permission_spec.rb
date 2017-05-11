@@ -6,9 +6,9 @@ RSpec.describe Permission do
       expect(permission.subject).to eq(ImageSeries)
     end
     it 'raises error for wring ability string' do
-      expect {
+      expect do
         Permission.from_ability('read_aa')
-      }.to raise_error RuntimeError
+      end.to raise_error RuntimeError
     end
   end
 end

@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
   def access_denied(*_args)
     respond_to do |format|
       format.html { render 'shared/forbidden', status: :forbidden, layout: 'active_admin' }
-      format.json { render json: { error_code: 403, error_message: "Forbidden" }, status: :forbidden  }
+      format.json { render json: { error_code: 403, error_message: 'Forbidden' }, status: :forbidden }
     end
   end
 
@@ -52,7 +52,7 @@ class ApplicationController < ActionController::Base
     @current_ability ||= ::Ability.new(current_user)
   end
 
-  def after_sign_in_path_for(resource)
+  def after_sign_in_path_for(_resource)
     admin_root_path
   end
 

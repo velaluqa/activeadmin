@@ -1,4 +1,5 @@
 # coding: utf-8
+
 RSpec.describe HistoricReportQuery do
   describe '#current_count' do
     let!(:query) do
@@ -49,7 +50,7 @@ RSpec.describe HistoricReportQuery do
       count       = { total: 15, group: { succeeded: 10, failed: 2 } }
       delta       = { total: 0,  group: { new: -1, succeeded: +1, failed: 0 } }
       result      = query.entry_values(count, delta)
-      expect(result).to include(group: 'new', count: 0,  delta: -1)
+      expect(result).to include(group: 'new', count: 0, delta: -1)
       expect(result).to include(group: 'succeeded', count: 10, delta: +1)
     end
   end
@@ -82,7 +83,7 @@ RSpec.describe HistoricReportQuery do
       it 'applies group deltas' do
         count       = { total: 15, group: { new: 3,  succeeded: 10, failed: 2 } }
         delta       = { total: 0,  group: { new: -1, succeeded: +1, failed: 0 } }
-        expectation = { total: 15, group: { new: 4,  succeeded:  9, failed: 2 } }
+        expectation = { total: 15, group: { new: 4,  succeeded: 9, failed: 2 } }
         expect(query.apply_delta(count, delta, reverse: true)).to eq(expectation)
       end
     end
@@ -123,7 +124,7 @@ RSpec.describe HistoricReportQuery do
             state: [nil, 0]
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: +1, group: {'0' => +1})
+        expect(query.calculate_delta(version)).to eq(total: +1, group: { '0' => +1 })
       end
 
       it 'calculates destroy' do
@@ -134,7 +135,7 @@ RSpec.describe HistoricReportQuery do
             state: 0
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: -1, group: {'0' => -1})
+        expect(query.calculate_delta(version)).to eq(total: -1, group: { '0' => -1 })
       end
 
       it 'calculates update of state column' do
@@ -145,7 +146,7 @@ RSpec.describe HistoricReportQuery do
             state: [0, 1]
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: 0, group: {'0' => -1, '1' => +1})
+        expect(query.calculate_delta(version)).to eq(total: 0, group: { '0' => -1, '1' => +1 })
       end
 
       it 'calculates update of state column' do
@@ -269,7 +270,7 @@ RSpec.describe HistoricReportQuery do
             ]
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: +1, group: {'0' => +1})
+        expect(query.calculate_delta(version)).to eq(total: +1, group: { '0' => +1 })
       end
 
       it 'calculates destroy' do
@@ -285,7 +286,7 @@ RSpec.describe HistoricReportQuery do
             }
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: -1, group: {'0' => -1})
+        expect(query.calculate_delta(version)).to eq(total: -1, group: { '0' => -1 })
       end
 
       it 'calculates update' do
@@ -309,7 +310,7 @@ RSpec.describe HistoricReportQuery do
             ]
           }
         )
-        expect(query.calculate_delta(version)).to eq(total: 0, group: {'0' => -1, '1' => +1})
+        expect(query.calculate_delta(version)).to eq(total: 0, group: { '0' => -1, '1' => +1 })
       end
 
       it 'ignores update of irrelevant columns' do

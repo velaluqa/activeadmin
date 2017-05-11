@@ -5,24 +5,29 @@ RSpec.describe Center do
     let!(:user_role) { create(:user_role, scope_object: center, user: user) }
 
     it 'destroys related user roles' do
-      expect {
+      expect do
         center.destroy
-      }.to change(UserRole, :count).by(-1)
+      end.to change(UserRole, :count).by(-1)
     end
   end
 
   describe 'scope ::searchable' do
     it 'selects search fields' do
       center = create(:center, name: 'FooCenter')
-      expect(Center.searchable.as_json)
-        .to eq [{
-                  'id' => nil,
-                  'study_id' => center.study_id,
-                  'study_name' => center.study.name,
-                  'text' => "#{center.code} - FooCenter",
-                  'result_id' => center.id,
-                  'result_type' => 'Center'
-                }]
+      expect(Center.searchable.as_json).to(
+        eq(
+          [
+            {
+              'id' => nil,
+              'study_id' => center.study_id,
+              'study_name' => center.study.name,
+              'text' => "#{center.code} - FooCenter",
+              'result_id' => center.id,
+              'result_type' => 'Center'
+            }
+          ]
+        )
+      )
     end
   end
 

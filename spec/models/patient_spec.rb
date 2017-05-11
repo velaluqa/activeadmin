@@ -5,9 +5,9 @@ RSpec.describe Patient do
     let!(:user_role) { create(:user_role, scope_object: patient, user: user) }
 
     it 'destroys related user roles' do
-      expect {
+      expect do
         patient.destroy
-      }.to change(UserRole, :count).by(-1)
+      end.to change(UserRole, :count).by(-1)
     end
   end
 
@@ -17,13 +17,13 @@ RSpec.describe Patient do
       patient = create(:patient, subject_id: 'Bar', center: center)
       expect(Patient.searchable.as_json)
         .to eq [{
-                  'id' => nil,
-                  'study_id' => patient.center.study_id,
-                  'study_name' => patient.center.study.name,
-                  'text' => 'FooBar',
-                  'result_id' => patient.id,
-                  'result_type' => 'Patient'
-                }]
+          'id' => nil,
+          'study_id' => patient.center.study_id,
+          'study_name' => patient.center.study.name,
+          'text' => 'FooBar',
+          'result_id' => patient.id,
+          'result_type' => 'Patient'
+        }]
     end
   end
 
@@ -166,21 +166,21 @@ RSpec.describe Patient do
     describe 'for study with visit template' do
       let!(:study) { create(:study) }
       let!(:center) { create(:center, study: study) }
-      let!(:config_yaml) { <<YAML }
-image_series_properties: []
-visit_types:
-  baseline:
-    description: Some simple visit type
-    required_series:
-      series1:
-        tqc: []
-    mqc: []
-visit_templates:
-  template:
-    visits:
-      - number: 1
-        type: baseline
-        description: 'Some preset for a visit'
+      let!(:config_yaml) { <<YAML.strip_heredoc }
+        image_series_properties: []
+        visit_types:
+          baseline:
+            description: Some simple visit type
+            required_series:
+              series1:
+                tqc: []
+            mqc: []
+        visit_templates:
+          template:
+            visits:
+              - number: 1
+                type: baseline
+                description: 'Some preset for a visit'
 YAML
 
       before(:each) do
@@ -207,22 +207,22 @@ YAML
     describe 'for study with enforced visit template' do
       let!(:study) { create(:study) }
       let!(:center) { create(:center, study: study) }
-      let!(:config_yaml) { <<YAML }
-image_series_properties: []
-visit_types:
-  baseline:
-    description: Some simple visit type
-    required_series:
-      series1:
-        tqc: []
-    mqc: []
-visit_templates:
-  template:
-    create_patient_enforce: yes
-    visits:
-      - number: 1
-        type: baseline
-        description: 'Some preset for a visit'
+      let!(:config_yaml) { <<YAML.strip_heredoc }
+        image_series_properties: []
+        visit_types:
+          baseline:
+            description: Some simple visit type
+            required_series:
+              series1:
+                tqc: []
+            mqc: []
+        visit_templates:
+          template:
+            create_patient_enforce: yes
+            visits:
+              - number: 1
+                type: baseline
+                description: 'Some preset for a visit'
 YAML
 
       before(:each) do

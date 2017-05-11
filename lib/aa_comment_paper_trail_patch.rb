@@ -7,10 +7,10 @@ module ActiveAdminCommentPaperTrailPatch
 
   module InstanceMethods
     def resource_name
-      if(self.resource.nil? or not self.resource.respond_to?(:name))
-        "#{self.resource_type} #{self.resource_id}"
+      if resource.nil? || !resource.respond_to?(:name)
+        "#{resource_type} #{resource_id}"
       else
-        "#{self.resource_type} '#{self.resource.name}'"
+        "#{resource_type} '#{resource.name}'"
       end
     end
 

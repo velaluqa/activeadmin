@@ -18,15 +18,13 @@ class DownloadImagesWorker
   def add_image(zip, image)
     zip.file.open(image.id.to_s, 'w') do |outfile|
       outfile.write(
-        File.open(Rails.root.join(image.absolute_image_storage_path).to_s, 'r') do |infile|
-          infile.read
-        end
+        File.open(Rails.root.join(image.absolute_image_storage_path).to_s, 'r', &:read)
       )
     end
   end
 
   def add_image_series(zip, image_series, create_folder = true)
-    if(create_folder)
+    if create_folder
       image_series_dir = image_series.id.to_s
 
       zip.dir.mkdir(image_series_dir)
@@ -59,7 +57,7 @@ class DownloadImagesWorker
       zip.dir.chdir('..')
     end
 
-    visit.image_series.select {|is| is.assigned_required_series.empty?}.each do |image_series|
+    visit.image_series.select { |is| is.assigned_required_series.empty? }.each do |image_series|
       add_image_series(zip, image_series, true)
     end
 
@@ -81,7 +79,7 @@ class DownloadImagesWorker
     zip.dir.mkdir(unassigned_image_series_dir)
     zip.dir.chdir(unassigned_image_series_dir)
 
-    patient.image_series.select {|is| is.visit.nil?}.each do |image_series|
+    patient.image_series.select { |is| is.visit.nil? }.each do |image_series|
       add_image_series(zip, image_series, true)
     end
 
@@ -118,6 +116,6 @@ class DownloadImagesWorker
       end
     end
 
-    job.finish_successfully({'zipfile' => output_path})
+    job.finish_successfully('zipfile' => output_path)
   end
 end

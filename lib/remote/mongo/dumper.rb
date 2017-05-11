@@ -1,17 +1,17 @@
 module Mongo
   class Dumper
     class << self
-      MONGODUMP_ARGS = %w(host port db username password collection out)
+      MONGODUMP_ARGS = %w[host port db username password collection out].freeze
 
       def mongoid_configuration
         conf = Rails.configuration.mongoid.clients['default']
-        fail 'No such mongoid configuration' if conf.nil?
+        raise 'No such mongoid configuration' if conf.nil?
         conf
       end
 
       def mongo_options
         conf = mongoid_configuration.clone
-        fail 'Cannot handle multiple hosts.' if conf['hosts'].length > 1
+        raise 'Cannot handle multiple hosts.' if conf['hosts'].length > 1
         conf['db'] = conf.delete('database')
         conf['host'], conf['port'] = conf.delete('hosts').first.split(':')
         conf
@@ -33,7 +33,7 @@ module Mongo
       end
 
       def rename_dir(options = {})
-        fail 'No renaming target given' unless options[:dir]
+        raise 'No renaming target given' unless options[:dir]
         source = File.join(options[:out].to_s || '.', mongo_options['db'], '')
         target = File.join(options[:out].to_s || '.', options[:dir], '')
         system_or_die("rsync --remove-source-files -a #{source.shellescape} #{target.shellescape}")

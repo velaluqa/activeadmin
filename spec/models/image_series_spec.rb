@@ -34,13 +34,13 @@ RSpec.describe ImageSeries do
       series = create(:image_series, name: 'FooSeries', series_number: '123')
       expect(ImageSeries.searchable.as_json)
         .to eq [{
-                  'id' => nil,
-                  'study_id' => series.patient.center.study_id,
-                  'study_name' => series.patient.center.study.name,
-                  'text' => 'FooSeries (123)',
-                  'result_id' => series.id,
-                  'result_type' => 'ImageSeries'
-                }]
+          'id' => nil,
+          'study_id' => series.patient.center.study_id,
+          'study_name' => series.patient.center.study.name,
+          'text' => 'FooSeries (123)',
+          'result_id' => series.id,
+          'result_type' => 'ImageSeries'
+        }]
     end
   end
 

@@ -1,4 +1,5 @@
 # coding: utf-8
+
 class EricaRemoteController < ApplicationController
   before_filter :skip_trackable # do not track requests to the ERICA Remote API as logins/logouts, because every single request would be counted as one login
 

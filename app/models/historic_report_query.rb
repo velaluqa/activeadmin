@@ -1,4 +1,5 @@
 # coding: utf-8
+
 # ## Schema Information
 #
 # Table name: `historic_report_queries`
@@ -33,9 +34,9 @@ class HistoricReportQuery < ActiveRecord::Base
   def calculate_cache(study_id)
     current_count = current_count(study_id)
     versions = Version
-                 .where('"versions"."id" <= ?', Version.last.id)
-                 .of_study_resource(study_id, resource_type)
-                 .order('"versions"."id" DESC')
+               .where('"versions"."id" <= ?', Version.last.id)
+               .of_study_resource(study_id, resource_type)
+               .order('"versions"."id" DESC')
     versions.ordered_find_each do |version|
       delta = calculate_delta(version)
       next if delta.nil?
@@ -95,7 +96,7 @@ class HistoricReportQuery < ActiveRecord::Base
   def apply_delta(count, delta, options = {})
     count = count.deep_dup
     delta.each_pair do |key, delta_val|
-      next unless delta_val.is_a?(Fixnum)
+      next unless delta_val.is_a?(Integer)
       if options[:reverse]
         count[key] -= delta_val
       else
@@ -103,7 +104,7 @@ class HistoricReportQuery < ActiveRecord::Base
       end
     end
     (delta[:group] || {}).each_pair do |key, delta_val|
-      next unless delta_val.is_a?(Fixnum)
+      next unless delta_val.is_a?(Integer)
       if options[:reverse]
         count[:group][key] ||= 0
         count[:group][key] -= delta_val
@@ -220,16 +221,16 @@ class HistoricReportQuery < ActiveRecord::Base
       delta = {
         total: new_count[:total] - old_count[:total],
         group: (old_count[:group].keys + new_count[:group].keys)
-          .uniq
-          .map do |group|
-          old_group_count = old_count[:group][group] || 0
-          new_group_count = new_count[:group][group] || 0
-          changed = true if old_group_count != new_group_count
-          [
-            group.to_s,
-            new_group_count - old_group_count
-          ]
-        end.to_h
+              .uniq
+              .map do |group|
+                 old_group_count = old_count[:group][group] || 0
+                 new_group_count = new_count[:group][group] || 0
+                 changed = true if old_group_count != new_group_count
+                 [
+                   group.to_s,
+                   new_group_count - old_group_count
+                 ]
+               end.to_h
       }
     end
     delta if changed

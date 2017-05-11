@@ -6,7 +6,7 @@ module NotificationObservable
 
         def initialize(reflection, options = {})
           @options = options.merge(
-            filters: %i(equality relations),
+            filters: %i[equality relations],
             is_relation: true
           )
           @reflection = reflection

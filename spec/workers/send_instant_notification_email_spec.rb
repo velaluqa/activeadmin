@@ -20,9 +20,9 @@ describe SendInstantNotificationEmail do
         .to receive(:instant_notification_email)
         .with(@notification)
         .and_call_original
-      expect {
+      expect do
         SendInstantNotificationEmail.new.perform(@notification.id)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'marks the notification as sent' do

@@ -38,7 +38,7 @@ class ImageSeries < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',
     meta: {
-      study_id: -> (series) { series.study.andand.id }
+      study_id: ->(series) { series.study.andand.id }
     }
   )
   acts_as_taggable
@@ -67,17 +67,17 @@ class ImageSeries < ActiveRecord::Base
 
   scope :not_assigned, -> { where(visit_id: nil) }
 
-  scope :by_study_ids, -> (*ids) {
+  scope :by_study_ids, ->(*ids) {
     joins(patient: :center)
       .where(centers: { study_id: Array[ids].flatten })
   }
 
-  scope :searchable, -> { join_study.select(<<SELECT) }
-centers.study_id AS study_id,
-studies.name AS study_name,
-image_series.name || ' (' || image_series.series_number::text || ')' AS text,
-image_series.id AS result_id,
-'ImageSeries'::varchar AS result_type
+  scope :searchable, -> { join_study.select(<<SELECT.strip_heredoc) }
+    centers.study_id AS study_id,
+    studies.name AS study_name,
+    image_series.name || ' (' || image_series.series_number::text || ')' AS text,
+    image_series.id AS result_id,
+    'ImageSeries'::varchar AS result_type
 SELECT
 
   scope :join_study, -> { joins(patient: { center: :study }) }
@@ -86,16 +86,16 @@ SELECT
   include ScopablePermissions
 
   def self.with_permissions
-    joins(patient: { center: :study }).joins(<<JOIN)
-INNER JOIN user_roles ON
-  (
-       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
-    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
-    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
-    OR user_roles.scope_object_id IS NULL
-  )
-INNER JOIN roles ON user_roles.role_id = roles.id
-INNER JOIN permissions ON roles.id = permissions.role_id
+    joins(patient: { center: :study }).joins(<<JOIN.strip_heredoc)
+      INNER JOIN user_roles ON
+        (
+             (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+          OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+          OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+          OR user_roles.scope_object_id IS NULL
+        )
+      INNER JOIN roles ON user_roles.role_id = roles.id
+      INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
@@ -105,7 +105,7 @@ JOIN
 
   # before_validation :assign_series_number
 
-  STATE_SYMS = [:importing, :imported, :visit_assigned, :required_series_assigned, :not_required].freeze
+  STATE_SYMS = %i[importing imported visit_assigned required_series_assigned not_required].freeze
 
   def state_index
     read_attribute(:state)
@@ -131,7 +131,7 @@ JOIN
 
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = if sym.is_a? Fixnum
+    index = if sym.is_a? Integer
               sym
             else
               ImageSeries::STATE_SYMS.index(sym)
@@ -382,8 +382,7 @@ JOIN
     nil
   end
 
-  def force_update=(val)
-  end
+  def force_update=(val); end
 
   # reassigning an image series to a different visit:
   # * check if new visit has same visit type as current visit
@@ -421,14 +420,14 @@ JOIN
       :patient_change
     elsif c.include?('state')
       case [int_to_state_sym(c['state'][0].to_i), c['state'][1]]
-      when [:imported, :visit_assigned], [:not_required, :visit_assigned] then :visit_assigned
-      when [:visit_assigned, :required_series_assigned], [:not_required, :required_series_assigned] then :required_series_assigned
-      when [:required_series_assigned, :visit_assigned] then :required_series_unassigned
-      when [:visit_assigned, :imported], [:required_series_assigned, :imported] then :visit_unassigned
-      when [:imported, :not_required], [:visit_assigned, :not_required], [:required_series_assigned, :not_required] then :marked_not_required
-      when [:not_required, :imported] then :unmarked_not_required
+      when %i[imported visit_assigned], %i[not_required visit_assigned] then :visit_assigned
+      when %i[visit_assigned required_series_assigned], %i[not_required required_series_assigned] then :required_series_assigned
+      when %i[required_series_assigned visit_assigned] then :required_series_unassigned
+      when %i[visit_assigned imported], %i[required_series_assigned imported] then :visit_unassigned
+      when %i[imported not_required], %i[visit_assigned not_required], %i[required_series_assigned not_required] then :marked_not_required
+      when %i[not_required imported] then :unmarked_not_required
       end
-    elsif (c.keys - %w(properties properties_version)).empty?
+    elsif (c.keys - %w[properties properties_version]).empty?
       :properties_change
     end
   end

@@ -43,18 +43,18 @@ class BackgroundJob < ActiveRecord::Base
   scope :completed, -> { where(completed: true) }
   scope :running, -> { where(completed: false) }
 
-  scope :granted_for, -> (options = {}) {
+  scope :granted_for, ->(options = {}) {
     user = options[:user] || raise("Missing 'user' option")
     return all if user.is_root_user?
     where(user_id: options[:user].id)
   }
 
-  scope :searchable, -> { select(<<SELECT) }
-NULL::integer AS study_id,
-NULL::varchar AS study_name,
-background_jobs.name AS text,
-background_jobs.id AS result_id,
-'BackgroundJob'::varchar AS result_type
+  scope :searchable, -> { select(<<SELECT.strip_heredoc) }
+    NULL::integer AS study_id,
+    NULL::varchar AS study_name,
+    background_jobs.name AS text,
+    background_jobs.id AS result_id,
+    'BackgroundJob'::varchar AS result_type
 SELECT
 
   ##

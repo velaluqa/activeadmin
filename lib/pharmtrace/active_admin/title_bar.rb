@@ -2,7 +2,7 @@ module Pharmtrace
   module ActiveAdmin
     class TitleBar < ::ActiveAdmin::Component
       def build(title, action_items)
-        super(id: "title_bar")
+        super(id: 'title_bar')
         @title = title
         @action_items = action_items
         build_titlebar_left
@@ -11,11 +11,9 @@ module Pharmtrace
 
       private
 
-
       def build_titlebar_left
-
         class_name = session[:selected_study_name].present? && 'with_selected_study'
-        div id: "titlebar_left", class: class_name do
+        div id: 'titlebar_left', class: class_name do
           if session[:selected_study_name].present?
             div(id: 'selected_study') do
               text_node link_to "Selected Study: #{session[:selected_study_name]}", admin_study_path(id: session[:selected_study_id])
@@ -27,12 +25,12 @@ module Pharmtrace
       end
 
       def build_titlebar_right
-        div id: "titlebar_right" do
+        div id: 'titlebar_right' do
           build_action_items
         end
       end
 
-      def build_breadcrumb(separator = "/")
+      def build_breadcrumb(separator = '/')
         breadcrumb_config = active_admin_config && active_admin_config.breadcrumb
 
         links = if breadcrumb_config.is_a?(Proc)
@@ -42,10 +40,10 @@ module Pharmtrace
                 end
         Array(links).reject! { |link| link.include?('"/admin"') }
         return unless links.present? && links.is_a?(::Array)
-        span class: "breadcrumb" do
+        span class: 'breadcrumb' do
           links.each do |link|
             text_node link
-            span(separator, class: "breadcrumb_sep")
+            span(separator, class: 'breadcrumb_sep')
           end
         end
       end

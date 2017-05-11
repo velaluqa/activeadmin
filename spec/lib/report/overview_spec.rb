@@ -6,14 +6,14 @@ describe Report::Overview do
     let!(:center1) { create(:center, study: study1) }
     let!(:patient1) { create(:patient, center: center1) }
     let!(:visit1) { create(:visit, patient: patient1) }
-    let!(:image_series1) { create(:image_series, patient: patient1)}
+    let!(:image_series1) { create(:image_series, patient: patient1) }
     let!(:role) { create(:role, with_permissions: { Study => :read_reports }) }
     let!(:user) { create(:user, with_user_roles: [role]) }
     let!(:report) { Report::Overview.new(columns: 'all', user: user) }
 
     it 'returns all available columns' do
       result = report.result[:studies].first[:columns]
-      expect(result).to eq [1,1,1,0,0,0,0,1,0,0,0,0]
+      expect(result).to eq [1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0]
     end
   end
 
@@ -30,7 +30,7 @@ describe Report::Overview do
     describe 'for user with full access' do
       let!(:role) { create(:role, with_permissions: { Study => :read_reports }) }
       let!(:user) { create(:user, with_user_roles: [role]) }
-      let!(:report) { Report::Overview.new(columns: %w(patients), user: user) }
+      let!(:report) { Report::Overview.new(columns: %w[patients], user: user) }
 
       it 'shows all studies' do
         report_studies = report.result[:studies].map { |study| study[:study_id] }
@@ -42,7 +42,7 @@ describe Report::Overview do
     describe 'for user limited access' do
       let!(:role) { create(:role, with_permissions: { Study => :read_reports }) }
       let!(:user) { create(:user, with_user_roles: [[role, study1]]) }
-      let!(:report) { Report::Overview.new(columns: %w(patients), user: user) }
+      let!(:report) { Report::Overview.new(columns: %w[patients], user: user) }
 
       it 'shows all studies' do
         report_studies = report.result[:studies].map { |study| study[:study_id] }
@@ -54,7 +54,7 @@ describe Report::Overview do
     describe 'for user without `read_reports` permission' do
       let!(:role) { create(:role, with_permissions: { Study => :read }) }
       let!(:user) { create(:user, with_user_roles: [[role, study1]]) }
-      let!(:report) { Report::Overview.new(columns: %w(patients), user: user) }
+      let!(:report) { Report::Overview.new(columns: %w[patients], user: user) }
 
       it 'shows all studies' do
         report_studies = report.result[:studies].map { |study| study[:study_id] }
@@ -66,7 +66,7 @@ describe Report::Overview do
     describe 'for user with permission one specific center' do
       let!(:role) { create(:role, with_permissions: { Study => :read_reports }) }
       let!(:user) { create(:user, with_user_roles: [[role, center1]]) }
-      let!(:report) { Report::Overview.new(columns: %w(patients), user: user) }
+      let!(:report) { Report::Overview.new(columns: %w[patients], user: user) }
 
       it 'shows all studies' do
         report_studies = report.result[:studies].map { |study| study[:study_id] }
@@ -82,7 +82,7 @@ describe Report::Overview do
     let!(:patient1) { create(:patient, center: center) }
     let!(:patient2) { create(:patient, center: center) }
     let!(:result) do
-      report = Report::Overview.new(columns: %w(patients))
+      report = Report::Overview.new(columns: %w[patients])
       report.result[:studies]
     end
 
@@ -105,7 +105,7 @@ describe Report::Overview do
     let!(:visit2) { create(:visit, patient: patient2) }
     let!(:visit3) { create(:visit, patient: patient2) }
     let!(:result) do
-      report = Report::Overview.new(columns: %w(visits))
+      report = Report::Overview.new(columns: %w[visits])
       report.result[:studies]
     end
 
@@ -134,7 +134,7 @@ describe Report::Overview do
       let!(:visit7) { create(:visit, patient: patient2, state: :incomplete_queried) }
       let!(:result) do
         report = Report::Overview.new(
-          columns: %w(visits_state_incomplete_na visits_state_incomplete_queried visits_state_complete_tqc_pending visits_state_complete_tqc_issues visits_state_complete_tqc_passed)
+          columns: %w[visits_state_incomplete_na visits_state_incomplete_queried visits_state_complete_tqc_pending visits_state_complete_tqc_issues visits_state_complete_tqc_passed]
         )
         report.result[:studies]
       end
@@ -143,7 +143,7 @@ describe Report::Overview do
         study_report = {
           study_id: study.id,
           study_name: study.name,
-          columns: [2,1,1,1,2]
+          columns: [2, 1, 1, 1, 2]
         }
         expect(result).to include(study_report)
       end
@@ -154,11 +154,11 @@ describe Report::Overview do
     let!(:study) { create(:study) }
     let!(:center) { create(:center, study: study) }
     let!(:patient1) { create(:patient, center: center) }
-    let!(:image_series1) { create(:image_series, patient: patient1)}
+    let!(:image_series1) { create(:image_series, patient: patient1) }
     let!(:patient2) { create(:patient, center: center) }
-    let!(:image_series2) { create(:image_series, patient: patient2)}
+    let!(:image_series2) { create(:image_series, patient: patient2) }
     let!(:result) do
-      report = Report::Overview.new(columns: %w(image_series))
+      report = Report::Overview.new(columns: %w[image_series])
       report.result[:studies]
     end
 
@@ -177,8 +177,8 @@ describe Report::Overview do
     let!(:study) { create(:study) }
     let!(:center) { create(:center, study: study) }
     let!(:patient1) { create(:patient, center: center) }
-    let!(:image_series1) { create(:image_series, patient: patient1)}
-    let!(:image_series2) { create(:image_series, patient: patient1)}
+    let!(:image_series1) { create(:image_series, patient: patient1) }
+    let!(:image_series2) { create(:image_series, patient: patient1) }
     let!(:visit) do
       assigned_image_series_index = {
         image_series1.id.to_s => ['chest'],
@@ -189,7 +189,7 @@ describe Report::Overview do
           'image_series_id' => image_series1.id.to_s,
           'tqc_state' => 2
         },
-        'abdomen'=>{
+        'abdomen' => {
           'image_series_id' => image_series2.id.to_s,
           'tqc_state' => 2
         },
@@ -203,7 +203,7 @@ describe Report::Overview do
       )
     end
     let!(:result) do
-      report = Report::Overview.new(columns: %w(required_series))
+      report = Report::Overview.new(columns: %w[required_series])
       report.result[:studies]
     end
 
@@ -222,8 +222,8 @@ describe Report::Overview do
     let!(:study) { create(:study) }
     let!(:center) { create(:center, study: study) }
     let!(:patient1) { create(:patient, center: center) }
-    let!(:image_series1) { create(:image_series, patient: patient1)}
-    let!(:image_series2) { create(:image_series, patient: patient1)}
+    let!(:image_series1) { create(:image_series, patient: patient1) }
+    let!(:image_series2) { create(:image_series, patient: patient1) }
     let!(:visit1) do
       create(
         :visit,
@@ -237,7 +237,7 @@ describe Report::Overview do
             'image_series_id' => image_series1.id.to_s,
             'tqc_state' => 0
           },
-          'abdomen'=>{
+          'abdomen' => {
             'image_series_id' => image_series2.id.to_s,
             'tqc_state' => 1
           },
@@ -261,7 +261,7 @@ describe Report::Overview do
             'image_series_id' => image_series1.id.to_s,
             'tqc_state' => 2
           },
-          'abdomen'=>{
+          'abdomen' => {
             'image_series_id' => image_series2.id.to_s,
             'tqc_state' => 2
           },
@@ -274,7 +274,7 @@ describe Report::Overview do
     end
     let!(:result) do
       report = Report::Overview.new(
-        columns: %w(required_series_state_pending required_series_state_issues required_series_state_passed)
+        columns: %w[required_series_state_pending required_series_state_issues required_series_state_passed]
       )
       report.result[:studies]
     end
@@ -283,7 +283,7 @@ describe Report::Overview do
       expected_result = {
         study_id: study.id,
         study_name: study.name,
-        columns: [1,2,3]
+        columns: [1, 2, 3]
       }
       expect(result).to include(expected_result)
     end

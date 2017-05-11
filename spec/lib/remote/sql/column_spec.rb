@@ -9,7 +9,8 @@ RSpec.describe Sql::Column do
           name: :nullable_column,
           type: :string,
           null: true,
-          limit: nil),
+          limit: nil
+        ),
         override: 'user{{:id}}'
       )
     end
@@ -29,7 +30,8 @@ RSpec.describe Sql::Column do
           name: :nullable_column,
           type: :string,
           null: true,
-          limit: nil),
+          limit: nil
+        ),
         override: ''
       )
     end
@@ -49,7 +51,8 @@ RSpec.describe Sql::Column do
           name: :nullable_column,
           type: :string,
           null: true,
-          limit: nil),
+          limit: nil
+        ),
         override: :nil
       )
     end

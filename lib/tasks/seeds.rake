@@ -51,23 +51,23 @@ namespace :erica do
                     Version => :manage
                   })
       create_role('Image Import', with_permissions: {
-                    Study => %i(read),
-                    Center => %i(read update create),
-                    Patient => %i(read update create),
-                    ImageSeries => %i(upload assign_patient assign_visit)
+                    Study => %i[read],
+                    Center => %i[read update create],
+                    Patient => %i[read update create],
+                    ImageSeries => %i[upload assign_patient assign_visit]
                   })
       create_role('Image Manager', with_permissions: {
-                    Study => %i(read update create),
-                    Center => %i(read update create),
-                    Patient => %i(read update create),
-                    ImageSeries => %i(upload assign_patient assign_visit),
-                    Visit => %i(read assign_required_series technical_qc)
+                    Study => %i[read update create],
+                    Center => %i[read update create],
+                    Patient => %i[read update create],
+                    ImageSeries => %i[upload assign_patient assign_visit],
+                    Visit => %i[read assign_required_series technical_qc]
                   })
       create_role('Medical QC', with_permissions: {
-                    Study => %i(read),
-                    Center => %i(read),
-                    Patient => %i(read),
-                    Visit => %i(read assign_required_series technical_qc medical_qc)
+                    Study => %i[read],
+                    Center => %i[read],
+                    Patient => %i[read],
+                    Visit => %i[read assign_required_series technical_qc medical_qc]
                   })
       create_role('Audit', with_permissions: {
                     Study => :read,

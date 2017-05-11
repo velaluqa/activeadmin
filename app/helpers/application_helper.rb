@@ -7,7 +7,7 @@ module ApplicationHelper
     # we remove the first line of YAML output, since it only contains metadata (and we don't need it for the diff, it only looks confusing)
     old = values[:from].to_yaml(canonical: false, indentation: 9).lines.to_a[1..-1].join.gsub(/!ruby\/hash:ActiveSupport::HashWithIndifferentAccess/, '')
     new = values[:to].to_yaml(canonical: false, indentation: 9).lines.to_a[1..-1].join.gsub(/!ruby\/hash:ActiveSupport::HashWithIndifferentAccess/, '')
-    return Diffy::Diff.new(old, new).to_s(:html).html_safe
+    Diffy::Diff.new(old, new).to_s(:html).html_safe
   end
 
   def admin_url_for(model)
@@ -16,7 +16,7 @@ module ApplicationHelper
   end
 
   def markdown(str)
-    @renderer ||=     Redcarpet::Markdown.new(
+    @renderer ||= Redcarpet::Markdown.new(
       RedcarpetInlineRenderer,
       no_intra_emphasis: true,
       tables: false,

@@ -6,7 +6,7 @@ module ActionDispatch
       hash.each do |k, v|
         case v
         when Array
-          if v.size > 0 && v.all?(&:nil?)
+          if !v.empty? && v.all?(&:nil?)
             hash[k] = nil
             next
           end

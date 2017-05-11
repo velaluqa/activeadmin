@@ -5,9 +5,9 @@ FactoryGirl.define do
     end
 
     name { Faker::Name.name }
-    username { |u| Faker::Internet.user_name(u.name, %w{. _ -}) }
+    username { |u| Faker::Internet.user_name(u.name, %w[. _ -]) }
     password 'password'
-    email { |u| Faker::Internet.safe_email }
+    email { |_u| Faker::Internet.safe_email }
 
     confirmed_at { DateTime.now }
 

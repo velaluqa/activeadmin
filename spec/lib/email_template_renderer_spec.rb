@@ -15,12 +15,12 @@ describe EmailTemplateRenderer do
     let!(:template) do
       EmailTemplate.new(
         email_type: 'NotificationProfile',
-        template: <<TPL
-My Visit Type: {{ notifications[0].resource.visit_type }}
+        template: <<TPL.strip_heredoc
+          My Visit Type: {{ notifications[0].resource.visit_type }}
 
-My Visit Type: {{ notifications[0].resource.visit_typ }}
+          My Visit Type: {{ notifications[0].resource.visit_typ }}
 
-Date: {{ notifications[0].resource.created_at }}
+          Date: {{ notifications[0].resource.created_at }}
 TPL
       )
     end
@@ -33,7 +33,7 @@ TPL
     end
 
     it 'renders existing variable values' do
-      expect(renderer.render).to include "<p>My Visit Type: foo_type</p>"
+      expect(renderer.render).to include '<p>My Visit Type: foo_type</p>'
       expect(renderer.render).to include "<p>Date: #{visit.created_at}</p>"
     end
 
@@ -42,7 +42,7 @@ TPL
     end
 
     it 'raises `SyntaxError`' do
-      expect {
+      expect do
         template = EmailTemplate.new(
           email_type: 'NotificationProfile',
           template: 'My Visit Type: {{ '
@@ -52,7 +52,7 @@ TPL
           user: user,
           notifications: [notification]
         ).render
-      }.to raise_error EmailTemplateRenderer::Error
+      end.to raise_error EmailTemplateRenderer::Error
     end
   end
 
@@ -64,10 +64,10 @@ TPL
         type: 'NotificationProfile',
         user: user,
         subject: visit,
-        template: <<TPL
-My Visit Type: {{ notifications[0].resource.visit_type }}
+        template: <<TPL.strip_heredoc
+          My Visit Type: {{ notifications[0].resource.visit_type }}
 
-Date: {{ notifications[0].resource.created_at }}
+          Date: {{ notifications[0].resource.created_at }}
 TPL
       )
       expect(result).to include "<p>My Visit Type: foo_type</p><p>Date: #{visit.created_at}</p>"
@@ -76,7 +76,7 @@ TPL
     it 'raises `CompilationError`' do
       user = create(:user)
       visit = create(:visit, visit_type: 'foo_type')
-      expect {
+      expect do
         EmailTemplateRenderer.render_preview(
           type: 'NotificationProfile',
           user: user,
@@ -84,13 +84,13 @@ TPL
           template:
             'My Visit Type: {{ notifications[0].resource.visit_typ }}'
         )
-      }.to raise_error EmailTemplateRenderer::Error
+      end.to raise_error EmailTemplateRenderer::Error
     end
 
     it 'raises `SyntaxError`' do
       user = create(:user)
       visit = create(:visit, visit_type: 'foo_type')
-      expect {
+      expect do
         EmailTemplateRenderer.render_preview(
           type: 'NotificationProfile',
           user: user,
@@ -98,7 +98,7 @@ TPL
           template:
             'My Visit Type: {{ '
         )
-      }.to raise_error EmailTemplateRenderer::Error
+      end.to raise_error EmailTemplateRenderer::Error
     end
   end
 end

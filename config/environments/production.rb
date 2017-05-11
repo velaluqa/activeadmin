@@ -40,7 +40,7 @@ StudyServer::Application.configure do
 
   # Precompile additional assets (application.js, application.css, and
   # all non-JS/CSS are already added).
-  config.assets.precompile += %w( forms_bootstrap_and_overrides.css image_hierarchy.js tqc_validation.js mqc_validation.js image_series_rearrange.js )
+  config.assets.precompile += %w[forms_bootstrap_and_overrides.css image_hierarchy.js tqc_validation.js mqc_validation.js image_series_rearrange.js]
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
@@ -87,7 +87,7 @@ StudyServer::Application.configure do
 
   config.airbrake_api_key = '21996bca9601d39ad1aa911e03922000'
 
-  config.maximum_email_throttling_delay = 30*24*60*60 # monthly
+  config.maximum_email_throttling_delay = 30 * 24 * 60 * 60 # monthly
 
   config.action_mailer.default_options = {
     from: (ENV['SMTP_SENDER'] || 'noreply@pharmtrace.com')

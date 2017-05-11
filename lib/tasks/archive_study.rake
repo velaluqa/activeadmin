@@ -1,5 +1,4 @@
 namespace :erica do
-
   # to be archived:
   # - RDBMS:
   #   - Study
@@ -20,13 +19,14 @@ namespace :erica do
   # 4. pg_dump archive db
   # 5. drop archive db
 
-  SQL_TABLES_TO_ARCHIVE = ['users', 'public_keys', 'studies', 'centers', 'patients', 'visits', 'image_series', 'images', 'versions']
+  SQL_TABLES_TO_ARCHIVE = %w[users public_keys studies centers patients visits image_series images versions].freeze
 
   def system_or_die(command)
-    unless(system(command))
+    unless system(command)
       raise 'Failed to execute shell command: "' + command + "\"\nWARNING: THE ARCHIVE IS INCOMPLETE!"
     end
   end
+
   def rsync_or_die(command)
     sync_command = 'rsync -av ' + command
     verify_command = 'rsync -a --stats -n ' + command
@@ -35,24 +35,24 @@ namespace :erica do
     system_or_die(sync_command)
 
     puts 'RSYNC VERIFY: ' + verify_command
-    rsync_output = %x{#{verify_command}}
+    rsync_output = `#{verify_command}`
 
     unsynced_file_count = 0
     rsync_output.lines.each do |line|
       puts line
       if line =~ /^Number of created files: ([0-9]+)/
-        unsynced_file_count += $1.to_i
+        unsynced_file_count += Regexp.last_match(1).to_i
         puts unsynced_file_count
       elsif line =~ /^Number of deleted files: ([0-9]+)/
-        unsynced_file_count += $1.to_i
+        unsynced_file_count += Regexp.last_match(1).to_i
         puts unsynced_file_count
       elsif line =~ /^Number of regular files transferred: ([0-9]+)/
-        unsynced_file_count += $1.to_i
+        unsynced_file_count += Regexp.last_match(1).to_i
         puts unsynced_file_count
       end
     end
 
-    if(unsynced_file_count > 0)
+    if unsynced_file_count > 0
       raise "Failed to rsync image storage, #{unsynced_file_count} files remain unsynced.\nWARNING: THE ARCHIVE IS INCOMPLETE!"
     end
   end
@@ -60,16 +60,19 @@ namespace :erica do
   def postgresql_create_database(name)
     ActiveRecord::Base.connection.execute("CREATE SCHEMA #{name};")
   end
+
   def postgresql_drop_database(name)
     ActiveRecord::Base.connection.execute("DROP SCHEMA #{name} CASCADE;")
   end
+
   def postgresql_create_table_like(source, target_db)
     create_table_sql = "CREATE TABLE #{target_db}.\"#{source}\" (LIKE \"#{source}\" INCLUDING ALL);"
     puts 'EXECUTING: ' + create_table_sql
     ActiveRecord::Base.connection.execute(create_table_sql)
   end
+
   def postgresql_dump_database(rails_db_name, db_name, archive_dump_pathname)
-    dump_command = "pg_dump -Ox -n '#{db_name}' '#{rails_db_name}' | gzip -9 > '#{archive_dump_pathname.to_s}'"
+    dump_command = "pg_dump -Ox -n '#{db_name}' '#{rails_db_name}' | gzip -9 > '#{archive_dump_pathname}'"
 
     puts 'EXECUTING: ' + dump_command
     system_or_die(dump_command)
@@ -77,10 +80,10 @@ namespace :erica do
 
   def sqlite3_create_table_like(source, target_db)
     create_table_sql = ActiveRecord::Base.connection.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='#{source}';").first['sql']
-    index_sqls = ActiveRecord::Base.connection.execute("SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='#{source}';").map {|e| e['sql']}
+    index_sqls = ActiveRecord::Base.connection.execute("SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='#{source}';").map { |e| e['sql'] }
 
     create_target_table_sql = create_table_sql.gsub(Regexp.new("CREATE TABLE \"#{source}\""), "CREATE TABLE #{target_db}.\"#{source}\"")
-    target_index_sqls = index_sqls.map {|sql| sql.gsub(Regexp.new("INDEX \""), "INDEX #{target_db}.\"")}
+    target_index_sqls = index_sqls.map { |sql| sql.gsub(Regexp.new('INDEX "'), "INDEX #{target_db}.\"") }
     puts create_target_table_sql
     puts target_index_sqls
     ActiveRecord::Base.connection.execute(create_target_table_sql)
@@ -94,9 +97,10 @@ namespace :erica do
     puts sql
     ActiveRecord::Base.connection.execute(sql)
   end
+
   def sql_archive(archive_db_name, study)
-    sql_insert_select(archive_db_name, 'users', "SELECT * FROM users")
-    sql_insert_select(archive_db_name, 'public_keys', "SELECT * FROM public_keys")
+    sql_insert_select(archive_db_name, 'users', 'SELECT * FROM users')
+    sql_insert_select(archive_db_name, 'public_keys', 'SELECT * FROM public_keys')
 
     sql_insert_select(archive_db_name, 'studies', "SELECT * FROM studies WHERE id = #{study.id}")
 
@@ -132,7 +136,7 @@ namespace :erica do
   end
 
   def sqlite3_archive(archive_db_pathname, archive_db_name, study)
-    ActiveRecord::Base.connection.execute("ATTACH DATABASE '#{archive_db_pathname.to_s}' AS #{archive_db_name};")
+    ActiveRecord::Base.connection.execute("ATTACH DATABASE '#{archive_db_pathname}' AS #{archive_db_name};")
 
     SQL_TABLES_TO_ARCHIVE.each do |table|
       sqlite3_create_table_like(table, archive_db_name)
@@ -142,6 +146,7 @@ namespace :erica do
 
     ActiveRecord::Base.connection.execute("DETACH DATABASE #{archive_db_name};")
   end
+
   def postgresql_archive(archive_dump_pathname, archive_db_name, study)
     postgresql_create_database(archive_db_name)
 
@@ -157,18 +162,18 @@ namespace :erica do
   end
 
   desc 'Archive a study and all its contents, removing them from ERICAv2.'
-  task :archive_study, [:study_id, :archive_path] => [:environment] do |t, args|
+  task :archive_study, %i[study_id archive_path] => [:environment] do |_t, args|
     study_id = args[:study_id]
     archive_path = args[:archive_path]
-    if(study_id.blank?)
+    if study_id.blank?
       puts 'No study id given'
       next
-    elsif(archive_path.blank?)
+    elsif archive_path.blank?
       puts 'No archive destination path given'
       next
     end
 
-    unless(['PostgreSQL', 'SQLite'].include?(ActiveRecord::Base.connection.adapter_name))
+    unless %w[PostgreSQL SQLite].include?(ActiveRecord::Base.connection.adapter_name)
       raise "Unhandled RDBMS adapter: #{ActiveRecord::Base.connection.adapter_name}. This script only supports PostgreSQL and SQLite!"
     end
 
@@ -181,22 +186,22 @@ namespace :erica do
       puts "FOUND: #{study.inspect}"
     end
 
-    puts "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    puts '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     puts "WARNING: THIS WILL ARCHIVE ALL DATA FOR STUDY '#{study.name}', INCLUDING DATABASE ENTRIES, AUDIT TRAIL ENTRIES, IMAGES AND CONFIGURATION."
-    puts "WARNING: THE DATA WILL BE DELETED FROM THE PRODUCTION DATABASE. THIS PROCESS IS NOT EASILY REVERSIBLE!"
-    puts "WARNING: TO CONFIRM THAT YOU WANT TO START THIS PROCESS, PLEASE RECONFIRM THE STUDY NAME BELOW, EXACTLY AS IT APPEARS ABOVE."
-    print "WARNING: STUDY NAME> "
+    puts 'WARNING: THE DATA WILL BE DELETED FROM THE PRODUCTION DATABASE. THIS PROCESS IS NOT EASILY REVERSIBLE!'
+    puts 'WARNING: TO CONFIRM THAT YOU WANT TO START THIS PROCESS, PLEASE RECONFIRM THE STUDY NAME BELOW, EXACTLY AS IT APPEARS ABOVE.'
+    print 'WARNING: STUDY NAME> '
     study_name_confirmation = STDIN.gets.chomp("\n")
-    if(study_name_confirmation != study.name)
-      puts "PROCESS ABORTED!"
+    if study_name_confirmation != study.name
+      puts 'PROCESS ABORTED!'
       next
     end
 
     archive_pathname = Pathname.new(archive_path)
-    if(archive_pathname.file?)
+    if archive_pathname.file?
       puts 'The given archive path is a file, please specify a directory'
       next
-    elsif(not archive_pathname.exist?)
+    elsif !archive_pathname.exist?
       begin
         archive_pathname.mkdir
       rescue SystemCallError => e
@@ -205,7 +210,7 @@ namespace :erica do
       end
     end
 
-    puts "Archiving image storage"
+    puts 'Archiving image storage'
     image_archive_pathname = archive_pathname.join('image_storage')
     image_archive_pathname.mkdir
     study_image_storage_path = study.absolute_image_storage_path
@@ -216,9 +221,9 @@ namespace :erica do
 
     rsync_or_die(study_image_storage_path + ' ' + image_archive_path_string)
 
-    puts "Archiving configuration files"
+    puts 'Archiving configuration files'
     data_archive_pathname = archive_pathname.join('data.tar.gz')
-    data_tar_command = "tar --exclude=#{Rails.application.config.image_storage_root} --exclude=#{Rails.application.config.image_export_root} -c \"#{Rails.application.config.data_directory}\" | gzip -9 > \"#{data_archive_pathname.to_s}\""
+    data_tar_command = "tar --exclude=#{Rails.application.config.image_storage_root} --exclude=#{Rails.application.config.image_export_root} -c \"#{Rails.application.config.data_directory}\" | gzip -9 > \"#{data_archive_pathname}\""
     puts 'EXECUTING: ' + data_tar_command
     system_or_die(data_tar_command)
 
@@ -229,14 +234,14 @@ namespace :erica do
 
       postgresql_archive(archive_postgresql_dump_pathname, archive_db_name, study)
 
-      puts "Created archive SQL dump at #{archive_postgresql_dump_pathname.to_s}"
+      puts "Created archive SQL dump at #{archive_postgresql_dump_pathname}"
     when 'SQLite'
       archive_db_name = 'archive_db'
       archive_sqlite3_db_pathname = archive_pathname.join('database.sqlite3')
 
       sqlite3_archive(archive_sqlite3_db_pathname, archive_db_name, study)
 
-      puts "Created archive db at #{archive_sqlite3_db_pathname.to_s}"
+      puts "Created archive db at #{archive_sqlite3_db_pathname}"
     else
       raise "Unhandled RDBMS adapter: #{ActiveRecord::Base.connection.adapter_name}. This script only supports PostgreSQL and SQLite!"
     end
@@ -245,7 +250,6 @@ namespace :erica do
     result = true
     PaperTrail.enabled = false
     result = ActiveRecord::Base.transaction do
-
       study.image_series.each do |image_series|
         image_series.images.each do |image|
           Version.where('item_type = \'Image\' AND item_id = ?', image.id).delete_all
@@ -273,11 +277,10 @@ namespace :erica do
       study.reload
       Version.where('item_type = \'Study\' AND item_id = ?', study.id).delete_all
       study.destroy
-
     end
     PaperTrail.enabled = true
 
-    if(result == false)
+    if result == false
       puts 'FAILED: some records might not have been deleted'
     else
       puts 'DONE'

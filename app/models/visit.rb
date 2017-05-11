@@ -49,7 +49,7 @@ class Visit < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',
     meta: {
-      study_id: -> (visit) { visit.study.andand.id }
+      study_id: ->(visit) { visit.study.andand.id }
     }
   )
   acts_as_taggable
@@ -75,34 +75,34 @@ class Visit < ActiveRecord::Base
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
   belongs_to :mqc_user, class_name: 'User'
 
-  scope :by_study_ids, -> (*ids) {
+  scope :by_study_ids, ->(*ids) {
     joins(patient: { center: :study })
       .where(studies: { id: Array[ids].flatten })
   }
 
-  scope :with_state, -> (state) {
+  scope :with_state, ->(state) {
     index =
       case state
-      when Fixnum then state
+      when Integer then state
       else Visit::STATE_SYMS.index(state.to_sym)
       end
     where(state: index)
   }
 
-  scope :searchable, -> { join_study.select(<<SELECT) }
-centers.study_id AS study_id,
-studies.name AS study_name,
-centers.code ||
-patients.subject_id ||
-'#' ||
-visits.visit_number ||
-CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END
-AS text,
-visits.id AS result_id,
-'Visit'::varchar AS result_type
+  scope :searchable, -> { join_study.select(<<SELECT.strip_heredoc) }
+    centers.study_id AS study_id,
+    studies.name AS study_name,
+    centers.code ||
+    patients.subject_id ||
+    '#' ||
+    visits.visit_number ||
+    CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END
+    AS text,
+    visits.id AS result_id,
+    'Visit'::varchar AS result_type
 SELECT
 
-  validates_uniqueness_of :visit_number, scope: [:patient_id, :repeatable_count]
+  validates_uniqueness_of :visit_number, scope: %i[patient_id repeatable_count]
   validates_presence_of :visit_number, :patient_id
 
   before_destroy do
@@ -118,21 +118,21 @@ SELECT
   include ScopablePermissions
 
   def self.with_permissions
-    joins(patient: { center: :study }).joins(<<JOIN)
-INNER JOIN user_roles ON
-  (
-       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
-    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
-    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
-    OR user_roles.scope_object_id IS NULL
-  )
-INNER JOIN roles ON user_roles.role_id = roles.id
-INNER JOIN permissions ON roles.id = permissions.role_id
+    joins(patient: { center: :study }).joins(<<JOIN.strip_heredoc)
+      INNER JOIN user_roles ON
+        (
+             (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+          OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+          OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+          OR user_roles.scope_object_id IS NULL
+        )
+      INNER JOIN roles ON user_roles.role_id = roles.id
+      INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
   # TODO: Replace with a less naive full-text search index
-  scope :filter, -> (query) {
+  scope :filter, ->(query) {
     return unless query
 
     words = query.split(' ')
@@ -145,13 +145,13 @@ JOIN
   scope :join_study, -> { joins(patient: { center: :study }) }
 
   scope :join_required_series, -> {
-    joins(<<JOIN_QUERY)
-JOIN json_each(visits.required_series::json) visits_required_series_hash ON true
-JOIN json_to_record(visits_required_series_hash.value) as visits_required_series(tqc_state int) ON true
+    joins(<<JOIN_QUERY.strip_heredoc)
+      JOIN json_each(visits.required_series::json) visits_required_series_hash ON true
+      JOIN json_to_record(visits_required_series_hash.value) as visits_required_series(tqc_state int) ON true
 JOIN_QUERY
   }
 
-  scope :of_study, -> (study) {
+  scope :of_study, ->(study) {
     study_id = study
     study_id = study.id if study.is_a?(ActiveRecord::Base)
     joins(patient: :center).where(centers: { study_id: study_id })
@@ -191,8 +191,8 @@ JOIN_QUERY
     patient.andand.study
   end
 
-  STATE_SYMS = [:incomplete_na, :complete_tqc_passed, :incomplete_queried, :complete_tqc_pending, :complete_tqc_issues].freeze
-  MQC_STATE_SYMS = [:pending, :issues, :passed].freeze
+  STATE_SYMS = %i[incomplete_na complete_tqc_passed incomplete_queried complete_tqc_pending complete_tqc_issues].freeze
+  MQC_STATE_SYMS = %i[pending issues passed].freeze
 
   def self.state_sym_to_int(sym)
     Visit::STATE_SYMS.index(sym)
@@ -214,7 +214,7 @@ JOIN_QUERY
 
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = if sym.is_a? Fixnum
+    index = if sym.is_a? Integer
               sym
             else
               Visit::STATE_SYMS.index(sym)
@@ -248,7 +248,7 @@ JOIN_QUERY
 
   def mqc_state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    index = if sym.is_a? Fixnum
+    index = if sym.is_a? Integer
               sym
             else
               Visit::MQC_STATE_SYMS.index(sym)
@@ -380,7 +380,7 @@ JOIN_QUERY
       id: id,
       name: "Visit No. #{visit_number}",
       image_series: required_series_objects
-        .reject { |rs| !rs.assigned? }
+        .select(&:assigned?)
         .map(&:wado_query)
         .reject(&:blank?)
     }
@@ -697,13 +697,13 @@ JOIN_QUERY
       else
         :state_change
       end
-    elsif c.include?('mqc_state') && (c.keys - %w(mqc_state mqc_date mqc_user_id)).empty?
+    elsif c.include?('mqc_state') && (c.keys - %w[mqc_state mqc_date mqc_user_id]).empty?
       case [int_to_mqc_state_sym(c['mqc_state'][0].to_i), c['mqc_state'][1]]
-      when [:passed, :pending], [:issues, :pending] then :mqc_reset
-      when [:pending, :passed] then :mqc_passed
-      when [:pending, :issues] then :mqc_issues
-      when [:issues, :passed] then :mqc_passed
-      when [:passed, :issues] then :mqc_issues
+      when %i[passed pending], %i[issues pending] then :mqc_reset
+      when %i[pending passed] then :mqc_passed
+      when %i[pending issues] then :mqc_issues
+      when %i[issues passed] then :mqc_passed
+      when %i[passed issues] then :mqc_issues
       else :mqc_state_change
       end
     elsif c.include?('mqc_user_id') && c.include?('mqc_date') && c.keys.length == 2 &&
@@ -726,13 +726,13 @@ JOIN_QUERY
       if c.keys == ['required_series']
         if diffs.all? { |_rs, diff| (diff.keys - ['domino_unid']).empty? }
           :rs_domino_unid_change
-        elsif diffs.all? { |_rs, diff| (diff.keys - %w(domino_unid tqc_state tqc_results tqc_date tqc_version tqc_user_id tqc_comment)).empty? }
+        elsif diffs.all? { |_rs, diff| (diff.keys - %w[domino_unid tqc_state tqc_results tqc_date tqc_version tqc_user_id tqc_comment]).empty? }
           :rs_tqc_performed
         end
-      elsif (c.keys - %w(required_series assigned_image_series_index)).empty?
+      elsif (c.keys - %w[required_series assigned_image_series_index]).empty?
         if diffs.all? do |rs, diff|
-             (diff.keys - %w(domino_unid image_series_id tqc_state tqc_results tqc_date tqc_version tqc_user_id tqc_comment)).empty? &&
-             ((diff.keys & %w(tqc_results tqc_date tqc_version tqc_user_id tqc_comment)).empty? ||
+             (diff.keys - %w[domino_unid image_series_id tqc_state tqc_results tqc_date tqc_version tqc_user_id tqc_comment]).empty? &&
+             ((diff.keys & %w[tqc_results tqc_date tqc_version tqc_user_id tqc_comment]).empty? ||
               (
                 (diff['tqc_state'].nil? || diff['tqc_state'] == 0) &&
                 c['required_series'][1][rs]['tqc_results'].nil? &&
@@ -746,7 +746,7 @@ JOIN_QUERY
           :rs_assignment_change
         end
       end
-    elsif (c.keys - %w(mqc_version mqc_results mqc_comment)).empty?
+    elsif (c.keys - %w[mqc_version mqc_results mqc_comment]).empty?
       :mqc_performed
     end
   end

@@ -1,4 +1,5 @@
 # coding: utf-8
+
 require 'remote/sql/restore'
 require 'remote/mongo/restore'
 
@@ -72,7 +73,7 @@ class RemoteRestore
     puts "#{working_dir}/*-*-*-*"
     Dir["#{working_dir}/*-*-*-*"].each do |path|
       next unless path =~ /^(\d{4}-\d{2}-\d{2})/
-      path_date = Date.strptime($1, '%Y-%m-%d')
+      path_date = Date.strptime(Regexp.last_match(1), '%Y-%m-%d')
       next unless path_date < (Date.today - 7)
       puts "delete #{path}"
     end

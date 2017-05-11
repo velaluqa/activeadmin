@@ -3,7 +3,7 @@ class CreateStudies < ActiveRecord::Migration
     create_table :studies do |t|
       t.string :name
 
-      t.timestamps :null => true
+      t.timestamps null: true
     end
   end
 end

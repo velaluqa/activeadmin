@@ -5,7 +5,7 @@ class ChangeNotificationProfileHabtmAssociationsToHasManyThrough < ActiveRecord:
       t.references :user, null: false
     end
     # This enforces uniqueness and speeds up profile->user lookups.
-    add_index(:notification_profile_users, [:notification_profile_id, :user_id],
+    add_index(:notification_profile_users, %i[notification_profile_id user_id],
               unique: true,
               name: 'index_notification_profile_users_join_table_index')
     # This speeds up user->profile lookups
@@ -24,7 +24,7 @@ class ChangeNotificationProfileHabtmAssociationsToHasManyThrough < ActiveRecord:
       t.references :role, null: false
     end
     # This enforces uniqueness and speeds up profile->role lookups.
-    add_index(:notification_profile_roles, [:notification_profile_id, :role_id],
+    add_index(:notification_profile_roles, %i[notification_profile_id role_id],
               unique: true,
               name: 'index_notification_profile_roles_join_table_index')
     # This speeds up role->profile lookups
@@ -48,7 +48,7 @@ class ChangeNotificationProfileHabtmAssociationsToHasManyThrough < ActiveRecord:
       t.references :user, null: false
     end
     # This enforces uniqueness and speeds up profile->user lookups.
-    add_index(:notification_profiles_users, [:notification_profile_id, :user_id],
+    add_index(:notification_profiles_users, %i[notification_profile_id user_id],
               unique: true,
               name: 'index_notification_profiles_users_join_table_index')
     # This speeds up user->profile lookups
@@ -56,10 +56,10 @@ class ChangeNotificationProfileHabtmAssociationsToHasManyThrough < ActiveRecord:
 
     assocs = ActiveRecord::Base.connection.execute('SELECT * FROM notification_profile_users').to_a
     assocs.each do |assoc|
-      ActiveRecord::Base.connection.
-        execute(<<QUERY)
-INSERT INTO notification_profiles_users (notification_profile_id, user_id) 
-VALUES (#{assoc['notification_profile_id']}, #{assoc['user_id']});
+      ActiveRecord::Base.connection
+                        .execute(<<QUERY.strip_heredoc)
+                          INSERT INTO notification_profiles_users (notification_profile_id, user_id)
+                          VALUES (#{assoc['notification_profile_id']}, #{assoc['user_id']});
 QUERY
     end
 
@@ -68,7 +68,7 @@ QUERY
       t.references :role, null: false
     end
     # This enforces uniqueness and speeds up profile->role lookups.
-    add_index(:notification_profiles_roles, [:notification_profile_id, :role_id],
+    add_index(:notification_profiles_roles, %i[notification_profile_id role_id],
               unique: true,
               name: 'index_notification_profiles_roles_join_table_index')
     # This speeds up role->profile lookups
@@ -76,10 +76,10 @@ QUERY
 
     assocs = ActiveRecord::Base.connection.execute('SELECT * FROM notification_profile_roles').to_a
     assocs.each do |assoc|
-      ActiveRecord::Base.connection.
-        execute(<<QUERY)
-INSERT INTO notification_profiles_roles (notification_profile_id, role_id) 
-VALUES (#{assoc['notification_profile_id']}, #{assoc['role_id']});
+      ActiveRecord::Base.connection
+                        .execute(<<QUERY.strip_heredoc)
+                          INSERT INTO notification_profiles_roles (notification_profile_id, role_id)
+                          VALUES (#{assoc['notification_profile_id']}, #{assoc['role_id']});
 QUERY
     end
 

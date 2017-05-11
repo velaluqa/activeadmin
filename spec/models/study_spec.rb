@@ -5,9 +5,9 @@ RSpec.describe Study do
     let!(:user_role) { create(:user_role, scope_object: study, user: user) }
 
     it 'destroys related user roles' do
-      expect {
+      expect do
         study.destroy
-      }.to change(UserRole, :count).by(-1)
+      end.to change(UserRole, :count).by(-1)
     end
   end
 
@@ -16,13 +16,13 @@ RSpec.describe Study do
       study = create(:study, name: 'FooStudy')
       expect(Study.searchable.as_json)
         .to eq [{
-                  'id' => nil,
-                  'study_id' => study.id,
-                  'study_name' => study.name,
-                  'text' => 'FooStudy',
-                  'result_id' => study.id,
-                  'result_type' => 'Study'
-                }]
+          'id' => nil,
+          'study_id' => study.id,
+          'study_name' => study.name,
+          'text' => 'FooStudy',
+          'result_id' => study.id,
+          'result_type' => 'Study'
+        }]
     end
   end
 
@@ -124,20 +124,20 @@ RSpec.describe Study do
 
   describe '#visit_templates' do
     let(:study) { create(:study) }
-    let(:config_yaml) { <<YAML }
-image_series_properties: []
-visit_types:
-  baseline:
-    description: Some simple visit type
-    required_series:
-      series1:
-        tqc: []
-    mqc: []
-visit_templates:
-  template:
-    visits:
-      - number: 1
-        type: baseline
+    let(:config_yaml) { <<YAML.strip_heredoc }
+      image_series_properties: []
+      visit_types:
+        baseline:
+          description: Some simple visit type
+          required_series:
+            series1:
+              tqc: []
+          mqc: []
+      visit_templates:
+        template:
+          visits:
+            - number: 1
+              type: baseline
 YAML
 
     before(:each) do
@@ -150,19 +150,19 @@ YAML
     end
 
     it 'returns visit templates of the configuration' do
-      expect(study.visit_templates).
-        to eq({'template' => {'visits' => [{ 'number' => 1, 'type' => 'baseline' }]}})
+      expect(study.visit_templates)
+        .to eq('template' => { 'visits' => [{ 'number' => 1, 'type' => 'baseline' }] })
     end
   end
 
   describe '#visit_types' do
     describe 'wrongly configured' do
       let(:study) { create(:study) }
-      let(:config_yaml) { <<YAML }
-image_series_properties: []
-visit_types:
-  pre-intervention
-  post-intervention
+      let(:config_yaml) { <<YAML.strip_heredoc }
+        image_series_properties: []
+        visit_types:
+          pre-intervention
+          post-intervention
 YAML
 
       before(:each) do
@@ -179,7 +179,6 @@ YAML
       end
     end
     describe 'configured as mapping' do
-
     end
   end
 

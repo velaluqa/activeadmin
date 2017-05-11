@@ -5,13 +5,13 @@ RSpec.describe BackgroundJob do
     it 'selects search fields' do
       expect(BackgroundJob.searchable.as_json)
         .to eq [{
-                  'id' => nil,
-                  'study_id' => nil,
-                  'study_name' => nil,
-                  'text' => 'FooJob',
-                  'result_id' => job.id,
-                  'result_type' => 'BackgroundJob'
-                }]
+          'id' => nil,
+          'study_id' => nil,
+          'study_name' => nil,
+          'text' => 'FooJob',
+          'result_id' => job.id,
+          'result_type' => 'BackgroundJob'
+        }]
     end
   end
 

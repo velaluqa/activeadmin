@@ -10,7 +10,7 @@ describe Report::HistoricCount do
       )
       HistoricReportCacheEntry.create(
         historic_report_query: query,
-        date: DateTime.new(2016, 12, 31, 12, 00),
+        date: DateTime.new(2016, 12, 31, 12, 0o0),
         study_id: study.id,
         values: [
           { group: nil, count: 1, delta: +1 },
@@ -55,12 +55,12 @@ describe Report::HistoricCount do
         values: [
           { group: nil, count: 4, delta: 0 },
           { group: 0,   count: 3, delta: -1 },
-          { group: 1,   count: 1, delta: +1  }
+          { group: 1,   count: 1, delta: +1 }
         ]
       )
       HistoricReportCacheEntry.create(
         historic_report_query: query,
-        date: DateTime.new(2017, 1, 11, 13, 00),
+        date: DateTime.new(2017, 1, 11, 13, 0o0),
         study_id: study.id,
         values: [
           { group: nil, count: 5, delta: +1 },
@@ -196,7 +196,7 @@ describe Report::HistoricCount do
       )
       HistoricReportCacheEntry.create(
         historic_report_query: query,
-        date: DateTime.new(2016, 12, 31, 12, 00),
+        date: DateTime.new(2016, 12, 31, 12, 0o0),
         study_id: study.id,
         values: [{ group: nil, count: 1, delta: +1 }]
       )
@@ -220,7 +220,7 @@ describe Report::HistoricCount do
       )
       HistoricReportCacheEntry.create(
         historic_report_query: query,
-        date: DateTime.new(2017, 1, 11, 13, 00),
+        date: DateTime.new(2017, 1, 11, 13, 0o0),
         study_id: study.id,
         values: [{ group: nil, count: 5, delta: +1 }]
       )

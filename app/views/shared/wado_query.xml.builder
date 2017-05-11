@@ -7,7 +7,7 @@ xml.wado_query('xmlns' => 'http://www.weasis.org/xsd', 'xmlns:xsi' => 'http://ww
           visit[:image_series].each do |image_series|
             xml.Series('SeriesDescription' => image_series[:id].to_s + ' - ' + image_series[:name], 'SeriesNumber' => image_series[:id].to_s, 'SeriesInstanceUID' => Rails.application.config.wado_dicom_prefix + image_series[:id].to_s) do
               image_series[:images].each_with_index do |image, i|
-                xml.Instance('SOPInstanceUID' => image.wado_uid, 'InstanceNumber' => i+1)
+                xml.Instance('SOPInstanceUID' => image.wado_uid, 'InstanceNumber' => i + 1)
               end
             end
           end

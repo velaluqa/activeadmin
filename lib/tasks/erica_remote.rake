@@ -2,12 +2,12 @@ namespace :erica do
   namespace :remote do
     desc 'Restore from ERICA remote temp data'
     task :restore, [:export_id] => :environment do |_, args|
-      fail 'Only available on ERICA remote installation' unless ERICA.remote?
+      raise 'Only available on ERICA remote installation' unless ERICA.remote?
       export_id = args[:export_id]
 
       name = "restore-#{export_id}.tar.lrz"
       job = BackgroundJob.where(name: name, completed: false).first
-      fail 'A restore job is already running! Aborting' if job
+      raise 'A restore job is already running! Aborting' if job
       job = BackgroundJob.create(name: name)
 
       if ENV['ASYNC'] =~ /^false|no$/
@@ -21,8 +21,8 @@ namespace :erica do
     task sync: ['erica:remote:sync_datastores', 'erica:remote:sync_images']
 
     desc 'Sync images to all ERICA remotes (in erica_remotes.yml)'
-    task :sync_datastores, [:prefix] =>  :environment do |_, args|
-      fail 'Only available on ERICA store installation' if ERICA.remote?
+    task :sync_datastores, [:prefix] => :environment do |_, args|
+      raise 'Only available on ERICA store installation' if ERICA.remote?
       require 'remote/remote_sync'
       RemoteSync.perform_datastore_sync('config/erica_remotes.yml',
                                         export_id_prefix: args[:prefix])
@@ -30,7 +30,7 @@ namespace :erica do
 
     desc 'Sync images to all ERICA remotes (in erica_remotes.yml)'
     task sync_images: :environment do
-      fail 'Only available on ERICA store installation' if ERICA.remote?
+      raise 'Only available on ERICA store installation' if ERICA.remote?
       require 'remote/remote_sync'
       RemoteSync.perform_image_sync('config/erica_remotes.yml')
     end
@@ -81,24 +81,24 @@ namespace :erica do
     end
   end
 
-  DEFAULT_CONFIG_FILE = 'config/erica_remotes.yml'
+  DEFAULT_CONFIG_FILE = 'config/erica_remotes.yml'.freeze
 
   desc 'Download images as zip'
-  task :download_images, [:resource_type, :resource_id] => [:environment] do |t, args|
+  task :download_images, %i[resource_type resource_id] => [:environment] do |_t, args|
     resource_type = args[:resource_type]
     resource_id = args[:resource_id]
 
-    if(resource_type.blank? or resource_id.blank?)
+    if resource_type.blank? || resource_id.blank?
       puts 'Missing input parameters'
       next
     end
 
-    unless(['Patient', 'Visit'].include?(resource_type))
+    unless %w[Patient Visit].include?(resource_type)
       puts "Invalid resource type #{resource_type} given. Valid resource types are: Patient, Visit"
       next_series_number
     end
 
-    background_job = BackgroundJob.create(:name => "Download images for #{resource_type} #{resource_id}", :user_id => User.where(:username => 'rprofmaad').first.id)
+    background_job = BackgroundJob.create(name: "Download images for #{resource_type} #{resource_id}", user_id: User.where(username: 'rprofmaad').first.id)
 
     DownloadImagesWorker.new.perform(background_job.id.to_s, resource_type, resource_id)
 

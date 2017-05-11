@@ -14,28 +14,28 @@ class WadoController < ApplicationController
   # we only support single/multi-frame dicom images as objects
 
   def wado
-    if(@wado_request[:chosen_content_type] == 'application/dicom')
+    if @wado_request[:chosen_content_type] == 'application/dicom'
       begin
         converted_image = image_to_transfer_syntax(@wado_request[:transfer_syntax])
-        if(converted_image == :not_found)
+        if converted_image == :not_found
           return head :not_found
-        elsif(converted_image.nil?)
+        elsif converted_image.nil?
           return head :not_implemented
         else
-          send_file converted_image.path, :status => :ok, :type => 'application/dicom'
+          send_file converted_image.path, status: :ok, type: 'application/dicom'
         end
       ensure
         converted_image.close if converted_image.respond_to?(:close)
       end
-    elsif(@wado_request[:chosen_content_type].start_with?('image/'))
+    elsif @wado_request[:chosen_content_type].start_with?('image/')
       image_bitmap_data = image_to_bitmap
-      if(image_bitmap_data.nil?)
+      if image_bitmap_data.nil?
         return head :not_implemented
       else
-        send_data image_bitmap_data, :status => :ok, :type => @wado_request[:chosen_content_type]
+        send_data image_bitmap_data, status: :ok, type: @wado_request[:chosen_content_type]
       end
     else
-      return head :bad_request
+      head :bad_request
     end
   end
 
@@ -50,12 +50,12 @@ class WadoController < ApplicationController
   end
 
   def check_request_type
-    if(params[:requestType] != 'WADO')
+    if params[:requestType] != 'WADO'
       head :bad_request
       return false
     end
 
-    return true
+    true
   end
 
   def read_wado_parameters
@@ -80,7 +80,7 @@ class WadoController < ApplicationController
     @wado_request[:columns] = params[:columns]
     @wado_request[:columns] = @wado_request[:columns].to_i unless @wado_request[:columns].nil?
     @wado_request[:region] = params[:region]
-    @wado_request[:region] = @wado_request[:region].split(',').map {|s| s.to_f} unless @wado_request[:region].nil?
+    @wado_request[:region] = @wado_request[:region].split(',').map(&:to_f) unless @wado_request[:region].nil?
 
     @wado_request[:window_center] = params[:windowCenter]
     @wado_request[:window_center] = @wado_request[:window_center].to_f unless @wado_request[:window_center].nil?
@@ -122,7 +122,7 @@ class WadoController < ApplicationController
 
   def find_supported_content_type
     @wado_request[:content_type].each do |content_type|
-      if(['application/dicom', 'image/jpeg', 'image/png', 'image/tiff'].include?(content_type))
+      if ['application/dicom', 'image/jpeg', 'image/png', 'image/tiff'].include?(content_type)
         @wado_request[:chosen_content_type] = content_type
         break
       end
@@ -137,12 +137,12 @@ class WadoController < ApplicationController
 
     image_id = @wado_request[:object_uid].slice(Rails.application.config.wado_dicom_prefix.length..-1).to_i
 
-    @image = Image.where(:id => image_id).first
+    @image = Image.where(id: image_id).first
     authorize! :read, @image
     pp @image
     return head :not_found if @image.nil?
 
-    return true
+    true
   end
 
   def image_to_transfer_syntax(transfer_syntax)
@@ -154,7 +154,7 @@ class WadoController < ApplicationController
              :not_found
            end
 
-    return nil unless [:explicit_vr_little_endian, :explicit_vr_big_endian, :implicit_vr_little_endian].include?(transfer_syntax)
+    return nil unless %i[explicit_vr_little_endian explicit_vr_big_endian implicit_vr_little_endian].include?(transfer_syntax)
 
     transfer_syntax_option = case transfer_syntax
                              when :explicit_vr_little_endian then '+te'
@@ -163,19 +163,18 @@ class WadoController < ApplicationController
                              else ''
                              end
 
-
     tempfile = Tempfile.new(["#{@image.id}_converted", '.dcm'])
 
     `#{Rails.application.config.dcmconv} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'`
 
-    return tempfile
+    tempfile
   end
 
   def image_to_bitmap
-    return nil unless (['image/jpeg', 'image/png', 'image/tiff'].include?(@wado_request[:chosen_content_type]))
+    return nil unless ['image/jpeg', 'image/png', 'image/tiff'].include?(@wado_request[:chosen_content_type])
 
     dicom_meta_header, dicom_metadata = @image.dicom_metadata
-    return nil if (dicom_metadata['0028,0010'].nil? || dicom_metadata['0028,0011'].nil?)
+    return nil if dicom_metadata['0028,0010'].nil? || dicom_metadata['0028,0011'].nil?
     original_rows = dicom_metadata['0028,0010'][:value].to_i
     original_columns = dicom_metadata['0028,0011'][:value].to_i
 
@@ -189,8 +188,8 @@ class WadoController < ApplicationController
 
     # scale
     scale_option = '+a '
-    if(@wado_request[:columns] and @wado_request[:rows])
-      if(@wado_request[:rows].to_f/original_rows.to_f < @wado_request[:columns].to_f/original_columns.to_f)
+    if @wado_request[:columns] && @wado_request[:rows]
+      if @wado_request[:rows].to_f / original_rows.to_f < @wado_request[:columns].to_f / original_columns.to_f
         scale_option += "+Syv #{@wado_request[:rows]}"
       else
         scale_option += "+Sxv #{@wado_request[:columns]}"
@@ -202,28 +201,27 @@ class WadoController < ApplicationController
 
     # clip
     clip_option = ''
-    unless(@wado_request[:region].nil?)
-      left = (original_columns*@wado_request[:region][0]).floor
-      top = (original_rows*@wado_request[:region][1]).floor
-      right = (original_columns*@wado_request[:region][2]).floor
-      bottom = (original_rows*@wado_request[:region][3]).floor
+    unless @wado_request[:region].nil?
+      left = (original_columns * @wado_request[:region][0]).floor
+      top = (original_rows * @wado_request[:region][1]).floor
+      right = (original_columns * @wado_request[:region][2]).floor
+      bottom = (original_rows * @wado_request[:region][3]).floor
 
-      width = right-left
-      height = bottom-top
+      width = right - left
+      height = bottom - top
 
-
-      clip_option = "+C #{left} #{top} #{width} #{height}" if(width > 0 and height > 0)
+      clip_option = "+C #{left} #{top} #{width} #{height}" if width > 0 && height > 0
     end
 
     # apply window
     window_option = ''
-    if(@wado_request[:window_width] and @wado_request[:window_center])
+    if @wado_request[:window_width] && @wado_request[:window_center]
       window_option = "+Ww #{@wado_request[:window_center]} #{@wado_request[:window_width]}"
     end
 
     # can all be done in one step using dcmj2pnm
     image_data = `#{Rails.application.config.dcmj2pnm} #{scale_option} #{clip_option} #{window_option} #{output_format_switch} '#{@image.absolute_image_storage_path}'`
 
-    return image_data
+    image_data
   end
 end

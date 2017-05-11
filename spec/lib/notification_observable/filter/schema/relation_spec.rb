@@ -21,7 +21,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Relation do
 
   with_model :SubSubModel do
     table do |t|
-      t.datetime :foobar, null:false
+      t.datetime :foobar, null: false
       t.text :foobaz, null: true
       t.references :sub_model
     end
@@ -39,15 +39,15 @@ RSpec.describe NotificationObservable::Filter::Schema::Relation do
 
       it 'returns schema for relation' do
         expect(@schema).to include(
-                             title: 'Related SubModel',
-                             type: 'object',
-                             required: ['sub_model'],
-                             properties: {
-                               'sub_model' => {
-                                 '$ref' => '#/definitions/model_sub_model'
-                               }
-                             }
-                           )
+          title: 'Related SubModel',
+          type: 'object',
+          required: ['sub_model'],
+          properties: {
+            'sub_model' => {
+              '$ref' => '#/definitions/model_sub_model'
+            }
+          }
+        )
       end
 
       it 'keeps definitions' do
@@ -64,15 +64,15 @@ RSpec.describe NotificationObservable::Filter::Schema::Relation do
 
       it 'returns schema for relation' do
         expect(@schema).to include(
-                             title: 'Related SubSubModels',
-                             type: 'object',
-                             required: ['sub_sub_models'],
-                             properties: {
-                               'sub_sub_models' => {
-                                 '$ref' => '#/definitions/model_sub_sub_model'
-                               }
-                             }
-                           )
+          title: 'Related SubSubModels',
+          type: 'object',
+          required: ['sub_sub_models'],
+          properties: {
+            'sub_sub_models' => {
+              '$ref' => '#/definitions/model_sub_sub_model'
+            }
+          }
+        )
       end
 
       it 'keeps definitions' do

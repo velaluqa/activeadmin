@@ -27,7 +27,7 @@ class Patient < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',
     meta: {
-      study_id: -> (patient) { patient.study.andand.id }
+      study_id: ->(patient) { patient.study.andand.id }
     }
   )
   acts_as_taggable
@@ -52,17 +52,17 @@ class Patient < ActiveRecord::Base
   validates_presence_of :subject_id
   validates_presence_of :center_id
 
-  scope :by_study_ids, -> (*ids) {
+  scope :by_study_ids, ->(*ids) {
     joins(:center)
       .where(centers: { study_id: Array[ids].flatten })
   }
 
-  scope :searchable, -> { join_study.select(<<SELECT) }
-centers.study_id AS study_id,
-studies.name AS study_name,
-centers.code || patients.subject_id AS text,
-patients.id AS result_id,
-'Patient'::varchar AS result_type
+  scope :searchable, -> { join_study.select(<<SELECT.strip_heredoc) }
+    centers.study_id AS study_id,
+    studies.name AS study_name,
+    centers.code || patients.subject_id AS text,
+    patients.id AS result_id,
+    'Patient'::varchar AS result_type
 SELECT
 
   scope :join_study, -> { joins(center: :study) }
@@ -74,16 +74,16 @@ SELECT
   include ScopablePermissions
 
   def self.with_permissions
-    joins(center: :study).joins(<<JOIN)
-INNER JOIN user_roles ON
-  (
-       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
-    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
-    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
-    OR user_roles.scope_object_id IS NULL
-  )
-INNER JOIN roles ON user_roles.role_id = roles.id
-INNER JOIN permissions ON roles.id = permissions.role_id
+    joins(center: :study).joins(<<JOIN.strip_heredoc)
+      INNER JOIN user_roles ON
+        (
+             (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+          OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+          OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+          OR user_roles.scope_object_id IS NULL
+        )
+      INNER JOIN roles ON user_roles.role_id = roles.id
+      INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
@@ -123,9 +123,7 @@ JOIN
 
   def wado_query
     { id: id, name: name, visits: visits.map(&:wado_query) +
-      [{ id: 0, name: 'Unassigned', image_series: image_series.where(visit_id: nil).map(&:wado_query)
-       }]
-    }
+      [{ id: 0, name: 'Unassigned', image_series: image_series.where(visit_id: nil).map(&:wado_query) }] }
   end
 
   # Used as getter by ActiveAdmin form.
@@ -155,7 +153,7 @@ JOIN
   end
 
   def domino_document_fields
-    %w(id subject_id)
+    %w[id subject_id]
   end
 
   def domino_document_properties(_action = :update)

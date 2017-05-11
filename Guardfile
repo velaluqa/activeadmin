@@ -1,5 +1,5 @@
 ignore %r{^data/}, %r{^spec/data}
-directories %w(app config lib spec)
+directories %w[app config lib spec]
 
 guard 'rspec', cmd: 'spring rspec -r spec_helper' do
   watch(%r{^spec/.+_spec\.rb$})
@@ -38,10 +38,10 @@ guard 'livereload' do
     png: :png,
     gif: :gif,
     jpg: :jpg,
-    jpeg: :jpeg,
+    jpeg: :jpeg
   }
 
-  rails_view_exts = %w(erb haml slim)
+  rails_view_exts = %w[erb haml slim]
 
   # file types LiveReload may optimize refresh for
   compiled_exts = extensions.values.uniq

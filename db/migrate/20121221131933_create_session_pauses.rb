@@ -6,7 +6,7 @@ class CreateSessionPauses < ActiveRecord::Migration
       t.string :reason
       t.integer :session_id
 
-      t.timestamps :null => true
+      t.timestamps null: true
     end
   end
 end

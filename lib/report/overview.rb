@@ -2,19 +2,19 @@ module Report
   # Calculates report values for a given array of values and all
   # studies a given user has the permissions to `read_reports` for.
   class Overview
-    AVAILABLE_COLUMNS = [
-      'patients',
-      'visits',
-      'visits_state_incomplete_na',
-      'visits_state_incomplete_queried',
-      'visits_state_complete_tqc_pending',
-      'visits_state_complete_tqc_issues',
-      'visits_state_complete_tqc_passed',
-      'image_series',
-      'required_series',
-      'required_series_state_pending',
-      'required_series_state_issues',
-      'required_series_state_passed'
+    AVAILABLE_COLUMNS = %w[
+      patients
+      visits
+      visits_state_incomplete_na
+      visits_state_incomplete_queried
+      visits_state_complete_tqc_pending
+      visits_state_complete_tqc_issues
+      visits_state_complete_tqc_passed
+      image_series
+      required_series
+      required_series_state_pending
+      required_series_state_issues
+      required_series_state_passed
     ].freeze
 
     attr_reader :study_ids, :user
@@ -104,10 +104,10 @@ module Report
       @required_series ||= {}
       @required_series[study.id] ||=
         study.visits
-          .join_required_series
-          .where('visits_required_series.tqc_state IS NOT NULL')
-          .group('visits_required_series.tqc_state')
-          .count
+             .join_required_series
+             .where('visits_required_series.tqc_state IS NOT NULL')
+             .group('visits_required_series.tqc_state')
+             .count
     end
 
     def required_series_column_value(study)

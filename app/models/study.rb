@@ -1,4 +1,5 @@
 # coding: utf-8
+
 require 'git_config_repository'
 require 'schema_validation'
 require 'uri'
@@ -55,12 +56,12 @@ class Study < ActiveRecord::Base
 
   scope :by_ids, ->(*ids) { where(id: Array[ids].flatten) }
 
-  scope :searchable, -> { select(<<SELECT) }
-studies.id AS study_id,
-studies.name AS study_name,
-studies.name AS text,
-studies.id AS result_id,
-'Study'::varchar AS result_type
+  scope :searchable, -> { select(<<SELECT.strip_heredoc) }
+    studies.id AS study_id,
+    studies.name AS study_name,
+    studies.name AS text,
+    studies.id AS result_id,
+    'Study'::varchar AS result_type
 SELECT
 
   include ImageStorageCallbacks
@@ -68,18 +69,18 @@ SELECT
   include ScopablePermissions
 
   def self.with_permissions
-    joins(<<JOIN)
-LEFT JOIN "centers" ON "centers"."study_id" = "studies"."id"
-LEFT JOIN "patients" ON "patients"."center_id" = "centers"."id"
-INNER JOIN user_roles ON
-  (
-       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
-    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
-    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
-    OR user_roles.scope_object_id IS NULL
-  )
-INNER JOIN roles ON user_roles.role_id = roles.id
-INNER JOIN permissions ON roles.id = permissions.role_id
+    joins(<<JOIN.strip_heredoc)
+      LEFT JOIN "centers" ON "centers"."study_id" = "studies"."id"
+      LEFT JOIN "patients" ON "patients"."center_id" = "centers"."id"
+      INNER JOIN user_roles ON
+        (
+             (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+          OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+          OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+          OR user_roles.scope_object_id IS NULL
+        )
+      INNER JOIN roles ON user_roles.role_id = roles.id
+      INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
@@ -96,7 +97,7 @@ JOIN
     end
   end
 
-  STATE_SYMS = [:building, :production].freeze
+  STATE_SYMS = %i[building production].freeze
 
   def self.state_sym_to_int(sym)
     Study::STATE_SYMS.index(sym)
@@ -114,7 +115,7 @@ JOIN
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
     index =
-      if sym.is_a? Fixnum
+      if sym.is_a? Integer
         sym
       else
         Study::STATE_SYMS.index(sym)
@@ -280,12 +281,12 @@ JOIN
       :name_change
     elsif c.include?('state')
       case [int_to_state_sym(c['state'][0].to_i), c['state'][1]]
-      when [:building, :production] then :production_start
-      when [:production, :building] then :production_abort
+      when %i[building production] then :production_start
+      when %i[production building] then :production_abort
       else :state_change
       end
-    elsif (c.keys - %w(domino_db_url domino_server_name notes_links_base_uri)).empty?
-      return :domino_settings_change
+    elsif (c.keys - %w[domino_db_url domino_server_name notes_links_base_uri]).empty?
+      :domino_settings_change
     end
   end
 

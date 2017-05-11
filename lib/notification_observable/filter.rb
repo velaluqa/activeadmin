@@ -4,9 +4,7 @@ module NotificationObservable
 
     def initialize(filters)
       @filters = filters.map do |conditions|
-        conditions.map do |condition|
-          condition.deep_symbolize_keys
-        end
+        conditions.map(&:deep_symbolize_keys)
       end
     end
 
@@ -100,8 +98,8 @@ module NotificationObservable
     # @return [Boolean] Whether the condition matches or not.
     def match_relation(model, key, condition)
       relation = model.class
-        .joins(relation_joins(key, condition))
-        .where(id: model.id)
+                      .joins(relation_joins(key, condition))
+                      .where(id: model.id)
       table_name, attr, expected, equal = relation_condition(model, key, condition)
       if attr
         if equal
@@ -129,7 +127,7 @@ module NotificationObservable
     end
 
     def relation_condition(model, key, condition)
-      ret = relation_equality_condition(model, key, condition) and return ret
+      (ret = relation_equality_condition(model, key, condition)) && (return ret)
       relation_existance_condition(model, key, condition)
     end
 
