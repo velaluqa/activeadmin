@@ -159,9 +159,9 @@ class WadoController < ApplicationController
 
     executable =
       if compressed_pixel_data?
-        Rails.application.config.dcmconv
-      else
         Rails.application.config.dcmdjpeg
+      else
+        Rails.application.config.dcmconv
       end
 
     tempfile = Tempfile.new(["#{@image.id}_converted", '.dcm'])
