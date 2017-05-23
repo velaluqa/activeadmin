@@ -173,6 +173,7 @@ class WadoController < ApplicationController
 
   def compressed_pixel_data?
     dcm = DICOM::DObject.read(@image.absolute_image_storage_path)
+    Rails.logger.warn(dcm.transfer_syntax)
     %w[
       1.2.840.10008.1.2.4.57
       1.2.840.10008.1.2.4.70
