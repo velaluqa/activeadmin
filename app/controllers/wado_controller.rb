@@ -96,28 +96,23 @@ class WadoController < ApplicationController
     @wado_request[:presentation_uid] = params[:presentationUID]
     @wado_request[:presentation_series_uid] = params[:presentationSeriesUID]
 
-    @wado_request[:transfer_syntax] = params[:transferSyntax]
-
     pp @wado_request
   end
 
   def parse_transfer_syntax
-    transfer_syntax_uid = @wado_request[:transfer_syntax]
-    transfer_syntax_uid ||= '1.2.840.10008.1.2.1' # default: Explicit VR Little Endian
-
-    @wado_request[:transfer_syntax] = case transfer_syntax_uid
-                                      when '1.2.840.10008.1.2' then :implicit_vr_little_endian
-                                      when '1.2.840.10008.1.2.1' then :explicit_vr_little_endian
-                                      when '1.2.840.10008.1.2.2' then :explicit_vr_big_endian
-                                      when '1.2.840.10008.1.2.4.57' then :jpeg_lossless
-                                      when '1.2.840.10008.1.2.4.70' then :jpeg_lossless_first_order
-                                      when '1.2.840.10008.1.2.5' then :rle_lossless
-                                      when '1.2.840.10008.1.2.4.90' then :jpeg_2000_lossless
-                                      when '1.2.840.10008.1.2.4.50' then :jpeg_baseline
-                                      when '1.2.840.10008.1.2.4.51' then :jpeg_extended
-                                      when '1.2.840.10008.1.2.4.91' then :jpeg_2000_lossy
-                                      else :implicit_vr_little_endian
-                                      end
+    @wado_request[:transfer_syntax] =
+      case params[:transferSyntax]
+      when '1.2.840.10008.1.2' then :implicit_vr_little_endian
+      when '1.2.840.10008.1.2.1' then :explicit_vr_little_endian
+      when '1.2.840.10008.1.2.2' then :explicit_vr_big_endian
+      when '1.2.840.10008.1.2.4.57' then :jpeg_lossless
+      when '1.2.840.10008.1.2.4.70' then :jpeg_lossless_first_order
+      when '1.2.840.10008.1.2.5' then :rle_lossless
+      when '1.2.840.10008.1.2.4.90' then :jpeg_2000_lossless
+      when '1.2.840.10008.1.2.4.50' then :jpeg_baseline
+      when '1.2.840.10008.1.2.4.51' then :jpeg_extended
+      when '1.2.840.10008.1.2.4.91' then :jpeg_2000_lossy
+      end
   end
 
   def find_supported_content_type
@@ -146,29 +141,33 @@ class WadoController < ApplicationController
   end
 
   def image_to_transfer_syntax(transfer_syntax)
-    # We disabled transer syntax conversion for performance reasons. This is immensely hacky, but oh well...
-    return begin
-             File.new(@image.absolute_image_storage_path)
-           rescue Errno::ENOENT => e
-             Rails.logger.warn "WADO file not found: #{@image.absolute_image_storage_path}"
-             :not_found
-           end
+    # If transfer syntax is not specified, the image will be returned
+    # as is. If there is a requested transfer syntax in the WADO query
+    # we do the conversion. This is for Mac OS X Weasis clients, that
+    # do not have JPEG2000 codecs and request a different transfer
+    # syntax, if the file cannot be decoded by the viewer.
+    return image_file if transfer_syntax.nil?
+    return image_file unless [:explicit_vr_little_endian, :explicit_vr_big_endian, :implicit_vr_little_endian].include?(transfer_syntax)
 
-    return nil unless [:explicit_vr_little_endian, :explicit_vr_big_endian, :implicit_vr_little_endian].include?(transfer_syntax)
-
-    transfer_syntax_option = case transfer_syntax
-                             when :explicit_vr_little_endian then '+te'
-                             when :explicit_vr_big_endian then '+tb'
-                             when :implicit_vr_little_endian then '+ti'
-                             else ''
-                             end
-
+    transfer_syntax_option =
+      case transfer_syntax
+      when :explicit_vr_little_endian then '+te'
+      when :explicit_vr_big_endian then '+tb'
+      when :implicit_vr_little_endian then '+ti'
+      else ''
+      end
 
     tempfile = Tempfile.new(["#{@image.id}_converted", '.dcm'])
-
+    puts "CONVERT COMMAND: #{Rails.application.config.dcmconv} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'"
     `#{Rails.application.config.dcmconv} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'`
+    tempfile
+  end
 
-    return tempfile
+  def image_file
+    File.new(@image.absolute_image_storage_path)
+  rescue Errno::ENOENT => _e
+    Rails.logger.warn "WADO file not found: #{@image.absolute_image_storage_path}"
+    :not_found
   end
 
   def image_to_bitmap
