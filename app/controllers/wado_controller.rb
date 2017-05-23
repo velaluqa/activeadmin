@@ -157,10 +157,30 @@ class WadoController < ApplicationController
       else ''
       end
 
+    executable =
+      if compressed_pixel_data?
+        Rails.application.config.dcmconv
+      else
+        Rails.application.config.dcmdjpeg
+      end
+
     tempfile = Tempfile.new(["#{@image.id}_converted", '.dcm'])
-    Rails.logger.warn "CONVERT COMMAND: #{Rails.application.config.dcmconv} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'"
-    `#{Rails.application.config.dcmconv} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'`
+    command = "#{executable} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'"
+    Rails.logger.warn(command)
+    `#{command}`
     tempfile
+  end
+
+  def compressed_pixel_data?
+    dcm = DICOM::DObject.read(@image.absolute_image_storage_path)
+    %w[
+      1.2.840.10008.1.2.4.57
+      1.2.840.10008.1.2.4.70
+      1.2.840.10008.1.2.4.90
+      1.2.840.10008.1.2.4.50
+      1.2.840.10008.1.2.4.51
+      1.2.840.10008.1.2.4.91
+    ].include?(dcm.transfer_syntax)
   end
 
   def image_file
