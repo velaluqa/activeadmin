@@ -594,9 +594,23 @@ ActiveAdmin.register Visit do
     current_user.ensure_authentication_token!
     @wado_query_urls = [required_series_wado_query_visit_url(@visit, :format => :xml, :authentication_token => current_user.authentication_token)]
 
-    render 'admin/shared/viewer_weasis.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
+    name = @visit
+             .name
+             .gsub(/[^0-9A-Za-z.\-]/, '_')
+             .gsub(/[()]/, '')
+             .gsub(/_{2,}/, '_')
+             .gsub(/_\z/, '')
+             .gsub(/\A_/, '')
+             .downcase
+    send_data(
+      render_to_string('admin/shared/viewer_weasis.jnpl', :layout => false),
+      type: 'application/x-java-jnlp-file',
+      filename: "required_series_visit_#{name}.jnlp",
+      disposition: 'attachment'
+    )
   end
-  action_item :edit, :only => [:show, :mqc_form, :mqc_results] do
+
+  action_item :only => [:show, :mqc_form, :mqc_results] do
     link_to('Viewer (RS)', all_required_series_viewer_admin_visit_path(resource))
   end
 
