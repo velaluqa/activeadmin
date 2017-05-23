@@ -158,7 +158,7 @@ class WadoController < ApplicationController
       end
 
     tempfile = Tempfile.new(["#{@image.id}_converted", '.dcm'])
-    puts "CONVERT COMMAND: #{Rails.application.config.dcmconv} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'"
+    Rails.logger.warn "CONVERT COMMAND: #{Rails.application.config.dcmconv} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'"
     `#{Rails.application.config.dcmconv} #{transfer_syntax_option} '#{@image.absolute_image_storage_path}' '#{tempfile.path}'`
     tempfile
   end
