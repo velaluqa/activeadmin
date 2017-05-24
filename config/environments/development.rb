@@ -61,6 +61,7 @@ StudyServer::Application.configure do
   config.dcm2xml = '/usr/bin/dcm2xml'
   config.dcmconv = '/usr/bin/dcmconv'
   config.dcmj2pnm = '/usr/bin/dcmj2pnm'
+  config.dcmdjpeg = '/usr/bin/dcmdjpeg'
 
   config.wado_dicom_prefix = '999.999.999.'
 
