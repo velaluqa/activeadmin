@@ -11,10 +11,10 @@ class ConvertVersionDataToJsonb < ActiveRecord::Migration
     PaperTrail::Version.reset_column_information
     PaperTrail::Version.find_each do |version|
       if (object = version.object)
-        version.update_column :new_object, YAML.load(object)
+        version.update_column :new_object, YAML.safe_load(object)
       end
       if (object_changes = version.object_changes)
-        version.update_column :new_object_changes, YAML.load(object_changes)
+        version.update_column :new_object_changes, YAML.safe_load(object_changes)
       end
 
       progress.increment

@@ -35,7 +35,8 @@ class NotificationMailer < ActionMailer::Base
       body: render_message(
         notification.user,
         notification.notification_profile,
-        [notification]),
+        [notification]
+      ),
       content_type: 'text/html'
     )
   end

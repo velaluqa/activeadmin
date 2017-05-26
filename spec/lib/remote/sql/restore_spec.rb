@@ -21,7 +21,7 @@ RSpec.describe Sql::Restore do
   describe '#psql_options' do
     it 'removes unnecessary options' do
       expect(Sql::Restore.psql_options.keys)
-        .to match_array %w(dbname host port username)
+        .to match_array %w[dbname host port username]
     end
   end
 

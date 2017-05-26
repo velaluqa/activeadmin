@@ -58,11 +58,12 @@ RSpec.describe Role do
     before(:each) do
       @role = create(:role, with_permissions: {
                        [Study, Image] => :read,
-                       User => :manage })
+                       User => :manage
+                     })
     end
 
     it 'returns the ability strings for each permissions' do
-      expect(@role.abilities).to match_array(%w(read_study read_image manage_user))
+      expect(@role.abilities).to match_array(%w[read_study read_image manage_user])
     end
   end
 
@@ -70,8 +71,9 @@ RSpec.describe Role do
     before(:each) do
       @role = create(:role, with_permissions: {
                        Study => :read,
-                       User => :manage })
-      @role.abilities = %w(manage_role manage_user)
+                       User => :manage
+                     })
+      @role.abilities = %w[manage_role manage_user]
     end
 
     it 'keeps existing abilities' do
@@ -89,7 +91,7 @@ RSpec.describe Role do
     it 'persists the new permissions array to the database' do
       @role.save
       @role.reload
-      expect(@role.abilities).to match_array %w(manage_role manage_user)
+      expect(@role.abilities).to match_array %w[manage_role manage_user]
     end
   end
 
@@ -99,13 +101,13 @@ RSpec.describe Role do
     it 'selects search fields' do
       expect(Role.searchable.as_json)
         .to eq [{
-                  'id' => nil,
-                  'study_id' => nil,
-                  'study_name' => nil,
-                  'text' => role.title,
-                  'result_id' => role.id,
-                  'result_type' => 'Role'
-                }]
+          'id' => nil,
+          'study_id' => nil,
+          'study_name' => nil,
+          'text' => role.title,
+          'result_id' => role.id,
+          'result_type' => 'Role'
+        }]
     end
   end
 end

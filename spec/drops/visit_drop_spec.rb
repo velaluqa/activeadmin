@@ -4,7 +4,7 @@ describe VisitDrop do
   it { should have_attribute(:visit_type) }
   it { should have_attribute(:visit_number) }
   it { should have_attribute(:description) }
-  it { should have_attribute(:required_series) }
+  it { VisitDrop.new(create(:visit)).should respond_to(:required_series) }
   it { should have_attribute(:assigned_image_series_index) }
   it { should have_attribute(:mqc_comment) }
   it { should have_attribute(:mqc_date) }

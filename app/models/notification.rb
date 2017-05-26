@@ -39,7 +39,7 @@ class Notification < ActiveRecord::Base
     version: :paper_trail_version,
     versions: :paper_trail_versions,
     meta: {
-      study_id: -> (notification) { notification.study.andand.id }
+      study_id: ->(notification) { notification.study.andand.id }
     }
   )
 
@@ -60,15 +60,15 @@ class Notification < ActiveRecord::Base
   # All notifications for given user.
   #
   # @param [User,Integer] user The user to filter by.
-  scope :for, -> (user) { where(user: user) }
+  scope :for, ->(user) { where(user: user) }
 
   # All notifications belonging to given profile.
   #
   # @param [NotificationProfile,Integer] profile The profile to filter by.
-  scope :of, -> (profile) { where(notification_profile: profile) }
+  scope :of, ->(profile) { where(notification_profile: profile) }
 
   # All notifications that are throttled via given throttling delay.
-  scope :throttled, -> (throttle, options = { joins: true }) do
+  scope :throttled, ->(throttle, options = { joins: true }) do
     throttle = Email.ensure_throttling_delay(throttle)
     (options[:joins] ? joins(:notification_profile, :user) : all)
       .where('least(?, notification_profiles.maximum_email_throttling_delay, users.email_throttling_delay) = ?',

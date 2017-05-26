@@ -3,9 +3,9 @@ module ScopablePermissions
 
   included do
     def self.with_permissions
-      raise <<ERROR
-Scope `with_permissions` not defined in #{self}.
-Make sure you override this method/scope to join the necessary permissions.
+      raise <<ERROR.strip_heredoc
+        Scope `with_permissions` not defined in #{self}.
+        Make sure you override this method/scope to join the necessary permissions.
 ERROR
     end
 
@@ -30,9 +30,9 @@ ERROR
       return all if user.is_root_user?
 
       sql = with_permissions
-              .select(:id)
-              .where(permissions: { activity: activities, subject: subject })
-              .where('user_roles.user_id = ?', user.id)
+            .select(:id)
+            .where(permissions: { activity: activities, subject: subject })
+            .where('user_roles.user_id = ?', user.id)
       where(id: sql)
     end
 
@@ -56,11 +56,11 @@ ERROR
       return true if user.is_root_user?
 
       self.class.with_permissions
-        .select(:id)
-        .where(permissions: { activity: activities, subject: subject })
-        .where(self.class.table_name => { id: id })
-        .where('user_roles.user_id = ?', user.id)
-        .exists?
+          .select(:id)
+          .where(permissions: { activity: activities, subject: subject })
+          .where(self.class.table_name => { id: id })
+          .where('user_roles.user_id = ?', user.id)
+          .exists?
     end
 
     ##

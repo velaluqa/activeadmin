@@ -4,7 +4,7 @@ class CreateImageSeries < ActiveRecord::Migration
       t.string :name
       t.integer :visit_id
 
-      t.timestamps :null => true
+      t.timestamps null: true
     end
   end
 end

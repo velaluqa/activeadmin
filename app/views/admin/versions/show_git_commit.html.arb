@@ -12,7 +12,7 @@ panel 'Commit Details' do
 
   attributes_table_for commit do
     row :time
-    row :author do      
+    row :author do
       unless author.nil?
         link_to(author.name, admin_user_path(author))
       end
@@ -30,7 +30,7 @@ panel 'Commit Details' do
     end
     row :changes do
       next if commit.commit.parents.empty?
-      
+
       parent = commit.commit.parents[0]
 
       if session

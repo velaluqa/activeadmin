@@ -6,13 +6,13 @@
 
   #form_area.offset1.span10
     - unless (@form.description.nil? or @form.description.empty?)
-      %p= simple_format(@form.description) 
+      %p= simple_format(@form.description)
     = form_tag('', :class => 'form-horizontal', :id => 'the_form') do
       = hidden_field_tag('form_id', @form.id)
       - current_group_index = nil
       - first_in_group = false
       %a.offset-anchor#form-top
-      - @form_config.each do |field|      
+      - @form_config.each do |field|
         - if(field['type'] == 'include_start')
           - current_group_index = 1
           - first_in_group = true

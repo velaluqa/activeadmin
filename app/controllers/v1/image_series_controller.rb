@@ -1,7 +1,7 @@
 module V1
   class ImageSeriesController < V1::ApiController
     def create
-      authorize_one! [:create, :upload], ImageSeries
+      authorize_one! %i[create upload], ImageSeries
 
       series_params = image_series_params
       series_params[:state] = :importing unless series_params[:state]
@@ -22,7 +22,7 @@ module V1
     def update
       @series = ImageSeries.find(params[:id])
 
-      authorize_one! [:update, :upload], ImageSeries
+      authorize_one! %i[update upload], ImageSeries
 
       @series.assign_attributes(image_series_params)
 
@@ -42,7 +42,7 @@ module V1
       authorize! :upload, ImageSeries
 
       unless params[:expected_image_count]
-        render json: { errors: ["Parameter `expected_image_count` missing."] },
+        render json: { errors: ['Parameter `expected_image_count` missing.'] },
                status: :bad_request
         return
       end

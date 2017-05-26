@@ -9,13 +9,13 @@ RSpec.describe User do
     it 'selects search fields' do
       expect(User.searchable.as_json)
         .to eq [{
-                  'id' => nil,
-                  'study_id' => nil,
-                  'study_name' => nil,
-                  'text' => user.name,
-                  'result_id' => user.id,
-                  'result_type' => 'User'
-                }]
+          'id' => nil,
+          'study_id' => nil,
+          'study_name' => nil,
+          'text' => user.name,
+          'result_id' => user.id,
+          'result_type' => 'User'
+        }]
     end
   end
 
@@ -60,36 +60,36 @@ RSpec.describe User do
 
       it 'to contain unscopable permissions' do
         expect(user.permission_matrix).to eq(
-                                            'Study' => %i(read),
-                                            'ImageSeries' => %i(upload),
-                                            'User' => %i(read update generate_keypair),
-                                            'PublicKey' => %i(read update)
-                                          )
+          'Study' => %i[read],
+          'ImageSeries' => %i[upload],
+          'User' => %i[read update generate_keypair],
+          'PublicKey' => %i[read update]
+        )
       end
     end
 
     context 'user with two roles' do
       before(:each) do
         @role1 = create(:role, with_permissions: {
-                          Study => %i(manage read),
-                          Image => %i(read)
+                          Study => %i[manage read],
+                          Image => %i[read]
                         })
         @role2 = create(:role, with_permissions: {
-                          Study => %i(manage read),
-                          Center => %i(manage read),
-                          Visit => %i(assign_required_series)
+                          Study => %i[manage read],
+                          Center => %i[manage read],
+                          Visit => %i[assign_required_series]
                         })
         @user = create(:user, with_user_roles: [@role1, @role2])
       end
 
       it 'only keeps :manage' do
         expected = {
-          'Study' => %i(manage),
-          'Center' => %i(manage),
-          'Image' => %i(read),
-          'Visit' => %i(assign_required_series),
-          'User' => %i(read update generate_keypair),
-          'PublicKey' => %i(read update)
+          'Study' => %i[manage],
+          'Center' => %i[manage],
+          'Image' => %i[read],
+          'Visit' => %i[assign_required_series],
+          'User' => %i[read update generate_keypair],
+          'PublicKey' => %i[read update]
         }
         expect(@user.permission_matrix).to eq(expected)
       end

@@ -10,9 +10,15 @@ FactoryGirl.define do
     trait :without_notification_callbacks do
       # Disable notification callbacks when creating factory objects.
       after(:build) do |object|
-        class << object; def notification_observable_create; true; end; end
-        class << object; def notification_observable_update; true; end; end
-        class << object; def notification_observable_destroy; true; end; end
+        class << object; def notification_observable_create
+                           true
+                         end; end
+        class << object; def notification_observable_update
+                           true
+                         end; end
+        class << object; def notification_observable_destroy
+                           true
+                         end; end
       end
     end
   end

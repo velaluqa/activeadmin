@@ -5,7 +5,7 @@ class CreateVisits < ActiveRecord::Migration
       t.string :visit_type
       t.integer :patient_id
 
-      t.timestamps :null => true
+      t.timestamps null: true
     end
   end
 end

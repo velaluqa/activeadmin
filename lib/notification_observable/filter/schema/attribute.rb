@@ -2,7 +2,7 @@ module NotificationObservable
   class Filter
     class Schema
       class Attribute
-        FILTERS = %i(equality changes custom).freeze
+        FILTERS = %i[equality changes custom].freeze
 
         def initialize(model, column)
           @model = model
@@ -79,7 +79,7 @@ module NotificationObservable
             properties: {
               changes: {
                 type: 'object',
-                required: ['from', 'to'],
+                required: %w[from to],
                 properties: {
                   from: validation,
                   to: validation
@@ -158,7 +158,7 @@ module NotificationObservable
         end
 
         def type_defaults
-          case  @column.type
+          case @column.type
           when :integer, :bigint then { type: 'integer' }
           when :float, :decimal  then { type: 'number' }
           when :datetime         then { type: 'string', format: 'datetime' }
@@ -212,7 +212,7 @@ module NotificationObservable
           case key
           when :minimum then { minLength: value }
           when :maximum then { maxLength: value }
-          when :is then { minLength: value, maxLength: value}
+          when :is then { minLength: value, maxLength: value }
           end
         end
 

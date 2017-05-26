@@ -16,14 +16,14 @@ class Sql
       %("#{name}")
     end
 
-    def type_postfix(options = {})
+    def type_postfix(_options = {})
       case type
       when :integer  then '::integer'
       when :string   then "::varchar(#{limit})"
       when :text     then '::text'
       when :datetime then '::timestamp'
       when :date     then '::date'
-      else fail "Unknown type for #{self}: #{type}"
+      else raise "Unknown type for #{self}: #{type}"
       end
     end
 
@@ -52,7 +52,7 @@ class Sql
       when :text     then "format('%L', #{with_ref(options)})"
       when :datetime then "format('%L', #{with_ref(options)})||'#{type_postfix(options)}'"
       when :date     then "format('%L', #{with_ref(options)})||'#{type_postfix(options)}'"
-      else fail "Unknown type for #{self}: #{type}"
+      else raise "Unknown type for #{self}: #{type}"
       end
     end
 

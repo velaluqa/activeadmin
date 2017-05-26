@@ -1,10 +1,9 @@
 - if errors.nil? or errors.empty?
   %p No Errors
-- else  
+- else
   %ul
     - errors.each do |error|
       - if error.is_a?(Kwalify::ValidationError)
         %li= "[#{error.path}]: #{error.message}"
       - else
         %li= error
-      

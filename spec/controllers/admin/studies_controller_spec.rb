@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe Admin::StudiesController do
-
   describe '#index' do
     describe 'without current user' do
       subject { get :index }

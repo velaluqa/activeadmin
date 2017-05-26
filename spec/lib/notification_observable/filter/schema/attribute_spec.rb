@@ -36,7 +36,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       validates :string2_field, length: { in: 2..10 }
       validates :string3_field, length: { is: 6 }
       validates :string4_field, format: { with: /\A[a-zA-Z]+\z/ }
-      validates :enum_field, inclusion: { in: %i(yes no maybe) }
+      validates :enum_field, inclusion: { in: %i[yes no maybe] }
     end
   end
 
@@ -44,14 +44,14 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     before(:each) do
       @column = TestModel.columns.first
       @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
-      @schema = @attr.schema(filters: %i(equality changes))
+      @schema = @attr.schema(filters: %i[equality changes])
     end
 
     it 'is of type `object`' do
       expect(@schema).to include(type: 'object')
     end
     it 'requires column name' do
-      expect(@schema).to include(required: %w(id))
+      expect(@schema).to include(required: %w[id])
     end
     it 'defines property schema for column name' do
       expect(@schema.dig2(:properties)).to have_key('id')
@@ -68,12 +68,12 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     it 'returns only schemas from options[:filters]' do
       equality_filter = @attr.equality_filter
       changes_filter = @attr.changes_filter
-      expect(@attr.filters(filters: %i(equality changes))).to include(*equality_filter)
-      expect(@attr.filters(filters: %i(equality changes))).to include(*changes_filter)
-      expect(@attr.filters(filters: %i(changes))).to include(*changes_filter)
-      expect(@attr.filters(filters: %i(changes))).not_to include(*equality_filter)
-      expect(@attr.filters(filters: %i(equality))).not_to include(*changes_filter)
-      expect(@attr.filters(filters: %i(equality))).to include(*equality_filter)
+      expect(@attr.filters(filters: %i[equality changes])).to include(*equality_filter)
+      expect(@attr.filters(filters: %i[equality changes])).to include(*changes_filter)
+      expect(@attr.filters(filters: %i[changes])).to include(*changes_filter)
+      expect(@attr.filters(filters: %i[changes])).not_to include(*equality_filter)
+      expect(@attr.filters(filters: %i[equality])).not_to include(*changes_filter)
+      expect(@attr.filters(filters: %i[equality])).to include(*equality_filter)
     end
   end
 
@@ -85,12 +85,12 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
 
     it 'validates equality' do
-      expect(@filter).to include(include(title: 'equals', required: %w(equal)))
+      expect(@filter).to include(include(title: 'equals', required: %w[equal]))
       expect(@filter).to include(include(properties: have_key(:equal)))
     end
 
     it 'validates non-equality' do
-      expect(@filter).to include(include(title: 'does not equal', required: %w(notEqual)))
+      expect(@filter).to include(include(title: 'does not equal', required: %w[notEqual]))
       expect(@filter).to include(include(properties: have_key(:notEqual)))
     end
   end
@@ -119,14 +119,13 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
 
     it 'requires `changes` property' do
-      expect(@filter).to include(required: %w(changes))
+      expect(@filter).to include(required: %w[changes])
     end
 
     it 'validates boolean' do
       expect(@filter.dig2(:properties, :changes)).to include(type: 'boolean')
     end
   end
-
 
   describe '#changes_from_filter' do
     before(:each) do
@@ -140,7 +139,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
 
     it 'requires `changes` property' do
-      expect(@filter).to include(required: %w(changes))
+      expect(@filter).to include(required: %w[changes])
     end
 
     it 'validates the from value' do
@@ -165,7 +164,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
 
     it 'requires `changes` property' do
-      expect(@filter).to include(required: %w(changes))
+      expect(@filter).to include(required: %w[changes])
     end
 
     it 'validates the from value' do
@@ -190,7 +189,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
 
     it 'requires `changes` property' do
-      expect(@filter).to include(required: %w(changes))
+      expect(@filter).to include(required: %w[changes])
     end
 
     it 'validates the from value' do
@@ -210,7 +209,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
     end
 
     it 'validates changed subvalue' do
-      expect(@filter).to include(include(title: 'Changed subvalue', required: %w(changed_subvalue)))
+      expect(@filter).to include(include(title: 'Changed subvalue', required: %w[changed_subvalue]))
       expect(@filter).to include(include(properties: have_key(:changed_subvalue)))
     end
   end
@@ -430,7 +429,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
 
       it 'returns the correct schema' do
         expect(@validation).to include(type: 'string')
-        expect(@validation).to include(enum: %w(yes no maybe))
+        expect(@validation).to include(enum: %w[yes no maybe])
       end
     end
   end

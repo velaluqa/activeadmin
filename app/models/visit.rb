@@ -49,53 +49,64 @@ class Visit < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',
     meta: {
-      study_id: -> (visit) { visit.study.andand.id }
+      study_id: ->(visit) { visit.study.andand.id }
     }
   )
   acts_as_taggable
 
-  attr_accessible :patient_id, :visit_number, :description, :visit_type, :state, :domino_unid
-  attr_accessible :patient
-  attr_accessible :mqc_date, :mqc_user_id, :mqc_state
-  attr_accessible :assigned_image_series_index, :required_series
-  attr_accessible :mqc_user, :mqc_results
-  
+  attr_accessible(
+    :patient_id,
+    :visit_number,
+    :description,
+    :visit_type,
+    :state,
+    :domino_unid,
+    :patient,
+    :assigned_image_series_index,
+    :required_series,
+    :mqc_date,
+    :mqc_user_id,
+    :mqc_state,
+    :mqc_user,
+    :mqc_results
+  )
+
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
-  belongs_to :mqc_user, :class_name => 'User'
+  belongs_to :mqc_user, class_name: 'User'
 
-  scope :by_study_ids, lambda { |*ids|
+  scope :by_study_ids, ->(*ids) {
     joins(patient: { center: :study })
       .where(studies: { id: Array[ids].flatten })
   }
 
-  scope :with_state, lambda { |state|
+  scope :with_state, ->(state) {
     index =
       case state
-      when Fixnum then state
+      when Integer then state
       else Visit::STATE_SYMS.index(state.to_sym)
       end
     where(state: index)
   }
 
-  scope :searchable, -> { join_study.select(<<SELECT) }
-centers.study_id AS study_id,
-studies.name AS study_name,
-centers.code ||
-patients.subject_id ||
-'#' ||
-visits.visit_number ||
-CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END 
-AS text,
-visits.id AS result_id,
-'Visit'::varchar AS result_type
+  scope :searchable, -> { join_study.select(<<SELECT.strip_heredoc) }
+    centers.study_id AS study_id,
+    studies.name AS study_name,
+    centers.code ||
+    patients.subject_id ||
+    '#' ||
+    visits.visit_number ||
+    CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END
+    AS text,
+    visits.id AS result_id,
+    'Visit'::varchar AS result_type
 SELECT
 
-  validates_uniqueness_of :visit_number, :scope => [:patient_id, :repeatable_count]
+  validates_uniqueness_of :visit_number, scope: %i[patient_id repeatable_count]
   validates_presence_of :visit_number, :patient_id
 
   before_destroy do
-    self.image_series.each do |is|
+    image_series.each do |is|
       is.visit = nil
       is.save
     end
@@ -107,21 +118,21 @@ SELECT
   include ScopablePermissions
 
   def self.with_permissions
-    joins(patient: { center: :study }).joins(<<JOIN)
-INNER JOIN user_roles ON
-  (
-       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
-    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
-    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
-    OR user_roles.scope_object_id IS NULL
-  )
-INNER JOIN roles ON user_roles.role_id = roles.id
-INNER JOIN permissions ON roles.id = permissions.role_id
+    joins(patient: { center: :study }).joins(<<JOIN.strip_heredoc)
+      INNER JOIN user_roles ON
+        (
+             (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+          OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+          OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+          OR user_roles.scope_object_id IS NULL
+        )
+      INNER JOIN roles ON user_roles.role_id = roles.id
+      INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
   # TODO: Replace with a less naive full-text search index
-  scope :filter, lambda { |query|
+  scope :filter, ->(query) {
     return unless query
 
     words = query.split(' ')
@@ -133,14 +144,14 @@ JOIN
 
   scope :join_study, -> { joins(patient: { center: :study }) }
 
-  scope :join_required_series, lambda {
-    joins(<<JOIN_QUERY)
-JOIN json_each(visits.required_series::json) visits_required_series_hash ON true
-JOIN json_to_record(visits_required_series_hash.value) as visits_required_series(tqc_state int) ON true
+  scope :join_required_series, -> {
+    joins(<<JOIN_QUERY.strip_heredoc)
+      JOIN json_each(visits.required_series::json) visits_required_series_hash ON true
+      JOIN json_to_record(visits_required_series_hash.value) as visits_required_series(tqc_state int) ON true
 JOIN_QUERY
   }
 
-  scope :of_study, lambda { |study|
+  scope :of_study, ->(study) {
     study_id = study
     study_id = study.id if study.is_a?(ActiveRecord::Base)
     joins(patient: :center).where(centers: { study_id: study_id })
@@ -173,25 +184,22 @@ JOIN_QUERY
   end
 
   def visit_date
-    self.image_series.map {|is| is.imaging_date}.reject {|date| date.nil? }.min
+    image_series.map(&:imaging_date).reject(&:nil?).min
   end
 
   def study
-    if self.patient.nil?
-      nil
-    else
-      self.patient.study
-    end
+    patient.andand.study
   end
 
-  STATE_SYMS = [:incomplete_na, :complete_tqc_passed, :incomplete_queried, :complete_tqc_pending, :complete_tqc_issues]
-  MQC_STATE_SYMS = [:pending, :issues, :passed]
+  STATE_SYMS = %i[incomplete_na complete_tqc_passed incomplete_queried complete_tqc_pending complete_tqc_issues].freeze
+  MQC_STATE_SYMS = %i[pending issues passed].freeze
 
   def self.state_sym_to_int(sym)
-    return Visit::STATE_SYMS.index(sym)
+    Visit::STATE_SYMS.index(sym)
   end
+
   def self.int_to_state_sym(sym)
-    return Visit::STATE_SYMS[sym]
+    Visit::STATE_SYMS[sym]
   end
 
   def state
@@ -206,24 +214,26 @@ JOIN_QUERY
 
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    if sym.is_a? Fixnum
-      index = sym
-    else
-      index = Visit::STATE_SYMS.index(sym)
-    end
+    index = if sym.is_a? Integer
+              sym
+            else
+              Visit::STATE_SYMS.index(sym)
+            end
 
     if index.nil?
-      throw "Unsupported state"
+      throw 'Unsupported state'
       return
     end
 
     write_attribute(:state, index)
   end
+
   def self.mqc_state_sym_to_int(sym)
-    return Visit::MQC_STATE_SYMS.index(sym)
+    Visit::MQC_STATE_SYMS.index(sym)
   end
+
   def self.int_to_mqc_state_sym(sym)
-    return Visit::MQC_STATE_SYMS[sym]
+    Visit::MQC_STATE_SYMS[sym]
   end
 
   def mqc_state
@@ -238,50 +248,53 @@ JOIN_QUERY
 
   def mqc_state=(sym)
     sym = sym.to_sym if sym.is_a? String
-    if sym.is_a? Fixnum
-      index = sym
-    else
-      index = Visit::MQC_STATE_SYMS.index(sym)
-    end
+    index = if sym.is_a? Integer
+              sym
+            else
+              Visit::MQC_STATE_SYMS.index(sym)
+            end
 
     if index.nil?
-      throw "Unsupported mQC state"
+      throw 'Unsupported mQC state'
       return
     end
 
     write_attribute(:mqc_state, index)
   end
 
-
   def current_required_series_specs
-    return nil if(self.visit_type.nil? or self.study.nil? or not self.study.semantically_valid?)
+    return nil if visit_type.nil? || study.nil? || !study.semantically_valid?
 
-    required_series_specs_for_configuration(self.study.current_configuration)
+    required_series_specs_for_configuration(study.current_configuration)
   end
+
   def locked_required_series_specs
-    return nil if(self.visit_type.nil? or self.study.nil? or not self.study.locked_semantically_valid?)
+    return nil if visit_type.nil? || study.nil? || !study.locked_semantically_valid?
 
-    required_series_specs_for_configuration(self.study.locked_configuration)
+    required_series_specs_for_configuration(study.locked_configuration)
   end
+
   def required_series_specs_at_version(version)
-    return nil if(self.visit_type.nil? or self.study.nil? or not self.study.semantically_valid_at_version?(version))    
+    return nil if visit_type.nil? || study.nil? || !study.semantically_valid_at_version?(version)
 
-    required_series_specs_for_configuration(self.study.configuration_at_version(version))
+    required_series_specs_for_configuration(study.configuration_at_version(version))
   end
+
   def required_series_specs_for_configuration(study_config)
-    return nil if self.visit_type.nil?
+    return nil if visit_type.nil?
 
-    return nil if(study_config['visit_types'][self.visit_type].nil? or study_config['visit_types'][self.visit_type]['required_series'].nil?)
-    required_series = study_config['visit_types'][self.visit_type]['required_series']
+    return nil if study_config['visit_types'][visit_type].nil? || study_config['visit_types'][visit_type]['required_series'].nil?
+    required_series = study_config['visit_types'][visit_type]['required_series']
 
-    return required_series
+    required_series
   end
 
   def required_series_names
-    required_series_specs = self.locked_required_series_specs
+    required_series_specs = locked_required_series_specs
     return nil if required_series_specs.nil?
-    return required_series_specs.keys
+    required_series_specs.keys
   end
+
   def required_series_objects
     required_series_names = self.required_series_names
     return [] if required_series_names.nil?
@@ -290,22 +303,25 @@ JOIN_QUERY
       RequiredSeries.new(self, required_series_name)
     end
 
-    return objects
+    objects
   end
+
   def assigned_required_series(required_series_name)
     required_series = self.required_series(required_series_name)
     return nil unless required_series.andand['image_series_id']
 
     ImageSeries.find(required_series['image_series_id'])
   end
+
   def assigned_required_series_id_map
     id_map = {}
     required_series.each do |required_series_name, required_series|
       id_map[required_series_name] = required_series['image_series_id']
     end
 
-    return id_map
+    id_map
   end
+
   def assigned_required_series_map
     map = assigned_required_series_id_map
     object_map = {}
@@ -313,7 +329,7 @@ JOIN_QUERY
       object_map[series_name] = ImageSeries.find(series_id) unless series_id.nil?
     end
 
-    return object_map
+    object_map
   end
 
   def remove_orphaned_required_series
@@ -339,76 +355,87 @@ JOIN_QUERY
 
       save
 
-      Rails.logger.info "Removed #{orphaned_required_series_names.size} orphaned required series from visit #{self.inspect}: #{orphaned_required_series_names.inspect}"
+      Rails.logger.info "Removed #{orphaned_required_series_names.size} orphaned required series from visit #{inspect}: #{orphaned_required_series_names.inspect}"
     end
   end
 
   def image_storage_path
     "#{patient.image_storage_path}/#{id}"
   end
+
   def required_series_image_storage_path(required_series_name)
     "#{image_storage_path}/#{required_series_name}"
   end
 
   def wado_query
-    {:id => self.id, :name => "Visit No. #{visit_number}", :image_series => 
-      self.image_series.map {|i_s| i_s.wado_query}
+    {
+      id: id,
+      name: "Visit No. #{visit_number}",
+      image_series: image_series.map(&:wado_query)
     }
   end
+
   def required_series_wado_query
-    {:id => self.id, :name => "Visit No. #{visit_number}", :image_series => 
-      self.required_series_objects.reject {|rs| not rs.assigned?}.map {|rs| rs.wado_query}.reject {|query| query.blank?}
+    {
+      id: id,
+      name: "Visit No. #{visit_number}",
+      image_series: required_series_objects
+        .select(&:assigned?)
+        .map(&:wado_query)
+        .reject(&:blank?)
     }
   end
 
   def domino_document_form
     'ImagingVisit_mqc'
   end
+
   def domino_document_query
     {
-      'docCode' => 10045,
-      'ericaID' => self.id,
+      'docCode' => 10_045,
+      'ericaID' => id
     }
   end
-  def domino_document_properties(action = :update)
+
+  def domino_document_properties(_action = :update)
     properties = {
       'ericaID' => id,
       'CenterNo' => patient.center.code,
       'PatNo' => patient.domino_patient_no,
-      'VisitNo' => self.visit_number,
-      'visitDescription' => self.description,
+      'VisitNo' => visit_number,
+      'visitDescription' => description
     }
 
     visit_date = self.visit_date
-    unless(visit_date.nil?)
-      properties.merge!({
-                          'DateImaging' => {'data' => visit_date.strftime('%d-%m-%Y'), 'type' => 'datetime'},
-                        })
+    unless visit_date.nil?
+      properties['DateImaging'] = { 'data' => visit_date.strftime('%d-%m-%Y'), 'type' => 'datetime' }
     end
 
     properties.merge!(mqc_to_domino)
 
-    properties['Status'] = case self.state_sym
-                                when :incomplete_na then 'Incomplete, not available'
-                                when :complete_tqc_passed then 'Complete, tQC of all series passed'
-                                when :incomplete_queried then 'Incomplete, queried'
-                                when :complete_tqc_pending then 'Complete, tQC not finished'
-                                when :complete_tqc_issues then 'Complete, tQC finished, not all series passed'
-                                end
+    properties['Status'] =
+      case state_sym
+      when :incomplete_na then 'Incomplete, not available'
+      when :complete_tqc_passed then 'Complete, tQC of all series passed'
+      when :incomplete_queried then 'Incomplete, queried'
+      when :complete_tqc_pending then 'Complete, tQC not finished'
+      when :complete_tqc_issues then 'Complete, tQC finished, not all series passed'
+      end
 
     properties
   end
+
   def schedule_domino_sync
-    DominoSyncWorker.perform_async(self.class.to_s, self.id)
-    self.schedule_required_series_domino_sync
+    DominoSyncWorker.perform_async(self.class.to_s, id)
+    schedule_required_series_domino_sync
   end
+
   def domino_sync
-    self.ensure_domino_document_exists
+    ensure_domino_document_exists
   end
+
   def schedule_required_series_domino_sync
-    self.required_series_objects.each do |required_series|
-      required_series.schedule_domino_sync
-    end
+    required_series_objects.each(&:schedule_domino_sync)
   end
 
   def rename_required_series(old_name, new_name)
@@ -420,18 +447,18 @@ JOIN_QUERY
 
     # Rename in `assigned_image_series_index`
     return if assigned_image_series_index.blank?
-    assigned_image_series_index.each do |series_id, assignment|
+    assigned_image_series_index.each do |_series_id, assignment|
       if assignment.include?(old_name)
         assignment.delete(old_name)
         assignment << new_name
       end
     end
-    
+
     image_storage_root = Rails.application.config.image_storage_root
-    image_storage_root += '/' unless(image_storage_root.end_with?('/')
-                                    )
-    if File.exists?(image_storage_root + self.required_series_image_storage_path(old_name))
-      FileUtils.mv(image_storage_root + self.required_series_image_storage_path(old_name), image_storage_root + self.required_series_image_storage_path(new_name))
+    image_storage_root += '/' unless image_storage_root.end_with?('/')
+
+    if File.exist?(image_storage_root + required_series_image_storage_path(old_name))
+      FileUtils.mv(image_storage_root + required_series_image_storage_path(old_name), image_storage_root + required_series_image_storage_path(new_name))
     end
 
     save
@@ -442,13 +469,13 @@ JOIN_QUERY
   def change_required_series_assignment(changed_assignments, options = { save: true })
     assignment_index = assigned_image_series_index
 
-    old_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
+    old_assigned_image_series = assignment_index.reject { |_series_id, assignment| assignment.nil? || assignment.empty? }.keys
 
     image_storage_root = Rails.application.config.image_storage_root
-    image_storage_root += '/' unless(image_storage_root.end_with?('/'))
+    image_storage_root += '/' unless image_storage_root.end_with?('/')
 
     domino_sync_series_ids = []
-    
+
     changed_assignments.each do |required_series_name, series_id|
       series_id = (series_id.blank? ? nil : series_id)
       old_series_id = nil
@@ -471,14 +498,14 @@ JOIN_QUERY
         end
       end
 
-      if(required_series[required_series_name]['image_series_id'].nil?)
-        FileUtils.rm(image_storage_root + self.required_series_image_storage_path(required_series_name), :force => true)
+      if required_series[required_series_name]['image_series_id'].nil?
+        FileUtils.rm(image_storage_root + required_series_image_storage_path(required_series_name), force: true)
       else
-        FileUtils.rm(image_storage_root + self.required_series_image_storage_path(required_series_name), :force => true)
-        FileUtils.ln_sf(series_id, image_storage_root + self.required_series_image_storage_path(required_series_name))
+        FileUtils.rm(image_storage_root + required_series_image_storage_path(required_series_name), force: true)
+        FileUtils.ln_sf(series_id, image_storage_root + required_series_image_storage_path(required_series_name))
       end
 
-      if(old_series_id != series_id)
+      if old_series_id != series_id
         required_series[required_series_name]['tqc_state'] = RequiredSeries.tqc_state_sym_to_int(:pending)
         required_series[required_series_name].delete('tqc_user_id')
         required_series[required_series_name].delete('tqc_date')
@@ -490,18 +517,18 @@ JOIN_QUERY
       domino_sync_series_ids << old_series_id unless old_series_id.blank?
       domino_sync_series_ids << series_id unless series_id.blank?
     end
-    
-    new_assigned_image_series = assignment_index.reject {|series_id, assignment| assignment.nil? or assignment.empty?}.keys
+
+    new_assigned_image_series = assignment_index.reject { |_series_id, assignment| assignment.nil? || assignment.empty? }.keys
     (old_assigned_image_series - new_assigned_image_series).uniq.each do |unassigned_series_id|
-      unassigned_series = ImageSeries.where(:id => unassigned_series_id).first
-      if(unassigned_series and unassigned_series.state_sym == :required_series_assigned)
+      unassigned_series = ImageSeries.where(id: unassigned_series_id).first
+      if unassigned_series && unassigned_series.state_sym == :required_series_assigned
         unassigned_series.state = (unassigned_series.visit.nil? ? :imported : :visit_assigned)
         unassigned_series.save
       end
     end
     (new_assigned_image_series - old_assigned_image_series).uniq.each do |assigned_series_id|
-      assigned_series = ImageSeries.where(:id => assigned_series_id).first
-      if(assigned_series and assigned_series.state_sym == :visit_assigned || assigned_series.state_sym == :not_required)
+      assigned_series = ImageSeries.where(id: assigned_series_id).first
+      if assigned_series && assigned_series.state_sym == :visit_assigned || assigned_series.state_sym == :not_required
         assigned_series.state = :required_series_assigned
         assigned_series.save
       end
@@ -514,14 +541,14 @@ JOIN_QUERY
     schedule_required_series_domino_sync
 
     domino_sync_series_ids.uniq.each do |series_id|
-      image_series = ImageSeries.where(:id => series_id).first
+      image_series = ImageSeries.where(id: series_id).first
       image_series.schedule_domino_sync unless image_series.nil?
     end
   end
 
   def reconstruct_assignment_index
     new_index = {}
-    
+
     required_series.each do |rs_name, data|
       next if data['image_series_id'].blank?
 
@@ -531,7 +558,7 @@ JOIN_QUERY
 
     self.assigned_image_series_index = new_index
   end
-  
+
   def reset_tqc_result(required_series_name)
     return unless required_series.andand[required_series_name]
 
@@ -546,8 +573,9 @@ JOIN_QUERY
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
   end
+
   def set_tqc_result(required_series_name, result, tqc_user, tqc_comment, tqc_date = nil, tqc_version = nil)
-    required_series_specs = self.locked_required_series_specs
+    required_series_specs = locked_required_series_specs
     return 'No valid study configuration exists.' if required_series_specs.nil?
 
     tqc_spec = (required_series_specs[required_series_name].nil? ? nil : required_series_specs[required_series_name]['tqc'])
@@ -555,7 +583,7 @@ JOIN_QUERY
 
     all_passed = true
     tqc_spec.each do |spec|
-      all_passed &&= (not result.nil? and result[spec['id']] == true)
+      all_passed &&= (!result.nil? && result[spec['id']] == true)
     end
 
     required_series = self.required_series[required_series_name]
@@ -564,7 +592,7 @@ JOIN_QUERY
     required_series['tqc_state'] = RequiredSeries.tqc_state_sym_to_int((all_passed ? :passed : :issues))
     required_series['tqc_user_id'] = (tqc_user.is_a?(User) ? tqc_user.id : tqc_user)
     required_series['tqc_date'] = (tqc_date.nil? ? Time.now : tqc_date)
-    required_series['tqc_version'] = (tqc_version.nil? ? self.study.locked_version : tqc_version)
+    required_series['tqc_version'] = (tqc_version.nil? ? study.locked_version : tqc_version)
     required_series['tqc_results'] = result
     required_series['tqc_comment'] = tqc_comment
 
@@ -572,15 +600,16 @@ JOIN_QUERY
     save
 
     RequiredSeries.new(self, required_series_name).schedule_domino_sync
-    return true
+    true
   end
+
   def set_mqc_result(result, mqc_user, mqc_comment, mqc_date = nil, mqc_version = nil)
-    mqc_spec = self.locked_mqc_spec
+    mqc_spec = locked_mqc_spec
     return 'No valid study configuration exists or it doesn\'t contain an mQC config for this visits visit type.' if mqc_spec.nil?
 
     all_passed = true
     mqc_spec.each do |spec|
-      all_passed &&= (not result.nil? and result[spec['id']] == true)
+      all_passed &&= (!result.nil? && result[spec['id']] == true)
     end
 
     self.mqc_state = all_passed ? :passed : :issues
@@ -590,9 +619,9 @@ JOIN_QUERY
     self.mqc_comment = mqc_comment
     self.mqc_version = mqc_version || study.andand.locked_version
 
-    self.save
+    save
 
-    return true
+    true
   end
 
   ##
@@ -605,22 +634,22 @@ JOIN_QUERY
   end
 
   def mqc_spec
-    reutrn mqc_spec_at_version(self.mqc_version || self.study.locked_version)
+    reutrn mqc_spec_at_version(mqc_version || study.locked_version)
   end
 
   def locked_mqc_spec
-    return mqc_spec_at_version(self.study.locked_version)
+    mqc_spec_at_version(study.locked_version)
   end
 
   def mqc_spec_at_version(version)
     config = study.configuration_at_version(version)
-    return nil if config.nil? or config['visit_types'].nil? or config['visit_types'][self.visit_type].nil?
-    
-    return config['visit_types'][self.visit_type]['mqc']
+    return nil if config.nil? || config['visit_types'].nil? || config['visit_types'][visit_type].nil?
+
+    config['visit_types'][visit_type]['mqc']
   end
 
   def locked_mqc_spec_with_results
-    return nil if locked_mqc_spec.nil? or mqc_results.blank?
+    return nil if locked_mqc_spec.nil? || mqc_results.blank?
 
     locked_mqc_spec.each do |question|
       question['answer'] = mqc_results[question['id']]
@@ -628,9 +657,11 @@ JOIN_QUERY
 
     locked_mqc_spec
   end
+
   def locked_mqc_spec_with_results
-    return mqc_spec_with_results_at_version(self.study.locked_version)
+    mqc_spec_with_results_at_version(study.locked_version)
   end
+
   def mqc_spec_with_results_at_version(version)
     mqc_spec_version = mqc_spec_at_version(version)
     return nil if mqc_spec_version.nil? || mqc_results.blank?
@@ -648,15 +679,15 @@ JOIN_QUERY
 
     return if c.empty?
 
-    if(c.keys == ['visit_number'])
+    if c.keys == ['visit_number']
       :visit_number_change
-    elsif(c.keys == ['patient_id'])
+    elsif c.keys == ['patient_id']
       :patient_change
-    elsif(c.keys == ['description'])
+    elsif c.keys == ['description']
       :description_change
-    elsif(c.keys == ['visit_type'])
+    elsif c.keys == ['visit_type']
       :visit_type_change
-    elsif(c.keys == ['state'])
+    elsif c.keys == ['state']
       # handle obsolete mqc states in state
       case c['state'][1]
       when :mqc_passed
@@ -666,19 +697,19 @@ JOIN_QUERY
       else
         :state_change
       end
-    elsif(c.include?('mqc_state') and (c.keys - ['mqc_state', 'mqc_date', 'mqc_user_id']).empty?)
+    elsif c.include?('mqc_state') && (c.keys - %w[mqc_state mqc_date mqc_user_id]).empty?
       case [int_to_mqc_state_sym(c['mqc_state'][0].to_i), c['mqc_state'][1]]
-      when [:passed, :pending], [:issues, :pending] then :mqc_reset
-      when [:pending, :passed] then :mqc_passed
-      when [:pending, :issues] then :mqc_issues
-      when [:issues, :passed] then :mqc_passed
-      when [:passed, :issues] then :mqc_issues
+      when %i[passed pending], %i[issues pending] then :mqc_reset
+      when %i[pending passed] then :mqc_passed
+      when %i[pending issues] then :mqc_issues
+      when %i[issues passed] then :mqc_passed
+      when %i[passed issues] then :mqc_issues
       else :mqc_state_change
       end
-    elsif(c.include?('mqc_user_id') and c.include?('mqc_date') and c.keys.length == 2 and
-          c['mqc_user_id'][1].blank? and c['mqc_date'][1].blank?)
+    elsif c.include?('mqc_user_id') && c.include?('mqc_date') && c.keys.length == 2 &&
+          c['mqc_user_id'][1].blank? && c['mqc_date'][1].blank?
       :mqc_reset
-    elsif(c.include?('state') and c.include?('mqc_date') and (2..3).include?(c.keys.length))
+    elsif c.include?('state') && c.include?('mqc_date') && (2..3).cover?(c.keys.length)
       case c['state'][1]
       when :mqc_passed then :mqc_passed
       when :mqc_issues then :mqc_issues
@@ -692,30 +723,30 @@ JOIN_QUERY
         diffs[rs] = diff
       end
 
-      if(c.keys == ['required_series'])
-        if(diffs.all? {|rs, diff| (diff.keys - ['domino_unid']).empty?})
+      if c.keys == ['required_series']
+        if diffs.all? { |_rs, diff| (diff.keys - ['domino_unid']).empty? }
           :rs_domino_unid_change
-        elsif(diffs.all? {|rs, diff| (diff.keys - ['domino_unid', 'tqc_state', 'tqc_results', 'tqc_date', 'tqc_version', 'tqc_user_id', 'tqc_comment']).empty?})
+        elsif diffs.all? { |_rs, diff| (diff.keys - %w[domino_unid tqc_state tqc_results tqc_date tqc_version tqc_user_id tqc_comment]).empty? }
           :rs_tqc_performed
         end
-      elsif((c.keys - ['required_series', 'assigned_image_series_index']).empty?)
-        if(diffs.all? {|rs, diff|
-             (diff.keys - ['domino_unid', 'image_series_id', 'tqc_state', 'tqc_results', 'tqc_date', 'tqc_version', 'tqc_user_id', 'tqc_comment']).empty? and
-               ((diff.keys & ['tqc_results', 'tqc_date', 'tqc_version', 'tqc_user_id', 'tqc_comment']).empty? or
-                (
-                  (diff['tqc_state'].nil? or diff['tqc_state'] == 0) and
-                  c['required_series'][1][rs]['tqc_results'].nil? and
-                  c['required_series'][1][rs]['tqc_date'].nil? and
-                  c['required_series'][1][rs]['tqc_version'].nil? and
-                  c['required_series'][1][rs]['tqc_user_id'].nil? and
-                  c['required_series'][1][rs]['tqc_comment'].nil?
-                )
-               )
-           })
+      elsif (c.keys - %w[required_series assigned_image_series_index]).empty?
+        if diffs.all? do |rs, diff|
+             (diff.keys - %w[domino_unid image_series_id tqc_state tqc_results tqc_date tqc_version tqc_user_id tqc_comment]).empty? &&
+             ((diff.keys & %w[tqc_results tqc_date tqc_version tqc_user_id tqc_comment]).empty? ||
+              (
+                (diff['tqc_state'].nil? || diff['tqc_state'] == 0) &&
+                c['required_series'][1][rs]['tqc_results'].nil? &&
+                c['required_series'][1][rs]['tqc_date'].nil? &&
+                c['required_series'][1][rs]['tqc_version'].nil? &&
+                c['required_series'][1][rs]['tqc_user_id'].nil? &&
+                c['required_series'][1][rs]['tqc_comment'].nil?
+              )
+             )
+           end
           :rs_assignment_change
         end
       end
-    elsif (c.keys - %w{mqc_version mqc_results mqc_comment}).empty?
+    elsif (c.keys - %w[mqc_version mqc_results mqc_comment]).empty?
       :mqc_performed
     end
   end
@@ -752,26 +783,28 @@ JOIN_QUERY
     self.mqc_comment = nil
     self.mqc_version = nil
 
-    self.save
+    save
   end
+
   def mqc_to_domino
     result = {}
 
-    result['QCdate'] = {'data' => (self.mqc_date.nil? ? '01-01-0001' : self.mqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime'}
-    result['QCperson'] = (self.mqc_user.nil? ? nil : self.mqc_user.name)
+    result['QCdate'] = { 'data' => (mqc_date.nil? ? '01-01-0001' : mqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime' }
+    result['QCperson'] = (mqc_user.nil? ? nil : mqc_user.name)
 
-    result['QCresult'] = case mqc_state_sym
-                         when :pending then 'Pending'
-                         when :issues then 'Performed, issues present'
-                         when :passed then 'Performed, no issues present'
-                         end
+    result['QCresult'] =
+      case mqc_state_sym
+      when :pending then 'Pending'
+      when :issues then 'Performed, issues present'
+      when :passed then 'Performed, no issues present'
+      end
 
     result['QCcomment'] = mqc_comment
 
     criteria_names = []
     criteria_values = []
-    results = self.mqc_spec_with_results_at_version(mqc_version)
-    if(results.nil?)
+    results = mqc_spec_with_results_at_version(mqc_version)
+    if results.nil?
       result['QCCriteriaNames'] = nil
       result['QCValues'] = nil
     else
@@ -784,19 +817,19 @@ JOIN_QUERY
       result['QCValues'] = criteria_values.join("\n")
     end
 
-    return result
+    result
   end
 
   def ensure_study_is_unchanged
-    if(self.patient_id_changed? and not self.patient_id_was.nil?)
-      old_patient = Patient.find(self.patient_id_was)
+    if patient_id_changed? && !patient_id_was.nil?
+      old_patient = Patient.find(patient_id_was)
 
-      if(old_patient.study != self.patient.study)
-        self.errors[:patient] << 'A visit cannot be reassigned to a patient in a different study.'
+      if old_patient.study != patient.study
+        errors[:patient] << 'A visit cannot be reassigned to a patient in a different study.'
         return false
       end
     end
 
-    return true
+    true
   end
 end

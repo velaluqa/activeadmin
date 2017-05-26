@@ -7,7 +7,7 @@ class Remote
     case arg
     when Remote then load_remote(arg)
     when Hash   then load_hash(arg)
-    else fail 'Given remote argument is not allowed.'
+    else raise 'Given remote argument is not allowed.'
     end
     retrieve_paths
   end
@@ -82,7 +82,7 @@ class Remote
     case response
     when Net::HTTPSuccess then JSON.parse(response.body)
     else
-      fail "Failed to retrieve path information ERICA remote at #{uri}: #{response.message}"
+      raise "Failed to retrieve path information ERICA remote at #{uri}: #{response.message}"
     end
   end
 end

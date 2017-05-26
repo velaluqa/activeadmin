@@ -160,7 +160,8 @@ RSpec.describe Ability do
       before(:each) do
         @role = create(:role, with_permissions: {
                          Study => :manage,
-                         Image => :read })
+                         Image => :read
+                       })
         @current_user = create(:user, with_user_roles:
                                         [
                                           [@role, @study1],

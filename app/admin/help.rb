@@ -4,8 +4,7 @@ ActiveAdmin.register_page 'Help' do
   end
 
   controller do
-    def authorize_access!
-    end
+    def authorize_access!; end
 
     helper :help
   end

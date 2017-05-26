@@ -11,14 +11,12 @@ module Legacy
 
     index patient_id: 1
 
-    track_history :track_create => true, :track_update => true, :track_destroy => true
+    track_history track_create: true, track_update: true, track_destroy: true
 
     def patient
-      begin
-        return Patient.find(read_attribute(:patient_id))
-      rescue ActiveRecord::RecordNotFound
-        return nil
-      end
+      return Patient.find(read_attribute(:patient_id))
+    rescue ActiveRecord::RecordNotFound
+      return nil
     end
 
     def patient=(patient)

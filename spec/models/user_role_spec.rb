@@ -9,7 +9,8 @@ RSpec.describe UserRole do
     @user_role = UserRole.create(
       user: @user,
       role: @role,
-      scope_object: @study)
+      scope_object: @study
+    )
     @user_role.reload
     expect(@user_role.scope_object).to eq @study
   end

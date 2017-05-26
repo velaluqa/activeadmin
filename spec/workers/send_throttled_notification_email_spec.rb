@@ -10,7 +10,7 @@ describe SendThrottledNotificationEmail do
   context 'with existing throttled notifications' do
     before(:each) do
       @user = create(:user)
-      @profile = create(:notification_profile, users: [@user], maximum_email_throttling_delay: 24*60*60)
+      @profile = create(:notification_profile, users: [@user], maximum_email_throttling_delay: 24 * 60 * 60)
       @notification = create(:notification, notification_profile: @profile, user: @user)
     end
 
@@ -20,9 +20,9 @@ describe SendThrottledNotificationEmail do
         .to receive(:throttled_notification_email)
         .with(@user, @profile, [@notification])
         .and_call_original
-      expect {
+      expect do
         SendThrottledNotificationEmail.new.perform(@user.id, @profile.id, [@notification.id])
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'marks the notification as sent' do

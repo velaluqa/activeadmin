@@ -19,10 +19,10 @@ ActiveAdmin.register Image do
     end
 
     def scoped_collection
-      if(session[:selected_study_id].nil?)
+      if session[:selected_study_id].nil?
         end_of_association_chain
       else
-        end_of_association_chain.includes(:image_series => {:patient => :center}).where('centers.study_id' => session[:selected_study_id])
+        end_of_association_chain.includes(image_series: { patient: :center }).where('centers.study_id' => session[:selected_study_id])
       end
     end
 
@@ -38,13 +38,13 @@ ActiveAdmin.register Image do
     column :image_series
     column :id
     column 'File' do |image|
-      if(image.file_is_present?)
+      if image.file_is_present?
         status_tag('Present', :ok)
       else
         status_tag('Missing', :error)
-      end      
+      end
     end
-    
+
     customizable_default_actions(current_ability)
   end
 
@@ -54,7 +54,7 @@ ActiveAdmin.register Image do
       row :id
       row :image_storage_path
       row 'File' do
-        if(image.file_is_present?)
+        if image.file_is_present?
           status_tag('Present', :ok)
         else
           status_tag('Missing', :error)
@@ -63,18 +63,18 @@ ActiveAdmin.register Image do
     end
   end
 
-  member_action :dicom_metadata, :method => :get do
+  member_action :dicom_metadata, method: :get do
     @image = Image.find(params[:id])
     authorize! :read, @image
 
     @dicom_meta_header, @dicom_metadata = @image.dicom_metadata_as_arrays
   end
 
-  action_item :edit, :only => :show do
+  action_item :edit, only: :show do
     link_to('DICOM Metadata', dicom_metadata_admin_image_path(resource)) if resource.file_is_present?
   end
 
-  action_item :edit, :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image', :audit_trail_view_id => resource.id)) if can? :read, Version
+  action_item :edit, only: :show do
+    link_to('Audit Trail', admin_versions_path(audit_trail_view_type: 'image', audit_trail_view_id: resource.id)) if can? :read, Version
   end
 end

@@ -16,12 +16,12 @@ ActiveAdmin.register PublicKey do
 
   index do
     selectable_column
-    column :user, :sortable => :user_id
-    column :status, :sortable => :deactivated_at do |public_key|
+    column :user, sortable: :user_id
+    column :status, sortable: :deactivated_at do |public_key|
       if public_key.active?
         status_tag('Active', :ok)
       else
-        status_tag('Deactivated', nil, :label => 'Deactivated at '+pretty_format(public_key.deactivated_at))
+        status_tag('Deactivated', nil, label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
       end
     end
     column :public_key do |public_key|
@@ -38,7 +38,7 @@ ActiveAdmin.register PublicKey do
         if public_key.active?
           status_tag('Active', :ok)
         else
-          status_tag('Deactivated', nil, :label => 'Deactivated at '+pretty_format(public_key.deactivated_at))
+          status_tag('Deactivated', nil, label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
         end
       end
       row :public_key do
@@ -49,18 +49,18 @@ ActiveAdmin.register PublicKey do
 
   # filters
   filter :user
-  filter :active, :as => :select
+  filter :active, as: :select
   filter :deactivated_at
 
-  member_action :download, :method => :get do
+  member_action :download, method: :get do
     @public_key = PublicKey.find(params[:id])
     authorize! :read, @public_key
-    
-    if(@public_key.public_key.nil?)
+
+    if @public_key.public_key.nil?
       flash[:error] = 'The public key is not present.'
       redirect_to :back
     else
-      send_data @public_key.public_key, :filename => @public_key.user.username + '_' + (@public_key.deactivated_at.nil? ? 'active' : @public_key.deactivated_at.strftime('%FT%R')) + '.pub'
+      send_data @public_key.public_key, filename: @public_key.user.username + '_' + (@public_key.deactivated_at.nil? ? 'active' : @public_key.deactivated_at.strftime('%FT%R')) + '.pub'
     end
   end
 end

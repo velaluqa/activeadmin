@@ -6,6 +6,6 @@ if ENV['RAILS_ENV'] == 'test' || ENV['RAILS_ENV'] == 'cucumber'
   puts 'required simplecov'
 end
 
-APP_PATH = File.expand_path('../../config/application',  __FILE__)
-require File.expand_path('../../config/boot',  __FILE__)
+APP_PATH = File.expand_path('../../config/application', __FILE__)
+require File.expand_path('../../config/boot', __FILE__)
 require 'rails/commands'

@@ -5,7 +5,7 @@ module Legacy
     include Mongoid::History::Trackable
 
     store_in collection: 'visit_data'
-    
+
     field :visit_id, type: Integer
     field :assigned_image_series_index, type: Hash, default: {}
     field :required_series, type: Hash, default: {}
@@ -16,7 +16,7 @@ module Legacy
 
     index visit_id: 1
 
-    track_history :track_create => true, :track_update => true, :track_destroy => true
+    track_history track_create: true, track_update: true, track_destroy: true
 
     def visit
       Visit.find(read_attribute(:visit_id))

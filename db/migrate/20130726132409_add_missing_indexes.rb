@@ -3,7 +3,7 @@ class AddMissingIndexes < ActiveRecord::Migration
     add_index :cases, :assigned_reader_id
     add_index :cases, :current_reader_id
     add_index :cases, :position
-    
+
     add_index :centers, :study_id
 
     add_index :forms, :session_id

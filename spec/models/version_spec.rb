@@ -12,10 +12,10 @@ RSpec.describe Version do
 
     it 'finds all ordered' do
       versions = Version
-                   .select(:id)
-                   .where('"versions"."id" >= ?', @first_id)
-                   .where('"versions"."id" <= ?', @last_id - 5)
-                   .order('"versions"."id" DESC')
+                 .select(:id)
+                 .where('"versions"."id" >= ?', @first_id)
+                 .where('"versions"."id" <= ?', @last_id - 5)
+                 .order('"versions"."id" DESC')
       ids = []
       versions.ordered_find_each do |version|
         ids.push(version.id)

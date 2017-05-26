@@ -13,20 +13,19 @@ ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICACommentMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICAKeywordsMixin::DSL)
 
-if(Rails.application.config.is_erica_remote)
+if Rails.application.config.is_erica_remote
   ActiveAdmin::Comment
   ActiveAdmin::Comment.send(:include, ActiveAdminCommentPaperTrailPatch)
 end
 
 ActiveAdmin.setup do |config|
-
   # == Site Title
   #
   # Set the title that is displayed on the main layout
   # for each of the active admin pages.
   #
   title = Rails.application.config.try(:erica).andand['title']
-  config.site_title = title || "ERICA"
+  config.site_title = title || 'ERICA'
 
   # narrow_title = Rails.application.config.try(:erica).andand['narrow_title']
   # config.narrow_site_title = narrow_title || "E"
@@ -42,7 +41,7 @@ ActiveAdmin.setup do |config|
   # Note: Recommended image height is 21px to properly fit in the header
   #
   # config.site_title_image = "/images/logo.png"
-  if(Rails.application.config.is_erica_remote and Rails.application.config.erica_remote['logo'])
+  if Rails.application.config.is_erica_remote && Rails.application.config.erica_remote['logo']
     config.site_title_image = 'client_logos/' + Rails.application.config.erica_remote['logo']
   end
 
@@ -98,7 +97,7 @@ ActiveAdmin.setup do |config|
   # config.pundit_default_policy = "MyDefaultPunditPolicy"
 
   # You can customize your CanCan Ability class name here.
-  config.cancan_ability_class = "Ability"
+  config.cancan_ability_class = 'Ability'
 
   # You can specify a method to be called on unauthorized access.
   # This is necessary in order to prevent a redirect loop which happens
@@ -115,7 +114,6 @@ ActiveAdmin.setup do |config|
   # This setting changes the method which Active Admin calls
   # (within the application controller) to return the currently logged in user.
   config.current_user_method = :current_user
-
 
   # == Logging Out
   #
@@ -220,7 +218,6 @@ ActiveAdmin.setup do |config|
   #
   # To load a javascript file:
   #   config.register_javascript 'my_javascript.js'
-
 
   # == CSV options
   #

@@ -3,7 +3,7 @@ placeholder :activity do
     activities = Ability::ACTIVITIES.values.flatten.uniq
     sym = activity.to_sym
     unless activities.include?(sym)
-      fail "Activity `#{sym}` not defined in `Ability`"
+      raise "Activity `#{sym}` not defined in `Ability`"
     end
     sym
   end
@@ -16,14 +16,12 @@ placeholder :subject do
 end
 
 placeholder :model do
-  match(/([^ $\n]+)/) do |model_name|
-    model_name.classify
-  end
+  match(/([^ $\n]+)/, &:classify)
 end
 
 placeholder :admin_path do
   match(/the dashboard/) do
-    "/admin/dashboard"
+    '/admin/dashboard'
   end
 
   match(/([^ $\n]+) ([^ $]+) "([^$\n]+)"/) do |action, model_name, identifier|
@@ -37,8 +35,8 @@ placeholder :admin_path do
       when 'Patient' then Patient.find_by(subject_id: identifier)
       when 'User' then User.find_by(username: identifier)
       end
-    Rails.application.routes.url_helpers.
-      send(method, record)
+    Rails.application.routes.url_helpers
+         .send(method, record)
   end
 
   match(/([^ $]+) "([^$\n]+)"/) do |model_name, identifier|
@@ -51,13 +49,13 @@ placeholder :admin_path do
       when 'User' then User.find_by(username: identifier)
       when 'Role' then Role.find_by(title: identifier)
       end
-    Rails.application.routes.url_helpers.
-      send("admin_#{model_name.singularize.underscore}_path", record)
+    Rails.application.routes.url_helpers
+         .send("admin_#{model_name.singularize.underscore}_path", record)
   end
 
   match(/([^$\n]+) list/) do |model_name|
-    Rails.application.routes.url_helpers.
-      send("admin_#{model_name.underscore.pluralize}_path")
+    Rails.application.routes.url_helpers
+         .send("admin_#{model_name.underscore.pluralize}_path")
   end
 
   match(/([^ $\n]+) ([^ $]+)/) do |action, model_name|

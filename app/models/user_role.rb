@@ -33,7 +33,7 @@ class UserRole < ActiveRecord::Base
   has_many :permissions, through: :role
 
   validates :role, presence: true
-  validates :role, uniqueness: { scope: [:user, :scope_object], message: 'User already has this role and scope combination' }
+  validates :role, uniqueness: { scope: %i[user scope_object], message: 'User already has this role and scope combination' }
 
   attr_accessible :user, :role, :scope_object
   # Needed for ActiveAdmin nested associations:

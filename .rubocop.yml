@@ -1,2 +1,6 @@
 Style/Alias:
   Enabled: false
+Style/Lambda:
+  Enabled: false
+Style/IndentHeredoc:
+  EnforcedStyle: active_support

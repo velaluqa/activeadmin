@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe Admin::EmailTemplatesController do
-
   describe '#index' do
     describe 'without current user' do
       subject { get :index }
@@ -172,14 +171,14 @@ RSpec.describe Admin::EmailTemplatesController do
     end
 
     describe 'without current user' do
-      subject {
+      subject do
         get(
           :preview,
           type: 'NotificationProfile',
           subject: "Study_#{@study.id}",
-          template:'Study: {{notifications.first.resource.name}}'
+          template: 'Study: {{notifications.first.resource.name}}'
         )
-      }
+      end
       it { expect(subject).to have_http_status(:found) }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -195,7 +194,7 @@ RSpec.describe Admin::EmailTemplatesController do
           :preview,
           type: 'NotificationProfile',
           subject: "Study_#{@study.id}",
-          template:'Study: {{notifications.first.resource.name}}'
+          template: 'Study: {{notifications.first.resource.name}}'
         )
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body)['result']).to include "Study: #{@study.name}"
@@ -212,7 +211,7 @@ RSpec.describe Admin::EmailTemplatesController do
           :preview,
           type: 'NotificationProfile',
           subject: "Study_#{@study.id}",
-          template:'Study: <%= notifications.first.resource.name %>'
+          template: 'Study: <%= notifications.first.resource.name %>'
         )
         expect(response).to have_http_status(:forbidden)
         expect(response.body).to eq '{"error":"Access Denied"}'

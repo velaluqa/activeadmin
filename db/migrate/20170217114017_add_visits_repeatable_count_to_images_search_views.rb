@@ -17,7 +17,7 @@ class AddVisitsRepeatableCountToImagesSearchViews < ActiveRecord::Migration
       drop view if exists studies_search;
     SQL
 
-    if(ActiveRecord::Base.connection.adapter_name == 'PostgreSQL')
+    if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
       execute <<-SQL
         create view studies_search as select studies.id as study_id, studies.name as text, 'study_' || studies.id as result_id, text 'study' as result_type from studies;
       SQL
@@ -50,6 +50,7 @@ class AddVisitsRepeatableCountToImagesSearchViews < ActiveRecord::Migration
       SQL
     end
   end
+
   def down
     execute <<-SQL
       drop view if exists images_search;

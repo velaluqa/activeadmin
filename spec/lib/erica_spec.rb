@@ -45,14 +45,14 @@ describe ERICA do
     it 'returns relative paths correctly' do
       expect(Rails.application.config)
         .to receive(:form_configs_directory)
-             .and_return('data/forms')
+        .and_return('data/forms')
       expect(ERICA.form_config_path).to eq Rails.root.join('data', 'forms')
     end
 
     it 'returns absolute paths correctly' do
       expect(Rails.application.config)
         .to receive(:form_configs_directory)
-             .and_return('/srv/data/forms')
+        .and_return('/srv/data/forms')
       expect(ERICA.form_config_path).to eq Pathname.new('/srv/data/forms')
     end
   end
@@ -61,14 +61,14 @@ describe ERICA do
     it 'returns relative paths correctly' do
       expect(Rails.application.config)
         .to receive(:session_configs_directory)
-             .and_return('data/sessions')
+        .and_return('data/sessions')
       expect(ERICA.session_config_path).to eq Rails.root.join('data', 'sessions')
     end
 
     it 'returns absolute paths correctly' do
       expect(Rails.application.config)
         .to receive(:session_configs_directory)
-             .and_return('/srv/data/sessions')
+        .and_return('/srv/data/sessions')
       expect(ERICA.session_config_path).to eq Pathname.new('/srv/data/sessions')
     end
   end

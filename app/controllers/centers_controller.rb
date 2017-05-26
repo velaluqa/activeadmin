@@ -1,23 +1,23 @@
 class CentersController < ApplicationController
-  before_filter :load_study, :only => [:index, :create]
-  before_filter :load_centers, :only => [:index]
-  before_filter :load_the_center, :only => [:wado_query]
+  before_filter :load_study, only: %i[index create]
+  before_filter :load_centers, only: [:index]
+  before_filter :load_the_center, only: [:wado_query]
 
-  skip_before_filter :verify_authenticity_token, :only => [:create]
+  skip_before_filter :verify_authenticity_token, only: [:create]
 
   def index
     respond_to do |format|
-      format.json { render :json => @centers}
+      format.json { render json: @centers }
     end
   end
 
   def create
     authorize! :create, Center
 
-    center = Center.create(:name => params[:center][:name], :code => params[:center][:code], :study => @study)
+    center = Center.create(name: params[:center][:name], code: params[:center][:code], study: @study)
 
     respond_to do |format|
-      format.json { render :json => {:success => !center.nil?, :center => center} }
+      format.json { render json: { success: !center.nil?, center: center } }
     end
   end
 
@@ -41,7 +41,7 @@ class CentersController < ApplicationController
     authorize! :read, Center
     @centers = @study.centers.accessible_by(current_ability).order('code asc')
   end
-  
+
   def load_the_center
     @center = Center.find(params[:id])
     authorize! :manage, @center

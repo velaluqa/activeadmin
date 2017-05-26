@@ -8,27 +8,27 @@ RSpec.describe NotificationMailer do
       create(
         :email_template,
         email_type: 'NotificationProfile',
-        template: <<TPL.gsub("\n", "\r\n")
-Dear {{ user.name }},
+        template: <<TPL.strip_heredoc.gsub("\n", "\r\n")
+          Dear {{ user.name }},
 
-<table>
-  <thead>
-    <th>Resource Type</th>
-    <th>Resource</th>
-    <th></th>
-  </thead>
-  {% for notification in notifications %}
-  <tr>
-    <td>{{ notification.resource.class_name }}</td>
-    <td>{{ notification.resource.visit_type }}({{ notification.resource.visit_number }})</td>
-    <td>{{ notification.resource | link:'Open in ERICA' }}</td>
-  </tr>
-  {% endfor %}
-</table>
+          <table>
+            <thead>
+              <th>Resource Type</th>
+              <th>Resource</th>
+              <th></th>
+            </thead>
+            {% for notification in notifications %}
+            <tr>
+              <td>{{ notification.resource.class_name }}</td>
+              <td>{{ notification.resource.visit_type }}({{ notification.resource.visit_number }})</td>
+              <td>{{ notification.resource | link:'Open in ERICA' }}</td>
+            </tr>
+            {% endfor %}
+          </table>
 
-Kind Regards,
+          Kind Regards,
 
-Your Pharmtrace Team
+          Your Pharmtrace Team
 TPL
       )
     end
@@ -77,27 +77,27 @@ TPL
       create(
         :email_template,
         email_type: 'NotificationProfile',
-        template: <<TPL
-Dear {{ user.name }},
+        template: <<TPL.strip_heredoc
+          Dear {{ user.name }},
 
-<table>
-  <thead>
-    <th>Resource Type</th>
-    <th>Resource</th>
-    <th></th>
-  </thead>
-  {% for notification in notifications %}
-  <tr>
-    <td>{{ notification.resource.class_name }}</td>
-    <td>{{ notification.resource.visit_type }}({{ notification.resource.visit_number }})</td>
-    <td>{{ notification.resource | link:'Open in ERICA' }}</td>
-  </tr>
-  {% endfor %}
-</table>
+          <table>
+            <thead>
+              <th>Resource Type</th>
+              <th>Resource</th>
+              <th></th>
+            </thead>
+            {% for notification in notifications %}
+            <tr>
+              <td>{{ notification.resource.class_name }}</td>
+              <td>{{ notification.resource.visit_type }}({{ notification.resource.visit_number }})</td>
+              <td>{{ notification.resource | link:'Open in ERICA' }}</td>
+            </tr>
+            {% endfor %}
+          </table>
 
-Kind Regards,
+          Kind Regards,
 
-Your Pharmtrace Team
+          Your Pharmtrace Team
 TPL
       )
     end
@@ -148,27 +148,27 @@ TPL
       create(
         :email_template,
         email_type: 'NotificationProfile',
-        template: <<TPL
-Dear {{ user.name }},
+        template: <<TPL.strip_heredoc
+          Dear {{ user.name }},
 
-<table>
-  <thead>
-    <th>Resource Type</th>
-    <th>Resource</th>
-    <th></th>
-  </thead>
-  {% for notification in notifications %}
-  <tr>
-    <td>{{ notification.resource.class_name }}</td>
-    <td>{{ notification.resource.visit_type }}({{ notification.resource.visit_number }})</td>
-    <td>{{ notification.resource | link:'Open in ERICA' }}</td>
-  </tr>
-  {% endfor %}
-</table>
+          <table>
+            <thead>
+              <th>Resource Type</th>
+              <th>Resource</th>
+              <th></th>
+            </thead>
+            {% for notification in notifications %}
+            <tr>
+              <td>{{ notification.resource.class_name }}</td>
+              <td>{{ notification.resource.visit_type }}({{ notification.resource.visit_number }})</td>
+              <td>{{ notification.resource | link:'Open in ERICA' }}</td>
+            </tr>
+            {% endfor %}
+          </table>
 
-Kind Regards,
+          Kind Regards,
 
-Your Pharmtrace Team
+          Your Pharmtrace Team
 TPL
       )
     end

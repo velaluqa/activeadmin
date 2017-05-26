@@ -27,35 +27,42 @@ class Patient < ActiveRecord::Base
   has_paper_trail(
     class_name: 'Version',
     meta: {
-      study_id: -> (patient) { patient.study.andand.id }
+      study_id: ->(patient) { patient.study.andand.id }
     }
   )
   acts_as_taggable
 
-  attr_accessible :center, :subject_id, :domino_unid
-  attr_accessible :center_id, :data, :export_history, :visit_template
+  attr_accessible(
+    :center,
+    :subject_id,
+    :domino_unid,
+    :center_id,
+    :data,
+    :export_history,
+    :visit_template
+  )
 
   belongs_to :center
-  has_many :visits, :dependent => :destroy
-  has_many :image_series, :dependent => :destroy
+  has_many :visits, dependent: :destroy
+  has_many :image_series, dependent: :destroy
 
-  has_many :user_roles, :as => :scope_object, dependent: :destroy
+  has_many :user_roles, as: :scope_object, dependent: :destroy
 
-  validates_uniqueness_of :subject_id, :scope => :center_id
+  validates_uniqueness_of :subject_id, scope: :center_id
   validates_presence_of :subject_id
   validates_presence_of :center_id
 
-  scope :by_study_ids, lambda { |*ids|
+  scope :by_study_ids, ->(*ids) {
     joins(:center)
       .where(centers: { study_id: Array[ids].flatten })
   }
 
-  scope :searchable, -> { join_study.select(<<SELECT) }
-centers.study_id AS study_id,
-studies.name AS study_name,
-centers.code || patients.subject_id AS text,
-patients.id AS result_id,
-'Patient'::varchar AS result_type
+  scope :searchable, -> { join_study.select(<<SELECT.strip_heredoc) }
+    centers.study_id AS study_id,
+    studies.name AS study_name,
+    centers.code || patients.subject_id AS text,
+    patients.id AS result_id,
+    'Patient'::varchar AS result_type
 SELECT
 
   scope :join_study, -> { joins(center: :study) }
@@ -67,16 +74,16 @@ SELECT
   include ScopablePermissions
 
   def self.with_permissions
-    joins(center: :study).joins(<<JOIN)
-INNER JOIN user_roles ON
-  (
-       (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
-    OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
-    OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
-    OR user_roles.scope_object_id IS NULL
-  )
-INNER JOIN roles ON user_roles.role_id = roles.id
-INNER JOIN permissions ON roles.id = permissions.role_id
+    joins(center: :study).joins(<<JOIN.strip_heredoc)
+      INNER JOIN user_roles ON
+        (
+             (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+          OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+          OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+          OR user_roles.scope_object_id IS NULL
+        )
+      INNER JOIN roles ON user_roles.role_id = roles.id
+      INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
   end
 
@@ -89,20 +96,16 @@ JOIN
   before_save :ensure_study_is_unchanged
 
   def form_answers
-    return FormAnswer.where(:patient_id => self.id)
+    FormAnswer.where(patient_id: id)
   end
 
   def study
-    if self.center.nil?
-      nil
-    else
-      self.center.study
-    end
+    center.andand.study
   end
 
   # virtual attribute for pretty names
   def name
-    if(center.nil?)
+    if center.nil?
       subject_id
     else
       center.code + subject_id
@@ -110,33 +113,28 @@ JOIN
   end
 
   def next_series_number
-    return 1 if self.image_series.empty?
+    return 1 if image_series.empty?
     image_series.order('series_number DESC').first.series_number + 1
   end
+
   def image_storage_path
     "#{center.image_storage_path}/#{id}"
   end
 
   def wado_query
-    {:id => self.id, :name => self.name, :visits => self.visits.map {|visit| visit.wado_query} +
-      [{:id => 0, :name => 'Unassigned', :image_series => self.image_series.where(:visit_id => nil).map {|i_s| i_s.wado_query}
-       }]
-    }
+    { id: id, name: name, visits: visits.map(&:wado_query) +
+      [{ id: 0, name: 'Unassigned', image_series: image_series.where(visit_id: nil).map(&:wado_query) }] }
   end
 
   # Used as getter by ActiveAdmin form.
   #
   # @return [String] visit template to set upon save
-  def visit_template
-    @visit_template
-  end
+  attr_reader :visit_template
 
   # Used as setter by ActiveAdmin form.
   #
   # @param [String] visit template to create visits from upon save
-  def visit_template=(template)
-    @visit_template = template
-  end
+  attr_writer :visit_template
 
   def domino_patient_no
     "#{center.code}#{subject_id}"
@@ -145,17 +143,20 @@ JOIN
   def domino_document_form
     'TrialSubject'
   end
+
   def domino_document_query
     {
-      'docCode' => 10028,
+      'docCode' => 10_028,
       'CenterNo' => center.code,
-      'PatientNo' => domino_patient_no,
+      'PatientNo' => domino_patient_no
     }
   end
+
   def domino_document_fields
-    ['id', 'subject_id']
+    %w[id subject_id]
   end
-  def domino_document_properties(action = :update)
+
+  def domino_document_properties(_action = :update)
     return {} if center.nil?
 
     {
@@ -165,11 +166,12 @@ JOIN
       'CenterNo' => center.code,
       'shCenterNo' => center.code,
       'UIDCenter' => center.domino_unid,
-      'PatientNo' => domino_patient_no,
+      'PatientNo' => domino_patient_no
     }
   end
+
   def domino_sync
-    self.ensure_domino_document_exists
+    ensure_domino_document_exists
   end
 
   def to_s
@@ -177,7 +179,7 @@ JOIN
   end
 
   def visit_template_applicable?(template)
-    template = study.visit_templates[template] or return false
+    (template = study.visit_templates[template]) || (return false)
     return true if template['repeatable']
     existing_visits_numbers = visits.map(&:original_visit_number)
     new_visit_numbers = template['visits'].map { |visit| visit['number'] }
@@ -185,12 +187,12 @@ JOIN
   end
 
   def create_visits_from_template!(template)
-    template = study.visit_templates[template] or return false
+    (template = study.visit_templates[template]) || (return false)
     Visit.transaction do
       template['visits'].each do |visit|
         max = visits
-                .where(visit_number: visit['number'])
-                .maximum(:repeatable_count) || -1
+              .where(visit_number: visit['number'])
+              .maximum(:repeatable_count) || -1
         postfix = (max > -1 ? ".#{max + 1}" : '')
         visits << Visit.create!(
           visit_number: "#{visit['number']}#{postfix}",
@@ -205,22 +207,22 @@ JOIN
   protected
 
   def ensure_study_is_unchanged
-    if(self.center_id_changed? and not self.center_id_was.nil?)
-      old_center = Center.find(self.center_id_was)
+    if center_id_changed? && !center_id_was.nil?
+      old_center = Center.find(center_id_was)
 
-      if(old_center.study != self.center.study)
-        self.errors[:center] << 'A patient cannot be reassigned to a center in a different study.'
+      if old_center.study != center.study
+        errors[:center] << 'A patient cannot be reassigned to a center in a different study.'
         return false
       end
     end
 
-    return true
+    true
   end
 
   # When a visit template is set at create, all visits from the
   # template are created.
   def add_visits_from_template
-    template = visit_template_hash or return
+    (template = visit_template_hash) || return
     self.visits = template['visits'].map do |visit|
       Visit.new(
         visit_type: visit['type'],
@@ -231,7 +233,7 @@ JOIN
   end
 
   def visit_template_hash
-    enforced_template = study.visit_templates.find { |name, tpl| tpl['create_patient_enforce'] }
+    enforced_template = study.visit_templates.find { |_name, tpl| tpl['create_patient_enforce'] }
     return enforced_template.second if enforced_template
     study.visit_templates[visit_template]
   end

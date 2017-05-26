@@ -4,27 +4,27 @@ class Ability
   attr_reader :current_user
 
   ACTIVITIES = {
-    BackgroundJob => %i(manage read update create destroy),
-    Sidekiq => %i(manage),
-    Study  => %i(manage read update create destroy read_reports),
-    Center => %i(manage read update create destroy),
-    Patient => %i(manage read update create destroy),
-    EmailTemplate => %i(manage read update create destroy),
-    ImageSeries => %i(manage read update create destroy upload assign_patient assign_visit),
-    Image => %i(manage read update create destroy),
-    NotificationProfile => %i(manage read update create destroy),
-    Notification => %i(manage read update create destroy),
-    User => %i(manage read update create destroy generate_keypair),
-    UserRole => %i(manage read update create destroy),
-    PublicKey => %i(manage read update create destroy),
-    Role => %i(manage read update create destroy),
-    Visit => %i(manage read update create destroy create_from_template assign_required_series technical_qc medical_qc),
-    Version => %i(manage read update create destroy)
+    BackgroundJob => %i[manage read update create destroy],
+    Sidekiq => %i[manage],
+    Study  => %i[manage read update create destroy read_reports],
+    Center => %i[manage read update create destroy],
+    Patient => %i[manage read update create destroy],
+    EmailTemplate => %i[manage read update create destroy],
+    ImageSeries => %i[manage read update create destroy upload assign_patient assign_visit],
+    Image => %i[manage read update create destroy],
+    NotificationProfile => %i[manage read update create destroy],
+    Notification => %i[manage read update create destroy],
+    User => %i[manage read update create destroy generate_keypair],
+    UserRole => %i[manage read update create destroy],
+    PublicKey => %i[manage read update create destroy],
+    Role => %i[manage read update create destroy],
+    Visit => %i[manage read update create destroy create_from_template assign_required_series technical_qc medical_qc],
+    Version => %i[manage read update create destroy]
   }.freeze
 
   UNSCOPABLE_ACTIVITIES = {
-    ImageSeries => %i(upload assign_patient assign_visit),
-    Visit => %i(assign_required_series technical_qc medical_qc)
+    ImageSeries => %i[upload assign_patient assign_visit],
+    Visit => %i[assign_required_series technical_qc medical_qc]
   }.freeze
 
   def initialize(current_user)
@@ -44,9 +44,7 @@ class Ability
 
   def permissions
     @permissions ||=
-      @current_user.permissions
-        .map { |p| [p.ability, true] }
-        .to_h
+      @current_user.permissions.map { |p| [p.ability, true] }.to_h
   end
 
   private
@@ -114,13 +112,13 @@ class Ability
   # permitted to manage his own user account and his own public keys.
   def define_basic_abilities
     unless can?(:manage, User)
-      can [:read, :update, :generate_keypair, :change_password], User, ['users.id = ?', current_user.id] do |user|
+      can %i[read update generate_keypair change_password], User, ['users.id = ?', current_user.id] do |user|
         user == current_user
       end
     end
 
     unless can?(:manage, PublicKey)
-      can [:read, :update, :generate_keypair, :change_password], PublicKey, ['public_keys.user_id = ?', current_user.id] do |public_key|
+      can %i[read update generate_keypair change_password], PublicKey, ['public_keys.user_id = ?', current_user.id] do |public_key|
         public_key.user == current_user
       end
     end

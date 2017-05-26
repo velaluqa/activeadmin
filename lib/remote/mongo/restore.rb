@@ -1,18 +1,18 @@
 module Mongo
   class Restore
     class << self
-      MONGORESTORE_ARGS = %w(host port db username password drop)
+      MONGORESTORE_ARGS = %w[host port db username password drop].freeze
 
       def mongoid_configuration
         conf = Rails.configuration.mongoid.clients['default']
-        fail 'No such mongoid configuration' if conf.nil?
+        raise 'No such mongoid configuration' if conf.nil?
         conf
       end
 
       def mongo_options
         conf = mongoid_configuration.clone
         if conf['hosts']
-          fail 'Cannot handle multiple hosts.' if conf['hosts'].length > 1
+          raise 'Cannot handle multiple hosts.' if conf['hosts'].length > 1
           conf['host'], conf['port'] = conf.delete('hosts').first.split(':')
         end
         conf['db'] = conf.delete('database')

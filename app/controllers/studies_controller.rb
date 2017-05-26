@@ -1,10 +1,10 @@
 class StudiesController < ApplicationController
-  before_filter :load_studies, :only => [:index]
-  before_filter :load_the_study, :only => [:wado_query]
+  before_filter :load_studies, only: [:index]
+  before_filter :load_the_study, only: [:wado_query]
 
   def index
     respond_to do |format|
-      format.json { render :json => @studies}
+      format.json { render json: @studies }
     end
   end
 
@@ -18,10 +18,10 @@ class StudiesController < ApplicationController
   end
 
   protected
-  
+
   def load_studies
     authorize! :read, Study
-    @studies = Study.accessible_by(current_ability)    
+    @studies = Study.accessible_by(current_ability)
   end
 
   def load_the_study

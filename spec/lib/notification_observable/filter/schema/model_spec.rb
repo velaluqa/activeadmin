@@ -21,7 +21,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
 
   with_model :SubSubModel do
     table do |t|
-      t.datetime :foobar, null:false
+      t.datetime :foobar, null: false
       t.text :foobaz, null: true
       t.references :sub_model
     end

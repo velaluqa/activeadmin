@@ -12,7 +12,7 @@ class RemoteSync
     @remotes = config.delete('remotes').map { |conf| Remote.new(conf) }
 
     dups = remotes.map(&:name).select { |e| remotes.count(e) > 1 }.uniq
-    fail "Duplicate remote names found: #{dups}" unless dups.empty?
+    raise "Duplicate remote names found: #{dups}" unless dups.empty?
   end
 
   def perform_datastore_sync(options = {})

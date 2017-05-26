@@ -1,4 +1,5 @@
 # coding: utf-8
+
 require 'serializers/hash_array_serializer'
 require 'serializers/string_array_serializer'
 
@@ -57,7 +58,7 @@ require 'notification_observable/filter/schema'
 # resource. For that, see the ~only_authorized_users~ attribute.
 #
 # ## Throttling
-p#
+p #
 # We do not want the user to be spammed by e-mails for each and every
 # action done in the ERICA system. Thus sending e-mails can be
 # throttled on a per-profile basis.
@@ -105,14 +106,14 @@ p#
 # **`updated_at`**                      | `datetime`         | `not null`
 #
 class NotificationProfile < ActiveRecord::Base
-  TRIGGERING_RESOURCES = %w(
+  TRIGGERING_RESOURCES = %w[
     Study
     Center
     Patient
     ImageSeries
     Image
     Visit
-  ).freeze
+  ].freeze
 
   has_paper_trail class_name: 'Version'
 
@@ -134,9 +135,9 @@ class NotificationProfile < ActiveRecord::Base
   # TODO: Add inclusion: { in: -> (a) { NotificationProfile::TRIGGERING_RESOURCES } }
   # Currently a LOT of tests break, when adding inclusion, because
   # tests are adding a TestModel which is not allowed...
-  validates :filters, json: { schema: :filters_schema, message: -> (messages) { messages } }, if: :triggering_resource_class
+  validates :filters, json: { schema: :filters_schema, message: ->(messages) { messages } }, if: :triggering_resource_class
   validates :maximum_email_throttling_delay, inclusion: { in: Email.allowed_throttling_delays.values }, if: :maximum_email_throttling_delay
-  validates :filter_triggering_user, inclusion: { in: %w(exclude include only) }
+  validates :filter_triggering_user, inclusion: { in: %w[exclude include only] }
   validate :validate_triggering_actions
   validates :email_template, presence: true
   validate :validate_email_template_type
@@ -150,10 +151,10 @@ class NotificationProfile < ActiveRecord::Base
   # @return [ActiveRecord::Relation<User>] the relation specifying all users
   def recipients
     return User.all if all_users?
-    relation = User.joins(<<JOIN)
-LEFT JOIN "notification_profile_users" AS "np_u" ON "np_u"."user_id" = "users"."id"
-LEFT JOIN "user_roles" AS "u_r" ON "u_r"."user_id" = "users"."id"
-LEFT JOIN "notification_profile_roles" AS "np_r" ON "np_r"."role_id" = "u_r"."role_id"
+    relation = User.joins(<<JOIN.strip_heredoc)
+      LEFT JOIN "notification_profile_users" AS "np_u" ON "np_u"."user_id" = "users"."id"
+      LEFT JOIN "user_roles" AS "u_r" ON "u_r"."user_id" = "users"."id"
+      LEFT JOIN "notification_profile_roles" AS "np_r" ON "np_r"."role_id" = "u_r"."role_id"
 JOIN
     relation
       .select('DISTINCT("users"."id"), "users".*')
@@ -177,9 +178,9 @@ JOIN
   # @return [ActiveRecord::Relation<User>] users with pending notifications
   def recipients_with_pending(options = {})
     relation = User
-      .select('DISTINCT("users"."id"), "users".*')
-      .joins(notifications: :notification_profile)
-      .merge(Notification.of(self).pending)
+               .select('DISTINCT("users"."id"), "users".*')
+               .joins(notifications: :notification_profile)
+               .merge(Notification.of(self).pending)
 
     return relation unless options[:throttle]
     relation.merge(Notification.throttled(options[:throttle], joins: false))
@@ -318,7 +319,7 @@ JOIN
 
   def validate_triggering_actions
     return errors.add(:triggering_actions, :not_array) unless triggering_actions.is_a?(Array)
-    if triggering_actions - %w(create update destroy) != []
+    if triggering_actions - %w[create update destroy] != []
       errors.add(:triggering_actions, :invalid)
     end
   end

@@ -37,8 +37,8 @@ class EricaDrop < Liquid::Rails::Drop # :nodoc:
 
       return if last_description.nil?
       names.each do |name|
-        self._associations[name][:description] = last_description
-        self._attr_descriptions.delete(name)
+        _associations[name][:description] = last_description
+        _attr_descriptions.delete(name)
       end
     end
     alias_method_chain :associate, :desc

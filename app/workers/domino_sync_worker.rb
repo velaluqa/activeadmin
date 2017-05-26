@@ -9,7 +9,7 @@ class DominoSyncWorker
     begin
       resource = resource_class_name.constantize.find(resource_id)
     rescue ActiveRecord::RecordNotFound => e
-      Rails.logger.warn 'Record not found for Domino sync: '+e.message
+      Rails.logger.warn 'Record not found for Domino sync: ' + e.message
       return true
     end
 

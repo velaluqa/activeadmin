@@ -3,7 +3,7 @@ module Pharmtrace
     # Override the header of ActiveAdmin to render some ERICA specific information.
     class Header < ::ActiveAdmin::Component
       def build(namespace, menu)
-        super(id: "header")
+        super(id: 'header')
 
         @namespace = namespace
         @menu = menu

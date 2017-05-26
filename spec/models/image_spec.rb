@@ -4,13 +4,13 @@ RSpec.describe Image do
       image = create(:image)
       expect(Image.searchable.as_json)
         .to eq [{
-                  'id' => nil,
-                  'study_id' => image.image_series.patient.center.study.id,
-                  'study_name' => image.image_series.patient.center.study.name,
-                  'text' => "#{image.image_series.series_number}##{image.id}",
-                  'result_id' => image.id,
-                  'result_type' => 'Image'
-                }]
+          'id' => nil,
+          'study_id' => image.image_series.patient.center.study.id,
+          'study_name' => image.image_series.patient.center.study.name,
+          'text' => "#{image.image_series.series_number}##{image.id}",
+          'result_id' => image.id,
+          'result_type' => 'Image'
+        }]
     end
   end
 

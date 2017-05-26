@@ -1,4 +1,4 @@
-= semantic_form_for @image_series, :url => assign_visit_admin_image_series_path(@image_series, :return_url => @return_url), :method => :post do |f|  
+= semantic_form_for @image_series, :url => assign_visit_admin_image_series_path(@image_series, :return_url => @return_url), :method => :post do |f|
   = f.inputs 'Assign Visit' do
     = f.input :visit, :collection => @image_series.patient.visits.map {|v| [v.name, v.id]} + [['Create new Visit', 'new']]
 

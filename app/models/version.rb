@@ -107,36 +107,36 @@ class Version < PaperTrail::Version
     def patient_query(study)
       Version
         .where(item_type: 'Patient')
-        .where(<<QUERY)
-   (object_changes -> 'center_id' ->> 1)::integer IN (#{study.centers.select(:id).to_sql})
-OR (object ->> 'center_id')::integer IN (#{study.centers.select(:id).to_sql})
+        .where(<<QUERY.strip_heredoc)
+             (object_changes -> 'center_id' ->> 1)::integer IN (#{study.centers.select(:id).to_sql})
+          OR (object ->> 'center_id')::integer IN (#{study.centers.select(:id).to_sql})
 QUERY
     end
 
     def visit_query(study)
       Version
         .where(item_type: 'Visit')
-        .where(<<QUERY)
-   (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
-OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
+        .where(<<QUERY.strip_heredoc)
+             (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
+          OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
 QUERY
     end
 
     def image_series_query(study)
       Version
         .where(item_type: 'ImageSeries')
-        .where(<<QUERY)
-   (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
-OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
+        .where(<<QUERY.strip_heredoc)
+             (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
+          OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
 QUERY
     end
 
     def required_series_query(study)
       Version
         .where(item_type: 'Visit')
-        .where(<<QUERY)
-   (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
-OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
+        .where(<<QUERY.strip_heredoc)
+             (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
+          OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
 QUERY
     end
   end

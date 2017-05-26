@@ -27,6 +27,6 @@ class V1::ImagesController < V1::ApiController
   protected
 
   def image_params
-    params.require(:image).permit(:image_series_id, file: [:name, :data])
+    params.require(:image).permit(:image_series_id, file: %i[name data])
   end
 end

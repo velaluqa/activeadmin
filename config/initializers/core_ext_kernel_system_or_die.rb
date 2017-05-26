@@ -1,6 +1,6 @@
 module Kernel
   def system_or_die(command)
     return if system(command)
-    fail "Command '#{command}' failed with status #{$?.exitstatus}."
+    raise "Command '#{command}' failed with status #{$CHILD_STATUS.exitstatus}."
   end
 end

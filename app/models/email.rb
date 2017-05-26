@@ -3,17 +3,17 @@ class Email
 
   THROTTLING_DELAYS = {
     'instantly'  => 0,
-    'hourly'     => 60*60,
-    'daily'      => 24*60*60,
-    'weekly'     => 7*24*60*60,
-    'monthly'    => 30*24*60*60,
-    'quarterly'  => 3*30*24*60*60,
-    'semesterly' => 6*30*24*60*60,
-    'yearly'     => 12*30*24*60*60
+    'hourly'     => 60 * 60,
+    'daily'      => 24 * 60 * 60,
+    'weekly'     => 7 * 24 * 60 * 60,
+    'monthly'    => 30 * 24 * 60 * 60,
+    'quarterly'  => 3 * 30 * 24 * 60 * 60,
+    'semesterly' => 6 * 30 * 24 * 60 * 60,
+    'yearly'     => 12 * 30 * 24 * 60 * 60
   }.with_indifferent_access
 
   def self.allowed_throttling_delays
-    THROTTLING_DELAYS.keep_if do |key, value|
+    THROTTLING_DELAYS.keep_if do |_key, value|
       value <= ERICA.maximum_email_throttling_delay
     end
   end

@@ -3,9 +3,7 @@ StudyServer::Application.routes.draw do
 
   mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?
 
-  if ERICA.remote?
-    get '/erica_remote/paths', to: 'erica_remote#paths'
-  end
+  get '/erica_remote/paths', to: 'erica_remote#paths' if ERICA.remote?
 
   devise_for :users, controllers: { sessions: 'users/sessions' }
   devise_scope :user do

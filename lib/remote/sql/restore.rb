@@ -1,11 +1,11 @@
 class Sql
   class Restore
     class << self
-      PSQL_ARGS = %w(host port dbname username file)
+      PSQL_ARGS = %w[host port dbname username file].freeze
 
       def database_configuration
         conf = Rails.configuration.database_configuration[Rails.env]
-        fail "No such database configuration for #{Rails.env}" if conf.nil?
+        raise "No such database configuration for #{Rails.env}" if conf.nil?
         conf
       end
 

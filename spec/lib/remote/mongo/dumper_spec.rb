@@ -7,11 +7,11 @@ RSpec.describe Mongo::Dumper do
         .to receive(:[]).with('default').and_return({})
       expect(Rails.configuration.mongoid.clients['default'])
         .to receive(:clone).and_return(
-              'database' => 'erica_store_test',
-              'hosts'    => ['localhost:27017'],
-              'username' => 'testuser',
-              'password' => 'testpass'
-            )
+          'database' => 'erica_store_test',
+          'hosts'    => ['localhost:27017'],
+          'username' => 'testuser',
+          'password' => 'testpass'
+        )
       expect(Mongo::Dumper.mongo_options)
         .to eq(
           'db'       => 'erica_store_test',

@@ -14,7 +14,7 @@ StudyServer::Application.configure do
 
   # Configure static asset server for tests with Cache-Control for performance.
   config.serve_static_files = true
-  config.static_cache_control = "public, max-age=3600"
+  config.static_cache_control = 'public, max-age=3600'
 
   # Show full error reports and disable caching.
   config.consider_all_requests_local       = true
@@ -75,5 +75,5 @@ StudyServer::Application.configure do
 
   config.airbrake_api_key = '75336396cd50acb145d5a78eaca49a57'
 
-  config.maximum_email_throttling_delay = 30*24*60*60 # monthly
+  config.maximum_email_throttling_delay = 30 * 24 * 60 * 60 # monthly
 end
