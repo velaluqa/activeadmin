@@ -99,4 +99,5 @@ step 'I click link :string in :string' do |locator, selector|
 end
 
 step 'I pry' do
+  binding.pry
 end
