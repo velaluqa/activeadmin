@@ -82,10 +82,8 @@ step 'I don\'t see :string' do |content|
   expect(page).not_to have_content(content)
 end
 
-step 'I am redirected to patient :string' do |subject_id|
-  @patient = Patient.where(subject_id: subject_id).first
-  expect(@patient).not_to be_nil
-  expect(page.current_path).to eq(admin_patient_path(@patient))
+step 'I am redirected to :admin_path' do |path|
+  expect(page.current_path).to eq(path)
 end
 
 step 'I click link :string' do |locator|
