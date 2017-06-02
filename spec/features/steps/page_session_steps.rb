@@ -90,6 +90,10 @@ step 'I click link :string' do |locator|
   click_link(locator)
 end
 
+step 'I follow link :string' do |locator|
+  page.find_link(locator).trigger('click')
+end
+
 step 'I click link :string in :string' do |locator, selector|
   within(selector) do
     click_link(locator)
