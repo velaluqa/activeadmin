@@ -11,6 +11,11 @@ Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
 load 'spec/features/steps/placeholders.rb', true
 require 'capybara/rails'
 
+require 'capybara-screenshot/rspec'
+# Add <base> to saved HTML pages so that the browser can load
+# respective assets when opening failing pages.
+Capybara.asset_host = 'http://localhost:3000'
+
 # Poltergeist is a headless webkit implementation and can be plugged
 # into capybara.
 require 'capybara/poltergeist'

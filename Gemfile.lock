@@ -171,6 +171,9 @@ GEM
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
     choice (0.2.0)
+    capybara-screenshot (1.0.14)
+      capybara (>= 1.0, < 3)
+      launchy
     cliver (0.3.2)
     code_analyzer (0.4.5)
       sexp_processor
@@ -723,6 +726,7 @@ DEPENDENCIES
   bundler-audit
   cancancan (~> 1.13.1)
   capybara
+  capybara-screenshot
   coderay
   coffee-rails (~> 4.1.1)
   database_cleaner

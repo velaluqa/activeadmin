@@ -247,6 +247,7 @@ group :development, :test do
   gem 'gitdeploy', git: 'ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git', branch: :master, require: false
 
   gem 'capybara'
+  gem 'capybara-screenshot'
   gem 'database_cleaner'
   gem 'poltergeist'
   gem 'transactional_capybara'
