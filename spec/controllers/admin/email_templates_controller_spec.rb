@@ -25,7 +25,7 @@ RSpec.describe Admin::EmailTemplatesController do
 
       it 'denies access' do
         response = get :index
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -58,7 +58,7 @@ RSpec.describe Admin::EmailTemplatesController do
 
       it 'denies access' do
         response = get(:show, id: @email_template.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -90,7 +90,7 @@ RSpec.describe Admin::EmailTemplatesController do
 
       it 'denies access' do
         response = get(:new)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -125,7 +125,7 @@ RSpec.describe Admin::EmailTemplatesController do
 
       it 'denies access' do
         response = post(:create, email_template: {})
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -160,7 +160,7 @@ RSpec.describe Admin::EmailTemplatesController do
 
       it 'denies access' do
         response = post(:destroy, id: @email_template.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end

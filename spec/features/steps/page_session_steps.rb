@@ -62,7 +62,8 @@ step 'I browse to :admin_path' do |path|
 end
 
 step 'I see the unauthorized page' do
-  expect(page).to have_content('Not authorized')
+  expect(page).to have_content('Not Authorized')
+  expect(page).to have_content('You are not authorized to perform this action!')
 end
 
 step 'I have following abilities:' do |table|

@@ -25,7 +25,7 @@ RSpec.describe Admin::ImagesController do
 
       it 'denies access' do
         response = get :index
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -58,7 +58,7 @@ RSpec.describe Admin::ImagesController do
 
       it 'denies access' do
         response = get(:show, id: @image.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -93,7 +93,7 @@ RSpec.describe Admin::ImagesController do
 
       it 'denies access' do
         response = post(:destroy, id: @image.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -126,7 +126,7 @@ RSpec.describe Admin::ImagesController do
 
       it 'denies access' do
         response = get(:dicom_metadata, id: @image.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end

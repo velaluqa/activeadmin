@@ -25,7 +25,7 @@ RSpec.describe Admin::BackgroundJobsController do
 
       it 'denies access' do
         response = get :index
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -58,7 +58,7 @@ RSpec.describe Admin::BackgroundJobsController do
 
       it 'denies access' do
         response = get(:show, id: @background_job.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -93,7 +93,7 @@ RSpec.describe Admin::BackgroundJobsController do
 
       it 'denies access' do
         response = post(:destroy, id: @background_job.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end

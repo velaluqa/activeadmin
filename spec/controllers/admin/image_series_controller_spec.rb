@@ -25,7 +25,7 @@ RSpec.describe Admin::ImageSeriesController do
 
       it 'denies access' do
         response = get :index
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -58,7 +58,7 @@ RSpec.describe Admin::ImageSeriesController do
 
       it 'denies access' do
         response = get(:show, id: @image_series.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -91,7 +91,7 @@ RSpec.describe Admin::ImageSeriesController do
 
       it 'denies access' do
         response = get(:viewer, id: @image_series.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end

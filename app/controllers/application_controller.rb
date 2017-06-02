@@ -43,7 +43,7 @@ class ApplicationController < ActionController::Base
 
   def access_denied(*_args)
     respond_to do |format|
-      format.html { render 'shared/forbidden', status: :forbidden, layout: 'active_admin' }
+      format.html { redirect_to '/admin/not_authorized' }
       format.json { render json: { error_code: 403, error_message: 'Forbidden' }, status: :forbidden }
     end
   end
