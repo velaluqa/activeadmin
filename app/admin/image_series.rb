@@ -204,7 +204,9 @@ ActiveAdmin.register ImageSeries do
       if can?(:assign_visit, image_series)
         result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
       end
-      result += link_to('Assign RS', assign_required_series_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') unless(image_series.visit_id.nil? or cannot? :manage, image_series)
+      if image_series.visit && can?(:assign_required_series, image_series.visit)
+        result += link_to('Assign RS', assign_required_series_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
+      end
 
       result.html_safe
     end
@@ -646,7 +648,7 @@ ActiveAdmin.register ImageSeries do
 
   member_action :assign_required_series, :method => :post do
     @image_series = ImageSeries.find(params[:id])
-    authorize! :manage, @image_series
+    authorize! :assign_required_series, @image_series.visit || Visit
 
     @image_series.change_required_series_assignment(params[:image_series][:assigned_required_series].reject {|rs| rs.blank?})
 
@@ -654,7 +656,14 @@ ActiveAdmin.register ImageSeries do
   end
   member_action :assign_required_series_form, :method => :get do
     @image_series = ImageSeries.find(params[:id])
-    authorize! :manage, @image_series
+
+    if @image_series.visit.nil?
+      flash[:error] = 'The image series does not have an assigned visit.'
+      redirect_to(params[:return_url] || admin_image_series_index_path)
+      return
+    end
+
+    authorize! :assign_required_series, @image_series.visit || Visit
 
     @required_series = @image_series.visit.required_series_names
     if(@required_series.blank?)
