@@ -9,3 +9,11 @@ end
 step 'I click the :string button' do |locator|
   click_button(locator)
 end
+
+step 'I check :string' do |label|
+  check(label)
+end
+
+step 'I uncheck :string' do |label|
+  uncheck(label)
+end
