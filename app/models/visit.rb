@@ -267,6 +267,10 @@ JOIN_QUERY
     study.visit_types.include?(visit_type)
   end
 
+  def required_series_available?
+    !(required_series_names || []).empty?
+  end
+
   def current_required_series_specs
     return nil if visit_type.nil? || study.nil? || !study.semantically_valid?
 

@@ -26,6 +26,45 @@ CONFIG
     end
   end
 
+  describe '#required_series_available?' do
+    let!(:study1) { create(:study, configuration: <<CONFIG.strip_heredoc) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT1: {}
+          SPECT2: {}
+      followup:
+        required_series: {}
+    image_series_properties: []
+CONFIG
+    let!(:center1) { create(:center, study: study1) }
+    let!(:patient1) { create(:patient, center: center1) }
+    let!(:visit1) { create(:visit, patient: patient1, visit_type: nil) }
+    let!(:visit2) { create(:visit, patient: patient1, visit_type: 'foobar') }
+    let!(:visit3) { create(:visit, patient: patient1, visit_type: 'followup') }
+    let!(:visit4) { create(:visit, patient: patient1, visit_type: 'baseline') }
+
+    before(:each) do
+      study1.lock!
+    end
+
+    it 'returns false if no visit type set' do
+      expect(visit1.required_series_available?).to be_falsy
+    end
+
+    it 'returns false if visit type is invalid' do
+      expect(visit2.required_series_available?).to be_falsy
+    end
+
+    it 'returns false if no required series configured for visit type' do
+      expect(visit3.required_series_available?).to be_falsy
+    end
+
+    it 'returns true if required series configured for visit type' do
+      expect(visit4.required_series_available?).to be_truthy
+    end
+  end
+
   describe '#state=' do
     context 'when saving' do
       let!(:visit) { create(:visit) }
