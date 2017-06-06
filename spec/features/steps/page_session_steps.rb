@@ -107,6 +107,27 @@ step 'I click link :string in :string' do |locator, selector|
   end
 end
 
+step 'I click :string in :string row' do |locator, row_content|
+  page.all('tr').each do |td|
+    next unless td.text.include?(row_content)
+    td.find_link(locator).trigger('click')
+  end
+end
+
+step 'I see :string in :string row' do |text, row_content|
+  page.all('tr').each do |td|
+    next unless td.text.include?(row_content)
+    expect(td.text).to include(text)
+  end
+end
+
+step 'I don\'t see :string in :string row' do |text, row_content|
+  page.all('tr').each do |td|
+    next unless td.text.include?(row_content)
+    expect(td.text).not_to include(text)
+  end
+end
+
 step 'I pry' do
   binding.pry
 end
