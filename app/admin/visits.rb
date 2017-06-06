@@ -289,7 +289,7 @@ ActiveAdmin.register Visit do
 
   member_action :assign_required_series, :method => :post do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    authorize! :assign_required_series, @visit
 
     @assignments = params[:assignments] || {}
 
@@ -299,7 +299,7 @@ ActiveAdmin.register Visit do
   end
   member_action :assign_required_series_form, :method => :get do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    authorize! :assign_required_series, @visit
 
     @required_series_names = params[:required_series_names]
     if(@required_series_names.nil?)
