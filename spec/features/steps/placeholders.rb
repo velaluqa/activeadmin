@@ -24,6 +24,11 @@ placeholder :admin_path do
     '/admin/dashboard'
   end
 
+  match(/([^ $\n]+) page/) do |page_name|
+    Rails.application.routes.url_helpers
+      .send("admin_#{page_name.underscore}_path")
+  end
+
   match(/([^ $\n]+) ([^ $]+) "([^$\n]+)"/) do |action, model_name, identifier|
     method = "admin_#{model_name.underscore}_path"
     method = "#{action}_#{method}" if action != 'show'
