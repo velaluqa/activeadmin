@@ -41,6 +41,10 @@ Feature: List Required Series
       | Patient | read, update, create |
       | Visit   | read                 |
 
+  # TODO: Scenario: Study not locked
+  # TODO: Scenario: Study not semantically valid
+  # TODO: Scenario: Not authorized to read RequiredSeries
+
   Scenario: No Visit Type Assigned
     Given I sign in as a user with role "Image Manager"
     When I browse to visit "10000"
