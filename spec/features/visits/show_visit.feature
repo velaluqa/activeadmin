@@ -4,16 +4,7 @@ Feature: Show Visit
   I want to see all visit details and respective required series in a table.
 
   Background:
-    Given a study "FooStudy" with configuration
-      """
-      visit_types:
-        baseline: 
-          description: A simple visit type
-          required_series: []
-        followup: 
-          description: A simple visit type
-          required_series: []
-      """
+    Given a study "FooStudy"
     And a center "FooCenter" for "FooStudy"
     And a patient "FooPatient" for "FooCenter"
     And a visit "10000" with:
@@ -39,8 +30,8 @@ Feature: Show Visit
   Scenario: Show visit
     Given I sign in as a user with role "Image Manager"
     When I browse to visit "10000"
-    Then I see "Patient 7FooPatient"
+    Then I see "FooPatient"
     Then I see "Visit Number 10000"
     Then I see "Description Visit Extraordinaire"
-    Then I see "Visit Type baselineCCC"
+    Then I see "Visit Type baseline"
     Then I see "State INCOMPLETE, NOT AVAILABLE"
