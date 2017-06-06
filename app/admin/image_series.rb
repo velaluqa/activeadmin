@@ -201,7 +201,9 @@ ActiveAdmin.register ImageSeries do
       result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnlp'), :class => 'member_link')
       result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank')
       result += link_to('Domino', image_series.lotus_notes_url, :class => 'member_link') unless(image_series.domino_unid.nil? or image_series.lotus_notes_url.nil? or Rails.application.config.is_erica_remote)
-      result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') if can? :manage, image_series
+      if can?(:assign_visit, image_series)
+        result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
+      end
       result += link_to('Assign RS', assign_required_series_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') unless(image_series.visit_id.nil? or cannot? :manage, image_series)
 
       result.html_safe
@@ -587,7 +589,14 @@ ActiveAdmin.register ImageSeries do
 
   member_action :assign_visit, :method => :post do
     @image_series = ImageSeries.find(params[:id])
-    authorize! :manage, @image_series
+    authorize! :assign_visit, @image_series
+
+    visit_id = params[:image_series][:visit_id]
+    if visit_id != 'new' && Visit.where(id: visit_id).first.nil?
+      flash[:error] = 'Please choose a visit or "Create New Visit" from the visit select box.'
+      redirect_to :back
+      return
+    end
 
     if(params[:image_series][:visit_id] == 'new')
       if(params[:image_series][:visit][:visit_type].blank?)
@@ -596,7 +605,12 @@ ActiveAdmin.register ImageSeries do
         return
       end
 
-      visit = Visit.create(:patient => @image_series.patient, :visit_number => params[:image_series][:visit][:visit_number], :visit_type => params[:image_series][:visit][:visit_type], :description => params[:image_series][:visit][:description])
+      visit = Visit.create(
+        :patient => @image_series.patient,
+        :visit_number => params[:image_series][:visit][:visit_number],
+        :visit_type => params[:image_series][:visit][:visit_type],
+        :description => params[:image_series][:visit][:description]
+      )
     elsif(params[:image_series][:visit_id].blank?)
       visit = nil
     else
@@ -616,7 +630,7 @@ ActiveAdmin.register ImageSeries do
   end
   member_action :assign_visit_form, :method => :get do
     @image_series = ImageSeries.find(params[:id])
-    authorize! :manage, @image_series
+    authorize! :assign_visit, @image_series
 
     if(@image_series.patient_id.nil?)
       flash[:error] = 'This image series is not assigned to a patient. Please assign a patient first!'

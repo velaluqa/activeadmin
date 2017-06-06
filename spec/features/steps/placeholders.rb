@@ -35,6 +35,7 @@ placeholder :admin_path do
       when 'Patient' then Patient.find_by(subject_id: identifier)
       when 'User' then User.find_by(username: identifier)
       when 'Visit' then Visit.find_by(visit_number: identifier)
+      when 'ImageSeries' then ImageSeries.find_by(name: identifier)
       end
     Rails.application.routes.url_helpers
          .send(method, record)
@@ -50,14 +51,20 @@ placeholder :admin_path do
       when 'User' then User.find_by(username: identifier)
       when 'Role' then Role.find_by(title: identifier)
       when 'Visit' then Visit.find_by(visit_number: identifier)
+      when 'ImageSeries' then ImageSeries.find_by(name: identifier)
       end
     Rails.application.routes.url_helpers
          .send("admin_#{model_name.singularize.underscore}_path", record)
   end
 
   match(/([^$\n]+) list/) do |model_name|
-    Rails.application.routes.url_helpers
-         .send("admin_#{model_name.underscore.pluralize}_path")
+    if model_name.underscore.pluralize == model_name.underscore.singularize
+      Rails.application.routes.url_helpers
+        .send("admin_#{model_name.underscore.pluralize}_index_path")
+    else
+      Rails.application.routes.url_helpers
+        .send("admin_#{model_name.underscore.pluralize}_path")
+    end
   end
 
   match(/([^ $\n]+) ([^ $]+)/) do |action, model_name|
@@ -76,6 +83,7 @@ placeholder :model_instance do
     when 'Patient' then Patient.find_by(subject_id: identifier)
     when 'User' then User.find_by(username: identifier)
     when 'Visit' then Visit.find_by(visit_number: identifier)
+    when 'ImageSeries' then ImageSeries.find_by(name: identifier)
     end
   end
 end
@@ -103,5 +111,10 @@ end
 placeholder :role_instance do
   match(/"([^"]+)"/) do |identifier|
     Role.find_by(title: identifier)
+  end
+end
+placeholder :image_series_instance do
+  match(/"([^"]+)"/) do |identifier|
+    ImageSeries.find_by(name: identifier)
   end
 end
