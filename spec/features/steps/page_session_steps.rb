@@ -61,6 +61,12 @@ step 'I browse to :admin_path' do |path|
   visit(path)
 end
 
+step 'I browse to :admin_path with:' do |path, parameters|
+  path = URI.parse(path)
+  path.query = URI.encode_www_form(parameters.to_a)
+  visit(path.to_s)
+end
+
 step 'I see the unauthorized page' do
   expect(page).to have_content('Not Authorized')
   expect(page).to have_content('You are not authorized to perform this action!')
