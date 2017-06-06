@@ -1,4 +1,31 @@
 RSpec.describe Visit do
+  describe '#visit_type_valid?' do
+    let!(:study1) { create(:study, configuration: <<CONFIG.strip_heredoc) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT1: {}
+          SPECT2: {}
+CONFIG
+    let!(:center1) { create(:center, study: study1) }
+    let!(:patient1) { create(:patient, center: center1) }
+    let!(:visit1) { create(:visit, patient: patient1, visit_type: nil) }
+    let!(:visit2) { create(:visit, patient: patient1, visit_type: 'foobar') }
+    let!(:visit3) { create(:visit, patient: patient1, visit_type: 'baseline') }
+
+    it 'returns false if no visit type set' do
+      expect(visit1.visit_type_valid?).to be_falsy
+    end
+
+    it 'returns false if visit type is not found in study configuration' do
+      expect(visit2.visit_type_valid?).to be_falsy
+    end
+
+    it 'returns true if visit type in study configuration' do
+      expect(visit3.visit_type_valid?).to be_truthy
+    end
+  end
+
   describe '#state=' do
     context 'when saving' do
       let!(:visit) { create(:visit) }

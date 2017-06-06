@@ -262,6 +262,11 @@ JOIN_QUERY
     write_attribute(:mqc_state, index)
   end
 
+  def visit_type_valid?
+    return false if visit_type.nil?
+    study.visit_types.include?(visit_type)
+  end
+
   def current_required_series_specs
     return nil if visit_type.nil? || study.nil? || !study.semantically_valid?
 
