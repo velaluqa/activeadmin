@@ -198,7 +198,21 @@ ActiveAdmin.register Visit do
         end
       end
     end
-    render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series => required_series_objects, :qc_result_access => (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))} unless required_series_objects.empty?
+
+    panel 'Required Series' do
+      if !visit.study.semantically_valid?
+        text_node "The study configuration is not valid."
+      elsif visit.visit_type.nil?
+        text_node "Assign a visit type to manage required series."
+      elsif !visit.visit_type_valid?
+        text_node "Assigned visit type not found in study configuration. Maybe the study configuration changed in the meantime. Reassign a valid visit type to manage required series."
+      elsif !visit.required_series_available?
+        text_node "The study configuration does not provide any required series for this visit type."
+      else
+        render :partial => 'admin/visits/required_series', :locals => {:visit => visit, :required_series => required_series_objects, :qc_result_access => (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))} unless required_series_objects.empty?
+      end
+    end
+
     active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, visit)
   end
 
