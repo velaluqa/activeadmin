@@ -317,8 +317,8 @@ ActiveAdmin.register Visit do
     @page_title = 'Assign image series as required series'
     render 'admin/visits/assign_required_series'
   end
-  action_item :edit, :only => :show do
-    link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource)) if(can? :mqc, resource or can? :manage, resource)
+  action_item :assign_required_series, :only => :show, if: -> { can?(:assign_required_series, resource)} do
+    link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource))
   end
 
   member_action :tqc_results, :method => :get do
