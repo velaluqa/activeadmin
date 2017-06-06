@@ -493,7 +493,7 @@ ActiveAdmin.register Visit do
 
   member_action :edit_state, :method => :post do
     @visit = Visit.find(params[:id])
-    authorize! :manage, @visit
+    authorize! :update_state, @visit
 
     @visit.state = params[:visit][:state]
 
@@ -506,15 +506,15 @@ ActiveAdmin.register Visit do
   end
   member_action :edit_state_form, :method => :get do
     @visit = Visit.find(params[:id])
-    authorize! :manage, @visit
+    authorize! :update_state, @visit
 
     @states = [['Incomplete, not available', :incomplete_na], ['Complete, tQC of all series passed', :complete_tqc_passed], ['Incomplete, queried', :incomplete_queried], ['Complete, tQC not finished', :complete_tqc_pending], ['Complete, tQC finished, not all series passed', :complete_tqc_issues]]
 
     @return_url = params[:return_url] || admin_visit_path(@visit)
     @page_title = 'Change Visit State'
   end
-  action_item :edit, :only => :show do
-    link_to('Change State', edit_state_form_admin_visit_path(resource, :return_url => request.fullpath)) if can? :manage, resource
+  action_item :edit, :only => :show, if: -> { can?(:update_state, resource) } do
+    link_to('Change State', edit_state_form_admin_visit_path(resource, :return_url => request.fullpath))
   end
 
   controller do
