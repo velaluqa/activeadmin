@@ -182,6 +182,39 @@ YAML
     end
   end
 
+  describe '#update_configuration!' do
+    let!(:yaml) { <<CONFIG.strip_heredoc }
+      image_series_properties: []
+      visit_types:
+        pre-intervention: {}
+        post-intervention: {}
+CONFIG
+    let!(:yaml2) { <<CONFIG.strip_heredoc }
+      image_series_properties: []
+      visit_types:
+        pre-intervention: {}
+        foobar: {}
+CONFIG
+    let!(:study) { create(:study) }
+    let!(:ref) { study.update_configuration!(yaml) }
+
+    it 'saves a new configuration to the study' do
+      expect(study.has_configuration?).to be_truthy
+      expect(study.current_configuration).to include('image_series_properties' => [])
+      expect(study.current_configuration).to include('visit_types' => include('pre-intervention', 'post-intervention'))
+    end
+
+    it 'returns the ref of the new configuration' do
+      expect(ref).to be_a(String)
+    end
+
+    it 'overrides existing configuration' do
+      study.update_configuration!(yaml2)
+      expect(study.current_configuration).not_to include('visit_types' => include('post-intervention'))
+      expect(study.current_configuration).to include('visit_types' => include('foobar'))
+    end
+  end
+
   describe 'versioning' do
     describe 'create' do
       before(:each) do

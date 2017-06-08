@@ -206,6 +206,11 @@ JOIN
     validation_errors
   end
 
+  def update_configuration!(config, user: nil)
+    repo = GitConfigRepository.new
+    repo.update_config_file(relative_config_file_path, config, user, "New configuration file for study #{id}")
+  end
+
   def visit_types
     return [] unless has_configuration?
     return [] unless current_configuration['visit_types'].is_a?(Hash)
