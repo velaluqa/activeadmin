@@ -136,6 +136,38 @@ CONFIG
     end
   end
 
+  describe '#required_series_objects' do
+    let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT_1: {}
+          SPECT_2: {}
+    image_series_properties: []
+CONFIG
+    let!(:center) { create(:center, study: study) }
+    let!(:patient) { create(:patient, center: center) }
+
+    describe 'for visit without visit type' do
+      let!(:visit) { create(:visit, patient: patient) }
+      it 'returns empty array' do
+        expect(visit.required_series_objects.map(&:name)).to eq([])
+      end
+    end
+    describe 'for visit with invalid visit type' do
+      let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline_invalid') }
+      it 'returns empty array' do
+        expect(visit.required_series_objects.map(&:name)).to eq([])
+      end
+    end
+    describe 'for visit with valid visit type' do
+      let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
+      it 'returns word array of required series' do
+        expect(visit.required_series_objects.map(&:name)).to eq(%w(SPECT_1 SPECT_2))
+      end
+    end
+  end
+
   describe '#change_required_series_assignment' do
     let!(:study1) { create(:study, configuration: <<CONFIG.strip_heredoc) }
     visit_types:
