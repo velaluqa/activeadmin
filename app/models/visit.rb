@@ -321,9 +321,7 @@ JOIN_QUERY
   end
 
   def required_series_names
-    required_series_specs = locked_required_series_specs
-    return nil if required_series_specs.nil?
-    required_series_specs.keys
+    locked_required_series_specs.andand.keys || []
   end
 
   def required_series_objects
