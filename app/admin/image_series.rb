@@ -59,7 +59,7 @@ ActiveAdmin.register ImageSeries do
       end
       params[:image_series].delete(:force_update)
 
-      original_required_series = original_visit.andand.required_series
+      original_required_series = original_visit.andand.required_series.deep_dup
 
       original_visit_assignment_changes = {}
       new_visit_assignment_changes = {}
@@ -67,11 +67,12 @@ ActiveAdmin.register ImageSeries do
         original_visit_assignment_changes[required_series_name] = nil
         new_visit_assignment_changes[required_series_name] = image_series.id.to_s
       end
+
       original_visit.change_required_series_assignment(original_visit_assignment_changes) unless original_visit.nil?
-      unless(original_visit.nil? or new_visit.nil? or original_visit.visit_type != new_visit.visit_type)
+      if original_visit && new_visit && original_visit.visit_type == new_visit.visit_type
         new_visit.change_required_series_assignment(new_visit_assignment_changes)
 
-        unless(original_required_series.nil?)
+        if original_required_series
           currently_assigned_required_series_names.each do |required_series_name|
             next if original_required_series[required_series_name].nil?
             new_visit.set_tqc_result(required_series_name,
@@ -85,7 +86,6 @@ ActiveAdmin.register ImageSeries do
       end
 
       update!
-      puts 'YEEEHAAAA!!!'
     end
 
     def generate_selected_filters
@@ -310,7 +310,10 @@ ActiveAdmin.register ImageSeries do
       f.input :series_number#, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
       f.input :name
       f.input :imaging_date, :as => :datepicker
-      f.input :force_update, :as => :hidden, :value => (params[:force_update] ? 'true' : 'false') if f.object.persisted?
+      if f.object.persisted?
+        f.object.force_update = (params[:force_update] || 'false')
+        f.input :force_update, :as => :hidden
+      end
       f.input :comment
     end
 

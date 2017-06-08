@@ -222,7 +222,7 @@ JOIN
   end
 
   def assigned_required_series
-    visit.andand.assigned_image_series_index.andand[id.to_s] || []
+    visit.andand.assigned_image_series_index.andand[id.to_s].andand.deep_dup || []
   end
 
   def change_required_series_assignment(new_assignment)
@@ -276,6 +276,15 @@ JOIN
     attributes.merge(
       state: state_sym
     ).to_json
+  end
+
+  # fake attributes for the somewhat laborious implementation of visit assignment changes
+  def force_update
+    @force_update
+  end
+
+  def force_update=(val)
+    @force_update = val
   end
 
   protected
@@ -376,13 +385,6 @@ JOIN
       end
     end
   end
-
-  # fake attributes for the somewhat laborious implementation of visit assignment changes
-  def force_update
-    nil
-  end
-
-  def force_update=(val); end
 
   # reassigning an image series to a different visit:
   # * check if new visit has same visit type as current visit
