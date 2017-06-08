@@ -241,12 +241,16 @@ CONFIG
     visit_types:
       baseline:
         required_series:
-          SPECT_1: {}
-          SPECT_2: {}
+          SPECT_1:
+            tqc: []
+          SPECT_2:
+            tqc: []
       baseline2:
         required_series:
-          SPECT_2: {}
-          SPECT_3: {}
+          SPECT_2:
+            tqc: []
+          SPECT_3:
+            tqc: []
     image_series_properties: []
 CONFIG
     before(:each) do
@@ -275,6 +279,8 @@ CONFIG
     describe 'changing assignment for required series' do
       before(:each) do
         visit1.change_required_series_assignment('SPECT_1' => image_series1.id)
+        visit1.set_tqc_result('SPECT_1', {}, create(:user), '')
+        expect(visit1.required_series_objects.find { |rs| rs.name == 'SPECT_1' }.tqc_state).to eq(:passed)
         visit1.change_required_series_assignment('SPECT_1' => image_series2.id)
       end
 
@@ -289,6 +295,9 @@ CONFIG
       it 'sets image series state of unassigned image series to `visit_assigned`' do
         image_series1.reload
         expect(image_series1.state_sym).to eq(:visit_assigned)
+      end
+      it 'resets `tqc_state` to `pending`' do
+        expect(visit1.required_series_objects.find { |rs| rs.name == 'SPECT_1' }.tqc_state).to eq(:pending)
       end
     end
 
