@@ -658,7 +658,7 @@ JOIN_QUERY
   end
 
   def mqc_spec
-    reutrn mqc_spec_at_version(mqc_version || study.locked_version)
+    mqc_spec_at_version(mqc_version || study.locked_version)
   end
 
   def locked_mqc_spec
