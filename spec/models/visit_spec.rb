@@ -1,4 +1,109 @@
 RSpec.describe Visit do
+  describe '#required_series_spec' do
+    describe 'for building study' do
+      let!(:study) { create(:study, configuration: <<CONFIG.strip_heredoc) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT_1: {}
+          SPECT_2: {}
+    image_series_properties: []
+CONFIG
+      let!(:center) { create(:center, study: study) }
+      let!(:patient) { create(:patient, center: center) }
+      let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
+      before(:each) { expect(visit.study.state).to eq(:building) }
+
+      it 'returns nil' do
+        expect(visit.required_series_spec).to be_nil
+      end
+    end
+
+    describe 'for semantically invalid study' do
+      let!(:study) { create(:study, configuration: <<CONFIG.strip_heredoc) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT_1: {}
+          SPECT_2: {}
+CONFIG
+      let!(:center) { create(:center, study: study) }
+      let!(:patient) { create(:patient, center: center) }
+      let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
+      before(:each) do
+        study.lock_configuration!
+        expect(visit.study.semantically_valid?).to be_falsy
+      end
+
+      it 'returns nil' do
+        expect(visit.required_series_spec).to be_nil
+      end
+    end
+
+    describe 'for visit_type = nil' do
+      let!(:study) { create(:study, configuration: <<CONFIG.strip_heredoc) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT_1: {}
+          SPECT_2: {}
+    image_series_properties: []
+CONFIG
+      let!(:center) { create(:center, study: study) }
+      let!(:patient) { create(:patient, center: center) }
+      let!(:visit) { create(:visit, patient: patient) }
+      before(:each) do
+        study.lock_configuration!
+      end
+
+      it 'returns nil' do
+        expect(visit.required_series_spec).to be_nil
+      end
+    end
+
+    describe 'for valid production study' do
+      let!(:study) { create(:study) }
+      let!(:center) { create(:center, study: study) }
+      let!(:patient) { create(:patient, center: center) }
+      let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
+
+      before(:each) do
+        study.update_configuration!(<<CONFIG.strip_heredoc)
+    visit_types:
+      baseline:
+        required_series:
+          SPECT_1: {}
+          SPECT_2: {}
+    image_series_properties: []
+CONFIG
+        study.lock_configuration!
+      end
+
+      let(:current_ref) { study.update_configuration!(<<CONFIG.strip_heredoc) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT_1: {}
+          SPECT_2: {}
+          foobar: {}
+    image_series_properties: []
+CONFIG
+
+
+      it 'defaults to locked study version specification for visits visit type' do
+        expect(visit.required_series_spec).to be_a(Hash)
+        expect(visit.required_series_spec).to include('SPECT_1' => {}, 'SPECT_2' => {})
+        expect(visit.required_series_spec).not_to include('foobar' => {})
+      end
+
+      describe 'given a :version option' do
+        it 'returns specific study specification for visits visit type' do
+          expect(visit.required_series_spec(version: current_ref)).to include('SPECT_1' => {}, 'SPECT_2' => {}, 'foobar' => {})
+        end
+      end
+    end
+  end
+
   describe '#change_required_series_assignment' do
     let!(:study1) { create(:study, configuration: <<CONFIG.strip_heredoc) }
     visit_types:

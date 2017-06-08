@@ -277,6 +277,28 @@ JOIN_QUERY
     required_series_specs_for_configuration(study.current_configuration)
   end
 
+  # Returns the studies specification of required series for the
+  # visits `visit_type` as Hash.
+  #
+  # @param version [Symbol, String] which version to get (can be
+  #   `:current`, `:locked` or a version reference)
+  # @return [Hash]
+  def required_series_spec(version: :locked)
+    return nil if visit_type.nil?
+    return nil if !study.semantically_valid?
+    return nil if study.state == :building
+
+    config =
+      if version == :locked
+        study.locked_configuration
+      elsif version == :current
+        study.current_configuration
+      else
+        study.configuration_at_version(version)
+      end
+    config.andand['visit_types'].andand[visit_type].andand['required_series']
+  end
+
   def locked_required_series_specs
     return nil if visit_type.nil? || study.nil? || !study.locked_semantically_valid?
 
