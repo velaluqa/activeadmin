@@ -215,6 +215,51 @@ CONFIG
     end
   end
 
+  describe '#lock_configuration!' do
+    let!(:study) { create(:study) }
+    let!(:locked_ref) { study.update_configuration!(<<CONFIG.strip_heredoc) }
+      image_series_properties: []
+      visit_types:
+        pre-intervention: {}
+        post-intervention: {}
+CONFIG
+    before(:each) do
+      study.lock_configuration!
+      study.reload
+    end
+
+    it 'sets the state to `production`' do
+      expect(study.state).to eq(:production)
+    end
+
+    it 'sets the `locked_version` to current configuration ref' do
+      expect(study.locked_version).to eq(locked_ref)
+    end
+  end
+
+  describe '#unlock_configuration!' do
+    let!(:study) { create(:study) }
+    let!(:locked_ref) { study.update_configuration!(<<CONFIG.strip_heredoc) }
+      image_series_properties: []
+      visit_types:
+        pre-intervention: {}
+        post-intervention: {}
+CONFIG
+    before(:each) do
+      study.lock_configuration!
+      study.unlock_configuration!
+      study.reload
+    end
+
+    it 'sets the state to `building`' do
+      expect(study.state).to eq(:building)
+    end
+
+    it 'sets the `locked_version` to `nil`' do
+      expect(study.locked_version).to be_nil
+    end
+  end
+
   describe 'versioning' do
     describe 'create' do
       before(:each) do

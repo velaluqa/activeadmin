@@ -206,6 +206,18 @@ JOIN
     validation_errors
   end
 
+  def lock_configuration!
+    self.state = :production
+    self.locked_version = GitConfigRepository.new.current_version
+    save!
+  end
+
+  def unlock_configuration!
+    self.state = :building
+    self.locked_version = nil
+    save!
+  end
+
   def update_configuration!(config, user: nil)
     repo = GitConfigRepository.new
     repo.update_config_file(relative_config_file_path, config, user, "New configuration file for study #{id}")
