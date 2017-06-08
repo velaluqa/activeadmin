@@ -137,6 +137,10 @@ QUERY
     !@image_series_id.blank?
   end
 
+  def image_series_id
+    @image_series_id.andand.to_i
+  end
+
   def assigned_image_series
     @assigned_image_series ||= ImageSeries.where(id: @image_series_id, visit_id: @visit.id).first unless @image_series_id.nil?
 

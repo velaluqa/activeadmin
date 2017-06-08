@@ -511,7 +511,7 @@ JOIN_QUERY
         FileUtils.rm(image_storage_root + required_series_image_storage_path(required_series_name), force: true)
       else
         FileUtils.rm(image_storage_root + required_series_image_storage_path(required_series_name), force: true)
-        FileUtils.ln_sf(series_id, image_storage_root + required_series_image_storage_path(required_series_name))
+        FileUtils.ln_sf(series_id.to_s, image_storage_root + required_series_image_storage_path(required_series_name))
       end
 
       if old_series_id != series_id

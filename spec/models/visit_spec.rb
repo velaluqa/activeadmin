@@ -1,4 +1,76 @@
 RSpec.describe Visit do
+  describe '#change_required_series_assignment' do
+    let!(:study1) { create(:study, configuration: <<CONFIG.strip_heredoc) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT_1: {}
+          SPECT_2: {}
+      baseline2:
+        required_series:
+          SPECT_2: {}
+          SPECT_3: {}
+    image_series_properties: []
+CONFIG
+    before(:each) do
+      study1.lock!
+    end
+
+    let!(:center1) { create(:center, study: study1) }
+    let!(:patient1) { create(:patient, center: center1) }
+    let!(:visit1) { create(:visit, patient: patient1, visit_type: 'baseline') }
+    let!(:image_series1) { create(:image_series, state: 1, patient: patient1, visit: visit1) }
+    let!(:image_series2) { create(:image_series, state: 1, patient: patient1, visit: visit1) }
+
+    describe 'adding assignment for required series' do
+      before(:each) do
+        visit1.change_required_series_assignment('SPECT_1' => image_series1.id)
+      end
+      it 'assigns new required series' do
+        expect(visit1.required_series_objects.map(&:image_series_id)).to include(image_series1.id)
+      end
+      it 'sets image series state of assigned image series to `required_series_assigned`' do
+        image_series1.reload
+        expect(image_series1.state_sym).to eq(:required_series_assigned)
+      end
+    end
+
+    describe 'changing assignment for required series' do
+      before(:each) do
+        visit1.change_required_series_assignment('SPECT_1' => image_series1.id)
+        visit1.change_required_series_assignment('SPECT_1' => image_series2.id)
+      end
+
+      it 'assigns new required series' do
+        expect(visit1.required_series_objects.map(&:image_series_id)).not_to include(image_series1.id)
+        expect(visit1.required_series_objects.map(&:image_series_id)).to include(image_series2.id)
+      end
+      it 'sets image series state of assigned image series to `required_series_assigned`' do
+        image_series2.reload
+        expect(image_series2.state_sym).to eq(:required_series_assigned)
+      end
+      it 'sets image series state of unassigned image series to `visit_assigned`' do
+        image_series1.reload
+        expect(image_series1.state_sym).to eq(:visit_assigned)
+      end
+    end
+
+    describe 'removing assignment for required series' do
+      before(:each) do
+        visit1.change_required_series_assignment('SPECT_1' => image_series1.id)
+        visit1.change_required_series_assignment('SPECT_1' => nil)
+      end
+
+      it 'removes required series assignment' do
+        expect(visit1.required_series_objects.map(&:image_series_id)).not_to include(image_series1.id)
+      end
+      it 'sets image series state of unassigned image series to `visit_assigned`' do
+        image_series1.reload
+        expect(image_series1.state_sym).to eq(:visit_assigned)
+      end
+    end
+  end
+
   describe '#visit_type_valid?' do
     let!(:study1) { create(:study, configuration: <<CONFIG.strip_heredoc) }
     visit_types:
