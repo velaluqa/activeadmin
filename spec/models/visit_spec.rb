@@ -118,7 +118,7 @@ CONFIG
     image_series_properties: []
 CONFIG
     before(:each) do
-      study1.lock!
+      study1.lock_configuration!
     end
 
     let!(:center1) { create(:center, study: study1) }
@@ -222,7 +222,7 @@ CONFIG
     let!(:visit4) { create(:visit, patient: patient1, visit_type: 'baseline') }
 
     before(:each) do
-      study1.lock!
+      study1.lock_configuration!
     end
 
     it 'returns false if no visit type set' do
