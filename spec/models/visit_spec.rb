@@ -1,4 +1,72 @@
 RSpec.describe Visit do
+  describe 'after commit hook handling required series' do
+    let!(:study1) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT_1: {}
+          SPECT_2: {}
+      baseline2:
+        required_series:
+          SPECT_2: {}
+          SPECT_3: {}
+    image_series_properties: []
+CONFIG
+    let!(:center1) { create(:center, study: study1) }
+    let!(:patient1) { create(:patient, center: center1) }
+
+    describe 'creating with visit type' do
+      let!(:visit) { create(:visit, patient: patient1, visit_type: 'baseline', visit_number: '10000') }
+
+      it 'adds `SPECT_1` and `SPECT_2` to visits required series' do
+        expect(visit.required_series_objects.map(&:name)).to include('SPECT_1', 'SPECT_2')
+      end
+    end
+
+    describe 'setting visit type' do
+      let!(:visit) { create(:visit, patient: patient1, visit_type: nil, visit_number: '10000') }
+
+      it 'adds `SPECT_2` and `SPECT_3` to visits required series' do
+        expect(visit .required_series_objects.map(&:name)).not_to include('SPECT_1', 'SPECT_2')
+        expect(visit .required_series_objects.map(&:name)).not_to include('SPECT_3')
+        visit.visit_type = 'baseline2'
+        visit.save!
+        expect(visit .required_series_objects.map(&:name)).not_to include('SPECT_1')
+        expect(visit.required_series_objects.map(&:name)).to include('SPECT_2', 'SPECT_3')
+      end
+    end
+
+    describe 'changing visit type' do
+      let!(:visit) { create(:visit, patient: patient1, visit_type: 'baseline', visit_number: '10000') }
+
+      before(:each) do
+        visit.visit_type = 'baseline2'
+        visit.save!
+      end
+
+      it 'removes `SPECT_1` from visits required series' do
+        expect(visit.required_series_objects.map(&:name)).not_to include('SPECT_1')
+      end
+
+      it 'adds `SPECT_3` to visits required series' do
+        expect(visit.required_series_objects.map(&:name)).to include('SPECT_2', 'SPECT_3')
+      end
+    end
+
+    describe 'removing visit type' do
+      let!(:visit) { create(:visit, patient: patient1, visit_type: 'baseline', visit_number: '10000') }
+
+      before(:each) do
+        visit.visit_type = nil
+        visit.save!
+      end
+
+      it 'removes all required series for visit' do
+        expect(visit.required_series_objects.map(&:name)).not_to include('SPECT_1', 'SPECT_2', 'SPECT_3')
+      end
+    end
+  end
+
   describe '#required_series_spec' do
     describe 'for building study' do
       let!(:study) { create(:study, configuration: <<CONFIG.strip_heredoc) }
