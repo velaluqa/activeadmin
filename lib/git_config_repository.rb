@@ -52,8 +52,12 @@ class GitConfigRepository
     @repo.lookup(oid)
   end
 
-  def update_config_file(path, new_file, author, commit_message)
-    FileUtils.cp(new_file, @repo.workdir + '/' + path)
+  def update_config_file(path, config, author, commit_message)
+    if config.is_a?(String)
+      File.write(@repo.workdir + '/' + path, config)
+    else
+      FileUtils.cp(config, @repo.workdir + '/' + path)
+    end
     update_path(path, author, commit_message)
   end
 
