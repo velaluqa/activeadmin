@@ -271,12 +271,6 @@ JOIN_QUERY
     !(required_series_names || []).empty?
   end
 
-  def current_required_series_specs
-    return nil if visit_type.nil? || study.nil? || !study.semantically_valid?
-
-    required_series_specs_for_configuration(study.current_configuration)
-  end
-
   # Returns the studies specification of required series for the
   # visits `visit_type` as Hash.
   #
@@ -330,13 +324,6 @@ JOIN_QUERY
     end
   end
 
-  def assigned_required_series(required_series_name)
-    required_series = self.required_series(required_series_name)
-    return nil unless required_series.andand['image_series_id']
-
-    ImageSeries.find(required_series['image_series_id'])
-  end
-
   def assigned_required_series_id_map
     id_map = {}
     required_series.each do |required_series_name, required_series|
@@ -344,16 +331,6 @@ JOIN_QUERY
     end
 
     id_map
-  end
-
-  def assigned_required_series_map
-    map = assigned_required_series_id_map
-    object_map = {}
-    map.each do |series_name, series_id|
-      object_map[series_name] = ImageSeries.find(series_id) unless series_id.nil?
-    end
-
-    object_map
   end
 
   def remove_orphaned_required_series
