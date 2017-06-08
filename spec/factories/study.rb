@@ -26,12 +26,7 @@ FactoryGirl.define do
 
     after(:create) do |study, evaluator|
       if evaluator.configuration.is_a?(String)
-        tempfile = Tempfile.new('test.yml')
-        tempfile.write(evaluator.configuration)
-        tempfile.close
-        repo = GitConfigRepository.new
-        repo.update_config_file(study.relative_config_file_path, tempfile, nil, "New configuration file for study #{study.id}")
-        tempfile.unlink
+        study.update_configuration!(evaluator.configuration)
       end
     end
   end
