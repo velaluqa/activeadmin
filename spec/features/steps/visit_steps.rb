@@ -23,3 +23,12 @@ step 'a visit with:' do |table|
   end
   create(:visit, options)
 end
+
+step 'visit :visit_instance has required series :string assigned to :image_series_instance' do |visit, required_series, image_series|
+  visit.change_required_series_assignment(required_series => image_series.id.to_s)
+end
+
+step 'visit :visit_instance required series :string has tQC with:' do |visit, required_series, tqc|
+  comment = tqc.to_h['comment']
+  visit.set_tqc_result(required_series, {}, @user, comment)
+end

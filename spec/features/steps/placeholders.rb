@@ -118,6 +118,11 @@ placeholder :role_instance do
     Role.find_by(title: identifier)
   end
 end
+placeholder :visit_instance do
+  match(/"([^"]+)"/) do |identifier|
+    Visit.find_by(visit_number: identifier)
+  end
+end
 placeholder :image_series_instance do
   match(/"([^"]+)"/) do |identifier|
     ImageSeries.find_by(name: identifier)
