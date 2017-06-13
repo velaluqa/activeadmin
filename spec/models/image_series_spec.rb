@@ -1,4 +1,24 @@
 RSpec.describe ImageSeries do
+  describe '#assigned_required_series' do
+    let!(:study) { create(:study) }
+    let!(:center) { create(:center, study: study) }
+    let!(:patient) { create(:patient, center: center) }
+    let!(:visit) { create(:visit, patient: patient) }
+    let!(:series1) { create(:image_series, visit: visit, patient: patient) }
+    let!(:required_series1) { create(:required_series, visit: visit, name: 'SPECT_1') }
+    let!(:required_series2) { create(:required_series, visit: visit, name: 'SPECT_2') }
+
+    before(:each) do
+      required_series1.assign_image_series!(series1)
+      required_series2.assign_image_series!(series1)
+    end
+
+    it 'returns assigned required series' do
+      expect(series1.assigned_required_series).to include(required_series1)
+      expect(series1.assigned_required_series).to include(required_series2)
+    end
+  end
+
   describe '#state=' do
     context 'after save' do
       let!(:image_series) { create(:image_series) }

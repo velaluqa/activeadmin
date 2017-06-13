@@ -178,7 +178,13 @@ YAML
         expect(study.visit_types).to eq([])
       end
     end
-    describe 'configured as mapping' do
+
+    describe 'locked configuration' do
+      it 'defaults to locked version'
+    end
+
+    describe 'unlocked configuration' do
+      it 'defaults to most current version'
     end
   end
 
@@ -257,6 +263,72 @@ CONFIG
 
     it 'sets the `locked_version` to `nil`' do
       expect(study.locked_version).to be_nil
+    end
+  end
+
+  describe '#configuration' do
+    describe 'for locked study' do
+      let!(:study) { create(:study) }
+      let!(:first_ref) { study.update_configuration!(<<CONFIG.strip_heredoc) }
+      image_series_properties: []
+      visit_types:
+        pre-intervention: {}
+        post-intervention: {}
+CONFIG
+      let!(:locked_ref) { study.lock_configuration! }
+      let!(:second_ref) { study.update_configuration!(<<CONFIG.strip_heredoc) }
+      image_series_properties: []
+      visit_types:
+        something: {}
+        completely: {}
+        different: {}
+CONFIG
+
+      it 'defaults to locked configuration' do
+        expect(study.configuration).to eq(study.configuration_at_version(study.locked_version))
+      end
+    end
+
+    describe 'for unlocked study' do
+      let!(:study) { create(:study) }
+      let!(:first_ref) { study.update_configuration!(<<CONFIG.strip_heredoc) }
+      image_series_properties: []
+      visit_types:
+        pre-intervention: {}
+        post-intervention: {}
+CONFIG
+      let!(:second_ref) { study.update_configuration!(<<CONFIG.strip_heredoc) }
+      image_series_properties: []
+      visit_types:
+        something: {}
+        completely: {}
+        different: {}
+CONFIG
+
+      it 'defaults to most current configuration' do
+        expect(study.configuration).to eq(study.configuration_at_version(second_ref))
+      end
+    end
+
+    describe 'for specified version ref' do
+      let!(:study) { create(:study) }
+      let!(:first_ref) { study.update_configuration!(<<CONFIG.strip_heredoc) }
+      image_series_properties: []
+      visit_types:
+        pre-intervention: {}
+        post-intervention: {}
+CONFIG
+      let!(:second_ref) { study.update_configuration!(<<CONFIG.strip_heredoc) }
+      image_series_properties: []
+      visit_types:
+        something: {}
+        completely: {}
+        different: {}
+CONFIG
+
+      it 'returns version its asking for' do
+        expect(study.configuration(version: first_ref)).to include('visit_types' => include('pre-intervention'))
+      end
     end
   end
 

@@ -82,9 +82,7 @@ class HistoricReportQuery < ActiveRecord::Base
     values.push(group: nil, count: count[:total], delta: delta[:total]) unless delta[:total] == 0
     count_keys = count[:group].andand.keys || []
     delta_keys = delta[:group].andand.keys || []
-    (count_keys + delta_keys)
-      .uniq
-      .each do |group|
+    (count_keys + delta_keys).uniq.each do |group|
       group_count = count[:group].andand[group] || 0
       group_delta = delta[:group].andand[group] || 0
       next if group_delta == 0
@@ -116,6 +114,28 @@ class HistoricReportQuery < ActiveRecord::Base
     count
   end
 
+  def classify_event(version)
+    case version.item_type
+    when 'RequiredSeries' then classify_required_series_event(version)
+    else classify_basic_event(version)
+    end
+  end
+
+  def classify_basic_event(version)
+    version.event
+  end
+
+  def classify_required_series_event(version)
+    changes = version.complete_changes
+    return if changes['image_series_id'].blank?
+    was = changes['image_series_id'][0]
+    becomes = changes['image_series_id'][1]
+    if was.nil? && becomes.present? then 'create'
+    elsif was.present? && becomes.nil? then 'destroy'
+    else 'update'
+    end
+  end
+
   def calculate_ungrouped_delta(version)
     case version.event
     when 'create' then { total: +1 }
@@ -131,30 +151,32 @@ class HistoricReportQuery < ActiveRecord::Base
       {
         total: +1,
         group: {
-          group.to_s => +1
+          map_group_name(group) => +1
         }
       }
     when 'destroy' then
+      group = version.object[group_by]
       {
         total: -1,
         group: {
-          version.object[group_by].to_s => -1
+          map_group_name(group) => -1
         }
       }
     when 'update' then
       return nil unless version.object_changes.key?(group_by)
+      old_group = version.object_changes[group_by][0]
+      new_group = version.object_changes[group_by][1]
       {
         total: 0,
         group: {
-          version.object_changes[group_by][0].to_s => -1,
-          version.object_changes[group_by][1].to_s => +1
+          map_group_name(old_group) => -1,
+          map_group_name(new_group) => +1
         }
       }
     end
   end
 
   def calculate_delta(version)
-    return calculate_rs_delta(version) if resource_type == 'RequiredSeries'
     if group_by.blank?
       calculate_ungrouped_delta(version)
     else
@@ -162,108 +184,18 @@ class HistoricReportQuery < ActiveRecord::Base
     end
   end
 
-  # TODO: Refactor in the process of moving required_series
-  # associations out of a JSON field into single relations.
-  #
-  # Apologies to anyone who has to maintain this stuff.
-  # Deadline is pressing.
-  def calculate_rs_delta(version)
-    if group_by.blank?
-      calculate_ungrouped_rs_delta(version)
-    else
-      calculate_grouped_rs_delta(version)
-    end
+  def map_group_name(group)
+    self.class.map_group_name(resource_type, group)
   end
 
-  def calculate_grouped_rs_delta(version)
-    changed = false
-    delta = {
-      total: 0,
-      group: {}
-    }
-    case version.event
-    when 'create'
-      rs = version.object_changes['required_series'].andand[1] || {}
-      rs.each_pair do |_, data|
-        next if data['image_series_id'].nil?
-        changed = true
-        delta[:total] += 1
-        delta[:group][data[group_by].to_s] ||= 0
-        delta[:group][data[group_by].to_s] += 1
-      end
-    when 'destroy' then
-      rs = version.object['required_series'] || {}
-      rs.each_pair do |_, data|
-        next if data['image_series_id'].nil?
-        changed = true
-        delta[:total] -= 1
-        delta[:group][data[group_by].to_s] ||= 0
-        delta[:group][data[group_by].to_s] -= 1
-      end
-    when 'update'
-      old, new = version.object_changes['required_series']
-      old_count = { total: 0, group: {} }
-      (old || {}).each_pair do |_, data|
-        next if data['image_series_id'].nil?
-        old_count[:total] += 1
-        old_count[:group][data[group_by].to_s] ||= 0
-        old_count[:group][data[group_by].to_s] += 1
-      end
-
-      new_count = { total: 0, group: {} }
-      (new || {}).each_pair do |_, data|
-        next if data['image_series_id'].nil?
-        new_count[:total] += 1
-        new_count[:group][data[group_by].to_s] ||= 0
-        new_count[:group][data[group_by].to_s] += 1
-      end
-      changed = true if new_count[:total] != old_count[:total]
-      delta = {
-        total: new_count[:total] - old_count[:total],
-        group: (old_count[:group].keys + new_count[:group].keys)
-              .uniq
-              .map do |group|
-                 old_group_count = old_count[:group][group] || 0
-                 new_group_count = new_count[:group][group] || 0
-                 changed = true if old_group_count != new_group_count
-                 [
-                   group.to_s,
-                   new_group_count - old_group_count
-                 ]
-               end.to_h
-      }
-    end
-    delta if changed
-  end
-
-  def calculate_ungrouped_rs_delta(version)
-    case version.event
-    when 'create'
-      delta = 0
-      rs = version.object_changes['required_series'].andand[1] || {}
-      rs.each_pair do |_, data|
-        delta += 1 if data['image_series_id']
-      end
-      { total: delta } if delta != 0
-    when 'destroy' then
-      delta = 0
-      rs = version.object['required_series'] || {}
-      rs.each_pair do |_, data|
-        delta -= 1 if data['image_series_id']
-      end
-      { total: delta } if delta != 0
-    when 'update'
-      old, new = version.object_changes['required_series']
-      old_count = 0
-      (old || {}).each_pair do |_, data|
-        old_count += 1 if data['image_series_id']
-      end
-      new_count = 0
-      (new || {}).each_pair do |_, data|
-        new_count += 1 if data['image_series_id']
-      end
-      delta = new_count - old_count
-      { total: delta } if delta != 0
+  def self.map_group_name(resource_type, group)
+    case resource_type
+    when 'RequiredSeries' then
+      return 'unassigned' if group.nil?
+      return group if RequiredSeries.tqc_states.include?(group)
+      return 'unassigned' if group.is_a?(String) && group.to_i.to_s != group
+      RequiredSeries.tqc_states.key(group.to_i) || 'unassigned'
+    else group.to_s
     end
   end
 end

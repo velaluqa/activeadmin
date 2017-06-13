@@ -48,6 +48,7 @@ class Study < ActiveRecord::Base
   has_many :visits, through: :patients
   has_many :image_series, through: :patients
   has_many :images, through: :image_series
+  has_many :required_series, through: :visits
 
   validates_presence_of :name
 
@@ -146,33 +147,21 @@ JOIN
   end
 
   def current_configuration
-    begin
-      config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, nil)
-    rescue SyntaxError => e
-      return nil
-    end
-
-    config
+    GitConfigRepository.new.yaml_at_version(relative_config_file_path, nil)
+  rescue SyntaxError => _e
+    nil
   end
 
   def locked_configuration
-    begin
-      config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, locked_version)
-    rescue SyntaxError => e
-      return nil
-    end
-
-    config
+    GitConfigRepository.new.yaml_at_version(relative_config_file_path, locked_version)
+  rescue SyntaxError => _e
+    nil
   end
 
   def configuration_at_version(version)
-    begin
-      config = GitConfigRepository.new.yaml_at_version(relative_config_file_path, version)
-    rescue SyntaxError => e
-      return nil
-    end
-
-    config
+    GitConfigRepository.new.yaml_at_version(relative_config_file_path, version)
+  rescue SyntaxError => _e
+    nil
   end
 
   def has_configuration?
@@ -223,16 +212,68 @@ JOIN
     repo.update_config_file(relative_config_file_path, config, user, "New configuration file for study #{id}")
   end
 
-  def visit_types
-    return [] unless has_configuration?
-    return [] unless current_configuration['visit_types'].is_a?(Hash)
-    current_configuration['visit_types'].keys
+  # Returns configured visit_type specification.
+  #
+  # @param [String] version the version to get the visit types for
+  # @return [Hash] hash with visit type specification
+  def visit_type_spec(version: nil)
+    config = configuration(version: version)
+    return {} unless config
+    return {} unless config['visit_types'].is_a?(Hash)
+    config['visit_types']
   end
 
-  def visit_templates
-    return {} unless has_configuration?
-    return {} unless current_configuration['visit_templates'].is_a?(Hash)
-    current_configuration['visit_templates']
+  # Returns configured visit type namesx.
+  #
+  # @param [String] version the version to get the visit types for
+  # @return [Array] array with visit type names
+  def visit_types(version: nil)
+    visit_type_spec(version: version).keys
+  end
+
+  def visit_templates(version: nil)
+    config = configuration(version: version)
+    return {} unless config
+    return {} unless config['visit_templates'].is_a?(Hash)
+    config['visit_templates']
+  end
+
+  # Returns configured required series specification for a specified
+  # `visit_type`.
+  #
+  # @param [String] visit_type the name of the visit type
+  # @param [String] version the version to get the required series for
+  # @return [Hash] hash with required series specification
+  def required_series_spec(visit_type, version: nil)
+    visit_types = visit_type_spec(version: version)
+    return {} unless visit_types[visit_type].is_a?(Hash)
+    return {} unless visit_types[visit_type]['required_series'].is_a?(Hash)
+    visit_types[visit_type]['required_series']
+  end
+
+  # Returns configured required series names for a specified
+  # `visit_type`.
+  #
+  # @param [String] visit_type the name of the visit type
+  # @param [String] version the version to get the required series for
+  # @return [Array] array of required series names
+  def required_series_names(visit_type, version: nil)
+    required_series_spec(visit_type, version: version).keys
+  end
+
+  def locked?
+    locked_version.present?
+  end
+
+  def configuration(version: nil)
+    version ||= locked? ? :locked : :current
+    if version == :locked
+      locked_configuration
+    elsif version == :current
+      current_configuration
+    else
+      configuration_at_version(version)
+    end
   end
 
   def wado_query

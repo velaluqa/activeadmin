@@ -194,8 +194,7 @@ ActiveAdmin.register Study do
         end
       end
 
-      repo = GitConfigRepository.new
-      repo.update_config_file(@study.relative_config_file_path, params[:study][:file].tempfile, current_user, "New configuration file for study #{@study.id}")
+      @study.update_configuration!(params[:study][:file].tempfile, user: current_user)
 
       redirect_to({ action: :show }, notice: 'Configuration successfully uploaded.' + (nullified_visits == 0 ? '' : " #{nullified_visits} visits had their visit type reset, because their former visit type no longer exists."))
     end

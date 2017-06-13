@@ -8,11 +8,11 @@
             %th State
             %td
               - case @required_series.tqc_state
-              - when :pending
+              - when 'pending'
                 %span.status_tag.Pending.warning Pending
-              - when :issues
+              - when 'issues'
                 %span.status_tag.Issues.error Performed, issues present
-              - when :passed
+              - when 'passed'
                 %span.status_tag.Passed.ok Passed
           %tr
             %th Date

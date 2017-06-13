@@ -118,6 +118,7 @@ RSpec.describe V1::ImageSeriesController do
     before(:each) do
       @visit = create(:visit)
       @image_series = create(:image_series, visit: @visit, name: 'Some Series', state: :imported)
+      @required_series = create(:required_series, visit: @visit, name:'liver_portal_venous')
       @required_series = ['liver_portal_venous']
     end
 

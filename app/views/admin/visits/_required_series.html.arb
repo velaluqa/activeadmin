@@ -1,21 +1,21 @@
-table_for required_series, :sortable => true, :class => 'index_table index' do
+table_for required_series, sortable: true, class: 'index_table index' do
   column :name
   column :assigned_image_series, :sortable => :image_series_id do |required_series|
     assigned_series = required_series.assigned_image_series
-    if(assigned_series.nil?)
-      status_tag('Missing', :error)
+    if assigned_series
+      status_tag('Assigned', :ok, label: link_to(assigned_series.name, admin_image_series_path(assigned_series)).html_safe)
     else
-      status_tag('Assigned', :ok, :label => link_to(assigned_series.name, admin_image_series_path(assigned_series)).html_safe)
+      status_tag('Missing', :error)
     end
   end
   if(qc_result_access)
     column 'tQC State', :tqc_state, :sortable => :tqc_state do |required_series|
       case required_series.tqc_state
-      when :pending
+      when 'pending'
         status_tag('Pending', :warning)
-      when :issues
+      when 'issues'
         status_tag('Performed, issues present', :error)
-      when :passed
+      when 'passed'
         status_tag('Passed', :ok)
       end
     end
@@ -31,8 +31,8 @@ table_for required_series, :sortable => true, :class => 'index_table index' do
 
     result += link_to((required_series.image_series_id.nil? ? 'Assign' : 'Reassign'), assign_required_series_form_admin_visit_path(visit, :required_series_names => required_series.name), :class => 'member_link')
     if(qc_result_access)
-      result += link_to('Perform tQC', tqc_form_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link') unless(required_series.tqc_state == :passed or required_series.assigned_image_series.nil?)
-      result += link_to('View tQC results', tqc_results_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link') if(required_series.tqc_state == :passed or required_series.tqc_state == :issues)
+      result += link_to('Perform tQC', tqc_form_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link') unless(required_series.tqc_state == 'passed' or required_series.assigned_image_series.nil?)
+      result += link_to('View tQC results', tqc_results_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link') if(required_series.tqc_state == 'passed' or required_series.tqc_state == 'issues')
     end
     result += link_to('Open Viewer', viewer_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') unless required_series.assigned_image_series.nil?
     result += link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') unless(required_series.assigned_image_series.nil? or required_series.assigned_image_series.images.empty?)

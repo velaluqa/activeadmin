@@ -5,11 +5,29 @@ RSpec.describe Visit do
       baseline:
         required_series:
           SPECT_1: {}
-          SPECT_2: {}
+          SPECT_2:
+            tqc:
+              - id: fubaz
+                label: "Something different from baselin2!"
+                type: bool
+          SPECT_3:
+            tqc:
+              - id: modality
+                label: "same tqc spec"
+                type: bool
       baseline2:
         required_series:
-          SPECT_2: {}
-          SPECT_3: {}
+          SPECT_2:
+            tqc:
+              - id: foobar
+                label: "Something different from baseline!"
+                type: bool
+          SPECT_3:
+            tqc:
+              - id: modality
+                label: "same tqc spec"
+                type: bool
+          SPECT_4: {}
     image_series_properties: []
 CONFIG
     let!(:center1) { create(:center, study: study1) }
@@ -27,12 +45,11 @@ CONFIG
       let!(:visit) { create(:visit, patient: patient1, visit_type: nil, visit_number: '10000') }
 
       it 'adds `SPECT_2` and `SPECT_3` to visits required series' do
-        expect(visit .required_series_objects.map(&:name)).not_to include('SPECT_1', 'SPECT_2')
-        expect(visit .required_series_objects.map(&:name)).not_to include('SPECT_3')
+        expect(visit .required_series_objects.map(&:name)).not_to include('SPECT_1', 'SPECT_2', 'SPECT_3', 'SPECT_4')
         visit.visit_type = 'baseline2'
         visit.save!
         expect(visit .required_series_objects.map(&:name)).not_to include('SPECT_1')
-        expect(visit.required_series_objects.map(&:name)).to include('SPECT_2', 'SPECT_3')
+        expect(visit.required_series_objects.map(&:name)).to include('SPECT_2', 'SPECT_3', 'SPECT_4')
       end
     end
 
@@ -48,8 +65,49 @@ CONFIG
         expect(visit.required_series_objects.map(&:name)).not_to include('SPECT_1')
       end
 
-      it 'adds `SPECT_3` to visits required series' do
+      it 'keeps same required series' do
         expect(visit.required_series_objects.map(&:name)).to include('SPECT_2', 'SPECT_3')
+      end
+
+      it 'adds `SPECT_4` to visits required series' do
+        expect(visit.required_series_objects.map(&:name)).to include('SPECT_4')
+      end
+    end
+
+    describe 'changing visit type for performed tqc' do
+      let!(:visit) { create(:visit, patient: patient1, visit_type: 'baseline', visit_number: '10000') }
+      let!(:user) { create(:user) }
+      let!(:series1) { create(:image_series, visit: visit) }
+      let!(:series2) { create(:image_series, visit: visit) }
+      let!(:spect_2) { RequiredSeries.where(visit: visit, name: 'SPECT_2').first }
+      let!(:spect_3) { RequiredSeries.where(visit: visit, name: 'SPECT_3').first }
+
+      before(:each) do
+        spect_2.assign_image_series!(series1)
+        spect_2.set_tqc_result({ 'fubaz' => true }, user, 'First tqc')
+        spect_3.assign_image_series!(series2)
+        spect_3.set_tqc_result({ 'modality' => true }, user, 'First tqc')
+        expect(visit.required_series_objects.map(&:tqc_state)).to eq([nil, 'passed', 'passed'])
+        visit.visit_type = 'baseline2'
+        visit.save!
+        spect_2.reload
+        spect_3.reload
+      end
+
+      it 'keeps tqc results if tqc specifications stay the same' do
+        expect(spect_3.tqc_state).to eq('passed')
+        expect(spect_3.tqc_user_id).to eq(user.id)
+        expect(spect_3.tqc_results).to eq('modality' => true)
+        expect(spect_3.tqc_comment).to eq('First tqc')
+      end
+
+      it 'resets tqc results if tqc specifications change' do
+        expect(spect_2.tqc_state).to eq('pending')
+        expect(spect_2.tqc_user_id).to be_nil
+        expect(spect_2.tqc_date).to be_nil
+        expect(spect_2.tqc_version).to be_nil
+        expect(spect_2.tqc_results).to be_nil
+        expect(spect_2.tqc_comment).to be_nil
       end
     end
 
@@ -62,7 +120,7 @@ CONFIG
       end
 
       it 'removes all required series for visit' do
-        expect(visit.required_series_objects.map(&:name)).not_to include('SPECT_1', 'SPECT_2', 'SPECT_3')
+        expect(visit.required_series_objects.map(&:name)).not_to include('SPECT_1', 'SPECT_2', 'SPECT_3', 'SPECT_4')
       end
     end
   end
@@ -82,9 +140,9 @@ CONFIG
       let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
       before(:each) { expect(visit.study.state).to eq(:building) }
 
-      it 'returns nil' do
-        expect(visit.required_series_spec).to be_nil
-      end
+      it 'returns includes spec' do
+        expect(visit.required_series_spec).to include('SPECT_1' => {}, 'SPECT_2' => {})
+        end
     end
 
     describe 'for semantically invalid study' do
@@ -103,8 +161,8 @@ CONFIG
         expect(visit.study.semantically_valid?).to be_falsy
       end
 
-      it 'returns nil' do
-        expect(visit.required_series_spec).to be_nil
+      it 'returns empty hash' do
+        expect(visit.required_series_spec).to eq({})
       end
     end
 
@@ -124,8 +182,8 @@ CONFIG
         study.lock_configuration!
       end
 
-      it 'returns nil' do
-        expect(visit.required_series_spec).to be_nil
+      it 'returns empty hash' do
+        expect(visit.required_series_spec).to eq({})
       end
     end
 
@@ -157,7 +215,6 @@ CONFIG
     image_series_properties: []
 CONFIG
 
-
       it 'defaults to locked study version specification for visits visit type' do
         expect(visit.required_series_spec).to be_a(Hash)
         expect(visit.required_series_spec).to include('SPECT_1' => {}, 'SPECT_2' => {})
@@ -170,6 +227,10 @@ CONFIG
         end
       end
     end
+  end
+
+  describe '#clean_required_series!' do
+    it 'removes invalid required series that do not match spec from study configuration'
   end
 
   describe '#required_series_names' do
@@ -280,7 +341,7 @@ CONFIG
       before(:each) do
         visit1.change_required_series_assignment('SPECT_1' => image_series1.id)
         visit1.set_tqc_result('SPECT_1', {}, create(:user), '')
-        expect(visit1.required_series_objects.find { |rs| rs.name == 'SPECT_1' }.tqc_state).to eq(:passed)
+        expect(visit1.required_series_objects.find { |rs| rs.name == 'SPECT_1' }.tqc_state).to eq('passed')
         visit1.change_required_series_assignment('SPECT_1' => image_series2.id)
       end
 
@@ -297,7 +358,7 @@ CONFIG
         expect(image_series1.state_sym).to eq(:visit_assigned)
       end
       it 'resets `tqc_state` to `pending`' do
-        expect(visit1.required_series_objects.find { |rs| rs.name == 'SPECT_1' }.tqc_state).to eq(:pending)
+        expect(visit1.required_series_objects.find { |rs| rs.name == 'SPECT_1' }.tqc_state).to eq('pending')
       end
     end
 
@@ -315,6 +376,22 @@ CONFIG
         expect(image_series1.state_sym).to eq(:visit_assigned)
       end
     end
+  end
+
+  describe '#assign_required_series' do
+    it 'creates new RequiredSeries for the new assignment'
+    it 'sets image series state of assigned image series to `required_series_assigned`'
+  end
+
+  describe '#reassign_required_series' do
+    it 'updates the RequiredSeries image_series'
+    it 'sets image series state of assigned image series to `required_series_assigned`'
+    it 'sets image series state of unassigned image series to `visit_assigned`'
+  end
+
+  describe '#unassign_required_series' do
+    it 'removes RequiredSeries relation of the assignment'
+    it 'sets image series state of unassigned image series to `visit_assigned`'
   end
 
   describe '#visit_type_valid?' do

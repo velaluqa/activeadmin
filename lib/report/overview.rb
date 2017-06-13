@@ -103,11 +103,11 @@ module Report
     def required_series(study)
       @required_series ||= {}
       @required_series[study.id] ||=
-        study.visits
-             .join_required_series
-             .where('visits_required_series.tqc_state IS NOT NULL')
-             .group('visits_required_series.tqc_state')
-             .count
+        study
+          .required_series
+          .where.not(tqc_state: nil)
+          .group(:tqc_state)
+          .count
     end
 
     def required_series_column_value(study)

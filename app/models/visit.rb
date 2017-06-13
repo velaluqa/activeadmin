@@ -74,6 +74,7 @@ class Visit < ActiveRecord::Base
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
   belongs_to :mqc_user, class_name: 'User'
+  has_many :required_series, dependent: :destroy
 
   scope :by_study_ids, ->(*ids) {
     joins(patient: { center: :study })
@@ -113,6 +114,8 @@ SELECT
   end
 
   before_save :ensure_study_is_unchanged
+
+  after_save(:update_required_series_preset)
 
   include ImageStorageCallbacks
   include ScopablePermissions
@@ -277,87 +280,23 @@ JOIN_QUERY
   # @param version [Symbol, String] which version to get (can be
   #   `:current`, `:locked` or a version reference)
   # @return [Hash]
-  def required_series_spec(version: :locked)
-    return nil if visit_type.nil?
-    return nil if !study.semantically_valid?
-    return nil if study.state == :building
-
-    config =
-      if version == :locked
-        study.locked_configuration
-      elsif version == :current
-        study.current_configuration
-      else
-        study.configuration_at_version(version)
-      end
-    config.andand['visit_types'].andand[visit_type].andand['required_series']
-  end
-
-  def locked_required_series_specs
-    return nil if visit_type.nil? || study.nil? || !study.locked_semantically_valid?
-
-    required_series_specs_for_configuration(study.locked_configuration)
-  end
-
-  def required_series_specs_at_version(version)
-    return nil if visit_type.nil? || study.nil? || !study.semantically_valid_at_version?(version)
-
-    required_series_specs_for_configuration(study.configuration_at_version(version))
-  end
-
-  def required_series_specs_for_configuration(study_config)
-    return nil if visit_type.nil?
-
-    return nil if study_config['visit_types'][visit_type].nil? || study_config['visit_types'][visit_type]['required_series'].nil?
-    required_series = study_config['visit_types'][visit_type]['required_series']
-
-    required_series
+  def required_series_spec(version: nil)
+    return {} unless study.semantically_valid?
+    study.required_series_spec(visit_type, version: version)
   end
 
   def required_series_names
-    locked_required_series_specs.andand.keys || []
+    RequiredSeries.where(visit_id: id).pluck(:name)
   end
 
   def required_series_objects
-    required_series_names.map do |name|
-      RequiredSeries.new(self, name)
-    end
+    RequiredSeries.where(visit_id: id)
   end
 
-  def assigned_required_series_id_map
-    id_map = {}
-    required_series.each do |required_series_name, required_series|
-      id_map[required_series_name] = required_series['image_series_id']
-    end
-
-    id_map
-  end
-
-  def remove_orphaned_required_series
-    current_required_series_names = required_series_names
-    return if current_required_series_names.nil?
-
-    saved_required_series_names = required_series.andand.keys || []
-
-    orphaned_required_series_names = (saved_required_series_names - current_required_series_names)
-    unless orphaned_required_series_names.empty?
-      changed_assignments = {}
-
-      orphaned_required_series_names.each do |orphaned_required_series_name|
-        RequiredSeries.new(self, orphaned_required_series_name).schedule_domino_document_trashing
-
-        deleted_series = required_series.delete(orphaned_required_series_name)
-        if deleted_series.andand['image_series_id']
-          changed_assignments[orphaned_required_series_name] = nil
-        end
-      end
-
-      change_required_series_assignment(changed_assignments, save: false)
-
-      save
-
-      Rails.logger.info "Removed #{orphaned_required_series_names.size} orphaned required series from visit #{inspect}: #{orphaned_required_series_names.inspect}"
-    end
+  def required_series_assignment
+    required_series_objects.map do |required_series|
+      [required_series.name, required_series.image_series_id]
+    end.to_h
   end
 
   def image_storage_path
@@ -439,169 +378,31 @@ JOIN_QUERY
     required_series_objects.each(&:schedule_domino_sync)
   end
 
-  def rename_required_series(old_name, new_name)
-    return unless required_series
-
-    # Rename in `required_series`
-    required_series_data = required_series.delete(old_name)
-    required_series[new_name] = required_series_data if required_series_data
-
-    # Rename in `assigned_image_series_index`
-    return if assigned_image_series_index.blank?
-    assigned_image_series_index.each do |_series_id, assignment|
-      if assignment.include?(old_name)
-        assignment.delete(old_name)
-        assignment << new_name
-      end
-    end
-
-    image_storage_root = Rails.application.config.image_storage_root
-    image_storage_root += '/' unless image_storage_root.end_with?('/')
-
-    if File.exist?(image_storage_root + required_series_image_storage_path(old_name))
-      FileUtils.mv(image_storage_root + required_series_image_storage_path(old_name), image_storage_root + required_series_image_storage_path(new_name))
-    end
-
-    save
-
-    RequiredSeries.new(self, new_name).schedule_domino_sync
-  end
-
   def change_required_series_assignment(changed_assignments, options = { save: true })
-    assignment_index = assigned_image_series_index
-
-    old_assigned_image_series = assignment_index.reject { |_series_id, assignment| assignment.nil? || assignment.empty? }.keys
-
-    image_storage_root = Rails.application.config.image_storage_root
-    image_storage_root += '/' unless image_storage_root.end_with?('/')
-
-    domino_sync_series_ids = []
-
-    changed_assignments.each do |required_series_name, series_id|
-      series_id = (series_id.blank? ? nil : series_id)
-      old_series_id = nil
-      required_series[required_series_name] = {} unless required_series[required_series_name]
-
-      if required_series[required_series_name]['image_series_id']
-        old_series_id = required_series[required_series_name]['image_series_id'].to_s
-
-        if !old_series_id.blank? && assignment_index[old_series_id]
-          assignment_index[old_series_id].delete(required_series_name)
+    ActiveRecord::Base.transaction do
+      changed_assignments.each_pair do |required_series_name, series_id|
+        required_series = RequiredSeries.find_by(visit: self, name: required_series_name)
+        if series_id.present?
+          series = ImageSeries.find(series_id)
+          next if series.blank?
+          required_series.assign_image_series!(series)
+        else
+          required_series.unassign_image_series!
         end
       end
-
-      required_series[required_series_name]['image_series_id'] = series_id
-
-      if series_id
-        assignment_index[series_id] ||= []
-        unless assignment_index[series_id].include?(required_series_name)
-          assignment_index[series_id] << required_series_name
-        end
-      end
-
-      if required_series[required_series_name]['image_series_id'].nil?
-        FileUtils.rm(image_storage_root + required_series_image_storage_path(required_series_name), force: true)
-      else
-        FileUtils.rm(image_storage_root + required_series_image_storage_path(required_series_name), force: true)
-        FileUtils.ln_sf(series_id.to_s, image_storage_root + required_series_image_storage_path(required_series_name))
-      end
-
-      if old_series_id != series_id
-        required_series[required_series_name]['tqc_state'] = RequiredSeries.tqc_state_sym_to_int(:pending)
-        required_series[required_series_name].delete('tqc_user_id')
-        required_series[required_series_name].delete('tqc_date')
-        required_series[required_series_name].delete('tqc_version')
-        required_series[required_series_name].delete('tqc_results')
-        required_series[required_series_name].delete('tqc_comment')
-      end
-
-      domino_sync_series_ids << old_series_id unless old_series_id.blank?
-      domino_sync_series_ids << series_id unless series_id.blank?
     end
-
-    new_assigned_image_series = assignment_index.reject { |_series_id, assignment| assignment.nil? || assignment.empty? }.keys
-    (old_assigned_image_series - new_assigned_image_series).uniq.each do |unassigned_series_id|
-      unassigned_series = ImageSeries.where(id: unassigned_series_id).first
-      if unassigned_series && unassigned_series.state_sym == :required_series_assigned
-        unassigned_series.state = (unassigned_series.visit.nil? ? :imported : :visit_assigned)
-        unassigned_series.save
-      end
-    end
-    (new_assigned_image_series - old_assigned_image_series).uniq.each do |assigned_series_id|
-      assigned_series = ImageSeries.where(id: assigned_series_id).first
-      if assigned_series && assigned_series.state_sym == :visit_assigned || assigned_series.state_sym == :not_required
-        assigned_series.state = :required_series_assigned
-        assigned_series.save
-      end
-    end
-
-    reconstruct_assignment_index
-
-    save if options[:save]
-
-    schedule_required_series_domino_sync
-
-    domino_sync_series_ids.uniq.each do |series_id|
-      image_series = ImageSeries.where(id: series_id).first
-      image_series.schedule_domino_sync unless image_series.nil?
-    end
-  end
-
-  def reconstruct_assignment_index
-    new_index = {}
-
-    required_series.each do |rs_name, data|
-      next if data['image_series_id'].blank?
-
-      new_index[data['image_series_id']] ||= []
-      new_index[data['image_series_id']] << rs_name
-    end
-
-    self.assigned_image_series_index = new_index
   end
 
   def reset_tqc_result(required_series_name)
-    return unless required_series.andand[required_series_name]
-
-    required_series[required_series_name]['tqc_state'] = :pending
-    required_series[required_series_name].delete('tqc_user_id')
-    required_series[required_series_name].delete('tqc_date')
-    required_series[required_series_name].delete('tqc_version')
-    required_series[required_series_name].delete('tqc_results')
-    required_series[required_series_name].delete('tqc_comment')
-
-    save
-
-    RequiredSeries.new(self, required_series_name).schedule_domino_sync
+    RequiredSeries
+      .find_by(visit: self, name: required_series_name)
+      .reset_tqc!
   end
 
-  def set_tqc_result(required_series_name, result, tqc_user, tqc_comment, tqc_date = nil, tqc_version = nil)
-    required_series_specs = locked_required_series_specs
-    return 'No valid study configuration exists.' if required_series_specs.nil?
-
-    tqc_spec = (required_series_specs[required_series_name].nil? ? nil : required_series_specs[required_series_name]['tqc'])
-    return 'No tQC config for this required series exists.' if tqc_spec.nil?
-
-    all_passed = true
-    tqc_spec.each do |spec|
-      all_passed &&= (!result.nil? && result[spec['id']] == true)
-    end
-
-    required_series = self.required_series[required_series_name]
-    return 'No assignment for this required series exists.' if required_series.nil?
-
-    required_series['tqc_state'] = RequiredSeries.tqc_state_sym_to_int((all_passed ? :passed : :issues))
-    required_series['tqc_user_id'] = (tqc_user.is_a?(User) ? tqc_user.id : tqc_user)
-    required_series['tqc_date'] = (tqc_date.nil? ? Time.now : tqc_date)
-    required_series['tqc_version'] = (tqc_version.nil? ? study.locked_version : tqc_version)
-    required_series['tqc_results'] = result
-    required_series['tqc_comment'] = tqc_comment
-
-    self.required_series[required_series_name] = required_series
-    save
-
-    RequiredSeries.new(self, required_series_name).schedule_domino_sync
-    true
+  def set_tqc_result(required_series_name, result, user, comment, date = nil, version = nil)
+    RequiredSeries
+      .find_by(visit: self, name: required_series_name)
+      .set_tqc_result(result, user, comment, date, version)
   end
 
   def set_mqc_result(result, mqc_user, mqc_comment, mqc_date = nil, mqc_version = nil)
@@ -832,5 +633,48 @@ JOIN_QUERY
     end
 
     true
+  end
+
+  def update_required_series_preset
+    return unless visit_type_changed?
+
+    if visit_type_was.blank? && visit_type.present?
+      add_new_required_series(required_series_spec.keys)
+    elsif visit_type_was.present? && visit_type.present?
+      clean_changed_required_series
+    elsif visit_type_was.present? && visit_type.blank?
+      remove_required_series
+    end
+  end
+
+  def clean_changed_required_series
+    old_spec = study.required_series_spec(visit_type_was)
+    new_spec = study.required_series_spec(visit_type)
+
+    remove_orphaned_required_series(old_spec.keys - new_spec.keys)
+    add_new_required_series(new_spec.keys - old_spec.keys)
+
+    invalidate_tqc_for_changed_spec(old_spec, new_spec)
+  end
+
+  def add_new_required_series(new)
+    new.each do |name|
+      RequiredSeries.create(visit: self, name: name)
+    end
+  end
+
+  def remove_orphaned_required_series(orphaned)
+    RequiredSeries.where(visit: self, name: orphaned).destroy_all
+  end
+
+  def remove_required_series
+    RequiredSeries.where(visit: self).destroy_all
+  end
+
+  def invalidate_tqc_for_changed_spec(old_spec, new_spec)
+    (old_spec.keys & new_spec.keys).each do |name|
+      next if old_spec[name]['tqc'] == new_spec[name]['tqc']
+      RequiredSeries.where(visit: self, name: name).each(&:reset_tqc!)
+    end
   end
 end

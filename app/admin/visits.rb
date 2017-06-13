@@ -136,8 +136,6 @@ ActiveAdmin.register Visit do
   end
 
   show do |visit|
-    visit.remove_orphaned_required_series
-
     attributes_table do
       row :patient
       row :visit_number
@@ -312,7 +310,7 @@ ActiveAdmin.register Visit do
       redirect_to :back
       return
     end
-    @current_assignment = @visit.assigned_required_series_id_map
+    @current_assignment = @visit.required_series_assignment
 
     @page_title = 'Assign image series as required series'
     render 'admin/visits/assign_required_series'
@@ -331,7 +329,7 @@ ActiveAdmin.register Visit do
       redirect_to :action => :show
       return
     end
-    @required_series = RequiredSeries.new(@visit, @required_series_name)
+    @required_series = RequiredSeries.where(visit: @visit, name: @required_series_name).first
 
     tqc_spec = @required_series.tqc_spec_with_results
     if(tqc_spec.nil?)
@@ -342,7 +340,7 @@ ActiveAdmin.register Visit do
 
     @tqc_version = if @required_series.tqc_version
                      @required_series.tqc_version
-                   elsif @visit.study and @visit.study.locked_version
+                   elsif @visit.study.andand.locked_version
                      @visit.study.locked_version
                    else
                      nil
@@ -389,7 +387,7 @@ ActiveAdmin.register Visit do
       redirect_to :action => :show
       return
     end
-    @required_series = RequiredSeries.new(@visit, @required_series_name)
+    @required_series = RequiredSeries.where(visit: @visit, name: @required_series_name).first
 
     if(@required_series.assigned_image_series.nil? or @required_series.assigned_image_series.images.empty?)
       flash[:error] = 'tQC can only be performed once an image series (containing at least one image) has been assigned for this required series.'
@@ -397,12 +395,12 @@ ActiveAdmin.register Visit do
       return
     end
 
-    tqc_spec = @required_series.locked_tqc_spec
-    if(tqc_spec.nil?)
+    unless @visit.study.semantically_valid?
       flash[:error] = 'Performing tQC requires a valid study config containing tQC specifications for this required series.'
       redirect_to :action => :show
       return
     end
+    tqc_spec = @required_series.tqc_spec
 
     @dicom_tqc_spec, @manual_tqc_spec = tqc_spec.partition {|spec| spec['type'] == 'dicom'}
 

@@ -29,48 +29,60 @@ RSpec.describe Version do
   end
 
   describe 'scope ::of_study_resource' do
-    before(:each) do
-      @study = create(:study)
-      @study_version = Version.last
-      @center = create(:center, study: @study)
-      @center_version = Version.last
-      @patient = create(:patient, center: @center)
-      @patient_version = Version.last
-      @visit = create(:visit, patient: @patient)
-      @visit_version = Version.last
-      @image_series = create(:image_series, patient: @patient)
-      @image_series_version = Version.last
-    end
+    let!(:study) { create(:study) }
+    let!(:study_version) { Version.last }
+    let!(:center) { create(:center, study: study) }
+    let!(:center_version) { Version.last }
+    let!(:patient) { create(:patient, center: center) }
+    let!(:patient_version) { Version.last }
+    let!(:visit) { create(:visit, patient: patient) }
+    let!(:visit_version) { Version.last }
+    let!(:required_series) { create(:required_series, visit: visit, name: 'SPECT_1')}
+    let!(:required_series_version) { Version.last }
+    let!(:image_series) { create(:image_series, visit: visit, patient: patient) }
+    let!(:image_series_version) { Version.last }
 
     describe 'with resource `Patient`' do
+      let(:result) { Version.of_study_resource(study, 'Patient') }
+
       it 'includes patient version' do
-        expect(Version.of_study_resource(@study, 'Patient')).to include(@patient_version)
-        expect(Version.of_study_resource(@study, 'Patient')).not_to include(@visit_version)
-        expect(Version.of_study_resource(@study, 'Patient')).not_to include(@image_series_version)
+        expect(result).to include(patient_version)
+        expect(result).not_to include(visit_version)
+        expect(result).not_to include(image_series_version)
+        expect(result).not_to include(required_series_version)
       end
     end
 
     describe 'with resource `Visit`' do
+      let(:result) { Version.of_study_resource(study, 'Visit') }
+
       it 'includes visit version' do
-        expect(Version.of_study_resource(@study, 'Visit')).not_to include(@patient_version)
-        expect(Version.of_study_resource(@study, 'Visit')).to include(@visit_version)
-        expect(Version.of_study_resource(@study, 'Visit')).not_to include(@image_series_version)
+        expect(result).not_to include(patient_version)
+        expect(result).to include(visit_version)
+        expect(result).not_to include(image_series_version)
+        expect(result).not_to include(required_series_version)
       end
     end
 
     describe 'with resource `ImageSeries`' do
+      let(:result) { Version.of_study_resource(study, 'ImageSeries') }
+
       it 'includes image_series version' do
-        expect(Version.of_study_resource(@study, 'ImageSeries')).not_to include(@patient_version)
-        expect(Version.of_study_resource(@study, 'ImageSeries')).not_to include(@visit_version)
-        expect(Version.of_study_resource(@study, 'ImageSeries')).to include(@image_series_version)
+        expect(result).not_to include(patient_version)
+        expect(result).not_to include(visit_version)
+        expect(result).to include(image_series_version)
+        expect(result).not_to include(required_series_version)
       end
     end
 
     describe 'with resource `RequiredSeries`' do
+      let(:result) { Version.of_study_resource(study, 'RequiredSeries') }
+
       it 'includes required_series version' do
-        expect(Version.of_study_resource(@study, 'RequiredSeries')).not_to include(@patient_version)
-        expect(Version.of_study_resource(@study, 'RequiredSeries')).to include(@visit_version)
-        expect(Version.of_study_resource(@study, 'RequiredSeries')).not_to include(@image_series_version)
+        expect(result).not_to include(patient_version)
+        expect(result).not_to include(visit_version)
+        expect(result).not_to include(image_series_version)
+        expect(result).to include(required_series_version)
       end
     end
   end
