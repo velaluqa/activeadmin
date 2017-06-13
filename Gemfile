@@ -90,7 +90,7 @@ gem 'devise', '~> 3.5.2'
 gem 'devise-token_authenticatable', '~> 0.4.6'
 
 # audit trail
-gem 'paper_trail', '~> 4.1.0'
+gem 'paper_trail', '~> 6.0.0'
 
 # ActiveAdmin
 gem 'activeadmin', '1.0.0.pre3'

@@ -69,8 +69,8 @@ module ImageStorageCallbacks
     #
     # @return [String] previous image storage path
     def previous_image_storage_path
-      return image_storage_path unless previous_version
-      previous_version.image_storage_path
+      return image_storage_path unless paper_trail.previous_version
+      paper_trail.previous_version.image_storage_path
     end
 
     # Stub: Should return the models image storage path. Make sure

@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   before_filter :authenticate_user_from_token!
   before_filter(:ensure_valid_password, if: proc { !current_user.nil? })
   before_filter(:ensure_valid_keypair, if: proc { !current_user.nil? })
+  before_action(:set_paper_trail_whodunnit)
 
   protect_from_forgery
 

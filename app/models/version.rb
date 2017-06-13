@@ -25,7 +25,16 @@
 class Version < PaperTrail::Version
   has_many :notifications
 
-  attr_accessible(:study_id)
+  attr_accessible(
+    :created_at,
+    :event,
+    :item_type,
+    :item_id,
+    :object,
+    :object_changes,
+    :whodunnit,
+    :study_id
+  )
 
   after_commit(:trigger_notification_profiles, on: :create)
 
