@@ -5,6 +5,24 @@ describe RequiredSeries do
     end
   end
 
+  describe 'versioning' do
+    let!(:required_series) { create(:required_series) }
+
+    it 'saves enum string into object changes' do
+      required_series.tqc_state = 'pending'
+      required_series.save!
+      expect(Version.last.object_changes.dig2('tqc_state', 0)).to be_nil
+      expect(Version.last.object_changes.dig2('tqc_state', 1)).to eq('pending')
+    end
+
+    it 'saves enum string into `destroy` version' do
+      required_series.tqc_state = 'issues'
+      required_series.save!
+      required_series.destroy
+      expect(Version.last.object['tqc_state']).to eq('issues')
+    end
+  end
+
   describe '#assign_image_series!' do
     let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
     visit_types:
