@@ -61,6 +61,36 @@ class RequiredSeries < ActiveRecord::Base
 
   scope :join_study, -> { joins(visit: { patient: { center: :study } }) }
 
+  scope :searchable, -> { join_study.select(<<SELECT.strip_heredoc) }
+    studies.id AS study_id,
+    studies.name AS study_name,
+    centers.code ||
+    patients.subject_id ||
+    '#' ||
+    visits.visit_number ||
+    CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END ||
+    ' - ' || required_series.name
+    AS text,
+    required_series.id AS result_id,
+    'RequiredSeries'::varchar AS result_type
+SELECT
+
+  include ScopablePermissions
+
+  def self.with_permissions
+    join_study.joins(<<JOIN.strip_heredoc)
+      INNER JOIN user_roles ON
+        (
+             (user_roles.scope_object_type = 'Study'   AND user_roles.scope_object_id = studies.id)
+          OR (user_roles.scope_object_type = 'Center'  AND user_roles.scope_object_id = centers.id)
+          OR (user_roles.scope_object_type = 'Patient' AND user_roles.scope_object_id = patients.id)
+          OR user_roles.scope_object_id IS NULL
+        )
+      INNER JOIN roles ON user_roles.role_id = roles.id
+      INNER JOIN permissions ON roles.id = permissions.role_id
+JOIN
+  end
+
   def self.count_for_study(study_id)
     join_study
       .where(studies: { id: study_id })

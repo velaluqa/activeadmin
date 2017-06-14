@@ -17,6 +17,7 @@ class Ability
     User => %i[manage read update create destroy generate_keypair],
     UserRole => %i[manage read update create destroy],
     PublicKey => %i[manage read update create destroy],
+    RequiredSeries => %i[manage read update],
     Role => %i[manage read update create destroy],
     Visit => %i[manage read update create destroy create_from_template update_state assign_required_series read_tqc perform_tqc technical_qc medical_qc],
     Version => %i[manage read update create destroy]
