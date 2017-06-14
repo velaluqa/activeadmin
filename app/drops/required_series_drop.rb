@@ -1,4 +1,6 @@
 class RequiredSeriesDrop < EricaDrop # :nodoc:
+  belongs_to(:visit)
+
   desc 'Returns the name of the required series.', 'String'
   attribute(:name)
 
