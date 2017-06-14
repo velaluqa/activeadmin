@@ -21,6 +21,8 @@ module Liquid
 
       def link(target, text = nil)
         Linker.new.link(target, text)
+      rescue Exception => _e
+        'No Link Available'
       end
     end
   end
