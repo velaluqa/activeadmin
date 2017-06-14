@@ -1,44 +1,43 @@
 require 'git_config_repository'
-
 # ## Schema Information
 #
 # Table name: `visits`
 #
 # ### Columns
 #
-# Name                               | Type               | Attributes
-# ---------------------------------- | ------------------ | ---------------------------
-# **`assigned_image_series_index`**  | `jsonb`            | `not null`
-# **`created_at`**                   | `datetime`         |
-# **`description`**                  | `string`           |
-# **`domino_unid`**                  | `string`           |
-# **`id`**                           | `integer`          | `not null, primary key`
-# **`mqc_comment`**                  | `string`           |
-# **`mqc_date`**                     | `datetime`         |
-# **`mqc_results`**                  | `jsonb`            | `not null`
-# **`mqc_state`**                    | `integer`          | `default(0)`
-# **`mqc_user_id`**                  | `integer`          |
-# **`mqc_version`**                  | `string`           |
-# **`patient_id`**                   | `integer`          |
-# **`repeatable_count`**             | `integer`          | `default(0), not null`
-# **`required_series`**              | `jsonb`            | `not null`
-# **`state`**                        | `integer`          | `default(0)`
-# **`updated_at`**                   | `datetime`         |
-# **`visit_number`**                 | `integer`          |
-# **`visit_type`**                   | `string`           |
+# Name                                   | Type               | Attributes
+# -------------------------------------- | ------------------ | ---------------------------
+# **`created_at`**                       | `datetime`         |
+# **`description`**                      | `string`           |
+# **`domino_unid`**                      | `string`           |
+# **`id`**                               | `integer`          | `not null, primary key`
+# **`mqc_comment`**                      | `string`           |
+# **`mqc_date`**                         | `datetime`         |
+# **`mqc_results`**                      | `jsonb`            | `not null`
+# **`mqc_state`**                        | `integer`          | `default(0)`
+# **`mqc_user_id`**                      | `integer`          |
+# **`mqc_version`**                      | `string`           |
+# **`old_assigned_image_series_index`**  | `jsonb`            | `not null`
+# **`old_required_series`**              | `jsonb`            | `not null`
+# **`patient_id`**                       | `integer`          |
+# **`repeatable_count`**                 | `integer`          | `default(0), not null`
+# **`state`**                            | `integer`          | `default(0)`
+# **`updated_at`**                       | `datetime`         |
+# **`visit_number`**                     | `integer`          |
+# **`visit_type`**                       | `string`           |
 #
 # ### Indexes
 #
-# * `index_visits_on_assigned_image_series_index`:
-#     * **`assigned_image_series_index`**
 # * `index_visits_on_mqc_results`:
 #     * **`mqc_results`**
 # * `index_visits_on_mqc_user_id`:
 #     * **`mqc_user_id`**
+# * `index_visits_on_old_assigned_image_series_index`:
+#     * **`old_assigned_image_series_index`**
+# * `index_visits_on_old_required_series`:
+#     * **`old_required_series`**
 # * `index_visits_on_patient_id`:
 #     * **`patient_id`**
-# * `index_visits_on_required_series`:
-#     * **`required_series`**
 # * `index_visits_on_visit_number`:
 #     * **`visit_number`**
 #
@@ -159,14 +158,6 @@ JOIN_QUERY
     study_id = study.id if study.is_a?(ActiveRecord::Base)
     joins(patient: :center).where(centers: { study_id: study_id })
   }
-
-  notification_attribute_filter(:required_series, :changes_tqc_state) do |old, new|
-    return false if new.blank? || !new.is_a?(Hash)
-    new.map do |name, _|
-      next if old.blank? || old[name].blank? || !old[name].is_a?(Hash) || !new[name].is_a?(Hash)
-      old[name]['tqc_state'] != new[name]['tqc_state']
-    end.any?
-  end
 
   def name
     "#{patient.andand.name}##{visit_number}"

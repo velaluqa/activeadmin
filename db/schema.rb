@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170607110121) do
+ActiveRecord::Schema.define(version: 20170614114308) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -399,21 +399,21 @@ ActiveRecord::Schema.define(version: 20170607110121) do
     t.string   "description"
     t.datetime "mqc_date"
     t.integer  "mqc_user_id"
-    t.integer  "state",                       default: 0
-    t.integer  "mqc_state",                   default: 0
-    t.jsonb    "assigned_image_series_index", default: {}, null: false
-    t.jsonb    "required_series",             default: {}, null: false
-    t.jsonb    "mqc_results",                 default: {}, null: false
+    t.integer  "state",                           default: 0
+    t.integer  "mqc_state",                       default: 0
+    t.jsonb    "old_assigned_image_series_index", default: {}, null: false
+    t.jsonb    "old_required_series",             default: {}, null: false
+    t.jsonb    "mqc_results",                     default: {}, null: false
     t.string   "mqc_comment"
     t.string   "mqc_version"
-    t.integer  "repeatable_count",            default: 0,  null: false
+    t.integer  "repeatable_count",                default: 0,  null: false
   end
 
-  add_index "visits", ["assigned_image_series_index"], name: "index_visits_on_assigned_image_series_index", using: :gin
   add_index "visits", ["mqc_results"], name: "index_visits_on_mqc_results", using: :gin
   add_index "visits", ["mqc_user_id"], name: "index_visits_on_mqc_user_id", using: :btree
+  add_index "visits", ["old_assigned_image_series_index"], name: "index_visits_on_old_assigned_image_series_index", using: :gin
+  add_index "visits", ["old_required_series"], name: "index_visits_on_old_required_series", using: :gin
   add_index "visits", ["patient_id"], name: "index_visits_on_patient_id", using: :btree
-  add_index "visits", ["required_series"], name: "index_visits_on_required_series", using: :gin
   add_index "visits", ["visit_number"], name: "index_visits_on_visit_number", using: :btree
 
 end
