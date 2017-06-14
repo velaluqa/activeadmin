@@ -17,6 +17,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       t.string :enum_field
       t.string :notnull_field, null: false
       t.json :json_field
+      t.integer :enum_field
     end
     model do
       include NotificationFilter
@@ -27,6 +28,8 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
           old[key]['subval'] != new[key]['subval']
         end.any?
       end
+
+      enum enum_field: { pending: 0, issues: 1, passed: 2 }
 
       validates :integer_field, numericality: { greater_than_or_equal_to: 5, less_than_or_equal_to: 10 }
       validates :bigint_field, numericality: { greater_than: 5, less_than: 10 }
@@ -244,6 +247,24 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       end
       it 'allows values for column' do
         expect(@validation[:oneOf]).to include(@attr.value_validation)
+      end
+    end
+
+    describe 'for enum column' do
+      before(:each) do
+        @column = TestModel.columns_hash['enum_field']
+        @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+        @validation = @attr.validation
+      end
+
+      it 'returns the correct schema' do
+        expected_validation = {
+          title: 'value',
+          type: 'string',
+          enum: ['pending', 'issues', 'passed'],
+          required: true
+        }
+        expect(@validation[:oneOf]).to include(expected_validation)
       end
     end
   end
