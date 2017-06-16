@@ -8,12 +8,8 @@ namespace :ci do
     task units: ['ci:prepare'] do
       sh 'COVERAGE=true bundle exec rspec --require spec_helper -f html -o reports/unit.html -f JUnit -o reports/rspec_report.xml'
     end
-
-    task features: ['ci:prepare'] do
-      sh 'COVERAGE=true bundle exec cucumber --format html --out reports/features.html --format json --out reports/cucumber_report.json'
-    end
   end
-  task test: ['ci:test:units', 'ci:test:features']
+  task test: ['ci:test:units']
 
   namespace :report do
     task :code_climate do
