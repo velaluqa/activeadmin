@@ -20,7 +20,7 @@ Now build the containers properly.
 
     docker-compose build
 
-## Running Development Server
+## Preparing Development Database
 
 Before we can run our development server, we need to bootstrap the
 databases for the `development` environment.
@@ -28,12 +28,14 @@ databases for the `development` environment.
 First we create the database and migrate to a vanilla ERICA database
 structure.
 
-    docker-compose run app rake db:create db:migrate
+    docker-compose run worker rake db:create db:migrate
 
 Then we seed the default roles and the root user for the `development`
 environment:
 
-    docker-compose run app rake erica:seed:root_user[root] erica:seed:roles
+    docker-compose run worker rake erica:seed:root_user[root] erica:seed:roles
+
+## Running Development Server
 
 To run the dev server you have to forward the port:
 
