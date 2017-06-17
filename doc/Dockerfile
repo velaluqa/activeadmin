@@ -23,3 +23,5 @@ RUN rm onbuild.el
 
 VOLUME /workspace
 WORKDIR /workspace
+
+CMD find -name \*.org -exec emacs --batch --load elisp/init.el {} -f org-html-export-to-html \; && tar czf htmls.tgz *.html

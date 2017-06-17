@@ -1,14 +1,29 @@
-#!/bin/bash
-docker build -t emacs_docs ./doc
-for file in $(ls ./doc | grep "\.org$"); do
-    echo "Building ${file} ..."
-    if [[ "$JOB_NAME" != "" ]]; then
-        echo "${file} in workspace /zfs/docker/volumes/jenkins-$(hostname)-workspace/${JOB_NAME}"
-        docker run --rm -v "/zfs/docker/volumes/jenkins-$(hostname)-workspace/${JOB_NAME}/:/workspace" emacs_docs emacs --batch --load doc/elisp/init.el "doc/${file}" -f org-html-export-to-html
-    else
-        docker run --rm -v "`pwd`:/workspace" emacs_docs emacs --batch --load doc/elisp/init.el doc/$file -f org-html-export-to-html
-    fi
-done
+#!/bin/sh
+
+set -ex
+
+if [ -z $CI ]; then
+    docker build -t emacs-docs ./doc
+    docker run --rm -v "`pwd`/doc:/workspace" emacs-docs
+    rm doc/htmls.tgz
+else
+    IMAGE=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs:${CI_COMMIT_SHA}
+    docker build -t ${IMAGE} ./doc
+
+    CONTAINER_NAME=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs_${CI_JOB_ID}
+    docker create --name ${CONTAINER_NAME} ${IMAGE}
+
+    find doc/ -name \*.org -exec docker cp {} ${CONTAINER_NAME}:/workspace \;
+    docker cp doc/elisp ${CONTAINER_NAME}:/workspace
+    docker start -a ${CONTAINER_NAME}
+
+    docker cp ${CONTAINER_NAME}:/workspace/htmls.tgz /tmp
+    tar xzf /tmp/htmls.tgz -C doc
+    rm /tmp/htmls.tgz
+    docker rm -v ${CONTAINER_NAME}
+    docker rmi --no-prune ${IMAGE}
+fi
+
 mkdir -p ./reports/manual
 mv -f ./doc/*.html ./reports/manual/
 cp -rf ./doc/css ./doc/fonts ./doc/images ./doc/js ./reports/manual/
