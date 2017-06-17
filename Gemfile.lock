@@ -29,17 +29,6 @@ GIT
     yard-activerecord (0.0.16)
       yard (>= 0.8.3)
 
-GIT
-  remote: ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git
-  revision: 68dff41fedc7667ab1bd8d1ec74b90fe0ed5a2ac
-  branch: master
-  specs:
-    gitdeploy (1.4.3)
-      andand
-      facets
-      mechanize
-      trollop
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -392,15 +381,6 @@ GEM
     lumberjack (1.0.10)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
-    mechanize (2.7.4)
-      domain_name (~> 0.5, >= 0.5.1)
-      http-cookie (~> 1.0)
-      mime-types (>= 1.17.2, < 3)
-      net-http-digest_auth (~> 1.1, >= 1.1.1)
-      net-http-persistent (~> 2.5, >= 2.5.2)
-      nokogiri (~> 1.6)
-      ntlm-http (~> 0.1, >= 0.1.1)
-      webrobots (>= 0.0.9, < 0.2)
     meta_request (0.4.0)
       callsite (~> 0.0, >= 0.0.11)
       rack-contrib (~> 1.1)
@@ -426,15 +406,12 @@ GEM
       mongoid-compatibility
     multi_json (1.11.2)
     nenv (0.3.0)
-    net-http-digest_auth (1.4)
-    net-http-persistent (2.9.4)
     netrc (0.11.0)
     nokogiri (1.6.8.1)
       mini_portile2 (~> 2.1.0)
     notiffany (0.0.8)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    ntlm-http (0.1.1)
     origin (2.2.0)
     orm_adapter (0.5.0)
     paper_trail (6.0.2)
@@ -713,7 +690,6 @@ GEM
       trailblazer-loader (>= 0.1.0)
     transactional_capybara (0.1.0)
       capybara
-    trollop (2.1.2)
     turnip (2.0.1)
       gherkin (>= 2.5)
       rspec (>= 3.0, < 4.0)
@@ -743,7 +719,6 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
-    webrobots (0.1.2)
     websocket-driver (0.6.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
@@ -801,7 +776,6 @@ DEPENDENCIES
   flog
   font-awesome-sass
   gherkin (~> 2.5)
-  gitdeploy!
   guard (~> 2.13.0)
   guard-livereload
   guard-rspec

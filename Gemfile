@@ -248,8 +248,6 @@ group :development, :test do
   gem 'yard-activerecord', github: 'velaluqa/yard-activerecord', require: false
   gem 'yard-activesupport-concern', require: false
 
-  gem 'gitdeploy', git: 'ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git', branch: :master, require: false
-
   gem 'capybara'
   gem 'capybara-screenshot'
   gem 'database_cleaner'

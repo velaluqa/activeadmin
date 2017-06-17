@@ -31,15 +31,6 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-# Configure the velaluqa repository keys to allow the use of private
-# repositories for the application dependencies.
-RUN mkdir /root/.ssh
-ADD ./vendor/docker/id_rsa.deployment /root/.ssh/id_rsa
-ADD ./vendor/docker/id_rsa.deployment.pub /root/.ssh/id_rsa.pub
-RUN ssh-keyscan -p 53639 git.velalu.qa > /root/.ssh/known_hosts
-RUN chown -R root:root /root/.ssh
-RUN chmod -R 600 /root/.ssh
-
 # Install application dependencies. This is done separately to
 # leverage the Docker cache when building.
 RUN mkdir -p $APP_HOME
