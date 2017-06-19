@@ -36,8 +36,7 @@ ENV LC_ALL en_US.UTF-8
 RUN mkdir -p $APP_HOME
 WORKDIR $APP_HOME
 ADD Gemfile Gemfile.lock $APP_HOME/
-RUN gem install bundler && \
-    bundle install --jobs 20 --retry 5
+RUN bundle install --jobs 20 --retry 5
 
 # Allow other containers to use the app root (e.g. nginx container).
 VOLUME /app
