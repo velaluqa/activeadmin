@@ -7,10 +7,10 @@ if [ -z $CI ]; then
     docker run --rm -v "`pwd`/doc:/workspace" emacs-docs
     rm doc/htmls.tgz
 else
-    IMAGE=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs:${CI_COMMIT_SHA}
+    IMAGE=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs:${CI_BUILD_REF}
     docker build -t ${IMAGE} ./doc
 
-    CONTAINER_NAME=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs_${CI_JOB_ID}
+    CONTAINER_NAME=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs_${CI_BUILD_ID}
     docker create --name ${CONTAINER_NAME} ${IMAGE}
 
     find doc/ -name \*.org -exec docker cp {} ${CONTAINER_NAME}:/workspace \;
