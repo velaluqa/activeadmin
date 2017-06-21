@@ -186,6 +186,9 @@ gem 'redcarpet'
 gem 'nokogiri'
 gem 'premailer-rails'
 
+gem 'trailblazer-rails'
+gem 'dry-types'
+
 group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
