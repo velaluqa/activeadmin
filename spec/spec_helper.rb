@@ -28,6 +28,8 @@ Capybara.default_driver = :poltergeist
 # connection and means to wait for pending ajax requests.
 require 'transactional_capybara/rspec'
 
+require 'rack/test'
+
 require 'yarjuf'
 
 require 'webmock/rspec'
