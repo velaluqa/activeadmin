@@ -13,8 +13,7 @@ else
     CONTAINER_NAME=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs_${CI_BUILD_ID}
     docker create --name ${CONTAINER_NAME} ${IMAGE}
 
-    find doc/ -name \*.org -exec docker cp {} ${CONTAINER_NAME}:/workspace \;
-    docker cp doc/elisp ${CONTAINER_NAME}:/workspace
+    docker cp doc/. ${CONTAINER_NAME}:/workspace
     docker start -a ${CONTAINER_NAME}
 
     docker cp ${CONTAINER_NAME}:/workspace/htmls.tgz /tmp
