@@ -6,7 +6,7 @@ class Ability
   ACTIVITIES = {
     BackgroundJob => %i[manage read update create destroy],
     Sidekiq => %i[manage],
-    Study  => %i[manage read update create destroy read_reports],
+    Study  => %i[manage read update create destroy read_reports configure],
     Center => %i[manage read update create destroy],
     Patient => %i[manage read update create destroy],
     EmailTemplate => %i[manage read update create destroy],
