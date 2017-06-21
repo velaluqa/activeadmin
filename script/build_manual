@@ -1,17 +1,22 @@
 #!/bin/sh
 
-set -ex
+set -e
+
+export GIT_BRANCH=$(git branch -a -v --abbrev=40 | grep $(git rev-parse HEAD) | awk '{print $1}' | grep -v '*' | head -n1 | awk -F '/' '{print $NF}')
+export GIT_VERSION=$(git describe --tags)
+
+set -x
 
 if [ -z $CI ]; then
     docker build -t emacs-docs ./doc
-    docker run --rm -v "`pwd`/doc:/workspace" emacs-docs
-    rm doc/htmls.tgz
+    docker run --rm -v "`pwd`/doc:/workspace" -e GIT_BRANCH -e GIT_VERSION emacs-docs
+    rm -f doc/htmls.tgz
 else
     IMAGE=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs:${CI_BUILD_REF}
     docker build -t ${IMAGE} ./doc
 
     CONTAINER_NAME=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs_${CI_BUILD_ID}
-    docker create --name ${CONTAINER_NAME} ${IMAGE}
+    docker create --name ${CONTAINER_NAME} -e GIT_BRANCH -e GIT_VERSION ${IMAGE}
 
     docker cp doc/. ${CONTAINER_NAME}:/workspace
     docker start -a ${CONTAINER_NAME}
