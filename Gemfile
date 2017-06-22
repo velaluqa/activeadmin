@@ -267,6 +267,7 @@ group :development, :test do
   gem 'with_model', '~> 1.2.1'
   # Spec delegation via ActiveSupport's #delegate method.
   gem 'delegate_matcher'
+  gem 'timecop'
 
   gem 'gherkin', '~> 2.5'
   gem 'turnip'
