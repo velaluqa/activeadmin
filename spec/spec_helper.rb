@@ -114,6 +114,12 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
   end
 
+  config.around(:each, paper_trail: false) do |example|
+    PaperTrail.enabled = false
+    example.run
+    PaperTrail.enabled = true
+  end
+
   config.around(:each) do |example|
     clear_data
     DatabaseCleaner.cleaning do
