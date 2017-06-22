@@ -2,6 +2,7 @@ image: registry.vela/velaluqa/gitlab-ci-build-images:ruby-2.3.4-docker
 
 variables:
   BUNDLE_GEMFILE: Gemfile-ci
+  REGISTRY: registry.velalu.qa
 
 cache:
   key: 'ruby234'
@@ -10,6 +11,7 @@ cache:
 
 before_script:
   - bundle install -j $(nproc) --deployment
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.velalu.qa
 
 stages:
   - deploy
@@ -17,12 +19,14 @@ stages:
 run:
   stage: deploy
   script:
-    - docker build -t ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_test:${CI_BUILD_REF} .
+    - docker build -t ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} .
     - docker run --name ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_postgres_${CI_BUILD_ID} -d postgres:9.5
     - docker run --name ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_redis_${CI_BUILD_ID} -d redis
     - echo "Waiting for postgres and redis to start up ..." && sleep 15
-    - docker run -t --name ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_test_${CI_BUILD_ID} --link ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_redis_${CI_BUILD_ID}:redis --link ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_postgres_${CI_BUILD_ID}:postgres -e RAILS_ENV=test ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_test:${CI_BUILD_REF} sh -c 'rm -f config/database.yml && ln -s database.yml.dev config/database.yml && rake db:setup ci'
+    - docker run -t --name ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_test_${CI_BUILD_ID} --link ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_redis_${CI_BUILD_ID}:redis --link ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_postgres_${CI_BUILD_ID}:postgres -e RAILS_ENV=test ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} sh -c 'rm -f config/database.yml && ln -s database.yml.dev config/database.yml && rake db:setup ci'
     - docker cp ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_test_${CI_BUILD_ID}:/app/reports .
     - docker rm -f -v ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_test_${CI_BUILD_ID} ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_postgres_${CI_BUILD_ID} ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_redis_${CI_BUILD_ID}
     - script/build_manual
+    - docker tag ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_SLUG}
+    - docker push ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_SLUG}
     - bundle exec gitdeploy
