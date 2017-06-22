@@ -12,7 +12,7 @@ if [ -z $CI ]; then
     docker run --rm -v "`pwd`/doc:/workspace" -e GIT_BRANCH -e GIT_VERSION emacs-docs
     rm -f doc/htmls.tgz
 else
-    IMAGE=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs:${CI_BUILD_REF}
+    IMAGE=registry.velalu.qa/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}_emacs-docs:${CI_BUILD_REF}
     docker build -t ${IMAGE} ./doc
 
     CONTAINER_NAME=${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_emacs-docs_${CI_BUILD_ID}
