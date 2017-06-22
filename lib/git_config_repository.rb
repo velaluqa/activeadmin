@@ -85,6 +85,19 @@ class GitConfigRepository
     Rugged::Commit.create(@repo, options)
   end
 
+  def version_at(timestamp)
+    walker = Rugged::Walker.new(@repo)
+    walker.sorting(Rugged::SORT_TOPO | Rugged::SORT_REVERSE) # optional
+    walker.push(current_version)
+    last_commit = nil
+    walker.each do |commit|
+      break if commit.time > timestamp
+      last_commit = commit
+    end
+    walker.reset
+    last_commit.try(:oid)
+  end
+
   def yaml_at_version(path, version = nil)
     version = current_version if version.nil?
 
