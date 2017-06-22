@@ -25,7 +25,6 @@ else
     tar xzf /tmp/htmls.tgz -C doc
     rm /tmp/htmls.tgz
     docker rm -v ${CONTAINER_NAME}
-    docker rmi --no-prune ${IMAGE}
 fi
 
 mkdir -p ./reports/manual
