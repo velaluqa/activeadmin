@@ -151,7 +151,7 @@ ActiveAdmin.register Study do
 
     authorize!(:configure, @study)
 
-    result = Study::UploadConfiguration.(params)
+    result = Study::UploadConfiguration.(params, current_user: current_user)
     if result.success?
       return redirect_to({ action: :show }, notice: 'Configuration successfully uploaded.')
     end
