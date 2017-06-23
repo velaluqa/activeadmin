@@ -190,7 +190,7 @@ RSpec.describe Admin::StudiesController do
       end
 
       let(:response) do
-        post(:upload_config, id: @study.id, study: { file: file })
+        post(:upload_config, id: @study.id, study_contract_upload_configuration: { file: file, id: @study.id, file_cache: '' })
       end
 
       it { expect(response).to redirect_to(%r{/admin/studies/\d+}) }
