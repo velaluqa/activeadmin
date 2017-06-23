@@ -63,9 +63,7 @@ class Version < PaperTrail::Version
       object
     else
       (object || {}).merge(
-        complete_changes
-          .map { |k, v| [k, v[1]] }
-          .to_h
+        complete_changes.transform_values { |_, new| new }
       )
     end
   end
