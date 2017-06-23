@@ -6,7 +6,7 @@ module Migration
         visit_versions_with_type.each do |version|
           next remove_required_series(version) if version.event == 'destroy'
           was, becomes = version.complete_changes['visit_type']
-          config = study_configuration(version.study, version.created_at.to_time)
+          config = study_configuration(version.study_id, version.created_at.to_time)
           if was.blank? && becomes.present?
             old = []
             new = config.andand['visit_types'].andand[becomes].andand['required_series'].try(:keys) || []
@@ -89,13 +89,29 @@ CLAUSE
           .order(created_at: :asc)
       end
 
-      def study_configuration(study, timestamp)
+      def locked_study_version_at(study_id, timestamp)
+        version =
+          Version
+            .where(item_type: 'Study', item_id: study_id)
+            .where('created_at < ?', timestamp)
+            .last
+        return version.complete_attributes['locked_version'] if version
+        study = Study.where(id: study_id).first
+        study = study.paper_trail.version_at(timestamp) || study
+        study.andand.locked_version
+      end
+
+      def study_configuration(study_id, timestamp)
         repo = GitConfigRepository.new
-        reified_study = study.paper_trail.version_at(timestamp) || study
-        historic_version = repo.version_at(timestamp)
-        version = reified_study.try(:locked_version) || historic_version
+        former_locked_version = locked_study_version_at(study_id, timestamp)
+        former_current_version = repo.version_at(timestamp)
+        version = former_locked_version || former_current_version
         return nil if version.nil?
-        repo.yaml_at_version(study.relative_config_file_path, version)
+        repo.yaml_at_version(study_config_path(study_id), version)
+      end
+
+      def study_config_path(id)
+        Rails.application.config.study_configs_subdirectory + "/#{id}.yml"
       end
     end
   end

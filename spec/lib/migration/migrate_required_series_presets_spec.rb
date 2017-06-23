@@ -392,12 +392,12 @@ CONFIG
     end
 
     it 'returns the configuration in history' do
-      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study, time1)).to eq(nil)
-      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study, time2)).to eq(YAML.load(config1))
-      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study, time3)).to eq(YAML.load(config2))
-      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study, time4)).to eq(YAML.load(config2))
-      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study, time5)).to eq(YAML.load(config2))
-      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study, time6)).to eq(YAML.load(config3))
+      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study.id, time1)).to eq(nil)
+      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study.id, time2)).to eq(YAML.load(config1))
+      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study.id, time3)).to eq(YAML.load(config2))
+      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study.id, time4)).to eq(YAML.load(config2))
+      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study.id, time5)).to eq(YAML.load(config2))
+      expect(Migration::MigrateRequiredSeriesPresets.study_configuration(study.id, time6)).to eq(YAML.load(config3))
     end
   end
 end
