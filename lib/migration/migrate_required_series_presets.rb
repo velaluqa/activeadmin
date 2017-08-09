@@ -3,7 +3,14 @@ module Migration
     class << self
       def run
         PaperTrail.enabled = false
-        visit_versions_with_type.each do |version|
+        ActiveRecord::Base.record_timestamps = false
+
+        progress = ProgressBar.create(
+          title: 'Required Series Presets',
+          total: visit_versions_with_type.count,
+          format: '%t |%B| %a / %E (%c / %C ~ %p%%)'
+        )
+        visit_versions_with_type.find_each do |version|
           next remove_required_series(version) if version.event == 'destroy'
           was, becomes = version.complete_changes['visit_type']
           config = study_configuration(version.study_id, version.created_at.to_time)
@@ -19,8 +26,12 @@ module Migration
           end
           create_required_series_presets(version, new)
           remove_required_series_presets(version, (old - new))
+
+          progress.increment
         end
+      ensure
         PaperTrail.enabled = true
+        ActiveRecord::Base.record_timestamps = true
       end
 
       def create_required_series_presets(version, required_series_names)
@@ -41,8 +52,8 @@ module Migration
             object_changes: {
               visit_id: [nil, version.item_id],
               name: [nil, name],
-              created_at: [nil, version.created_at.iso8601],
-              updated_at: [nil, version.created_at.iso8601]
+              created_at: [nil, version.created_at.to_json],
+              updated_at: [nil, version.created_at.to_json]
             },
             created_at: version.created_at,
             updated_at: version.created_at,
@@ -94,9 +105,11 @@ CLAUSE
           Version
             .where(item_type: 'Study', item_id: study_id)
             .where('created_at < ?', timestamp)
-            .last
+            .order(id: :desc)
+            .first
         return version.complete_attributes['locked_version'] if version
         study = Study.where(id: study_id).first
+        binding.pry if study.nil?
         study = study.paper_trail.version_at(timestamp) || study
         study.andand.locked_version
       end
