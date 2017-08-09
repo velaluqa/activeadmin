@@ -20,6 +20,7 @@ ActiveAdmin.register Version do
                                                 'Form' => 'Form',
                                                 'Image' => 'Image',
                                                 'ImageSeries' => 'ImageSeries',
+                                                'RequiredSeries' => 'RequiredSeries',
                                                 'Patient' => 'Patient',
                                                 'Role' => 'Role',
                                                 'Session' => 'Session',
