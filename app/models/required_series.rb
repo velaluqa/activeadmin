@@ -56,7 +56,9 @@ class RequiredSeries < ActiveRecord::Base
     :tqc_state,
     :tqc_comment,
     :tqc_user,
-    :domino_unid
+    :domino_unid,
+    :created_at,
+    :updated_at
   )
 
   scope :join_study, -> { joins(visit: { patient: { center: :study } }) }
