@@ -48,6 +48,18 @@ class GitConfigRepository
     walker
   end
 
+  def commits_for_file(path)
+    tab = []
+    walker = Rugged::Walker.new(@repo)
+    walker.sorting(Rugged::SORT_DATE)
+    walker.push(@repo.head.target)
+    walker.each do |commit|
+      next if commit.diff(paths: [path]).size <= 0
+      tab.push(commit)
+    end
+    tab
+  end
+
   def lookup(oid)
     @repo.lookup(oid)
   end
