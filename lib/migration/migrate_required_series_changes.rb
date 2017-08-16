@@ -2,17 +2,34 @@ module Migration
   class MigrateRequiredSeriesChanges
     class << self
       def run
+        PaperTrail.enabled = false
+        ActiveRecord::Base.record_timestamps = false
+
         RequiredSeries.skip_callback(:save, :after, :update_image_series_state)
-        versions.each do |version|
+
+        progress = ProgressBar.create(
+          title: 'Required Series Changes',
+          total: versions.count,
+          format: '%t |%B| %a / %E (%c / %C ~ %p%%)'
+        )
+        versions.find_each do |version|
           required_series_changes(version).each do |mapping|
             create_required_series_version(version, **mapping)
           end
+          progress.increment
         end
         RequiredSeries.set_callback(:save, :after, :update_image_series_state)
+      ensure
+        PaperTrail.enabled = true
+        ActiveRecord::Base.record_timestamps = true
       end
 
       def create_required_series_version(visit_version, visit_id:, name:, changes:)
         latest_version = find_latest_required_series_version(visit_id, name)
+        binding.pry if latest_version.nil?
+        changes = non_obsolete_changes(latest_version, visit_version, changes)
+        return if Version.where(created_at: visit_version.created_at, item_id: latest_version.item_id, item_type: 'RequiredSeries').exists?
+        return if changes.blank?
         Version.create(
           item_type: 'RequiredSeries',
           item_id: latest_version.item_id,
@@ -56,9 +73,23 @@ CLAUSE
           .order(created_at: :asc)
       end
 
+      def non_obsolete_changes(latest_version, visit_version, changes)
+        complete_attributes = latest_version.complete_attributes
+        changes = changes.delete_if do |col, (_, became)|
+          complete_attributes.andand[col] == became
+        end
+        if changes.present?
+          changes['updated_at'] = [
+            complete_attributes['updated_at'] || complete_attributes['created_at'],
+            visit_version.created_at
+          ]
+        end
+        changes
+      end
+
       def required_series_changes(visit_version)
         was, becomes = visit_version.complete_changes['required_series']
-        (was.keys + becomes.keys).uniq.map do |required_series_name|
+        ((was.andand.keys || []) + (becomes.andand.keys || [])).uniq.map do |required_series_name|
           {
             visit_id: visit_version.item_id,
             name: required_series_name,

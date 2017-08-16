@@ -74,8 +74,8 @@ CONF
                 'object_changes' => include(
                   'name' => [nil, 'SPECT_1'],
                   'visit_id' => [nil, visit.id],
-                  'created_at' => [nil, version.created_at.to_json],
-                  'updated_at' => [nil, version.created_at.to_json]
+                  'created_at' => [nil, version.created_at.as_json],
+                  'updated_at' => [nil, version.created_at.as_json]
                 ),
                 'created_at' => version.created_at,
                 'study_id' => study.id
@@ -88,8 +88,8 @@ CONF
                 'object_changes' => include(
                   'name' => [nil, 'SPECT_2'],
                   'visit_id' => [nil, visit.id],
-                  'created_at' => [nil, version.created_at.to_json],
-                  'updated_at' => [nil, version.created_at.to_json]
+                  'created_at' => [nil, version.created_at.as_json],
+                  'updated_at' => [nil, version.created_at.as_json]
                 ),
                 'created_at' => version.created_at,
                 'study_id' => study.id
@@ -137,8 +137,8 @@ CONF
                 'object_changes' => include(
                   'name' => [nil, 'SPECT_1'],
                   'visit_id' => [nil, visit.id],
-                  'created_at' => [nil, version.created_at.to_json],
-                  'updated_at' => [nil, version.created_at.to_json]
+                  'created_at' => [nil, version.created_at.as_json],
+                  'updated_at' => [nil, version.created_at.as_json]
                 ),
                 'created_at' => version.created_at,
                 'study_id' => study.id
@@ -151,8 +151,8 @@ CONF
                 'object_changes' => include(
                   'name' => [nil, 'SPECT_2'],
                   'visit_id' => [nil, visit.id],
-                  'created_at' => [nil, version.created_at.to_json],
-                  'updated_at' => [nil, version.created_at.to_json]
+                  'created_at' => [nil, version.created_at.as_json],
+                  'updated_at' => [nil, version.created_at.as_json]
                 ),
                 'created_at' => version.created_at,
                 'study_id' => study.id
@@ -227,8 +227,8 @@ CONF
                 'object_changes' => include(
                   'name' => [nil, 'SPECT_1'],
                   'visit_id' => [nil, visit.id],
-                  'created_at' => [nil, version1.created_at.to_json],
-                  'updated_at' => [nil, version1.created_at.to_json]
+                  'created_at' => [nil, version1.created_at.as_json],
+                  'updated_at' => [nil, version1.created_at.as_json]
                 ),
                 'created_at' => version1.created_at,
                 'study_id' => study.id
@@ -241,8 +241,8 @@ CONF
                 'object_changes' => include(
                   'name' => [nil, 'SPECT_3'],
                   'visit_id' => [nil, visit.id],
-                  'created_at' => [nil, version2.created_at.to_json],
-                  'updated_at' => [nil, version2.created_at.to_json]
+                  'created_at' => [nil, version2.created_at.as_json],
+                  'updated_at' => [nil, version2.created_at.as_json]
                 ),
                 'created_at' => version2.created_at,
                 'study_id' => study.id

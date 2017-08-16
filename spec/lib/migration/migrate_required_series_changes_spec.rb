@@ -3,6 +3,136 @@ require 'migration/migrate_required_series_changes'
 describe Migration::MigrateRequiredSeriesChanges, paper_trail: false do
   describe '::run' do
     describe 'for `update` visit versions with required series' do
+      describe 'syncing domino document' do
+        let!(:visit) { create(:visit) }
+        let!(:required_series1) { create(:required_series, visit: visit, name: 'SPECT_1') }
+        let!(:required_series2) { create(:required_series, visit: visit, name: 'SPECT_2') }
+
+        let!(:version0) do
+          Version.create!(
+            item_type: 'RequiredSeries',
+            item_id: required_series1.id,
+            event: 'create',
+            object_changes: {
+              'id' => [nil, required_series1.id],
+              'visit_id' => [nil, visit.id],
+              'name' => [nil, 'SPECT_1'],
+              'created_at' => [nil, required_series1.created_at.as_json],
+              'updated_at' => [nil, required_series1.created_at.as_json]
+            }
+          )
+        end
+        let!(:version1) do
+          Version.create!(
+            item_type: 'RequiredSeries',
+            item_id: required_series2.id,
+            event: 'create',
+            object_changes: {
+              'id' => [nil, required_series2.id],
+              'visit_id' => [nil, visit.id],
+              'name' => [nil, 'SPECT_2'],
+              'created_at' => [nil, required_series2.created_at.as_json],
+              'updated_at' => [nil, required_series2.created_at.as_json]
+            }
+          )
+        end
+        let!(:version2) do
+          Version.create!(
+            item_type: 'Visit',
+            item_id: visit.id,
+            event: 'update',
+            object_changes: {
+              'required_series' => [
+                {}, {
+                  'SPECT_1' => {
+                    'domino_unid' => '1234567890'
+                  }
+                }
+              ]
+            }
+          )
+        end
+        let!(:version3) do
+          Version.create!(
+            item_type: 'Visit',
+            item_id: visit.id,
+            event: 'update',
+            object_changes: {
+              'required_series' => [
+                {
+                  'SPECT_1' => {
+                    'domino_unid' => '1234567890'
+                  }
+                }, {
+                  'SPECT_1' => {
+                    'domino_unid' => '1234567890'
+                  },
+                  'SPECT_2' => {
+                    'domino_unid' => '0123456789'
+                  }
+                }
+              ]
+            }
+          )
+        end
+        let!(:version4) do
+          Version.create!(
+            item_type: 'Visit',
+            item_id: visit.id,
+            event: 'update',
+            object_changes: {
+              'required_series' => [
+                {}, {
+                  'SPECT_1' => {x
+                    'domino_unid' => '1234567890'
+                  },
+                  'SPECT_2' => {
+                    'domino_unid' => '0123456789'
+                  }
+                }
+              ]
+            }
+          )
+        end
+
+        before(:each) do
+          Migration::MigrateRequiredSeriesChanges.run
+        end
+
+        it 'only takes the first domino unids' do
+          expect(Version.where(item_type: 'RequiredSeries', item_id: required_series1.id).map(&:attributes))
+            .to contain_exactly(
+                  include(
+                    'object_changes' => include(
+                      'domino_unid' => [nil, '1234567890'],
+                      'updated_at' => [required_series1.created_at.as_json, version2.created_at.as_json]
+                    )
+                  ),
+                  include(
+                    'object_changes' => include(
+                      'name' => [nil, 'SPECT_1'],
+                      'created_at' => [nil, required_series1.created_at.as_json]
+                    )
+                  )
+                )
+          expect(Version.where(item_type: 'RequiredSeries', item_id: required_series2.id).map(&:attributes))
+            .to contain_exactly(
+                  include(
+                    'object_changes' => include(
+                      'domino_unid' => [nil, '0123456789'],
+                      'updated_at' => [required_series2.created_at.as_json, version3.created_at.as_json]
+                    )
+                  ),
+                  include(
+                    'object_changes' => include(
+                      'name' => [nil, 'SPECT_2'],
+                      'created_at' => [nil, required_series2.created_at.as_json]
+                    )
+                  )
+                )
+        end
+      end
+
       describe 'assigning required series' do
         let!(:visit) { create(:visit) }
         let!(:required_series) { create(:required_series, visit: visit, name: 'SPECT_1') }

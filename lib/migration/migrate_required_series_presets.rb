@@ -5,12 +5,21 @@ module Migration
         PaperTrail.enabled = false
         ActiveRecord::Base.record_timestamps = false
 
+        # create_presets_from_visit_type_change
+        create_presets_from_study_configuration_change
+      ensure
+        PaperTrail.enabled = true
+        ActiveRecord::Base.record_timestamps = true
+      end
+
+      def create_presets_from_visit_type_change
         progress = ProgressBar.create(
           title: 'Required Series Presets',
           total: visit_versions_with_type.count,
           format: '%t |%B| %a / %E (%c / %C ~ %p%%)'
         )
         visit_versions_with_type.find_each do |version|
+          binding.pry
           next remove_required_series(version) if version.event == 'destroy'
           was, becomes = version.complete_changes['visit_type']
           config = study_configuration(version.study_id, version.created_at.to_time)
@@ -29,9 +38,62 @@ module Migration
 
           progress.increment
         end
-      ensure
-        PaperTrail.enabled = true
-        ActiveRecord::Base.record_timestamps = true
+      end
+
+      def create_presets_from_study_configuration_change
+        puts 'About to migrate preset changes from study configuration changes'
+        study_ids = Version.pluck('DISTINCT(study_id)').compact
+
+        study_ids.each do |study_id|
+          previous_config = {}
+          repo = GitConfigRepository.new
+          config_path = Rails.application.config.study_configs_subdirectory + "/#{study_id}.yml"
+          commits = repo.commits_for_file(config_path)
+          puts "Commits for study with id #{study_id}"
+          commits.each do |commit|
+            commit_config = repo.yaml_at_version(config_path, commit.oid)
+            migrate_config_change(study_id, commit, previous_config, commit_config)
+            previous_config = commit_config
+          end
+        end
+      end
+
+      def migrate_config_change(study_id, commit, previous_config, commit_config)
+        old_visit_types = previous_config.andand['visit_types'].try(:keys) || []
+        new_visit_types = commit_config.andand['visit_types'].try(:keys) || []
+
+        # Visit types added to the configuration. Look for visits that
+        # need to be updated with the new required series.
+        (new_visit_types - old_visit_types).each do |visit_type|
+          add_visit_type_required_series(study_id, commit, visit_type, commit_config)
+        end
+        # Visit types removed from the configuration. Remove any
+        # existing required series.
+        (old_visit_types - new_visit_types).each do |visit_type|
+          remove_visit_type_required_series(study_id, commit, visit_type, previous_config)
+        end
+        # Visit types kept but maybe updated. Look for added or
+        # removed required series and migrate changes.
+        (old_visit_types & new_visit_types).each do |visit_type|
+          handle_visit_type_required_series_update(study_id, commit, visit_type, previous_config, commit_config)
+        end
+      end
+
+      def add_visit_type_required_series(study_id, commit, visit_type, commit_config)
+        new_rs = commit_config.andand['visit_types'].andand[visit_type].andand['required_series'].try(:keys) || []
+
+      end
+
+      def remove_visit_type_required_series(study_id, commit, visit_type, previous_config)
+        old_rs = previous_config.andand['visit_types'].andand[visit_type].andand['required_series'].try(:keys) || []
+
+      end
+
+      def handle_visit_type_required_series_update(study_id, commit, visit_type, previous_config, commit_config)
+        old_rs = previous_config.andand['visit_types'].andand[visit_type].andand['required_series'].try(:keys) || []
+        new_rs = commit_config.andand['visit_types'].andand[visit_type].andand['required_series'].try(:keys) || []
+
+
       end
 
       def create_required_series_presets(version, required_series_names)
@@ -52,8 +114,8 @@ module Migration
             object_changes: {
               visit_id: [nil, version.item_id],
               name: [nil, name],
-              created_at: [nil, version.created_at.to_json],
-              updated_at: [nil, version.created_at.to_json]
+              created_at: [nil, version.created_at.as_json],
+              updated_at: [nil, version.created_at.as_json]
             },
             created_at: version.created_at,
             updated_at: version.created_at,
@@ -92,10 +154,10 @@ module Migration
 
       def visit_versions_with_type
         Version
-          .where(item_type: 'Visit')
+          .where(item_type: 'Visit', item_id: 9714)
           .where(<<CLAUSE.strip_heredoc)
             (event = 'destroy' AND object ->> 'visit_type' IS NOT NULL)
-         OR ((object_changes ->> 'visit_type')::jsonb -> 1 IS NOT NULL)
+        OR ((object_changes ->> 'visit_type')::jsonb -> 1 IS NOT NULL)
 CLAUSE
           .order(created_at: :asc)
       end
