@@ -20,6 +20,29 @@ module Migration
         RequiredSeries.set_callback(:save, :after, :update_image_series_state)
       end
 
+      def migrated_configs(study_id)
+        @migrated_configs ||=
+          begin
+            if File.exists?('study_config_migration.yml')
+              JSON.parse(File.read('study_config_migration.yml'))
+            else
+              {}
+            end
+          end
+        @migrated_configs[study_id.to_s] ||= []
+      end
+
+      def migrated_config?(study_id, time)
+        migrated_configs(study_id).include?(time.as_json)
+      end
+
+      def save_migrated_config(study_id, time)
+        migrated_configs(study_id).push(time)
+        File.open('study_config_migration.yml', 'w+') do |file|
+          file.write(@migrated_configs.to_json)
+        end
+      end
+
       def migrate_study(study_id, config_history)
         current_config = {}
         versions =
@@ -164,6 +187,8 @@ module Migration
         (old_visit_types & new_visit_types).each do |visit_type|
           config_change_modified_visit_type(study_id, time, visit_type, previous_config, current_config)
         end
+
+        save_migrated_config(study_id, time)
       end
 
       def config_change_added_visit_type(study_id, time, visit_type, current_config)
