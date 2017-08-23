@@ -6,6 +6,179 @@ describe Migration::MigrateRequiredSeries, focus: true do
     Time.new(2017, 8, 1) + i.day
   end
 
+  describe '::required_series_changes' do
+    let!(:visit) { create(:visit) }
+    let!(:image_series) { create(:image_series, visit: visit) }
+
+    describe 'image_series_id added' do
+      describe 'tqc_state already set' do
+        let!(:visit_version) do
+          Version.new(
+            event: 'update',
+            item_type: 'Visit',
+            item_id: visit.id,
+            object_changes: {
+              'required_series' => [
+                {
+                  'rs1' => {
+                    'tqc_state' => 2,
+                    'image_series_id' => nil
+                  }
+                }, {
+                  'rs1' => {
+                    'image_series_id' => image_series.id
+                  }
+                }
+              ]
+            }
+          )
+        end
+
+        let(:changes) { Migration::MigrateRequiredSeries.required_series_changes(visit_version) }
+
+        it 'returns correct changes' do
+          expect(changes)
+            .to eq(
+                  [
+                    {
+                      visit_id: visit.id,
+                      name: 'rs1',
+                      changes: {
+                        'image_series_id' => [nil, image_series.id],
+                        'tqc_state' => [nil, 'pending']
+                      }
+                    }
+                  ]
+                )
+
+        end
+      end
+      describe 'tqc_state unset' do
+        let!(:visit_version) do
+          Version.new(
+            event: 'update',
+            item_type: 'Visit',
+            item_id: visit.id,
+            object_changes: {
+              'required_series' => [
+                {
+                  'rs1' => {
+                    'image_series_id' => nil
+                  }
+                }, {
+                  'rs1' => {
+                    'image_series_id' => image_series.id
+                  }
+                }
+              ]
+            }
+          )
+        end
+
+        let(:changes) { Migration::MigrateRequiredSeries.required_series_changes(visit_version) }
+
+        it 'returns correct changes' do
+          expect(changes)
+            .to eq(
+                  [
+                    {
+                      visit_id: visit.id,
+                      name: 'rs1',
+                      changes: {
+                        'image_series_id' => [nil, image_series.id],
+                        'tqc_state' => [nil, 'pending']
+                      }
+                    }
+                  ]
+                )
+
+        end
+      end
+    end
+    describe 'image_series_id removed' do
+      describe 'tqc_state already set' do
+        let!(:visit_version) do
+          Version.new(
+            event: 'update',
+            item_type: 'Visit',
+            item_id: visit.id,
+            object_changes: {
+              'required_series' => [
+                {
+                  'rs1' => {
+                    'tqc_state' => 1,
+                    'image_series_id' => image_series.id
+                  }
+                }, {
+                  'rs1' => {
+                    'image_series_id' => nil
+                  }
+                }
+              ]
+            }
+          )
+        end
+
+        let(:changes) { Migration::MigrateRequiredSeries.required_series_changes(visit_version) }
+
+        it 'returns correct changes' do
+          expect(changes)
+            .to eq(
+                  [
+                    {
+                      visit_id: visit.id,
+                      name: 'rs1',
+                      changes: {
+                        'image_series_id' => [image_series.id, nil],
+                        'tqc_state' => ['issues', nil]
+                      }
+                    }
+                  ]
+                )
+        end
+      end
+      describe 'tqc_state unset' do
+        let!(:visit_version) do
+          Version.new(
+            event: 'update',
+            item_type: 'Visit',
+            item_id: visit.id,
+            object_changes: {
+              'required_series' => [
+                {
+                  'rs1' => {
+                    'image_series_id' => image_series.id
+                  }
+                }, {
+                  'rs1' => {
+                    'image_series_id' => nil
+                  }
+                }
+              ]
+            }
+          )
+        end
+
+        let(:changes) { Migration::MigrateRequiredSeries.required_series_changes(visit_version) }
+
+        it 'returns correct changes' do
+          expect(changes)
+            .to eq(
+                  [
+                    {
+                      visit_id: visit.id,
+                      name: 'rs1',
+                      changes: {
+                        'image_series_id' => [image_series.id, nil],
+                      }
+                    }
+                  ]
+                )
+        end
+      end
+    end
+  end
+
   describe '::merged_study_configurations' do
     let(:commits) do
       [

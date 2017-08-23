@@ -404,26 +404,40 @@ CLAUSE
           {
             visit_id: visit_version.item_id,
             name: required_series_name,
-            changes: RequiredSeries.columns.map do |column|
-              was_value = was.andand[required_series_name].andand[column.name]
-              becomes_value = becomes.andand[required_series_name].andand[column.name]
-              next if was_value == becomes_value
-              if column.name == 'tqc_state'
-                enum = RequiredSeries.defined_enums[column.name].invert
-                [column.name, [enum[was_value], enum[becomes_value]]]
-              elsif column.name == 'image_series_id'
-                [column.name, [was_value.andand.to_i, becomes_value.andand.to_i]]
-              elsif column.name == 'tqc_date'
-                [column.name, [
-                   was_value.present? ? DateTime.parse(was_value) : nil,
-                   becomes_value.present? ? DateTime.parse(becomes_value) : nil
-                 ]]
-              else
-                [column.name, [was_value, becomes_value]]
-              end
-            end.compact.to_h
+            changes: extract_changes(visit_version, required_series_name)
           }
         end
+      end
+
+      def extract_changes(visit_version, required_series_name)
+        was, becomes = visit_version.complete_changes['required_series']
+        changes = {}
+        RequiredSeries.columns.map do |column|
+          was_value = was.dig2(required_series_name, column.name)
+          becomes_value = becomes.dig2(required_series_name, column.name)
+          next if was_value == becomes_value
+          if column.name == 'tqc_state'
+            enum = RequiredSeries.defined_enums[column.name].invert
+            changes[column.name] ||= [enum[was_value], enum[becomes_value]]
+          elsif column.name == 'image_series_id'
+            changes[column.name] = [was_value.andand.to_i, becomes_value.andand.to_i]
+            if was_value.blank? && becomes_value.present?
+              changes['tqc_state'] = [nil, 'pending']
+            elsif was_value.present? && becomes_value.blank?
+              enum = RequiredSeries.defined_enums['tqc_state'].invert
+              state_value = was.dig2(required_series_name, 'tqc_state')
+              changes['tqc_state'] = [enum[state_value], nil] if enum[state_value].present?
+            end
+          elsif column.name == 'tqc_date'
+            changes[column.name] = [
+              was_value.present? ? DateTime.parse(was_value) : nil,
+              becomes_value.present? ? DateTime.parse(becomes_value) : nil
+            ]
+          else
+            changes[column.name] = [was_value, becomes_value]
+          end
+        end.compact
+        changes
       end
 
       def visit_versions_with_type
