@@ -57,3 +57,4 @@ app/assets/images/client_logos/*
 reports
 /spec/data/
 /images/
+/study_config_migration.yml
