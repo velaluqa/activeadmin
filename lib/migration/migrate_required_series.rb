@@ -265,7 +265,10 @@ module Migration
                       .where('((object_changes ->> \'visit_type\')::jsonb ->> 1) = ?', visit_type)
                       .distinct
                       .pluck(:item_id)
-        RequiredSeries.where(visit_id: visit_ids).where(name: required_series).find_each do |rs|
+        RequiredSeries
+          .where(visit_id: visit_ids, name: required_series)
+          .where('created_at < ?', time)
+          .find_each do |rs|
           destroy_required_series(study_id, time, rs)
         end
       end
