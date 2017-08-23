@@ -227,7 +227,7 @@ module Migration
         end
       end
 
-      def required_series_added(study_id, visit_id, time, rs_names)
+      def required_series_added(study_id, visit_id, time, rs_names, whodunnit: nil)
         rs_names.each do |name|
           next if RequiredSeries.where(visit_id: visit_id, name: name).exists?
           required_series =
@@ -248,6 +248,7 @@ module Migration
               created_at: [nil, time.as_json],
               updated_at: [nil, time.as_json]
             },
+            whodunnit: whodunnit,
             created_at: time.to_datetime,
             updated_at: time.to_datetime,
             study_id: study_id
@@ -305,6 +306,7 @@ module Migration
               created_at: [nil, version.created_at.as_json],
               updated_at: [nil, version.created_at.as_json]
             },
+            whodunnit: version.whodunnit,
             created_at: version.created_at,
             updated_at: version.created_at,
             study_id: version.study_id
@@ -353,6 +355,7 @@ module Migration
           object: latest_version.complete_attributes,
           object_changes: changes,
           created_at: visit_version.created_at,
+          whodunnit: visit_version.whodunnit,
           study_id: visit_version.study_id
         )
         required_series = RequiredSeries.where(id: latest_version.item_id).first
