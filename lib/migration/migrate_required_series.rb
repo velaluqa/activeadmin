@@ -8,6 +8,7 @@ module Migration
         RequiredSeries.skip_callback(:save, :after, :update_image_series_state)
 
         study_ids = Version.pluck('DISTINCT(study_id)').compact
+        puts "Migrating studies: #{study_ids.inspect}"
         study_ids.each do |study_id|
           puts "Migrating study #{study_id}"
           config_history = study_configurations(study_id)
@@ -281,6 +282,7 @@ module Migration
 
       def migrate_visit_type_change(version, current_config)
         was, becomes = version.object_changes.andand['visit_type']
+        puts "Migrate visit type change: #{was} => #{becomes}"
         old_rs = current_config['visit_types'].andand[was].andand['required_series'].try(:keys) || []
         new_rs = current_config['visit_types'].andand[becomes].andand['required_series'].try(:keys) || []
 
@@ -289,8 +291,11 @@ module Migration
       end
 
       def create_required_series_presets(version, required_series_names)
+        puts "Create Required Series Presets: #{required_series_names.join(',')}"
         required_series_names.each do |name|
+          puts "--- Checking existing required series"
           next if RequiredSeries.where(visit_id: version.item_id, name: name).exists?
+          puts "--- Creating required series"
           required_series =
             RequiredSeries.create!(
               visit_id: version.item_id,
@@ -298,6 +303,7 @@ module Migration
               created_at: version.created_at,
               updated_at: version.created_at
             )
+          puts "--- Creating required series version"
           Version.create!(
             item_type: 'RequiredSeries',
             item_id: required_series.id,
@@ -318,6 +324,7 @@ module Migration
       end
 
       def remove_required_series_presets(version, required_series_names)
+        puts "Remove Required Series Presets: #{required_series_names.join(',')}"
         required_series_names.each do |name|
           required_series = RequiredSeries.where(visit_id: version.item_id, name: name).first
           next if required_series.blank?
@@ -326,6 +333,8 @@ module Migration
       end
 
       def destroy_required_series(study_id, destroyed_at, required_series)
+        puts "Destroy required series #{required_series.visit_id} - #{required_series.name}"
+        puts "--- creating destroy version"
         Version.create!(
           item_type: 'RequiredSeries',
           item_id: required_series.id,
@@ -336,21 +345,28 @@ module Migration
           updated_at: destroyed_at,
           study_id: study_id
         )
+        puts "--- destroying required series"
         required_series.destroy!
       end
 
       def migrate_required_series_change(version, current_config)
+        puts "Migrate required series change"
         required_series_changes(version).each do |mapping|
           create_required_series_version(version, **mapping)
         end
       end
 
       def create_required_series_version(visit_version, visit_id:, name:, changes:)
+        puts "Creating required series version #{visit_id} - #{name}"
+        puts "--- Finding latest required series version"
         latest_version = find_latest_required_series_version(visit_id, name)
         binding.pry if latest_version.nil?
+        puts "--- Extracting non-obsolete changes"
         changes = non_obsolete_changes(latest_version, visit_version, changes)
+        puts "--- Checking if required series version exists"
         return if Version.where(created_at: visit_version.created_at, item_id: latest_version.item_id, item_type: 'RequiredSeries').exists?
         return if changes.blank?
+        puts "--- Creating version"
         Version.create(
           item_type: 'RequiredSeries',
           item_id: latest_version.item_id,
@@ -361,11 +377,14 @@ module Migration
           whodunnit: visit_version.whodunnit,
           study_id: visit_version.study_id
         )
+        puts "--- Checking existing required series "
         required_series = RequiredSeries.where(id: latest_version.item_id).first
         return if required_series.nil?
         attributes = changes.transform_values { |_, new| new }
+        puts "--- Updating existing required series"
         required_series.update_attributes(attributes)
         required_series.save!
+        puts "--- Updating done"
       end
 
       def find_latest_required_series_version(visit_id, name)
