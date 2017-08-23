@@ -116,13 +116,14 @@ module Migration
             time: commit.time,
             yaml: repo.yaml_at_version(config_path, commit.oid)
           }
-        end
+        end.sort_by { |commit| commit[:time] }
       end
 
       def study_configuration_locks(study_id)
         Version
           .where(item_type: 'Study', item_id: study_id)
           .where('(object_changes ->> \'locked_version\') IS NOT NULL')
+          .order(created_at: :asc)
           .map do |version|
           {
             time: version.created_at,
@@ -132,6 +133,7 @@ module Migration
       end
 
       def merged_study_configurations(commits, locks)
+        repo = GitConfigRepository.new
         configs = []
         locked_version = nil
         commits.each do |commit|
@@ -142,7 +144,7 @@ module Migration
               if locked_version.present? && configs.last.andand[:ref] != locked_version
                 configs.push(
                   ref: locked_version,
-                  time: locked_version[:time],
+                  time: version[:time],
                   yaml: repo.yaml_at_version(locked_version)
                 )
               end
