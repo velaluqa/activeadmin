@@ -4,6 +4,8 @@ module Migration
       def run
         PaperTrail.enabled = false
         ActiveRecord::Base.record_timestamps = false
+        RequiredSeries.skip_callback(:commit, :after, :schedule_domino_sync)
+        RequiredSeries.skip_callback(:save, :after, :update_image_series_state)
 
         study_ids = Version.pluck('DISTINCT(study_id)').compact
         study_ids.each do |study_id|
@@ -14,6 +16,8 @@ module Migration
       ensure
         PaperTrail.enabled = true
         ActiveRecord::Base.record_timestamps = true
+        RequiredSeries.set_callback(:commit, :after, :schedule_domino_sync)
+        RequiredSeries.set_callback(:save, :after, :update_image_series_state)
       end
 
       def migrate_study(study_id, config_history)
