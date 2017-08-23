@@ -22,7 +22,11 @@ module Migration
 
       def migrate_study(study_id, config_history)
         current_config = {}
-        versions = Version.where(item_type: 'Visit', study_id: study_id)
+        versions =
+          Version
+            .where(item_type: 'Visit', study_id: study_id)
+            .where(migrated_required_series: false)
+            .order(created_at: :asc)
 
         puts "Loading visit versions for study #{study_id}"
         progress = ProgressBar.create(
@@ -31,27 +35,43 @@ module Migration
           format: '%t |%B| %a / %E (%c / %C ~ %p%%)'
         )
         versions.find_each do |version|
-          if version.created_at >= config_history.first[:time]
-            config_change = config_history.shift
-            previous_config = current_config
-            current_config = config_change[:yaml]
-            migrate_config_change(study_id, config_change[:time], previous_config, current_config)
-          end
-          migrate_visit_destroy(version) if version.event == 'destroy'
-          if version.object_changes.andand['visit_type'].andand[1].present?
-            migrate_visit_type_change(version, current_config)
-          end
-          if version.object_changes.andand['required_series'].present?
-            migrate_required_series_change(version, current_config)
-          end
+          Version.transaction do
+            while config_history.first && version.created_at >= config_history.first[:time]
+              puts "Version created (#{version.created_at.as_json}) >= #{config_history.first[:time].as_json}"
+              config_change = config_history.shift
+              previous_config = current_config
+              current_config = config_change[:yaml]
+              if migrated_config?(study_id, config_change[:time])
+                puts ' => skipping; already done'
+              else
+                puts ' => Migrating Config Change'
+                migrate_config_change(study_id, config_change[:time], previous_config, current_config)
+              end
+            end
+            migrate_visit_destroy(version) if version.event == 'destroy'
+            if version.object_changes.andand['visit_type'].andand[1].present?
+              migrate_visit_type_change(version, current_config)
+            end
+            if version.object_changes.andand['required_series'].present?
+              migrate_required_series_change(version, current_config)
+            end
 
+            version.migrated_required_series = true
+            version.save!
+          end
           progress.increment
         end
         while config_history.first.present?
+          puts "Configuration update #{config_history.first[:time].as_json}"
           config_change = config_history.shift
           previous_config = current_config
           current_config = config_change[:yaml]
-          migrate_config_change(study_id, config_change[:time], previous_config, current_config)
+          if migrated_config?(study_id, config_change[:time])
+            puts ' => skipping; already done'
+          else
+            puts ' => Migrating Config Change'
+            migrate_config_change(study_id, config_change[:time], previous_config, current_config)
+          end
         end
       end
 
