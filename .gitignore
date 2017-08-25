@@ -58,3 +58,4 @@ reports
 /spec/data/
 /images/
 /study_config_migration.yml
+/import
