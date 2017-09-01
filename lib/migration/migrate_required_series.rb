@@ -69,7 +69,13 @@ module Migration
                 puts ' => skipping; already done'
               else
                 puts ' => Migrating Config Change'
-                migrate_config_change(study_id, config_change[:time], previous_config, current_config)
+                migrate_config_change(
+                  study_id,
+                  config_change[:time],
+                  previous_config,
+                  current_config,
+                  whodunnit: 'config_change'
+                )
               end
             end
             migrate_visit_destroy(version) if version.event == 'destroy'
@@ -94,7 +100,13 @@ module Migration
             puts ' => skipping; already done'
           else
             puts ' => Migrating Config Change'
-            migrate_config_change(study_id, config_change[:time], previous_config, current_config)
+            migrate_config_change(
+              study_id,
+              config_change[:time],
+              previous_config,
+              current_config,
+              whodunnit: 'config_change'
+            )
           end
         end
       end
@@ -171,33 +183,33 @@ module Migration
         configs
       end
 
-      def migrate_config_change(study_id, time, previous_config, current_config)
+      def migrate_config_change(study_id, time, previous_config, current_config, whodunnit: nil)
         old_visit_types = previous_config.andand['visit_types'].try(:keys) || []
         new_visit_types = current_config.andand['visit_types'].try(:keys) || []
 
         # Visit types added to the configuration. Look for visits that
         # need to be updated with the new required series.
         (new_visit_types - old_visit_types).each do |visit_type|
-          config_change_added_visit_type(study_id, time, visit_type, current_config)
+          config_change_added_visit_type(study_id, time, visit_type, current_config, whodunnit: whodunnit)
         end
         # Visit types removed from the configuration. Remove any
         # existing required series.
         (old_visit_types - new_visit_types).each do |visit_type|
-          config_change_removed_visit_type(study_id, time, visit_type, previous_config)
+          config_change_removed_visit_type(study_id, time, visit_type, previous_config, whodunnit: whodunnit)
         end
         # Visit types kept but maybe updated. Look for added or
         # removed required series and migrate changes.
         (old_visit_types & new_visit_types).each do |visit_type|
-          config_change_modified_visit_type(study_id, time, visit_type, previous_config, current_config)
+          config_change_modified_visit_type(study_id, time, visit_type, previous_config, current_config, whodunnit: whodunnit)
         end
 
         save_migrated_config(study_id, time)
       end
 
-      def config_change_added_visit_type(study_id, time, visit_type, current_config)
+      def config_change_added_visit_type(study_id, time, visit_type, current_config, whodunnit: nil)
         rs_names = current_config.andand['visit_types'].andand[visit_type].andand['required_series'].try(:keys) || []
         visits_with_visit_type(study_id, visit_type, time).each do |visit_id|
-          required_series_added(study_id, visit_id, time, rs_names)
+          required_series_added(study_id, visit_id, time, rs_names, whodunnit: whodunnit)
         end
       end
 
@@ -211,20 +223,20 @@ module Migration
           .pluck(:item_id)
       end
 
-      def config_change_removed_visit_type(study_id, time, visit_type, previous_config)
+      def config_change_removed_visit_type(study_id, time, visit_type, previous_config, whodunnit: nil)
         rs_names = previous_config.andand['visit_types'].andand[visit_type].andand['required_series'].try(:keys) || []
-        remove_required_series_for_visit_type(study_id, time, visit_type, rs_names)
+        remove_required_series_for_visit_type(study_id, time, visit_type, rs_names, whodunnit: whodunnit)
       end
 
-      def config_change_modified_visit_type(study_id, time, visit_type, previous_config, current_config)
+      def config_change_modified_visit_type(study_id, time, visit_type, previous_config, current_config, whodunnit: nil)
         old_rs = previous_config.andand['visit_types'].andand[visit_type].andand['required_series'].try(:keys) || []
         new_rs = current_config.andand['visit_types'].andand[visit_type].andand['required_series'].try(:keys) || []
 
         # Removed RequiredSeries
-        remove_required_series_for_visit_type(study_id, time, visit_type, (old_rs - new_rs))
+        remove_required_series_for_visit_type(study_id, time, visit_type , (old_rs - new_rs), whodunnit: whodunnit)
         # Added RequiredSeries
         visits_with_visit_type(study_id, visit_type, time).each do |visit_id|
-          required_series_added(study_id, visit_id, time, (new_rs - old_rs))
+          required_series_added(study_id, visit_id, time , (new_rs - old_rs), whodunnit: whodunnit)
         end
       end
 
@@ -257,7 +269,7 @@ module Migration
         end
       end
 
-      def remove_required_series_for_visit_type(study_id, time, visit_type, required_series)
+      def remove_required_series_for_visit_type(study_id, time, visit_type, required_series, whodunnit: nil)
         return if required_series.empty?
         visit_ids = Version
                       .where(item_type: 'Visit')
@@ -270,7 +282,7 @@ module Migration
           .where(visit_id: visit_ids, name: required_series)
           .where('created_at < ?', time)
           .find_each do |rs|
-          destroy_required_series(study_id, time, rs)
+          destroy_required_series(study_id, time, rs, whodunnit: whodunnit)
         end
       end
 
@@ -332,7 +344,7 @@ module Migration
         end
       end
 
-      def destroy_required_series(study_id, destroyed_at, required_series)
+      def destroy_required_series(study_id, destroyed_at, required_series, whodunnit: nil)
         puts "Destroy required series #{required_series.visit_id} - #{required_series.name}"
         puts "--- creating destroy version"
         Version.create!(
@@ -343,7 +355,8 @@ module Migration
           object_changes: nil,
           created_at: destroyed_at,
           updated_at: destroyed_at,
-          study_id: study_id
+          study_id: study_id,
+          whodunnit: whodunnit
         )
         puts "--- destroying required series"
         required_series.destroy!
