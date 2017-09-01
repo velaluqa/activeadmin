@@ -372,7 +372,7 @@ module Migration
       def create_required_series_version(visit_version, visit_id:, name:, changes:)
         puts "Creating required series version #{visit_id} - #{name}"
         puts "--- Finding latest required series version"
-        latest_version = find_latest_required_series_version(visit_id, name)
+        latest_version = find_latest_required_series_version(visit_version.study_id, visit_id, name)
         binding.pry if latest_version.nil?
         puts "--- Extracting non-obsolete changes"
         changes = non_obsolete_changes(latest_version, visit_version, changes)
@@ -400,9 +400,9 @@ module Migration
         puts "--- Updating done"
       end
 
-      def find_latest_required_series_version(visit_id, name)
+      def find_latest_required_series_version(study_id, visit_id, name)
         Version
-          .where(item_type: 'RequiredSeries')
+          .where(item_type: 'RequiredSeries', study_id: study_id)
           .where(<<CLAUSE.strip_heredoc, visit_id: visit_id, name: name)
             (
               ((object ->> 'name') LIKE :name) OR
