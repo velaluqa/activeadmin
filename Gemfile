@@ -193,6 +193,7 @@ group :development do
   gem 'meta_request', '~> 0.4.0'
   # Generate UML diagrams for the database.
   gem 'railroady'
+  gem 'rails-erd'
   # Hints missing indexes.
   gem 'lol_dba'
 

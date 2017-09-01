@@ -15,6 +15,7 @@ RUN apt-get update -qq && \
     locales \
     cmake \
     postgresql-client \
+    graphviz \
     dcmtk
 
 RUN mkdir -p /tmp/phantomjs && \
