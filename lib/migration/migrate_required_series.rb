@@ -380,7 +380,7 @@ module Migration
         return if Version.where(created_at: visit_version.created_at, item_id: latest_version.item_id, item_type: 'RequiredSeries').exists?
         return if changes.blank?
         puts "--- Creating version"
-        Version.create(
+        Version.create!(
           item_type: 'RequiredSeries',
           item_id: latest_version.item_id,
           event: 'update',
