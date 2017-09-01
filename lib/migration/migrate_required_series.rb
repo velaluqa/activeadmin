@@ -162,20 +162,21 @@ module Migration
                 )
               end
             else
-              next if locked_version.nil?
-              latest_commit = nil
-              commits.each do |commit|
-                if commit[:time] > version[:time]
-                  configs.push(
-                    ref: latest_commit[:ref],
-                    time: version[:time],
-                    yaml: latest_commit[:yaml]
-                  )
-                  break
+              if locked_version.present?
+                latest_commit = nil
+                commits.each do |commit|
+                  if commit[:time] > version[:time]
+                    configs.push(
+                      ref: latest_commit[:ref],
+                      time: version[:time],
+                      yaml: latest_commit[:yaml]
+                    )
+                    break
+                  end
+                  latest_commit = commit
                 end
-                latest_commit = commit
+                locked_version = nil
               end
-              locked_version = nil
             end
           end
           configs.push(commit) if locked_version.nil?
