@@ -83,7 +83,7 @@ describe Migration::MigrateRequiredSeriesChanges, paper_trail: false do
             object_changes: {
               'required_series' => [
                 {}, {
-                  'SPECT_1' => {x
+                  'SPECT_1' => {
                     'domino_unid' => '1234567890'
                   },
                   'SPECT_2' => {
