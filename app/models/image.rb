@@ -74,6 +74,8 @@ JOIN
     "#{image_series.image_storage_path}/#{id}"
   end
 
+  # TODO: Actually return an absolute path! This should be tested and
+  # all usage should be verified!
   def absolute_image_storage_path
     Rails.application.config.image_storage_root + '/' + image_storage_path
   end
