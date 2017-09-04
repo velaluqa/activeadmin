@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'migration/migrate_required_series'
 
-describe Migration::MigrateRequiredSeries, focus: true do
+describe Migration::MigrateRequiredSeries do
   def point_in_time(i)
     Time.new(2017, 8, 1) + i.day
   end
