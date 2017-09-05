@@ -109,7 +109,7 @@ CONFIG
         expect(background_job.results['Case List']).
           to eq(<<CASELIST.strip_heredoc)
           patient,images,type
-          1211,8,baseline
+          #{patient.name},#{visit.visit_number},baseline
 CASELIST
       end
     end
