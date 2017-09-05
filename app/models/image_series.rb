@@ -207,19 +207,16 @@ JOIN
   def domino_sync
     ensure_domino_document_exists
 
-    unless visit.nil?
-      # the reload call is here to work around a race condition in the domino sync
-      # when an image series is re/unassigned on a visit that had mQC completed, the image series sync is started first
-      # it then starts its visit sync, possibly after the visit was modified and had its mQC results reset
-      # this visit instance would then contain the old values, including the mQC details
-      # therefor, we reload it here before we sync it, to make sure we have the most up-to-date values
-      visit.reload
-      visit.domino_sync
+    return if visit.nil?
+    # the reload call is here to work around a race condition in the domino sync
+    # when an image series is re/unassigned on a visit that had mQC completed, the image series sync is started first
+    # it then starts its visit sync, possibly after the visit was modified and had its mQC results reset
+    # this visit instance would then contain the old values, including the mQC details
+    # therefor, we reload it here before we sync it, to make sure we have the most up-to-date values
+    visit.reload
+    visit.domino_sync
 
-      assigned_required_series.pluck(:name).each do |as_name|
-        RequiredSeries.new(visit, as_name).domino_sync
-      end
-    end
+    assigned_required_series.each(&:domino_sync)
   end
 
   def assigned_required_series
