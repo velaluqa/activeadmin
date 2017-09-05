@@ -202,8 +202,11 @@ JOIN
 
   def wado_query
     return nil unless assigned?
-
-    { id: (@visit.nil? ? '_' + name : @visit.id.to_s + '_' + name), name: name, images: assigned_image_series.images.order('id ASC') }
+    {
+      id: "#{visit.id}_#{name}",
+      name: name,
+      images: assigned_image_series.images.order('id ASC')
+    }
   end
 
   def domino_document_form
