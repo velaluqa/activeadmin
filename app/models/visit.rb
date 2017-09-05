@@ -360,8 +360,7 @@ JOIN_QUERY
     ensure_domino_document_exists
   end
 
-
-  def change_required_series_assignment(changed_assignments, options = { save: true })
+  def change_required_series_assignment(changed_assignments)
     ActiveRecord::Base.transaction do
       changed_assignments.each_pair do |required_series_name, series_id|
         required_series = RequiredSeries.find_by(visit: self, name: required_series_name)
