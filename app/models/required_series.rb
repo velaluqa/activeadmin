@@ -29,6 +29,8 @@
 #     * **`name`**
 #
 class RequiredSeries < ActiveRecord::Base
+  include DominoDocument
+
   belongs_to :visit
   belongs_to :image_series
 
@@ -41,8 +43,6 @@ class RequiredSeries < ActiveRecord::Base
       study_id: ->(series) { series.study.andand.id }
     }
   )
-
-  include DominoDocument
 
   attr_accessible(
     :visit,
@@ -213,37 +213,46 @@ JOIN
   def domino_document_query
     {
       'docCode' => 10_044,
-      'ericaID' => @visit.id,
+      'ericaID' => visit.id,
       'RequiredSeries' => name
     }
   end
 
   def domino_document_properties(_action = :update)
     properties = {
-      'ericaID' => @visit.id,
-      'CenterNo' => @visit.patient.center.code,
-      'PatNo' => @visit.patient.domino_patient_no,
-      'VisitNo' => @visit.visit_number,
+      'ericaID' => visit.id,
+      'CenterNo' => visit.patient.center.code,
+      'PatNo' => visit.patient.domino_patient_no,
+      'VisitNo' => visit.visit_number,
       'RequiredSeries' => name
     }
 
     if assigned_image_series.nil?
-      properties.merge!('trash' => 1,
-                        'ericaASID' => nil,
-                        'DateImaging' => '01-01-0001',
-                        'SeriesDescription' => nil,
-                        'DICOMTagNames' => nil,
-                        'DICOMValues' => nil)
+      properties.merge!(
+        'trash' => 1,
+        'ericaASID' => nil,
+        'DateImaging' => {
+          'data' => '01-01-0001',
+          'type' => 'datetime'
+        },
+        'SeriesDescription' => nil,
+        'DICOMTagNames' => nil,
+        'DICOMValues' => nil
+      )
     else
-      properties.merge!('trash' => 0,
-                        'ericaASID' => assigned_image_series.id,
-                        'DateImaging' => { 'data' => assigned_image_series.imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime' },
-                        'SeriesDescription' => assigned_image_series.name)
+      properties.merge!(
+        'trash' => 0,
+        'ericaASID' => assigned_image_series.id,
+        'DateImaging' => {
+          'data' => assigned_image_series.imaging_date.strftime('%d-%m-%Y'),
+          'type' => 'datetime'
+        },
+        'SeriesDescription' => assigned_image_series.name
+      )
       properties.merge!(assigned_image_series.dicom_metadata_to_domino)
     end
-    properties.merge!(tqc_to_domino)
 
-    properties
+    properties.merge(tqc_to_domino)
   end
 
   def domino_sync
@@ -253,37 +262,38 @@ JOIN
   protected
 
   def tqc_to_domino
-    result = {}
+    result = {
+      'QCdate' => {
+        'data' => (tqc_date.nil? ? '01-01-0001' : tqc_date.strftime('%d-%m-%Y')),
+        'type' => 'datetime'
+      },
+      'QCresult' => tqc_state_label,
+      'QCcomment' => tqc_comment,
+      'QCperson' => (tqc_user.nil? ? nil : tqc_user.name),
+      'QCCriteriaNames' => nil,
+      'QCValues' => nil
+    }
 
-    result['QCdate'] = { 'data' => (tqc_date.nil? ? '01-01-0001' : tqc_date.strftime('%d-%m-%Y')), 'type' => 'datetime' }
-    result['QCperson'] = (tqc_user.nil? ? nil : tqc_user.name)
-
-    result['QCresult'] =
-      case tqc_state
-      when :pending then 'Pending'
-      when :issues then 'Performed, issues present'
-      when :passed then 'Performed, no issues present'
-      end
-
-    result['QCcomment'] = tqc_comment
-
-    criteria_names = []
-    criteria_values = []
-    results = tqc_spec_with_results_at_version(tqc_version || study.locked_version)
-    if results.nil?
-      result['QCCriteriaNames'] = nil
-      result['QCValues'] = nil
-    else
+    results = tqc_spec_with_results(version: (tqc_version || study.locked_version))
+    if results.present?
+      criteria_names = []
+      criteria_values = []
       results.each do |criterion|
         criteria_names << criterion['label']
         criteria_values << (criterion['answer'] == true ? 'Pass' : 'Fail')
       end
-
       result['QCCriteriaNames'] = criteria_names.join("\n")
       result['QCValues'] = criteria_values.join("\n")
     end
-
     result
+  end
+
+  def tqc_state_label
+    case tqc_state
+    when 'pending' then 'Pending'
+    when 'issues' then 'Performed, issues present'
+    when 'passed' then 'Performed, no issues present'
+    end
   end
 
   private

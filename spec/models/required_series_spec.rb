@@ -185,4 +185,168 @@ CONFIG
       end
     end
   end
+
+  describe '#domino_document_query' do
+    let!(:study) { create(:study) }
+    let!(:center) { create(:center, study: study) }
+    let!(:patient) { create(:patient, center: center) }
+    let!(:visit) { create(:visit, patient: patient) }
+    let!(:required_series) { create(:required_series, visit: visit, name: 'SPECT_1')}
+
+    it 'returns the correct query' do
+      expect(required_series.domino_document_query)
+        .to eq(
+              'docCode' => 10044,
+              'ericaID' => required_series.visit.id,
+              'RequiredSeries' => 'SPECT_1'
+            )
+    end
+  end
+
+  describe '#domino_document_properties' do
+    let!(:study) { create(:study, configuration: <<CONFIG) }
+    visit_types:
+      baseline:
+        required_series:
+          SPECT_1:
+            tqc:
+              - id: coverage
+                label: 'Is the entire region covered?'
+                type: bool
+              - id: contrast_new
+                label: 'Correct contrast phase according to new standards?'
+                type: bool
+          SPECT_2:
+            tqc:
+              - id: coverage
+                label: 'Is the entire region covered?'
+                type: bool
+              - id: contrast_new
+                label: 'Correct contrast phase according to new standards?'
+                type: bool
+    image_series_properties: []
+CONFIG
+    let!(:center) { create(:center, study: study) }
+    let!(:patient) { create(:patient, center: center) }
+    let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
+    let!(:image_series) { create(:image_series, visit: visit) }
+
+    describe 'for required series without assigned image series' do
+      let!(:required_series) { visit.required_series.where(name: 'SPECT_1').first }
+
+      it 'returns the correct properties' do
+        expect(required_series.domino_document_properties)
+          .to include(
+                'ericaID' => visit.id,
+                'CenterNo' => center.code,
+                'PatNo' => patient.domino_patient_no,
+                'VisitNo' => visit.visit_number,
+                'RequiredSeries' => 'SPECT_1',
+                'trash' => 1,
+                'ericaASID' => nil,
+                'DateImaging' => {
+                  'data' => '01-01-0001',
+                  'type' => 'datetime'
+                },
+                'SeriesDescription' => nil,
+                'DICOMTagNames' => nil,
+                'DICOMValues' => nil,
+                'QCdate' => {
+                  'data' => '01-01-0001',
+                  'type' => 'datetime'
+                },
+                'QCperson' => nil,
+                'QCresult' => nil,
+                'QCcomment' => nil,
+                'QCCriteriaNames' => nil,
+                'QCValues' => nil,
+              )
+      end
+    end
+    describe 'for required series with assigned image series' do
+      let!(:required_series) { visit.required_series.where(name: 'SPECT_1').first }
+
+      before(:each) do
+        required_series.image_series = image_series
+        required_series.save!
+      end
+
+      it 'returns the correct properties' do
+        expect(required_series.domino_document_properties)
+          .to include(
+                'ericaID' => visit.id,
+                'CenterNo' => center.code,
+                'PatNo' => patient.domino_patient_no,
+                'VisitNo' => visit.visit_number,
+                'RequiredSeries' => 'SPECT_1',
+                'trash' => 0,
+                'ericaASID' => image_series.id,
+                'DateImaging' => {
+                  'data' => image_series.imaging_date.strftime('%d-%m-%Y'),
+                  'type' => 'datetime'
+                },
+                'SeriesDescription' => image_series.name,
+                'QCdate' => {
+                  'data' => '01-01-0001',
+                  'type' => 'datetime'
+                },
+                'QCperson' => nil,
+                'QCresult' => nil,
+                'QCcomment' => nil,
+                'QCCriteriaNames' => nil,
+                'QCValues' => nil,
+              )
+      end
+    end
+    describe 'for required series with results' do
+      let!(:user) { create(:user) }
+      let!(:required_series) { visit.required_series.where(name: 'SPECT_1').first }
+
+      before(:each) do
+        required_series.image_series = image_series
+        required_series.update_attributes(
+          image_series: image_series,
+          tqc_date: DateTime.now,
+          tqc_results: {
+            'coverage' => true,
+            'contrast_new' => false
+          },
+          tqc_comment: 'Something interesting',
+          tqc_state: :passed,
+          tqc_user_id: user.id,
+        )
+        required_series.save!
+      end
+
+      it 'returns the correct properties' do
+        expect(required_series.domino_document_properties)
+          .to include(
+                'ericaID' => visit.id,
+                'CenterNo' => center.code,
+                'PatNo' => patient.domino_patient_no,
+                'VisitNo' => visit.visit_number,
+                'RequiredSeries' => 'SPECT_1',
+                'trash' => 0,
+                'ericaASID' => image_series.id,
+                'DateImaging' => {
+                  'data' => image_series.imaging_date.strftime('%d-%m-%Y'),
+                  'type' => 'datetime'
+                },
+                'SeriesDescription' => image_series.name,
+                'QCdate' => {
+                  'data' => required_series.tqc_date.strftime('%d-%m-%Y'),
+                  'type' => 'datetime'
+                },
+                'QCperson' => user.name,
+                'QCresult' => 'Performed, no issues present',
+                'QCcomment' => 'Something interesting',
+                'QCCriteriaNames' => <<CRITERIA.strip_heredoc.strip,
+                Is the entire region covered?
+                Correct contrast phase according to new standards?
+CRITERIA
+                'QCValues' => "Pass\nFail",
+              )
+      end
+    end
+  end
 end
