@@ -356,18 +356,10 @@ JOIN_QUERY
     properties
   end
 
-  def schedule_domino_sync
-    DominoSyncWorker.perform_async(self.class.to_s, id)
-    schedule_required_series_domino_sync
-  end
-
   def domino_sync
     ensure_domino_document_exists
   end
 
-  def schedule_required_series_domino_sync
-    required_series_objects.each(&:schedule_domino_sync)
-  end
 
   def change_required_series_assignment(changed_assignments, options = { save: true })
     ActiveRecord::Base.transaction do
