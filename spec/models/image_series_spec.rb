@@ -37,6 +37,7 @@ RSpec.describe ImageSeries do
       end
 
       it 'saved the correct version object_changes for state' do
+        expect(version.object_changes.dig2('state', 0)).to eq(0)
         expect(version.object_changes.dig2('state', 1)).to eq(1)
       end
     end
