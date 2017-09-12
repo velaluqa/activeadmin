@@ -72,14 +72,24 @@
   line-height: 1.5em;
   border-radius: $border-radius-base;
   @extend .label, .label-default;
+
+  background-color: rgba(189, 195, 199, 0.34);
+  color: #999;
+
   &.error {
-    @extend .label-danger;
+    // background-color: #f9dddd;
+    background-color: #e74c3c;
+    color: #fff;
   }
   &.warning {
-    @extend .label-warning;
+    // background-color: rgba(#e67e22, 0.3);
+    background-color: #e67e22;
+    color: #fff;
   }
   &.ok {
-    @extend .label-success;
+    // background-color: #cdefdb;
+    background-color: #53a54d;
+    color: #fff;
   }
 
   ul {
