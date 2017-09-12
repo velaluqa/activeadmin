@@ -198,7 +198,7 @@ ActiveAdmin.register ImageSeries do
     column 'View (in)' do |image_series|
       result = ''
 
-      result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'), :class => 'member_link')
+      result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnlp'), :class => 'member_link')
       result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank')
       result += link_to('Domino', image_series.lotus_notes_url, :class => 'member_link') unless(image_series.domino_unid.nil? or image_series.lotus_notes_url.nil? or Rails.application.config.is_erica_remote)
       result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') if can? :manage, image_series
@@ -252,7 +252,7 @@ ActiveAdmin.register ImageSeries do
         end
       end
       row 'Viewer' do
-        link_to('View in Viewer', viewer_admin_image_series_path(image_series, :format => 'jnpl'))
+        link_to('View in Viewer', viewer_admin_image_series_path(image_series, :format => 'jnlp'))
       end
     end
 
@@ -342,7 +342,20 @@ ActiveAdmin.register ImageSeries do
     current_user.ensure_authentication_token!
     @wado_query_urls = [wado_query_image_series_url(@image_series, :format => :xml, :authentication_token => current_user.authentication_token)]
 
-    render 'admin/shared/viewer_weasis.jnpl', :layout => false, :content_type => 'application/x-java-jnlp-file'
+    name = @image_series
+      .name
+      .gsub(/[^0-9A-Za-z.\-]/, '_')
+      .gsub(/[()]/, '')
+      .gsub(/_{2,}/, '_')
+      .gsub(/_\z/, '')
+      .gsub(/\A_/, '')
+      .downcase
+    send_data(
+      render_to_string('admin/shared/viewer_weasis.jnpl', :layout => false),
+      type: 'application/x-java-jnlp-file',
+      filename: "image_series_#{name}.jnlp",
+      disposition: 'attachment'
+    )
   end
 
   member_action :edit_properties, :method => :post do
