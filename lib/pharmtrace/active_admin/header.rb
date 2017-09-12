@@ -47,6 +47,11 @@ module Pharmtrace
       end
 
       def build_utility_navigation
+        div(id: 'utility_nav') do
+          input(type: 'checkbox', id: 'toggle-menu')
+          label(for: 'toggle-menu')
+          label('Show Always', for: 'toggle-menu', class: 'text')
+        end
       end
     end
   end
