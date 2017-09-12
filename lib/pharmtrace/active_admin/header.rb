@@ -33,20 +33,20 @@ module Pharmtrace
       end
 
       def build_global_navigation
-        insert_tag(
-          view_factory.global_navigation,
-          @menu,
-          class: 'header-item tabs'
-        )
+        div(class: 'header-item tabs') do
+          insert_tag(
+            view_factory.global_navigation,
+            @menu
+          )
+          insert_tag(
+            view_factory.utility_navigation,
+            @utility_menu,
+            class: 'second'
+          )
+        end
       end
 
       def build_utility_navigation
-        insert_tag(
-          view_factory.utility_navigation,
-          @utility_menu,
-          id: 'utility_nav',
-          class: 'header-item tabs'
-        )
       end
     end
   end

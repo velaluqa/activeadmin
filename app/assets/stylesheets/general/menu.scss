@@ -77,19 +77,18 @@
     }
   }
 
+  .header-item.tabs {
+    padding-bottom: 0*45px;
+    padding-top: 5px;
+  }
+
   ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
 
-    &#tabs {
-      padding-bottom: 2*45px;
-      padding-top: 5px;
-    }
-
-    &#utility_nav {
-      position: absolute;
-      bottom: 0;
+    &.second {
+      border-top: 2px solid $menu-spacer-color;
     }
 
     li {
