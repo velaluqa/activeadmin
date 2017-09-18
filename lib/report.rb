@@ -22,7 +22,6 @@ module Report
         'mqc_state' => Visit::MQC_STATE_SYMS.map(&:to_s)
       },
       ImageSeries => { 'state' => ImageSeries::STATE_SYMS.map(&:to_s) },
-      RequiredSeries => { 'tqc_state' => RequiredSeries.tqc_states.keys }
     }
   end
 
