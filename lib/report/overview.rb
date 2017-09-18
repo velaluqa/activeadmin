@@ -12,6 +12,7 @@ module Report
       visits_state_complete_tqc_passed
       image_series
       required_series
+      required_series_unassigned
       required_series_state_pending
       required_series_state_issues
       required_series_state_passed
@@ -105,13 +106,16 @@ module Report
       @required_series[study.id] ||=
         study
           .required_series
-          .where.not(tqc_state: nil)
           .group(:tqc_state)
           .count
     end
 
     def required_series_column_value(study)
       required_series(study).inject(0) { |agg, (_, val)| agg + val }
+    end
+
+    def required_series_unassigned_column_value(study)
+      required_series(study)[nil] || 0
     end
 
     def required_series_state_pending_column_value(study)

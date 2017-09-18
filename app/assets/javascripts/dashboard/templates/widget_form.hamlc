@@ -25,6 +25,7 @@
           %option{ value: 'visits_state_complete_tqc_passed' } Visits (complete_tqc_passed)
           %option{ value: 'image_series' } ImageSeries
           %option{ value: 'required_series' } RequiredSeries
+          %option{ value: 'required_series_unassigned' } RequiredSeries (unassigned)
           %option{ value: 'required_series_state_pending' } RequiredSeries (pending)
           %option{ value: 'required_series_state_issues' } RequiredSeries (issues)
           %option{ value: 'required_series_state_passe' } RequiredSeries (passe)
