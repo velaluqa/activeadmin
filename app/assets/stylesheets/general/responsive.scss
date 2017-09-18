@@ -21,5 +21,20 @@ body {
 }
 
 #title_bar {
+  transition: padding-left .5s ease-in-out;
   padding-left: $menu-width;
+}
+
+body {
+  transition: padding-left .5s ease-in-out;
+}
+
+body.pin-menu {
+  #header {
+    max-width: 1000px;
+    .site_title {
+      .wide   { display: inline-block; }
+      .narrow { display: none; }
+    }
+  }
 }

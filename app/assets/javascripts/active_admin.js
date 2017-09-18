@@ -30,6 +30,7 @@
 //= require bootstrap/scrollspy
 //= require bootstrap/modal
 //= require bootbox
+//= require erica_menu
 //= require_self
 
 bootbox.setDefaults({ size: 'small' });
