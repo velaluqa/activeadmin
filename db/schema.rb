@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170614114308) do
+ActiveRecord::Schema.define(version: 20170921102504) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 20170614114308) do
 
   create_table "background_jobs", force: :cascade do |t|
     t.string   "legacy_id"
+    t.string   "name",                          null: false
     t.integer  "user_id"
     t.boolean  "completed",     default: false, null: false
     t.float    "progress",      default: 0.0,   null: false
@@ -42,12 +43,10 @@ ActiveRecord::Schema.define(version: 20170614114308) do
     t.jsonb    "results",       default: {},    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "name",                          null: false
   end
 
   add_index "background_jobs", ["completed"], name: "index_background_jobs_on_completed", using: :btree
   add_index "background_jobs", ["legacy_id"], name: "index_background_jobs_on_legacy_id", using: :btree
-  add_index "background_jobs", ["name"], name: "index_background_jobs_on_name", using: :btree
   add_index "background_jobs", ["results"], name: "index_background_jobs_on_results", using: :gin
   add_index "background_jobs", ["user_id"], name: "index_background_jobs_on_user_id", using: :btree
 
@@ -112,6 +111,7 @@ ActiveRecord::Schema.define(version: 20170614114308) do
     t.integer  "historic_report_query_id", null: false
     t.integer  "study_id",                 null: false
     t.datetime "date",                     null: false
+    t.integer  "version_id"
   end
 
   add_index "historic_report_cache_entries", ["date"], name: "index_historic_report_cache_entries_on_date", using: :btree
@@ -377,14 +377,15 @@ ActiveRecord::Schema.define(version: 20170614114308) do
   add_index "validators_sessions", ["user_id", "session_id"], name: "index_validators_sessions_on_user_id_and_session_id", using: :btree
 
   create_table "versions", force: :cascade do |t|
-    t.string   "item_type",      null: false
-    t.integer  "item_id",        null: false
-    t.string   "event",          null: false
+    t.string   "item_type",                                null: false
+    t.integer  "item_id",                                  null: false
+    t.string   "event",                                    null: false
     t.string   "whodunnit"
     t.datetime "created_at"
     t.jsonb    "object"
     t.jsonb    "object_changes"
     t.integer  "study_id"
+    t.boolean  "migrated_required_series", default: false, null: false
   end
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree

@@ -12,6 +12,7 @@
 # **`historic_report_query_id`**  | `integer`          | `not null`
 # **`id`**                        | `integer`          | `not null, primary key`
 # **`study_id`**                  | `integer`          | `not null`
+# **`version_id`**                | `integer`          |
 #
 # ### Indexes
 #
