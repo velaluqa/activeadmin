@@ -43,9 +43,9 @@ class HistoricReportCacheEntry < ActiveRecord::Base
     historic_report_cache_values.map(&:to_h)
   end
 
-  def self.ensure_cache_entry(query, study_id, date, values = [])
+  def self.ensure_cache_entry(query, study_id, version, values = [])
     HistoricReportCacheEntry
-      .where(historic_report_query_id: query.id, study_id: study_id, date: date)
-      .first_or_create(values: values)
+      .where(historic_report_query_id: query.id, study_id: study_id, version_id: version.id)
+      .first_or_create(values: values, date: version.created_at)
   end
 end

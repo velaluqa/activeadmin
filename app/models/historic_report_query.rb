@@ -43,7 +43,7 @@ class HistoricReportQuery < ActiveRecord::Base
       HistoricReportCacheEntry.ensure_cache_entry(
         self,
         study_id,
-        version.created_at,
+        version,
         entry_values(current_count, delta)
       )
       current_count = apply_delta(current_count, delta, reverse: true)

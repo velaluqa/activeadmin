@@ -208,7 +208,27 @@ RSpec.describe HistoricReportQuery do
         HistoricReportQuery.create(resource_type: 'RequiredSeries', group_by: 'tqc_state')
       end
 
-      it 'calculates create' do
+      it 'calculates create with unassigned' do
+        version = build(
+          :version,
+          item_type: 'RequiredSeries',
+          item_id: required_series.id,
+          event: 'create',
+          object_changes: {
+            'visit_id' => [nil, required_series.visit.id],
+            'name' => [nil, 'SPECT_1']
+          }
+        )
+        expected_delta = {
+          total: +1,
+          group: {
+            'unassigned' => +1
+          }
+        }
+        expect(query.calculate_delta(version)).to eq(expected_delta)
+      end
+
+      it 'calculates create with state' do
         version = build(
           :version,
           item_type: 'RequiredSeries',
@@ -333,7 +353,8 @@ RSpec.describe HistoricReportQuery do
           patient1 = create(:patient, center: center)
           Version.last.update_attributes!(created_at: four_hours_ago, updated_at: four_hours_ago)
           create(:patient, center: center)
-          Version.last.update_attributes!(created_at: three_hours_ago, updated_at: three_hours_ago)
+          @version4 = Version.last
+          @version4.update_attributes!(created_at: three_hours_ago, updated_at: three_hours_ago)
           patient1.destroy
           Version.last.update_attributes!(created_at: one_hour_ago, updated_at: one_hour_ago)
         end
@@ -343,7 +364,7 @@ RSpec.describe HistoricReportQuery do
           HistoricReportCacheEntry.ensure_cache_entry(
             query,
             @study.id,
-            three_hours_ago,
+            @version4,
             [{ group: nil, count: 2, delta: 1 }]
           )
           query.calculate_cache(@study.id)
@@ -505,7 +526,7 @@ CONFIG
           visit.change_required_series_assignment('SPECT_1' => image_series1.id)
           visit.change_required_series_assignment('SPECT_2' => image_series2.id)
           visit.set_tqc_result('SPECT_1', {}, user, 'Some tQC')
-          visit.destroy
+          visit.change_required_series_assignment('SPECT_2' => nil)
         end
 
         it 'creates full cache' do
@@ -516,7 +537,7 @@ CONFIG
           query.calculate_cache(study.id)
           query.calculate_cache(study.id)
           entries = HistoricReportCacheEntry.order('"date" ASC').last(20)
-          expect(entries.length).to eq(6)
+          expect(entries.length).to eq(5)
           expect(entries[0].values).to include(group: 'unassigned', delta: +1, count: 1)
           expect(entries[0].values).to include(group: nil,          delta: +1, count: 1)
           expect(entries[1].values).to include(group: 'unassigned', delta: +1, count: 2)
@@ -525,10 +546,49 @@ CONFIG
           expect(entries[2].values).to include(group: 'pending',    delta: +1, count: 1)
           expect(entries[3].values).to include(group: 'unassigned', delta: -1, count: 0)
           expect(entries[3].values).to include(group: 'pending',    delta: +1, count: 2)
-          expect(entries[4].values).to include(group: nil,          delta: -1, count: 1)
           expect(entries[4].values).to include(group: 'pending',    delta: -1, count: 1)
-          expect(entries[5].values).to include(group: nil,          delta: -1, count: 0)
-          expect(entries[5].values).to include(group: 'pending',    delta: -1, count: 0)
+          expect(entries[4].values).to include(group: 'unassigned', delta: +1, count: 1)
+        end
+      end
+    end
+
+    describe 'for resource_type `RequiredSeries` grouped by `tqc_state`' do
+      describe 'with versions at same date' do
+        let!(:study) { create(:study) }
+        let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
+        visit_types:
+          baseline:
+            required_series:
+              SPECT_1:
+                tqc: []
+              SPECT_2:
+                tqc: []
+        image_series_properties: []
+CONFIG
+        let!(:center) { create(:center, study: study) }
+        let!(:patient) { create(:patient, center: center) }
+        let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
+
+        before(:each) do
+          # Set the `created_at` times to the same datetimes. The
+          # RequiredSeries were created through assigning a visit type.
+          datetime1 = DateTime.now
+          Version.where(item_type: 'RequiredSeries').first.update_attributes!(created_at: datetime1)
+          Version.where(item_type: 'RequiredSeries').last.update_attributes!(created_at: datetime1)
+        end
+
+        it 'creates full cache' do
+          query = HistoricReportQuery.create(
+            resource_type: 'RequiredSeries',
+            group_by: 'tqc_state'
+          )
+          query.calculate_cache(study.id)
+          entries = HistoricReportCacheEntry.order('"date" ASC')
+          expect(entries.length).to eq(2)
+          expect(entries[0].values).to include(group: 'unassigned', delta: +1, count: 1)
+          expect(entries[0].values).to include(group: nil,          delta: +1, count: 1)
+          expect(entries[1].values).to include(group: 'unassigned', delta: +1, count: 2)
+          expect(entries[1].values).to include(group: nil,          delta: +1, count: 2)
         end
       end
     end
