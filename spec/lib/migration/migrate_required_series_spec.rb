@@ -6,6 +6,40 @@ describe Migration::MigrateRequiredSeries do
     Time.new(2017, 8, 1) + i.day
   end
 
+  describe '::non_obsolete_changes' do
+    let!(:visit) { create(:visit) }
+    let!(:image_series) { create(:image_series, visit: visit) }
+
+    let!(:requires_series) { create(:required_series, name: 'rs1', visit: visit) }
+
+    let!(:visit_version) do
+      Version.new(
+        event: 'update',
+        item_type: 'Visit',
+        item_id: visit.id,
+        object_changes: {
+          'required_series' => [
+            {
+              'rs1' => {}
+            }, {
+              'rs1' => { 'tqc_state' => 0 }
+            }
+          ]
+        },
+        created_at: DateTime.now.as_json
+      )
+    end
+
+    it 'removes `tqc_state` if image_series is not existing' do
+      last_version = Version.where(item_type: 'RequiredSeries').last
+      changes = {
+        'tqc_state' => [nil, 0]
+      }
+      non_obsolete_changes = Migration::MigrateRequiredSeries.non_obsolete_changes(last_version, visit_version, changes)
+      expect(non_obsolete_changes).to eq({})
+    end
+  end
+
   describe '::required_series_changes' do
     let!(:visit) { create(:visit) }
     let!(:image_series) { create(:image_series, visit: visit) }

@@ -422,6 +422,7 @@ CLAUSE
         changes = changes.delete_if do |col, (_, became)|
           complete_attributes.andand[col] == became
         end
+        changes.delete('tqc_state') if complete_attributes['tqc_state'].nil? && changes.dig('image_series_id', 1).nil?
         if changes.present?
           changes['updated_at'] = [
             complete_attributes['updated_at'] || complete_attributes['created_at'],
