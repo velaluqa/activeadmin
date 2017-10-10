@@ -11,6 +11,11 @@ Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
 load 'spec/features/steps/placeholders.rb', true
 require 'capybara/rails'
 
+require 'capybara-screenshot/rspec'
+# Add <base> to saved HTML pages so that the browser can load
+# respective assets when opening failing pages.
+Capybara.asset_host = 'http://localhost:3000'
+
 # Poltergeist is a headless webkit implementation and can be plugged
 # into capybara.
 require 'capybara/poltergeist'
@@ -22,6 +27,8 @@ Capybara.default_driver = :poltergeist
 # The gem `transaction_capybara` configures a shared database
 # connection and means to wait for pending ajax requests.
 require 'transactional_capybara/rspec'
+
+require 'rack/test'
 
 require 'yarjuf'
 
@@ -105,6 +112,12 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :deletion
     example.run
     DatabaseCleaner.strategy = :transaction
+  end
+
+  config.around(:each, paper_trail: false) do |example|
+    PaperTrail.enabled = false
+    example.run
+    PaperTrail.enabled = true
   end
 
   config.around(:each) do |example|

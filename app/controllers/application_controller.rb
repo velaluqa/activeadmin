@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   before_filter :authenticate_user_from_token!
   before_filter(:ensure_valid_password, if: proc { !current_user.nil? })
   before_filter(:ensure_valid_keypair, if: proc { !current_user.nil? })
+  before_action(:set_paper_trail_whodunnit)
 
   protect_from_forgery
 
@@ -43,7 +44,7 @@ class ApplicationController < ActionController::Base
 
   def access_denied(*_args)
     respond_to do |format|
-      format.html { render 'shared/forbidden', status: :forbidden, layout: 'active_admin' }
+      format.html { redirect_to '/admin/not_authorized' }
       format.json { render json: { error_code: 403, error_message: 'Forbidden' }, status: :forbidden }
     end
   end

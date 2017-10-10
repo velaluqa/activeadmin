@@ -2,6 +2,7 @@ class CreateBackgroundJobs < ActiveRecord::Migration
   def change
     create_table :background_jobs do |t|
       t.string :legacy_id
+      t.string :name, null: false
       t.integer :user_id, null: true
       t.boolean :completed, null: false, default: false
       t.float :progress, null: false, default: 0.0

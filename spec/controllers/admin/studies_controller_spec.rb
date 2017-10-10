@@ -25,7 +25,7 @@ RSpec.describe Admin::StudiesController do
 
       it 'denies access' do
         response = get :index
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -58,7 +58,7 @@ RSpec.describe Admin::StudiesController do
 
       it 'denies access' do
         response = get(:show, id: @study.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -90,7 +90,7 @@ RSpec.describe Admin::StudiesController do
 
       it 'denies access' do
         response = get(:new)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -125,7 +125,7 @@ RSpec.describe Admin::StudiesController do
 
       it 'denies access' do
         response = post(:create, study: {})
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -160,7 +160,7 @@ RSpec.describe Admin::StudiesController do
 
       it 'denies access' do
         response = post(:destroy, id: @study.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -190,7 +190,7 @@ RSpec.describe Admin::StudiesController do
       end
 
       let(:response) do
-        post(:upload_config, id: @study.id, study: { file: file })
+        post(:upload_config, id: @study.id, study_contract_upload_configuration: { file: file, id: @study.id, file_cache: '' })
       end
 
       it { expect(response).to redirect_to(%r{/admin/studies/\d+}) }
@@ -205,7 +205,7 @@ RSpec.describe Admin::StudiesController do
         post(:upload_config, id: @study.id, study: { file: file })
       end
 
-      it { expect(response).to have_http_status(:forbidden) }
+      it { expect(response).to redirect_to(admin_not_authorized_path) }
     end
   end
 end

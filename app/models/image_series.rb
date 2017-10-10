@@ -34,6 +34,7 @@
 #
 class ImageSeries < ActiveRecord::Base
   include DominoDocument
+  after_commit :schedule_domino_sync
 
   has_paper_trail(
     class_name: 'Version',
@@ -186,6 +187,7 @@ JOIN
   end
 
   def domino_document_properties(_action = :update)
+    assigned_required_series = self.assigned_required_series.pluck(:name)
     properties = {
       'ericaID' => id,
       'CenterNo' => patient.center.code,
@@ -193,7 +195,7 @@ JOIN
       'VisitNo' => (visit.nil? ? nil : visit.visit_number),
       'DateImaging' => { 'data' => imaging_date.strftime('%d-%m-%Y'), 'type' => 'datetime' }, # this is utterly ridiculous: sending the date in the corrent format (%Y-%m-%d) leads switched month/day for days where this can work (1-12). sending a completely broken format leads to correct parses... *doublefacepalm*
       'SeriesDescription' => name,
-      'AssignedTo' => (assigned_required_series.nil? ? nil : assigned_required_series.join("\n"))
+      'AssignedTo' => (assigned_required_series.empty? ? nil : assigned_required_series.join("\n"))
     }
 
     properties.merge!(dicom_metadata_to_domino)
@@ -205,34 +207,27 @@ JOIN
   def domino_sync
     ensure_domino_document_exists
 
-    unless visit.nil?
-      # the reload call is here to work around a race condition in the domino sync
-      # when an image series is re/unassigned on a visit that had mQC completed, the image series sync is started first
-      # it then starts its visit sync, possibly after the visit was modified and had its mQC results reset
-      # this visit instance would then contain the old values, including the mQC details
-      # therefor, we reload it here before we sync it, to make sure we have the most up-to-date values
-      visit.reload
-      visit.domino_sync
+    return if visit.nil?
+    # the reload call is here to work around a race condition in the domino sync
+    # when an image series is re/unassigned on a visit that had mQC completed, the image series sync is started first
+    # it then starts its visit sync, possibly after the visit was modified and had its mQC results reset
+    # this visit instance would then contain the old values, including the mQC details
+    # therefor, we reload it here before we sync it, to make sure we have the most up-to-date values
+    visit.reload
+    visit.domino_sync
 
-      assigned_required_series_names = assigned_required_series || []
-      assigned_required_series_names.each do |as_name|
-        RequiredSeries.new(visit, as_name).domino_sync
-      end
-    end
+    assigned_required_series.each(&:domino_sync)
   end
 
   def assigned_required_series
-    visit.andand.assigned_image_series_index.andand[id.to_s] || []
+    RequiredSeries.where(visit: visit, image_series: self)
   end
 
   def change_required_series_assignment(new_assignment)
     return if visit.nil?
     changes = {}
 
-    current_assignment = assigned_required_series
-
-    pp current_assignment
-    pp new_assignment
+    current_assignment = assigned_required_series.pluck(:name)
 
     (current_assignment - new_assignment).each do |unassigned_required_series|
       changes[unassigned_required_series] = nil
@@ -276,6 +271,15 @@ JOIN
     attributes.merge(
       state: state_sym
     ).to_json
+  end
+
+  # fake attributes for the somewhat laborious implementation of visit assignment changes
+  def force_update
+    @force_update
+  end
+
+  def force_update=(val)
+    @force_update = val
   end
 
   protected
@@ -376,13 +380,6 @@ JOIN
       end
     end
   end
-
-  # fake attributes for the somewhat laborious implementation of visit assignment changes
-  def force_update
-    nil
-  end
-
-  def force_update=(val); end
 
   # reassigning an image series to a different visit:
   # * check if new visit has same visit type as current visit

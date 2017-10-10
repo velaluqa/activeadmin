@@ -3,13 +3,15 @@ class ConvertVersionDataToJsonb < ActiveRecord::Migration
     add_column :versions, :new_object, :jsonb
     add_column :versions, :new_object_changes, :jsonb
 
+    binding.pry
+
     progress = ProgressBar.create(
       title: 'Convert Version Data',
       total: Version.count,
       format: '%t |%B| %a / %E (%p%%)'
     )
-    PaperTrail::Version.reset_column_information
-    PaperTrail::Version.find_each do |version|
+    ::Version.reset_column_information
+    ::Version.find_each do |version|
       if (object = version.object)
         version.update_column :new_object, YAML.safe_load(object)
       end
@@ -35,8 +37,8 @@ class ConvertVersionDataToJsonb < ActiveRecord::Migration
       total: Version.count,
       format: '%t |%B| %a / %E (%p%%)'
     )
-    PaperTrail::Version.reset_column_information
-    PaperTrail::Version.find_each do |version|
+    ::Version.reset_column_information
+    ::Version.find_each do |version|
       if (object = version.object)
         version.update_column :new_object, YAML.dump(object)
       end

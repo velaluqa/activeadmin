@@ -9,3 +9,18 @@ end
 step 'I click the :string button' do |locator|
   click_button(locator)
 end
+
+step 'I check :string' do |label|
+  check(label)
+end
+
+step 'I uncheck :string' do |label|
+  uncheck(label)
+end
+
+step 'I provide string for file field :string' do |locator, file_contents|
+  file = Tempfile.new('upload_file')
+  file.write(file_contents)
+  file.close
+  attach_file(locator, file.path)
+end

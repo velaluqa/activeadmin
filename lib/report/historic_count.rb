@@ -130,16 +130,15 @@ QUERY
     end
 
     def transform_group(group, entries)
-      label =
-        if @group_by.blank?
-          'total'
-        else
-          Report.map_group_label(resource_class, @group_by, group)
-        end
       {
-        label: label,
+        label: group_label(group),
         data: entries.map(&method(:transform_entry))
       }
+    end
+
+    def group_label(group)
+      return 'total' if @group_by.blank?
+      Report.map_group_label(resource_class, @group_by, group)
     end
 
     def resource_class

@@ -1,13 +1,14 @@
 = semantic_form_for @image_series, :url => assign_visit_admin_image_series_path(@image_series, :return_url => @return_url), :method => :post do |f|
   = f.inputs 'Assign Visit' do
-    = f.input :visit, :collection => @image_series.patient.visits.map {|v| [v.name, v.id]} + [['Create new Visit', 'new']]
+    = f.input :visit, :collection => @image_series.patient.visits.map {|v| [v.name, v.id]} + [['Create New Visit', 'new']]
 
-  = f.semantic_fields_for :visit do |visit|
-    = visit.inputs 'When creating a new Visit' do
-      = visit.input :visit_number
-      = visit.input :visit_type, :as => :select, :collection => @visit_types
-      = visit.input :description
+  - if can?(:create, Visit)
+    = f.semantic_fields_for :visit do |visit|
+      = visit.inputs 'When creating a new Visit' do
+        = visit.input :visit_number
+        = visit.input :visit_type, :as => :select, :collection => @visit_types
+        = visit.input :description
 
   = f.actions do
-    = f.action :submit, :as => :input
-    = f.action :cancel, :as => :link, :wrapper_html => {:class => 'cancel'}, :url => @return_url
+    = f.action :submit, :as => :input, :label => 'Assign Visit'
+    = f.action :cancel, :as => :link, :wrapper_html => {:class => 'cancel'}, :url => @return_url, :labelo => 'Cancel'

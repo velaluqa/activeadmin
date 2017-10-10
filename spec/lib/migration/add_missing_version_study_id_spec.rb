@@ -34,27 +34,6 @@ describe Migration::AddMissingVersionStudyId do
         expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
       end
     end
-
-    describe '::find_study_id' do
-      it 'finds study_id for center version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@center.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for patient version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@patient.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image_series version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image_series.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for visit version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@visit.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for notification version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@notification.paper_trail_versions.last)).to eq(@study.id)
-      end
-    end
   end
 
   describe 'for missing study' do
@@ -70,27 +49,6 @@ describe Migration::AddMissingVersionStudyId do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
         expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
-      end
-    end
-
-    describe '::find_study_id' do
-      it 'finds study_id for center version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@center.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for patient version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@patient.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image_series version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image_series.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for visit version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@visit.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for notification version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@notification.paper_trail_versions.last)).to eq(@study.id)
       end
     end
   end
@@ -110,27 +68,6 @@ describe Migration::AddMissingVersionStudyId do
         expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
       end
     end
-
-    describe '::find_study_id' do
-      it 'finds study_id for center version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@center.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for patient version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@patient.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image_series version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image_series.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for visit version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@visit.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for notification version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@notification.paper_trail_versions.last)).to eq(@study.id)
-      end
-    end
   end
 
   describe 'for missing patient' do
@@ -146,27 +83,6 @@ describe Migration::AddMissingVersionStudyId do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
         expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
-      end
-    end
-
-    describe '::find_study_id' do
-      it 'finds study_id for center version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@center.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for patient version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@patient.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image_series version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image_series.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for visit version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@visit.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for notification version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@notification.paper_trail_versions.last)).to eq(@study.id)
       end
     end
   end
@@ -186,27 +102,6 @@ describe Migration::AddMissingVersionStudyId do
         expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
       end
     end
-
-    describe '::find_study_id' do
-      it 'finds study_id for center version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@center.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for patient version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@patient.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image_series version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image_series.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for visit version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@visit.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for notification version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@notification.paper_trail_versions.last)).to eq(@study.id)
-      end
-    end
   end
 
   describe 'for missing image' do
@@ -224,27 +119,6 @@ describe Migration::AddMissingVersionStudyId do
         expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
       end
     end
-
-    describe '::find_study_id' do
-      it 'finds study_id for center version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@center.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for patient version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@patient.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image_series version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image_series.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for visit version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@visit.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for notification version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@notification.paper_trail_versions.last)).to eq(@study.id)
-      end
-    end
   end
 
   describe 'for missing visit' do
@@ -260,27 +134,6 @@ describe Migration::AddMissingVersionStudyId do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
         expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
-      end
-    end
-
-    describe '::find_study_id' do
-      it 'finds study_id for center version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@center.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for patient version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@patient.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image_series version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image_series.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for visit version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@visit.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for notification version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@notification.paper_trail_versions.last)).to eq(@study.id)
       end
     end
   end
@@ -304,27 +157,6 @@ describe Migration::AddMissingVersionStudyId do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
         expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
-      end
-    end
-
-    describe '::find_study_id' do
-      it 'finds study_id for center version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@center.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for patient version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@patient.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image_series version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image_series.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for image version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@image.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for visit version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@visit.versions.last)).to eq(@study.id)
-      end
-      it 'finds study_id for notification version' do
-        expect(Migration::AddMissingVersionStudyId.find_study_id(@notification.paper_trail_versions.last)).to eq(@study.id)
       end
     end
   end

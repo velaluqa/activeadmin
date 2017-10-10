@@ -25,7 +25,7 @@ RSpec.describe Admin::UsersController do
 
       it 'denies access' do
         response = get :index
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -58,7 +58,7 @@ RSpec.describe Admin::UsersController do
 
       it 'denies access' do
         response = get(:show, id: @user.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -90,7 +90,7 @@ RSpec.describe Admin::UsersController do
 
       it 'denies access' do
         response = get(:new)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -133,7 +133,7 @@ RSpec.describe Admin::UsersController do
 
       it 'denies access' do
         response = post(:create, user: user)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -168,7 +168,7 @@ RSpec.describe Admin::UsersController do
 
       it 'denies access' do
         response = post(:destroy, id: @user.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end

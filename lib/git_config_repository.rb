@@ -48,12 +48,28 @@ class GitConfigRepository
     walker
   end
 
+  def commits_for_file(path)
+    tab = []
+    walker = Rugged::Walker.new(@repo)
+    walker.sorting(Rugged::SORT_DATE)
+    walker.push(@repo.head.target)
+    walker.each do |commit|
+      next if commit.diff(paths: [path]).size <= 0
+      tab.push(commit)
+    end
+    tab
+  end
+
   def lookup(oid)
     @repo.lookup(oid)
   end
 
-  def update_config_file(path, new_file, author, commit_message)
-    FileUtils.cp(new_file, @repo.workdir + '/' + path)
+  def update_config_file(path, config, author, commit_message)
+    if config.is_a?(String)
+      File.write(@repo.workdir + '/' + path, config)
+    else
+      FileUtils.cp(config, @repo.workdir + '/' + path)
+    end
     update_path(path, author, commit_message)
   end
 
@@ -79,6 +95,19 @@ class GitConfigRepository
     options[:tree] = tree
 
     Rugged::Commit.create(@repo, options)
+  end
+
+  def version_at(timestamp)
+    walker = Rugged::Walker.new(@repo)
+    walker.sorting(Rugged::SORT_TOPO | Rugged::SORT_REVERSE) # optional
+    walker.push(current_version)
+    last_commit = nil
+    walker.each do |commit|
+      break if commit.time > timestamp
+      last_commit = commit
+    end
+    walker.reset
+    last_commit.try(:oid)
   end
 
   def yaml_at_version(path, version = nil)

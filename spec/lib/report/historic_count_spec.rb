@@ -87,7 +87,7 @@ describe Report::HistoricCount do
           expected_datasets = {
             datasets: [
               {
-                label: :incomplete_na,
+                label: 'incomplete_na',
                 data: [
                   { x: '2016-12-31', y: 1 },
                   { x: '2017-01-03', y: 2 },
@@ -95,7 +95,7 @@ describe Report::HistoricCount do
                   { x: '2017-01-11', y: 4 }
                 ]
               }, {
-                label: :complete_tqc_passed,
+                label: 'complete_tqc_passed',
                 data: [
                   { x: '2016-12-31', y: 0 },
                   { x: '2017-01-03', y: 0 },
@@ -128,14 +128,14 @@ describe Report::HistoricCount do
           expected_datasets = {
             datasets: [
               {
-                label: :incomplete_na,
+                label: 'incomplete_na',
                 data: [
                   { x: '2016-12-26', y: 1 },
                   { x: '2017-01-02', y: 3 },
                   { x: '2017-01-09', y: 4 }
                 ]
               }, {
-                label: :complete_tqc_passed,
+                label: 'complete_tqc_passed',
                 data: [
                   { x: '2016-12-26', y: 0 },
                   { x: '2017-01-02', y: 1 },
@@ -167,13 +167,13 @@ describe Report::HistoricCount do
           expected_datasets = {
             datasets: [
               {
-                label: :incomplete_na,
+                label: 'incomplete_na',
                 data: [
                   { x: '2016-12-01', y: 1 },
                   { x: '2017-01-01', y: 4 }
                 ]
               }, {
-                label: :complete_tqc_passed,
+                label: 'complete_tqc_passed',
                 data: [
                   { x: '2016-12-01', y: 0 },
                   { x: '2017-01-01', y: 1 }

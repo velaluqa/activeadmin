@@ -27,7 +27,9 @@ ActiveAdmin.register ImageSeries do
 
     def update
       image_series = ImageSeries.find(params[:id])
-      currently_assigned_required_series_names = image_series.assigned_required_series
+
+      currently_assigned_required_series = image_series.assigned_required_series
+      currently_assigned_required_series_names = image_series.assigned_required_series.pluck(:name)
       original_visit = image_series.visit
       new_visit = (params[:image_series][:visit_id].blank? ? nil : Visit.find(params[:image_series][:visit_id]))
 
@@ -43,14 +45,13 @@ ActiveAdmin.register ImageSeries do
           return
         end
 
-        unless(new_visit.nil?)
-          new_visit_assignment_map = new_visit.assigned_required_series_id_map
-          already_assigned_required_series_names = []
-          currently_assigned_required_series_names.each do |required_series_name|
-            already_assigned_required_series_names << required_series_name unless new_visit_assignment_map[required_series_name].nil?
+        if new_visit.present?
+          new_visit_assignment = new_visit.required_series_assignment
+          already_assigned_required_series_names = currently_assigned_required_series_names.select do |required_series_name|
+            new_visit_assignment[required_series_name].present?
           end
 
-          unless(already_assigned_required_series_names.empty?)
+          if already_assigned_required_series_names.present?
             flash[:error] = 'The following required series in the new visit will have their assignment and tQC results overwritten by this change: '+already_assigned_required_series_names.join(", ")+'. If you want to continue, press "Update" again.'
             redirect_to edit_admin_image_series_path(image_series, :force_update => true, :visit_id => params[:image_series][:visit_id])
             return
@@ -59,38 +60,31 @@ ActiveAdmin.register ImageSeries do
       end
       params[:image_series].delete(:force_update)
 
-      original_required_series = original_visit.andand.required_series
-
-      original_visit_assignment_changes = {}
-      new_visit_assignment_changes = {}
-      currently_assigned_required_series_names.each do |required_series_name|
-        original_visit_assignment_changes[required_series_name] = nil
-        new_visit_assignment_changes[required_series_name] = image_series.id.to_s
+      original_required_series_assignment = original_visit.required_series_assignment
+      unassigned_required_series = {}
+      currently_assigned_required_series.each do |required_series|
+        unassigned_required_series[required_series.name] = required_series.attributes
+        required_series.unassign_image_series!
       end
-      original_visit.change_required_series_assignment(original_visit_assignment_changes) unless original_visit.nil?
-      unless(original_visit.nil? or new_visit.nil? or original_visit.visit_type != new_visit.visit_type)
-        new_visit.change_required_series_assignment(new_visit_assignment_changes)
+      if original_visit && new_visit && original_visit.visit_type == new_visit.visit_type
+        new_visit.change_required_series_assignment(original_required_series_assignment)
 
-        unless(original_required_series.nil?)
-          currently_assigned_required_series_names.each do |required_series_name|
-            next if original_required_series[required_series_name].nil?
-            new_visit.set_tqc_result(required_series_name,
-                                     original_required_series[required_series_name]['tqc_results'],
-                                     original_required_series[required_series_name]['tqc_user_id'],
-                                     original_required_series[required_series_name]['tqc_comment'],
-                                     original_required_series[required_series_name]['tqc_date'],
-                                     original_required_series[required_series_name]['tqc_version'])
-          end
+        currently_assigned_required_series_names.each do |required_series_name|
+          next if unassigned_required_series[required_series_name].nil?
+          new_visit.set_tqc_result(required_series_name,
+                                   unassigned_required_series[required_series_name]['tqc_results'],
+                                   unassigned_required_series[required_series_name]['tqc_user_id'],
+                                   unassigned_required_series[required_series_name]['tqc_comment'],
+                                   unassigned_required_series[required_series_name]['tqc_date'],
+                                   unassigned_required_series[required_series_name]['tqc_version'])
         end
       end
 
       update!
-      puts 'YEEEHAAAA!!!'
     end
 
     def generate_selected_filters
       selected_filters = []
-
 
       selected_filters += Visit.accessible_by(current_ability).where(:id => params[:q][:visit_id_in]).map {|visit| {:id => 'visit_'+visit.id.to_s, :text => visit.name, :type => 'visit'} } unless(params[:q][:visit_id_in].nil?)
       selected_filters += Patient.accessible_by(current_ability).where(:id => params[:q][:patient_id_in]).map {|patient| {:id => 'patient_'+patient.id.to_s, :text => patient.name, :type => 'patient'} } unless(params[:q][:patient_id_in].nil?)
@@ -181,7 +175,7 @@ ActiveAdmin.register ImageSeries do
       when :visit_assigned
         status_tag('Visit assigned', :warning)
       when :required_series_assigned
-        assigned_required_series = image_series.assigned_required_series
+        assigned_required_series = image_series.assigned_required_series.pluck(:name)
 
         label = '<ul>'
         label += assigned_required_series.map {|ars| '<li>'+ars+'</li>'}.join('')
@@ -201,8 +195,12 @@ ActiveAdmin.register ImageSeries do
       result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnlp'), :class => 'member_link')
       result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank')
       result += link_to('Domino', image_series.lotus_notes_url, :class => 'member_link') unless(image_series.domino_unid.nil? or image_series.lotus_notes_url.nil? or Rails.application.config.is_erica_remote)
-      result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') if can? :manage, image_series
-      result += link_to('Assign RS', assign_required_series_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link') unless(image_series.visit_id.nil? or cannot? :manage, image_series)
+      if can?(:assign_visit, image_series)
+        result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
+      end
+      if image_series.visit && can?(:assign_required_series, image_series.visit)
+        result += link_to('Assign RS', assign_required_series_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
+      end
 
       result.html_safe
     end
@@ -240,7 +238,7 @@ ActiveAdmin.register ImageSeries do
       comment_row(image_series, :comment, 'Comment')
       keywords_row(image_series, :tags, 'Keywords') if Rails.application.config.is_erica_remote
       row 'Required Series' do
-        assigned_required_series = image_series.assigned_required_series
+        assigned_required_series = image_series.assigned_required_series.pluck(:name)
         if(assigned_required_series.empty?)
           "None assigned"
         else
@@ -306,7 +304,10 @@ ActiveAdmin.register ImageSeries do
       f.input :series_number#, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
       f.input :name
       f.input :imaging_date, :as => :datepicker
-      f.input :force_update, :as => :hidden, :value => (params[:force_update] ? 'true' : 'false') if f.object.persisted?
+      if f.object.persisted?
+        f.object.force_update = (params[:force_update] || 'false')
+        f.input :force_update, :as => :hidden
+      end
       f.input :comment
     end
 
@@ -587,7 +588,14 @@ ActiveAdmin.register ImageSeries do
 
   member_action :assign_visit, :method => :post do
     @image_series = ImageSeries.find(params[:id])
-    authorize! :manage, @image_series
+    authorize! :assign_visit, @image_series
+
+    visit_id = params[:image_series][:visit_id]
+    if visit_id != 'new' && Visit.where(id: visit_id).first.nil?
+      flash[:error] = 'Please choose a visit or "Create New Visit" from the visit select box.'
+      redirect_to :back
+      return
+    end
 
     if(params[:image_series][:visit_id] == 'new')
       if(params[:image_series][:visit][:visit_type].blank?)
@@ -596,7 +604,12 @@ ActiveAdmin.register ImageSeries do
         return
       end
 
-      visit = Visit.create(:patient => @image_series.patient, :visit_number => params[:image_series][:visit][:visit_number], :visit_type => params[:image_series][:visit][:visit_type], :description => params[:image_series][:visit][:description])
+      visit = Visit.create(
+        :patient => @image_series.patient,
+        :visit_number => params[:image_series][:visit][:visit_number],
+        :visit_type => params[:image_series][:visit][:visit_type],
+        :description => params[:image_series][:visit][:description]
+      )
     elsif(params[:image_series][:visit_id].blank?)
       visit = nil
     else
@@ -616,7 +629,7 @@ ActiveAdmin.register ImageSeries do
   end
   member_action :assign_visit_form, :method => :get do
     @image_series = ImageSeries.find(params[:id])
-    authorize! :manage, @image_series
+    authorize! :assign_visit, @image_series
 
     if(@image_series.patient_id.nil?)
       flash[:error] = 'This image series is not assigned to a patient. Please assign a patient first!'
@@ -632,7 +645,7 @@ ActiveAdmin.register ImageSeries do
 
   member_action :assign_required_series, :method => :post do
     @image_series = ImageSeries.find(params[:id])
-    authorize! :manage, @image_series
+    authorize! :assign_required_series, @image_series.visit || Visit
 
     @image_series.change_required_series_assignment(params[:image_series][:assigned_required_series].reject {|rs| rs.blank?})
 
@@ -640,7 +653,14 @@ ActiveAdmin.register ImageSeries do
   end
   member_action :assign_required_series_form, :method => :get do
     @image_series = ImageSeries.find(params[:id])
-    authorize! :manage, @image_series
+
+    if @image_series.visit.nil?
+      flash[:error] = 'The image series does not have an assigned visit.'
+      redirect_to(params[:return_url] || admin_image_series_index_path)
+      return
+    end
+
+    authorize! :assign_required_series, @image_series.visit || Visit
 
     @required_series = @image_series.visit.required_series_names
     if(@required_series.blank?)
@@ -650,7 +670,7 @@ ActiveAdmin.register ImageSeries do
     end
     @assigned_required_series = @image_series.assigned_required_series
     @otherwise_assigned_required_series = []
-    @image_series.visit.assigned_required_series_id_map.each do |required_series_name, assigned_image_series_id|
+    @image_series.visit.required_series_assignment.each do |required_series_name, assigned_image_series_id|
       @otherwise_assigned_required_series << required_series_name unless(assigned_image_series_id.blank? or assigned_image_series_id.to_i == @image_series.id)
     end
 

@@ -31,7 +31,7 @@ window.initializeRecordSearch = ($elements = $('.select2-record-search')) ->
           query.models = $el.data('models') if $el.data('models')?
           query
         processResults: (data, params) ->
-          groups = ['Study', 'Center', 'Patient', 'Visit', 'ImageSeries', 'Image', 'BackgroundJob', 'Role', 'User']
+          groups = ['Study', 'Center', 'Patient', 'Visit', 'RequiredSeries', 'ImageSeries', 'Image', 'BackgroundJob', 'Role', 'User']
           grouped = _
             .chain(data)
             .map (obj) ->

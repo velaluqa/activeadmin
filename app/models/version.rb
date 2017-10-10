@@ -25,7 +25,18 @@
 class Version < PaperTrail::Version
   has_many :notifications
 
-  attr_accessible(:study_id)
+  attr_accessible(
+    :created_at,
+    :event,
+    :item_type,
+    :item_id,
+    :object,
+    :object_changes,
+    :whodunnit,
+    :study_id
+  )
+
+  belongs_to(:study)
 
   after_commit(:trigger_notification_profiles, on: :create)
 
@@ -52,9 +63,7 @@ class Version < PaperTrail::Version
       object
     else
       (object || {}).merge(
-        complete_changes
-          .map { |k, v| [k, v[1]] }
-          .to_h
+        complete_changes.transform_values { |_, new| new }
       )
     end
   end
@@ -81,13 +90,7 @@ class Version < PaperTrail::Version
     # Scopes all versions for a given `study` and `item_type`.
     def of_study_resource(study, resource_type)
       study = Study.find(study) unless study.is_a?(Study)
-      case resource_type
-      when 'Patient' then patient_query(study)
-      when 'Visit' then visit_query(study)
-      when 'ImageSeries' then image_series_query(study)
-      when 'RequiredSeries' then required_series_query(study)
-      else Version.where(item_type: resource_type)
-      end
+      Version.where(item_type: resource_type, study_id: study.id)
     end
 
     def after(date, options = {})
@@ -100,44 +103,6 @@ class Version < PaperTrail::Version
       rel = where('"versions"."created_at" < ?', date)
       rel = rel.where(options) unless options.empty?
       rel.order('"versions"."id" DESC')
-    end
-
-    private
-
-    def patient_query(study)
-      Version
-        .where(item_type: 'Patient')
-        .where(<<QUERY.strip_heredoc)
-             (object_changes -> 'center_id' ->> 1)::integer IN (#{study.centers.select(:id).to_sql})
-          OR (object ->> 'center_id')::integer IN (#{study.centers.select(:id).to_sql})
-QUERY
-    end
-
-    def visit_query(study)
-      Version
-        .where(item_type: 'Visit')
-        .where(<<QUERY.strip_heredoc)
-             (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
-          OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
-QUERY
-    end
-
-    def image_series_query(study)
-      Version
-        .where(item_type: 'ImageSeries')
-        .where(<<QUERY.strip_heredoc)
-             (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
-          OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
-QUERY
-    end
-
-    def required_series_query(study)
-      Version
-        .where(item_type: 'Visit')
-        .where(<<QUERY.strip_heredoc)
-             (object_changes -> 'patient_id' ->> 1)::integer IN (#{study.patients.select(:id).to_sql})
-          OR (object ->> 'patient_id')::integer IN (#{study.patients.select(:id).to_sql})
-QUERY
     end
   end
 end

@@ -50,7 +50,11 @@ module NotificationObservable
         case filter_name
         when :equal then model.attributes[attr] == filter
         when :notEqual then model.attributes[attr] != filter
-        when :changes then match_change(attr, filter, previous_attributes(model, changes), model.attributes)
+        when :changes then
+          # TODO: When switched to Rails 5 we can use `ActiveRecord::Base#attributes`.
+          # For now we have to use our own method to translate the raw
+          # db value to the enum string ourselves.
+          match_change(attr, filter, previous_attributes(model, changes), model.attributes_with_enum_strings)
         else match_custom(attr, filter_name, model, changes)
         end
       end.all?

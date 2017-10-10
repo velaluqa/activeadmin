@@ -1,4 +1,6 @@
 class RequiredSeriesDrop < EricaDrop # :nodoc:
+  belongs_to(:visit)
+
   desc 'Returns the name of the required series.', 'String'
   attribute(:name)
 
@@ -6,9 +8,7 @@ class RequiredSeriesDrop < EricaDrop # :nodoc:
   attribute(:tqc_results)
 
   desc 'Returns tQC state.', 'String'
-  def tqc_state
-    object.tqc_state.to_s
-  end
+  attribute(:tqc_state)
 
   desc 'Returns a list of failed checks.', 'Array<String>'
   def failed_tqc_checks

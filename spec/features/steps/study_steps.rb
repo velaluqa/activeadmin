@@ -19,3 +19,7 @@ step 'a study :string with configuration' do |name, config_yaml|
   repo.update_config_file(study.relative_config_file_path, tempfile, nil, "New configuration file for study #{study.id}")
   tempfile.unlink
 end
+
+step 'study :study_instance is locked' do |study|
+  study.lock!
+end

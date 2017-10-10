@@ -6,7 +6,7 @@ class Ability
   ACTIVITIES = {
     BackgroundJob => %i[manage read update create destroy],
     Sidekiq => %i[manage],
-    Study  => %i[manage read update create destroy read_reports],
+    Study  => %i[manage read update create destroy read_reports configure],
     Center => %i[manage read update create destroy],
     Patient => %i[manage read update create destroy],
     EmailTemplate => %i[manage read update create destroy],
@@ -17,8 +17,9 @@ class Ability
     User => %i[manage read update create destroy generate_keypair],
     UserRole => %i[manage read update create destroy],
     PublicKey => %i[manage read update create destroy],
+    RequiredSeries => %i[manage read update],
     Role => %i[manage read update create destroy],
-    Visit => %i[manage read update create destroy create_from_template assign_required_series technical_qc medical_qc],
+    Visit => %i[manage read update create destroy create_from_template update_state assign_required_series read_tqc perform_tqc technical_qc medical_qc],
     Version => %i[manage read update create destroy]
   }.freeze
 

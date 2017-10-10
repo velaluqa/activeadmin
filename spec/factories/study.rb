@@ -2,6 +2,10 @@ FactoryGirl.define do
   factory :study do
     sequence(:name) { |n| "Study #{n}" }
 
+    transient do
+      configuration(nil)
+    end
+
     trait :production do
       state Study.state_sym_to_int(:production)
     end
@@ -17,6 +21,18 @@ FactoryGirl.define do
 
       after :create do |study, evaluator|
         create_list :center, evaluator.centers_count, study: study
+      end
+    end
+
+    after(:create) do |study, evaluator|
+      if evaluator.configuration.is_a?(String)
+        study.update_configuration!(evaluator.configuration)
+      end
+    end
+
+    trait :locked do
+      after(:create) do |study, evaluator|
+        study.lock_configuration!
       end
     end
   end

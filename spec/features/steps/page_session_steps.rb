@@ -61,8 +61,15 @@ step 'I browse to :admin_path' do |path|
   visit(path)
 end
 
+step 'I browse to :admin_path with:' do |path, parameters|
+  path = URI.parse(path)
+  path.query = URI.encode_www_form(parameters.to_a)
+  visit(path.to_s)
+end
+
 step 'I see the unauthorized page' do
-  expect(page).to have_content('Not authorized')
+  expect(page).to have_content('Not Authorized')
+  expect(page).to have_content('You are not authorized to perform this action!')
 end
 
 step 'I have following abilities:' do |table|
@@ -82,14 +89,16 @@ step 'I don\'t see :string' do |content|
   expect(page).not_to have_content(content)
 end
 
-step 'I am redirected to patient :string' do |subject_id|
-  @patient = Patient.where(subject_id: subject_id).first
-  expect(@patient).not_to be_nil
-  expect(page.current_path).to eq(admin_patient_path(@patient))
+step 'I am redirected to :admin_path' do |path|
+  expect(page.current_path).to eq(path)
 end
 
 step 'I click link :string' do |locator|
   click_link(locator)
+end
+
+step 'I follow link :string' do |locator|
+  page.find_link(locator).trigger('click')
 end
 
 step 'I click link :string in :string' do |locator, selector|
@@ -98,5 +107,27 @@ step 'I click link :string in :string' do |locator, selector|
   end
 end
 
+step 'I click :string in :string row' do |locator, row_content|
+  page.all('tr').each do |td|
+    next unless td.text.include?(row_content)
+    td.find_link(locator).trigger('click')
+  end
+end
+
+step 'I see :string in :string row' do |text, row_content|
+  page.all('tr').each do |td|
+    next unless td.text.include?(row_content)
+    expect(td.text).to include(text)
+  end
+end
+
+step 'I don\'t see :string in :string row' do |text, row_content|
+  page.all('tr').each do |td|
+    next unless td.text.include?(row_content)
+    expect(td.text).not_to include(text)
+  end
+end
+
 step 'I pry' do
+  binding.pry
 end

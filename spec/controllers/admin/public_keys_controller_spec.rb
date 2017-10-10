@@ -27,7 +27,7 @@ RSpec.describe Admin::PublicKeysController do
 
       it 'denies access' do
         response = get :index
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end
@@ -60,7 +60,7 @@ RSpec.describe Admin::PublicKeysController do
 
       it 'denies access' do
         response = get(:show, id: @public_key.id)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
   end

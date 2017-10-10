@@ -90,7 +90,7 @@ gem 'devise', '~> 3.5.2'
 gem 'devise-token_authenticatable', '~> 0.4.6'
 
 # audit trail
-gem 'paper_trail', '~> 4.1.0'
+gem 'paper_trail', '~> 6.0.0'
 
 # ActiveAdmin
 gem 'activeadmin', '1.0.0.pre3'
@@ -186,6 +186,9 @@ gem 'redcarpet'
 gem 'nokogiri'
 gem 'premailer-rails'
 
+gem 'trailblazer-rails'
+gem 'dry-types'
+
 group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
@@ -247,6 +250,7 @@ group :development, :test do
   gem 'gitdeploy', git: 'ssh://git@git.velalu.qa:53639/velaluqa/gitdeploy.git', branch: :master, require: false
 
   gem 'capybara'
+  gem 'capybara-screenshot'
   gem 'database_cleaner'
   gem 'poltergeist'
   gem 'transactional_capybara'
@@ -263,6 +267,7 @@ group :development, :test do
   gem 'with_model', '~> 1.2.1'
   # Spec delegation via ActiveSupport's #delegate method.
   gem 'delegate_matcher'
+  gem 'timecop'
 
   gem 'gherkin', '~> 2.5'
   gem 'turnip'

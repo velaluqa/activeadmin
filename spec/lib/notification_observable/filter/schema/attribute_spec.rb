@@ -14,9 +14,10 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       t.time :time_field
       t.binary :binary_field
       t.boolean :boolean_field
-      t.string :enum_field
+      t.string :inclusion_field
       t.string :notnull_field, null: false
       t.json :json_field
+      t.integer :enum_field
     end
     model do
       include NotificationFilter
@@ -28,6 +29,8 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
         end.any?
       end
 
+      enum enum_field: { pending: 0, issues: 1, passed: 2 }
+
       validates :integer_field, numericality: { greater_than_or_equal_to: 5, less_than_or_equal_to: 10 }
       validates :bigint_field, numericality: { greater_than: 5, less_than: 10 }
       validates :float_field, numericality: { greater_than_or_equal_to: 1.1, less_than_or_equal_to: 1.8 }
@@ -36,7 +39,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       validates :string2_field, length: { in: 2..10 }
       validates :string3_field, length: { is: 6 }
       validates :string4_field, format: { with: /\A[a-zA-Z]+\z/ }
-      validates :enum_field, inclusion: { in: %i[yes no maybe] }
+      validates :inclusion_field, inclusion: { in: %i[yes no maybe] }
     end
   end
 
@@ -203,7 +206,7 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
 
   describe '#custom_filter' do
     before(:each) do
-      @column = TestModel.columns.last
+      @column = TestModel.columns_hash['json_field']
       @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
       @filter = @attr.custom_filter
     end
@@ -244,6 +247,24 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
       end
       it 'allows values for column' do
         expect(@validation[:oneOf]).to include(@attr.value_validation)
+      end
+    end
+
+    describe 'for enum column' do
+      before(:each) do
+        @column = TestModel.columns_hash['enum_field']
+        @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
+        @validation = @attr.validation
+      end
+
+      it 'returns the correct schema' do
+        expected_validation = {
+          title: 'value',
+          type: 'string',
+          enum: ['pending', 'issues', 'passed'],
+          required: true
+        }
+        expect(@validation[:oneOf]).to include(expected_validation)
       end
     end
   end
@@ -420,9 +441,9 @@ RSpec.describe NotificationObservable::Filter::Schema::Attribute do
         expect(@validation).to include(format: 'checkbox')
       end
     end
-    describe 'for enum column' do
+    describe 'for inclusion validated column' do
       before(:each) do
-        @column = TestModel.columns_hash['enum_field']
+        @column = TestModel.columns_hash['inclusion_field']
         @attr = NotificationObservable::Filter::Schema::Attribute.new(TestModel, @column)
         @validation = @attr.value_validation
       end

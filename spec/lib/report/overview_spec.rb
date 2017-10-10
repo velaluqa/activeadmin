@@ -13,7 +13,7 @@ describe Report::Overview do
 
     it 'returns all available columns' do
       result = report.result[:studies].first[:columns]
-      expect(result).to eq [1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+      expect(result).to eq [1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
     end
   end
 
@@ -174,35 +174,30 @@ describe Report::Overview do
 
   describe 'with required_series column' do
     let!(:user) { create(:user) }
-    let!(:study) { create(:study) }
+    let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
+      visit_types:
+        baseline:
+          required_series:
+            SPECT_1:
+              tqc: []
+            SPECT_2:
+              tqc: []
+      image_series_properties: []
+CONFIG
     let!(:center) { create(:center, study: study) }
     let!(:patient1) { create(:patient, center: center) }
     let!(:image_series1) { create(:image_series, patient: patient1) }
     let!(:image_series2) { create(:image_series, patient: patient1) }
-    let!(:visit) do
-      assigned_image_series_index = {
-        image_series1.id.to_s => ['chest'],
-        image_series2.id.to_s => ['abdomen']
-      }
-      required_series = {
-        'chest' => {
-          'image_series_id' => image_series1.id.to_s,
-          'tqc_state' => 2
-        },
-        'abdomen' => {
-          'image_series_id' => image_series2.id.to_s,
-          'tqc_state' => 2
-        },
-        'additional' => {}
-      }
-      create(
-        :visit,
-        patient: patient1,
-        assigned_image_series_index: assigned_image_series_index,
-        required_series: required_series
-      )
+    let!(:visit) { create(:visit, patient: patient1, visit_type: 'baseline' ) }
+
+    before(:each) do
+      visit.change_required_series_assignment('SPECT_1' => image_series1.id)
+      expect(visit.set_tqc_result('SPECT_1', {}, user, '')).to eq(true)
+      visit.change_required_series_assignment('SPECT_2' => image_series1.id)
+      expect(visit.set_tqc_result('SPECT_2', {}, user, '')).to eq(true)
     end
-    let!(:result) do
+
+    let(:result) do
       report = Report::Overview.new(columns: %w[required_series])
       report.result[:studies]
     end
@@ -219,60 +214,35 @@ describe Report::Overview do
 
   describe 'with required_series state column' do
     let!(:user) { create(:user) }
-    let!(:study) { create(:study) }
+    let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
+      visit_types:
+        baseline:
+          required_series:
+            SPECT_1:
+              tqc: []
+            SPECT_2:
+              tqc: []
+      image_series_properties: []
+CONFIG
     let!(:center) { create(:center, study: study) }
     let!(:patient1) { create(:patient, center: center) }
     let!(:image_series1) { create(:image_series, patient: patient1) }
     let!(:image_series2) { create(:image_series, patient: patient1) }
-    let!(:visit1) do
-      create(
-        :visit,
-        patient: patient1,
-        assigned_image_series_index: {
-          image_series1.id.to_s => ['chest'],
-          image_series2.id.to_s => ['abdomen']
-        },
-        required_series: {
-          'chest' => {
-            'image_series_id' => image_series1.id.to_s,
-            'tqc_state' => 0
-          },
-          'abdomen' => {
-            'image_series_id' => image_series2.id.to_s,
-            'tqc_state' => 1
-          },
-          'additional' => {
-            'image_series_id' => image_series2.id.to_s,
-            'tqc_state' => 1
-          }
-        }
-      )
+    let!(:visit1) { create(:visit, patient: patient1, visit_type: 'baseline') }
+    let!(:required_series11) { RequiredSeries.where(visit: visit1, name: 'SPECT_1').first }
+    let!(:required_series12) { RequiredSeries.where(visit: visit1, name: 'SPECT_2').first }
+    let!(:visit2) { create(:visit, patient: patient1, visit_type: 'baseline') }
+    let!(:required_series21) { RequiredSeries.where(visit: visit2, name: 'SPECT_1').first }
+    let!(:required_series22) { RequiredSeries.where(visit: visit2, name: 'SPECT_2').first }
+
+    before(:each) do
+      required_series11.update_attributes(tqc_state: 0)
+      required_series12.update_attributes(tqc_state: 1)
+      required_series21.update_attributes(tqc_state: 2)
+      required_series22.update_attributes(tqc_state: 2)
     end
-    let!(:visit2) do
-      create(
-        :visit,
-        patient: patient1,
-        assigned_image_series_index: {
-          image_series1.id.to_s => ['chest'],
-          image_series2.id.to_s => ['abdomen']
-        },
-        required_series: {
-          'chest' => {
-            'image_series_id' => image_series1.id.to_s,
-            'tqc_state' => 2
-          },
-          'abdomen' => {
-            'image_series_id' => image_series2.id.to_s,
-            'tqc_state' => 2
-          },
-          'additional' => {
-            'image_series_id' => image_series2.id.to_s,
-            'tqc_state' => 2
-          }
-        }
-      )
-    end
-    let!(:result) do
+
+    let(:result) do
       report = Report::Overview.new(
         columns: %w[required_series_state_pending required_series_state_issues required_series_state_passed]
       )
@@ -283,7 +253,7 @@ describe Report::Overview do
       expected_result = {
         study_id: study.id,
         study_name: study.name,
-        columns: [1, 2, 3]
+        columns: [1, 1, 2]
       }
       expect(result).to include(expected_result)
     end

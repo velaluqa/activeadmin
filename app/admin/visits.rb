@@ -136,8 +136,6 @@ ActiveAdmin.register Visit do
   end
 
   show do |visit|
-    visit.remove_orphaned_required_series
-
     attributes_table do
       row :patient
       row :visit_number
@@ -198,7 +196,21 @@ ActiveAdmin.register Visit do
         end
       end
     end
-    render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series => required_series_objects, :qc_result_access => (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))} unless required_series_objects.empty?
+
+    panel 'Required Series' do
+      if !visit.study.semantically_valid?
+        text_node "The study configuration is not valid."
+      elsif visit.visit_type.nil?
+        text_node "Assign a visit type to manage required series."
+      elsif !visit.visit_type_valid?
+        text_node "Assigned visit type not found in study configuration. Maybe the study configuration changed in the meantime. Reassign a valid visit type to manage required series."
+      elsif !visit.required_series_available?
+        text_node "The study configuration does not provide any required series for this visit type."
+      else
+        render :partial => 'admin/visits/required_series', :locals => {:visit => visit, :required_series => required_series_objects, :qc_result_access => (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))} unless required_series_objects.empty?
+      end
+    end
+
     active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, visit)
   end
 
@@ -275,7 +287,7 @@ ActiveAdmin.register Visit do
 
   member_action :assign_required_series, :method => :post do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    authorize! :assign_required_series, @visit
 
     @assignments = params[:assignments] || {}
 
@@ -285,7 +297,7 @@ ActiveAdmin.register Visit do
   end
   member_action :assign_required_series_form, :method => :get do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    authorize! :assign_required_series, @visit
 
     @required_series_names = params[:required_series_names]
     if(@required_series_names.nil?)
@@ -298,13 +310,13 @@ ActiveAdmin.register Visit do
       redirect_to :back
       return
     end
-    @current_assignment = @visit.assigned_required_series_id_map
+    @current_assignment = @visit.required_series_assignment
 
     @page_title = 'Assign image series as required series'
     render 'admin/visits/assign_required_series'
   end
-  action_item :edit, :only => :show do
-    link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource)) if(can? :mqc, resource or can? :manage, resource)
+  action_item :assign_required_series, :only => :show, if: -> { can?(:assign_required_series, resource)} do
+    link_to('Assign Required Series', assign_required_series_form_admin_visit_path(resource))
   end
 
   member_action :tqc_results, :method => :get do
@@ -317,7 +329,7 @@ ActiveAdmin.register Visit do
       redirect_to :action => :show
       return
     end
-    @required_series = RequiredSeries.new(@visit, @required_series_name)
+    @required_series = RequiredSeries.where(visit: @visit, name: @required_series_name).first
 
     tqc_spec = @required_series.tqc_spec_with_results
     if(tqc_spec.nil?)
@@ -328,7 +340,7 @@ ActiveAdmin.register Visit do
 
     @tqc_version = if @required_series.tqc_version
                      @required_series.tqc_version
-                   elsif @visit.study and @visit.study.locked_version
+                   elsif @visit.study.andand.locked_version
                      @visit.study.locked_version
                    else
                      nil
@@ -375,7 +387,7 @@ ActiveAdmin.register Visit do
       redirect_to :action => :show
       return
     end
-    @required_series = RequiredSeries.new(@visit, @required_series_name)
+    @required_series = RequiredSeries.where(visit: @visit, name: @required_series_name).first
 
     if(@required_series.assigned_image_series.nil? or @required_series.assigned_image_series.images.empty?)
       flash[:error] = 'tQC can only be performed once an image series (containing at least one image) has been assigned for this required series.'
@@ -383,12 +395,12 @@ ActiveAdmin.register Visit do
       return
     end
 
-    tqc_spec = @required_series.locked_tqc_spec
-    if(tqc_spec.nil?)
+    unless @visit.study.semantically_valid?
       flash[:error] = 'Performing tQC requires a valid study config containing tQC specifications for this required series.'
       redirect_to :action => :show
       return
     end
+    tqc_spec = @required_series.tqc_spec
 
     @dicom_tqc_spec, @manual_tqc_spec = tqc_spec.partition {|spec| spec['type'] == 'dicom'}
 
@@ -479,7 +491,7 @@ ActiveAdmin.register Visit do
 
   member_action :edit_state, :method => :post do
     @visit = Visit.find(params[:id])
-    authorize! :manage, @visit
+    authorize! :update_state, @visit
 
     @visit.state = params[:visit][:state]
 
@@ -492,15 +504,15 @@ ActiveAdmin.register Visit do
   end
   member_action :edit_state_form, :method => :get do
     @visit = Visit.find(params[:id])
-    authorize! :manage, @visit
+    authorize! :update_state, @visit
 
     @states = [['Incomplete, not available', :incomplete_na], ['Complete, tQC of all series passed', :complete_tqc_passed], ['Incomplete, queried', :incomplete_queried], ['Complete, tQC not finished', :complete_tqc_pending], ['Complete, tQC finished, not all series passed', :complete_tqc_issues]]
 
     @return_url = params[:return_url] || admin_visit_path(@visit)
     @page_title = 'Change Visit State'
   end
-  action_item :edit, :only => :show do
-    link_to('Change State', edit_state_form_admin_visit_path(resource, :return_url => request.fullpath)) if can? :manage, resource
+  action_item :edit, :only => :show, if: -> { can?(:update_state, resource) } do
+    link_to('Change State', edit_state_form_admin_visit_path(resource, :return_url => request.fullpath))
   end
 
   controller do

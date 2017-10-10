@@ -142,11 +142,33 @@ module NotificationObservable
           end
         end
 
+        def enum_column?
+          @model.defined_enums.key?(@column.name)
+        end
+
+        def enum_column_values
+          @model.defined_enums[@column.name].keys
+        end
+
         def validation
           options = []
           options << { title: 'NULL', type: 'null' } if @column.null
-          options << value_validation
+          options <<
+            if enum_column?
+              enum_validation
+            else
+              value_validation
+            end
           { oneOf: options }
+        end
+
+        def enum_validation
+          {
+            title: 'value',
+            type: 'string',
+            enum: enum_column_values,
+            required: true
+          }
         end
 
         def value_validation

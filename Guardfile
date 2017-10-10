@@ -9,6 +9,7 @@ guard 'rspec', cmd: 'spring rspec -r spec_helper' do
   watch(%r{^lib/(.+)\.rb$}) { |m| "spec/lib/#{m[1]}_spec.rb" }
   watch('spec/spec_helper.rb') { 'spec' }
   watch(%r{^app/(.+)\.rb$}) { |m| "spec/#{m[1]}_spec.rb" }
+  watch(%r{^app/admin/(.+)\.rb$}) { |m| "spec/controllers/admin/#{m[1]}_controller_spec.rb" }
   watch(%r{^app/(.*)(\.erb|\.slim|\.haml)$}) do |m|
     "spec/#{m[1]}#{m[2]}_spec.rb"
   end
