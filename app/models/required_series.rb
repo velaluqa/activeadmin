@@ -96,17 +96,15 @@ JOIN
   def self.count_for_study(study_id)
     join_study
       .where(studies: { id: study_id })
-      .where('image_series_id IS NOT NULL')
       .count
   end
 
   def self.grouped_count_for_study(study_id, group_by)
     join_study
       .where(studies: { id: study_id })
-      .where('"required_series"."image_series_id" IS NOT NULL')
       .group("\"required_series\".\"#{group_by}\"")
       .count
-      .map { |group, count| [tqc_states.key(group), count] }
+      .map { |group, count| [tqc_states.key(group) || 'unassigned', count] }
       .to_h
   end
 

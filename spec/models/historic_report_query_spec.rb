@@ -546,4 +546,30 @@ CONFIG
       end
     end
   end
+
+  describe '::current_count' do
+    let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
+        visit_types:
+          baseline:
+          required_series:
+          baseline:
+          tqc: []
+        extra:
+          tqc: []
+        image_series_properties: []
+CONFIG
+    let!(:center) { create(:center, study: study) }
+    let!(:patient) { create(:patient, center: center) }
+    let!(:visit) { create(:visit, patient: patient) }
+    let!(:required_series1) { create(:required_series, visit: visit, name: 'SPECT_1') }
+    let!(:required_series2) { create(:required_series, visit: visit, name: 'SPECT_2') }
+
+    let(:query) do
+      HistoricReportQuery.create(resource_type: 'RequiredSeries', group_by: 'tqc_state')
+    end
+
+    it 'returns correct grouped count' do
+      expect(query.current_count(study.id)).to eq(total: 2, group: { 'unassigned' => 2})
+    end
+  end
 end
