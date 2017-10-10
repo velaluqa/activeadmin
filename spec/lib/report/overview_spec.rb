@@ -13,7 +13,7 @@ describe Report::Overview do
 
     it 'returns all available columns' do
       result = report.result[:studies].first[:columns]
-      expect(result).to eq [1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+      expect(result).to eq [1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
     end
   end
 
