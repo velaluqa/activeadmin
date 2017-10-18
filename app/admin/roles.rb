@@ -36,4 +36,12 @@ ActiveAdmin.register Role do
       render partial: 'permissions_matrix', locals: { state: 'show', role: role, disabled: true }
     end
   end
+
+  action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
+    url = admin_versions_path(
+      audit_trail_view_type: 'role',
+      audit_trail_view_id: resource.id
+    )
+    link_to('Audit Trail', url)
+  end
 end

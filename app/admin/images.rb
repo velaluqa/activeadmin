@@ -74,7 +74,11 @@ ActiveAdmin.register Image do
     link_to('DICOM Metadata', dicom_metadata_admin_image_path(resource)) if resource.file_is_present?
   end
 
-  action_item :edit, only: :show do
-    link_to('Audit Trail', admin_versions_path(audit_trail_view_type: 'image', audit_trail_view_id: resource.id)) if can? :read, Version
+  action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
+    url = admin_versions_path(
+      audit_trail_view_type: 'image',
+      audit_trail_view_id: resource.id
+    )
+    link_to('Audit Trail', url)
   end
 end

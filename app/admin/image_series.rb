@@ -757,7 +757,11 @@ ActiveAdmin.register ImageSeries do
   erica_commentable(:comment, 'Comment')
   erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-  action_item :edit, :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'image_series', :audit_trail_view_id => resource.id)) if can? :read, Version
+  action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
+    url = admin_versions_path(
+      audit_trail_view_type: 'image_series',
+      audit_trail_view_id: resource.id
+    )
+    link_to('Audit Trail', url)
   end
 end

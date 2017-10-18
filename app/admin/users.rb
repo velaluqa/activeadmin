@@ -207,7 +207,11 @@ ActiveAdmin.register User do
     link_to 'Unlock', unlock_admin_user_path(resource)
   end
 
-  action_item :audit_trail, only: :show do
-    link_to('Audit Trail', admin_versions_path(audit_trail_view_type: 'user', audit_trail_view_id: resource.id)) if can? :read, Version
+  action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
+    url = admin_versions_path(
+      audit_trail_view_type: 'user',
+      audit_trail_view_id: resource.id
+    )
+    link_to('Audit Trail', url)
   end
 end

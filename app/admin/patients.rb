@@ -159,8 +159,12 @@ ActiveAdmin.register Patient do
   filter :subject_id, :label => 'Subject ID'
   keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
 
-  action_item :audit_trail, :only => :show do
-    link_to('Audit Trail', admin_versions_path(:audit_trail_view_type => 'patient', :audit_trail_view_id => resource.id)) if can? :read, Version
+  action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
+    url = admin_versions_path(
+      audit_trail_view_type: 'patient',
+      audit_trail_view_id: resource.id
+    )
+    link_to('Audit Trail', url)
   end
 
   controller do
