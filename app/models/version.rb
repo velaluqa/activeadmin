@@ -40,6 +40,57 @@ class Version < PaperTrail::Version
 
   after_commit(:trigger_notification_profiles, on: :create)
 
+  scope :for_study, -> (study_id) { where(study_id: study_id) }
+  # TODO: #3353 - Use Version#center_id: association_chain.where(center_id: params[:audit_trail_view_id])
+  scope :for_center, -> (center_id) { where(<<WHERE.strip_heredoc, center_id: center_id) }
+    (item_type LIKE 'Center' AND item_id = :center_id) OR
+    (item_type LIKE 'Patient' AND item_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)) OR
+    (item_type LIKE 'Visit' AND item_id IN
+      (SELECT id FROM visits WHERE visits.patient_id IN
+        (SELECT id FROM patients WHERE patients.center_id = :center_id))) OR
+    (item_type LIKE 'ImageSeries' AND item_id IN
+      (SELECT id FROM image_series WHERE image_series.patient_id IN
+        (SELECT id FROM patients WHERE patients.center_id = :center_id))) OR
+    (item_type LIKE 'Image' AND item_id IN
+      (SELECT id FROM images WHERE images.image_series_id IN
+        (SELECT id FROM image_series WHERE image_series.patient_id IN
+          (SELECT id FROM patients WHERE patients.center_id = :center_id))))
+WHERE
+  # TODO: #3353 - Use Version#patient_id: association_chain.where(patient_id: params[:audit_trail_view_id])
+  scope :for_patient, -> (patient_id) { where(<<WHERE.strip_heredoc, patient_id: patient_id) }
+    (item_type LIKE 'Patient' AND item_id = :patient_id) OR
+    (item_type LIKE 'Visit' AND item_id IN
+      (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) OR
+    (item_type LIKE 'ImageSeries' AND item_id IN
+      (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)) OR
+    (item_type LIKE 'Image' AND item_id IN
+      (SELECT id FROM images WHERE images.image_series_id IN
+        (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)))
+WHERE
+  # TODO: #3353 - Use Version#visit_id: association_chain.where(visit_id: params[:audit_trail_view_id])
+  scope :for_visit, -> (visit_id) { where(<<WHERE.strip_heredoc, visit_id: visit_id) }
+    (item_type LIKE 'Visit' AND item_id = :visit_id) OR
+    (item_type LIKE 'ImageSeries' AND item_id IN
+      (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)) OR
+    (item_type LIKE 'Image' AND item_id IN
+      (SELECT id FROM images WHERE images.image_series_id IN
+        (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)))
+WHERE
+  # TODO: #3353 - Use Version#image_series_id: association_chain.where(image_series_id: params[:audit_trail_view_id])
+  scope :for_image_series, -> (image_series_id) { where(<<WHERE.strip_heredoc, image_series_id: image_series_id) }
+    (item_type LIKE 'ImageSeries' AND item_id = :image_series_id) OR
+    (item_type LIKE 'Image' AND item_id IN
+      (SELECT id FROM images WHERE images.image_series_id = :image_series_id))
+WHERE
+  # TODO: #3353 - Use Version#image_series_id: association_chain.where(image_id: params[:audit_trail_view_id])
+  scope :for_image, -> (image_id) { where('item_type LIKE \'Image\' AND item_id = ?', image_id) }
+  scope :for_role, -> (image_id) { where('item_type LIKE \'Role\' AND item_id = ?', image_id) }
+  scope :for_user, -> (user_id) { where(<<WHERE.strip_heredoc, user_id: user_id) }
+    (item_type LIKE 'User' AND item_id = :user_id) OR
+    (item_type LIKE 'UserRole' and item_id IN
+      (SELECT id FROM user_roles WHERE user_roles.user_id = :user_id))
+WHERE
+
   def triggering_user
     case whodunnit
     when User then whodunnit

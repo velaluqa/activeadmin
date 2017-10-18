@@ -42,50 +42,15 @@ ActiveAdmin.register Version do
       return association_chain if params[:audit_trail_view_type].nil? || params[:audit_trail_view_id].nil?
 
       case params[:audit_trail_view_type]
-      when 'study'
-        association_chain.where(study_id: params[:audit_trail_view_id])
-      when 'center'
-        # TODO: #3353 - Use Version#center_id: association_chain.where(center_id: params[:audit_trail_view_id])
-        association_chain.where(<<WHERE, center_id: params[:audit_trail_view_id])
-(item_type LIKE 'Center' AND item_id = :center_id) OR
-(item_type LIKE 'Patient' AND item_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)) OR
-(item_type LIKE 'Visit' AND item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) OR
-(item_type LIKE 'ImageSeries' AND item_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) OR
-(item_type LIKE 'Image' AND item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))))
-WHERE
-      when 'patient'
-        # TODO: #3353 - Use Version#patient_id: association_chain.where(patient_id: params[:audit_trail_view_id])
-        association_chain.where(<<WHERE, patient_id: params[:audit_trail_view_id])
-(item_type LIKE 'Patient' AND item_id = :patient_id) OR
-(item_type LIKE 'Visit' AND item_id IN (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) OR
-(item_type LIKE 'ImageSeries' AND item_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)) OR
-(item_type LIKE 'Image' AND item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)))
-WHERE
-      when 'visit'
-        # TODO: #3353 - Use Version#visit_id: association_chain.where(visit_id: params[:audit_trail_view_id])
-        association_chain.where(<<WHERE, visit_id: params[:audit_trail_view_id])
-(item_type LIKE 'Visit' AND item_id = :visit_id) OR
-(item_type LIKE 'ImageSeries' AND item_id IN (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)) OR
-(item_type LIKE 'Image' AND item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)))
-WHERE
-      when 'image_series'
-        # TODO: #3353 - Use Version#image_series_id: association_chain.where(image_series_id: params[:audit_trail_view_id])
-        association_chain.where(<<WHERE, image_series_id: params[:audit_trail_view_id])
-(item_type LIKE 'ImageSeries' AND item_id = :image_series_id) OR
-(item_type LIKE 'Image' AND item_id IN (SELECT id FROM images WHERE images.image_series_id = :image_series_id))
-WHERE
-      when 'image'
-        # TODO: #3353 - Use Version#image_series_id: association_chain.where(image_id: params[:audit_trail_view_id])
-        association_chain.where('item_type LIKE \'Image\' AND item_id = ?', params[:audit_trail_view_id].to_i)
-      when 'role'
-        association_chain.where('item_type LIKE \'Role\' AND item_id = ?', params[:audit_trail_view_id].to_i)
-      when 'user'
-        association_chain.where(<<WHERE, user_id: params[:audit_trail_view_id])
-(item_type LIKE 'User' AND item_id = :user_id) OR
-(item_type LIKE 'UserRole' and item_id IN (SELECT id FROM user_roles WHERE user_roles.user_id = :user_id))
-WHERE
-      else
-        association_chain
+      when 'study' then association_chain.for_study(params[:audit_trail_view_id])
+      when 'center' then association_chain.for_center(params[:audit_trail_view_id])
+      when 'patient' then association_chain.for_patient(params[:audit_trail_view_id])
+      when 'visit' then association_chain.for_visit(params[:audit_trail_view_id])
+      when 'image_series' then association_chain.for_image_series(params[:audit_trail_view_id])
+      when 'image' then association_chain.for_image(params[:audit_trail_view_id])
+      when 'role' then association_chain.for_role(params[:audit_trail_view_id])
+      when 'user' then association_chain.for_user(params[:audit_trail_view_id])
+      else association_chain
       end.accessible_by(current_ability)
     end
 
