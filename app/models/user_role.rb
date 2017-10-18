@@ -76,4 +76,18 @@ class UserRole < ActiveRecord::Base
     self.scope_object_id = match[:scope_object_id].to_i
     self.scope_object_type = match[:scope_object_type].classify
   end
+
+  def to_s
+    str = role.title
+    str += " on #{scope_object_type}: #{scope_object}" if scope_object
+    str
+  end
+
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    case event_symbol
+    when 'create' then ['Assigned', :ok]
+    when 'destroy' then ['Unassigned', :warning]
+    when 'update' then ['Scope Changed', :error]
+    end
+  end
 end

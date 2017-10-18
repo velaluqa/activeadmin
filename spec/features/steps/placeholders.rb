@@ -38,9 +38,11 @@ placeholder :admin_path do
       when 'Study' then Study.find_by(name: identifier)
       when 'Center' then Center.find_by(name: identifier)
       when 'Patient' then Patient.find_by(subject_id: identifier)
-      when 'User' then User.find_by(username: identifier)
       when 'Visit' then Visit.find_by(visit_number: identifier)
       when 'ImageSeries' then ImageSeries.find_by(name: identifier)
+      when 'Image' then Image.find_by(id: identifier)
+      when 'User' then User.find_by(username: identifier)
+      when 'Role' then Role.find_by(title: identifier)
       end
     Rails.application.routes.url_helpers
          .send(method, record)
@@ -53,10 +55,11 @@ placeholder :admin_path do
       when 'Study' then Study.find_by(name: identifier)
       when 'Center' then Center.find_by(name: identifier)
       when 'Patient' then Patient.find_by(subject_id: identifier)
-      when 'User' then User.find_by(username: identifier)
-      when 'Role' then Role.find_by(title: identifier)
       when 'Visit' then Visit.find_by(visit_number: identifier)
       when 'ImageSeries' then ImageSeries.find_by(name: identifier)
+      when 'Image' then Image.find_by(id: identifier)
+      when 'User' then User.find_by(username: identifier)
+      when 'Role' then Role.find_by(title: identifier)
       end
     Rails.application.routes.url_helpers
          .send("admin_#{model_name.singularize.underscore}_path", record)

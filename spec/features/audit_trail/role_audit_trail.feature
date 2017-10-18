@@ -6,11 +6,11 @@ Feature: User Audit Trail
   Scenario: Scoped Audit Trail
     Given a role "Test Role" with permissions:
        | Version | read |
+       | Role    | read |
     And I sign in as a user with role "Test Role"
-    When I browse to user "testuser"
+    When I browse to role "Test Role"
     And I click link "Audit Trail" in "#title_bar"
-    Then I see "Test User"
-    And I see "Test Role"
-    And I see "ASSIGNED"
+    Then I see "Role Test Role"
+    And I see "CREATE"
 
 

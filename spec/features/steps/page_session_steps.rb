@@ -61,6 +61,23 @@ step 'I browse to :admin_path' do |path|
   visit(path)
 end
 
+step 'I browse to last defined :model' do |model_name|
+  model_name = model_name.classify
+  record =
+    case model_name
+    when 'Study' then @study
+    when 'Center' then @center
+    when 'Patient' then @patient
+    when 'Visit' then @visit
+    when 'ImageSeries' then @image_series
+    when 'Image' then @image
+    when 'User' then @user
+    when 'Role' then @role
+    end
+  path = Rails.application.routes.url_helpers.send("admin_#{model_name.singularize.underscore}_path", record)
+  visit(path)
+end
+
 step 'I browse to :admin_path with:' do |path, parameters|
   path = URI.parse(path)
   path.query = URI.encode_www_form(parameters.to_a)

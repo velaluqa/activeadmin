@@ -1,9 +1,9 @@
 postgres:
-  image: postgres:9.5
+  image: postgres:9.6
   ports:
     - 5432:5432
   volumes:
-    - ./tmp/postgresql_data:/var/lib/postgresql/data
+    - ./tmp/postgresql_data_3_0_0/9.6/data:/var/lib/postgresql/data
 redis:
   image: redis
   ports:
@@ -17,6 +17,7 @@ app:
     - ./config/database.yml.dev:/app/config/database.yml
     - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
     - ./tmp:/app/tmp
+    - ./import/data:/app/data
   ports:
     - 3000:3000
   environment: &environment

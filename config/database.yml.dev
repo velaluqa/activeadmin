@@ -5,7 +5,7 @@ development: &default
   timeout: 5000
   host: postgres
   username: postgres
-  database: erica_store_development
+  database: erica_v2_production
 
 production:
   <<: *default

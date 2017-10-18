@@ -39,52 +39,51 @@ ActiveAdmin.register Version do
     def scoped_collection
       association_chain = end_of_association_chain.includes(:item)
 
-      return association_chain if(params[:audit_trail_view_type].nil? or params[:audit_trail_view_id].nil?)
+      return association_chain if params[:audit_trail_view_type].nil? || params[:audit_trail_view_id].nil?
 
       case params[:audit_trail_view_type]
-      when 'case'
-        association_chain.where('item_type LIKE \'Case\' and item_id = ?', params[:audit_trail_view_id].to_i)
-      when 'patient'
-        association_chain.where('(item_type LIKE \'Patient\' and item_id = :patient_id) or
-       (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.patient_id = :patient_id)) or
-       (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) or
-       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)) or
-       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)))
-', {:patient_id => params[:audit_trail_view_id].to_i})
-      when 'form'
-        association_chain.where('item_type LIKE \'Form\' and item_id = ?', params[:audit_trail_view_id].to_i)
-      when 'role'
-        association_chain.where('item_type LIKE \'Role\' and item_id = ?', params[:audit_trail_view_id].to_i)
-      when 'user'
-        association_chain.where('(item_type LIKE \'User\' and item_id = :user_id) or (item_type LIKE \'Role\' and item_id IN (SELECT id FROM roles WHERE roles.user_id = :user_id))',
-                                       {:user_id => params[:audit_trail_view_id].to_i})
-      when 'session'
-        association_chain.where('(item_type LIKE \'Session\' and item_id = :session_id) or (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.session_id = :session_id)) or (item_type LIKE \'Patient\' and item_id IN (SELECT id FROM patients WHERE patients.session_id = :session_id)) or (item_type LIKE \'Form\' and item_id IN (SELECT id FROM forms WHERE forms.session_id = :session_id))',
-                                       {:session_id => params[:audit_trail_view_id].to_i})
       when 'study'
-        association_chain.where('(item_type LIKE \'Study\' and item_id = :study_id) or
-       (item_type LIKE \'Session\' and item_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id)) or
-       (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or
-       (item_type LIKE \'Form\' and item_id IN (SELECT id FROM forms WHERE forms.session_id IN (SELECT id FROM sessions WHERE sessions.study_id = :study_id))) or
-       (item_type LIKE \'Center\' and item_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)) or
-       (item_type LIKE \'Patient\' and item_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id))) or
-       (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))) or
-       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))) or
-       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id IN (SELECT id FROM centers WHERE centers.study_id = :study_id)))))',
-                                       {:study_id => params[:audit_trail_view_id].to_i})
-      when 'image'
-        association_chain.where('item_type LIKE \'Image\' and item_id = ?', params[:audit_trail_view_id].to_i)
-      when 'image_series'
-        association_chain.where('(item_type LIKE \'ImageSeries\' and item_id = :image_series_id) or (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id = :image_series_id))', {:image_series_id => params[:audit_trail_view_id].to_i})
-      when 'visit'
-        association_chain.where('(item_type LIKE \'Visit\' and item_id = :visit_id) or (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)) or (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)))', {:visit_id => params[:audit_trail_view_id].to_i})
+        association_chain.where(study_id: params[:audit_trail_view_id])
       when 'center'
-        association_chain.where('(item_type LIKE \'Center\' and item_id = :center_id) or
-       (item_type LIKE \'Patient\' and item_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)) or
-       (item_type LIKE \'Case\' and item_id IN (SELECT id FROM cases WHERE cases.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) or
-       (item_type LIKE \'Visit\' and item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) or
-       (item_type LIKE \'ImageSeries\' and item_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) or
-       (item_type LIKE \'Image\' and item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))))', {:center_id => params[:audit_trail_view_id].to_i})
+        # TODO: #3353 - Use Version#center_id: association_chain.where(center_id: params[:audit_trail_view_id])
+        association_chain.where(<<WHERE, center_id: params[:audit_trail_view_id])
+(item_type LIKE 'Center' AND item_id = :center_id) OR
+(item_type LIKE 'Patient' AND item_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id)) OR
+(item_type LIKE 'Visit' AND item_id IN (SELECT id FROM visits WHERE visits.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) OR
+(item_type LIKE 'ImageSeries' AND item_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))) OR
+(item_type LIKE 'Image' AND item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id IN (SELECT id FROM patients WHERE patients.center_id = :center_id))))
+WHERE
+      when 'patient'
+        # TODO: #3353 - Use Version#patient_id: association_chain.where(patient_id: params[:audit_trail_view_id])
+        association_chain.where(<<WHERE, patient_id: params[:audit_trail_view_id])
+(item_type LIKE 'Patient' AND item_id = :patient_id) OR
+(item_type LIKE 'Visit' AND item_id IN (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) OR
+(item_type LIKE 'ImageSeries' AND item_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)) OR
+(item_type LIKE 'Image' AND item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)))
+WHERE
+      when 'visit'
+        # TODO: #3353 - Use Version#visit_id: association_chain.where(visit_id: params[:audit_trail_view_id])
+        association_chain.where(<<WHERE, visit_id: params[:audit_trail_view_id])
+(item_type LIKE 'Visit' AND item_id = :visit_id) OR
+(item_type LIKE 'ImageSeries' AND item_id IN (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)) OR
+(item_type LIKE 'Image' AND item_id IN (SELECT id FROM images WHERE images.image_series_id IN (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)))
+WHERE
+      when 'image_series'
+        # TODO: #3353 - Use Version#image_series_id: association_chain.where(image_series_id: params[:audit_trail_view_id])
+        association_chain.where(<<WHERE, image_series_id: params[:audit_trail_view_id])
+(item_type LIKE 'ImageSeries' AND item_id = :image_series_id) OR
+(item_type LIKE 'Image' AND item_id IN (SELECT id FROM images WHERE images.image_series_id = :image_series_id))
+WHERE
+      when 'image'
+        # TODO: #3353 - Use Version#image_series_id: association_chain.where(image_id: params[:audit_trail_view_id])
+        association_chain.where('item_type LIKE \'Image\' AND item_id = ?', params[:audit_trail_view_id].to_i)
+      when 'role'
+        association_chain.where('item_type LIKE \'Role\' AND item_id = ?', params[:audit_trail_view_id].to_i)
+      when 'user'
+        association_chain.where(<<WHERE, user_id: params[:audit_trail_view_id])
+(item_type LIKE 'User' AND item_id = :user_id) OR
+(item_type LIKE 'UserRole' and item_id IN (SELECT id FROM user_roles WHERE user_roles.user_id = :user_id))
+WHERE
       else
         association_chain
       end.accessible_by(current_ability)
@@ -112,27 +111,29 @@ ActiveAdmin.register Version do
     end
 
     def self.event_title_and_severity(item_type, event_symbol)
-      if ['create', 'update', 'destroy', :domino_unid_change].include?(event_symbol)
-        return case event_symbol
-               when 'create' then ['Create', nil]
-               when 'update' then ['Update', :warning]
-               when 'destroy' then ['Destroy', :error]
-               when :domino_unid_change then ['Domino UNID Change', :ok]
-               end
-      end
-
-      title = event_symbol.to_s.humanize
-      severity = :warning
+      title = nil
+      severity = nil
       begin
         item_class = item_type.constantize
         if item_class.respond_to?(:audit_trail_event_title_and_severity)
-          proper_title, proper_severity = item_class.audit_trail_event_title_and_severity(event_symbol)
-          title = proper_title || title
-          severity = proper_severity || severity
+          title, severity = item_class.audit_trail_event_title_and_severity(event_symbol)
         end
       rescue NameError => e
         pp e
       end
+
+      if ['create', 'update', 'destroy', :domino_unid_change].include?(event_symbol)
+        case event_symbol
+        when 'create' then severity ||= nil
+        when 'update' then severity ||= :warning
+        when 'destroy' then severity ||= :error
+        when :domino_unid_change
+          title = 'Domino UNID Change'
+          severity = :ok
+        end
+      end
+
+      title ||= event_symbol.to_s.humanize
 
       [title, severity]
     end

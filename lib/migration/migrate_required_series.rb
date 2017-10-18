@@ -7,7 +7,10 @@ module Migration
         RequiredSeries.skip_callback(:commit, :after, :schedule_domino_sync)
         RequiredSeries.skip_callback(:save, :after, :update_image_series_state)
 
-        study_ids = Version.pluck('DISTINCT(study_id)').compact
+        puts "Loading study ids ..."
+        # study_ids = Version.pluck('DISTINCT(study_id)').compact
+        study_ids = [5]
+        # study_ids = [12, 8, 1, 2, 15, 3, 10, 11, 4, 13, 5, 9, 16, 7, 6]
         puts "Migrating studies: #{study_ids.inspect}"
         study_ids.each do |study_id|
           puts "Migrating study #{study_id}"
