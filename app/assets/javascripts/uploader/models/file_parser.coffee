@@ -62,4 +62,12 @@ class ImageUploader.Models.FileParser extends Backbone.Model
 
   addDirectory: (entry) ->
     dirReader = entry.createReader()
-    dirReader.readEntries @addFsEntries
+
+    # `readEntries` might not return all entries, we have to rerun
+    # `readEntries` until the returned `entries` Array is empty.
+    callback = (entries) =>
+      return if entries?.length is 0
+      @addFsEntries(entries)
+      dirReader.readEntries(callback)
+
+    dirReader.readEntries(callback)
