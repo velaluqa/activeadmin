@@ -9,6 +9,8 @@ class ImageUploader.Collections.ImageSeries extends Backbone.Collection
     series = @findWhere(instanceUid: options.instanceUid)
     return series if series?
 
+    options.name = "Unnamed" unless options.name?
+
     series = new ImageUploader.Models.ImageSeries
       name: options.name
       instanceUid: options.instanceUid
