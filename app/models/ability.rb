@@ -39,6 +39,8 @@ class Ability
       define_basic_abilities
     end
 
+    define_dynamic_abilities
+
     define_page_abilities
   end
 
@@ -104,6 +106,15 @@ class Ability
   def define_unscopable_ability(subject, activity)
     return unless current_user.permissions.allow?(activity, subject)
     can(activity, subject)
+  end
+
+  def define_dynamic_abilities
+    can %i[read create], ActiveAdmin::Comment do |comment|
+      can?(:comment, comment.resource)
+    end
+    can %i[update], ActiveAdmin::Comment do |comment|
+      can?(:comment, comment.resource) && comment.author_id == current_user.id
+    end
   end
 
   ##
