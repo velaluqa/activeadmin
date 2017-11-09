@@ -50,7 +50,7 @@ ActiveAdmin.register Center do
       row :image_storage_path
       keywords_row(center, :tags, 'Keywords') if ERICA.remote?
     end
-    active_admin_comments if ERICA.remote? && can?(:remote_comment, center)
+    active_admin_comments if can?(:comment, center)
   end
 
   form do |f|

@@ -30,6 +30,30 @@ None
 
 None
 
+## 6.0.2
+
+*Major Changes:* None
+
+*Minor Changes:* None
+
+*Patches:*
+
+* Bug #3608 - Comment feature is blocked by legacy ERICA Remote flags
+
+*Development:* None
+
+## 6.0.1
+
+*Major Changes:* None
+
+*Minor Changes:* None
+
+*Patches:*
+
+* Bug #3592 - Image upload fails for given PET images
+
+*Development:* None
+
 ## 6.0.0
 
 *Major Changes:*
