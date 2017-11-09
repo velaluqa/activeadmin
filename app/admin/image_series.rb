@@ -267,7 +267,7 @@ ActiveAdmin.register ImageSeries do
                :values => image_series.properties
              }
     end
-    active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, image_series)
+    active_admin_comments if can?(:comment, image_series)
   end
 
   form do |f|
