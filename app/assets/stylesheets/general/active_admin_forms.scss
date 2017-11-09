@@ -275,3 +275,55 @@ form {
     @extend .btn, .btn-default;
   }
 }
+
+.comments {
+  .panel_contents {
+    padding: 16px;
+
+    .active_admin_comment_meta {
+      h4 {
+	font-size: 14px;
+	margin: 0;
+	display: inline;
+
+	a {
+	  color: $gray;
+	}
+      }
+
+      h4 + span {
+	color: $gray;
+	font-size: 14px;
+	&:before {
+	  content: ' — '
+	}
+      }
+    }
+
+    fieldset {
+      border: 0;
+
+      ol {
+	padding: 0;
+	margin-bottom: 0;
+      }
+    }
+
+    .empty {
+      height: 50px;
+      line-height: 50px;
+      display: block;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    form .inputs li textarea {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    form .actions li input[type="submit"] {
+      margin-right: 0
+    }
+  }
+}
