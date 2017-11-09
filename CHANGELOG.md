@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 7.0.1
+
+*Major Changes:* None
+
+*Minor Changes:* None
+
+*Patches:*
+
+* Bug #3608 - Comment feature is blocked by legacy ERICA Remote flags
+
+*Development:* None
+
 ## 7.0.0
 
 *Major Changes:*
