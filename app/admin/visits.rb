@@ -211,7 +211,7 @@ ActiveAdmin.register Visit do
       end
     end
 
-    active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, visit)
+    active_admin_comments if can?(:comment, visit)
   end
 
   form do |f|
