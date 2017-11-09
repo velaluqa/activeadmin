@@ -199,7 +199,7 @@ ActiveAdmin.register Visit do
       end
     end
     render :partial => 'admin/visits/required_series', :locals => { :visit => visit, :required_series => required_series_objects, :qc_result_access => (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))} unless required_series_objects.empty?
-    active_admin_comments if (Rails.application.config.is_erica_remote and can? :remote_comment, visit)
+    active_admin_comments if can?(:comment, visit)
   end
 
   form do |f|

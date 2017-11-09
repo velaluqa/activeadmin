@@ -6,19 +6,19 @@ class Ability
   ACTIVITIES = {
     BackgroundJob => %i[manage read update create destroy],
     Sidekiq => %i[manage],
-    Study  => %i[manage read update create destroy read_reports],
-    Center => %i[manage read update create destroy],
-    Patient => %i[manage read update create destroy],
+    Study  => %i[manage read update create destroy comment read_reports],
+    Center => %i[manage read update create destroy comment],
+    Patient => %i[manage read update create destroy comment],
     EmailTemplate => %i[manage read update create destroy],
-    ImageSeries => %i[manage read update create destroy upload assign_patient assign_visit],
-    Image => %i[manage read update create destroy],
+    ImageSeries => %i[manage read update create destroy comment upload assign_patient assign_visit],
+    Image => %i[manage read update create destroy comment],
     NotificationProfile => %i[manage read update create destroy],
     Notification => %i[manage read update create destroy],
     User => %i[manage read update create destroy generate_keypair],
     UserRole => %i[manage read update create destroy],
     PublicKey => %i[manage read update create destroy],
     Role => %i[manage read update create destroy],
-    Visit => %i[manage read update create destroy create_from_template assign_required_series technical_qc medical_qc],
+    Visit => %i[manage read update create destroy comment create_from_template assign_required_series technical_qc medical_qc],
     Version => %i[manage read update create destroy]
   }.freeze
 
@@ -38,6 +38,8 @@ class Ability
       define_scopable_abilities
       define_basic_abilities
     end
+
+    define_dynamic_abilities
 
     define_page_abilities
   end
@@ -104,6 +106,15 @@ class Ability
   def define_unscopable_ability(subject, activity)
     return unless current_user.permissions.allow?(activity, subject)
     can(activity, subject)
+  end
+
+  def define_dynamic_abilities
+    can %i[read create], ActiveAdmin::Comment do |comment|
+      can?(:comment, comment.resource)
+    end
+    can %i[update], ActiveAdmin::Comment do |comment|
+      can?(:comment, comment.resource) && comment.author_id == current_user.id
+    end
   end
 
   ##

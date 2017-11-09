@@ -104,7 +104,7 @@ ActiveAdmin.register Study do
         render 'admin/shared/config_table', current: current, locked: locked
       end
     end
-    active_admin_comments if Rails.application.config.is_erica_remote && can?(:remote_comment, study)
+    active_admin_comments if can?(:comment, study)
   end
 
   form do |f|
