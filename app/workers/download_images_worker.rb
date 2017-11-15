@@ -105,7 +105,9 @@ class DownloadImagesWorker
     image_storage_path = Rails.root.join(Rails.application.config.image_storage_root, resource.image_storage_path, '**/*').to_s
     images = Dir.glob(image_storage_path)
 
-    output_path = Pathname.new(Dir.tmpdir).join('images_' + job_id.to_s + '.zip').to_s
+    output_dir_path = Pathname.new(Dir.tmpdir).join('erica/download_images_worker')
+    FileUtils.mkdir_p(output_dir_path.to_s)
+    output_path = output_dir_path.join('images_' + job_id.to_s + '.zip').to_s
 
     Zip::File.open(output_path, Zip::File::CREATE) do |zipfile|
       case resource
