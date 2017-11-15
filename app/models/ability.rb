@@ -8,7 +8,7 @@ class Ability
     Sidekiq => %i[manage],
     Study  => %i[manage read update create destroy comment read_reports configure],
     Center => %i[manage read update create destroy comment],
-    Patient => %i[manage read update create destroy comment],
+    Patient => %i[manage read update create destroy comment download_images],
     EmailTemplate => %i[manage read update create destroy],
     ImageSeries => %i[manage read update create destroy comment upload assign_patient assign_visit],
     Image => %i[manage read update create destroy comment],
