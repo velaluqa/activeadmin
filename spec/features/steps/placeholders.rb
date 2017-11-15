@@ -35,6 +35,7 @@ placeholder :admin_path do
     model_name = model_name.classify
     record =
       case model_name
+      when 'BackgroundJob' then BackgroundJob.find_by(id: identifier)
       when 'Study' then Study.find_by(name: identifier)
       when 'Center' then Center.find_by(name: identifier)
       when 'Patient' then Patient.find_by(subject_id: identifier)
@@ -52,6 +53,7 @@ placeholder :admin_path do
     model_name = model_name.classify
     record =
       case model_name
+      when 'BackgroundJob' then BackgroundJob.find_by(id: identifier)
       when 'Study' then Study.find_by(name: identifier)
       when 'Center' then Center.find_by(name: identifier)
       when 'Patient' then Patient.find_by(subject_id: identifier)
@@ -86,6 +88,7 @@ placeholder :model_instance do
   match(/([^ $]+) "([^$\n]+)"/) do |model_name, identifier|
     model_name = model_name.classify
     case model_name
+    when 'BackgroundJob' then BackgroundJob.find_by(id: identifier)
     when 'Study' then Study.find_by(name: identifier)
     when 'Center' then Center.find_by(name: identifier)
     when 'Patient' then Patient.find_by(subject_id: identifier)
@@ -96,6 +99,11 @@ placeholder :model_instance do
   end
 end
 
+placeholder :background_job_instance do
+  match(/"([^"]+)"/) do |identifier|
+    BackgroundJob.find_by(id: identifier)
+  end
+end
 placeholder :study_instance do
   match(/"([^"]+)"/) do |identifier|
     Study.find_by(name: identifier)
