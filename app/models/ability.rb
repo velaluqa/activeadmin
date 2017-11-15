@@ -19,7 +19,7 @@ class Ability
     PublicKey => %i[manage read update create destroy],
     RequiredSeries => %i[manage read update],
     Role => %i[manage read update create destroy],
-    Visit => %i[manage read update create destroy comment create_from_template update_state assign_required_series read_tqc perform_tqc technical_qc medical_qc],
+    Visit => %i[manage read update create destroy comment download_images create_from_template update_state assign_required_series read_tqc perform_tqc technical_qc medical_qc],
     Version => %i[manage read update create destroy]
   }.freeze
 
