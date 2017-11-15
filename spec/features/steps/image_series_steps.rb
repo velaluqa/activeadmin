@@ -6,6 +6,13 @@ step 'a/an image_series :string for :patient_instance' do |name, patient|
   @image_series = create(:image_series, name: name, patient: patient)
 end
 
+step 'a/an image_series :string for :patient_instance with :number images' do |name, patient, image_number|
+  @image_series = create(:image_series, name: name, patient: patient)
+  1.upto(image_number.to_i) do |i|
+    create(:image, image_series_id: @image_series.id)
+  end
+end
+
 step 'a/an image_series :string with:' do |name, table|
   options = { name: name }
   table.to_a.each do |attribute, value|
