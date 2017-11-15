@@ -93,6 +93,8 @@ RSpec.configure do |config|
   config.extend WithModel
 
   def clear_data
+    FileUtils.rm_rf("#{Dir.tmpdir}/erica")
+    FileUtils.mkdir_p("#{Dir.tmpdir}/erica")
     FileUtils.rm_rf('spec/data')
     FileUtils.mkdir_p('spec/data/images')
     FileUtils.mkdir_p('spec/data/studies')
