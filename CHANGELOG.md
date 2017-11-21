@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 7.0.2
+
+*Major Changes:* None
+
+*Minor Changes:* None
+
+*Patches:*
+
+* Bug #3625 - Fix download images bug
+* Feature #3626 - Commenting feature tests
+
+*Development:* None
+
 ## 7.0.1
 
 *Major Changes:* None
@@ -41,6 +54,18 @@ None
 *Development:*
 
 None
+
+## 6.0.3
+
+*Major Changes:* None
+
+*Minor Changes:* None
+
+*Patches:*
+
+* Bug #3625 - Fix download images bug
+
+*Development:* None
 
 ## 6.0.2
 
