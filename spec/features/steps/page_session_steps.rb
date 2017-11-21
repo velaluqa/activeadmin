@@ -148,3 +148,22 @@ end
 step 'I pry' do
   binding.pry
 end
+
+step 'I wait :number seconds' do |seconds|
+  sleep(seconds.to_i)
+end
+
+step 'I wait for all jobs in :string queue' do |queue|
+  available_workers =
+    Dir['app/workers/**/*']
+      .entries
+      .map { |file| File.read(file).match(/class ([^\n]*)/).andand[1] }
+      .compact
+  if available_workers.include?(queue)
+    queue.constantize.drain
+  end
+end
+
+step 'I download zip file' do
+  expect(page.response_headers['Content-Type']).to eq "application/zip"
+end

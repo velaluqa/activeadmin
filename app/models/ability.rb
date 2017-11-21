@@ -8,10 +8,10 @@ class Ability
     Sidekiq => %i[manage],
     Study  => %i[manage read update create destroy comment read_reports configure],
     Center => %i[manage read update create destroy comment],
-    Patient => %i[manage read update create destroy comment],
+    Patient => %i[manage read update create destroy comment download_images],
     EmailTemplate => %i[manage read update create destroy],
     ImageSeries => %i[manage read update create destroy comment upload assign_patient assign_visit],
-    Image => %i[manage read update create destroy comment],
+    Image => %i[manage read update create destroy],
     NotificationProfile => %i[manage read update create destroy],
     Notification => %i[manage read update create destroy],
     User => %i[manage read update create destroy generate_keypair],
@@ -19,7 +19,7 @@ class Ability
     PublicKey => %i[manage read update create destroy],
     RequiredSeries => %i[manage read update],
     Role => %i[manage read update create destroy],
-    Visit => %i[manage read update create destroy comment create_from_template update_state assign_required_series read_tqc perform_tqc technical_qc medical_qc],
+    Visit => %i[manage read update create destroy comment download_images create_from_template update_state assign_required_series read_tqc perform_tqc technical_qc medical_qc],
     Version => %i[manage read update create destroy]
   }.freeze
 
