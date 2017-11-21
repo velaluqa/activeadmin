@@ -11,7 +11,7 @@ class Ability
     Patient => %i[manage read update create destroy comment download_images],
     EmailTemplate => %i[manage read update create destroy],
     ImageSeries => %i[manage read update create destroy comment upload assign_patient assign_visit],
-    Image => %i[manage read update create destroy comment],
+    Image => %i[manage read update create destroy],
     NotificationProfile => %i[manage read update create destroy],
     Notification => %i[manage read update create destroy],
     User => %i[manage read update create destroy generate_keypair],
