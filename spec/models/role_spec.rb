@@ -54,6 +54,33 @@ RSpec.describe Role do
     end
   end
 
+  describe '#add_permission' do
+    describe 'for non-existing permission' do
+      before(:each) do
+        @role = create(:role)
+        @role.remove_permission(:read, Study)
+      end
+      it 'adds the new permission to the permissions array' do
+        expect(@role.allows?(:read, Study)).to be_falsy
+      end
+      it 'saves the permission' do
+        expect(@role.permissions.where(activity: :read, subject: Study).exists?).to be_falsy
+      end
+    end
+
+    describe 'for existing permission' do
+      before(:each) do
+        @role = create(:role, with_permissions: { Study => :read })
+        expect(@role.permissions.where(activity: :read, subject: Study).exists?).to be_truthy
+        @role.remove_permission(:read, Study)
+      end
+
+      it 'does nothing' do
+        expect(@role.permissions.where(activity: :read, subject: Study).exists?).to be_falsy
+      end
+    end
+  end
+
   describe '#abilities' do
     before(:each) do
       @role = create(:role, with_permissions: {
