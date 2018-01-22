@@ -30,9 +30,13 @@ Feature: Delete Visits
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I cannot create patients
+    Given I sign in as a user with all permissions
+    But I cannot destroy visits
     When I browse to visits list
+    Then I don't see "FooPatient 10000 Visit Extraordinaire INCOMPLETE, NOT AVAILABLE PENDING ViewDelete"
+    When I browse to visit "10000"
+    Then I don't see "Delete Visit"
+    When I browse to destroy visit "1000"
     Then I see the unauthorized page
 
   Scenario: Successful
