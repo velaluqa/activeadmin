@@ -19,9 +19,8 @@ Feature: Download Patient Images
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read patient
-    And I cannot download_images patient
+    Given I sign in as a user with all permissions
+    But I cannot download_images patient
     When I browse to patient "TestPatient"
     Then I don't see "Download images"
     When I browse to download_images patient "TestPatient"

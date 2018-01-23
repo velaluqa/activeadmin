@@ -16,8 +16,10 @@ Feature: Create Patient
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I cannot create patients
+    Given I sign in as a user with all permissions
+    But I cannot create patients
+    When I browse to patients page
+    Then I don't see "New Patient"
     When I browse to "/admin/patients/new"
     Then I see the unauthorized page
 

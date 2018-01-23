@@ -42,9 +42,8 @@ Feature: Assign Required Series
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read image_series
-    And I cannot assign_required_series visits
+    Given I sign in as a user with all permissions
+    But I cannot assign_required_series visits
     When I browse to visits list
     And I don't see "Assign RS" in "TestSeries1" row
     And I don't see "Assign RS" in "TestSeries2" row

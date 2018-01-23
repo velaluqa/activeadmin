@@ -18,11 +18,10 @@ Feature: Comment Center
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read Center
-    And I cannot comment Center
+    Given I sign in as a user with all permissions
+    But I cannot comment Center
     When I browse to center "TestCenter"
-    Then I don't see "Comment"
+    Then I don't see "COMMENTS (0)"
 
   Scenario: Read Comments
     Given I sign in as a user with role "Image Manager"

@@ -36,8 +36,6 @@ Feature: Delete Visits
     Then I don't see "FooPatient 10000 Visit Extraordinaire INCOMPLETE, NOT AVAILABLE PENDING ViewDelete"
     When I browse to visit "10000"
     Then I don't see "Delete Visit"
-    When I browse to destroy visit "1000"
-    Then I see the unauthorized page
 
   Scenario: Successful
     Given I sign in as a user with role "Image Manager"

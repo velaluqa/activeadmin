@@ -34,9 +34,8 @@ Feature: Download Visit Images
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read visits
-    And I cannot download_images visits
+    Given I sign in as a user with all permissions
+    But I cannot download_images visits
     When I browse to visit "1000"
     Then I don't see "Download images"
     When I browse to download_images visit "1000"
