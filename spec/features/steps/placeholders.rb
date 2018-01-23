@@ -29,6 +29,13 @@ placeholder :admin_path do
       .send("admin_#{page_name.underscore}_path")
   end
 
+  match(/the latest ([^ $]+)/) do |model_name|
+    model_name = model_name.classify
+    record = model_name.constantize.last
+    Rails.application.routes.url_helpers
+      .send("admin_#{model_name.singularize.underscore}_path", record)
+  end
+
   match(/([^ $\n]+) ([^ $]+) "([^$\n]+)"/) do |action, model_name, identifier|
     method = "admin_#{model_name.underscore}_path"
     method = "#{action}_#{method}" if action != 'show'

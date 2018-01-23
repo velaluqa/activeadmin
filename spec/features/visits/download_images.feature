@@ -47,10 +47,10 @@ Feature: Download Visit Images
     When I browse to visit "1000"
     Then I see "Download images"
     When I click link "Download images"
-    Then I am redirected to background_job "1"
+    Then I am redirected to the latest background_job
     And I see "Your download will be available shortly."
     When I wait for all jobs in "DownloadImagesWorker" queue
-    And I browse to background_job "1"
+    And I browse to the latest background_job
     Then I see "Zip file Download"
     When I click link "Download"
     Then I download zip file
