@@ -84,7 +84,7 @@ placeholder :admin_path do
     end
   end
 
-  match(/([^ $\n]+) ([^ $]+)/) do |action, model_name|
+  match(/([^ $\n]+) ([^ $]+)( form)?/) do |action, model_name|
     method = "admin_#{model_name.underscore}_path"
     method = "#{action}_#{method}" if action != 'index'
     Rails.application.routes.url_helpers.send(method)
