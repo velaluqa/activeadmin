@@ -21,7 +21,7 @@ Feature: Center Audit Trail
       | visit   |      10000 |
     And an image for image series "Foo"
 
-  Scenario: Scoped Audit Trail
+  Scenario: Center-specific Audit Trail
     When I sign in as a user with role "Test Role"
     And I browse to center "FooCenter"
     And I click link "Audit Trail" in "#title_bar"

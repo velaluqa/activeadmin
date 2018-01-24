@@ -3,7 +3,7 @@ Feature: User Audit Trail
   As authorized user,
   I want to see only this users changes, the relevant user roles and roles.
 
-  Scenario: Scoped Audit Trail
+  Scenario: User-specific Audit Trail
     Given a role "Test Role" with permissions:
        | Version | read |
     And I sign in as a user with role "Test Role"
