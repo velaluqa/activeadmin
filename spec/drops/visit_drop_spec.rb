@@ -1,21 +1,22 @@
 describe VisitDrop do
-  it { should have_attribute(:id) }
-  it { should have_attribute(:state) }
-  it { should have_attribute(:visit_type) }
-  it { should have_attribute(:visit_number) }
-  it { should have_attribute(:description) }
-  it { VisitDrop.new(create(:visit)).should respond_to(:required_series) }
-  it { should have_attribute(:assigned_image_series_index) }
-  it { should have_attribute(:mqc_comment) }
-  it { should have_attribute(:mqc_date) }
-  it { should have_attribute(:mqc_results) }
-  it { should have_attribute(:mqc_state) }
-  it { should have_attribute(:mqc_version) }
-  it { should have_attribute(:created_at) }
-  it { should have_attribute(:updated_at) }
-  it { should have_attribute(:domino_unid) }
+  specify { expect(VisitDrop.new(create(:visit))).to respond_to(:required_series) }
 
-  it { should belongs_to(:patient) }
-  it { should have_many(:image_series) }
-  it { should belongs_to(:mqc_user) }
+  it { is_expected.to have_attribute(:id) }
+  it { is_expected.to have_attribute(:state) }
+  it { is_expected.to have_attribute(:visit_type) }
+  it { is_expected.to have_attribute(:visit_number) }
+  it { is_expected.to have_attribute(:description) }
+  it { is_expected.to have_attribute(:assigned_image_series_index) }
+  it { is_expected.to have_attribute(:mqc_comment) }
+  it { is_expected.to have_attribute(:mqc_date) }
+  it { is_expected.to have_attribute(:mqc_results) }
+  it { is_expected.to have_attribute(:mqc_state) }
+  it { is_expected.to have_attribute(:mqc_version) }
+  it { is_expected.to have_attribute(:created_at) }
+  it { is_expected.to have_attribute(:updated_at) }
+  it { is_expected.to have_attribute(:domino_unid) }
+
+  it { is_expected.to belongs_to(:patient) }
+  it { is_expected.to have_many(:image_series) }
+  it { is_expected.to belongs_to(:mqc_user) }
 end
