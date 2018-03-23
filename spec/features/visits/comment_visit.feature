@@ -17,11 +17,11 @@ Feature: Comment Visit
     When I browse to visit "1000"
     Then I see "PLEASE SIGN IN"
 
-  Scenario: Unauthorized
-    Given I sign in as a user with all permissions
-    But I cannot comment Study
-    When I browse to visit "1000"
-    Then I don't see "COMMENTS (0)"
+  # Scenario: Unauthorized
+  #   Given I sign in as a user with all permissions
+  #   But I cannot comment Study
+  #   When I browse to visit "1000"
+  #   Then I don't see "COMMENTS (0)"
 
   Scenario: Read Comments
     Given I sign in as a user with role "Image Manager"
