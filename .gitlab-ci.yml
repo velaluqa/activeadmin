@@ -1,8 +1,10 @@
-image: registry.vela/velaluqa/gitlab-ci-build-images:ruby-2.3.4-docker
+image: registry.vela/velaluqa/gitlab-ci-build-images:ruby-2.3.4-docker-compose
 
 variables:
   BUNDLE_GEMFILE: Gemfile-ci
   REGISTRY: registry.velalu.qa
+  COMPOSE_FILE: docker-compose-ci.yml
+  COMPOSE_PROJECT_NAME: $CI_PIPELINE_ID
 
 cache:
   key: 'ruby234'
@@ -14,19 +16,35 @@ before_script:
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.velalu.qa
 
 stages:
-  - deploy
+  - build
+  - test
+  - publish_docs
+  - cleanup
+  - publish_image
 
-run:
-  stage: deploy
+build:
+  stage: build
+  script: docker-compose build test
+
+test:
+  stage: test
+  script: docker-compose run test bundle exec rake db:setup ci
+
+cleanup:
+  stage: cleanup
+  when: always
+  script: docker-compose down
+
+publish_docs:
+  stage: publish_docs
   script:
-    - docker build -t ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} .
-    - docker run --name ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_postgres_${CI_BUILD_ID} -d postgres:9.5
-    - docker run --name ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_redis_${CI_BUILD_ID} -d redis
-    - echo "Waiting for postgres and redis to start up ..." && sleep 15
-    - docker run -t --name ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_test_${CI_BUILD_ID} --link ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_redis_${CI_BUILD_ID}:redis --link ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_postgres_${CI_BUILD_ID}:postgres -e RAILS_ENV=test ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} sh -c 'rm -f config/database.yml && ln -s database.yml.dev config/database.yml && rake db:setup ci'
-    - docker cp ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_test_${CI_BUILD_ID}:/app/reports .
-    - docker rm -f -v ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_test_${CI_BUILD_ID} ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_postgres_${CI_BUILD_ID} ${CI_PROJECT_NAMESPACE}_${CI_PROJECT_NAME}_redis_${CI_BUILD_ID}
     - script/build_manual
-    - docker tag ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_SLUG}
-    - docker push ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_SLUG}
     - bundle exec gitdeploy
+
+publish_image:
+  stage: publish_docs
+  script:
+    - docker tag ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_SLUG}
+    - docker tag ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:latest
+    - docker push ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_SLUG}
+    - docker push ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:latest
