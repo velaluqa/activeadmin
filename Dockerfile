@@ -44,3 +44,9 @@ VOLUME /app
 
 # Add the application code.
 COPY . /app
+
+ENTRYPOINT ["lib/support/docker-entrypoint.sh"]
+
+EXPOSE 3000
+
+CMD ["bin/rails", "s", "-b", "0.0.0.0"]
