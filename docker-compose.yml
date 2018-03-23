@@ -14,15 +14,17 @@ app:
   tty: true
   volumes: &volumes
     - .:/app
-    - ./config/database.yml.dev:/app/config/database.yml
     - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
     - ./tmp:/app/tmp
   ports:
     - 3000:3000
   environment: &environment
-    DB_USERNAME: postgres
-    DB_PASSWORD:
+    RAILS_ENV: development
     TRUSTED_IP: 172.18.0.1
+    # POSTGRES_HOST: postgres
+    # POSTGRES_DATABASE: erica_store_production
+    # POSTGRES_USERNAME: postgres
+    # POSTGRES_PASSWORD:
   links: &links
     - postgres
     - redis
