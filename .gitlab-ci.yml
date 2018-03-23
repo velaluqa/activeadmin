@@ -42,7 +42,7 @@ publish_docs:
     - bundle exec gitdeploy
 
 publish_image:
-  stage: publish_docs
+  stage: publish_image
   script:
     - docker tag ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_SLUG}
     - docker tag ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:latest
