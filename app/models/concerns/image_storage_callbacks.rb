@@ -46,6 +46,7 @@ module ImageStorageCallbacks
     #
     # @return [Boolean] success
     def move_image_storage_dir(old, new)
+      return true if old == new
       FileUtils.mv(old, new)
     rescue SystemCallError => e
       Rails.logger.error "Failed to move image storage directory for #{self} from #{old} to #{new}: #{e}"
@@ -58,7 +59,11 @@ module ImageStorageCallbacks
     #
     # @return [Boolean] success
     def remove_image_storage_dir(path)
-      FileUtils.rm_r(path)
+      if File.exist?(path)
+        FileUtils.rm_r(path)
+      else
+        true
+      end
     rescue SystemCallError => e
       Rails.logger.error "Failed to remove image storage for #{self} at #{path}: #{e}"
       false
