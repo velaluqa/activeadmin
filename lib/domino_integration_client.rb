@@ -12,9 +12,8 @@ class DominoIntegrationClient
     @db_base_url = "#{db_uri.scheme}://#{db_uri.host}:#{db_uri.port}"
     @db_name = db_uri.path[1..-1]
 
-    @databases_resource = RestClient::Resource.new("#{db_base_url}/api/data", user: username, password: password, headers: {accept: 'application/json', content_type: 'application/json'})
-    @documents_resource = RestClient::Resource.new("#{db_url}/api/data/documents", user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
-    @collections_resource = RestClient::Resource.new("#{db_url}/api/data/collections", user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
+    @username = username
+    @password = password
   end
 
   def ensure_document_exists(query, form, create_properties, update_properties)
@@ -41,7 +40,7 @@ class DominoIntegrationClient
       return false
     end
 
-    @documents_resource["unid/#{unid}"].patch(properties.to_json, params: { form: form, computewithform: true }) do |response|
+    documents_resource["unid/#{unid}"].patch(properties.to_json, params: { form: form, computewithform: true }) do |response|
       pp response if response.code == 400
       if response.code == 404
         :'404'
@@ -81,7 +80,7 @@ class DominoIntegrationClient
 
   def get_document_by_unid(unid)
     perform_command do
-      response = @documents_resource["unid/#{unid}"].get
+      response = documents_resource["unid/#{unid}"].get
       JSON.parse(response.body)
     end
   end
@@ -99,15 +98,16 @@ class DominoIntegrationClient
     end
 
     perform_command do
-      response = @documents_resource.get(params: { search: query_string })
+      response = documents_resource.get(params: { search: query_string })
       JSON.parse(response.body)
     end
   end
 
   def create_document(form, properties)
     return nil if readonly?
+
     perform_command do
-      response = @documents_resource.post(
+      response = documents_resource.post(
         properties.to_json,
         params: {
           form: form,
@@ -124,16 +124,18 @@ class DominoIntegrationClient
 
   protected
 
+  attr_reader :username, :password
+
   def list_databases
     perform_command do
-      response = @databases_resource.get
+      response = databases_resource.get
       JSON.parse(response.body)
     end
   end
 
   def list_collections
     perform_command do
-      response = @collections_resource.get
+      response = collections_resource.get
       JSON.parse(response.body)
     end
   end
@@ -146,5 +148,37 @@ class DominoIntegrationClient
     raise CommandError, "Could not authenticate with Domino Server: #{e}"
   rescue RestClient::NotFound => e
     raise CommandError, "Could not list databases for Domino Server: #{e}"
+  end
+
+  def rest_client_options
+    @rest_client_options ||= {
+      user: username,
+      password: password,
+      headers: {
+        accept: 'application/json',
+        content_type: 'application/json'
+      }
+    }
+  end
+
+  def databases_resource
+    @databases_resource ||= RestClient::Resource.new(
+      "#{db_base_url}/api/data",
+      rest_client_options
+    )
+  end
+
+  def documents_resource
+    @documents_resource ||= RestClient::Resource.new(
+      "#{db_url}/api/data/documents",
+      rest_client_options
+    )
+  end
+
+  def collections_resource
+    @collections_resource ||= RestClient::Resource.new(
+      "#{db_url}/api/data/collections",
+      rest_client_options
+    )
   end
 end
