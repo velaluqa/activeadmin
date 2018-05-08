@@ -17,12 +17,10 @@ class DominoIntegrationClient
   end
 
   def ensure_document_exists(query, form, create_properties, update_properties)
-    existing_documents = find_document(query)
-
-    if existing_documents && existing_documents.respond_to?(:length) && !existing_documents.empty?
-      unid = existing_documents[0]['@unid']
+    documents = find_document(query)
+    if documents.first
+      unid = documents.first['@unid']
       update_document(unid, form, update_properties)
-
       unid
     else
       create_document(form, create_properties)
@@ -40,7 +38,7 @@ class DominoIntegrationClient
       return false
     end
 
-    documents_resource["unid/#{unid}"].patch(properties.to_json, params: { form: form, computewithform: true }) do |response|
+    documents_resource["unid/#{unid}"].patch(properties.to_json, form_params(form)) do |response|
       pp response if response.code == 400
       if response.code == 404
         :'404'
@@ -87,18 +85,8 @@ class DominoIntegrationClient
 
   # query is a hash, specifying field name / value pairs
   def find_document(query)
-    if query.is_a?(Hash)
-      query_string = query.map do |field, value|
-        "field #{field} = #{value}"
-      end.join(' and ')
-    elsif query.is_a?(String)
-      query_string = query
-    else
-      return nil
-    end
-
     perform_command do
-      response = documents_resource.get(params: { search: query_string })
+      response = documents_resource.get(search_params(query))
       JSON.parse(response.body)
     end
   end
@@ -107,14 +95,9 @@ class DominoIntegrationClient
     return nil if readonly?
 
     perform_command do
-      response = documents_resource.post(
-        properties.to_json,
-        params: {
-          form: form,
-          computewithform: true
-        }
-      )
-      response.headers[:location].split('/').last if response.code == 201
+      response = documents_resource.post(properties.to_json, form_params(form))
+      return unless response.code == 201
+      response.headers[:location].split('/').last
     end
   end
 
@@ -180,5 +163,33 @@ class DominoIntegrationClient
       "#{db_url}/api/data/collections",
       rest_client_options
     )
+  end
+
+  def form_params(form)
+    {
+      params: {
+        form: form,
+        computewithform: true
+      }
+    }
+  end
+
+  def query_string(query)
+    case query
+    when Hash then
+      query
+        .map { |field, value| "field #{field} = #{value}" }
+        .join(' and ')
+    when String then query
+    else raise "Unable to create query string: #{query.inspect}"
+    end
+  end
+
+  def search_params(query)
+    {
+      params: {
+        search: query_string(query)
+      }
+    }
   end
 end
