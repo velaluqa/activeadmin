@@ -130,7 +130,7 @@ class DominoIntegrationClient
   rescue RestClient::Unauthorized, RestClient::Forbidden => e
     raise CommandError, "Could not authenticate with Domino Server as user #{username}"
   rescue RestClient::NotFound => e
-    raise CommandError, "Could not list databases for Domino Server: #{e}"
+    raise CommandError, "Domino Server reported `File or URL not found`: #{e}"
   end
 
   def rest_client_options

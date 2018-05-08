@@ -25,7 +25,7 @@ RSpec.describe DominoIntegrationClient do
         .to_return(status: 404)
       expect { client.replica_id }.to raise_error(
         DominoIntegrationClient::CommandError,
-        /Could not list databases/
+        /File or URL not found/
       )
     end
 
@@ -57,7 +57,7 @@ RSpec.describe DominoIntegrationClient do
       expect { client.collection_unid('All') }
         .to raise_error(
           DominoIntegrationClient::CommandError,
-          /Could not list databases/
+          /File or URL not found/
         )
     end
 
@@ -89,7 +89,7 @@ RSpec.describe DominoIntegrationClient do
       expect { client.find_document('field abc = 1') }
         .to raise_error(
           DominoIntegrationClient::CommandError,
-          /Could not list databases/
+          /File or URL not found/
         )
     end
 
