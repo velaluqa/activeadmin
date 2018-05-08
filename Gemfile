@@ -119,7 +119,7 @@ gem 'diffy'
 gem 'select2-rails', '~> 4.0.1'
 
 # rest-client gem to access Domino Data Services REST API
-gem 'rest-client'
+gem 'rest-client', '~> 2.0.0'
 
 # Used during GoodImage migration
 # group :goodimage_migration do
