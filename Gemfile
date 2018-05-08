@@ -210,6 +210,7 @@ end
 
 group :test do
   gem 'rspec-sidekiq', github: 'velaluqa/rspec-sidekiq', branch: 'deprecate-have-enqueued-job'
+  gem 'webmock'
 end
 
 group :development, :test do
@@ -254,7 +255,6 @@ group :development, :test do
   gem 'database_cleaner'
   gem 'poltergeist'
   gem 'transactional_capybara'
-  gem 'webmock'
   gem 'yarjuf', '~> 2.0.0'
 
   gem 'spring'
