@@ -1,6 +1,8 @@
 require 'uri'
 
 class DominoIntegrationClient
+  class CommandError < StandardError; end
+
   attr_reader :db_url, :db_base_url, :db_name
 
   def initialize(db_url, username, password)
@@ -79,14 +81,9 @@ class DominoIntegrationClient
   end
 
   def get_document_by_unid(unid)
-    @documents_resource['unid/' + unid].get do |response|
-      if response.code == 200
-        begin
-          JSON.parse(response.body)
-        rescue JSON::JSONError => e
-          raise 'Failed to parse JSON response from Domino server: ' + e.message
-        end
-      end
+    perform_command do
+      response = @documents_resource['unid/' + unid].get
+      JSON.parse(response.body)
     end
   end
 
@@ -102,20 +99,23 @@ class DominoIntegrationClient
       return nil
     end
 
-    @documents_resource.get(params: { search: query_string }) do |response|
-      if response.code == 200
-        begin
-          JSON.parse(response.body)
-        rescue JSON::JSONError => e
-          raise 'Failed to parse JSON response from Domino server: ' + e.message
-        end
-      end
+    perform_command do
+      response = @documents_resource.get(params: { search: query_string })
+      JSON.parse(response.body)
     end
   end
 
   def create_document(form, properties)
     return nil unless Rails.application.config.domino_integration_readonly == false
     @documents_resource.post(properties.to_json, params: { form: form, computewithform: true }) do |response|
+    perform_command do
+      response = @documents_resource.post(
+        properties.to_json,
+        params: {
+          form: form,
+          computewithform: true
+        }
+      )
       response.headers[:location].split('/').last if response.code == 201
     end
   end
@@ -123,26 +123,26 @@ class DominoIntegrationClient
   protected
 
   def list_databases
-    @databases_resource.get do |response|
-      if response.code == 200
-        begin
-          JSON.parse(response.body)
-        rescue JSON::JSONError => e
-          raise 'Failed to parse JSON response from Domino server: ' + e.message
-        end
-      end
+    perform_command do
+      response = @databases_resource.get
+      JSON.parse(response.body)
     end
   end
 
   def list_collections
-    @collections_resource.get do |response|
-      if response.code == 200
-        begin
-          JSON.parse(response.body)
-        rescue JSON::JSONError => e
-          raise 'Failed to parse JSON response from Domino server: ' + e.message
-        end
-      end
+    perform_command do
+      response = @collections_resource.get
+      JSON.parse(response.body)
     end
+  end
+
+  def perform_command
+    yield
+  rescue JSON::JSONError => e
+    raise CommandError, "Could not parse JSON response from Domino server: #{e}"
+  rescue RestClient::Unauthorized, RestClient::Forbidden => e
+    raise CommandError, "Could not authenticate with Domino Server: #{e}"
+  rescue RestClient::NotFound => e
+    raise CommandError, "Could not list databases for Domino Server: #{e}"
   end
 end
