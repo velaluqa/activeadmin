@@ -12,10 +12,9 @@ class DominoIntegrationClient
     @db_base_url = "#{db_uri.scheme}://#{db_uri.host}:#{db_uri.port}"
     @db_name = db_uri.path[1..-1]
 
-    @databases_resource = RestClient::Resource.new(@db_base_url + '/api/data', user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
-
-    @documents_resource = RestClient::Resource.new(@db_url + '/api/data/documents', user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
-    @collections_resource = RestClient::Resource.new(@db_url + '/api/data/collections', user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
+    @databases_resource = RestClient::Resource.new("#{db_base_url}/api/data", user: username, password: password, headers: {accept: 'application/json', content_type: 'application/json'})
+    @documents_resource = RestClient::Resource.new("#{db_url}/api/data/documents", user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
+    @collections_resource = RestClient::Resource.new("#{db_url}/api/data/collections", user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
   end
 
   def ensure_document_exists(query, form, create_properties, update_properties)
@@ -42,7 +41,7 @@ class DominoIntegrationClient
       return false
     end
 
-    @documents_resource['unid/' + unid].patch(properties.to_json, params: { form: form, computewithform: true }) do |response|
+    @documents_resource["unid/#{unid}"].patch(properties.to_json, params: { form: form, computewithform: true }) do |response|
       pp response if response.code == 400
       if response.code == 404
         :'404'
@@ -82,7 +81,7 @@ class DominoIntegrationClient
 
   def get_document_by_unid(unid)
     perform_command do
-      response = @documents_resource['unid/' + unid].get
+      response = @documents_resource["unid/#{unid}"].get
       JSON.parse(response.body)
     end
   end
