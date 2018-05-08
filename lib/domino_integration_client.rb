@@ -128,7 +128,7 @@ class DominoIntegrationClient
   rescue JSON::JSONError => e
     raise CommandError, "Could not parse JSON response from Domino server: #{e}"
   rescue RestClient::Unauthorized, RestClient::Forbidden => e
-    raise CommandError, "Could not authenticate with Domino Server: #{e}"
+    raise CommandError, "Could not authenticate with Domino Server as user #{username}"
   rescue RestClient::NotFound => e
     raise CommandError, "Could not list databases for Domino Server: #{e}"
   end
