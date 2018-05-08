@@ -38,7 +38,7 @@ class DominoIntegrationClient
       else
         properties = { 'ericaID' => properties['ericaID'] }
       end
-    elsif Rails.application.config.domino_integration_readonly == true
+    elsif readonly?
       return false
     end
 
@@ -106,8 +106,7 @@ class DominoIntegrationClient
   end
 
   def create_document(form, properties)
-    return nil unless Rails.application.config.domino_integration_readonly == false
-    @documents_resource.post(properties.to_json, params: { form: form, computewithform: true }) do |response|
+    return nil if readonly?
     perform_command do
       response = @documents_resource.post(
         properties.to_json,
@@ -118,6 +117,10 @@ class DominoIntegrationClient
       )
       response.headers[:location].split('/').last if response.code == 201
     end
+  end
+
+  def readonly?
+    Rails.application.config.domino_integration_readonly == true
   end
 
   protected
