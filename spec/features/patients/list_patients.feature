@@ -14,9 +14,9 @@ Feature: List Patients
       | Patient | read, update, create |
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I cannot read patients
-    When I browse to "/admin/patients"
+    Given I sign in as a user with all permissions
+    But I cannot read patients
+    When I browse to patients list
     Then I see the unauthorized page
 
   Scenario: Image Import Role System-Wide

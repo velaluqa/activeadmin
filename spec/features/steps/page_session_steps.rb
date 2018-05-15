@@ -17,6 +17,11 @@ step 'I sign in as a user' do
   expect(page).to have_content('Signed in successfully')
 end
 
+step 'I sign in as a user with all permissions' do
+  send('I sign in as a user')
+  send('I have permission to perform all actions')
+end
+
 step 'I sign in as a user with role scoped to :model_instance' do |record|
   send('I sign in as a user')
   send('I have a role scoped to :model_instance', record)
@@ -45,11 +50,23 @@ step 'I have a role scoped to :model_instance' do |scope_object|
   send('user :user_instance belongs to role :role_instance scoped to :model_instance', @current_user, @current_user_role, scope_object)
 end
 
+step 'I have permission to perform all actions' do
+  abilities = Ability::ACTIVITIES.flat_map do |subject, val|
+    val.flat_map do |action|
+      next if action == :manage
+      [action, subject.to_s.underscore].join('_').downcase
+    end
+  end.compact
+  @current_user_role.abilities = abilities
+  @current_user_role.save!
+end
+
 step 'I can :activity :subject' do |activity, subject|
   @current_user_role.add_permission(activity, subject)
 end
 
 step 'I cannot :activity :subject' do |activity, subject|
+  @current_user_role.remove_permission(activity, subject)
   expect(@current_user.can?(activity, subject)).to be_falsy
 end
 

@@ -43,10 +43,9 @@ Feature: Batch Assign Required Series
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read visits
-    And I cannot assign_required_series visits
-    When I browse to show visit "10000"
+    Given I sign in as a user with all permissions
+    But I cannot assign_required_series visits
+    When I browse to visit "10000"
     Then I don't see "Assign Required Series"
     When I browse to assign_required_series_form visit "10000"
     Then I see the unauthorized page

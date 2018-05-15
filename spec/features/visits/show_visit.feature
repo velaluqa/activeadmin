@@ -22,8 +22,8 @@ Feature: Show Visit
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I cannot read visits
+    Given I sign in as a user with all permissions
+    But I cannot read visits
     When I browse to visit "10000"
     Then I see the unauthorized page
 

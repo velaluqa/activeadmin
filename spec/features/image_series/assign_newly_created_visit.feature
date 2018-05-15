@@ -37,19 +37,16 @@ Feature: Assign Newly Created Visit
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized to assign visits
-    Given I sign in as a user
-    And I can read image_series
-    And I cannot assign_visit image_series
+    Given I sign in as a user with all permissions
+    But I cannot assign_visit image_series
     When I browse to image_series list
     Then I don't see "Assign Visit"
     When I browse to assign_visit_form image_series "TestSeries"
     Then I see the unauthorized page
 
   Scenario: Unauthorized to create visits
-    Given I sign in as a user
-    And I can read image_series
-    And I can assign_visit image_series
-    And I cannot create visits
+    Given I sign in as a user with all permissions
+    But I cannot create visits
     When I browse to image_series list
     And I follow link "Assign Visit"
     Then I see "ASSIGN VISIT"

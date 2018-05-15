@@ -82,9 +82,12 @@ StudyServer::Application.configure do
 
   config.wado_dicom_prefix = '999.999.999.'
 
-  config.domino_integration_username = 'erica'
-  config.domino_integration_password = 'test'
-  config.domino_integration_readonly = false
+  config.domino_integration_username =
+    ENV['ERICA_DOMINO_USERNAME'] || 'erica'
+  config.domino_integration_password =
+    ENV['ERICA_DOMINO_PASSWORD'] || 'test'
+  config.domino_integration_readonly =
+    ENV['ERICA_DOMINO_READONLY'] == 'true'
 
   config.airbrake_api_key = '21996bca9601d39ad1aa911e03922000'
 

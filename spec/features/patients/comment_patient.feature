@@ -18,11 +18,10 @@ Feature: Comment Patient
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read Patient
-    And I cannot comment Patient
+    Given I sign in as a user with all permissions
+    But I cannot comment Patient
     When I browse to patient "TestPatient"
-    Then I don't see "Comment"
+    Then I don't see "COMMENTS (0)"
 
   Scenario: Read Comments
     Given I sign in as a user with role "Image Manager"

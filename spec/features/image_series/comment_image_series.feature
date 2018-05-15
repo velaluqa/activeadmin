@@ -18,11 +18,10 @@ Feature: Comment Image Series
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read ImageSeries
-    And I cannot comment ImageSeries
+    Given I sign in as a user with all permissions
+    But I cannot comment ImageSeries
     When I browse to image_series "TestSeries"
-    Then I don't see "Comment"
+    Then I don't see "COMMENTS (0)"
 
   Scenario: Read Comments
     Given I sign in as a user with role "Image Manager"

@@ -23,8 +23,8 @@ Feature: List Visits
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I cannot create patients
+    Given I sign in as a user with all permissions
+    But I cannot read visits
     When I browse to visits list
     Then I see the unauthorized page
 

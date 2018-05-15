@@ -18,11 +18,10 @@ Feature: Comment Study
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read Study
-    And I cannot comment Study
+    Given I sign in as a user with all permissions
+    But I cannot comment Study
     When I browse to study "TestStudy"
-    Then I don't see "Comment"
+    Then I don't see "COMMENTS (0)"
 
   Scenario: Read Comments
     Given I sign in as a user with role "Image Manager"

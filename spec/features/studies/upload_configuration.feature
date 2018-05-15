@@ -45,9 +45,8 @@ Feature: Upload Configuration
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read Study
-    And I cannot configure Study
+    Given I sign in as a user with all permissions
+    But I cannot configure Study
     When I browse to study "FooStudy"
     Then I don't see "Upload configuration"
     When I browse to upload_config_form study "FooStudy"

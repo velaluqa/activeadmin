@@ -29,7 +29,9 @@ table_for required_series, sortable: true, class: 'index_table index' do
   column do |required_series|
     result = ''
 
-    result += link_to((required_series.image_series_id.nil? ? 'Assign' : 'Reassign'), assign_required_series_form_admin_visit_path(visit, :required_series_names => required_series.name), :class => 'member_link')
+    if can?(:assign_required_series, required_series)
+      result += link_to((required_series.image_series_id.nil? ? 'Assign' : 'Reassign'), assign_required_series_form_admin_visit_path(visit, :required_series_names => required_series.name), :class => 'member_link')
+    end
     if(qc_result_access)
       result += link_to('Perform tQC', tqc_form_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link') unless(required_series.tqc_state == 'passed' or required_series.assigned_image_series.nil?)
       result += link_to('View tQC results', tqc_results_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link') if(required_series.tqc_state == 'passed' or required_series.tqc_state == 'issues')

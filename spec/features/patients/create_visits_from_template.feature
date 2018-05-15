@@ -48,9 +48,11 @@ Feature: Create Visits From Template
     Then I see "PLEASE SIGN IN"
 
   Scenario: Not authorized
-    Given I sign in as a user
-    And I cannot create_from_template visits
-    When I browse to "/admin/patients/1/create_visits_from_template"
+    Given I sign in as a user with all permissions
+    But I cannot create_from_template visits
+    When I browse to patient "PatientWith"
+    And I don't see "Visits From Template"
+    When I browse to create_visits_from_template patient "PatientWithout"
     Then I see the unauthorized page
 
   Scenario: No Visit Templates available

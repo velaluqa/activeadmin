@@ -306,32 +306,33 @@ JOIN
     return true if domino_db_url.blank?
 
     new_notes_links_base_uri = URI(domino_db_url)
-    begin
-      new_notes_links_base_uri.host = domino_server_name unless domino_server_name.blank?
-    rescue URI::InvalidComponentError => e
-      errors[:domino_server_name] = 'Invalid format: ' + e.message
-      return false
-    end
+    new_notes_links_base_uri.host = domino_server_name unless domino_server_name.blank?
     new_notes_links_base_uri.scheme = 'Notes'
 
-    begin
-      domino_integration_client = DominoIntegrationClient.new(domino_db_url, Rails.application.config.domino_integration_username, Rails.application.config.domino_integration_password)
+    domino_integration_client = DominoIntegrationClient.new(
+      domino_db_url,
+      Rails.application.config.domino_integration_username,
+      Rails.application.config.domino_integration_password
+    )
 
-      replica_id = domino_integration_client.replica_id
-      collection_unid = domino_integration_client.collection_unid('All')
-    rescue Exception => e
-      Rails.logger.warn "Failed to communicate with the Domino server: #{e.message}"
-      errors.add :domino_db_url, "Failed to communicate with the Domino server: #{e.message}"
-    end
+    replica_id = domino_integration_client.replica_id
+    collection_unid = domino_integration_client.collection_unid('All')
 
     if replica_id.nil? || collection_unid.nil?
-      self.notes_links_base_uri = nil
-      false
-    else
-      new_notes_links_base_uri.path = "/#{replica_id}/#{collection_unid}/"
-      self.notes_links_base_uri = new_notes_links_base_uri.to_s
-      true
+      Rails.logger.warn "Failed to communicate with the Domino server: #{e.message}"
+      errors.add :domino_db_url, 'Could not find Domino Replica.'
+      return false
     end
+
+    new_notes_links_base_uri.path = "/#{replica_id}/#{collection_unid}/"
+    self.notes_links_base_uri = new_notes_links_base_uri.to_s
+    true
+  rescue URI::InvalidComponentError => e
+    errors.add :domino_db_url, "Invalid format: #{e.message}"
+    false
+  rescue StandardError => e
+    errors.add :domino_db_url, e.message
+    false
   end
 
   def self.classify_audit_trail_event(c)

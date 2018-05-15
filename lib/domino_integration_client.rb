@@ -1,6 +1,8 @@
 require 'uri'
 
 class DominoIntegrationClient
+  class CommandError < StandardError; end
+
   attr_reader :db_url, :db_base_url, :db_name
 
   def initialize(db_url, username, password)
@@ -10,19 +12,15 @@ class DominoIntegrationClient
     @db_base_url = "#{db_uri.scheme}://#{db_uri.host}:#{db_uri.port}"
     @db_name = db_uri.path[1..-1]
 
-    @databases_resource = RestClient::Resource.new(@db_base_url + '/api/data', user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
-
-    @documents_resource = RestClient::Resource.new(@db_url + '/api/data/documents', user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
-    @collections_resource = RestClient::Resource.new(@db_url + '/api/data/collections', user: username, password: password, headers: { accept: 'application/json', content_type: 'application/json' })
+    @username = username
+    @password = password
   end
 
   def ensure_document_exists(query, form, create_properties, update_properties)
-    existing_documents = find_document(query)
-
-    if existing_documents && existing_documents.respond_to?(:length) && !existing_documents.empty?
-      unid = existing_documents[0]['@unid']
+    documents = find_document(query)
+    if documents.first
+      unid = documents.first['@unid']
       update_document(unid, form, update_properties)
-
       unid
     else
       create_document(form, create_properties)
@@ -36,11 +34,11 @@ class DominoIntegrationClient
       else
         properties = { 'ericaID' => properties['ericaID'] }
       end
-    elsif Rails.application.config.domino_integration_readonly == true
+    elsif readonly?
       return false
     end
 
-    @documents_resource['unid/' + unid].patch(properties.to_json, params: { form: form, computewithform: true }) do |response|
+    documents_resource["unid/#{unid}"].patch(properties.to_json, form_params(form)) do |response|
       pp response if response.code == 400
       if response.code == 404
         :'404'
@@ -54,7 +52,9 @@ class DominoIntegrationClient
     databases = list_databases
     return nil if databases.nil?
 
-    our_database = databases.find { |database| database['@filepath'] == @db_name }
+    our_database = databases.find do |database|
+      database['@filepath'] == @db_name
+    end
     return nil if our_database.nil?
 
     our_database['@replicaid']
@@ -64,7 +64,9 @@ class DominoIntegrationClient
     collections = list_collections
     return nil if collections.nil?
 
-    target_collection = collections.find { |collection| collection['@title'] == collection_name }
+    target_collection = collections.find do |collection|
+      collection['@title'] == collection_name
+    end
     return nil if target_collection.nil?
 
     target_collection['@unid']
@@ -79,70 +81,119 @@ class DominoIntegrationClient
   end
 
   def get_document_by_unid(unid)
-    @documents_resource['unid/' + unid].get do |response|
-      if response.code == 200
-        begin
-          JSON.parse(response.body)
-        rescue JSON::JSONError => e
-          raise 'Failed to parse JSON response from Domino server: ' + e.message
-        end
-      end
+    perform_command do
+      response = documents_resource["unid/#{unid}"].get
+      JSON.parse(response.body)
     end
   end
 
   # query is a hash, specifying field name / value pairs
   def find_document(query)
-    if query.is_a?(Hash)
-      query_string = query.map do |field, value|
-        "field #{field} = #{value}"
-      end.join(' and ')
-    elsif query.is_a?(String)
-      query_string = query
-    else
-      return nil
-    end
-
-    @documents_resource.get(params: { search: query_string }) do |response|
-      if response.code == 200
-        begin
-          JSON.parse(response.body)
-        rescue JSON::JSONError => e
-          raise 'Failed to parse JSON response from Domino server: ' + e.message
-        end
-      end
+    perform_command do
+      response = documents_resource.get(search_params(query))
+      JSON.parse(response.body)
     end
   end
 
   def create_document(form, properties)
-    return nil unless Rails.application.config.domino_integration_readonly == false
-    @documents_resource.post(properties.to_json, params: { form: form, computewithform: true }) do |response|
-      response.headers[:location].split('/').last if response.code == 201
+    return nil if readonly?
+
+    perform_command do
+      response = documents_resource.post(properties.to_json, form_params(form))
+      return unless response.code == 201
+      response.headers[:location].split('/').last
     end
+  end
+
+  def readonly?
+    Rails.application.config.domino_integration_readonly == true
   end
 
   protected
 
+  attr_reader :username, :password
+
   def list_databases
-    @databases_resource.get do |response|
-      if response.code == 200
-        begin
-          JSON.parse(response.body)
-        rescue JSON::JSONError => e
-          raise 'Failed to parse JSON response from Domino server: ' + e.message
-        end
-      end
+    perform_command do
+      response = databases_resource.get
+      JSON.parse(response.body)
     end
   end
 
   def list_collections
-    @collections_resource.get do |response|
-      if response.code == 200
-        begin
-          JSON.parse(response.body)
-        rescue JSON::JSONError => e
-          raise 'Failed to parse JSON response from Domino server: ' + e.message
-        end
-      end
+    perform_command do
+      response = collections_resource.get
+      JSON.parse(response.body)
     end
+  end
+
+  def perform_command
+    yield
+  rescue JSON::JSONError => e
+    raise CommandError, "Could not parse JSON response from Domino server: #{e}"
+  rescue RestClient::Unauthorized, RestClient::Forbidden => e
+    raise CommandError, "Could not authenticate with Domino Server as user #{username}"
+  rescue RestClient::NotFound => e
+    raise CommandError, "Domino Server reported `File or URL not found`: #{e}"
+  end
+
+  def rest_client_options
+    @rest_client_options ||= {
+      user: username,
+      password: password,
+      headers: {
+        accept: 'application/json',
+        content_type: 'application/json'
+      }
+    }
+  end
+
+  def databases_resource
+    @databases_resource ||= RestClient::Resource.new(
+      "#{db_base_url}/api/data",
+      rest_client_options
+    )
+  end
+
+  def documents_resource
+    @documents_resource ||= RestClient::Resource.new(
+      "#{db_url}/api/data/documents",
+      rest_client_options
+    )
+  end
+
+  def collections_resource
+    @collections_resource ||= RestClient::Resource.new(
+      "#{db_url}/api/data/collections",
+      rest_client_options
+    )
+  end
+
+  def form_params(form)
+    {
+      params: {
+        form: form,
+        computewithform: true
+      }
+    }
+  end
+
+  def query_string(query)
+    case query
+    when Hash then
+      query
+        .map { |field, value| "field #{field} = #{value}" }
+        .join(' and ')
+    when String then query
+    else raise "Unable to create query string: #{query.inspect}"
+    end
+  end
+
+  def search_params(query)
+    {
+      params: {
+        search: query_string(query)
+      }
+    }
   end
 end

@@ -56,6 +56,16 @@ SELECT
     permissions << Permission.new(activity: activity, subject: subject)
   end
 
+  # Remove permission from the role quickly.
+  #
+  # @param [Symbol, String] activity The activity to deny
+  # @param [ActiveRecord::Model, String] subject The subject to permit
+  #   activity on
+  def remove_permission(activity, subject)
+    permissions.where(activity: activity, subject: subject).destroy_all
+    permissions.reload
+  end
+
   def allows?(activities, subject)
     subject_string = subject.to_s.underscore
     Array[activities].flatten.any? do |activity|

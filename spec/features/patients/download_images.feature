@@ -1,4 +1,4 @@
-Feature: Download Visit Images
+Feature: Download Patient Images
   In order to retrieve a local copy of images,
   As authorized user for `download_images`,
   I can download an archive of all images of a visit.
@@ -19,9 +19,8 @@ Feature: Download Visit Images
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read patient
-    And I cannot download_images patient
+    Given I sign in as a user with all permissions
+    But I cannot download_images patient
     When I browse to patient "TestPatient"
     Then I don't see "Download images"
     When I browse to download_images patient "TestPatient"
@@ -32,10 +31,10 @@ Feature: Download Visit Images
     When I browse to patient "TestPatient"
     Then I see "Download images"
     When I click link "Download images"
-    Then I am redirected to background_job "1"
+    Then I am redirected to the latest background_job
     And I see "Your download will be available shortly."
     When I wait for all jobs in "DownloadImagesWorker" queue
-    And I browse to background_job "1"
+    And I browse to the latest background_job
     Then I see "Zip file Download"
     When I click link "Download"
     Then I download zip file

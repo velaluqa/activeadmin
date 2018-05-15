@@ -28,8 +28,13 @@ Feature: Update Visit
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I cannot create patients
+    Given I sign in as a user with all permissions
+    But I cannot update visits
+    When I browse to visits list
+    Then I don't see "ViewEditDelete"
+    And I see "ViewDelete"
+    When I browse to visit "10000"
+    Then I don't see "Edit Visit"
     When I browse to edit visit "10000"
     Then I see the unauthorized page
 

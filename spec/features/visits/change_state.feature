@@ -37,9 +37,8 @@ Feature: Change State
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read visits
-    And I cannot update_state visits
+    Given I sign in as a user with all permissions
+    But I cannot update_state visits
     When I browse to show visit "10000"
     Then I don't see "Change State"
     When I browse to edit_state_form visit "10000"

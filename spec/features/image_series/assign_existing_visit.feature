@@ -24,9 +24,8 @@ Feature: Assign Visit
     Then I see "PLEASE SIGN IN"
 
   Scenario: Unauthorized
-    Given I sign in as a user
-    And I can read image_series
-    And I cannot assign_visit image_series
+    Given I sign in as a user with all permissions
+    But I cannot assign_visit image_series
     When I browse to image_series list
     Then I don't see "Assign Visit"
     When I browse to assign_visit_form image_series "TestSeries"

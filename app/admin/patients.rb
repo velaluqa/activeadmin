@@ -300,7 +300,7 @@ ActiveAdmin.register Patient do
     @patient = Patient.find(params[:id])
     @templates = @patient.study.andand.visit_templates
   end
-  action_item :create_visits_from_template, only: :show, if: -> { !resource.study.visit_templates.blank? } do
+  action_item :create_visits_from_template, only: :show, if: -> { can?(:create_from_template, Visit) && !resource.study.visit_templates.blank? } do
     link_to('Visits From Template', create_visits_from_template_admin_patient_path(resource))
   end
 
