@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 7.0.3
+
+*Patches:*
+
+* Bug #3910 - Catch connection errors to IBM Notes server
+
 ## 7.0.2
 
 *Major Changes:* None
