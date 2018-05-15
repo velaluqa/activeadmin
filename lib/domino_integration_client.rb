@@ -52,7 +52,9 @@ class DominoIntegrationClient
     databases = list_databases
     return nil if databases.nil?
 
-    our_database = databases.find { |database| database['@filepath'] == @db_name }
+    our_database = databases.find do |database|
+      database['@filepath'] == @db_name
+    end
     return nil if our_database.nil?
 
     our_database['@replicaid']
@@ -62,7 +64,9 @@ class DominoIntegrationClient
     collections = list_collections
     return nil if collections.nil?
 
-    target_collection = collections.find { |collection| collection['@title'] == collection_name }
+    target_collection = collections.find do |collection|
+      collection['@title'] == collection_name
+    end
     return nil if target_collection.nil?
 
     target_collection['@unid']
