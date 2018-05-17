@@ -338,7 +338,7 @@ JOIN
     errors.add :domino_db_url, "Communication error: #{e.message}"
     false
   rescue StandardError => e
-    errors.add :domino_db_url, e.message
+    errors.add :domino_db_url, "System error: #{e.message}"
     false
   end
 
