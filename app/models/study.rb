@@ -318,11 +318,13 @@ JOIN
     replica_id = domino_integration_client.replica_id
     collection_unid = domino_integration_client.collection_unid('All')
 
-    if replica_id.nil? || collection_unid.nil?
-      errors.add(
-        :domino_db_url,
-        'Could not find Domino Replica or Collection.'
-      )
+    if replica_id.nil?
+      errors.add(:domino_db_url, 'Could not find Domino Replica. Note: Domino Db Url is case-sensitive.')
+      return false
+    end
+
+    if collection_unid.nil?
+      errors.add(:domino_db_url, 'Could not find Domino Collection. Note: Domino Db Url is case-sensitive.')
       return false
     end
 
@@ -332,8 +334,11 @@ JOIN
   rescue URI::InvalidComponentError => e
     errors.add :domino_db_url, "Invalid format: #{e.message}"
     false
+  rescue DominoIntegrationClient::CommandError => e
+    errors.add :domino_db_url, "Communication error: #{e.message}"
+    false
   rescue StandardError => e
-    errors.add :domino_db_url, e.message
+    errors.add :domino_db_url, "System error: #{e.message}"
     false
   end
 
