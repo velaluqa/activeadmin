@@ -319,8 +319,10 @@ JOIN
     collection_unid = domino_integration_client.collection_unid('All')
 
     if replica_id.nil? || collection_unid.nil?
-      Rails.logger.warn "Failed to communicate with the Domino server: #{e.message}"
-      errors.add :domino_db_url, 'Could not find Domino Replica.'
+      errors.add(
+        :domino_db_url,
+        'Could not find Domino Replica or Collection.'
+      )
       return false
     end
 
