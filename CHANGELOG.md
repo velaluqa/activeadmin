@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 7.0.4
+
+*Patches:*
+
+* Bug #3921 - Changing Domino URL fails with unreadable error message
+
 ## 7.0.3
 
 *Patches:*
