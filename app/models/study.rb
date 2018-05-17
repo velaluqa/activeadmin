@@ -334,6 +334,9 @@ JOIN
   rescue URI::InvalidComponentError => e
     errors.add :domino_db_url, "Invalid format: #{e.message}"
     false
+  rescue DominoIntegrationClient::CommandError => e
+    errors.add :domino_db_url, "Communication error: #{e.message}"
+    false
   rescue StandardError => e
     errors.add :domino_db_url, e.message
     false
