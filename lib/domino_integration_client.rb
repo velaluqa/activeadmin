@@ -135,6 +135,9 @@ class DominoIntegrationClient
     raise CommandError, "Could not authenticate with Domino Server as user #{username}"
   rescue RestClient::NotFound => e
     raise CommandError, "Domino Server reported `File or URL not found`: #{e}"
+  rescue RestClient::BadRequest => e
+    err = JSON.parse(e.response)
+    raise CommandError, "Domino Request Error: #{err['code']} #{err['text']}: #{err['message']}"
   end
 
   def rest_client_options

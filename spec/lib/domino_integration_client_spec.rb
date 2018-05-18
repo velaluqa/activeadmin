@@ -29,6 +29,23 @@ RSpec.describe DominoIntegrationClient do
       )
     end
 
+    it 'raises RestClient::RequestFailed error' do
+      stub_request(:get, 'https://username:password@domino-server.local:443/api/data')
+        .to_return(status: 400, body: <<~JSON)
+{
+  "code": 400,
+  "text": "Bad Request",
+  "message": "This is a domino specific message",
+  "data": "domino stack trace"
+}
+JSON
+      expect { client.replica_id }
+        .to raise_error(
+              DominoIntegrationClient::CommandError,
+              /Domino Request Error: 400 Bad Request: This is a domino specific message/
+            )
+    end
+
     it 'raises JSON parsing error' do
       stub_request(:get, 'https://username:password@domino-server.local:443/api/data')
         .to_return(status: 200, body: '{')
@@ -59,6 +76,23 @@ RSpec.describe DominoIntegrationClient do
           DominoIntegrationClient::CommandError,
           /File or URL not found/
         )
+    end
+
+    it 'raises RestClient::RequestFailed error' do
+      stub_request(:get, 'https://username:password@domino-server.local/Pharmtrace/340060.nsf/api/data/collections')
+        .to_return(status: 400, body: <<~JSON)
+{
+  "code": 400,
+  "text": "Bad Request",
+  "message": "This is a domino specific message",
+  "data": "domino stack trace"
+}
+JSON
+      expect { client.collection_unid('All') }
+        .to raise_error(
+              DominoIntegrationClient::CommandError,
+              /Domino Request Error: 400 Bad Request: This is a domino specific message/
+            )
     end
 
     it 'raises JSON parsing error' do
@@ -101,6 +135,23 @@ RSpec.describe DominoIntegrationClient do
           DominoIntegrationClient::CommandError,
           /Could not parse JSON response/
         )
+    end
+
+    it 'raises RestClient::RequestFailed error' do
+      stub_request(:get, 'https://username:password@domino-server.local/Pharmtrace/340060.nsf/api/data/documents?search=field%20abc%20=%201')
+        .to_return(status: 400, body: <<~JSON)
+{
+  "code": 400,
+  "text": "Bad Request",
+  "message": "This is a domino specific message",
+  "data": "domino stack trace"
+}
+JSON
+      expect { client.find_document('field abc = 1') }
+        .to raise_error(
+              DominoIntegrationClient::CommandError,
+              /Domino Request Error: 400 Bad Request: This is a domino specific message/
+            )
     end
 
     it 'creates query string for search params from hash' do
