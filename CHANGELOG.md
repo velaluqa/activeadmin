@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 7.0.5
+
+*Patches:*
+
+* Bug #3926 - Domino Sync fails with 400 Bad Request for ABX
+* Patch #3927 - Provide more information for RestClient::BadRequest
+* Patch #3928 - Wrap `update document` in `perform command` block
+
 ## 7.0.4
 
 *Patches:*
