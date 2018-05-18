@@ -38,12 +38,15 @@ class DominoIntegrationClient
       return false
     end
 
-    documents_resource["unid/#{unid}"].patch(properties.to_json, form_params(form)) do |response|
-      pp response if response.code == 400
-      if response.code == 404
+    perform_command do
+      begin
+        result = documents_resource["unid/#{unid}"].patch(properties.to_json, form_params(form))
+        result.code == 200
+      rescue RestClient::NotFound
         :'404'
-      else
-        response.code == 200
+      rescue RestClient::BadRequest => e
+        pp e.response
+        false
       end
     end
   end
@@ -135,6 +138,9 @@ class DominoIntegrationClient
     raise CommandError, "Could not authenticate with Domino Server as user #{username}"
   rescue RestClient::NotFound => e
     raise CommandError, "Domino Server reported `File or URL not found`: #{e}"
+  rescue RestClient::BadRequest => e
+    err = JSON.parse(e.response)
+    raise CommandError, "Domino Request Error: #{err['code']} #{err['text']}: #{err['message']}"
   end
 
   def rest_client_options
