@@ -38,12 +38,15 @@ class DominoIntegrationClient
       return false
     end
 
-    documents_resource["unid/#{unid}"].patch(properties.to_json, form_params(form)) do |response|
-      pp response if response.code == 400
-      if response.code == 404
+    perform_command do
+      begin
+        result = documents_resource["unid/#{unid}"].patch(properties.to_json, form_params(form))
+        result.code == 200
+      rescue RestClient::NotFound
         :'404'
-      else
-        response.code == 200
+      rescue RestClient::BadRequest => e
+        pp e.response
+        false
       end
     end
   end
