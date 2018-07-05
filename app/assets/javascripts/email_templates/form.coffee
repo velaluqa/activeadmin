@@ -12,7 +12,7 @@ $ ->
 
   refreshPreview = ->
     success = (response) ->
-      $('#preview')[0].srcdoc = response.result
+      window.srcDoc.set($('#preview')[0], response.result)
       editor.session.setAnnotations([])
       $('.iframe-wrapper').toggleClass('loading', false)
 

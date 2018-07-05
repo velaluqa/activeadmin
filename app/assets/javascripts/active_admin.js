@@ -20,6 +20,7 @@
 //= require extensions
 //= require vendor/polyfill_setAsap
 //= require vendor/polyfill_promise
+//= require vendor/polyfill_srcdoc.min
 //= require vendor/naturalSort
 //= require vendor/Chart.bundle
 //= require vendor/Chart.even-tick-distribution
