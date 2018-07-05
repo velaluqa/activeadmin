@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 7.0.6
+
+*Patches:*
+
+* Bug #3877 - Fix width of select boxes in resource forms
+* Bug #4028 - Fix filter by study, center or patient in record lists
+* Bug #4029 - Fix overlapping selectbox in email template form
+* Bug #4030 - Fix EmailTemplate preview via EDGE browser
+
 ## 7.0.5
 
 *Patches:*
