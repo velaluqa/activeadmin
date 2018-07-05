@@ -123,14 +123,16 @@ body.admin_email_templates {
   form .inputs li .select2.select2-container {
     margin-right: 4px;
   }
-  fieldset {
-    .select2 {
-      float: right;
-    }
+  .preview {
+    fieldset {
+      .select2 {
+	float: right;
+      }
 
-    .string.input {
-      label {
-	margin-left: 15px;
+      .string.input {
+	label {
+	  margin-left: 15px;
+	}
       }
     }
   }
