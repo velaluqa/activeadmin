@@ -2,8 +2,6 @@
 @import "select2-bootstrap-theme";
 
 .select2-container--bootstrap {
-  width: 100% !important;
-
   .select2-selection {
     @include box-shadow(0 0 !important);
   }
