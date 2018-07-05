@@ -12,6 +12,10 @@
 }
 
 .filter_form {
+  .select2-container--bootstrap {
+    width: 100% !important;
+  }
+
   .filter_form_field {
     @extend .form-group-sm;
     margin-bottom: 10px;
