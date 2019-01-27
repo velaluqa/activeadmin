@@ -7,10 +7,12 @@ services:
     image: redis:3.2
   test:
     build: .
-    image: ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF}
+    image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
     command: 'rake setup:db ci'
     environment:
       RAILS_ENV: test
+    volumes:
+      - ${DOCKER_PWD:-.}/reports:/app/reports
     links:
       - postgres
       - redis

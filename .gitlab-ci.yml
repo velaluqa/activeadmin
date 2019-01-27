@@ -2,25 +2,8 @@ image: registry.vela/velaluqa/gitlab-ci-build-images:ruby-2.3.4-docker-compose
 
 variables:
   BUNDLE_GEMFILE: Gemfile-ci
-  REGISTRY: registry.velalu.qa
   COMPOSE_FILE: docker-compose-ci.yml
   COMPOSE_PROJECT_NAME: $CI_PIPELINE_ID
-
-cache:
-  key: 'ruby234'
-  paths:
-    - vendor/bundle
-
-before_script:
-  - bundle install -j $(nproc) --deployment
-  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.velalu.qa
-
-stages:
-  - build
-  - test
-  - publish_docs
-  - cleanup
-  - publish_image
 
 build:
   stage: build
@@ -28,23 +11,34 @@ build:
 
 test:
   stage: test
-  script: docker-compose run test bundle exec rake db:setup ci
-
-cleanup:
-  stage: cleanup
-  when: always
-  script: docker-compose down
-
-publish_docs:
-  stage: publish_docs
   script:
+    - export DOCKER_PWD=$(echo /cache/$(hostname)/*/${CI_PROJECT_NAME}/ | awk '{sub(/^\/cache/,"/srv/build-cache")}1')
+    - docker-compose run test bundle exec rake db:setup ci
+  after_script:
+    - docker-compose down
+  artifacts:
+    paths:
+      - reports
+
+docs:publish:
+  stage: deploy
+  cache:
+    key: 'ruby234'
+    paths:
+      - vendor/bundle
+  before_script:
+    - bundle install -j $(nproc) --deployment
+  script:
+    - export DOCKER_PWD=$(echo /cache/$(hostname)/*/${CI_PROJECT_NAME}/ | awk '{sub(/^\/cache/,"/srv/build-cache")}1')
     - script/build_manual
     - bundle exec gitdeploy
 
-publish_image:
-  stage: publish_image
+image:publish:
+  stage: deploy
   script:
-    - docker tag ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_SLUG}
-    - docker tag ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF} ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:latest
-    - docker push ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_SLUG}
-    - docker push ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:latest
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+    - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+  after_script:
+    - docker rmi ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+  dependencies: []
