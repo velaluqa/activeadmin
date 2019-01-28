@@ -17,7 +17,7 @@ RUN apt-get update -qq && \
     postgresql-client \
     graphviz \
     dcmtk
-RUN gem install bundler
+RUN gem install bundler -N -v '< 2'
 
 RUN mkdir -p /tmp/phantomjs && \
     curl -L https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 | tar -xj --strip-components=1 -C /tmp/phantomjs && \
