@@ -186,7 +186,7 @@ group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
   # Chrome extension to get meta info for the current request.
-  gem 'meta_request', '~> 0.4.0'
+  gem 'meta_request'
   # Generate UML diagrams for the database.
   gem 'railroady'
   gem 'rails-erd'
@@ -198,7 +198,7 @@ group :development do
   gem 'binding_of_caller'
 
   # Catching mails and serving them locally via a web interface.
-  gem 'letter_opener_web', '~> 1.2.0'
+  gem 'letter_opener_web'
 end
 
 group :test do
@@ -246,24 +246,26 @@ group :development, :test do
   gem 'database_cleaner'
   gem 'poltergeist'
   gem 'transactional_capybara'
-  gem 'yarjuf', '~> 2.0.0'
+  gem 'yarjuf'
 
   gem 'spring'
   gem 'spring-commands-rspec'
 
-  gem 'rspec', '~> 3.4.0'
-  gem 'rspec-mocks', '~> 3.4.1'
-  gem 'rspec-rails', '~> 3.4.2'
+  gem 'rspec'
+  gem 'rspec-mocks'
+  gem 'rspec-rails'
   gem 'shoulda-matchers'
-  gem 'with_model', '~> 1.2.1'
+  gem 'with_model'
   # Spec delegation via ActiveSupport's #delegate method.
   gem 'delegate_matcher'
   gem 'timecop'
 
-  gem 'gherkin', '~> 2.5'
-  gem 'turnip'
+  gem 'gherkin'
+  # Installs 2.0.1 with non-working gherkin 6 without a version
+  # constraint
+  gem 'turnip', '~> 3.1'
 
-  gem 'guard', '~> 2.13.0'
+  gem 'guard'
   gem 'guard-livereload'
   gem 'guard-rspec'
 
