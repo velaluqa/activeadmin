@@ -242,6 +242,7 @@ group :development, :test do
   gem 'yard-activesupport-concern', require: false
 
   gem 'capybara'
+  gem 'puma' # for capybara
   gem 'capybara-screenshot'
   gem 'database_cleaner'
   gem 'poltergeist'

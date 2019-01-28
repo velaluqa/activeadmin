@@ -21,6 +21,8 @@ Capybara.asset_host = 'http://localhost:3000'
 require 'capybara/poltergeist'
 Capybara.javascript_driver = :poltergeist
 Capybara.default_driver = :poltergeist
+Capybara.server = :puma, { Silent: true }
+
 
 # Capybara starts the webserver in another thread. Running feature
 # specs/steps with AJAX requests may result in race conditions.
