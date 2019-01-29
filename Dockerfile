@@ -16,7 +16,9 @@ RUN apt-get update -qq && \
     cmake \
     postgresql-client \
     graphviz \
-    dcmtk
+    dcmtk \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 RUN gem install bundler -N -v '< 2'
 
 RUN mkdir -p /tmp/phantomjs && \
