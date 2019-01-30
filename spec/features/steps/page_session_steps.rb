@@ -119,8 +119,16 @@ step 'I see :string' do |content|
   expect(page).to have_content(content, normalize_ws: true)
 end
 
+step 'I see :string within :string' do |content, locator|
+  expect(page.find(locator)).to have_content(content, normalize_ws: true)
+end
+
 step 'I don\'t see :string' do |content|
   expect(page).not_to have_content(content, normalize_ws: true)
+end
+
+step 'I don\'t see :string within :string' do |content, locator|
+  expect(page.find(locator)).not_to have_content(content, normalize_ws: true)
 end
 
 step 'I am redirected to :admin_path' do |path|
