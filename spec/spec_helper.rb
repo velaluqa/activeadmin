@@ -16,7 +16,7 @@ require 'capybara-screenshot/rspec'
 # respective assets when opening failing pages.
 
 Capybara.register_driver(:selenium) do |app|
-  Capybara::Selenium::Driver.new(
+  driver = Capybara::Selenium::Driver.new(
     app,
     browser: :remote,
     url: ENV.fetch('SELENIUM_DRIVER_URL'),
@@ -27,6 +27,12 @@ Capybara.register_driver(:selenium) do |app|
     ),
     http_client: Selenium::WebDriver::Remote::Http::Default.new
   )
+  # Taken from https://github.com/teamcapybara/capybara/blob/12c065154809cc1ea075753e54b3eb51477a748a/spec/selenium_spec_chrome_remote.rb#L56
+  driver.browser.file_detector = lambda do |args|
+    str = args.first.to_s
+    str if File.exist?(str)
+  end
+  driver
 end
 Capybara.default_driver = :selenium # Same effect like a @javascript tag everywhere
 Capybara.server = :puma, { Silent: true }
