@@ -182,5 +182,15 @@ step 'I wait for all jobs in :string queue' do |queue|
 end
 
 step 'I download zip file' do
-  expect(page.response_headers['Content-Type']).to eq "application/zip"
+  clear_downloads_js = "document.querySelector('downloads-manager').shadowRoot.querySelector('downloads-toolbar').shadowRoot.querySelector('button.clear-all').click()"
+  download_count_js = "document.querySelector('downloads-manager').shadowRoot.querySelectorAll('downloads-item').length"
+  no_downloads_el_js = "document.querySelector('downloads-manager').shadowRoot.querySelector('#no-downloads')"
+
+  page.driver.browser.get('chrome://downloads/')
+  download_count = page.evaluate_script(download_count_js)
+  expect(download_count).to eq(1)
+  expect(page).to have_content(".zip\n")
+  page.evaluate_script(clear_downloads_js)
+  no_downloads_el = page.evaluate_script(no_downloads_el_js)
+  expect(no_downloads_el[:hidden]).to be_falsy
 end
