@@ -245,7 +245,7 @@ group :development, :test do
   gem 'puma' # for capybara
   gem 'capybara-screenshot'
   gem 'database_cleaner'
-  gem 'poltergeist'
+  gem 'selenium-webdriver'
   gem 'transactional_capybara'
   gem 'yarjuf'
 

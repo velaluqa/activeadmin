@@ -11,8 +11,16 @@ services:
     command: 'rake setup:db ci'
     environment:
       RAILS_ENV: test
+      SELENIUM_DRIVER_URL: http://chrome:4444/wd/hub
     volumes:
       - ${DOCKER_PWD:-.}/reports:/app/reports
     links:
       - postgres
       - redis
+      - chrome
+  chrome:
+    image: selenium/standalone-chrome
+    environment:
+      SCREEN_WIDTH: 1920
+      SCREEN_HEIGHT: 1080
+    shm_size: 2GB

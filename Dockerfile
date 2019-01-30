@@ -21,12 +21,6 @@ RUN apt-get update -qq && \
     && rm -rf /var/lib/apt/lists/*
 RUN gem install bundler -N -v '< 2'
 
-RUN mkdir -p /tmp/phantomjs && \
-    curl -L https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 | tar -xj --strip-components=1 -C /tmp/phantomjs && \
-    mv /tmp/phantomjs/bin/phantomjs /usr/local/bin && \
-    chmod +x /usr/local/bin/phantomjs && \
-    rm -rf /tmp/phantomjs
-
 # Set the locale
 RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && \
     locale-gen

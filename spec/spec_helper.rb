@@ -14,15 +14,25 @@ require 'capybara/rails'
 require 'capybara-screenshot/rspec'
 # Add <base> to saved HTML pages so that the browser can load
 # respective assets when opening failing pages.
-Capybara.asset_host = 'http://localhost:3000'
 
-# Poltergeist is a headless webkit implementation and can be plugged
-# into capybara.
-require 'capybara/poltergeist'
-Capybara.javascript_driver = :poltergeist
-Capybara.default_driver = :poltergeist
+Capybara.register_driver(:selenium) do |app|
+  Capybara::Selenium::Driver.new(
+    app,
+    browser: :remote,
+    url: ENV.fetch('SELENIUM_DRIVER_URL'),
+    desired_capabilities: Selenium::WebDriver::Remote::Capabilities.chrome(
+      chromeOptions: {
+        args: %w[start-maximized no-sandbox disable-gpu]
+      }
+    ),
+    http_client: Selenium::WebDriver::Remote::Http::Default.new
+  )
+end
+Capybara.default_driver = :selenium # Same effect like a @javascript tag everywhere
 Capybara.server = :puma, { Silent: true }
-
+Capybara.server_host = Socket.ip_address_list.detect{ |addr| addr.ipv4_private? }.ip_address
+Capybara.server_port = 3000
+Capybara.app_host = "http://#{Capybara.server_host}:#{Capybara.server_port}"
 
 # Capybara starts the webserver in another thread. Running feature
 # specs/steps with AJAX requests may result in race conditions.
@@ -35,6 +45,13 @@ require 'rack/test'
 require 'yarjuf'
 
 require 'webmock/rspec'
+selenium_remote_uri = URI.parse(ENV.fetch('SELENIUM_DRIVER_URL'))
+WebMock.disable_net_connect!(
+  allow: [
+    "#{selenium_remote_uri.host}:#{selenium_remote_uri.port}",
+    Capybara.app_host
+  ]
+)
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
@@ -130,14 +147,6 @@ RSpec.configure do |config|
       example.run
     end
     ::PaperTrail.whodunnit = nil
-  end
-
-  # Disable webmock in feature test.
-  config.before(type: :feature) do
-    WebMock.allow_net_connect!
-  end
-  config.after(type: :feature) do
-    WebMock.disable_net_connect!
   end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
