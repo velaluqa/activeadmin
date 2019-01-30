@@ -132,7 +132,7 @@ step 'I click link :string' do |locator|
 end
 
 step 'I follow link :string' do |locator|
-  page.find_link(locator).trigger('click')
+  page.click_link(locator)
 end
 
 step 'I click link :string in :string' do |locator, selector|
@@ -144,7 +144,7 @@ end
 step 'I click :string in :string row' do |locator, row_content|
   page.all('tr').each do |td|
     next unless td.text.include?(row_content)
-    td.find_link(locator).trigger('click')
+    td.click_link(locator)
   end
 end
 
