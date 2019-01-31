@@ -19,6 +19,7 @@ test:
   artifacts:
     paths:
       - reports
+      - tmp/capybara
 
 docs:publish:
   stage: deploy
