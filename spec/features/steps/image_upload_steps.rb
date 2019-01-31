@@ -12,9 +12,7 @@ end
 
 step 'I select :string for upload' do |series|
   page.all('tr').each do |tr|
-    if tr.text.include?(series)
-      tr.find('td.upload-flag input').set('true')
-    end
+    tr.check if tr.text.include?(series)
   end
 end
 
