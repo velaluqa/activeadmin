@@ -1,5 +1,13 @@
 step 'I select a DICOM folder for :string' do |field_name|
-  attach_file(field_name, Rails.root.join('spec/files/dicom_upload_test/IM-0001-0001.dcm').to_s)
+  # Selenium cannot handle a directory, this option is non-standard,
+  # though.
+  field_id = find_field(field_name, visible: :all)[:id]
+  page.execute_script("document.getElementById('#{field_id}').webkitdirectory = false")
+  attach_file(
+    field_name,
+    Dir[Rails.root.join('spec/files/dicom_upload_test/*')],
+    visible: :all
+  )
 end
 
 step 'I select :string for upload' do |series|
