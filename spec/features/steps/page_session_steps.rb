@@ -195,10 +195,19 @@ step 'I download zip file' do
   no_downloads_el_js = "document.querySelector('downloads-manager').shadowRoot.querySelector('#no-downloads')"
 
   page.driver.browser.get('chrome://downloads/')
-  download_count = page.evaluate_script(download_count_js)
+  ts = Time.now
+  begin
+    sleep(0.1)
+    download_count = page.evaluate_script(download_count_js)
+  end until Time.now - ts > Capybara.default_max_wait_time ||
+            download_count == 1 || !sleep(0.1)
   expect(download_count).to eq(1)
   expect(page).to have_content(".zip\n")
   page.evaluate_script(clear_downloads_js)
-  no_downloads_el = page.evaluate_script(no_downloads_el_js)
+  ts = Time.now
+  begin
+    no_downloads_el = page.evaluate_script(no_downloads_el_js)
+  end until Time.now - ts > Capybara.default_max_wait_time ||
+            !no_downloads_el[:hidden] || !sleep(0.1)
   expect(no_downloads_el[:hidden]).to be_falsy
 end
