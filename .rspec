@@ -1,1 +1,1 @@
---colour --format progress --tag ~slow -r turnip/rspec
+--colour --format ValidationReport::RSpec::Formatter --tag ~slow -r turnip/rspec

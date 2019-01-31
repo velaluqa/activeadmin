@@ -1,3 +1,5 @@
+require 'validation_report/validation_report'
+
 if ENV['COVERAGE']
   require 'simplecov'
   SimpleCov.command_name 'RSpec'
@@ -114,6 +116,7 @@ RSpec.configure do |config|
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.include FactoryGirl::Syntax::Methods
   config.include Devise::TestHelpers, type: :controller
+  config.include ValidationReport::RSpec::Helper
   config.extend ControllerMacros, type: :controller
   config.extend WithModel
 

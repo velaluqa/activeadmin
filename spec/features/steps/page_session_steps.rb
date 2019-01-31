@@ -10,11 +10,15 @@ step 'I sign in as a user' do
                                      with_user_roles: [@current_user_role])
   visit('/users/sign_in')
   within('#new_user') do
+    validation_report_screenshot
     fill_in 'Username', with: 'testuser'
+    validation_report_screenshot
     fill_in 'Password', with: 'password'
+    validation_report_screenshot
   end
   click_button 'Sign in'
   expect(page).to have_content('Signed in successfully')
+  validation_report_screenshot
 end
 
 step 'I sign in as a user with all permissions' do
@@ -117,18 +121,22 @@ end
 
 step 'I see :string' do |content|
   expect(page).to have_content(content, normalize_ws: true)
+  validation_report_screenshot
 end
 
 step 'I see :string within :string' do |content, locator|
   expect(page.find(locator)).to have_content(content, normalize_ws: true)
+  validation_report_screenshot
 end
 
 step 'I don\'t see :string' do |content|
   expect(page).not_to have_content(content, normalize_ws: true)
+  validation_report_screenshot
 end
 
 step 'I don\'t see :string within :string' do |content, locator|
   expect(page.find(locator)).not_to have_content(content, normalize_ws: true)
+  validation_report_screenshot
 end
 
 step 'I am redirected to :admin_path' do |path|
