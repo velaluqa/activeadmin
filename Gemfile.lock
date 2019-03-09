@@ -765,7 +765,7 @@ DEPENDENCIES
   bundler-audit
   cancancan (~> 1.13.1)
   capybara
-  capybara-screenshot
+  capybara-screenshot (= 1.0.22)
   coderay
   coffee-rails (~> 4.1.1)
   database_cleaner
@@ -864,7 +864,7 @@ DEPENDENCIES
   timecop
   trailblazer-rails
   transactional_capybara
-  turnip (~> 3.1)
+  turnip (= 3.1.0)
   uglifier (>= 1.0.3)
   ultraviolet
   unicorn (~> 5.1.0)

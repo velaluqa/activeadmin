@@ -243,7 +243,10 @@ group :development, :test do
 
   gem 'capybara'
   gem 'puma' # for capybara
-  gem 'capybara-screenshot'
+
+  # Lock capybara-screenshot because it's being monkey-patched for the
+  # validation report
+  gem 'capybara-screenshot', '1.0.22'
   gem 'database_cleaner'
   gem 'selenium-webdriver'
   gem 'transactional_capybara'
@@ -264,7 +267,10 @@ group :development, :test do
   gem 'gherkin'
   # Installs 2.0.1 with non-working gherkin 6 without a version
   # constraint
-  gem 'turnip', '~> 3.1'
+  #
+  # Lock turnip because it's being monkey-patched for the validation
+  # report
+  gem 'turnip', '3.1.0'
 
   gem 'guard'
   gem 'guard-livereload'
