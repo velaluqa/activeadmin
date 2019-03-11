@@ -22,7 +22,10 @@ module ValidationReport
   end
 
   def self.add_feature(feature:, filename:)
-    @features << Feature.new(turnip_feature: feature, file_path: filename)
+    @features << Feature.new(
+      turnip_feature: feature,
+      file_path: Pathname.new(filename).relative_path_from(Rails.root)
+    )
   end
 
   def self.current_turnip_step=(turnip_step)
@@ -81,7 +84,12 @@ module ValidationReport
       md << "#{feature.description}\n"
       feature.scenarios.each do |scenario|
         md << "\n#### #{feature.name} :: #{scenario.name}\n\n"
-        md << "Steps compilation changed with version x.x.x\n"
+        v = scenario.last_change_version
+        if v == :unreleased
+          md << "Scenario definition unreleased\n"
+        else
+          md << "Scenario definition changed with version #{v}\n"
+        end
         v = scenario.last_change_version_of_step_definitions
         if v == :unreleased
           md << "Step definitions unreleased\n"
