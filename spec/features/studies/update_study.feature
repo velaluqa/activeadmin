@@ -28,7 +28,7 @@ Feature: Update Study
     When I browse to study "FooStudy"
     And I follow link "Edit Study"
     Then I see "Edit Study"
-    When I fill in "Updated Study" for "Name*"
+    When I fill in "Name*" with "Updated Study"
     And I click the "Update Study" button
     Then I am redirected to study "Updated Study"
     And I see "Name Updated Study"

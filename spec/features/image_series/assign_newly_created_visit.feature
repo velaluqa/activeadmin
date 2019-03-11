@@ -60,9 +60,9 @@ Feature: Assign Newly Created Visit
     Then I see "ASSIGN VISIT"
     And I see "WHEN CREATING A NEW VISIT"
     When I select "Create New Visit" from "Visit"
-    And I fill in "20000" for "Visit number"
+    And I fill in "Visit number" with "20000"
     And I select "followup" from "Visit type"
-    And I fill in "Newly created visit" for "Description"
+    And I fill in "Description" with "Newly created visit"
     And I click the "Assign Visit" button
     Then I am redirected to image_series list
     And I see "#20000"

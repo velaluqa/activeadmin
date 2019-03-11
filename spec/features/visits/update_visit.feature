@@ -52,7 +52,7 @@ Feature: Update Visit
     Given I sign in as a user with role "Image Manager"
     When I browse to edit visit "10000"
     Then I see "Edit Visit"
-    When I fill in "10001" for "Visit number"
+    When I fill in "Visit number" with "10001"
     And I click the "Update Visit" button
     Then I am redirected to visit "10001"
     And I see "Visit Number 10001"
@@ -62,7 +62,7 @@ Feature: Update Visit
     Given I sign in as a user with role "Image Manager"
     When I browse to edit visit "10000"
     Then I see "Edit Visit"
-    When I fill in "Some Description" for "Description"
+    When I fill in "Description" with "Some Description"
     And I click the "Update Visit" button
     Then I am redirected to visit "10000"
     And I see "Description Some Description"

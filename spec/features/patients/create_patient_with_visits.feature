@@ -123,7 +123,7 @@ Feature: Create Patient With Visits
     When I browse to "/admin/patients/new"
     And I select "CenterEnforce" from "Center"
     Then I see "Enforced Visit Description"
-    When I fill in "PatientEnforce" for "Subject"
+    When I fill in "Subject" with "PatientEnforce"
     And I click the "Create Patient" button
     Then I see "Patient was successfully created"
     When I browse to "/admin/visits"
@@ -143,7 +143,7 @@ Feature: Create Patient With Visits
     When I browse to "/admin/patients/new"
     And I select "CenterEnforce" from "Center"
     Then I see "Enforced Visit Description"
-    When I fill in "PatientEnforce" for "Subject"
+    When I fill in "Subject" with "PatientEnforce"
     And I click the "Create Patient" button
     Then I see "Patient was successfully created"
     When I browse to "/admin/visits"
@@ -157,7 +157,7 @@ Feature: Create Patient With Visits
     And I select "CenterDefault" from "Center"
     Then I see "Default Preset"
     And I see "Default Visit Description"
-    When I fill in "PatientDefault" for "Subject"
+    When I fill in "Subject" with "PatientDefault"
     And I click the "Create Patient" button
     Then I see "Patient was successfully created"
     When I browse to "/admin/visits"
@@ -169,7 +169,7 @@ Feature: Create Patient With Visits
     And I can create_from_template visits
     When I browse to "/admin/patients/new"
     And I select "CenterOptional" from "Center"
-    When I fill in "PatientOptional" for "Subject"
+    When I fill in "Subject" with "PatientOptional"
     And I select "Option 1 Preset" from "From Template"
     Then I see "Option 1 Visit Description"
     When I click the "Create Patient" button
