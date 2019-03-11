@@ -7,9 +7,13 @@ module ValidationReport
     end
 
     def steps
-      @steps ||= (@turnip_backgrounds.map(&:steps).flatten +
-                  @turnip_scenario.steps).map do |turnip_step|
-        turnip_step.instance_eval { @root_step }
+      @steps ||= begin
+        steps = (@turnip_backgrounds.map(&:steps).flatten +
+            @turnip_scenario.steps).map do |turnip_step|
+          turnip_step.instance_eval { @root_step }
+        end
+        steps.compact!
+        steps
       end
     end
 
