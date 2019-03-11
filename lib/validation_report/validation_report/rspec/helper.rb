@@ -4,8 +4,10 @@ module ValidationReport
   module RSpec
     module Helper
       def validation_report_screenshot
-        image_path = make_screenshot
-        ValidationReport.attach_screenshot(image_path)
+        if ValidationReport.enabled?
+          image_path = make_screenshot
+          ValidationReport.attach_screenshot(image_path)
+        end
       end
 
       private

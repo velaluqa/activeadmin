@@ -17,6 +17,10 @@ module ValidationReport
     FileUtils.mkdir_p(@tmp_path)
   end
 
+  def self.enabled?
+    !@tmp_path.nil?
+  end
+
   def self.tmp_path
     @tmp_path
   end
