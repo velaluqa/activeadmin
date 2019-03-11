@@ -75,9 +75,13 @@ module ValidationReport
   end
 
   def self.generate(rspec_example_notifications)
+    application_name = Rails.application.class.parent_name
+    application_version = `git describe --tags 2>&1`.strip
+
     # Generate markdown
     md = File.open(@tmp_path.join('validation_report.md'), 'w')
-    md << "# Automated Validation Report for xxx x.x.x\n"
+    md << '# Automated Validation Report for ' +
+          "#{application_name} #{application_version}\n"
     md << "\n## Version History\n\n"
     versions.each do |version|
       md << "* #{version}\n"
