@@ -4,6 +4,7 @@ end
 
 step 'I fill in :string for :string' do |value, field|
   fill_in(field, with: value)
+  validation_report_screenshot
 end
 
 step 'I click the :string button' do |locator|
@@ -12,10 +13,12 @@ end
 
 step 'I check :string' do |label|
   check(label)
+  validation_report_screenshot
 end
 
 step 'I uncheck :string' do |label|
   uncheck(label)
+  validation_report_screenshot
 end
 
 step 'I provide :string for file field :string' do |locator, file_contents|

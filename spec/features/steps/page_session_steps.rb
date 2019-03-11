@@ -2,8 +2,8 @@ step 'I sign in as a user' do
   step('a test user with a test role')
   step('I browse to the dashboard')
   step('I see "You need to sign in"')
-  step('I type in my username')
-  step('I type in my password')
+  step("I fill in \"Username\" with \"#{@current_user.username}\"")
+  step("I fill in \"Password\" with \"#{@current_user.password}\"")
   step('I click "Sign in"')
   step('I see "Signed in successfully"')
 end
@@ -20,16 +20,6 @@ step 'a test user with a test role' do
     password_changed_at: Time.now,
     with_user_roles: [@current_user_role]
   )
-end
-
-step 'I type in my username' do
-  fill_in 'Username', with: @current_user.username
-  validation_report_screenshot
-end
-
-step 'I type in my password' do
-  fill_in 'Password', with: @current_user.password
-  validation_report_screenshot
 end
 
 step 'I sign in as a user with all permissions' do
@@ -180,6 +170,7 @@ step 'I see :string in :string row' do |text, row_content|
     next unless td.text.include?(row_content)
     expect(td.text).to include(text)
   end
+  validation_report_screenshot
 end
 
 step 'I don\'t see :string in :string row' do |text, row_content|
@@ -187,6 +178,7 @@ step 'I don\'t see :string in :string row' do |text, row_content|
     next unless td.text.include?(row_content)
     expect(td.text).not_to include(text)
   end
+  validation_report_screenshot
 end
 
 step 'I pry' do
@@ -221,6 +213,7 @@ step 'I download zip file' do
             download_count == 1 || !sleep(0.1)
   expect(download_count).to eq(1)
   expect(page).to have_content(".zip\n")
+  validation_report_screenshot
   page.evaluate_script(clear_downloads_js)
   ts = Time.now
   begin
