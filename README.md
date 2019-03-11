@@ -63,6 +63,15 @@ To run rake tasks you have to do it in the docker environment like so:
 
     docker-compose run app rake <task>
 
+## Write Turnip step definitions
+
+The validation report requires a few things:
+
+* Do not use `send` in your step definitions to call subsequent steps,
+  use `step` instead (and provide a string parameter) to make them
+  appear as a substep in the validation report.
+* Call `validation_report_screenshot` where appropriate.
+
 ## Upgrade from 3.0.0 to 6.0.0
 
 This process may take a long time.
