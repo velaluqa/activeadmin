@@ -15,5 +15,17 @@ module ValidationReport
     def name
       @turnip_scenario.name
     end
+
+    # @return [Gem::Version, Symbol] last change version or :unreleased
+    def last_change_version_of_step_definitions
+      step_versions = steps.map(&:last_change_version)
+
+      if step_versions.include?(:unreleased)
+        return :unreleased
+      end
+
+      step_versions.sort!
+      step_versions.last
+    end
   end
 end

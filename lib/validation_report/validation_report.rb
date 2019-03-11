@@ -82,7 +82,12 @@ module ValidationReport
       feature.scenarios.each do |scenario|
         md << "\n#### #{feature.name} :: #{scenario.name}\n\n"
         md << "Steps compilation changed with version x.x.x\n"
-        md << "Step definitions changed with version x.x.x\n"
+        v = scenario.last_change_version_of_step_definitions
+        if v == :unreleased
+          md << "Step definitions unreleased\n"
+        else
+          md << "Step definitions changed with version #{v}\n"
+        end
         scenario.steps.each do |step|
           if step.nil?
             md << "\nSTEP OMITTED\n"
