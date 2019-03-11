@@ -216,7 +216,6 @@ step 'I download zip file' do
   page.driver.browser.get('chrome://downloads/')
   ts = Time.now
   begin
-    sleep(0.1)
     download_count = page.evaluate_script(download_count_js)
   end until Time.now - ts > Capybara.default_max_wait_time ||
             download_count == 1 || !sleep(0.1)
