@@ -18,7 +18,7 @@ step 'I uncheck :string' do |label|
   uncheck(label)
 end
 
-step 'I provide string for file field :string' do |locator, file_contents|
+step 'I provide :string for file field :string' do |locator, file_contents|
   file = Tempfile.new('upload_file')
   file.write(file_contents)
   file.close
