@@ -49,21 +49,25 @@ module ValidationReport
     @current_step.add_screenshot(Screenshot.new(path: image_path))
   end
 
-  def self.generate(rspec_example_notifications)
-    # Grab release versions
-    versions = `git tag -l`.split("\n").map! do |v|
-      begin
-        Gem::Version.new(v)
-      rescue
-        # the tag might not be of correct version format
-        # in those cases we simply ignore the tag (remove them by compact!)
-        nil
-      end
+  def self.versions
+    @versions ||= begin
+       versions = `git tag -l`.split("\n").map! do |v|
+         begin
+           Gem::Version.new(v)
+         rescue
+           # the tag might not be of correct version format
+           # in those cases we simply ignore the tag (remove them by compact!)
+           nil
+         end
+       end
+       versions.compact!
+       versions.sort!
+       versions.reverse!
+       versions
     end
-    versions.compact!
-    versions.sort!
-    versions.reverse!
+  end
 
+  def self.generate(rspec_example_notifications)
     # Generate markdown
     md = File.open(@tmp_path.join('validation_report.md'), 'w')
     md << "# Automated Validation Report for xxx x.x.x\n"

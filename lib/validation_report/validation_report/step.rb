@@ -3,9 +3,9 @@ module ValidationReport
     attr_accessor :parent_step, :turnip_step
     attr_reader :substeps_and_screenshots
 
-    def initialize(label:, source_file_path:)
+    def initialize(label:, source_location:)
       @label = label
-      @source_file_path = source_file_path
+      @source_location = source_location
       @substeps_and_screenshots = []
     end
 
@@ -16,12 +16,6 @@ module ValidationReport
 
     def add_screenshot(screenshot)
       @substeps_and_screenshots << screenshot
-    end
-
-    def text
-      if @turnip_step.present?
-        @text ||= @turnip_step.keyword + @turnip_step.text
-      end
     end
 
     def table
@@ -36,6 +30,7 @@ module ValidationReport
       end
     end
 
+    # @return [String] markdown section
     def report_markdown(indent_level:)
       md = "\n#{'#' * indent_level} #{@label}\n"
       if table
@@ -49,7 +44,12 @@ module ValidationReport
         md << step.docstring
         md << "\n```\n"
       end
-      md << "\nStep definition changed with version x.x.x\n"
+      v = last_change_version
+      if v == :unreleased
+        md << "\nStep definition unreleased\n"
+      else
+        md << "\nStep definition changed with version #{last_change_version}\n"
+      end
       substeps_and_screenshots.each do |substep_or_screenshot|
         if substep_or_screenshot.is_a?(Step)
           md << substep_or_screenshot.report_markdown(
@@ -60,6 +60,60 @@ module ValidationReport
         end
       end
       md
+    end
+
+    # @return [String] source code of step definition
+    def source_code
+      @source_code ||= begin
+        f = File.new(@source_location.first, 'r')
+        i = 1
+        while i < @source_location.last
+          f.gets
+          i += 1
+        end
+        step_source = f.readline
+        # Read until beginning of next step definition or EOF
+        while true
+          begin
+            line = f.readline
+          rescue EOFError
+            break
+          end
+          if line !~ /\Astep/
+            step_source += line
+          else
+            break
+          end
+        end
+        f.close
+        step_source.strip
+      end
+    end
+
+    # @return [Gem::Version, Symbol] last change version or :unreleased
+    def last_change_version
+      @last_change_version ||= calculate_last_change_version
+    end
+
+    private
+    # This is a private method, because return statements within a
+    # begin ... end memoize block voids memoization
+    def calculate_last_change_version
+      versions = ValidationReport.versions
+      step_file = `git show #{versions.first}:#{@source_location.first} 2>&1`
+      unless step_file.include?(source_code)
+        return :unreleased
+      end
+
+      1.upto(versions.length - 1) do |i|
+        version = versions[i]
+        step_file = `git show #{version}:#{@source_location.first} 2>&1`
+        unless step_file.include?(source_code)
+          return versions[i - 1]
+        end
+      end
+
+      return versions.last
     end
   end
 end

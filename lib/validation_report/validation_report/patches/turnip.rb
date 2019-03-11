@@ -49,8 +49,7 @@ module Turnip::RSpec
       end
       ValidationReport.push_step(
         label: step_label,
-        source_file_path:
-          matches.first.step_definition.block.source_location.first
+        source_location: matches.first.step_definition.block.source_location
       )
 
       send(matches.first.method_name, *(matches.first.params + extra_args))
