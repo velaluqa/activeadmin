@@ -1,3 +1,4 @@
+# coding: utf-8
 require File.expand_path('validation_report/feature', File.dirname(__FILE__))
 require File.expand_path('validation_report/scenario', File.dirname(__FILE__))
 require File.expand_path('validation_report/step', File.dirname(__FILE__))
@@ -80,6 +81,9 @@ module ValidationReport
 
     # Generate markdown
     md = File.open(@tmp_path.join('validation_report.md'), 'w')
+    md << '<style type="text/css">'
+    md << File.read(File.join(File.dirname(__FILE__), 'style.css'))
+    md << '</style>'
     md << '# Automated Validation Report for ' +
           "#{application_name} #{application_version}\n"
     md << "\n## Version History\n\n"
@@ -89,29 +93,33 @@ module ValidationReport
     md << "\n## Automated Feature Validation\n\n"
     @features.sort(&:file_path).each do |feature|
       md << "### #{feature.name}\n\n"
-      md << "#{feature.description}\n"
+      md << "```\n  #{feature.description}\n```\n"
+      md << "\n<table class=\"scenarios\">\n<tr>\n<th>" +
+            [
+              'Scenario',
+              'Step',
+              'Screenshot',
+              'Passed',
+              'Last Change Version',
+              'Date',
+              'Signature'
+            ].join("</th>\n<th>") +
+            "</th>\n</tr>\n"
       feature.scenarios.each do |scenario|
-        md << "\n#### #{feature.name} :: #{scenario.name}\n\n"
-        v = scenario.last_change_version
-        if v == :unreleased
-          md << "Scenario definition unreleased\n"
-        else
-          md << "Scenario definition changed with version #{v}\n"
-        end
-        v = scenario.last_change_version_of_step_definitions
-        if v == :unreleased
-          md << "Step definitions unreleased\n"
-        else
-          md << "Step definitions changed with version #{v}\n"
-        end
+        md << "<tr>\n" +
+              [
+                "<td colspan=\"3\">#{scenario.name}</td>\n",
+                "<td class=\"passed\">✓</td>",
+                "<td>#{scenario.last_change_version}</td>\n",
+                "<td></td>\n",
+                "<td></td>\n",
+              ].join +
+              "</tr>\n"
         scenario.steps.each do |step|
-          if step.nil?
-            md << "\nSTEP OMITTED\n"
-          else
-            md << step.report_markdown(indent_level: 5)
-          end
+          md << step.report_html_row
         end
       end
+      md << "</table>\n"
     end
     md.close
   end

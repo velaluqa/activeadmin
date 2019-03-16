@@ -21,9 +21,19 @@ module ValidationReport
       @turnip_scenario.name
     end
 
+    def last_change_version
+      versions = [last_change_version_of_step_definitions, change_version]
+      if versions.include?(:unreleased)
+        return :unreleased
+      end
+
+      versions.sort!
+      versions.last
+    end
+
     # @return [Gem::Version, Symbol] last change version or :unreleased
     def last_change_version_of_step_definitions
-      step_versions = steps.map(&:last_change_version)
+      step_versions = steps.map(&:change_version)
 
       if step_versions.include?(:unreleased)
         return :unreleased
@@ -33,8 +43,10 @@ module ValidationReport
       step_versions.last
     end
 
+    # Calculates change version for scenario definition
+    #
     # @return [Gem::Version, Symbol] last change version or :unreleased
-    def last_change_version
+    def change_version
       current_hash = comparison_hash(@feature.turnip_feature)
       versions = ValidationReport.versions
 

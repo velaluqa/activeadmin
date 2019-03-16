@@ -1,0 +1,23 @@
+table.scenarios {
+  width: 100%;
+}
+
+table.scenarios th, table.scenarios td {
+  padding: 5px 15px;
+}
+
+table.scenarios td.passed {
+  background-color: #A7E3AB;
+}
+
+table.step-parameters {
+  border-collapse: collapse;
+}
+
+table.step-parameters, table.step-parameters td {
+  border: 1px solid black;
+}
+
+table.step-parameters td {
+  padding: 2px 10px;
+}

@@ -16,7 +16,7 @@ module ValidationReport
         image_path = Capybara::Screenshot.screenshot
         target_path = ValidationReport.tmp_path.join(File.basename(image_path))
         FileUtils.mv(image_path, target_path)
-        target_path
+        File.basename(target_path)
       end
     end
   end

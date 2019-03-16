@@ -30,36 +30,44 @@ module ValidationReport
       end
     end
 
-    # @return [String] markdown section
-    def report_markdown(indent_level:)
-      md = "\n#{'#' * indent_level} #{@label}\n"
+    # @return [String]
+    def report_html_row(indent_level: 0)
+      step_cell = "#{'→' * indent_level} #{@label}"
       if table
-        md << "\n"
+        step_cell << "<br/><table class=\"step-parameters\">"
         table.to_a.each do |row|
-          md << "| #{row.join(' | ')} |\n"
+          step_cell << '<tr><td>'
+          step_cell << row.join('</td><td>')
+          step_cell << '</td></tr>'
         end
+        step_cell << "</table>"
       end
       if docstring
-        md << "\n```\n"
-        md << step.docstring
-        md << "\n```\n"
+        step_cell << '<br/><pre>'
+        step_cell << step.docstring
+        step_cell << '</pre>'
       end
-      v = last_change_version
-      if v == :unreleased
-        md << "\nStep definition unreleased\n"
-      else
-        md << "\nStep definition changed with version #{last_change_version}\n"
+      screenshots = substeps_and_screenshots.select { |s| s.is_a?(Screenshot) }
+      substeps = substeps_and_screenshots.select { |s| s.is_a?(Step) }
+      if screenshots.length > 1
+        throw "There should only be one screenshot per step."
+      elsif screenshots.length > 0
+        screenshot_cell = "<a href=\"#{screenshots.first.path}\">Open</a>"
       end
-      substeps_and_screenshots.each do |substep_or_screenshot|
-        if substep_or_screenshot.is_a?(Step)
-          md << substep_or_screenshot.report_markdown(
-            indent_level: indent_level + 1
-          )
-        elsif substep_or_screenshot.is_a?(Screenshot)
-          md << "\n![](#{substep_or_screenshot.path})\n"
-        end
-      end
-      md
+      "<tr>\n" +
+        [
+          "<td></td>\n",
+          "<td>#{step_cell}</td>\n",
+          "<td>#{screenshot_cell}</td>\n",
+          "<td class=\"passed\">✓</td>",
+          "<td></td>\n",
+          "<td></td>\n",
+          "<td></td>\n"
+        ].join +
+        "</tr>\n" +
+        substeps.map do |substep|
+          substep.report_html_row(indent_level: indent_level + 1)
+        end.join
     end
 
     # @return [String] source code of step definition
@@ -90,15 +98,15 @@ module ValidationReport
       end
     end
 
-    # @return [Gem::Version, Symbol] last change version or :unreleased
-    def last_change_version
-      @last_change_version ||= calculate_last_change_version
+    # @return [Gem::Version, Symbol] change version or :unreleased
+    def change_version
+      @change_version ||= calculate_change_version
     end
 
     private
     # This is a private method, because return statements within a
     # begin ... end memoize block voids memoization
-    def calculate_last_change_version
+    def calculate_change_version
       versions = ValidationReport.versions
       step_file = `git show #{versions.first}:#{@source_location.first} 2>&1`
       unless step_file.include?(source_code)
