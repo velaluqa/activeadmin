@@ -7,6 +7,7 @@ module ValidationReport
       @label = label
       @source_location = source_location
       @substeps_and_screenshots = []
+      @failed = false
     end
 
     def add_substep(step)
@@ -16,6 +17,14 @@ module ValidationReport
 
     def add_screenshot(screenshot)
       @substeps_and_screenshots << screenshot
+    end
+
+    def mark_as_failed
+      @failed = true
+    end
+
+    def passed?
+      !@failed
     end
 
     def table
@@ -59,7 +68,7 @@ module ValidationReport
           "<td></td>\n",
           "<td>#{step_cell}</td>\n",
           "<td>#{screenshot_cell}</td>\n",
-          "<td class=\"passed\">✓</td>",
+          @failed ? "<td class=\"failed\">✕</td>" : "<td class=\"passed\">✓</td>",
           "<td></td>\n",
           "<td></td>\n",
           "<td></td>\n"

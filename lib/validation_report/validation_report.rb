@@ -57,6 +57,10 @@ module ValidationReport
     @current_step.add_screenshot(Screenshot.new(path: image_path))
   end
 
+  def self.report_failure
+    @current_step.mark_as_failed
+  end
+
   def self.versions
     @versions ||= begin
        versions = `git tag -l`.split("\n").map! do |v|
@@ -109,7 +113,7 @@ module ValidationReport
         md << "<tr>\n" +
               [
                 "<td colspan=\"3\">#{scenario.name}</td>\n",
-                "<td class=\"passed\">✓</td>",
+                scenario.passed? ? "<td class=\"passed\">✓</td>" : "<td class=\"failed\">✕</td>",
                 "<td>#{scenario.last_change_version}</td>\n",
                 "<td></td>\n",
                 "<td></td>\n",

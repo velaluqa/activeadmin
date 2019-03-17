@@ -10,6 +10,10 @@ table.scenarios td.passed {
   background-color: #A7E3AB;
 }
 
+table.scenarios td.failed {
+  background-color: #E3ABA7;
+}
+
 table.step-parameters {
   border-collapse: collapse;
 }

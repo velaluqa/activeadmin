@@ -21,6 +21,12 @@ module ValidationReport
       @turnip_scenario.name
     end
 
+    def passed?
+      steps.find do |step|
+        !step.passed?
+      end.nil?
+    end
+
     def last_change_version
       versions = [last_change_version_of_step_definitions, change_version]
       if versions.include?(:unreleased)
