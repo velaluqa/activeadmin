@@ -63,7 +63,7 @@ module ValidationReport
       elsif screenshots.length > 0
         screenshot_cell = "<a href=\"#{screenshots.first.path}\">Open</a>"
       end
-      "<tr>\n" +
+      html = "<tr>\n" +
         [
           "<td></td>\n",
           "<td>#{step_cell}</td>\n",
@@ -77,6 +77,18 @@ module ValidationReport
         substeps.map do |substep|
           substep.report_html_row(indent_level: indent_level + 1)
         end.join
+      if @failed
+        html << "<tr>\n" +
+                [
+                  "<td></td>\n",
+                  "<td cellspan=\"3\"><i>Further steps omitted, if any</i></td>\n",
+                  "<td></td>\n",
+                  "<td></td>\n",
+                  "<td></td>\n"
+                ].join +
+                "</tr>\n"
+      end
+      html
     end
 
     # @return [String] source code of step definition

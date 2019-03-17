@@ -3,10 +3,13 @@ require File.expand_path('validation_report/feature', File.dirname(__FILE__))
 require File.expand_path('validation_report/scenario', File.dirname(__FILE__))
 require File.expand_path('validation_report/step', File.dirname(__FILE__))
 require File.expand_path('validation_report/screenshot', File.dirname(__FILE__))
+require File.expand_path('validation_report/rspec/helper', File.dirname(__FILE__))
 
 require 'fileutils'
 
 module ValidationReport
+  extend RSpec::Helper
+
   def self.initialize
     @features = []
     @current_step = nil
@@ -16,6 +19,14 @@ module ValidationReport
     @tmp_path = Rails.root.join('tmp/validation_report')
     FileUtils.rm_rf(Dir[@tmp_path.join('*')])
     FileUtils.mkdir_p(@tmp_path)
+
+    ::RSpec.configure do |config|
+      config.after(type: :feature) do |example|
+        # In case of a failure, @current_step is not nil, and we add a
+        # screenshot, to ensure we get a screenshot for a failing step.
+        ValidationReport.ensure_screenshot
+      end
+    end
   end
 
   def self.enabled?
@@ -55,6 +66,10 @@ module ValidationReport
 
   def self.attach_screenshot(image_path)
     @current_step.add_screenshot(Screenshot.new(path: image_path))
+  end
+
+  def self.ensure_screenshot
+    @current_step && validation_report_screenshot
   end
 
   def self.report_failure
@@ -132,6 +147,5 @@ end
 ValidationReport.initialize
 
 require File.expand_path('validation_report/rspec/formatter', File.dirname(__FILE__))
-require File.expand_path('validation_report/rspec/helper', File.dirname(__FILE__))
 require File.expand_path('validation_report/patches/capybara_screenshot', File.dirname(__FILE__))
 require File.expand_path('validation_report/patches/turnip', File.dirname(__FILE__))
