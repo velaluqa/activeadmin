@@ -61,7 +61,7 @@ module ValidationReport
       if screenshots.length > 1
         throw "There should only be one screenshot per step."
       elsif screenshots.length > 0
-        screenshot_cell = "<a href=\"#{screenshots.first.path}\">Open</a>"
+        screenshot_cell = "<a href=\"#{screenshots.first.path}\" target=\"_blank\">Open</a>"
       end
       html = "<tr>\n" +
         [
