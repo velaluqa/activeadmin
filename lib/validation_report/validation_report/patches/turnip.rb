@@ -1,5 +1,3 @@
-require 'turnip'
-
 module Turnip
   module RSpec
     class << self

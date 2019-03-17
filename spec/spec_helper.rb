@@ -1,5 +1,3 @@
-require 'validation_report/validation_report'
-
 if ENV['COVERAGE']
   require 'simplecov'
   SimpleCov.command_name 'RSpec'
@@ -11,9 +9,12 @@ require 'turnip'
 require 'turnip/capybara'
 Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
 load 'spec/features/steps/placeholders.rb', true
-require 'capybara/rails'
-
+require 'capybara/rspec'
 require 'capybara-screenshot/rspec'
+
+# Require after capybara-screenshot and turnip which get monkey-patched
+require 'validation_report/validation_report'
+
 # Add <base> to saved HTML pages so that the browser can load
 # respective assets when opening failing pages.
 

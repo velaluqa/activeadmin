@@ -1,5 +1,3 @@
-require 'capybara-screenshot/rspec'
-
 Capybara::Screenshot.append_random = true
 
 module Capybara
