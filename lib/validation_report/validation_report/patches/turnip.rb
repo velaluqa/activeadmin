@@ -32,6 +32,20 @@ module Turnip
           send(method.to_s, description)
         end.compact
 
+        # CUSTOM CODE START
+        if step_or_description.respond_to?(:argument) # Turnip::Node::Step
+          step_label = step_or_description.to_s
+        else # String
+          step_label = step_or_description
+        end
+        source_location = matches.first &&
+                          matches.first.step_definition.block.source_location
+        ValidationReport.push_step(
+          label: step_label,
+          source_location: source_location
+        )
+        # CUSTOM CODE END
+
         if matches.length == 0
           raise Turnip::Pending, description
         end
@@ -41,21 +55,10 @@ module Turnip
           raise Turnip::Ambiguous, msg
         end
 
-        # CUSTOM CODE START
-        if step_or_description.respond_to?(:argument) # Turnip::Node::Step
-          step_label = step_or_description.to_s
-        else # String
-          step_label = step_or_description
-        end
-        ValidationReport.push_step(
-          label: step_label,
-          source_location: matches.first.step_definition.block.source_location
-        )
-        # CUSTOM CODE END
-
         send(matches.first.method_name, *(matches.first.params + extra_args))
 
         # CUSTOM CODE START
+        ValidationReport.mark_current_step_as_passed
         ValidationReport.pop_step
         # CUSTOM CODE END
       end

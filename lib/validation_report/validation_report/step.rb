@@ -7,7 +7,7 @@ module ValidationReport
       @label = label
       @source_location = source_location
       @substeps_and_screenshots = []
-      @failed = false
+      @passed = false
     end
 
     def add_substep(step)
@@ -19,12 +19,12 @@ module ValidationReport
       @substeps_and_screenshots << screenshot
     end
 
-    def mark_as_failed
-      @failed = true
+    def mark_as_passed
+      @passed = true
     end
 
     def passed?
-      !@failed
+      @passed
     end
 
     def table
@@ -68,7 +68,7 @@ module ValidationReport
           "<td></td>\n",
           "<td>#{step_cell}</td>\n",
           "<td>#{screenshot_cell}</td>\n",
-          @failed ? "<td class=\"failed\">✕</td>" : "<td class=\"passed\">✓</td>",
+          @passed ? "<td class=\"passed\">✓</td>" : "<td class=\"failed\">✕</td>",
           "<td></td>\n",
           "<td></td>\n",
           "<td></td>\n"
@@ -77,7 +77,7 @@ module ValidationReport
         substeps.map do |substep|
           substep.report_html_row(indent_level: indent_level + 1)
         end.join
-      if @failed
+      unless @passed
         html << "<tr>\n" +
                 [
                   "<td></td>\n",
@@ -128,6 +128,8 @@ module ValidationReport
     # This is a private method, because return statements within a
     # begin ... end memoize block voids memoization
     def calculate_change_version
+      return :unreleased unless @source_location
+
       versions = ValidationReport.versions
       step_file = `git show #{versions.first}:#{@source_location.first} 2>&1`
       unless step_file.include?(source_code)

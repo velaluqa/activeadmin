@@ -4,27 +4,28 @@ module ValidationReport
       @turnip_scenario = turnip_scenario
       @turnip_backgrounds = turnip_backgrounds
       @feature = feature
+      @passed = false
     end
 
     def steps
-      @steps ||= begin
-        steps = (@turnip_backgrounds.map(&:steps).flatten +
-            @turnip_scenario.steps).map do |turnip_step|
-          turnip_step.instance_eval { @root_step }
-        end
-        steps.compact!
-        steps
+      steps = (@turnip_backgrounds.map(&:steps).flatten +
+               @turnip_scenario.steps).map do |turnip_step|
+        turnip_step.instance_eval { @root_step }
       end
+      steps.compact!
+      steps
     end
 
     def name
       @turnip_scenario.name
     end
 
+    def mark_as_passed
+      @passed = true
+    end
+
     def passed?
-      steps.find do |step|
-        !step.passed?
-      end.nil?
+      @passed
     end
 
     def last_change_version
