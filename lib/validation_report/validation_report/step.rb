@@ -53,7 +53,7 @@ module ValidationReport
       end
       if docstring
         step_cell << '<br/><pre>'
-        step_cell << step.docstring
+        step_cell << docstring
         step_cell << '</pre>'
       end
       screenshots = substeps_and_screenshots.select { |s| s.is_a?(Screenshot) }
