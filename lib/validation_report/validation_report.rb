@@ -54,8 +54,10 @@ module ValidationReport
     if @current_step.nil?
       step.turnip_step = @current_turnip_step
       @current_turnip_step.instance_eval { @root_step = step }
-      @current_scenario = @features.last.scenarios.find do |scenario|
-        scenario.steps.include?(step)
+      @features.find do |feature|
+        @current_scenario = feature.scenarios.find do |scenario|
+          scenario.steps.include?(step)
+        end
       end
     else
       @current_step.add_substep(step)
