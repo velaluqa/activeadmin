@@ -119,7 +119,7 @@ module ValidationReport
       md << "* #{version}\n"
     end
     md << "\n## Automated Feature Validation\n\n"
-    @features.sort(&:file_path).each do |feature|
+    @features.sort_by(&:file_path).each do |feature|
       md << "### #{feature.name}\n\n"
       md << "```\n  #{feature.description}\n```\n"
       md << "\n<table class=\"scenarios\">\n<tr>\n<th>" +
