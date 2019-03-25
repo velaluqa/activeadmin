@@ -148,7 +148,7 @@ step 'I click :string' do |locator|
   click_on(locator)
 end
 
-step 'I follow link :string' do |locator|
+step 'I click link :string' do |locator|
   page.click_link(locator)
 end
 

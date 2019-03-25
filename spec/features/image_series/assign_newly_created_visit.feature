@@ -48,7 +48,7 @@ Feature: Assign Newly Created Visit
     Given I sign in as a user with all permissions
     But I cannot create visits
     When I browse to image_series list
-    And I follow link "Assign Visit"
+    And I click link "Assign Visit"
     Then I see "ASSIGN VISIT"
     And I don't see "WHEN CREATING A NEW VISIT"
 
@@ -56,7 +56,7 @@ Feature: Assign Newly Created Visit
     Given I sign in as a user with role "Image Manager"
     When I browse to image_series list
     Then I see "Assign Visit"
-    When I follow link "Assign Visit"
+    When I click link "Assign Visit"
     Then I see "ASSIGN VISIT"
     And I see "WHEN CREATING A NEW VISIT"
     When I select "Create New Visit" from "Visit"

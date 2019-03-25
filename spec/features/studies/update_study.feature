@@ -26,7 +26,7 @@ Feature: Update Study
   Scenario: Change Name
     Given I sign in as a user with role "Image Manager"
     When I browse to study "FooStudy"
-    And I follow link "Edit Study"
+    And I click link "Edit Study"
     Then I see "Edit Study"
     When I fill in "Name*" with "Updated Study"
     And I click the "Update Study" button
