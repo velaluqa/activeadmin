@@ -109,6 +109,7 @@ module ValidationReport
 
     # Generate markdown
     md = File.open(@tmp_path.join('validation_report.md'), 'w')
+    md << '<meta charset="utf-8" />'
     md << '<style type="text/css">'
     md << File.read(File.join(File.dirname(__FILE__), 'style.css'))
     md << '</style>'
