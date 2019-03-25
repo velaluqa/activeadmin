@@ -32,6 +32,7 @@ docs:publish:
   script:
     - export DOCKER_PWD=$(echo /cache/$(hostname)/*/${CI_PROJECT_NAME}/ | awk '{sub(/^\/cache/,"/srv/build-cache")}1')
     - script/build_manual
+    - script/build_validation_report
     - bundle exec gitdeploy
 
 image:publish:

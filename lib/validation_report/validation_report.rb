@@ -16,7 +16,7 @@ module ValidationReport
   end
 
   def self.setup
-    @tmp_path = Rails.root.join('tmp/validation_report')
+    @tmp_path = Rails.root.join('reports/validation')
     FileUtils.rm_rf(Dir[@tmp_path.join('*')])
     FileUtils.mkdir_p(@tmp_path)
 

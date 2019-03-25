@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -ex
+
+docker run --rm -v "${DOCKER_PWD:-$PWD}/reports/validation:/source" jagregory/pandoc -f markdown -t html5 validation_report.md -o validation_report.html
+rm -f reports/validation/validation_report.md
