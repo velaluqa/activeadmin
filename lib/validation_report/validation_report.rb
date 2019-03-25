@@ -156,5 +156,4 @@ end
 ValidationReport.initialize
 
 require File.expand_path('validation_report/rspec/formatter', File.dirname(__FILE__))
-require File.expand_path('validation_report/patches/capybara_screenshot', File.dirname(__FILE__))
 require File.expand_path('validation_report/patches/turnip', File.dirname(__FILE__))
