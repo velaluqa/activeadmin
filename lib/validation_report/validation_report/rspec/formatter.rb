@@ -14,7 +14,9 @@ module ValidationReport
       end
 
       def example_passed(_notification)
-        ValidationReport.mark_current_scenario_as_passed
+        if _notification.example.file_path =~ /\.feature\z/
+          ValidationReport.mark_current_scenario_as_passed
+        end
       end
     end
   end
