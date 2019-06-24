@@ -162,7 +162,7 @@ JOIN
   def self.audit_trail_event_title_and_severity(event_symbol)
     case event_symbol
     when :image_series_change then ['Image Series Change', :ok]
-           end
+    end
   end
 
   protected

@@ -92,7 +92,7 @@ ActiveAdmin.register Visit do
   index do
     selectable_column
     column :patient, sortable: 'patients.subject_id' do |visit|
-      link_to(visit.patient.subject_id, admin_patient_path(visit.patient))
+      link_to(visit.patient.name, admin_patient_path(visit.patient))
     end
     column :visit_number
     column :description
