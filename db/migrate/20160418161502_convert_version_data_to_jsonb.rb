@@ -3,8 +3,6 @@ class ConvertVersionDataToJsonb < ActiveRecord::Migration
     add_column :versions, :new_object, :jsonb
     add_column :versions, :new_object_changes, :jsonb
 
-    binding.pry
-
     progress = ProgressBar.create(
       title: 'Convert Version Data',
       total: Version.count,
