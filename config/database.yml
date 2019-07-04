@@ -1,0 +1,23 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch('RAILS_MAX_THREADS') { 5 } %>
+  host: <%= ENV['POSTGRES_HOST'] || 'postgres' %>
+
+development:
+  <<: *default
+  database: <%= ENV['POSTGRES_DATABASE'] || 'erica_store_development' %>
+  username: <%= ENV['POSTGRES_USERNAME'] || 'postgres' %>
+  password: <%= ENV['POSTGRES_PASSWORD'] || '' %>
+
+test: &test
+  <<: *default
+  database: <%= ENV['POSTGRES_DATABASE'] || 'erica_store_test' %>
+  username: <%= ENV['POSTGRES_USERNAME'] || 'postgres' %>
+  password: <%= ENV['POSTGRES_PASSWORD'] || '' %>
+
+production:
+  <<: *default
+  database: <%= ENV['POSTGRES_DATABASE'] || 'erica_store_production' %>
+  username: <%= ENV['POSTGRES_USERNAME'] || 'erica_store' %>
+  password: <%= ENV['POSTGRES_PASSWORD'] %>

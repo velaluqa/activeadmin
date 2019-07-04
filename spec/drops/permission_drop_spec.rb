@@ -3,14 +3,14 @@ describe PermissionDrop do
     allow(subject.send(:object)).to receive(:ability)
   end
 
-  it { should have_attribute(:id) }
-  it { should have_attribute(:activity) }
-  it { should have_attribute(:subject) }
-  it { should have_attribute(:created_at) }
-  it { should have_attribute(:updated_at) }
+  it { is_expected.to have_attribute(:id) }
+  it { is_expected.to have_attribute(:activity) }
+  it { is_expected.to have_attribute(:subject) }
+  it { is_expected.to have_attribute(:created_at) }
+  it { is_expected.to have_attribute(:updated_at) }
 
-  it { should belongs_to(:role) }
-  it { should have_many(:users) }
+  it { is_expected.to belongs_to(:role) }
+  it { is_expected.to have_many(:users) }
 
-  it { should delegate(:ability).to(:object) }
+  it { is_expected.to delegate(:ability).to(:object) }
 end

@@ -20,7 +20,7 @@ Now build the containers properly.
 
     docker-compose build
 
-## Running Development Server
+## Preparing Development Database
 
 Before we can run our development server, we need to bootstrap the
 databases for the `development` environment.
@@ -28,12 +28,14 @@ databases for the `development` environment.
 First we create the database and migrate to a vanilla ERICA database
 structure.
 
-    docker-compose run app rake db:create db:migrate
+    docker-compose run worker rake db:create db:migrate
 
 Then we seed the default roles and the root user for the `development`
 environment:
 
-    docker-compose run app rake erica:seed:root_user[root] erica:seed:roles
+    docker-compose run worker rake erica:seed:root_user[root] erica:seed:roles
+
+## Running Development Server
 
 To run the dev server you have to forward the port:
 
@@ -60,6 +62,15 @@ Then start the test runner via:
 To run rake tasks you have to do it in the docker environment like so:
 
     docker-compose run app rake <task>
+
+## Write Turnip step definitions
+
+The validation report requires a few things:
+
+* Do not use `send` in your step definitions to call subsequent steps,
+  use `step` instead (and provide a string parameter) to make them
+  appear as a substep in the validation report.
+* Call `validation_report_screenshot` where appropriate.
 
 ## Upgrade from 3.0.0 to 6.0.0
 

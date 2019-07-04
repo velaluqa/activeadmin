@@ -87,7 +87,10 @@ CONFIG
         spect_2.set_tqc_result({ 'fubaz' => true }, user, 'First tqc')
         spect_3.assign_image_series!(series2)
         spect_3.set_tqc_result({ 'modality' => true }, user, 'First tqc')
-        expect(visit.required_series_objects.map(&:tqc_state)).to eq([nil, 'passed', 'passed'])
+        objects = visit.required_series_objects.map(&:attributes)
+        expect(objects).to include(include('name' => 'SPECT_1', 'tqc_state' => nil))
+        expect(objects).to include(include('name' => 'SPECT_2', 'tqc_state' => 2))
+        expect(objects).to include(include('name' => 'SPECT_3', 'tqc_state' => 2))
         visit.visit_type = 'baseline2'
         visit.save!
         spect_2.reload

@@ -1,53 +1,58 @@
 step 'I sign in as a user' do
+  step('a test user with a test role')
+  step('I browse to the dashboard')
+  step('I see "You need to sign in"')
+  step("I fill in \"Username\" with \"#{@current_user.username}\"")
+  step("I fill in \"Password\" with \"#{@current_user.password}\"")
+  step('I click "Sign in"')
+  step('I see "Signed in successfully"')
+end
+
+step 'a test user with a test role' do
   @current_user_role = FactoryGirl.create(:role)
-  @current_user = FactoryGirl.create(:user,
-                                     :changed_password,
-                                     :with_keypair,
-                                     name: 'Test User',
-                                     username: 'testuser',
-                                     password: 'password',
-                                     password_changed_at: Time.now,
-                                     with_user_roles: [@current_user_role])
-  visit('/users/sign_in')
-  within('#new_user') do
-    fill_in 'Username', with: 'testuser'
-    fill_in 'Password', with: 'password'
-  end
-  click_button 'Sign in'
-  expect(page).to have_content('Signed in successfully')
+  @current_user = FactoryGirl.create(
+    :user,
+    :changed_password,
+    :with_keypair,
+    name: 'Test User',
+    username: 'testuser',
+    password: 'password',
+    password_changed_at: Time.now,
+    with_user_roles: [@current_user_role]
+  )
 end
 
 step 'I sign in as a user with all permissions' do
-  send('I sign in as a user')
-  send('I have permission to perform all actions')
+  step('I sign in as a user')
+  step('I have permission to perform all actions')
 end
 
-step 'I sign in as a user with role scoped to :model_instance' do |record|
-  send('I sign in as a user')
-  send('I have a role scoped to :model_instance', record)
+step 'I sign in as a user with role scoped to :string :string' do |model, identifier|
+  step('I sign in as a user')
+  step("I have a role scoped to #{model} \"#{identifier}}\"")
 end
 
-step 'I sign in as a user with role :role_instance' do |role|
-  send('I sign in as a user')
-  send('I belong to role :role_instance', role)
+step 'I sign in as a user with role :string' do |role|
+  step('I sign in as a user')
+  step("I belong to role \"#{role}\"")
 end
 
-step 'I sign in as a user with role :role_instance scoped to :model_instance' do |role, scope_object|
-  send('I sign in as a user')
-  send('I belong to role :role_instance scoped to :model_instance', role, scope_object)
+step 'I sign in as a user with role :string scoped to :string :string' do |role, model, identifier|
+  step('I sign in as a user')
+  step("I belong to role \"#{role}\" scoped to #{model} \"#{identifier}\"")
 end
 
-step 'I belong to role :role_instance' do |role|
-  send('user :user_instance belongs to role :role_instance', @current_user, role)
+step 'I belong to role :string' do |role|
+  step("user \"#{@current_user.username}\" belongs to role \"#{role}\"")
 end
 
-step 'I belong to role :role_instance scoped to :model_instance' do |role, scope_object|
-  send('user :user_instance belongs to role :role_instance scoped to :model_instance', @current_user, role, scope_object)
+step 'I belong to role :string scoped to :string :string' do |role, model, identifier|
+  step("user \"#{@current_user.username}\" belongs to role \"#{role}\" scoped to #{model} \"#{identifier}\"")
 end
 
-step 'I have a role scoped to :model_instance' do |scope_object|
+step 'I have a role scoped to :string :string' do |model, identifier|
   @current_user_role = FactoryGirl.create(:role)
-  send('user :user_instance belongs to role :role_instance scoped to :model_instance', @current_user, @current_user_role, scope_object)
+  step("user \"#{@current_user.username}\" belongs to role \"#{@current_user_role.title}\" scoped to #{model} \"#{identifier}\"")
 end
 
 step 'I have permission to perform all actions' do
@@ -116,23 +121,35 @@ step 'I have following abilities:' do |table|
 end
 
 step 'I see :string' do |content|
-  expect(page).to have_content(content)
+  expect(page).to have_content(content, normalize_ws: true)
+  validation_report_screenshot
+end
+
+step 'I see :string within :string' do |content, locator|
+  expect(page.find(locator)).to have_content(content, normalize_ws: true)
+  validation_report_screenshot
 end
 
 step 'I don\'t see :string' do |content|
-  expect(page).not_to have_content(content)
+  expect(page).not_to have_content(content, normalize_ws: true)
+  validation_report_screenshot
+end
+
+step 'I don\'t see :string within :string' do |content, locator|
+  expect(page.find(locator)).not_to have_content(content, normalize_ws: true)
+  validation_report_screenshot
 end
 
 step 'I am redirected to :admin_path' do |path|
   expect(page.current_path).to eq(path)
 end
 
-step 'I click link :string' do |locator|
-  click_link(locator)
+step 'I click :string' do |locator|
+  click_on(locator)
 end
 
-step 'I follow link :string' do |locator|
-  page.find_link(locator).trigger('click')
+step 'I click link :string' do |locator|
+  page.click_link(locator)
 end
 
 step 'I click link :string in :string' do |locator, selector|
@@ -144,7 +161,7 @@ end
 step 'I click :string in :string row' do |locator, row_content|
   page.all('tr').each do |td|
     next unless td.text.include?(row_content)
-    td.find_link(locator).trigger('click')
+    td.click_link(locator)
   end
 end
 
@@ -153,6 +170,7 @@ step 'I see :string in :string row' do |text, row_content|
     next unless td.text.include?(row_content)
     expect(td.text).to include(text)
   end
+  validation_report_screenshot
 end
 
 step 'I don\'t see :string in :string row' do |text, row_content|
@@ -160,6 +178,7 @@ step 'I don\'t see :string in :string row' do |text, row_content|
     next unless td.text.include?(row_content)
     expect(td.text).not_to include(text)
   end
+  validation_report_screenshot
 end
 
 step 'I pry' do
@@ -182,5 +201,24 @@ step 'I wait for all jobs in :string queue' do |queue|
 end
 
 step 'I download zip file' do
-  expect(page.response_headers['Content-Type']).to eq "application/zip"
+  clear_downloads_js = "document.querySelector('downloads-manager').shadowRoot.querySelector('downloads-toolbar').shadowRoot.querySelector('button.clear-all').click()"
+  download_count_js = "document.querySelector('downloads-manager').shadowRoot.querySelectorAll('downloads-item').length"
+  no_downloads_el_js = "document.querySelector('downloads-manager').shadowRoot.querySelector('#no-downloads')"
+
+  page.driver.browser.get('chrome://downloads/')
+  ts = Time.now
+  begin
+    download_count = page.evaluate_script(download_count_js)
+  end until Time.now - ts > Capybara.default_max_wait_time ||
+            download_count == 1 || !sleep(0.1)
+  expect(download_count).to eq(1)
+  expect(page).to have_content(".zip\n")
+  validation_report_screenshot
+  page.evaluate_script(clear_downloads_js)
+  ts = Time.now
+  begin
+    no_downloads_el = page.evaluate_script(no_downloads_el_js)
+  end until Time.now - ts > Capybara.default_max_wait_time ||
+            !no_downloads_el[:hidden] || !sleep(0.1)
+  expect(no_downloads_el[:hidden]).to be_falsy
 end

@@ -1,15 +1,15 @@
 describe BackgroundJobDrop do
-  it { should have_attribute(:id) }
-  it { should have_attribute(:progress) }
-  it { should have_attribute(:error_message) }
-  it { should have_attribute(:results) }
-  it { should have_attribute(:created_at) }
-  it { should have_attribute(:updated_at) }
-  it { should have_attribute(:completed_at) }
+  it { is_expected.to have_attribute(:id) }
+  it { is_expected.to have_attribute(:progress) }
+  it { is_expected.to have_attribute(:error_message) }
+  it { is_expected.to have_attribute(:results) }
+  it { is_expected.to have_attribute(:created_at) }
+  it { is_expected.to have_attribute(:updated_at) }
+  it { is_expected.to have_attribute(:completed_at) }
 
-  it { should belongs_to(:user) }
+  it { is_expected.to belongs_to(:user) }
 
-  it { should respond_to(:finished?) }
-  it { should respond_to(:succeeded?) }
-  it { should respond_to(:failed?) }
+  it { is_expected.to respond_to(:finished?) }
+  it { is_expected.to respond_to(:succeeded?) }
+  it { is_expected.to respond_to(:failed?) }
 end

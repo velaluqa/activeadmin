@@ -1,14 +1,14 @@
 describe CenterDrop do
-  it { should have_attribute(:id) }
-  it { should have_attribute(:study_id) }
-  it { should have_attribute(:name) }
-  it { should have_attribute(:code) }
-  it { should have_attribute(:domino_unid) }
-  it { should have_attribute(:created_at) }
-  it { should have_attribute(:updated_at) }
+  it { is_expected.to have_attribute(:id) }
+  it { is_expected.to have_attribute(:study_id) }
+  it { is_expected.to have_attribute(:name) }
+  it { is_expected.to have_attribute(:code) }
+  it { is_expected.to have_attribute(:domino_unid) }
+  it { is_expected.to have_attribute(:created_at) }
+  it { is_expected.to have_attribute(:updated_at) }
 
-  it { should belongs_to(:study) }
-  it { should have_many(:patients) }
+  it { is_expected.to belongs_to(:study) }
+  it { is_expected.to have_many(:patients) }
 
   describe '#full_name' do
     let(:center) { create(:center) }

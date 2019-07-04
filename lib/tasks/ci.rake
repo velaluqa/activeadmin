@@ -6,18 +6,14 @@ namespace :ci do
 
   namespace :test do
     task units: ['ci:prepare'] do
-      sh 'COVERAGE=true bundle exec rspec --require spec_helper -f html -o reports/unit.html -f JUnit -o reports/rspec_report.xml'
-    end
-
-    task features: ['ci:prepare'] do
-      sh 'COVERAGE=true bundle exec cucumber --format html --out reports/features.html --format json --out reports/cucumber_report.json'
+      sh 'COVERAGE=true bundle exec spring rspec --format ValidationReport::RSpec::Formatter --format html -o reports/unit.html --format JUnit -o reports/rspec_report.xml'
     end
   end
-  task test: ['ci:test:units', 'ci:test:features']
+  task test: ['ci:test:units']
 
   namespace :report do
     task :code_climate do
-      sh 'bundle exec rubycritic app lib config/initializers --path reports/code_climate || true'
+      sh 'bundle exec rubycritic app lib config/initializers --path reports/code_climate --no-browser || true'
     end
 
     task :code_style do

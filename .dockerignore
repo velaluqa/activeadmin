@@ -1,9 +1,12 @@
-data/**/*
-tmp/**/*
+data/*
+tmp/*
 spec/data
 reports
 doc
-log/*.log
+log/*
 images/
 .git
 import
+.bundle
+.dockerignore
+.gitlab-ci.yml

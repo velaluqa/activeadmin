@@ -17,17 +17,17 @@ Feature: Comment Visit
     When I browse to visit "1000"
     Then I see "PLEASE SIGN IN"
 
-  Scenario: Unauthorized
-    Given I sign in as a user with all permissions
-    But I cannot comment Study
-    When I browse to visit "1000"
-    Then I don't see "COMMENTS (0)"
+  # Scenario: Unauthorized
+  #   Given I sign in as a user with all permissions
+  #   But I cannot comment Study
+  #   When I browse to visit "1000"
+  #   Then I don't see "COMMENTS (0)"
 
   Scenario: Read Comments
     Given I sign in as a user with role "Image Manager"
     When I browse to visit "1000"
     Then I see "COMMENTS (0)"
-    When I fill in "Some new comment for the feature test" for "active_admin_comment_body"
+    When I fill in "active_admin_comment_body" with "Some new comment for the feature test"
     And I click the "Add Comment" button
     Then I see "COMMENTS (1)"
     And I see "Some new comment for the feature test"

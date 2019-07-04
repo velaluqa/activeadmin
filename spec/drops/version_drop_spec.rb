@@ -1,10 +1,10 @@
 describe VersionDrop do
-  it { should have_attribute(:id) }
-  it { should have_attribute(:event) }
-  it { should have_attribute(:object) }
-  it { should have_attribute(:object_changes) }
-  it { should have_attribute(:whodunnit) }
-  it { should have_attribute(:created_at) }
+  it { is_expected.to have_attribute(:id) }
+  it { is_expected.to have_attribute(:event) }
+  it { is_expected.to have_attribute(:object) }
+  it { is_expected.to have_attribute(:object_changes) }
+  it { is_expected.to have_attribute(:whodunnit) }
+  it { is_expected.to have_attribute(:created_at) }
 
-  it { should belongs_to(:item) }
+  it { is_expected.to belongs_to(:item) }
 end

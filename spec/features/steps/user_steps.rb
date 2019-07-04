@@ -2,16 +2,14 @@ step 'a user :string' do |username|
   FactoryGirl.create(:user, username: username)
 end
 
-step 'a user :string with role :role_instance' do |username, role|
-  send('a user :string', username)
-  user = User.find_by(username: username)
-  send('user :user_instance belongs to role :role_instance', user, role)
+step 'a user :string with role :string' do |username, role|
+  step("a user \"#{username}\"")
+  step("user \"#{username}\" belongs to role \"#{role}\"")
 end
 
-step 'a user :string with role :role_instance scoped to :model_instance' do |username, role, scope_object|
-  send('a user :string', username)
-  user = User.find_by(username: username)
-  send('user :user_instance belongs to role :role_instance scoped to :model_instance', user, role, scope_object)
+step 'a user :string with role :string scoped to :model :instance' do |username, role, model, instance|
+  step("a user \"#{username}\"")
+  step("user \"#{username}\" belongs to role \"#{role}\" scoped to #{model} \"#{instance}\"")
 end
 
 step 'user :user_instance belongs to role :role_instance' do |user, role|
