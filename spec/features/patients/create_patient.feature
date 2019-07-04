@@ -28,7 +28,7 @@ Feature: Create Patient
     When I browse to "/admin/patients/new"
     Then I see "New Patient"
     When I select "FooCenter" from "Center"
-    And I fill in "FooPatient" for "Subject"
+    And I fill in "Subject" with "FooPatient"
     And I click the "Create Patient" button
     Then I am redirected to patient "FooPatient"
     And I see "Patient was successfully created"
@@ -38,7 +38,7 @@ Feature: Create Patient
     When I browse to "/admin/patients/new"
     Then I see "New Patient"
     When I select "FooCenter" from "Center"
-    And I fill in "FooPatient" for "Subject"
+    And I fill in "Subject" with "FooPatient"
     And I click the "Create Patient" button
     Then I am redirected to patient "FooPatient"
     And I see "Patient was successfully created"
@@ -48,7 +48,7 @@ Feature: Create Patient
     When I browse to "/admin/patients/new"
     Then I see "New Patient"
     When I select "FooCenter" from "Center"
-    And I fill in "FooPatient" for "Subject"
+    And I fill in "Subject" with "FooPatient"
     And I click the "Create Patient" button
     Then I am redirected to patient "FooPatient"
     And I see "Patient was successfully created"

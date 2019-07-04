@@ -1,16 +1,16 @@
 describe NotificationProfileDrop do
-  it { should have_attribute(:id) }
-  it { should have_attribute(:title) }
-  it { should have_attribute(:description) }
-  it { should have_attribute(:notification_type) }
-  it { should have_attribute(:is_enabled) }
-  it { should have_attribute(:triggering_actions) }
-  it { should have_attribute(:triggering_resource) }
-  it { should have_attribute(:filters) }
-  it { should have_attribute(:maximum_email_throttling_delay) }
-  it { should have_attribute(:only_authorized_recipients) }
-  it { should have_attribute(:updated_at) }
-  it { should have_attribute(:created_at) }
+  it { is_expected.to have_attribute(:id) }
+  it { is_expected.to have_attribute(:title) }
+  it { is_expected.to have_attribute(:description) }
+  it { is_expected.to have_attribute(:notification_type) }
+  it { is_expected.to have_attribute(:is_enabled) }
+  it { is_expected.to have_attribute(:triggering_actions) }
+  it { is_expected.to have_attribute(:triggering_resource) }
+  it { is_expected.to have_attribute(:filters) }
+  it { is_expected.to have_attribute(:maximum_email_throttling_delay) }
+  it { is_expected.to have_attribute(:only_authorized_recipients) }
+  it { is_expected.to have_attribute(:updated_at) }
+  it { is_expected.to have_attribute(:created_at) }
 
-  it { should have_many(:notifications) }
+  it { is_expected.to have_many(:notifications) }
 end

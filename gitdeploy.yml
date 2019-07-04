@@ -8,8 +8,8 @@ deployments:
     links:
       "Manual": "{{url}}/manual/erica.html"
       "Documentation": "{{url}}/doc/index.html"
+      "Validation Report": "{{url}}/validation/validation_report.html"
       "QA: Unit Tests": "{{url}}/unit.html"
-      "QA: Requirement Tests": "{{url}}/features.html"
       "QA: Test Coverage": "{{url}}/coverage/index.html"
       "Report: Code Climate": "{{url}}/code_climate/overview.html"
       "Report: Code Style Violations": "{{url}}/code_style.html"

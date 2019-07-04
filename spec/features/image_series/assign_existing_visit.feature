@@ -35,7 +35,7 @@ Feature: Assign Visit
     Given I sign in as a user with role "Image Manager"
     When I browse to image_series list
     Then I see "Assign Visit"
-    When I follow link "Assign Visit"
+    When I click link "Assign Visit"
     Then I see "ASSIGN VISIT"
     When I select "10000" from "Visit"
     And I click the "Assign Visit" button

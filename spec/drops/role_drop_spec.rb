@@ -1,11 +1,11 @@
 describe RoleDrop do
-  it { should have_attribute(:id) }
-  it { should have_attribute(:title) }
-  it { should have_attribute(:created_at) }
-  it { should have_attribute(:updated_at) }
+  it { is_expected.to have_attribute(:id) }
+  it { is_expected.to have_attribute(:title) }
+  it { is_expected.to have_attribute(:created_at) }
+  it { is_expected.to have_attribute(:updated_at) }
 
-  it { should have_many(:user_roles) }
-  it { should have_many(:users) }
-  it { should have_many(:permissions) }
-  it { should have_many(:notification_profiles) }
+  it { is_expected.to have_many(:user_roles) }
+  it { is_expected.to have_many(:users) }
+  it { is_expected.to have_many(:permissions) }
+  it { is_expected.to have_many(:notification_profiles) }
 end

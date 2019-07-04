@@ -27,9 +27,8 @@ Feature: ImageSeries Audit Trail
     And I click link "Audit Trail" in "#title_bar"
     Then I see "Image Image #"
     And I see "ImageSeries Foo"
-    And I don't see "Patient"
-    And I don't see "Visit"
-    And I don't see "Patient"
-    And I don't see "Center"
-    And I don't see "Study"
+    And I don't see "Patient" within "#main_content"
+    And I don't see "Visit" within "#main_content"
+    And I don't see "Center" within "#main_content"
+    And I don't see "Study" within "#main_content"
 

@@ -41,7 +41,7 @@ Feature: Create Visits
     When I click link "New Visit"
     Then I see "New Visit"
     When I select "FooPatient" from "Patient"
-    And I fill in "10000" for "Visit number"
+    And I fill in "Visit number" with "10000"
     And I click the "Create Visit" button
     Then I am redirected to visit "10000"
     And I see "Visit was successfully created"
@@ -53,7 +53,7 @@ Feature: Create Visits
     When I click link "New Visit"
     Then I see "New Visit"
     When I select "FooPatient" from "Patient"
-    And I fill in "10000" for "Visit number"
+    And I fill in "Visit number" with "10000"
     And I click the "Create Visit" button
     Then I am redirected to visit "10000"
     And I see "Visit was successfully created"
@@ -65,7 +65,7 @@ Feature: Create Visits
     When I click link "New Visit"
     Then I see "New Visit"
     When I select "FooPatient" from "Patient"
-    And I fill in "10000" for "Visit number"
+    And I fill in "Visit number" with "10000"
     And I click the "Create Visit" button
     Then I am redirected to visit "10000"
     And I see "Visit was successfully created"

@@ -1,14 +1,22 @@
-#!/bin/bash
-docker build -t emacs_docs ./doc
-for file in $(ls ./doc | grep "\.org$"); do
-    echo "Building ${file} ..."
-    if [[ "$JOB_NAME" != "" ]]; then
-        echo "${file} in workspace /zfs/docker/volumes/jenkins-$(hostname)-workspace/${JOB_NAME}"
-        docker run --rm -v "/zfs/docker/volumes/jenkins-$(hostname)-workspace/${JOB_NAME}/:/workspace" emacs_docs emacs --batch --load doc/elisp/init.el "doc/${file}" -f org-html-export-to-html
-    else
-        docker run --rm -v "`pwd`:/workspace" emacs_docs emacs --batch --load doc/elisp/init.el doc/$file -f org-html-export-to-html
-    fi
-done
+#!/bin/sh
+
+set -e
+
+export GIT_BRANCH=$(git branch -a -v --abbrev=40 | grep $(git rev-parse HEAD) | awk '{print $1}' | grep -v '*' | head -n1 | awk -F '/' '{print $NF}')
+export GIT_VERSION=$(git describe --tags)
+
+set -x
+
+if [ -z $CI ]; then
+    IMAGE=emacs-docs
+else
+    IMAGE=${CI_REGISTRY_IMAGE}_emacs-docs:${CI_COMMIT_SHA}
+fi
+
+docker build -t $IMAGE ./doc
+docker run --rm -v "${DOCKER_PWD:-$PWD}/doc:/workspace" -e GIT_BRANCH -e GIT_VERSION $IMAGE
+rm -f doc/htmls.tgz
+
 mkdir -p ./reports/manual
 mv -f ./doc/*.html ./reports/manual/
 cp -rf ./doc/css ./doc/fonts ./doc/images ./doc/js ./reports/manual/

@@ -622,7 +622,7 @@ ActiveAdmin.register Visit do
     )
   end
 
-  action_item :only => [:show, :mqc_form, :mqc_results] do
+  action_item :view, :only => [:show, :mqc_form, :mqc_results] do
     link_to('Viewer (RS)', all_required_series_viewer_admin_visit_path(resource))
   end
 

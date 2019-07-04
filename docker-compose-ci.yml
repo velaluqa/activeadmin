@@ -1,21 +1,27 @@
-mongo:
-  image: mongo
-postgres:
-  image: postgres
-redis:
-  image: redis
-dev:
-  build: .
-  command: zeus start
-  volumes:
-    - /zfs/docker/volumes/jenkins-${HOSTNAME}-workspace/pharmtrace-erica-store/reports:/app/reports
-    - /zfs/docker/volumes/jenkins-${HOSTNAME}-workspace/pharmtrace-erica-store/config/database.yml.dev:/app/config/database.yml
-    - /zfs/docker/volumes/jenkins-${HOSTNAME}-workspace/pharmtrace-erica-store/config/mongoid.yml.dev:/app/config/mongoid.yml
-    - /zfs/docker/volumes/jenkins-${HOSTNAME}-workspace/pharmtrace-erica-store/config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
-  environment:
-    - DB_USERNAME=postgres
-    - DB_PASSWORD=
-  links:
-    - postgres
-    - mongo
-    - redis
+version: "3"
+
+services:
+  postgres:
+    image: postgres:9.6
+  redis:
+    image: redis:3.2
+  test:
+    build: .
+    image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+    command: 'rake setup:db ci'
+    environment:
+      RAILS_ENV: test
+      SELENIUM_DRIVER_URL: http://chrome:4444/wd/hub
+    volumes:
+      - ${DOCKER_PWD:-.}/reports:/app/reports # Artifacts
+      - ${DOCKER_PWD:-.}/.git:/app/.git:ro    # Validation Report requires access to git history
+    links:
+      - postgres
+      - redis
+      - chrome
+  chrome:
+    image: selenium/standalone-chrome
+    environment:
+      SCREEN_WIDTH: 1920
+      SCREEN_HEIGHT: 1080
+    shm_size: 2GB

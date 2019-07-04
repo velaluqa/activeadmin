@@ -25,7 +25,7 @@ Feature: Create Study
     Then I see "New Study"
     When I click link "New Study"
     Then I see "New Study"
-    And I fill in "Newly Created Study" for "Name*"
+    And I fill in "Name*" with "Newly Created Study"
     And I click the "Create Study" button
     Then I am redirected to study "Newly Created Study"
     And I see "Study was successfully created"

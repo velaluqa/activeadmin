@@ -14,15 +14,17 @@ app:
   tty: true
   volumes: &volumes
     - .:/app
-    - ./config/database.yml.dev:/app/config/database.yml
     - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
     - ./tmp:/app/tmp
   ports:
     - 3000:3000
   environment: &environment
-    DB_USERNAME: postgres
-    DB_PASSWORD:
+    RAILS_ENV: development
     TRUSTED_IP: 172.18.0.1
+    # POSTGRES_HOST: postgres
+    # POSTGRES_DATABASE: erica_store_production
+    # POSTGRES_USERNAME: postgres
+    # POSTGRES_PASSWORD:
   links: &links
     - postgres
     - redis
@@ -35,9 +37,11 @@ test:
   environment:
     <<: *environment
     RAILS_ENV: test
+    SELENIUM_DRIVER_URL: http://chrome:4444/wd/hub
   links:
     - postgres
     - redis
+    - chrome
 worker:
   build: *build
   command: bundle exec sidekiq
@@ -58,3 +62,12 @@ https:
     - app:rw
   links:
     - app
+chrome:
+  image: selenium/standalone-chrome-debug
+  #image: selenium/standalone-chrome
+  ports:
+    - 5900:5900
+  environment:
+    SCREEN_WIDTH: 1920
+    SCREEN_HEIGHT: 1080
+  shm_size: 2GB
