@@ -1,4 +1,4 @@
-FROM ruby:2.3.4
+FROM ruby:2.3.7-stretch
 MAINTAINER aandersen@velalu.qa
 
 ENV APP_HOME /app
