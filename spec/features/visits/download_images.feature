@@ -23,7 +23,6 @@ Feature: Download Visit Images
     And a required series "SPECT_1" for visit "1000" with:
       | image_series | TestSeries |
     And a role "Image Manager" with permissions:
-      | BackgroundJob | read                  |
       | Study         | read                  |
       | Center        | read                  |
       | Patient       | read                  |
@@ -41,8 +40,22 @@ Feature: Download Visit Images
     When I browse to download_images visit "1000"
     Then I see the unauthorized page
 
-  Scenario: Success
+  Scenario: Scoped System-Wide
     Given I sign in as a user with role "Image Manager"
+    When I browse to visit "1000"
+    Then I see "Download images"
+    When I click link "Download images"
+    Then I am redirected to the latest background_job
+    And I see "Your download will be available shortly."
+    When I wait for all jobs in "DownloadImagesWorker" queue
+    And I browse to the latest background_job
+    Then I see "Zip file Download"
+    When I click link "Download"
+    Then I download zip file
+    # TODO: Test zip file content
+
+  Scenario: Scoped to study
+    Given I sign in as a user with role "Image Manager" scoped to Study "TestStudy"
     When I browse to visit "1000"
     Then I see "Download images"
     When I click link "Download images"
