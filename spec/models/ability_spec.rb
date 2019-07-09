@@ -1,23 +1,23 @@
 RSpec.describe Ability do
   context 'with existing study records' do
     before(:each) do
-      @study1        = create(:study)
-      @center1       = create(:center, study: @study1)
-      @patient1      = create(:patient, center: @center1)
-      @visit1        = create(:visit, patient: @patient1)
+      @study1 = create(:study)
+      @center1 = create(:center, study: @study1)
+      @patient1 = create(:patient, center: @center1)
+      @visit1 = create(:visit, patient: @patient1)
       @image_series1 = create(:image_series, patient: @patient1, visit: @visit1)
-      @image1        = create(:image, image_series: @image_series1)
+      @image1 = create(:image, image_series: @image_series1)
 
-      @study2        = create(:study)
-      @center2       = create(:center, study: @study2)
-      @patient2      = create(:patient, center: @center2)
-      @visit2        = create(:visit, patient: @patient2)
+      @study2 = create(:study)
+      @center2 = create(:center, study: @study2)
+      @patient2 = create(:patient, center: @center2)
+      @visit2 = create(:visit, patient: @patient2)
       @image_series2 = create(:image_series, patient: @patient2, visit: @visit2)
-      @image2        = create(:image, image_series: @image_series2)
+      @image2 = create(:image, image_series: @image_series2)
 
-      @version       = create(:version)
+      @version = create(:version)
 
-      @some_user     = create(:user)
+      @some_user = create(:user)
     end
 
     describe 'for application administrator' do
@@ -103,11 +103,13 @@ RSpec.describe Ability do
       end
 
       it 'scopes all studies' do
-        expect(Study.accessible_by(@ability).pluck(:id)).to match_array Study.pluck(:id)
+        expect(Study.accessible_by(@ability).pluck(:id)).to match_array Study
+                      .pluck(:id)
       end
 
       it 'scopes all images' do
-        expect(Image.accessible_by(@ability).pluck(:id)).to match_array Image.pluck(:id)
+        expect(Image.accessible_by(@ability).pluck(:id)).to match_array Image
+                      .pluck(:id)
       end
     end
 
@@ -115,11 +117,8 @@ RSpec.describe Ability do
       before(:each) do
         @role1 = create(:role, with_permissions: { Study => :manage })
         @role2 = create(:role, with_permissions: { Image => :read })
-        @current_user = create(:user, with_user_roles:
-                                        [
-                                          [@role1, @study1],
-                                          [@role2, @study1]
-                                        ])
+        @current_user =
+          create(:user, with_user_roles: [[@role1, @study1], [@role2, @study1]])
         @ability = Ability.new(@current_user)
       end
 
@@ -158,15 +157,10 @@ RSpec.describe Ability do
 
     describe 'for user with doubly scoped permissions, it' do
       before(:each) do
-        @role = create(:role, with_permissions: {
-                         Study => :manage,
-                         Image => :read
-                       })
-        @current_user = create(:user, with_user_roles:
-                                        [
-                                          [@role, @study1],
-                                          [@role, @center1]
-                                        ])
+        @role =
+          create(:role, with_permissions: { Study => :manage, Image => :read })
+        @current_user =
+          create(:user, with_user_roles: [[@role, @study1], [@role, @center1]])
         @ability = Ability.new(@current_user)
       end
 
@@ -209,13 +203,16 @@ RSpec.describe Ability do
         @role2 = create(:role, with_permissions: { [Study, Image] => :read })
         @role3 = create(:role, with_permissions: { Version => :read })
         @role4 = create(:role, with_permissions: { User => :manage })
-        @current_user = create(:user, with_user_roles:
-                                        [
-                                          [@role1, @study1],
-                                          @role2,
-                                          @role3,
-                                          [@role4, @study1]
-                                        ])
+        @current_user =
+          create(
+            :user,
+            with_user_roles: [
+              [@role1, @study1],
+              @role2,
+              @role3,
+              [@role4, @study1]
+            ]
+          )
         @ability = Ability.new(@current_user)
       end
 
@@ -267,11 +264,13 @@ RSpec.describe Ability do
       end
 
       it 'scopes all studies' do
-        expect(Study.accessible_by(@ability).pluck(:id)).to match_array Study.pluck(:id)
+        expect(Study.accessible_by(@ability).pluck(:id)).to match_array Study
+                      .pluck(:id)
       end
 
       it 'scopes all images' do
-        expect(Image.accessible_by(@ability).pluck(:id)).to match_array Image.pluck(:id)
+        expect(Image.accessible_by(@ability).pluck(:id)).to match_array Image
+                      .pluck(:id)
       end
     end
   end
@@ -280,10 +279,14 @@ RSpec.describe Ability do
     let!(:study) { create(:study) }
 
     describe 'for user with mixed permissions, it' do
-      let!(:role1) { create(:role, with_permissions: { [Study, Patient] => :read }) }
+      let!(:role1) do
+        create(:role, with_permissions: { [Study, Patient] => :read })
+      end
       let!(:role2) { create(:role, with_permissions: { Version => :read }) }
       let!(:role3) { create(:role, with_permissions: { User => :manage }) }
-      let!(:user) { create(:user, with_user_roles: [[role1, study], role2, role3]) }
+      let!(:user) do
+        create(:user, with_user_roles: [[role1, study], role2, role3])
+      end
       let!(:ability) { Ability.new(user) }
 
       it 'allows reading all studies' do
@@ -314,12 +317,20 @@ RSpec.describe Ability do
 
   describe 'unscopable permission' do
     let!(:study) { create(:study) }
-    let!(:role) { create(:role, with_permissions: { ImageSeries => :upload }) }
+    let!(:role) do
+      create(
+        :role,
+        with_permissions: { ImageSeries => :upload, BackgroundJob => :manage }
+      )
+    end
     let!(:user) { create(:user, with_user_roles: [[role, study]]) }
     let!(:ability) { Ability.new(user) }
 
     it 'allows uploading images' do
       expect(ability.can?(:upload, ImageSeries)).to be_truthy
+    end
+    it 'allows read background jobs' do
+      expect(ability.can?(:manage, BackgroundJob)).to be_truthy
     end
   end
 end
