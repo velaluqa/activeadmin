@@ -121,8 +121,15 @@ class Ability
   ##
   # Basic abilities are granted irrespective of the permissions
   # defined in any role. For example, a user should always be
-  # permitted to manage his own user account and his own public keys.
+  # permitted to manage his own user account, his own background jobs
+  # and his own public keys.
   def define_basic_abilities
+    unless can?(:manage, BackgroundJob)
+      can %i[read update create destroy], BackgroundJob, ['background_jobs.user_id = ?', current_user.id] do |background_job|
+        background_job.user == current_user
+      end
+    end
+
     unless can?(:manage, User)
       can %i[read update generate_keypair change_password], User, ['users.id = ?', current_user.id] do |user|
         user == current_user
