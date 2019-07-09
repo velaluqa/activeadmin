@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 7.0.8
+
+*Development:*
+
+* Patch #4228 - Integrate Full Test-Suite running real browsers
+  * Database configuration via environment variables
+  * Gitlab CI pipeline with automatic deployment
+  * Extract feature test report for validation purposes
+* Fix #4445 - "Download Images" does not work for non-*system-wide* role assignment
+* Patch - Remove import volume from development
+* Patch - Default `DISABLE_SPRING=t`
+* Update - Update docker environment to Debian Stretch for future compatibility
+
+## 7.0.7
+
+*Patches:*
+
+* Bug - Show full patient name in visit list including center code
+
+*Development:*
+
+* Patch - Fix migrations stalling due to `binding.pry`
+
 ## 7.0.6
 
 *Patches:*
