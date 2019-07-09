@@ -24,6 +24,7 @@ class Ability
   }.freeze
 
   UNSCOPABLE_ACTIVITIES = {
+    BackgroundJob => %i[manage read update create destroy],
     ImageSeries => %i[upload assign_patient assign_visit],
     Visit => %i[assign_required_series technical_qc medical_qc]
   }.freeze
@@ -79,19 +80,18 @@ class Ability
   # scope of the granting `UserRole`.
   def define_scopable_abilities
     ACTIVITIES.each_pair do |subject, activities|
-      next unless subject.try(:scopable_permissions?)
       activities.each do |activity|
-        define_scopable_ability(subject, activity)
+        if unscopable?(subject, activity)
+          define_unscopable_ability(subject, activity)
+        elsif subject.try(:scopable_permissions?)
+          define_scopable_ability(subject, activity)
+        end
       end
     end
   end
 
   def define_scopable_ability(subject, activity)
     return unless any_permission?(subject, activity)
-    if unscopable?(subject, activity)
-      define_unscopable_ability(subject, activity)
-      return
-    end
     can activity, subject do |subject_instance|
       if subject_instance.new_record?
         can?(activity, subject_instance.class)

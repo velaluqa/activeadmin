@@ -10,16 +10,26 @@ end
 
 step 'a test user with a test role' do
   @current_user_role = FactoryGirl.create(:role)
-  @current_user = FactoryGirl.create(
-    :user,
-    :changed_password,
-    :with_keypair,
-    name: 'Test User',
-    username: 'testuser',
-    password: 'password',
-    password_changed_at: Time.now,
-    with_user_roles: [@current_user_role]
-  )
+  @current_user =
+    FactoryGirl.create(
+      :user,
+      :changed_password,
+      :with_keypair,
+      name: 'Test User',
+      username: 'testuser',
+      password: 'password',
+      password_changed_at: Time.now,
+      with_user_roles: [@current_user_role]
+    )
+end
+
+step 'I sign in as user :string' do |username|
+  step('I browse to the dashboard')
+  step('I see "You need to sign in"')
+  step("I fill in \"Username\" with \"#{username}\"")
+  step('I fill in "Password" with "password"')
+  step('I click "Sign in"')
+  step('I see "Signed in successfully"')
 end
 
 step 'I sign in as a user with all permissions' do
@@ -47,21 +57,30 @@ step 'I belong to role :string' do |role|
 end
 
 step 'I belong to role :string scoped to :string :string' do |role, model, identifier|
-  step("user \"#{@current_user.username}\" belongs to role \"#{role}\" scoped to #{model} \"#{identifier}\"")
+  step(
+    "user \"#{@current_user.username}\" belongs to role \"#{role}\" scoped to #{
+      model
+    } \"#{identifier}\""
+  )
 end
 
 step 'I have a role scoped to :string :string' do |model, identifier|
   @current_user_role = FactoryGirl.create(:role)
-  step("user \"#{@current_user.username}\" belongs to role \"#{@current_user_role.title}\" scoped to #{model} \"#{identifier}\"")
+  step(
+    "user \"#{@current_user.username}\" belongs to role \"#{
+      @current_user_role.title
+    }\" scoped to #{model} \"#{identifier}\""
+  )
 end
 
 step 'I have permission to perform all actions' do
-  abilities = Ability::ACTIVITIES.flat_map do |subject, val|
-    val.flat_map do |action|
-      next if action == :manage
-      [action, subject.to_s.underscore].join('_').downcase
-    end
-  end.compact
+  abilities =
+    Ability::ACTIVITIES.flat_map do |subject, val|
+      val.flat_map do |action|
+        next if action == :manage
+        [action, subject.to_s.underscore].join('_').downcase
+      end
+    end.compact
   @current_user_role.abilities = abilities
   @current_user_role.save!
 end
@@ -87,16 +106,28 @@ step 'I browse to last defined :model' do |model_name|
   model_name = model_name.classify
   record =
     case model_name
-    when 'Study' then @study
-    when 'Center' then @center
-    when 'Patient' then @patient
-    when 'Visit' then @visit
-    when 'ImageSeries' then @image_series
-    when 'Image' then @image
-    when 'User' then @user
-    when 'Role' then @role
+    when 'Study'
+      @study
+    when 'Center'
+      @center
+    when 'Patient'
+      @patient
+    when 'Visit'
+      @visit
+    when 'ImageSeries'
+      @image_series
+    when 'Image'
+      @image
+    when 'User'
+      @user
+    when 'Role'
+      @role
     end
-  path = Rails.application.routes.url_helpers.send("admin_#{model_name.singularize.underscore}_path", record)
+  path =
+    Rails.application.routes.url_helpers.send(
+      "admin_#{model_name.singularize.underscore}_path",
+      record
+    )
   visit(path)
 end
 
@@ -130,12 +161,12 @@ step 'I see :string within :string' do |content, locator|
   validation_report_screenshot
 end
 
-step 'I don\'t see :string' do |content|
+step "I don't see :string" do |content|
   expect(page).not_to have_content(content, normalize_ws: true)
   validation_report_screenshot
 end
 
-step 'I don\'t see :string within :string' do |content, locator|
+step "I don't see :string within :string" do |content, locator|
   expect(page.find(locator)).not_to have_content(content, normalize_ws: true)
   validation_report_screenshot
 end
@@ -153,9 +184,7 @@ step 'I click link :string' do |locator|
 end
 
 step 'I click link :string in :string' do |locator, selector|
-  within(selector) do
-    click_link(locator)
-  end
+  within(selector) { click_link(locator) }
 end
 
 step 'I click :string in :string row' do |locator, row_content|
@@ -173,7 +202,7 @@ step 'I see :string in :string row' do |text, row_content|
   validation_report_screenshot
 end
 
-step 'I don\'t see :string in :string row' do |text, row_content|
+step "I don't see :string in :string row" do |text, row_content|
   page.all('tr').each do |td|
     next unless td.text.include?(row_content)
     expect(td.text).not_to include(text)
@@ -191,34 +220,39 @@ end
 
 step 'I wait for all jobs in :string queue' do |queue|
   available_workers =
-    Dir['app/workers/**/*']
-      .entries
-      .map { |file| File.read(file).match(/class ([^\n]*)/).andand[1] }
-      .compact
-  if available_workers.include?(queue)
-    queue.constantize.drain
-  end
+    Dir['app/workers/**/*'].entries.map do |file|
+      File.read(file).match(/class ([^\n]*)/).andand[1]
+    end.compact
+  queue.constantize.drain if available_workers.include?(queue)
 end
 
 step 'I download zip file' do
-  clear_downloads_js = "document.querySelector('downloads-manager').shadowRoot.querySelector('downloads-toolbar').shadowRoot.querySelector('button.clear-all').click()"
-  download_count_js = "document.querySelector('downloads-manager').shadowRoot.querySelectorAll('downloads-item').length"
-  no_downloads_el_js = "document.querySelector('downloads-manager').shadowRoot.querySelector('#no-downloads')"
+  clear_downloads_js =
+    "document.querySelector('downloads-manager').shadowRoot.querySelector('downloads-toolbar').shadowRoot.querySelector('button.clear-all').click()"
+  download_count_js =
+    "document.querySelector('downloads-manager').shadowRoot.querySelectorAll('downloads-item').length"
+  no_downloads_el_js =
+    "document.querySelector('downloads-manager').shadowRoot.querySelector('#no-downloads')"
 
   page.driver.browser.get('chrome://downloads/')
   ts = Time.now
-  begin
-    download_count = page.evaluate_script(download_count_js)
-  end until Time.now - ts > Capybara.default_max_wait_time ||
-            download_count == 1 || !sleep(0.1)
+  until Time.now - ts > Capybara.default_max_wait_time || download_count == 1 ||
+    !sleep(0.1)
+    begin
+      download_count = page.evaluate_script(download_count_js)
+    end
+  end
   expect(download_count).to eq(1)
   expect(page).to have_content(".zip\n")
   validation_report_screenshot
   page.evaluate_script(clear_downloads_js)
   ts = Time.now
-  begin
-    no_downloads_el = page.evaluate_script(no_downloads_el_js)
-  end until Time.now - ts > Capybara.default_max_wait_time ||
-            !no_downloads_el[:hidden] || !sleep(0.1)
+  until Time.now - ts > Capybara.default_max_wait_time ||
+    !no_downloads_el[:hidden] ||
+    !sleep(0.1)
+    begin
+      no_downloads_el = page.evaluate_script(no_downloads_el_js)
+    end
+  end
   expect(no_downloads_el[:hidden]).to be_falsy
 end
