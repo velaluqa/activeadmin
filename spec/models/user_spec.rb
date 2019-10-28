@@ -60,6 +60,7 @@ RSpec.describe User do
 
       it 'to contain unscopable permissions' do
         expect(user.permission_matrix).to eq(
+          'BackgroundJob' => %i[read update create destroy],
           'Study' => %i[read],
           'ImageSeries' => %i[upload],
           'User' => %i[read update generate_keypair],
@@ -84,6 +85,7 @@ RSpec.describe User do
 
       it 'only keeps :manage' do
         expected = {
+          'BackgroundJob' => %i[read update create destroy],
           'Study' => %i[manage],
           'Center' => %i[manage],
           'Image' => %i[read],
