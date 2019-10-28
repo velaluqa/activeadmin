@@ -368,6 +368,16 @@ docker exec -it erica_postgres_production su postgres -c "psql -c \"CREATE DATAB
 docker exec -it erica_postgres_production su postgres -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE erica_production to erica;\""
 #+END_SRC
 
+Or connect via ~docker exec -it erica_postgres_production su postgres -c psql~ and perform:
+
+#+BEGIN_SRC shell
+cd /srv
+docker exec -it erica_postgres su postgres -c psql
+CREATE USER erica WITH PASSWORD '<erica password>'
+CREATE DATABASE erica_production
+GRANT ALL PRIVILEGES ON DATABASE erica_production to erica;
+#+END_SRC
+
 ** Configure ERICA
 
 *** Create database configuration file
