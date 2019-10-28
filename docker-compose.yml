@@ -32,7 +32,7 @@ app:
     - worker
 test:
   build: *build
-  command: guard
+  command: bundle exec guard
   tty: true
   volumes: *volumes
   environment:
