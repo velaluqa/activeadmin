@@ -1,4 +1,4 @@
-StudyServer::Application.routes.draw do
+Rails.application.routes.draw do
   ActiveAdmin.routes(self)
 
   mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?

@@ -1,4 +1,4 @@
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 
 # Require standard library extensions before anything rails specific,
 # so that ActiveSupport has the last word in terms of method
@@ -16,21 +16,18 @@ require 'pp'
 
 module StudyServer
   class Application < Rails::Application
-    # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration should go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded.
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 5.0
 
     config.generators do |g|
       g.test_framework :rspec, fixture: true
-      g.fixture_replacement :factory_girl, dir: 'spec/factories'
+      g.fixture_replacement :factory_bot, dir: 'spec/factories'
       g.template_engine :haml
     end
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W[#{config.root}/app/workers #{config.root}/app/models/concerns #{config.root}/app/drops]
 
-    # Opt-in into the future default behaviour.
-    config.active_record.raise_in_transactional_callbacks = true
 
     config.active_job.queue_adapter = :sidekiq
 
