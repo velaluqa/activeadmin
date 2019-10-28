@@ -59,11 +59,8 @@ module ImageStorageCallbacks
     #
     # @return [Boolean] success
     def remove_image_storage_dir(path)
-      if File.exist?(path)
-        FileUtils.rm_r(path)
-      else
-        true
-      end
+      return true unless File.exist?(path)
+      FileUtils.rm_r(path)
     rescue SystemCallError => e
       Rails.logger.error "Failed to remove image storage for #{self} at #{path}: #{e}"
       false
