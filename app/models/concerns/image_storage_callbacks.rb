@@ -82,5 +82,9 @@ module ImageStorageCallbacks
     def image_storage_path
       raise '#image_storage_path is not defined for model including ImageStorageCallbacks concern'
     end
+
+    def absolute_image_storage_path
+      File.join(Rails.configuration.image_storage_root, image_storage_path)
+    end
   end
 end
