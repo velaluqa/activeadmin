@@ -240,6 +240,8 @@ step 'I download zip file' do
     !sleep(0.1)
     begin
       download_count = page.evaluate_script(download_count_js)
+    rescue e
+      puts e.inspect
     end
   end
   expect(download_count).to eq(1)
@@ -252,6 +254,8 @@ step 'I download zip file' do
     !sleep(0.1)
     begin
       no_downloads_el = page.evaluate_script(no_downloads_el_js)
+    rescue e
+      puts e.inspect
     end
   end
   expect(no_downloads_el[:hidden]).to be_falsy
