@@ -24,7 +24,7 @@
 # * `index_user_roles_on_user_id`:
 #     * **`user_id`**
 #
-class UserRole < ActiveRecord::Base
+class UserRole < ApplicationRecord
   has_paper_trail class_name: 'Version'
 
   belongs_to :user

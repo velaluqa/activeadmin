@@ -21,7 +21,7 @@
 # * `index_public_keys_on_user_id`:
 #     * **`user_id`**
 #
-class PublicKey < ActiveRecord::Base
+class PublicKey < ApplicationRecord
   attr_accessible :public_key, :user_id, :active, :deactivated_at
   attr_accessible :user
 

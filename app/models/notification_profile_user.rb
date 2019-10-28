@@ -19,7 +19,7 @@
 #     * **`user_id`**
 #
 
-class NotificationProfileUser < ActiveRecord::Base
+class NotificationProfileUser < ApplicationRecord
   has_paper_trail class_name: 'Version'
 
   belongs_to :notification_profile

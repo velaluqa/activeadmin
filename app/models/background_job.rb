@@ -35,7 +35,7 @@
 # * `index_background_jobs_on_user_id`:
 #     * **`user_id`**
 #
-class BackgroundJob < ActiveRecord::Base
+class BackgroundJob < ApplicationRecord
   belongs_to :user
 
   before_destroy :remove_zipfile

@@ -126,7 +126,7 @@ WHERE
   end
 
   class << self
-    # The provided method `find_each` of ActiveRecord is based on
+    # The provided method `find_each` of ActiveRecord ApplicationRecord
     # `find_in_batches` which strips existing `order` filters and
     # orders by `id ASC` by default.
     #

@@ -16,7 +16,7 @@
 # **`title`**       | `string`           | `not null`
 # **`updated_at`**  | `datetime`         |
 #
-class Role < ActiveRecord::Base
+class Role < ApplicationRecord
   has_paper_trail class_name: 'Version'
 
   attr_accessible(:title, :abilities)

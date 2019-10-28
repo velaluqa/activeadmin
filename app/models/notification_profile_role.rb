@@ -18,7 +18,7 @@
 # * `index_notification_profile_roles_on_role_id`:
 #     * **`role_id`**
 #
-class NotificationProfileRole < ActiveRecord::Base
+class NotificationProfileRole < ApplicationRecord
   has_paper_trail class_name: 'Version'
 
   belongs_to :notification_profile

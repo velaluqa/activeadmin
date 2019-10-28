@@ -17,7 +17,7 @@
 # * `index_historic_report_cache_values_on_entry_id`:
 #     * **`historic_report_cache_entry_id`**
 #
-class HistoricReportCacheValue < ActiveRecord::Base
+class HistoricReportCacheValue < ApplicationRecord
   belongs_to :historic_report_cache_entry
 
   def to_h

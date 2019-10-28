@@ -41,7 +41,7 @@ require 'git_config_repository'
 # * `index_visits_on_visit_number`:
 #     * **`visit_number`**
 #
-class Visit < ActiveRecord::Base
+class Visit < ApplicationRecord
   include DominoDocument
   include NotificationFilter
 

@@ -19,7 +19,7 @@
 # ERICA keeps all historic data in the audit trail. This data is
 # extracted for reporting if available.
 #
-class HistoricReportQuery < ActiveRecord::Base
+class HistoricReportQuery < ApplicationRecord
   has_many :historic_report_cache_entries
   alias_method :cache_entries, :historic_report_cache_entries
 

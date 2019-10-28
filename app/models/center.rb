@@ -22,7 +22,7 @@
 #     * **`study_id`**
 #     * **`code`**
 #
-class Center < ActiveRecord::Base
+class Center < ApplicationRecord
   include DominoDocument
 
   has_paper_trail(

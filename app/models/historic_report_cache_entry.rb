@@ -23,7 +23,7 @@
 # * `index_historic_report_cache_entries_on_study_id`:
 #     * **`study_id`**
 #
-class HistoricReportCacheEntry < ActiveRecord::Base
+class HistoricReportCacheEntry < ApplicationRecord
   belongs_to :historic_report_query
   belongs_to :study
 

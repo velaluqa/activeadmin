@@ -28,7 +28,7 @@
 #     * **`visit_id`**
 #     * **`name`**
 #
-class RequiredSeries < ActiveRecord::Base
+class RequiredSeries < ApplicationRecord
   include DominoDocument
 
   belongs_to :visit

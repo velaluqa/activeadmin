@@ -22,7 +22,7 @@
 # * `index_permissions_on_subject`:
 #     * **`subject`**
 #
-class Permission < ActiveRecord::Base
+class Permission < ApplicationRecord
   ABILITY_REGEX = /^(.+)_(#{Ability::ACTIVITIES.keys.map { |subject| subject.to_s.underscore }.join('|')})$/
 
   belongs_to :role

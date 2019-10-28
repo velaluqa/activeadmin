@@ -46,7 +46,7 @@ require 'email_validator'
 # * `index_users_on_username` (_unique_):
 #     * **`username`**
 #
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   has_paper_trail class_name: 'Version'
 
   devise(

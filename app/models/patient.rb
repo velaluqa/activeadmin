@@ -21,7 +21,7 @@
 # * `index_patients_on_center_id`:
 #     * **`center_id`**
 #
-class Patient < ActiveRecord::Base
+class Patient < ApplicationRecord
   include DominoDocument
 
   has_paper_trail(

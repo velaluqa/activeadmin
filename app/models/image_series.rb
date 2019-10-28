@@ -32,7 +32,7 @@
 # * `index_image_series_on_visit_id`:
 #     * **`visit_id`**
 #
-class ImageSeries < ActiveRecord::Base
+class ImageSeries < ApplicationRecord
   include DominoDocument
   after_commit :schedule_domino_sync
 
