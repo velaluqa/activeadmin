@@ -140,7 +140,7 @@ gem 'faker'
 gem 'awesome_print'
 
 # Use HAML and CoffeeScript for Backbone.JS SPAs
-gem 'haml_coffee_assets', github: 'nolan/haml_coffee_assets'
+gem 'haml_coffee_assets'
 gem 'sprockets-rails'
 
 # Validate JSONB columns via JSONschema

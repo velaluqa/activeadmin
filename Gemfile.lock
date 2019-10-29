@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/nolan/haml_coffee_assets.git
-  revision: fdf477d2cc3907040de3faf32f8c72fe48c5fb21
-  specs:
-    haml_coffee_assets (1.16.0)
-      coffee-script (~> 2.0)
-      sprockets (>= 2.0)
-      tilt (~> 1.1)
-
-GIT
   remote: https://github.com/velaluqa/liquid.git
   revision: 86944fe7b77710b299a5d03fb6ef816f6c09feb4
   branch: master
@@ -304,6 +295,9 @@ GEM
       haml (>= 4.0.6, < 6.0)
       html2haml (>= 1.0.1)
       railties (>= 5.1)
+    haml_coffee_assets (1.18.0)
+      coffee-script (>= 2)
+      sprockets (>= 2)
     has_scope (0.7.2)
       actionpack (>= 4.1)
       activesupport (>= 4.1)
@@ -793,7 +787,7 @@ DEPENDENCIES
   guard-rspec
   haml
   haml-rails
-  haml_coffee_assets!
+  haml_coffee_assets
   hirb
   jbuilder
   jquery-rails
