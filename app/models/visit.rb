@@ -134,7 +134,7 @@ JOIN
   end
 
   # TODO: Replace with a less naive full-text search index
-  scope :filter, ->(query) {
+  scope :with_filter, ->(query) {
     return unless query
 
     words = query.split(' ')
