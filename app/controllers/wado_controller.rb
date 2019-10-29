@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 class WadoController < ApplicationController
-  before_filter :skip_trackable # do not track requests to the WADO API as logins/logouts, because every single request would be counted as one login
-  before_filter :authenticate_user!
-  before_filter :authorize_user!
+  before_action :skip_trackable # do not track requests to the WADO API as logins/logouts, because every single request would be counted as one login
+  before_action :authenticate_user!
+  before_action :authorize_user!
 
-  before_filter :check_request_type
+  before_action :check_request_type
 
-  before_filter :read_wado_parameters
-  before_filter :parse_transfer_syntax
-  before_filter :find_supported_content_type
-  before_filter :find_image
+  before_action :read_wado_parameters
+  before_action :parse_transfer_syntax
+  before_action :find_supported_content_type
+  before_action :find_image
 
   # we only support single/multi-frame dicom images as objects
 
@@ -50,12 +50,10 @@ class WadoController < ApplicationController
   end
 
   def check_request_type
-    if params[:requestType] != 'WADO'
-      head :bad_request
-      return false
-    end
+    return if params[:requestType] == 'WADO'
 
-    true
+    head :bad_request
+    throw(:abort)
   end
 
   def read_wado_parameters
@@ -136,8 +134,6 @@ class WadoController < ApplicationController
     authorize! :read, @image
     pp @image
     return head :not_found if @image.nil?
-
-    true
   end
 
   def image_to_transfer_syntax(transfer_syntax)

@@ -1,9 +1,10 @@
 class Users::SessionsController < Devise::SessionsController
   DeviseController.respond_to :json
 
-  skip_before_filter :verify_authenticity_token, only: :authenticate_user
+  skip_before_action :verify_authenticity_token, only: :authenticate_user
 
-  after_filter :generate_csrf_token, only: :create # force generation of a CSRF token on login
+  # Force generation of a CSRF token on login
+  after_action :generate_csrf_token, only: :create
 
   def new
     @dont_display_navbar = true

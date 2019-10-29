@@ -1,5 +1,5 @@
 class VisitsController < ApplicationController
-  before_filter :load_the_visit, only: %i[wado_query required_series_wado_query]
+  before_action :load_the_visit, only: %i[wado_query required_series_wado_query]
 
   def wado_query
     @patients = [{ id: @visit.patient.id, name: @visit.patient.name, visits: [@visit.wado_query] }]

@@ -4,7 +4,7 @@ ActiveAdmin.register BackgroundJob do
     priority: 10
   )
 
-  before_filter { @skip_sidebar = true }
+  before_action { @skip_sidebar = true }
 
   config.filters = false
   config.comments = false

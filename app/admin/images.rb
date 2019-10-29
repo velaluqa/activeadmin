@@ -26,7 +26,7 @@ ActiveAdmin.register Image do
       end
     end
 
-    before_filter :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
+    before_action :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
     def authorize_erica_remote
       return if params[:format].blank?
       authorize! :download_status_files, Image

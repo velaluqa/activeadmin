@@ -46,7 +46,7 @@ module StudyServer
     config.assets.paths << Rails.root.join('vendor', 'assets', 'fonts')
 
     config.to_prepare do
-      Devise::UsersController.skip_before_filter(:ensure_valid_password, :ensure_valid_keypair)
+      Devise::UsersController.skip_before_action(:ensure_valid_password, :ensure_valid_keypair)
     end
   end
 end

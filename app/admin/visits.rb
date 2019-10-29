@@ -34,13 +34,13 @@ ActiveAdmin.register Visit do
       return selected_filters
     end
 
-    before_filter :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
+    before_action :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
     def authorize_erica_remote
       return if params[:format].blank?
       authorize! :download_status_files, Visit
     end
 
-    before_filter :transform_filter_params, only: :index
+    before_action :transform_filter_params, only: :index
     def transform_filter_params
       session[:current_images_filter] = nil if params[:clear_filter] == 'true'
 
