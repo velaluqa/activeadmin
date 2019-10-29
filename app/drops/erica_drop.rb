@@ -16,7 +16,8 @@ class EricaDrop < Liquid::Rails::Drop # :nodoc:
         _set_attr_description(attr)
       end
     end
-    alias_method_chain(:attributes, :desc)
+    alias_method :attributes_without_desc, :attributes
+    alias_method :attributes, :attributes_with_desc
 
     def attribute(attr)
       @_attributes.push(attr)
@@ -41,7 +42,8 @@ class EricaDrop < Liquid::Rails::Drop # :nodoc:
         _attr_descriptions.delete(name)
       end
     end
-    alias_method_chain :associate, :desc
+    alias_method :associate_without_desc, :associate
+    alias_method :associate, :associate_with_desc
 
     def method_added(name)
       super
