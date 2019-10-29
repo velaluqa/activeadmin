@@ -6,15 +6,6 @@ GIT
     liquid (4.0.0.rc3)
 
 GIT
-  remote: https://github.com/velaluqa/rspec-sidekiq.git
-  revision: 538cb9d4802d936d660f47df8c1841a2a8d51960
-  branch: deprecate-have-enqueued-job
-  specs:
-    rspec-sidekiq (3.0.1)
-      rspec-core (~> 3.0, >= 3.0.0)
-      sidekiq (>= 2.4.0)
-
-GIT
   remote: https://github.com/velaluqa/textpow.git
   revision: 46005ff8fdfe0108c45f98fc0be0c6bf170b27ec
   branch: master
@@ -552,6 +543,9 @@ GEM
       rspec-expectations (~> 3.9.0)
       rspec-mocks (~> 3.9.0)
       rspec-support (~> 3.9.0)
+    rspec-sidekiq (3.0.3)
+      rspec-core (~> 3.0, >= 3.0.0)
+      sidekiq (>= 2.4.0)
     rspec-support (3.9.0)
     rubocop (0.76.0)
       jaro_winkler (~> 1.5.1)
@@ -828,7 +822,7 @@ DEPENDENCIES
   rspec
   rspec-mocks
   rspec-rails
-  rspec-sidekiq!
+  rspec-sidekiq
   rubocop
   rubocop-checkstyle_formatter
   ruby-progressbar
