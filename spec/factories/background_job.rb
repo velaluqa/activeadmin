@@ -3,7 +3,7 @@ FactoryBot.define do
     user
     completed { false }
 
-    name { Faker::Lorem.words(3) }
+    name { Faker::Lorem.words(number: 3) }
 
     trait :complete do
       completed { true }

@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :notification_profile do
-    title { Faker::Lorem.sentence(3, false, 3) }
+    title { Faker::Lorem.sentence(word_count: 3, supplemental: false, random_words_to_add: 3) }
     description { nil }
     notification_type { nil }
 
