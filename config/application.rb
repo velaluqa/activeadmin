@@ -40,11 +40,6 @@ module StudyServer
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-    # Version of your assets, change this if you want to expire all your assets
-    config.assets.version = '1.0'
-
-    config.assets.paths << Rails.root.join('vendor', 'assets', 'fonts')
-
     config.to_prepare do
       Devise::UsersController.skip_before_action(:ensure_valid_password, :ensure_valid_keypair)
     end
