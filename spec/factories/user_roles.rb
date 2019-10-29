@@ -1,7 +1,9 @@
 FactoryBot.define do
   factory :user_role do
     transient do
-      with_permissions({})
+      with_permissions do
+        {}
+      end
     end
 
     user

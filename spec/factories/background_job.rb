@@ -1,22 +1,22 @@
 FactoryBot.define do
   factory :background_job do
     user
-    completed false
+    completed { false }
 
     name { Faker::Lorem.words(3) }
 
     trait :complete do
-      completed true
-      progress 1.0
+      completed { true }
+      progress { 1.0 }
       completed_at { DateTime.now }
     end
 
     trait :successful do
-      successful true
+      successful { true }
     end
 
     trait :failed do
-      successful false
+      successful { false }
     end
 
     trait :with_zipfile do

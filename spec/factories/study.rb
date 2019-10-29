@@ -3,20 +3,20 @@ FactoryBot.define do
     sequence(:name) { |n| "Study #{n}" }
 
     transient do
-      configuration(nil)
+      configuration { nil }
     end
 
     trait :production do
-      state Study.state_sym_to_int(:production)
+      state { Study.state_sym_to_int(:production) }
     end
 
     trait :building do
-      state Study.state_sym_to_int(:building)
+      state { Study.state_sym_to_int(:building) }
     end
 
     trait :with_centers do
       transient do
-        centers_count 3
+        centers_count { 3 }
       end
 
       after :create do |study, evaluator|

@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :public_key do
     user
-    public_key 'Some Public Key'
-    active true
+    public_key { 'Some Public Key' }
+    active { true }
 
     before(:create) do |public_key|
       return unless public_key.active?
@@ -10,11 +10,11 @@ FactoryBot.define do
     end
 
     trait :active do
-      active true
+      active { true }
     end
 
     trait :deactivated do
-      active false
+      active { false }
       deactivated_at { DateTime.now }
     end
   end
