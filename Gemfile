@@ -132,7 +132,7 @@ gem 'facets', require: false
 gem 'sinatra', require: nil
 gem 'slim'
 
-# FactoryGirl is used in production to create seed data.
+# FactoryBot is used in production to create seed data.
 gem 'factory_bot_rails'
 gem 'faker'
 
@@ -157,6 +157,7 @@ gem 'nokogiri'
 gem 'premailer-rails'
 
 gem 'trailblazer-rails'
+gem 'reform-rails'
 gem 'dry-types'
 
 group :development do

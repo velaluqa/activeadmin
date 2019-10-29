@@ -507,6 +507,9 @@ GEM
     reform (2.2.4)
       disposable (>= 0.4.1)
       representable (>= 2.4.0, < 3.1.0)
+    reform-rails (0.1.7)
+      activemodel (>= 3.2)
+      reform (>= 2.2.0)
     regexp_parser (1.6.0)
     representable (3.0.4)
       declarative (< 0.1.0)
@@ -660,7 +663,7 @@ GEM
       ref
     thor (0.20.3)
     thread_safe (0.3.6)
-    tilt (1.4.1)
+    tilt (2.0.10)
     timecop (0.9.1)
     tins (1.21.1)
     trailblazer (2.1.0)
@@ -818,6 +821,7 @@ DEPENDENCIES
   redcarpet
   redis-namespace
   reek
+  reform-rails
   rest-client
   rspec
   rspec-mocks
