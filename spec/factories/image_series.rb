@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :image_series do
     sequence(:name) { |n| "image_series#{n}" }
     patient do |is|

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :notification do
     notification_profile_id { create(:notification_profile).id }
     resource_id { create(:visit, :without_notification_callbacks).id }

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :patient do
     center
     sequence(:subject_id)

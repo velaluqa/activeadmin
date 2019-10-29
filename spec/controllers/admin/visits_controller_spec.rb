@@ -109,7 +109,7 @@ RSpec.describe Admin::VisitsController do
       end
 
       before(:each) do
-        @patient = FactoryGirl.create(:patient)
+        @patient = FactoryBot.create(:patient)
       end
 
       it 'succeeds' do

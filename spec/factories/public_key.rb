@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :public_key do
     user
     public_key 'Some Public Key'

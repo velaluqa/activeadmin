@@ -1,5 +1,5 @@
 step 'a user :string' do |username|
-  FactoryGirl.create(
+  FactoryBot.create(
     :user,
     :changed_password,
     :with_keypair,

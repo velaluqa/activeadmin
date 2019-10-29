@@ -3,7 +3,7 @@ module ControllerMacros
     before(:each) do
       @request.env['devise.mapping'] = Devise.mappings[:user]
       user =
-        FactoryGirl.create(
+        FactoryBot.create(
           :user,
           :changed_password,
           :with_keypair,
@@ -18,7 +18,7 @@ module ControllerMacros
   def login_user_with_abilities(&block)
     before(:each) do
       @request.env['devise.mapping'] = Devise.mappings[:user]
-      @current_user = FactoryGirl.create(:user, :changed_password, :with_keypair)
+      @current_user = FactoryBot.create(:user, :changed_password, :with_keypair)
       sign_in @current_user
 
       ability = Class.new { attr_accessor :current_user }.new

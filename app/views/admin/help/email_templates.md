@@ -1,11 +1,11 @@
 <%-
   locals = {
     test_studies: [
-  	  FactoryGirl.build(:study, name: 'Study 1'),
-  	  FactoryGirl.build(:study, name: 'Study 2'),
-  	  FactoryGirl.build(:study, name: 'Study 3')
+  	  FactoryBot.build(:study, name: 'Study 1'),
+  	  FactoryBot.build(:study, name: 'Study 2'),
+  	  FactoryBot.build(:study, name: 'Study 3')
   	],
-  	test_study: Study.first || FactoryGirl.build(:study, id: 1, name: 'Sophisticated Test Study', created_at: (DateTime.now - 2.days))
+  	test_study: Study.first || FactoryBot.build(:study, id: 1, name: 'Sophisticated Test Study', created_at: (DateTime.now - 2.days))
   }
 -%>
 

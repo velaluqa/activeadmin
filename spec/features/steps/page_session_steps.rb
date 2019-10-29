@@ -9,9 +9,9 @@ step 'I sign in as a user' do
 end
 
 step 'a test user with a test role' do
-  @current_user_role = FactoryGirl.create(:role)
+  @current_user_role = FactoryBot.create(:role)
   @current_user =
-    FactoryGirl.create(
+    FactoryBot.create(
       :user,
       :changed_password,
       :with_keypair,
@@ -65,7 +65,7 @@ step 'I belong to role :string scoped to :string :string' do |role, model, ident
 end
 
 step 'I have a role scoped to :string :string' do |model, identifier|
-  @current_user_role = FactoryGirl.create(:role)
+  @current_user_role = FactoryBot.create(:role)
   step(
     "user \"#{@current_user.username}\" belongs to role \"#{
       @current_user_role.title

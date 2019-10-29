@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :background_job do
     user
     completed false

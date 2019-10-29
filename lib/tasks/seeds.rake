@@ -29,7 +29,7 @@ namespace :erica do
       def create_role(title, permissions = {})
         return if Role.where(title: title).exists?
         puts "Creating role '#{title}'"
-        FactoryGirl.create(:role,
+        FactoryBot.create(:role,
                            title: title,
                            with_permissions: permissions[:with_permissions])
       end
@@ -100,16 +100,16 @@ namespace :erica do
           total: center_count * patient_count * image_series_count * image_count
         )
         center_count.times do
-          center = FactoryGirl.create(:center, study: options[:study])
+          center = FactoryBot.create(:center, study: options[:study])
 
           patient_count.times do
-            patient = FactoryGirl.create(:patient, center: center)
+            patient = FactoryBot.create(:patient, center: center)
 
             image_series_count.times do
-              image_series = FactoryGirl.create(:image_series, patient: patient)
+              image_series = FactoryBot.create(:image_series, patient: patient)
 
               image_count.times do
-                FactoryGirl.create(:image, image_series: image_series)
+                FactoryBot.create(:image, image_series: image_series)
 
                 progress.increment
               end
@@ -118,7 +118,7 @@ namespace :erica do
         end
       end
 
-      @study1 = FactoryGirl.create(:study, name: 'Small Study')
+      @study1 = FactoryBot.create(:study, name: 'Small Study')
       populate_study(
         study: @study1,
         centers: 10,
@@ -126,7 +126,7 @@ namespace :erica do
         image_series: 10,
         images: 10
       )
-      @study2 = FactoryGirl.create(:study, name: 'Medium Study')
+      @study2 = FactoryBot.create(:study, name: 'Medium Study')
       populate_study(
         study: @study2,
         centers: 25,
@@ -134,7 +134,7 @@ namespace :erica do
         image_series: 25,
         images: 25
       )
-      @study3 = FactoryGirl.create(:study, name: 'Large Study')
+      @study3 = FactoryBot.create(:study, name: 'Large Study')
       populate_study(
         study: @study3,
         centers: 50,
