@@ -118,9 +118,6 @@ class NotificationProfile < ActiveRecord::Base
 
   has_paper_trail class_name: 'Version'
 
-  serialize :triggering_actions, StringArraySerializer
-  serialize :filters, HashArraySerializer
-
   has_many :notification_profile_users
   has_many :users, through: :notification_profile_users, dependent: :destroy
   has_many :notification_profile_roles
