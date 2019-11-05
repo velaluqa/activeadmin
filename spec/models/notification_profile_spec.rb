@@ -511,7 +511,7 @@ RSpec.describe NotificationProfile do
   with_model :MultiModel do
     table do |t|
       t.string :foo, null: true
-      t.references :test_model
+      t.references :test_model, index: false
     end
     model do
       belongs_to :test_model
@@ -534,7 +534,7 @@ RSpec.describe NotificationProfile do
       t.string :foobar, null: true
       t.string :foobaz, null: true
       t.json :required_series
-      t.references :extra_model
+      t.references :extra_model, index: false
     end
     model do
       include NotificationFilter
