@@ -15,7 +15,7 @@ RSpec.describe V1::ImagesController do
     end
 
     describe 'without current user' do
-      let(:response) { post(:create, format: :json, image: @image_data) }
+      let(:response) { post(:create, format: :json, params: { image: @image_data }) }
       it { expect(response).to have_http_status(:forbidden) }
     end
 
@@ -26,7 +26,7 @@ RSpec.describe V1::ImagesController do
       end
 
       it 'succeeds' do
-        response = post(:create, format: :json, image: @image_data)
+        response = post(:create, format: :json, params: { image: @image_data })
         expect(response).to have_http_status(:created)
         expect(File).to exist(ERICA.image_storage_path.join(Image.last.image_storage_path))
       end
@@ -38,7 +38,7 @@ RSpec.describe V1::ImagesController do
       end
 
       it 'denies access' do
-        response = post(:create, format: :json, image: @image_data)
+        response = post(:create, format: :json, params: { image: @image_data })
         expect(response).to have_http_status(:forbidden)
       end
     end

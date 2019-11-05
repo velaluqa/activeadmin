@@ -12,7 +12,7 @@ RSpec.describe V1::ImageSeriesController do
     end
 
     describe 'without current user' do
-      let(:response) { post(:create, format: :json, image_series: image_series) }
+      let(:response) { post(:create, format: :json, params: { image_series: image_series }) }
       it { expect(response).to have_http_status(:forbidden) }
     end
 
@@ -23,7 +23,7 @@ RSpec.describe V1::ImageSeriesController do
       end
 
       it 'succeeds' do
-        response = post(:create, format: :json, image_series: image_series)
+        response = post(:create, format: :json, params: { image_series: image_series })
         expect(response).to have_http_status(:created)
       end
     end
@@ -34,7 +34,7 @@ RSpec.describe V1::ImageSeriesController do
       end
 
       it 'denies access' do
-        response = post(:create, format: :json, image_series: image_series)
+        response = post(:create, format: :json, params: { image_series: image_series })
         expect(response).to have_http_status(:forbidden)
       end
     end
@@ -50,7 +50,7 @@ RSpec.describe V1::ImageSeriesController do
     end
 
     describe 'without current user' do
-      let(:response) { put(:update, id: @image_series.id, format: :json, image_series: @new_attributes) }
+      let(:response) { put(:update, format: :json, params: { id: @image_series.id, image_series: @new_attributes }) }
       it { expect(response).to have_http_status(:forbidden) }
     end
 
@@ -61,7 +61,7 @@ RSpec.describe V1::ImageSeriesController do
       end
 
       it 'succeeds' do
-        response = put(:update, id: @image_series.id, format: :json, image_series: @new_attributes)
+        response = put(:update, format: :json, params: { id: @image_series.id, image_series: @new_attributes })
         expect(response).to have_http_status(:ok)
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe V1::ImageSeriesController do
       end
 
       it 'denies access' do
-        response = put(:update, id: @image_series.id, format: :json, image_series: @new_attributes)
+        response = put(:update, format: :json, params: { id: @image_series.id, image_series: @new_attributes })
         expect(response).to have_http_status(:forbidden)
       end
     end
@@ -84,7 +84,7 @@ RSpec.describe V1::ImageSeriesController do
     end
 
     describe 'without current user' do
-      let(:response) { post(:finish_import, id: @image_series.id, format: :json, expected_image_count: 0) }
+      let(:response) { post(:finish_import, format: :json, params: { id: @image_series.id, expected_image_count: 0 }) }
       it { expect(response).to have_http_status(:forbidden) }
     end
 
@@ -95,7 +95,7 @@ RSpec.describe V1::ImageSeriesController do
       end
 
       it 'succeeds' do
-        response = post(:finish_import, id: @image_series.id, format: :json, expected_image_count: 0)
+        response = post(:finish_import, format: :json, params: { id: @image_series.id, expected_image_count: 0 })
         expect(response).to have_http_status(:ok)
         @image_series.reload
         expect(@image_series.state_sym).to eq :imported
@@ -108,7 +108,7 @@ RSpec.describe V1::ImageSeriesController do
       end
 
       it 'denies access' do
-        response = post(:finish_import, id: @image_series.id, format: :json, expected_image_count: 0)
+        response = post(:finish_import, format: :json, params: { id: @image_series.id, expected_image_count: 0 })
         expect(response).to have_http_status(:forbidden)
       end
     end
@@ -123,7 +123,7 @@ RSpec.describe V1::ImageSeriesController do
     end
 
     describe 'without current user' do
-      let(:response) { post(:assign_required_series, id: @image_series.id, format: :json, required_series: @required_series) }
+      let(:response) { post(:assign_required_series, format: :json, params: { id: @image_series.id, required_series: @required_series }) }
       it { expect(response).to have_http_status(:forbidden) }
     end
 
@@ -134,7 +134,7 @@ RSpec.describe V1::ImageSeriesController do
       end
 
       it 'succeeds' do
-        response = post(:assign_required_series, id: @image_series.id, format: :json, required_series: @required_series)
+        response = post(:assign_required_series, format: :json, params: { id: @image_series.id, required_series: @required_series })
         expect(response).to have_http_status(:ok)
       end
     end
@@ -145,7 +145,7 @@ RSpec.describe V1::ImageSeriesController do
       end
 
       it 'denies access' do
-        response = post(:assign_required_series, id: @image_series.id, format: :json, required_series: @required_series)
+        response = post(:assign_required_series, format: :json, params: { id: @image_series.id, required_series: @required_series })
         expect(response).to have_http_status(:forbidden)
       end
     end

@@ -15,7 +15,7 @@ RSpec.describe Admin::StudiesController do
 
       it 'succeeds' do
         response = get :index
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -36,7 +36,7 @@ RSpec.describe Admin::StudiesController do
     end
 
     describe 'without current user' do
-      subject { get(:show, id: @study.id) }
+      subject { get(:show, params: { id: @study.id }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -47,8 +47,8 @@ RSpec.describe Admin::StudiesController do
       end
 
       it 'succeeds' do
-        response = get(:show, id: @study.id)
-        expect(response).to be_success
+        response = get(:show, params: { id: @study.id })
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -57,7 +57,7 @@ RSpec.describe Admin::StudiesController do
       login_user_with_abilities
 
       it 'denies access' do
-        response = get(:show, id: @study.id)
+        response = get(:show, params: { id: @study.id })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
@@ -78,7 +78,7 @@ RSpec.describe Admin::StudiesController do
 
       it 'succeeds' do
         response = get(:new)
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -97,7 +97,7 @@ RSpec.describe Admin::StudiesController do
 
   describe '#create' do
     describe 'without current user' do
-      subject { post(:create, study: {}) }
+      subject { post(:create, params: { study: {} }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -109,10 +109,12 @@ RSpec.describe Admin::StudiesController do
       end
 
       it 'succeeds' do
-        response = post(:create, study: {
-                          name: 'My New Study',
-                          domino_db_url: '',
-                          domino_server_name: ''
+        response = post(:create, params: {
+                          study: {
+                            name: 'My New Study',
+                            domino_db_url: '',
+                            domino_server_name: ''
+                          }
                         })
         expect(response).to redirect_to(%r{/admin/studies/\d+})
       end
@@ -124,7 +126,7 @@ RSpec.describe Admin::StudiesController do
       end
 
       it 'denies access' do
-        response = post(:create, study: {})
+        response = post(:create, params: { study: {} })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
@@ -136,7 +138,7 @@ RSpec.describe Admin::StudiesController do
     end
 
     describe 'without current user' do
-      subject { post(:destroy, id: @study.id) }
+      subject { post(:destroy, params: { id: @study.id }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -148,7 +150,7 @@ RSpec.describe Admin::StudiesController do
       end
 
       it 'succeeds' do
-        response = post(:destroy, id: @study.id)
+        response = post(:destroy, params: { id: @study.id })
         expect(response).to redirect_to('/admin/studies')
       end
     end
@@ -159,7 +161,7 @@ RSpec.describe Admin::StudiesController do
       end
 
       it 'denies access' do
-        response = post(:destroy, id: @study.id)
+        response = post(:destroy, params: { id: @study.id })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
@@ -176,7 +178,7 @@ RSpec.describe Admin::StudiesController do
 
     describe 'without current user' do
       let(:response) do
-        post(:upload_config, id: @study.id, study: { file: file })
+        post(:upload_config, params: { id: @study.id, study: { file: file } })
       end
 
       it { expect(response).to have_http_status(:found) }
@@ -190,7 +192,16 @@ RSpec.describe Admin::StudiesController do
       end
 
       let(:response) do
-        post(:upload_config, id: @study.id, study_contract_upload_configuration: { file: file, id: @study.id, file_cache: '' })
+        post(
+          :upload_config,
+          params: {
+            id: @study.id,
+            study_contract_upload_configuration: {
+              file: file,
+              id: @study.id,
+              file_cache: ''
+            }
+          })
       end
 
       it { expect(response).to redirect_to(%r{/admin/studies/\d+}) }
@@ -202,7 +213,7 @@ RSpec.describe Admin::StudiesController do
       end
 
       let(:response) do
-        post(:upload_config, id: @study.id, study: { file: file })
+        post(:upload_config, params: { id: @study.id, study: { file: file } })
       end
 
       it { expect(response).to redirect_to(admin_not_authorized_path) }

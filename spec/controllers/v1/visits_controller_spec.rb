@@ -7,7 +7,7 @@ RSpec.describe V1::VisitsController do
     end
 
     describe 'without current user' do
-      subject { get :index, format: :json, patient_id: @visit.patient.id }
+      subject { get :index, format: :json, params: { patient_id: @visit.patient.id } }
       it { expect(subject).to have_http_status(:forbidden) }
     end
 
@@ -17,8 +17,8 @@ RSpec.describe V1::VisitsController do
       end
 
       it 'succeeds' do
-        response = get :index, format: :json, patient_id: @visit.patient.id
-        expect(response).to be_success
+        response = get :index, format: :json, params: { patient_id: @visit.patient.id }
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -27,7 +27,7 @@ RSpec.describe V1::VisitsController do
       login_user_with_abilities
 
       it 'denies access' do
-        response = get :index, format: :json, patient_id: @visit.patient.id
+        response = get :index, format: :json, params: { patient_id: @visit.patient.id }
         expect(response).to have_http_status(:forbidden)
       end
     end

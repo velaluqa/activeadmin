@@ -15,7 +15,7 @@ RSpec.describe Admin::EmailTemplatesController do
 
       it 'succeeds' do
         response = get :index
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -36,7 +36,7 @@ RSpec.describe Admin::EmailTemplatesController do
     end
 
     describe 'without current user' do
-      subject { get(:show, id: @email_template.id) }
+      subject { get(:show, params: { id: @email_template.id }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -47,8 +47,8 @@ RSpec.describe Admin::EmailTemplatesController do
       end
 
       it 'succeeds' do
-        response = get(:show, id: @email_template.id)
-        expect(response).to be_success
+        response = get(:show, params: { id: @email_template.id })
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -57,7 +57,7 @@ RSpec.describe Admin::EmailTemplatesController do
       login_user_with_abilities
 
       it 'denies access' do
-        response = get(:show, id: @email_template.id)
+        response = get(:show, params: { id: @email_template.id })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
@@ -78,7 +78,7 @@ RSpec.describe Admin::EmailTemplatesController do
 
       it 'succeeds' do
         response = get(:new)
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -97,7 +97,7 @@ RSpec.describe Admin::EmailTemplatesController do
 
   describe '#create' do
     describe 'without current user' do
-      subject { post(:create, email_template: {}) }
+      subject { post(:create, params: { email_template: {} }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -109,10 +109,12 @@ RSpec.describe Admin::EmailTemplatesController do
       end
 
       it 'succeeds' do
-        response = post(:create, email_template: {
-                          name: 'My New EmailTemplate',
-                          email_type: 'NotificationProfile',
-                          template: 'Some Template'
+        response = post(:create, params: {
+                          email_template: {
+                            name: 'My New EmailTemplate',
+                            email_type: 'NotificationProfile',
+                            template: 'Some Template'
+                          }
                         })
         expect(response).to redirect_to(%r{/admin/email_templates/\d+})
       end
@@ -124,7 +126,7 @@ RSpec.describe Admin::EmailTemplatesController do
       end
 
       it 'denies access' do
-        response = post(:create, email_template: {})
+        response = post(:create, params: { email_template: {} })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
@@ -136,7 +138,7 @@ RSpec.describe Admin::EmailTemplatesController do
     end
 
     describe 'without current user' do
-      subject { post(:destroy, id: @email_template.id) }
+      subject { post(:destroy, params: { id: @email_template.id }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -148,7 +150,7 @@ RSpec.describe Admin::EmailTemplatesController do
       end
 
       it 'succeeds' do
-        response = post(:destroy, id: @email_template.id)
+        response = post(:destroy, params: { id: @email_template.id })
         expect(response).to redirect_to('/admin/email_templates')
       end
     end
@@ -159,7 +161,7 @@ RSpec.describe Admin::EmailTemplatesController do
       end
 
       it 'denies access' do
-        response = post(:destroy, id: @email_template.id)
+        response = post(:destroy, params: { id: @email_template.id })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
@@ -174,9 +176,11 @@ RSpec.describe Admin::EmailTemplatesController do
       subject do
         get(
           :preview,
-          type: 'NotificationProfile',
-          subject: "Study_#{@study.id}",
-          template: 'Study: {{notifications.first.resource.name}}'
+          params: {
+            type: 'NotificationProfile',
+            subject: "Study_#{@study.id}",
+            template: 'Study: {{notifications.first.resource.name}}'
+          }
         )
       end
       it { expect(subject).to have_http_status(:found) }
@@ -192,9 +196,11 @@ RSpec.describe Admin::EmailTemplatesController do
       it 'succeeds' do
         response = get(
           :preview,
-          type: 'NotificationProfile',
-          subject: "Study_#{@study.id}",
-          template: 'Study: {{notifications.first.resource.name}}'
+          params: {
+            type: 'NotificationProfile',
+            subject: "Study_#{@study.id}",
+            template: 'Study: {{notifications.first.resource.name}}'
+          }
         )
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body)['result']).to include "Study: #{@study.name}"
@@ -209,9 +215,11 @@ RSpec.describe Admin::EmailTemplatesController do
       it 'denies access' do
         response = get(
           :preview,
-          type: 'NotificationProfile',
-          subject: "Study_#{@study.id}",
-          template: 'Study: <%= notifications.first.resource.name %>'
+          params: {
+            type: 'NotificationProfile',
+            subject: "Study_#{@study.id}",
+            template: 'Study: <%= notifications.first.resource.name %>'
+          }
         )
         expect(response).to have_http_status(:forbidden)
         expect(response.body).to eq '{"error":"Access Denied"}'
