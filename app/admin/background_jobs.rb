@@ -22,7 +22,7 @@ ActiveAdmin.register BackgroundJob do
     def destroy
       unless BackgroundJob.find(params[:id]).finished?
         flash[:error] = 'Running jobs cannot be deleted!'
-        redirect_to :back
+        redirect_back(fallback_location: admin_background_jobs_path)
         return
       end
 
@@ -104,11 +104,13 @@ ActiveAdmin.register BackgroundJob do
     authorize! :read, background_job
 
     unless background_job.results && background_job.results['zipfile']
-      redirect_to :back, alert: 'No download available'
+      flash[:alert] = 'No download available'
+      redirect_back(fallback_location: admin_background_job_path(id: params[:id]))
       return
     end
     unless File.readable?(background_job.results['zipfile'])
-      redirect_to :back, alert: 'File not found'
+      flash[:alert] = 'File not found'
+      redirect_back(fallback_location: admin_background_job_path(id: params[:id]))
       return
     end
 

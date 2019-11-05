@@ -58,7 +58,7 @@ ActiveAdmin.register PublicKey do
 
     if @public_key.public_key.nil?
       flash[:error] = 'The public key is not present.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_public_key_path(id: params[:id]))
     else
       send_data @public_key.public_key, filename: @public_key.user.username + '_' + (@public_key.deactivated_at.nil? ? 'active' : @public_key.deactivated_at.strftime('%FT%R')) + '.pub'
     end

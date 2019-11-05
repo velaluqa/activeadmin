@@ -307,7 +307,7 @@ ActiveAdmin.register Visit do
     end
     if(@required_series_names.nil?)
       flash[:error] = 'This visit has no required series defined. Either the study config is invalid, the visit doesn\'t have a visit type or its visit type doesn\'t define any required series.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_visit_path(id: params[:id]))
       return
     end
     @current_assignment = @visit.required_series_assignment

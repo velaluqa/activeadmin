@@ -15,7 +15,8 @@ module ActiveAdmin
             session[:viewer_cart] << { type: resource_type, id: id.to_i }
           end
 
-          redirect_to(:back, notice: "#{selection.length} #{ActiveSupport::Inflector.humanize(resource_type)} added to viewer cart.")
+          flash[:notice] = "#{selection.length} #{ActiveSupport::Inflector.humanize(resource_type)} added to viewer cart."
+          redirect_back(fallback_location: admin_viewer_cart_path)
         end
       end
     end

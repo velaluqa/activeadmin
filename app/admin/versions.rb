@@ -232,7 +232,7 @@ ActiveAdmin.register Version do
 
     if commit.nil? || commit.type != :commit
       flash[:error] = 'No such commit exists'
-      redirect_to :back
+      redirect_back(fallback_location: admin_versions_path)
       return
     end
 

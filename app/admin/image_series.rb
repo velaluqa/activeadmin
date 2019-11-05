@@ -435,7 +435,8 @@ ActiveAdmin.register ImageSeries do
       i_s.save
     end
 
-    redirect_to(:back, :notice => 'Selected image series were marked as not relevant for read.')
+    flash[:notice] = 'Selected image series were marked as not relevant for read.'
+    redirect_back(fallback_location: admin_image_series_index_path)
   end
 
   member_action :dicom_metadata, :method => :get do
@@ -460,11 +461,11 @@ ActiveAdmin.register ImageSeries do
   collection_action :batch_assign_to_patient, :method => :post do
     if(params[:patient_id].nil?)
       flash[:error] = 'You have to select a patient to assign these image series to.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_image_series_index_path)
       return
     elsif(params[:image_series].nil?)
       flash[:error] = 'You have to specify at least one image series to assign to this patient.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_image_series_index_path)
       return
     end
 
@@ -496,12 +497,12 @@ ActiveAdmin.register ImageSeries do
 
       if(image_series.study.id != study_id)
         flash[:error] = 'Not all selected image series belong to the same study. Batch assignment can only be used for series of the same study.'
-        redirect_to :back
+        redirect_back(fallback_location: admin_image_series_index_path)
         failure = true
         break
       elsif(image_series.visit_id != nil)
         flash[:error] = 'Not all selected image series are currently unassigned. Batch assignment can only be used for series which are not currently assigned to a visit.'
-        redirect_to :back
+        redirect_back(fallback_location: admin_image_series_index_path)
         failure = true
         break
       end
@@ -518,11 +519,11 @@ ActiveAdmin.register ImageSeries do
   collection_action :batch_assign_to_visit, :method => :post do
     if(params[:visit_id].blank?)
       flash[:error] = 'You have to select a visit to assign these image series to.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_image_series_index_path)
       return
     elsif(params[:image_series].blank?)
       flash[:error] = 'You have to specify at least one image series to assign to this visit.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_image_series_index_path)
       return
     end
 
@@ -532,7 +533,7 @@ ActiveAdmin.register ImageSeries do
     if(params[:visit_id] == 'new')
       if(params[:visit][:visit_type].blank?)
         flash[:error] = 'When creating a new visit, a visit type must be selected.'
-        redirect_to :back
+        redirect_back(fallback_location: admin_image_series_index_path)
         return
       end
 
@@ -568,12 +569,12 @@ ActiveAdmin.register ImageSeries do
 
       if(image_series.patient_id != patient_id)
         flash[:error] = 'Not all selected image series belong to the same patient. Batch assignment can only be used for series from one patient which are not currently assigned to a visit.'
-        redirect_to :back
+        redirect_back(fallback_location: admin_image_series_index_path)
         failure = true
         break
       elsif(image_series.visit_id != nil)
         flash[:error] = 'Not all selected image series are currently unassigned. Batch assignment can only be used for series from one patient which are not currently assigned to a visit.'
-        redirect_to :back
+        redirect_back(fallback_location: admin_image_series_index_path)
         failure = true
         break
       end
@@ -593,14 +594,14 @@ ActiveAdmin.register ImageSeries do
     visit_id = params[:image_series][:visit_id]
     if visit_id != 'new' && Visit.where(id: visit_id).first.nil?
       flash[:error] = 'Please choose a visit or "Create New Visit" from the visit select box.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_image_series_path(id: params[:id]))
       return
     end
 
     if(params[:image_series][:visit_id] == 'new')
       if(params[:image_series][:visit][:visit_type].blank?)
         flash[:error] = 'When creating a new visit, a visit type must be selected.'
-        redirect_to :back
+        redirect_back(fallback_location: admin_image_series_path(id: params[:id]))
         return
       end
 
@@ -618,7 +619,7 @@ ActiveAdmin.register ImageSeries do
 
     if(visit and visit.patient_id != @image_series.patient_id)
       flash[:error] = 'Visit doesn\'t belong to the image series curent patient. To change the patient, please \'Edit\' the image series.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_image_series_path(id: params[:id]))
       return
     end
 
@@ -745,7 +746,7 @@ ActiveAdmin.register ImageSeries do
     end
     if(patient_mismatch)
       flash[:error] = 'All image series must belong to the same patient.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_image_series_index_path)
       next
     end
 

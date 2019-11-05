@@ -186,7 +186,8 @@ ActiveAdmin.register Study do
     session[:selected_study_id] = @study.id
     session[:selected_study_name] = @study.name
 
-    redirect_to :back, notice: "Study #{@study.name} was selected for this session."
+    flash[:notice] = "Study #{@study.name} was selected for this session."
+    redirect_back(fallback_location: admin_studies_path)
   end
 
   action_item :select, only: :show, if: -> { session[:selected_study_id] != resource.id } do
@@ -204,11 +205,12 @@ ActiveAdmin.register Study do
   collection_action :deselect_study, method: :get do
     if session[:selected_study_id].nil?
       flash[:error] = 'No study selected for current session.'
-      redirect_to :back
+      redirect_back(fallback_location: root_url)
     else
       session[:selected_study_id] = nil
       session[:selected_study_name] = nil
-      redirect_to :back, notice: 'The study was deselected for the current session.'
+      flash[:notice] = 'The study was deselected for the current session.'
+      redirect_back(fallback_location: root_url)
     end
   end
 
