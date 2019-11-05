@@ -2,10 +2,10 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
   with_model :TestModel do
     table do |t|
       t.string :foo
-      t.references :sub_model
+      t.references :sub_model, index: false
     end
     model do
-      belongs_to :sub_model
+      belongs_to :sub_model, optional: true
     end
   end
 
@@ -23,10 +23,10 @@ RSpec.describe NotificationObservable::Filter::Schema::Model do
     table do |t|
       t.datetime :foobar, null: false
       t.text :foobaz, null: true
-      t.references :sub_model
+      t.references :sub_model, index: false
     end
     model do
-      belongs_to :sub_model
+      belongs_to :sub_model, optional: true
     end
   end
 
