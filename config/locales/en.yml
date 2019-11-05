@@ -40,7 +40,13 @@ en:
             what you do. This can lead to problems in project
             management, because the code is used to identify centers
             across documents.
-
+  activerecord:
+    errors:
+      models:
+        notification_profile:
+          attributes:
+            triggering_actions:
+              not_array: is not an array
   model:
     notification_profile:
       filter_triggering_user:
