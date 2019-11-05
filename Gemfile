@@ -69,7 +69,7 @@ gem 'devise'
 gem 'devise-token_authenticatable'
 
 # audit trail
-gem 'paper_trail'
+gem 'paper_trail', '~> 9.0'
 
 # ActiveAdmin
 gem 'activeadmin'
