@@ -36,7 +36,7 @@ class Version < PaperTrail::Version
     :study_id
   )
 
-  belongs_to(:study)
+  belongs_to(:study, optional: true)
 
   after_commit(:trigger_notification_profiles, on: :create)
 

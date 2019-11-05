@@ -29,7 +29,7 @@ class UserRole < ApplicationRecord
 
   belongs_to :user
   belongs_to :role
-  belongs_to :scope_object, polymorphic: true
+  belongs_to :scope_object, polymorphic: true, optional: true
   has_many :permissions, through: :role
 
   validates :role, presence: true

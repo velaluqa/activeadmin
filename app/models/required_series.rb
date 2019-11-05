@@ -32,7 +32,7 @@ class RequiredSeries < ApplicationRecord
   include DominoDocument
 
   belongs_to :visit
-  belongs_to :image_series
+  belongs_to :image_series, optional: true
 
   after_save :update_image_series_state
   after_commit :schedule_domino_sync

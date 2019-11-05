@@ -59,7 +59,7 @@ class ImageSeries < ApplicationRecord
     :properties_version
   )
 
-  belongs_to :visit
+  belongs_to :visit, optional: true
   belongs_to :patient
   has_many :images, dependent: :destroy
 

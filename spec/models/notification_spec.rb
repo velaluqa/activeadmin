@@ -1,8 +1,8 @@
 RSpec.describe Notification do
   it { should belong_to(:notification_profile) }
   it { should belong_to(:user) }
-  it { should belong_to(:version) }
-  it { should belong_to(:resource) }
+  it { should belong_to(:version).optional }
+  it { should belong_to(:resource).optional }
 
   describe 'model' do
     it 'is invalid without user' do

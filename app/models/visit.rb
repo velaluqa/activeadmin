@@ -72,7 +72,7 @@ class Visit < ApplicationRecord
 
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
-  belongs_to :mqc_user, class_name: 'User'
+  belongs_to :mqc_user, class_name: 'User', optional: true
   has_many :required_series, dependent: :destroy
 
   scope :by_study_ids, ->(*ids) {

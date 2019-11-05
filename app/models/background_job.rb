@@ -36,7 +36,7 @@
 #     * **`user_id`**
 #
 class BackgroundJob < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, optional: true
 
   before_destroy :remove_zipfile
 
