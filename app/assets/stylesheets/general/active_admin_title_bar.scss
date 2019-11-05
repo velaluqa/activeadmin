@@ -74,10 +74,10 @@
       margin: 0 7.5px 0 0;
     }
     &.new a:before { content: $fa-var-plus; }
-    &.edit a:before { content: $fa-var-pencil; }
-    &.destroy a:before { content: $fa-var-trash-o; }
+    &.edit a:before { content: $fa-var-pen; }
+    &.destroy a:before { content: $fa-var-trash; }
     &.configure a:before { content: $fa-var-cogs; }
-    &.select a:before { content: $fa-var-hand_pointer-o; }
+    &.select a:before { content: $fa-var-hand-pointer; }
     &.generate_keypair a:before { content: $fa-var-key; }
     &.lock a:before { content: $fa-var-lock; }
     &.unlock a:before { content: $fa-var-unlock; }
@@ -87,12 +87,12 @@
     &.download_images a:before { content: $fa-var-download; }
     &.reorder_visits a:before { content: $fa-var-sort; }
 
-    &.edit_dashboard a:before { content: $fa-var-pencil; }
+    &.edit_dashboard a:before { content: $fa-var-pen; }
     &.save_dashboard a:before { content: $fa-var-check; }
 
     &.start_viewer a:before { content: $fa-var-eye; }
-    &.clear_cart a:before { content: $fa-var-remove; }
+    &.clear_cart a:before { content: $fa-var-times; }
 
-    &.deselect a:before { content: $fa-var-remove; }
+    &.deselect a:before { content: $fa-var-times; }
   }
 }

@@ -179,13 +179,13 @@
 	}
       }
 
-      &#study-selection > a:before { content: $fa-var-hand-o-right; }
+      &#study-selection > a:before { content: "\f0a4"; }
       &#dashboard > a:before { content: "\f0e4"; }
       &#viewer_cart > a:before { content: "\f07a"; }
 
       &#studies > a:before { content: "\f02d"; }
       &#centers > a:before { content: "\f19c"; }
-      &#patients > a:before { content: $fa-var-vcard-o; }
+      &#patients > a:before { content: "\f2bb"; }
       &#image_series > a:before { content: "\f03e"; }
       &#visits > a:before { content: "\f0f1"; }
 
@@ -195,7 +195,7 @@
       &#users > a:before { content: "\f007"; }
       &#roles > a:before { content: "\f0c0"; }
 
-      &#notification_profiles > a:before { content: $fa-var-envelope-square; }
+      &#notification_profiles > a:before { content: "\f0e0"; }
       &#email_templates > a:before { content: "\f003"; }
 
       &#notifications > a:before { content: "\f0a2"; }

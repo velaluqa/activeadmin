@@ -147,11 +147,11 @@ span.label {
     }
 
     &.sorted-desc:before {
-      content: $fa-var-sort-desc;
+      content: $fa-var-sort-down;
       color: $text-color;
     }
     &.sorted-asc:before {
-      content: $fa-var-sort-asc;
+      content: $fa-var-sort-up;
       color: $text-color;
     }
   }
