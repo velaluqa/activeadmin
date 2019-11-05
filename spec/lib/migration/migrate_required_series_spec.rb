@@ -6,6 +6,12 @@ describe Migration::MigrateRequiredSeries do
     Time.new(2017, 8, 1) + i.day
   end
 
+  before(:each) do
+    if File.exist?('study_config_migration.yml')
+      FileUtils.rm('study_config_migration.yml')
+    end
+  end
+
   describe '::non_obsolete_changes' do
     let!(:visit) { create(:visit) }
     let!(:image_series) { create(:image_series, visit: visit) }
