@@ -10,7 +10,7 @@ module Migration
           return
         end
 
-        ImageSeries.skip_callback(:save, :before, :update_state)
+        ImageSeries.skip_update_state_callback = true
 
         puts "Updating image series state values: #{ImageSeries.count}"
         time = Benchmark.realtime do
@@ -48,7 +48,7 @@ SQL
         end
         puts "Time elapsed #{time*1000} milliseconds"
 
-        ImageSeries.set_callback(:save, :before, :update_state)
+        ImageSeries.skip_update_state_callback = false
       end
 
       def image_series_with_latest_state?

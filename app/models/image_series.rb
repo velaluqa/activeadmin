@@ -102,6 +102,8 @@ JOIN
 
   before_save :ensure_study_is_unchanged
   before_save :ensure_visit_is_for_patient
+
+  cattr_accessor :skip_update_state_callback
   before_save :update_state
 
   # before_validation :assign_series_number
@@ -369,6 +371,8 @@ JOIN
   end
 
   def update_state
+    return if ImageSeries.skip_update_state_callback
+
     if visit_id_changed?
       old_visit_id = changes[:visit_id][0]
       new_visit_id = changes[:visit_id][1]
