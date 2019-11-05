@@ -4,6 +4,9 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_user
 
+  skip_before_action(:ensure_valid_password)
+  skip_before_action(:ensure_valid_keypair)
+
   layout 'devise'
 
   def change_password; end
