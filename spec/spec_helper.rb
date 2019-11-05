@@ -72,7 +72,7 @@ require 'database_cleaner'
 
 # Drops are encapsulations for liquid templates which are created in a
 # potentially hostile environment (e.g. by the end-user).
-require 'liquid4-rails/matchers'
+require 'liquid-rails/matchers'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are

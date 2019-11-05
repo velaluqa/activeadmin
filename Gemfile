@@ -24,10 +24,8 @@ gem 'json'
 gem 'haml'
 
 # Liquid Templating Engine for User generated Templates
-# TODO: Liquid is waiting for release since March. Use the released
-# rubygem when it's available.
-gem 'liquid', github: 'velaluqa/liquid', branch: 'master'
-gem 'liquid4-rails'
+gem 'liquid'
+gem 'liquid-rails', '~> 0.2.0'
 
 # Gems used for assets
 gem 'coffee-rails'
