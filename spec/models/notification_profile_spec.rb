@@ -514,7 +514,7 @@ RSpec.describe NotificationProfile do
       t.references :test_model, index: false
     end
     model do
-      belongs_to :test_model
+      belongs_to :test_model, optional: true
     end
   end
 
@@ -542,7 +542,7 @@ RSpec.describe NotificationProfile do
       has_paper_trail class_name: 'Version'
 
       has_many :multi_models
-      belongs_to :extra_model
+      belongs_to :extra_model, optional: true
 
       notification_attribute_filter(:required_series, :changes_tqc_state) do |old, new|
         return false if new.blank? || !new.is_a?(Hash)
