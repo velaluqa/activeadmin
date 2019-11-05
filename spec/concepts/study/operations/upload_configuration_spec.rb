@@ -34,7 +34,7 @@ CONFIG
     end
 
     describe 'with `force` = false' do
-      let!(:operation) { Study::UploadConfiguration.(params) }
+      let!(:operation) { Study::UploadConfiguration.(params: params) }
 
       it 'fails' do
         expect(operation.success?).to be_falsy
@@ -51,7 +51,7 @@ CONFIG
           }
         }
       end
-      let!(:operation) { Study::UploadConfiguration.(params) }
+      let!(:operation) { Study::UploadConfiguration.(params: params) }
 
       it 'succeeds' do
         expect(operation.success?).to be_truthy
@@ -98,7 +98,7 @@ CONFIG
     end
 
     describe 'with `force` = false' do
-      let!(:operation) { Study::UploadConfiguration.(params) }
+      let!(:operation) { Study::UploadConfiguration.(params: params) }
 
       it 'fails' do
         expect(operation.success?).to be_falsy
@@ -115,7 +115,7 @@ CONFIG
           }
         }
       end
-      let!(:operation) { Study::UploadConfiguration.(params) }
+      let!(:operation) { Study::UploadConfiguration.(params: params) }
 
       it 'succeeds' do
         expect(operation.success?).to be_truthy
@@ -150,7 +150,7 @@ CONFIG
         }
       }
     end
-    let!(:operation) { Study::UploadConfiguration.(params) }
+    let!(:operation) { Study::UploadConfiguration.(params: params) }
 
     it 'fails' do
       expect(operation.success?).to be_falsy
@@ -185,7 +185,7 @@ CONFIG
         }
       }
     end
-    let!(:operation) { Study::UploadConfiguration.(params) }
+    let!(:operation) { Study::UploadConfiguration.(params: params) }
 
     it 'succeeds' do
       expect(operation.success?).to be_truthy
