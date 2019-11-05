@@ -715,7 +715,8 @@ RSpec.describe NotificationProfile do
     end
 
     it 'creates notification for system actions' do
-      ::PaperTrail.whodunnit = nil
+      ::PaperTrail.request.whodunnit = nil
+
       @record = TestModel.create(foobar: 'foo')
       expect do
         @profile1.trigger(@record.versions.last)
@@ -731,7 +732,7 @@ RSpec.describe NotificationProfile do
         @profile1.filter_triggering_user = 'exclude'
         @profile1.save!
 
-        ::PaperTrail.whodunnit = @user2.id
+        ::PaperTrail.request.whodunnit = @user2.id
         @record = TestModel.create(foobar: 'foo')
       end
 
@@ -755,7 +756,7 @@ RSpec.describe NotificationProfile do
         @profile1.filter_triggering_user = 'include'
         @profile1.save!
 
-        ::PaperTrail.whodunnit = @user2.id
+        ::PaperTrail.request.whodunnit = @user2.id
         @record = TestModel.create(foobar: 'foo')
       end
 
@@ -779,7 +780,7 @@ RSpec.describe NotificationProfile do
         @profile1.filter_triggering_user = 'only'
         @profile1.save!
 
-        ::PaperTrail.whodunnit = @user2.id
+        ::PaperTrail.request.whodunnit = @user2.id
         @record = TestModel.create(foobar: 'foo')
       end
 
@@ -799,7 +800,7 @@ RSpec.describe NotificationProfile do
     end
 
     it 'creates notification only for authorized users' do
-      ::PaperTrail.whodunnit = nil
+      ::PaperTrail.request.whodunnit = nil
       @record = TestModel.create(foobar: 'foo')
       allow_any_instance_of(Ability).to receive(:can?) { |ability, _activity, _subject|
         ability.current_user == @user1

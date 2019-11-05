@@ -156,7 +156,7 @@ RSpec.configure do |config|
     DatabaseCleaner.cleaning do
       example.run
     end
-    ::PaperTrail.whodunnit = nil
+    ::PaperTrail.request.whodunnit = nil
   end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
