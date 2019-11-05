@@ -59,6 +59,7 @@ module Migration
         progress = ProgressBar.create(
           title: 'Visit Versions',
           total: versions.count,
+          output: $stdout,
           format: '%t |%B| %a / %E (%c / %C ~ %p%%)'
         )
         versions.find_each do |version|

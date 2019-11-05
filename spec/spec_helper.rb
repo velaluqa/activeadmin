@@ -151,6 +151,18 @@ RSpec.configure do |config|
     PaperTrail.enabled = true
   end
 
+  config.around(:each, silent_output: true) do |example|
+    original_stderr = $stderr
+    original_stdout = $stdout
+    $stderr = File.open(File::NULL, 'w')
+    $stdout = File.open(File::NULL, 'w')
+
+    example.run
+
+    $stderr = original_stderr
+    $stdout = original_stdout
+  end
+
   config.around(:each) do |example|
     clear_data
     DatabaseCleaner.cleaning do

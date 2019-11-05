@@ -5,6 +5,7 @@ module Migration
         progress = ProgressBar.create(
           title: 'Visit#state',
           total: visit_state_versions.count,
+          output: $stdout,
           format: '%t |%B| %a / %E (%c / %C ~ %p%%)'
         )
         visit_state_versions.find_each do |version|
@@ -23,6 +24,7 @@ module Migration
         progress = ProgressBar.create(
           title: 'Visit#mqc_state',
           total: visit_mqc_state_versions.count,
+          output: $stdout,
           format: '%t |%B| %a / %E (%c / %C ~ %p%%)'
         )
         visit_mqc_state_versions.find_each do |version|
@@ -41,6 +43,7 @@ module Migration
         progress = ProgressBar.create(
           title: 'ImageSeries#state',
           total: image_series_state_versions.count,
+          output: $stdout,
           format: '%t |%B| %a / %E (%c / %C ~ %p%%)'
         )
         image_series_state_versions.find_each do |version|
