@@ -30,9 +30,9 @@ ActiveAdmin.register Study do
     end
     column :configuration do |study|
       if study.has_configuration?
-        status_tag('Available', :ok)
+        status_tag('Available', class: 'ok')
       else
-        status_tag('Missing', :error)
+        status_tag('Missing', class: 'error')
       end
     end
     column :state, sortable: :state do |study|
@@ -56,7 +56,7 @@ ActiveAdmin.register Study do
         if study.domino_integration_enabled?
           link_to(study.domino_db_url, study.domino_db_url)
         else
-          status_tag('Disabled', :warning, label: 'Domino integration not enabled')
+          status_tag('Disabled', class: 'warning', label: 'Domino integration not enabled')
         end
       end
       row :domino_server_name

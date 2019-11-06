@@ -127,7 +127,7 @@ ActiveAdmin.register Version do
 
   action_item :edit, only: :index do
     resource = controller.audit_trail_resource
-    status_tag(params[:audit_trail_view_type] + ': ' + (resource.respond_to?(:name) ? resource.name : '<' + resource.id.to_s + '>'), :error, class: 'audit_trail_indicator') unless resource.nil?
+    status_tag(params[:audit_trail_view_type] + ': ' + (resource.respond_to?(:name) ? resource.name : '<' + resource.id.to_s + '>'), class: 'error audit_trail_indicator') unless resource.nil?
   end
 
   index(:pagination_total => false) do
@@ -145,7 +145,7 @@ ActiveAdmin.register Version do
     column :event do |version|
       event = Admin::VersionsController.classify_event(version)
       event_title, event_severity = Admin::VersionsController.event_title_and_severity(version.item_type, event)
-      status_tag(event_title, event_severity)
+      status_tag(event_title, class: event_severity.to_s)
     end
     column :user, sortable: :whodunnit do |version|
       if version.whodunnit.blank?
@@ -173,7 +173,7 @@ ActiveAdmin.register Version do
       row :event do
         event = Admin::VersionsController.classify_event(version)
         event_title, event_severity = Admin::VersionsController.event_title_and_severity(version.item_type, event)
-        status_tag(event_title, event_severity)
+        status_tag(event_title, class: event_severity.to_s)
       end
       row :user do
         if version.whodunnit.blank?

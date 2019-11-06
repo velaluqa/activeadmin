@@ -104,10 +104,10 @@ ActiveAdmin.register Visit do
 
         case(visit.state_sym)
         when :incomplete_na then status_tag('Incomplete, not available')
-        when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
-        when :incomplete_queried then status_tag('Incomplete, queried', :warning)
-        when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
-        when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', :error)
+        when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', class: 'ok')
+        when :incomplete_queried then status_tag('Incomplete, queried', class: 'warning')
+        when :complete_tqc_pending then status_tag('Complete, tQC not finished', class: 'warning')
+        when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', class: 'error')
         end
       end
       column 'mQC State', :mqc_state, :sortable => :mqc_state do |visit|
@@ -115,8 +115,8 @@ ActiveAdmin.register Visit do
 
         case(visit.mqc_state_sym)
         when :pending then status_tag('Pending')
-        when :issues then status_tag('Performed, issues present', :error)
-        when :passed then status_tag('Performed, passed', :ok)
+        when :issues then status_tag('Performed, issues present', class: 'error')
+        when :passed then status_tag('Performed, passed', class: 'ok')
         end
       end
       column 'mQC Date', :mqc_date do |visit|
@@ -146,17 +146,17 @@ ActiveAdmin.register Visit do
         row :state do
           case(visit.state_sym)
           when :incomplete_na then status_tag('Incomplete, not available')
-          when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
-          when :incomplete_queried then status_tag('Incomplete, queried', :warning)
-          when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
-          when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', :error)
+          when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', class: 'ok')
+          when :incomplete_queried then status_tag('Incomplete, queried', class: 'warning')
+          when :complete_tqc_pending then status_tag('Complete, tQC not finished', class: 'warning')
+          when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', class: 'error')
           end
         end
         row 'mQC State' do
           case(visit.mqc_state_sym)
           when :pending then status_tag('Pending')
-          when :issues then status_tag('Performed, issues present', :error)
-          when :passed then status_tag('Performed, passed', :ok)
+          when :issues then status_tag('Performed, issues present', class: 'error')
+          when :passed then status_tag('Performed, passed', class: 'ok')
           end
         end
         if(visit.mqc_version)

@@ -65,7 +65,7 @@ panel 'Commit Details' do
             td do
               diff = Diffy::Diff.new(versions[0], versions[1], :allow_empty_diff => true)
               if(diff.to_s(:text).empty?)
-                status_tag('No changes', :ok)
+                status_tag('No changes', class: 'ok')
               else
                 diff.to_s(:html).html_safe
               end

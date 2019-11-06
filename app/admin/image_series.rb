@@ -169,11 +169,11 @@ ActiveAdmin.register ImageSeries do
     column :state, :sortable => :state do |image_series|
       case image_series.state_sym
       when :importing
-        status_tag('Importing', :note)
+        status_tag('Importing', class: 'note')
       when :imported
-        status_tag('Imported', :error)
+        status_tag('Imported', class: 'error')
       when :visit_assigned
-        status_tag('Visit assigned', :warning)
+        status_tag('Visit assigned', class: 'warning')
       when :required_series_assigned
         assigned_required_series = image_series.assigned_required_series.pluck(:name)
 
@@ -226,11 +226,11 @@ ActiveAdmin.register ImageSeries do
       row :state do
         case image_series.state_sym
         when :imported
-          status_tag('Imported', :error)
+          status_tag('Imported', class: 'error')
         when :visit_assigned
-          status_tag('Visit assigned', :warning)
+          status_tag('Visit assigned', class: 'warning')
         when :required_series_assigned
-          status_tag('Required series assigned', :ok)
+          status_tag('Required series assigned', class: 'ok')
         when :not_required
           status_tag('Not relevant for read')
         end

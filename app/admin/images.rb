@@ -39,9 +39,9 @@ ActiveAdmin.register Image do
     column :id
     column 'File' do |image|
       if image.file_is_present?
-        status_tag('Present', :ok)
+        status_tag('Present', class: 'ok')
       else
-        status_tag('Missing', :error)
+        status_tag('Missing', class: 'error')
       end
     end
 
@@ -55,9 +55,9 @@ ActiveAdmin.register Image do
       row :image_storage_path
       row 'File' do
         if image.file_is_present?
-          status_tag('Present', :ok)
+          status_tag('Present', class: 'ok')
         else
-          status_tag('Missing', :error)
+          status_tag('Missing', class: 'error')
         end
       end
     end

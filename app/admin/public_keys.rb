@@ -19,9 +19,9 @@ ActiveAdmin.register PublicKey do
     column :user, sortable: :user_id
     column :status, sortable: :deactivated_at do |public_key|
       if public_key.active?
-        status_tag('Active', :ok)
+        status_tag('Active', class: 'ok')
       else
-        status_tag('Deactivated', nil, label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
+        status_tag('Deactivated', label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
       end
     end
     column :public_key do |public_key|
@@ -36,9 +36,9 @@ ActiveAdmin.register PublicKey do
       row :user
       row :status do
         if public_key.active?
-          status_tag('Active', :ok)
+          status_tag('Active', class: 'ok')
         else
-          status_tag('Deactivated', nil, label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
+          status_tag('Deactivated', label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
         end
       end
       row :public_key do

@@ -3,20 +3,20 @@ table_for required_series, sortable: true, class: 'index_table index' do
   column :assigned_image_series, :sortable => :image_series_id do |required_series|
     assigned_series = required_series.assigned_image_series
     if assigned_series
-      status_tag('Assigned', :ok, label: link_to(assigned_series.name, admin_image_series_path(assigned_series)).html_safe)
+      status_tag('Assigned', class: 'ok', label: link_to(assigned_series.name, admin_image_series_path(assigned_series)).html_safe)
     else
-      status_tag('Missing', :error)
+      status_tag('Missing', class: 'error')
     end
   end
   if(qc_result_access)
     column 'tQC State', :tqc_state, :sortable => :tqc_state do |required_series|
       case required_series.tqc_state
       when 'pending'
-        status_tag('Pending', :warning)
+        status_tag('Pending', class: 'warning')
       when 'issues'
-        status_tag('Performed, issues present', :error)
+        status_tag('Performed, issues present', class: 'error')
       when 'passed'
-        status_tag('Passed', :ok)
+        status_tag('Passed', class: 'ok')
       end
     end
     column 'tQC Date', :tqc_date, :sortable => :tqc_date do |required_series|
