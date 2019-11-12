@@ -507,11 +507,11 @@ CONFIG
         let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
         visit_types:
           baseline:
-          required_series:
-          baseline:
-          tqc: []
-        extra:
-          tqc: []
+            required_series:
+              baseline:
+                tqc: []
+              extra:
+                tqc: []
         image_series_properties: []
 CONFIG
         let!(:center) { create(:center, study: study) }
@@ -611,11 +611,11 @@ CONFIG
     let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
         visit_types:
           baseline:
-          required_series:
-          baseline:
-          tqc: []
-        extra:
-          tqc: []
+            required_series:
+              baseline:
+                tqc: []
+              extra:
+                tqc: []
         image_series_properties: []
 CONFIG
     let!(:center) { create(:center, study: study) }
