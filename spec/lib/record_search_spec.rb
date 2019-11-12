@@ -64,102 +64,102 @@ CONFIG
       it 'returns matched records' do
         expect(search.results)
           .to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => 'TestStudy1',
-            'result_id' => study1.id.to_s,
+            'result_id' => study1.id,
             'result_type' => 'Study'
           )
         expect(search.results)
           .to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => "TestCenter1 - #{center1.name}",
-            'result_id' => center1.id.to_s,
+            'result_id' => center1.id,
             'result_type' => 'Center'
           )
         expect(search.results)
           .to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => 'TestCenter1TestPatient1',
-            'result_id' => patient1.id.to_s,
+            'result_id' => patient1.id,
             'result_type' => 'Patient'
           )
         expect(search.results)
           .to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => "TestCenter1TestPatient1##{visit1.visit_number}",
-            'result_id' => visit1.id.to_s,
+            'result_id' => visit1.id,
             'result_type' => 'Visit'
           )
         expect(search.results)
           .to include(
-                'study_id' => study1.id.to_s,
+                'study_id' => study1.id,
                 'study_name' => study1.name,
                 'text' =>
                 "TestCenter1TestPatient1##{visit1.visit_number} - SPECT_1",
-                'result_id' => required_series11.id.to_s,
+                'result_id' => required_series11.id,
                 'result_type' => 'RequiredSeries'
               )
         expect(search.results)
           .to include(
-                'study_id' => study1.id.to_s,
+                'study_id' => study1.id,
                 'study_name' => study1.name,
                 'text' =>
                 "TestCenter1TestPatient1##{visit1.visit_number} - SPECT_2",
-                'result_id' => required_series12.id.to_s,
+                'result_id' => required_series12.id,
                 'result_type' => 'RequiredSeries'
               )
         expect(search.results)
           .to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => 'TestStudy2',
-            'result_id' => study2.id.to_s,
+            'result_id' => study2.id,
             'result_type' => 'Study'
           )
         expect(search.results)
           .to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => "TestCenter2 - #{center2.name}",
-            'result_id' => center2.id.to_s,
+            'result_id' => center2.id,
             'result_type' => 'Center'
           )
         expect(search.results)
           .to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => 'TestCenter2TestPatient2',
-            'result_id' => patient2.id.to_s,
+            'result_id' => patient2.id,
             'result_type' => 'Patient'
           )
         expect(search.results)
           .to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => "TestCenter2TestPatient2##{visit2.visit_number}",
-            'result_id' => visit2.id.to_s,
+            'result_id' => visit2.id,
             'result_type' => 'Visit'
           )
         expect(search.results)
           .to include(
-                'study_id' => study2.id.to_s,
+                'study_id' => study2.id,
                 'study_name' => study2.name,
                 'text' =>
                 "TestCenter2TestPatient2##{visit2.visit_number} - OTHER_1",
-                'result_id' => required_series21.id.to_s,
+                'result_id' => required_series21.id,
                 'result_type' => 'RequiredSeries'
               )
         expect(search.results)
           .to include(
-                'study_id' => study2.id.to_s,
+                'study_id' => study2.id,
                 'study_name' => study2.name,
                 'text' =>
                 "TestCenter2TestPatient2##{visit2.visit_number} - OTHER_2",
-                'result_id' => required_series22.id.to_s,
+                'result_id' => required_series22.id,
                 'result_type' => 'RequiredSeries'
               )
       end
@@ -177,102 +177,102 @@ CONFIG
       it 'returns matched records' do
         expect(search.results)
           .to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => 'TestStudy1',
-            'result_id' => study1.id.to_s,
+            'result_id' => study1.id,
             'result_type' => 'Study'
           )
         expect(search.results)
           .not_to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => "TestCenter1 - #{center1.name}",
-            'result_id' => center1.id.to_s,
+            'result_id' => center1.id,
             'result_type' => 'Center'
           )
         expect(search.results)
           .not_to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => 'TestCenter1TestPatient1',
-            'result_id' => patient1.id.to_s,
+            'result_id' => patient1.id,
             'result_type' => 'Patient'
           )
         expect(search.results)
           .not_to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => "TestCenter1TestPatient1##{visit1.visit_number}",
-            'result_id' => visit1.id.to_s,
+            'result_id' => visit1.id,
             'result_type' => 'Visit'
           )
         expect(search.results)
           .not_to include(
-                'study_id' => study1.id.to_s,
+                'study_id' => study1.id,
                 'study_name' => study1.name,
                 'text' =>
                 "TestCenter1TestPatient1##{visit1.visit_number} - SPECT_1",
-                'result_id' => required_series11.id.to_s,
+                'result_id' => required_series11.id,
                 'result_type' => 'RequiredSeries'
               )
         expect(search.results)
           .not_to include(
-                'study_id' => study1.id.to_s,
+                'study_id' => study1.id,
                 'study_name' => study1.name,
                 'text' =>
                 "TestCenter1TestPatient1##{visit1.visit_number} - SPECT_2",
-                'result_id' => required_series12.id.to_s,
+                'result_id' => required_series12.id,
                 'result_type' => 'RequiredSeries'
               )
         expect(search.results)
           .to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => 'TestStudy2',
-            'result_id' => study2.id.to_s,
+            'result_id' => study2.id,
             'result_type' => 'Study'
           )
         expect(search.results)
           .not_to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => "TestCenter2 - #{center2.name}",
-            'result_id' => center2.id.to_s,
+            'result_id' => center2.id,
             'result_type' => 'Center'
           )
         expect(search.results)
           .not_to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => 'TestCenter2TestPatient2',
-            'result_id' => patient2.id.to_s,
+            'result_id' => patient2.id,
             'result_type' => 'Patient'
           )
         expect(search.results)
           .not_to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => "TestCenter2TestPatient2##{visit2.visit_number}",
-            'result_id' => visit2.id.to_s,
+            'result_id' => visit2.id,
             'result_type' => 'Visit'
           )
         expect(search.results)
           .not_to include(
-                'study_id' => study2.id.to_s,
+                'study_id' => study2.id,
                 'study_name' => study2.name,
                 'text' =>
                 "TestCenter2TestPatient2##{visit2.visit_number} - OTHER_1",
-                'result_id' => required_series21.id.to_s,
+                'result_id' => required_series21.id,
                 'result_type' => 'RequiredSeries'
               )
         expect(search.results)
           .not_to include(
-                'study_id' => study2.id.to_s,
+                'study_id' => study2.id,
                 'study_name' => study2.name,
                 'text' =>
                 "TestCenter2TestPatient2##{visit2.visit_number} - OTHER_2",
-                'result_id' => required_series22.id.to_s,
+                'result_id' => required_series22.id,
                 'result_type' => 'RequiredSeries'
               )
       end
@@ -290,102 +290,102 @@ CONFIG
       it 'does not return anything from study 2' do
         expect(search.results)
           .to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => 'TestStudy1',
-            'result_id' => study1.id.to_s,
+            'result_id' => study1.id,
             'result_type' => 'Study'
           )
         expect(search.results)
           .to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => "TestCenter1 - #{center1.name}",
-            'result_id' => center1.id.to_s,
+            'result_id' => center1.id,
             'result_type' => 'Center'
           )
         expect(search.results)
           .to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => 'TestCenter1TestPatient1',
-            'result_id' => patient1.id.to_s,
+            'result_id' => patient1.id,
             'result_type' => 'Patient'
           )
         expect(search.results)
           .to include(
-            'study_id' => study1.id.to_s,
+            'study_id' => study1.id,
             'study_name' => study1.name,
             'text' => "TestCenter1TestPatient1##{visit1.visit_number}",
-            'result_id' => visit1.id.to_s,
+            'result_id' => visit1.id,
             'result_type' => 'Visit'
           )
         expect(search.results)
           .to include(
-                    'study_id' => study1.id.to_s,
+                    'study_id' => study1.id,
                     'study_name' => study1.name,
                     'text' =>
                     "TestCenter1TestPatient1##{visit1.visit_number} - SPECT_1",
-                    'result_id' => required_series11.id.to_s,
+                    'result_id' => required_series11.id,
                     'result_type' => 'RequiredSeries'
                   )
         expect(search.results)
           .to include(
-                    'study_id' => study1.id.to_s,
+                    'study_id' => study1.id,
                     'study_name' => study1.name,
                     'text' =>
                     "TestCenter1TestPatient1##{visit1.visit_number} - SPECT_2",
-                    'result_id' => required_series12.id.to_s,
+                    'result_id' => required_series12.id,
                     'result_type' => 'RequiredSeries'
                   )
         expect(search.results)
           .not_to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => 'TestStudy2',
-            'result_id' => study2.id.to_s,
+            'result_id' => study2.id,
             'result_type' => 'Study'
           )
         expect(search.results)
           .not_to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => "TestCenter2 - #{center2.name}",
-            'result_id' => center2.id.to_s,
+            'result_id' => center2.id,
             'result_type' => 'Center'
           )
         expect(search.results)
           .not_to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => 'TestCenter2TestPatient2',
-            'result_id' => patient2.id.to_s,
+            'result_id' => patient2.id,
             'result_type' => 'Patient'
           )
         expect(search.results)
           .not_to include(
-            'study_id' => study2.id.to_s,
+            'study_id' => study2.id,
             'study_name' => study2.name,
             'text' => "TestCenter2TestPatient2##{visit2.visit_number}",
-            'result_id' => visit2.id.to_s,
+            'result_id' => visit2.id,
             'result_type' => 'Visit'
           )
         expect(search.results)
           .not_to include(
-                    'study_id' => study2.id.to_s,
+                    'study_id' => study2.id,
                     'study_name' => study2.name,
                     'text' =>
                     "TestCenter2TestPatient2##{visit2.visit_number} - OTHER_1",
-                    'result_id' => required_series21.id.to_s,
+                    'result_id' => required_series21.id,
                     'result_type' => 'RequiredSeries'
                   )
         expect(search.results)
           .not_to include(
-                    'study_id' => study2.id.to_s,
+                    'study_id' => study2.id,
                     'study_name' => study2.name,
                     'text' =>
                     "TestCenter2TestPatient2##{visit2.visit_number} - OTHER_2",
-                    'result_id' => required_series22.id.to_s,
+                    'result_id' => required_series22.id,
                     'result_type' => 'RequiredSeries'
                   )
       end
