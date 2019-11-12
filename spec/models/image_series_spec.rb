@@ -58,6 +58,7 @@ RSpec.describe ImageSeries do
           'id' => nil,
           'study_id' => series.patient.center.study_id,
           'study_name' => series.patient.center.study.name,
+          'tag_list' => [],
           'text' => 'FooSeries (123)',
           'result_id' => series.id,
           'result_type' => 'ImageSeries'

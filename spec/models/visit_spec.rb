@@ -519,6 +519,7 @@ CONFIG
           'id' => nil,
           'study_id' => visit.patient.center.study_id,
           'study_name' => visit.patient.center.study.name,
+          'tag_list' => [],
           'text' => "FooBar##{visit.visit_number}",
           'result_id' => visit.id,
           'result_type' => 'Visit'

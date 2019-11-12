@@ -20,6 +20,7 @@ RSpec.describe Patient do
           'id' => nil,
           'study_id' => patient.center.study_id,
           'study_name' => patient.center.study.name,
+          'tag_list' => [],
           'text' => 'FooBar',
           'result_id' => patient.id,
           'result_type' => 'Patient'
