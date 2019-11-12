@@ -45,7 +45,7 @@ class DominoIntegrationClient
       rescue RestClient::NotFound
         :'404'
       rescue RestClient::BadRequest => e
-        pp e.response
+        Rails.logger.warn("DominoIntegrationClient Bad Request :: #{e.response.body}")
         false
       end
     end
