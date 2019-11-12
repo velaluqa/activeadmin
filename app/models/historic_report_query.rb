@@ -36,7 +36,7 @@ class HistoricReportQuery < ApplicationRecord
     versions = Version
                .where('"versions"."id" <= ?', Version.last.id)
                .of_study_resource(study_id, resource_type)
-               .order('"versions"."id" DESC')
+               .order("versions.id" => :desc)
     versions.ordered_find_each do |version|
       delta = calculate_delta(version)
       next if delta.nil?

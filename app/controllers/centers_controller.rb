@@ -39,7 +39,7 @@ class CentersController < ApplicationController
 
   def load_centers
     authorize! :read, Center
-    @centers = @study.centers.accessible_by(current_ability).order('code asc')
+    @centers = @study.centers.accessible_by(current_ability).order(code: :asc)
   end
 
   def load_the_center

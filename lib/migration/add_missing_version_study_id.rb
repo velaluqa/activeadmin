@@ -77,7 +77,7 @@ JOIN
             .where('versions.item_type = ?', item_type)
             .where('versions.study_id IS NULL')
             .group('parent_versions.study_id')
-            .pluck('CONCAT(\'UPDATE versions SET study_id = \' || parent_versions.study_id || \'WHERE id IN (\' || string_agg(versions.id::varchar, \',\') || \')\') AS statement')
+            .pluck(Arel.sql('CONCAT(\'UPDATE versions SET study_id = \' || parent_versions.study_id || \'WHERE id IN (\' || string_agg(versions.id::varchar, \',\') || \')\') AS statement'))
 
         puts "Saving #{item_type} versions study_ids"
         update_statements.each do |statement|

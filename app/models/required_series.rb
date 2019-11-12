@@ -203,7 +203,7 @@ JOIN
     {
       id: "#{visit.id}_#{name}",
       name: name,
-      images: assigned_image_series.images.order('id ASC')
+      images: assigned_image_series.images.order(id: :asc)
     }
   end
 

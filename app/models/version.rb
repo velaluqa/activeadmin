@@ -147,13 +147,13 @@ WHERE
     def after(date, options = {})
       rel = where('"versions"."created_at" > ?', date)
       rel = rel.where(options) unless options.empty?
-      rel.order('"versions"."id" ASC')
+      rel.order('"versions"."id"' => :asc)
     end
 
     def before(date, options = {})
       rel = where('"versions"."created_at" < ?', date)
       rel = rel.where(options) unless options.empty?
-      rel.order('"versions"."id" DESC')
+      rel.order('"versions"."id"' => :desc)
     end
   end
 end

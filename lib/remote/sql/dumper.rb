@@ -53,7 +53,7 @@ class Sql
     def new_values
       query = @relation
               .select(new_values_select)
-              .order("\"#{table_name}\".\"id\"")
+              .order(Arel.sql("\"#{table_name}\".\"id\""))
       ActiveRecord::Base.connection.select_values(query)
     end
 

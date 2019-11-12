@@ -169,7 +169,7 @@ JOIN
   end
 
   def wado_query
-    { id: id, name: name, images: images.order('id ASC') }
+    { id: id, name: name, images: images.order(id: :asc) }
   end
 
   def sample_image
