@@ -1,6 +1,6 @@
-module Pharmtrace
-  module ActiveAdmin
-    class SiteTitle < ::ActiveAdmin::Component
+module ActiveAdmin
+  module Views
+    class EricaSiteTitle < Component
       def build(namespace)
         super(id: 'site_title')
         @namespace = namespace

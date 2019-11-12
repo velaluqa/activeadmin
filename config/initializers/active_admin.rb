@@ -1,8 +1,14 @@
 # ActiveAdmin extensions like components and mixins
-require_dependency 'pharmtrace/active_admin'
 
-require 'aa_footer'
-require 'aa_site_title'
+module ActiveAdmin
+  module Views; end
+end
+require_dependency 'active_admin/views/erica_header'
+require_dependency 'active_admin/views/erica_site_title'
+require_dependency 'active_admin/views/erica_action_items'
+require_dependency 'active_admin/views/erica_title_bar'
+require_dependency 'active_admin/views/erica_footer'
+
 require 'aa_viewer_cart_mixin'
 require 'aa_erica_comment'
 require 'aa_erica_keywords'
@@ -331,9 +337,9 @@ ActiveAdmin.setup do |config|
   #
   # Render custom ERICA footer and title.
   #
-  config.view_factory.header = Pharmtrace::ActiveAdmin::Header
-  config.view_factory.site_title = Pharmtrace::ActiveAdmin::SiteTitle
-  config.view_factory.action_items = Pharmtrace::ActiveAdmin::ActionItems
-  config.view_factory.title_bar = Pharmtrace::ActiveAdmin::TitleBar
-  config.view_factory.footer = PharmTraceERICAFooter
+  config.view_factory.register header: ActiveAdmin::Views::EricaHeader
+  config.view_factory.register site_title: ActiveAdmin::Views::EricaSiteTitle
+  config.view_factory.register action_items: ActiveAdmin::Views::EricaActionItems
+  config.view_factory.register title_bar: ActiveAdmin::Views::EricaTitleBar
+  config.view_factory.register footer: ActiveAdmin::Views::EricaFooter
 end
