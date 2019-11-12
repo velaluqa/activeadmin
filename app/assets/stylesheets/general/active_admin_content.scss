@@ -13,7 +13,7 @@
   &:after {
     margin-left: 5px;
     font-family: FontAwesome;
-    content: $fa-var-caret-down;
+    content: "\f0d7";
   }
 }
 
@@ -141,17 +141,17 @@ span.label {
   th.sortable {
     &:before {
       font-family: FontAwesome;
-      content: $fa-var-sort;
+      content: "\f0dc";
       color: $gray-light;
       margin-right: 5px;
     }
 
     &.sorted-desc:before {
-      content: $fa-var-sort-down;
+      content: "\f0d7";
       color: $text-color;
     }
     &.sorted-asc:before {
-      content: $fa-var-sort-up;
+      content: "\f0d8";
       color: $text-color;
     }
   }
