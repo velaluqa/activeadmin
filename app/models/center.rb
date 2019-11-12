@@ -87,13 +87,7 @@ SELECT
   validates_uniqueness_of :code, scope: :study_id
   validates_presence_of :name, :code, :study_id
 
-  before_destroy do
-    unless patients.empty?
-      errors.add :base, 'You cannot delete a center which has patients associated.'
-      return false
-    end
-  end
-
+  before_destroy :ensure_no_patients
   before_save :ensure_study_is_unchanged
 
   def full_name
@@ -161,10 +155,17 @@ SELECT
 
   protected
 
+  def ensure_no_patients
+    return if patients.empty?
+
+    errors.add :study, 'You cannot delete a center which has patients associated.'
+    throw(:abort)
+  end
+
   def ensure_study_is_unchanged
-    if persisted? && study_id_changed?
-      errors[:study] << 'A center cannot be reassigned to a different study.'
-      false
-    end
+    return unless persisted? && study_id_changed?
+
+    errors.add :study, 'A center cannot be reassigned to a different study.'
+    throw(:abort)
   end
 end

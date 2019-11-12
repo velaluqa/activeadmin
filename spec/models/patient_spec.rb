@@ -245,6 +245,15 @@ YAML
     end
   end
 
+  it 'does not allow reassignment of study' do
+    other_center = create(:center)
+    patient = create(:patient)
+    patient.center = other_center
+
+    expect(patient.save).to be_falsy
+    expect(patient.errors.messages).to include(center: ['A patient cannot be reassigned to a center in a different study.'])
+  end
+
   describe 'versioning' do
     describe 'create' do
       before(:each) do

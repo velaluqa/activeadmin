@@ -131,7 +131,7 @@ SELECT
   # If the job is finished and it has a zipfile referenced in its
   # `results` remove the file upon deletion of the resource.
   def remove_zipfile
-    return false unless finished?
+    throw :abort unless finished?
 
     File.delete(results['zipfile']) if results.andand['zipfile']
   rescue => error

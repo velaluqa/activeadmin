@@ -147,6 +147,26 @@ RSpec.describe Center do
     end
   end
 
+  describe 'having patients' do
+    let!(:center) { create(:center) }
+    let!(:patient) { create(:patient, center: center) }
+
+    it 'does not allow destruction' do
+      is_destroyed = center.destroy
+      expect(is_destroyed).to be_falsy
+      expect(center.errors.messages).to include(study: ['You cannot delete a center which has patients associated.'])
+    end
+  end
+
+  it 'does not allow reassignment of study' do
+    other_study = create(:study)
+    center = create(:center)
+    center.study = other_study
+
+    expect(center.save).to be_falsy
+    expect(center.errors.messages).to include(study: ['A center cannot be reassigned to a different study.'])
+  end
+
   describe 'versioning' do
     describe 'create' do
       before(:each) do

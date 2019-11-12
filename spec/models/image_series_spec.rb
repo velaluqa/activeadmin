@@ -170,6 +170,30 @@ RSpec.describe ImageSeries do
     end
   end
 
+  it 'does not allow reassignment of study' do
+    other_patient = create(:patient)
+    image_series = create(:image_series)
+    image_series.patient = other_patient
+
+    expect(image_series.save).to be_falsy
+    expect(image_series.errors.messages).to include(patient: ['An image series cannot be reassigned to a patient in a different study.'])
+  end
+
+  it 'does not allow setting visit for another patient' do
+    study = create(:study)
+    center = create(:center, study: study)
+    patient = create(:patient, center: center)
+    visit = create(:visit, patient: patient)
+    other_patient = create(:patient, center: center)
+    other_visit = create(:visit, patient: other_patient)
+
+    image_series = create(:image_series, visit: visit, patient: patient)
+    image_series.visit = other_visit
+
+    expect(image_series.save).to be_falsy
+    expect(image_series.errors.messages).to include(visit: ['The visits patient is different from this image series\' patient'])
+  end
+
   describe 'versioning' do
     describe 'create' do
       before(:each) do

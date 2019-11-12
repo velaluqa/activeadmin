@@ -656,6 +656,15 @@ CONFIG
     end
   end
 
+  it 'does not allow reassignment of study' do
+    other_patient = create(:patient)
+    visit = create(:visit)
+    visit.patient = other_patient
+
+    expect(visit.save).to be_falsy
+    expect(visit.errors.messages).to include(patient: ['A visit cannot be reassigned to a patient in a different study.'])
+  end
+
   describe 'versioning' do
     describe 'create' do
       before(:each) do

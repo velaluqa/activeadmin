@@ -343,25 +343,20 @@ JOIN
   end
 
   def ensure_study_is_unchanged
-    if patient_id_changed? && !patient_id_was.nil?
-      old_patient = Patient.find(patient_id_was)
+    return unless patient_id_changed? && patient_id_was
 
-      if old_patient.study != patient.study
-        errors[:patient] << 'An image series cannot be reassigned to a patient in a different study.'
-        return false
-      end
-    end
+    old_patient = Patient.find(patient_id_was)
+    return if old_patient.study == patient.study
 
-    true
+    errors[:patient] << 'An image series cannot be reassigned to a patient in a different study.'
+    throw(:abort)
   end
 
   def ensure_visit_is_for_patient
-    if visit && visit.patient != patient
-      errors[:visit] << 'The visits patient is different from this image series\' patient'
-      false
-    else
-      true
-    end
+    return unless visit && visit.patient != patient
+
+    errors[:visit] << 'The visits patient is different from this image series\' patient'
+    throw(:abort)
   end
 
   def assign_series_number

@@ -605,16 +605,13 @@ JOIN_QUERY
   end
 
   def ensure_study_is_unchanged
-    if patient_id_changed? && !patient_id_was.nil?
-      old_patient = Patient.find(patient_id_was)
+    return unless patient_id_changed? && patient_id_was
 
-      if old_patient.study != patient.study
-        errors[:patient] << 'A visit cannot be reassigned to a patient in a different study.'
-        return false
-      end
-    end
+    old_patient = Patient.find(patient_id_was)
+    return unless old_patient.study != patient.study
 
-    true
+    errors[:patient] << 'A visit cannot be reassigned to a patient in a different study.'
+    throw :abort
   end
 
   def update_required_series_preset
