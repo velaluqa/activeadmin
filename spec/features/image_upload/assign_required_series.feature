@@ -1,3 +1,4 @@
+@js
 Feature: Assign Required Series
   In order simplify the image management process,
   As authorized user for upload, visit assignment and required series assignment,
