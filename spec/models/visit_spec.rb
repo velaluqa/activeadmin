@@ -89,8 +89,8 @@ CONFIG
         spect_3.set_tqc_result({ 'modality' => true }, user, 'First tqc')
         objects = visit.required_series_objects.map(&:attributes)
         expect(objects).to include(include('name' => 'SPECT_1', 'tqc_state' => nil))
-        expect(objects).to include(include('name' => 'SPECT_2', 'tqc_state' => 2))
-        expect(objects).to include(include('name' => 'SPECT_3', 'tqc_state' => 2))
+        expect(objects).to include(include('name' => 'SPECT_2', 'tqc_state' => 'passed'))
+        expect(objects).to include(include('name' => 'SPECT_3', 'tqc_state' => 'passed'))
         visit.visit_type = 'baseline2'
         visit.save!
         spect_2.reload
