@@ -1,7 +1,7 @@
 ignore %r{^data/}, %r{^spec/data}
 directories %w[app config lib spec]
 
-guard 'rspec', cmd: 'spring rspec -r spec_helper' do
+guard 'rspec', cmd: 'rspec -r spec_helper' do
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^spec/features\/.+.feature$})
   watch(%r{^spec/features/steps/(.+)_steps.rb$}) { |m| "spec/features/#{m[1]}.feature" }
