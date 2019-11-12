@@ -35,8 +35,8 @@ RSpec.describe Ability do
 
     describe 'for user without permissions, it' do
       before(:each) do
-        @public_key = create(:public_key)
-        @current_user = create(:user, public_keys: [@public_key])
+        @current_user = create(:user)
+        @public_key = create(:public_key, user: @current_user)
         @ability = Ability.new(@current_user)
       end
 

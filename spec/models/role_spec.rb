@@ -21,7 +21,7 @@ RSpec.describe Role do
         end
 
         it 'does not save the permission' do
-          expect(Permission.where(activity: :read, subject: Study).exists?).to be_falsy
+          expect(Permission.granting(:read, Study).exists?).to be_falsy
         end
       end
 
@@ -36,7 +36,7 @@ RSpec.describe Role do
         end
 
         it 'saves the permission' do
-          expect(@role.permissions.where(activity: :read, subject: Study).exists?).to be_truthy
+          expect(@role.permissions.granting(:read, Study).exists?).to be_truthy
         end
       end
     end
@@ -44,12 +44,12 @@ RSpec.describe Role do
     describe 'for existing permission' do
       before(:each) do
         @role = create(:role, with_permissions: { Study => :read })
-        expect(@role.permissions.where(activity: :read, subject: Study).count).to eq 1
+        expect(@role.permissions.granting(:read, Study).count).to eq 1
         @role.add_permission(:read, Study)
       end
 
       it 'does nothing' do
-        expect(@role.permissions.where(activity: :read, subject: Study).count).to eq 1
+        expect(@role.permissions.granting(:read, Study).count).to eq 1
       end
     end
   end
@@ -64,19 +64,19 @@ RSpec.describe Role do
         expect(@role.allows?(:read, Study)).to be_falsy
       end
       it 'saves the permission' do
-        expect(@role.permissions.where(activity: :read, subject: Study).exists?).to be_falsy
+        expect(@role.permissions.granting(:read, Study).exists?).to be_falsy
       end
     end
 
     describe 'for existing permission' do
       before(:each) do
         @role = create(:role, with_permissions: { Study => :read })
-        expect(@role.permissions.where(activity: :read, subject: Study).exists?).to be_truthy
+        expect(@role.permissions.granting(:read, Study).exists?).to be_truthy
         @role.remove_permission(:read, Study)
       end
 
       it 'does nothing' do
-        expect(@role.permissions.where(activity: :read, subject: Study).exists?).to be_falsy
+        expect(@role.permissions.granting(:read, Study).exists?).to be_falsy
       end
     end
   end

@@ -62,7 +62,7 @@ SELECT
   # @param [ActiveRecord::Model, String] subject The subject to permit
   #   activity on
   def remove_permission(activity, subject)
-    permissions.where(activity: activity, subject: subject).destroy_all
+    permissions.granting(activity, subject).destroy_all
     permissions.reload
   end
 

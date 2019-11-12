@@ -28,6 +28,10 @@ class Permission < ApplicationRecord
   belongs_to :role
   has_many :users, through: :role
 
+  scope :granting, ->(activity, subject) {
+    where(activity: activity.to_s, subject: subject.to_s)
+  }
+
   # Returns true if a UserRole exists with given activity for subject.
   def self.allow?(activity, subject)
     all.where(subject: subject.to_s, activity: activity.to_s).exists?
