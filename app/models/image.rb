@@ -96,7 +96,7 @@ JOIN
       tmp.close
 
       tmp_dicom = DICOM::DObject.read(tmp.path)
-      tmp_dicom.patients_name = "#{image_series.patient.center_id}#{image_series.patient.subject_id}"
+      tmp_dicom.patients_name = "#{image_series.patient.name}"
       tmp_dicom.write(absolute_image_storage_path)
     ensure
       tmp.close
