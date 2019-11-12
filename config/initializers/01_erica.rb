@@ -51,7 +51,7 @@ class ERICA
     end
 
     def narrow_site_title
-      Rails.application.config.try(:erica).andand['narrow_site_title']
+      Rails.application.config.try(:erica).andand['narrow_site_title'] || 'E'
     end
 
     def default_dashboard_configuration

@@ -33,9 +33,6 @@ ActiveAdmin.setup do |config|
   title = Rails.application.config.try(:erica).andand['title']
   config.site_title = title || 'ERICA'
 
-  # narrow_title = Rails.application.config.try(:erica).andand['narrow_title']
-  # config.narrow_site_title = narrow_title || "E"
-
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.
   #
