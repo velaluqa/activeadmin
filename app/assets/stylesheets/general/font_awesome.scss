@@ -1,0 +1,38 @@
+@font-face {
+  font-family: 'FontAwesome';
+  font-style: normal;
+  font-weight: 300;
+  font-display: auto;
+  src: font-url('fa-light-300.eot');
+  src: font-url('fa-light-300.eot?#iefix') format('embedded-opentype'),
+       font-url('fa-light-300.woff2') format('woff2'),
+       font-url('fa-light-300.woff') format('woff'),
+       font-url('fa-light-300.ttf') format('truetype'),
+       font-url('fa-light-300.svg#fontawesome') format('svg');
+}
+
+@font-face {
+  font-family: 'FontAwesome';
+  font-style: normal;
+  font-weight: 400;
+  font-display: auto;
+  src: font-url('fa-regular-400.eott');
+  src: font-url('fa-regular-400.eot?#iefix') format('embedded-opentype'),
+       font-url('fa-regular-400.woff2') format('woff2'),
+       font-url('fa-regular-400.woff') format('woff'),
+       font-url('fa-regular-400.ttf') format('truetype'),
+       font-url('fa-regular-400.svg#fontawesome') format('svg');
+}
+
+@font-face {
+  font-family: 'FontAwesome';
+  font-style: normal;
+  font-weight: 900;
+  font-display: auto;
+  src: font-url('fa-solid-900.eot');
+  src: font-url('fa-solid-900.eot?#iefix') format('embedded-opentype'),
+       font-url('fa-solid-900.woff2') format('woff2'),
+       font-url('fa-solid-900.woff') format('woff'),
+       font-url('fa-solid-900.ttf') format('truetype'),
+       font-url('fa-solid-900.svg#fontawesome') format('svg');
+}
