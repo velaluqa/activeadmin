@@ -125,7 +125,7 @@ RSpec.describe Image do
       dicom = DICOM::DObject.read('spec/files/test.dicom')
       expect(dicom.patients_name.value).to eq 'WRIX'
       dicom = DICOM::DObject.read(@image.absolute_image_storage_path)
-      expect(dicom.patients_name.value).to eq "#{@image.image_series.patient.center_id}#{@image.image_series.patient.subject_id}"
+      expect(dicom.patients_name.value).to eq "#{@image.image_series.patient.name}"
     end
   end
 

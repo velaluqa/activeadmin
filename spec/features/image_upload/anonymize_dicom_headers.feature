@@ -1,3 +1,4 @@
+@js
 Feature: Anonymize DICOM Headers
   In order adhere to regulatory specifics,
   As authorized user for upload,
@@ -17,7 +18,9 @@ Feature: Anonymize DICOM Headers
               tqc: []
       image_series_properties: []
       """
-    And a center "FooCenter" for "FooStudy"
+    And a center "FooCenter" with:
+      | study | FooStudy |
+      | code  |        1 |
     And a patient "FooPatient" for "FooCenter"
     And a role "Image Manager" with permissions:
       | Study       | read         |
