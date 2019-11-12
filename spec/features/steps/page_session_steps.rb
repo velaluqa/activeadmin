@@ -236,8 +236,13 @@ step 'I download zip file' do
 
   page.driver.browser.get('chrome://downloads/')
   ts = Time.now
-  until Time.now - ts > Capybara.default_max_wait_time || download_count == 1 ||
-    !sleep(0.1)
+
+  begin
+    download_count = page.evaluate_script(download_count_js)
+  rescue e
+    puts e.inspect
+  end
+  until (Time.now - ts) > Capybara.default_max_wait_time || download_count == 1 || !sleep(0.1)
     begin
       download_count = page.evaluate_script(download_count_js)
     rescue e
@@ -249,9 +254,12 @@ step 'I download zip file' do
   validation_report_screenshot
   page.evaluate_script(clear_downloads_js)
   ts = Time.now
-  until Time.now - ts > Capybara.default_max_wait_time ||
-    !no_downloads_el[:hidden] ||
-    !sleep(0.1)
+  begin
+    no_downloads_el = page.evaluate_script(no_downloads_el_js)
+  rescue e
+    puts e.inspect
+  end
+  until Time.now - ts > Capybara.default_max_wait_time || !no_downloads_el[:hidden] || !sleep(0.1)
     begin
       no_downloads_el = page.evaluate_script(no_downloads_el_js)
     rescue e
