@@ -17,6 +17,9 @@ gem 'protected_attributes_continued'
 gem 'pg'
 gem 'sqlite3'
 
+gem 'mongoid', '~> 6.0'
+gem 'mongoid-history', '~> 0.5.0'
+
 gem 'json'
 
 # HAML templating engine
