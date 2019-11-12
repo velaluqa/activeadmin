@@ -618,19 +618,19 @@ JOIN_QUERY
   end
 
   def update_required_series_preset
-    return unless visit_type_changed?
+    return unless saved_change_to_visit_type?
 
-    if visit_type_was.blank? && visit_type.present?
+    if visit_type_before_last_save.blank? && visit_type.present?
       add_new_required_series(required_series_spec.keys)
-    elsif visit_type_was.present? && visit_type.present?
+    elsif visit_type_before_last_save.present? && visit_type.present?
       clean_changed_required_series
-    elsif visit_type_was.present? && visit_type.blank?
+    elsif visit_type_before_last_save.present? && visit_type.blank?
       remove_required_series
     end
   end
 
   def clean_changed_required_series
-    old_spec = study.required_series_spec(visit_type_was)
+    old_spec = study.required_series_spec(visit_type_before_last_save)
     new_spec = study.required_series_spec(visit_type)
 
     remove_orphaned_required_series(old_spec.keys - new_spec.keys)
