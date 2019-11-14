@@ -8,17 +8,20 @@ Rails.application.config.assets.version = '1.0'
 # Add Yarn node_modules folder to the asset load path.
 Rails.application.config.assets.paths << Rails.root.join('node_modules')
 Rails.application.config.assets.paths << Rails.root.join('vendor', 'assets', 'fonts')
+Rails.application.config.assets.configure do |env|
+  env.export_concurrent = false
+end
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.
-Rails.application.config.assets.precompile +=
-  %w[
-    forms_bootstrap_and_overrides.css
-    image_hierarchy.js
-    tqc_validation.js
-    mqc_validation.js
-    role_form.js
-    notification_profiles/filters_json_editor.js
-    image_series_rearrange.js
-  ]
+# Rails.application.config.assets.precompile +=
+#   %w[
+#     forms_bootstrap_and_overrides.css
+#     image_hierarchy.js
+#     tqc_validation.js
+#     mqc_validation.js
+#     role_form.js
+#     notification_profiles/filters_json_editor.js
+#     image_series_rearrange.js
+#   ]

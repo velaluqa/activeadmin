@@ -6,7 +6,7 @@ namespace :ci do
 
   namespace :test do
     task units: ['ci:prepare'] do
-      sh 'COVERAGE=true bundle exec spring rspec --format ValidationReport::RSpec::Formatter --format html -o reports/unit.html --format JUnit -o reports/rspec_report.xml'
+      sh 'COVERAGE=true bundle exec rspec --format progress --format html -o reports/unit.html --format JUnit -o reports/rspec_report.xml'
     end
   end
   task test: ['ci:test:units']

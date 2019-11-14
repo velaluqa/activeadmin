@@ -5,6 +5,12 @@ variables:
   COMPOSE_FILE: docker-compose-ci.yml
   COMPOSE_PROJECT_NAME: $CI_PIPELINE_ID
 
+stages:
+  - build
+  - test
+  - deploy
+  - cleanup
+
 build:
   stage: build
   script: docker-compose build test
@@ -13,6 +19,7 @@ test:
   stage: test
   script:
     - export DOCKER_PWD=$(echo /cache/$(hostname)/*/${CI_PROJECT_NAME}/ | awk '{sub(/^\/cache/,"/srv/build-cache")}1')
+    - /bin/bash -l
     - docker-compose run test bundle exec rake db:setup
     - docker-compose run test bundle exec rake ci
   after_script:
@@ -45,3 +52,9 @@ image:publish:
   after_script:
     - docker rmi ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
   dependencies: []
+
+cleanup:docker:
+  stage: cleanup
+  script:
+    - docker-compose down
+  when: always

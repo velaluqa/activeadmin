@@ -12,6 +12,7 @@ services:
     environment:
       RAILS_ENV: test
       SELENIUM_DRIVER_URL: http://chrome:4444/wd/hub
+    privileged: true
     volumes:
       - ${DOCKER_PWD:-.}/reports:/app/reports # Artifacts
       - ${DOCKER_PWD:-.}/.git:/app/.git:ro    # Validation Report requires access to git history
