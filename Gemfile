@@ -143,6 +143,7 @@ gem 'awesome_print'
 # Use HAML and CoffeeScript for Backbone.JS SPAs
 gem 'haml_coffee_assets'
 gem 'sprockets-rails'
+gem 'sprockets', '~> 3.0'
 
 # Validate JSONB columns via JSONschema
 gem 'activerecord_json_validator'

@@ -1,9 +1,0 @@
-//= link application.css
-//= link dashboard/main.js
-//= link vendor/dicomParser.js
-//= link uploader/main.js
-//= link email_templates/form.js
-//= link patients/visit_templates.js
-//= link_tree ../images
-//= link_directory ../javascripts .js
-//= link_directory ../stylesheets .css
