@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 7.0.9
+
+### DevOps
+
+* Fix building manual via ubuntu 18.04 LTS docker image
+
 ## 7.0.8
 
 ### Fixed
