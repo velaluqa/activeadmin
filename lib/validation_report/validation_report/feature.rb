@@ -5,6 +5,7 @@ module ValidationReport
     def initialize(turnip_feature:, file_path:)
       @turnip_feature = turnip_feature
       @file_path = file_path
+      @scenarios ||= []
     end
 
     def name

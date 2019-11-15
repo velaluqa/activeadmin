@@ -10,12 +10,14 @@ require 'fileutils'
 module ValidationReport
   extend RSpec::Helper
 
-  def self.initialize
-    @features = []
-    @current_step = nil
-  end
-
   def self.setup
+    @current_feature = nil
+    @current_scenario = nil
+    @current_step = nil
+    @features_hash = {}
+    @scenarios_hash = {}
+    @features = []
+
     @tmp_path = Rails.root.join('reports/validation')
     FileUtils.rm_rf(Dir[@tmp_path.join('*')])
     FileUtils.mkdir_p(@tmp_path)
@@ -37,12 +39,32 @@ module ValidationReport
     @tmp_path
   end
 
-  def self.add_feature(feature:, filename:)
-    @features << Feature.new(
-      turnip_feature: feature,
-      file_path: Pathname.new(filename).relative_path_from(Rails.root)
-    )
+  def self.push_feature(feature:, filename:)
+    @current_feature = @features_hash[filename] ||=
+      begin
+        feature = Feature.new(
+          turnip_feature: feature,
+          file_path: Pathname.new(filename).relative_path_from(Rails.root)
+        )
+        @features << feature
+        feature
+      end
   end
+
+  def self.push_scenario(feature_filename:, scenario:)
+    key = "#{feature_filename}##{scenario.name}"
+    @current_scenario = @scenarios_hash[key] ||=
+      begin
+        feature = @features_hash[feature_filename]
+        scenario = Scenario.new(
+          feature: feature,
+          turnip_scenario: scenario
+        )
+        feature.scenarios << scenario
+        scenario
+      end
+  end
+
 
   def self.current_turnip_step=(turnip_step)
     @current_turnip_step = turnip_step
@@ -52,13 +74,9 @@ module ValidationReport
   def self.push_step(*args)
     step = Step.new(*args)
     if @current_step.nil?
+      step.scenario = @current_scenario
       step.turnip_step = @current_turnip_step
-      @current_turnip_step.instance_eval { @root_step = step }
-      @features.find do |feature|
-        @current_scenario = feature.scenarios.find do |scenario|
-          scenario.steps.include?(step)
-        end
-      end
+      @current_scenario.steps << step
     else
       @current_step.add_substep(step)
     end
@@ -153,8 +171,6 @@ module ValidationReport
     md.close
   end
 end
-
-ValidationReport.initialize
 
 require File.expand_path('validation_report/rspec/formatter', File.dirname(__FILE__))
 require File.expand_path('validation_report/patches/turnip', File.dirname(__FILE__))

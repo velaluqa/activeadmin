@@ -1,13 +1,16 @@
+# coding: utf-8
 module ValidationReport
   class Step
-    attr_accessor :parent_step, :turnip_step
+    attr_reader :name
     attr_reader :substeps_and_screenshots
+    attr_accessor :parent_step, :turnip_step, :scenario
 
     def initialize(label:, source_location:)
-      @label = label
+      @name = label
       @source_location = source_location
       @substeps_and_screenshots = []
       @passed = false
+      @scenario = nil
     end
 
     def add_substep(step)
@@ -27,21 +30,21 @@ module ValidationReport
       @passed
     end
 
+    def turnip_argument
+      @turnip_step&.argument
+    end
+
     def table
-      if @turnip_step.present?
-        @turnip_step.argument if @turnip_step.argument.is_a?(Turnip::Table)
-      end
+      turnip_argument if turnip_argument.is_a?(Turnip::Table)
     end
 
     def docstring
-      if @turnip_step.present?
-        @turnip_step.argument if @turnip_step.argument.is_a?(String)
-      end
+      turnip_argument if turnip_argument.is_a?(String)
     end
 
     # @return [String]
     def report_html_row(indent_level: 0)
-      step_cell = "#{'→' * indent_level} #{@label}"
+      step_cell = "#{'→' * indent_level} #{name}"
       if table
         step_cell << "<br/><table class=\"step-parameters\">"
         table.to_a.each do |row|
