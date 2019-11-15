@@ -651,8 +651,6 @@ GEM
     simplecov-json (0.2)
       json
       simplecov
-    simplecov-rcov (0.2.3)
-      simplecov (>= 0.4.1)
     sinatra (1.0)
       rack (>= 1.0)
     slim (3.0.9)
@@ -866,7 +864,6 @@ DEPENDENCIES
   simplecov
   simplecov-cobertura
   simplecov-json
-  simplecov-rcov
   sinatra
   slim
   spring

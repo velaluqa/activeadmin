@@ -216,7 +216,6 @@ group :development, :test do
   gem 'simplecov', require: false
   gem 'simplecov-cobertura', require: false
   gem 'simplecov-json', require: false
-  gem 'simplecov-rcov', require: false
   gem 'yard', require: false
   gem 'yard-activerecord', github: 'velaluqa/yard-activerecord', require: false
   gem 'yard-activesupport-concern', require: false
