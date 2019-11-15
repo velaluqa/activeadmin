@@ -102,6 +102,8 @@ RSpec::Sidekiq.configure do |config|
 end
 
 RSpec.configure do |config|
+  config.raise_error_for_unimplemented_steps = true
+
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
 
