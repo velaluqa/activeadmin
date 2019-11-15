@@ -1,6 +1,6 @@
 if ENV['COVERAGE']
   require 'simplecov'
-  SimpleCov.command_name 'RSpec'
+  SimpleCov.start 'rails'
 end
 
 # Turnip is a Gherkin language and runner implementation with better
