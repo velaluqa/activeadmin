@@ -2,7 +2,7 @@ RSpec::Support.require_rspec_core 'formatters/base_text_formatter'
 
 module ValidationReport
   module RSpec
-    class Formatter < ::RSpec::Core::Formatters::ProgressFormatter
+    class Formatter < ::RSpec::Core::Formatters::DocumentationFormatter
       ::RSpec::Core::Formatters.register self, :start, :stop, :example_passed
 
       def start(_notification)
