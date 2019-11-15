@@ -183,6 +183,12 @@ step 'I click link :string' do |locator|
   page.click_link(locator)
 end
 
+step 'I click link :string and confirm' do |locator|
+  page.accept_confirm do
+    page.click_link(locator)
+  end
+end
+
 step 'I click link :string in :string' do |locator, selector|
   within(selector) { click_link(locator) }
 end
