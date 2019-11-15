@@ -13,7 +13,7 @@ namespace :ci do
 
   namespace :report do
     task :code_climate do
-      sh 'bundle exec rubycritic app lib config/initializers --path reports/code_climate --no-browser || true'
+      # sh 'bundle exec rubycritic app lib config/initializers --path reports/code_climate --no-browser || true'
     end
 
     task :code_style do
