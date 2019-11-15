@@ -9,7 +9,6 @@ stages:
   - build
   - test
   - deploy
-  - cleanup
 
 build:
   stage: build
@@ -51,9 +50,3 @@ image:publish:
   after_script:
     - docker rmi ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
   dependencies: []
-
-cleanup:docker:
-  stage: cleanup
-  script:
-    - docker-compose down
-  when: always
