@@ -36,7 +36,7 @@ table_for required_series, sortable: true, class: 'index_table index' do
       if required_series.assigned_image_series.present? && required_series.tqc_state != 'passed' && can?(:perform_tqc, visit)
         result += link_to('Perform tQC', tqc_form_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link')
       end
-      if required_series.tqc_state != 'pending' && can?(:read_tqc, visit)
+      if required_series.assigned_image_series.present? && required_series.tqc_state != 'pending' && can?(:read_tqc, visit)
         result += link_to('View tQC results', tqc_results_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link')
       end
     end
