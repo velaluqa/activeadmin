@@ -11,6 +11,10 @@ step 'I click the :string button' do |locator|
   click_button(locator)
 end
 
+step 'I click button :string' do |locator|
+  click_button(locator)
+end
+
 step 'I check :string' do |label|
   check(label)
   validation_report_screenshot
