@@ -1,6 +1,6 @@
 require_dependency 'migration/add_missing_version_study_id'
 
-describe Migration::AddMissingVersionStudyId do
+describe Migration::AddMissingVersionStudyId, silent_output: true do
   before(:each) do
     @email_template = create(:email_template)
     @notification_profile = create(:notification_profile, email_template: @email_template)

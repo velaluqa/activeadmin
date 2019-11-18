@@ -1,9 +1,15 @@
 # coding: utf-8
 require 'migration/migrate_required_series'
 
-describe Migration::MigrateRequiredSeries do
+describe Migration::MigrateRequiredSeries, silent_output: true do
   def point_in_time(i)
     Time.new(2017, 8, 1) + i.day
+  end
+
+  before(:each) do
+    if File.exist?('study_config_migration.yml')
+      FileUtils.rm('study_config_migration.yml')
+    end
   end
 
   describe '::non_obsolete_changes' do

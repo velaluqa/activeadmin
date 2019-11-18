@@ -35,8 +35,8 @@
 # * `index_background_jobs_on_user_id`:
 #     * **`user_id`**
 #
-class BackgroundJob < ActiveRecord::Base
-  belongs_to :user
+class BackgroundJob < ApplicationRecord
+  belongs_to :user, optional: true
 
   before_destroy :remove_zipfile
 
@@ -131,7 +131,7 @@ SELECT
   # If the job is finished and it has a zipfile referenced in its
   # `results` remove the file upon deletion of the resource.
   def remove_zipfile
-    return false unless finished?
+    throw :abort unless finished?
 
     File.delete(results['zipfile']) if results.andand['zipfile']
   rescue => error

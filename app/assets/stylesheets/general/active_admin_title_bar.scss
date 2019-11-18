@@ -73,26 +73,26 @@
       font-family: FontAwesome;
       margin: 0 7.5px 0 0;
     }
-    &.new a:before { content: $fa-var-plus; }
-    &.edit a:before { content: $fa-var-pencil; }
-    &.destroy a:before { content: $fa-var-trash-o; }
-    &.configure a:before { content: $fa-var-cogs; }
-    &.select a:before { content: $fa-var-hand_pointer-o; }
-    &.generate_keypair a:before { content: $fa-var-key; }
-    &.lock a:before { content: $fa-var-lock; }
-    &.unlock a:before { content: $fa-var-unlock; }
-    &.audit_trail a:before { content: $fa-var-history; }
+    &.new a:before { content: "\f067"; }
+    &.edit a:before { content: "\f304"; }
+    &.destroy a:before { content: "\f2ed"; }
+    &.configure a:before { content: "\f085"; }
+    &.select a:before { content: "\f25a"; }
+    &.generate_keypair a:before { content: "\f084"; }
+    &.lock a:before { content: "\f30d"; }
+    &.unlock a:before { content: "\f3c2"; }
+    &.audit_trail a:before { content: "\f1da"; }
 
-    &.export_for_erica1 a:before { content: $fa-var-share; }
-    &.download_images a:before { content: $fa-var-download; }
-    &.reorder_visits a:before { content: $fa-var-sort; }
+    &.export_for_erica1 a:before { content: "\f56e"; }
+    &.download_images a:before { content: "\f56d"; }
+    &.reorder_visits a:before { content: "\f885"; }
 
-    &.edit_dashboard a:before { content: $fa-var-pencil; }
-    &.save_dashboard a:before { content: $fa-var-check; }
+    &.edit_dashboard a:before { content: "\f304"; }
+    &.save_dashboard a:before { content: "\f00c"; }
 
-    &.start_viewer a:before { content: $fa-var-eye; }
-    &.clear_cart a:before { content: $fa-var-remove; }
+    &.start_viewer a:before { content: "\f06e"; }
+    &.clear_cart a:before { content: "\f00d"; }
 
-    &.deselect a:before { content: $fa-var-remove; }
+    &.deselect a:before { content: "\f00d"; }
   }
 }

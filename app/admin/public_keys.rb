@@ -19,9 +19,9 @@ ActiveAdmin.register PublicKey do
     column :user, sortable: :user_id
     column :status, sortable: :deactivated_at do |public_key|
       if public_key.active?
-        status_tag('Active', :ok)
+        status_tag('Active', class: 'ok')
       else
-        status_tag('Deactivated', nil, label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
+        status_tag('Deactivated', label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
       end
     end
     column :public_key do |public_key|
@@ -36,9 +36,9 @@ ActiveAdmin.register PublicKey do
       row :user
       row :status do
         if public_key.active?
-          status_tag('Active', :ok)
+          status_tag('Active', class: 'ok')
         else
-          status_tag('Deactivated', nil, label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
+          status_tag('Deactivated', label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
         end
       end
       row :public_key do
@@ -58,7 +58,7 @@ ActiveAdmin.register PublicKey do
 
     if @public_key.public_key.nil?
       flash[:error] = 'The public key is not present.'
-      redirect_to :back
+      redirect_back(fallback_location: admin_public_key_path(id: params[:id]))
     else
       send_data @public_key.public_key, filename: @public_key.user.username + '_' + (@public_key.deactivated_at.nil? ? 'active' : @public_key.deactivated_at.strftime('%FT%R')) + '.pub'
     end

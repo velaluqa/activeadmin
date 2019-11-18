@@ -1,7 +1,8 @@
-module Pharmtrace
-  module ActiveAdmin
-    # Override the header of ActiveAdmin to render some ERICA specific information.
-    class Header < ::ActiveAdmin::Component
+# coding: utf-8
+module ActiveAdmin
+  module Views
+    # Overriding ActiveAdmin defaults.
+    class EricaHeader < Component
       def build(namespace, menu)
         super(id: 'header')
 

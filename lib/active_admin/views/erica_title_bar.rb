@@ -1,6 +1,6 @@
-module Pharmtrace
-  module ActiveAdmin
-    class TitleBar < ::ActiveAdmin::Component
+module ActiveAdmin
+  module Views
+    class EricaTitleBar < Component
       def build(title, action_items)
         super(id: 'title_bar')
         @title = title

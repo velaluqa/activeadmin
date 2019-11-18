@@ -1,6 +1,6 @@
 require 'migration/fix_version_object_changes_for_state_columns'
 
-describe Migration::FixVersionObjectChangesForStateColumns do
+describe Migration::FixVersionObjectChangesForStateColumns, silent_output: true do
   describe '::run' do
     before(:each) do
       @visit_state_version = Version.create(

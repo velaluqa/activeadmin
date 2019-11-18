@@ -23,6 +23,7 @@ RSpec.describe Center do
               'study_name' => center.study.name,
               'text' => "#{center.code} - FooCenter",
               'result_id' => center.id,
+              'tag_list' => [],
               'result_type' => 'Center'
             }
           ]
@@ -145,6 +146,26 @@ RSpec.describe Center do
       expect(Center.by_study_ids([@study1.id, @study3.id]).all)
         .to match_array [@center11, @center12, @center31, @center32]
     end
+  end
+
+  describe 'having patients' do
+    let!(:center) { create(:center) }
+    let!(:patient) { create(:patient, center: center) }
+
+    it 'does not allow destruction' do
+      is_destroyed = center.destroy
+      expect(is_destroyed).to be_falsy
+      expect(center.errors.messages).to include(study: ['You cannot delete a center which has patients associated.'])
+    end
+  end
+
+  it 'does not allow reassignment of study' do
+    other_study = create(:study)
+    center = create(:center)
+    center.study = other_study
+
+    expect(center.save).to be_falsy
+    expect(center.errors.messages).to include(study: ['A center cannot be reassigned to a different study.'])
   end
 
   describe 'versioning' do

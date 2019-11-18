@@ -1,3 +1,4 @@
+@js
 Feature: Assign Required Series
   In order simplify the image management process,
   As authorized user for upload, visit assignment and required series assignment,
@@ -55,6 +56,7 @@ Feature: Assign Required Series
     And I select visit "10000" for "SCOUT 3-PLANE RT"
     And I select required series "SPECT_1" for "SCOUT 3-PLANE RT"
     And I click the "Upload Image Series" button
+    And I wait 5 seconds
     Then I see "Upload complete!"
     When I browse to image_series list
     Then I see "#10000" in "SCOUT 3-PLANE RT" row

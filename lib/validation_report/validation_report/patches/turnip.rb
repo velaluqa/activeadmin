@@ -1,11 +1,30 @@
+# coding: utf-8
 module Turnip
   module RSpec
     class << self
-      alias_method :original_run_feature, :run_feature
-
+      # Original see: https://github.com/jnicklas/turnip/blob/v3.1.0/lib/turnip/rspec.rb#L79
       def run_feature(context, feature, filename)
-        ValidationReport.add_feature(feature: feature, filename: filename)
-        original_run_feature(context, feature, filename)
+        background_steps = feature.backgrounds.map(&:steps).flatten
+
+        feature.scenarios.each do |scenario|
+          step_names = (background_steps + scenario.steps).map(&:to_s)
+          description = step_names.join(" → ")
+
+          context.describe scenario.name, scenario.metadata_hash do
+            instance_eval <<-EOS, filename, scenario.line
+              it description do
+                ValidationReport.push_feature(feature: feature, filename: filename)
+                ValidationReport.push_scenario(feature_filename: filename, scenario: scenario)
+                background_steps.each do |step|
+                  run_step(filename, step)
+                end
+                scenario.steps.each do |step|
+                  run_step(filename, step)
+                end
+              end
+            EOS
+          end
+        end
       end
     end
 

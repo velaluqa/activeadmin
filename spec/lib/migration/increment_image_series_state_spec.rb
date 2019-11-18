@@ -1,6 +1,6 @@
 require 'migration/increment_image_series_state'
 
-describe Migration::IncrementImageSeriesState do
+describe Migration::IncrementImageSeriesState, silent_output: true do
   describe '::run' do
     before(:each) do
       ImageSeries.skip_callback(:save, :before, :update_state)

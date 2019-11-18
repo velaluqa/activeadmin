@@ -15,7 +15,7 @@ RSpec.describe Admin::UsersController do
 
       it 'succeeds' do
         response = get :index
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -36,7 +36,7 @@ RSpec.describe Admin::UsersController do
     end
 
     describe 'without current user' do
-      subject { get(:show, id: @user.id) }
+      subject { get(:show, params: { id: @user.id }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -47,8 +47,8 @@ RSpec.describe Admin::UsersController do
       end
 
       it 'succeeds' do
-        response = get(:show, id: @user.id)
-        expect(response).to be_success
+        response = get(:show, params: { id: @user.id })
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -57,7 +57,7 @@ RSpec.describe Admin::UsersController do
       login_user_with_abilities
 
       it 'denies access' do
-        response = get(:show, id: @user.id)
+        response = get(:show, params: { id: @user.id })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
@@ -78,7 +78,7 @@ RSpec.describe Admin::UsersController do
 
       it 'succeeds' do
         response = get(:new)
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -109,7 +109,7 @@ RSpec.describe Admin::UsersController do
     end
 
     describe 'without current user' do
-      subject { post(:create, user: user) }
+      subject { post(:create, params: { user: user }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -121,7 +121,7 @@ RSpec.describe Admin::UsersController do
       end
 
       it 'succeeds' do
-        response = post(:create, user: user)
+        response = post(:create, params: { user: user })
         expect(response).to redirect_to(%r{/admin/users/\d+})
       end
     end
@@ -132,7 +132,7 @@ RSpec.describe Admin::UsersController do
       end
 
       it 'denies access' do
-        response = post(:create, user: user)
+        response = post(:create, params: { user: user })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end
@@ -144,7 +144,7 @@ RSpec.describe Admin::UsersController do
     end
 
     describe 'without current user' do
-      subject { post(:destroy, id: @user.id) }
+      subject { post(:destroy, params: { id: @user.id }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -156,7 +156,7 @@ RSpec.describe Admin::UsersController do
       end
 
       it 'succeeds' do
-        response = post(:destroy, id: @user.id)
+        response = post(:destroy, params: { id: @user.id })
         expect(response).to redirect_to('/admin/users')
       end
     end
@@ -167,7 +167,7 @@ RSpec.describe Admin::UsersController do
       end
 
       it 'denies access' do
-        response = post(:destroy, id: @user.id)
+        response = post(:destroy, params: { id: @user.id })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end

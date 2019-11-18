@@ -9,7 +9,12 @@
   background-color: $menu-background;
   padding-bottom: $menu-width;
 
-  .site_title {
+  // TODO: Hack because `menu false` does not work for resource.
+  #user_roles.menu_item {
+    display: none;
+  }
+
+  #site_title {
     position: absolute;
     width: 100%;
     height: $menu-width;
@@ -21,7 +26,7 @@
 
     line-height: $menu-width;
 
-    .wide {
+    .wide, .narrow {
       font-weight: bold;
       font-size: 1.2em;
       letter-spacing: 0.1em;
@@ -33,7 +38,7 @@
 
       &:before {
 	font-family: FontAwesome;
-	content: "\f0c9";
+        content: "\f0c9";
       }
     }
   }
@@ -107,21 +112,21 @@
       float: left;
 
       &:after {
-	transform: translateX(0px);
-	transition: transform .1s ease-out, background-color .1s ease-out;
-	content: ' ';
-	display: block;
-	width: 10px;
-	height: 10px;
-	border-radius: 15px;
-	background-color: $wet-asphalt;
+        transform: translateX(0px);
+        transition: transform .1s ease-out, background-color .1s ease-out;
+        content: ' ';
+        display: block;
+        width: 10px;
+        height: 10px;
+        border-radius: 15px;
+        background-color: $wet-asphalt;
       }
     }
 
     input#toggle-menu:checked + label {
       &:after {
-	transform: translateX(14px);
-	background-color: $green-sea;
+        transform: translateX(14px);
+        background-color: $green-sea;
       }
     }
 
@@ -156,36 +161,36 @@
         width: $menu-width;
         text-align: center;
         cursor: pointer;
-	display: inline-block;
-	content: " ";
+        display: inline-block;
+        content: " ";
       }
 
       &.has_nested {
-	border-top: 2px solid $menu-spacer-color;
+        border-top: 2px solid $menu-spacer-color;
 
-	&:first-child {
-	  border-top: 0;
-	}
+        &:first-child {
+          border-top: 0;
+        }
 
-	ul li {
-	  // padding: 0;
-	}
+        ul li {
+          // padding: 0;
+        }
 
-	&:before {
-	  display: none;
-	}
-	&> a {
-	  display: none;
-	}
+        &:before {
+          display: none;
+        }
+        &> a {
+          display: none;
+        }
       }
 
-      &#study-selection > a:before { content: $fa-var-hand-o-right; }
-      &#dashboard > a:before { content: "\f0e4"; }
+      &#study-selection > a:before { content: "\f0a4"; }
+      &#dashboard > a:before { content: "\f62d"; }
       &#viewer_cart > a:before { content: "\f07a"; }
 
       &#studies > a:before { content: "\f02d"; }
       &#centers > a:before { content: "\f19c"; }
-      &#patients > a:before { content: $fa-var-vcard-o; }
+      &#patients > a:before { content: "\f2bb"; }
       &#image_series > a:before { content: "\f03e"; }
       &#visits > a:before { content: "\f0f1"; }
 
@@ -195,7 +200,7 @@
       &#users > a:before { content: "\f007"; }
       &#roles > a:before { content: "\f0c0"; }
 
-      &#notification_profiles > a:before { content: $fa-var-envelope-square; }
+      &#notification_profiles > a:before { content: "\f0e0"; }
       &#email_templates > a:before { content: "\f003"; }
 
       &#notifications > a:before { content: "\f0a2"; }
@@ -207,9 +212,9 @@
       &#logout > a:before { content: "\f08b"; }
 
       a {
-	padding: 0 20px 0 0;
-	color: $menu-link-color;
-	text-decoration: none;
+        padding: 0 20px 0 0;
+        color: $menu-link-color;
+        text-decoration: none;
       }
 
       &:hover {
@@ -217,7 +222,7 @@
       }
 
       .current {
-	background-color: rgba(0,0,0,0.2);
+        background-color: rgba(0,0,0,0.2);
         > a, > a:before { color: $menu-link-hover-color; }
       }
     }

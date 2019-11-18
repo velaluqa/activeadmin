@@ -1,6 +1,6 @@
 class StudiesController < ApplicationController
-  before_filter :load_studies, only: [:index]
-  before_filter :load_the_study, only: [:wado_query]
+  before_action :load_studies, only: [:index]
+  before_action :load_the_study, only: [:wado_query]
 
   def index
     respond_to do |format|

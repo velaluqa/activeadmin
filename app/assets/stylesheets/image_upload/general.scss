@@ -276,9 +276,9 @@ body.admin_image_upload {
 
     .btn-primary {
       &:before {
-	font-family: FontAwesome;
-	content: $fa-var-cloud-upload;
-	margin-right: 5px;
+	      font-family: FontAwesome;
+	      content: "\f0ee";
+	      margin-right: 5px;
       }
     }
   }

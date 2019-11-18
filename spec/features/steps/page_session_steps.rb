@@ -9,9 +9,9 @@ step 'I sign in as a user' do
 end
 
 step 'a test user with a test role' do
-  @current_user_role = FactoryGirl.create(:role)
+  @current_user_role = FactoryBot.create(:role)
   @current_user =
-    FactoryGirl.create(
+    FactoryBot.create(
       :user,
       :changed_password,
       :with_keypair,
@@ -65,7 +65,7 @@ step 'I belong to role :string scoped to :string :string' do |role, model, ident
 end
 
 step 'I have a role scoped to :string :string' do |model, identifier|
-  @current_user_role = FactoryGirl.create(:role)
+  @current_user_role = FactoryBot.create(:role)
   step(
     "user \"#{@current_user.username}\" belongs to role \"#{
       @current_user_role.title
@@ -183,6 +183,12 @@ step 'I click link :string' do |locator|
   page.click_link(locator)
 end
 
+step 'I click link :string and confirm' do |locator|
+  page.accept_confirm do
+    page.click_link(locator)
+  end
+end
+
 step 'I click link :string in :string' do |locator, selector|
   within(selector) { click_link(locator) }
 end
@@ -236,8 +242,13 @@ step 'I download zip file' do
 
   page.driver.browser.get('chrome://downloads/')
   ts = Time.now
-  until Time.now - ts > Capybara.default_max_wait_time || download_count == 1 ||
-    !sleep(0.1)
+
+  begin
+    download_count = page.evaluate_script(download_count_js)
+  rescue e
+    puts e.inspect
+  end
+  until (Time.now - ts) > Capybara.default_max_wait_time || download_count == 1 || !sleep(0.1)
     begin
       download_count = page.evaluate_script(download_count_js)
     rescue e
@@ -249,9 +260,12 @@ step 'I download zip file' do
   validation_report_screenshot
   page.evaluate_script(clear_downloads_js)
   ts = Time.now
-  until Time.now - ts > Capybara.default_max_wait_time ||
-    !no_downloads_el[:hidden] ||
-    !sleep(0.1)
+  begin
+    no_downloads_el = page.evaluate_script(no_downloads_el_js)
+  rescue e
+    puts e.inspect
+  end
+  until Time.now - ts > Capybara.default_max_wait_time || !no_downloads_el[:hidden] || !sleep(0.1)
     begin
       no_downloads_el = page.evaluate_script(no_downloads_el_js)
     rescue e

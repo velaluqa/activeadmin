@@ -4,7 +4,7 @@ ActiveAdmin.register BackgroundJob do
     priority: 10
   )
 
-  before_filter { @skip_sidebar = true }
+  before_action { @skip_sidebar = true }
 
   config.filters = false
   config.comments = false
@@ -22,7 +22,7 @@ ActiveAdmin.register BackgroundJob do
     def destroy
       unless BackgroundJob.find(params[:id]).finished?
         flash[:error] = 'Running jobs cannot be deleted!'
-        redirect_to :back
+        redirect_back(fallback_location: admin_background_jobs_path)
         return
       end
 
@@ -37,11 +37,11 @@ ActiveAdmin.register BackgroundJob do
     column :created_at
     column 'State', sortable: :completed do |background_job|
       if background_job.finished? && !background_job.failed?
-        status_tag('Completed', :ok)
+        status_tag('Completed', class: 'ok')
       elsif background_job.failed?
-        status_tag('Failed', :error)
+        status_tag('Failed', class: 'error')
       else
-        status_tag('Running', :warning, label: 'Running: ' + ('%.2f' % (background_job.progress * 100)) + '% completed')
+        status_tag('Running', class: 'warning', label: 'Running: ' + ('%.2f' % (background_job.progress * 100)) + '% completed')
       end
     end
     column :completed_at
@@ -57,11 +57,11 @@ ActiveAdmin.register BackgroundJob do
       row :user
       row 'State' do
         if background_job.finished? && !background_job.failed?
-          status_tag('Completed', :ok)
+          status_tag('Completed', class: 'ok')
         elsif background_job.failed?
-          status_tag('Failed', :error)
+          status_tag('Failed', class: 'error')
         else
-          status_tag('Running', :warning, label: 'Running: ' + ('%.2f' % (background_job.progress * 100)) + '% completed')
+          status_tag('Running', class: 'warning', label: 'Running: ' + ('%.2f' % (background_job.progress * 100)) + '% completed')
         end
       end
       row :error_message if background_job.failed? && !background_job.error_message.blank?
@@ -104,11 +104,13 @@ ActiveAdmin.register BackgroundJob do
     authorize! :read, background_job
 
     unless background_job.results && background_job.results['zipfile']
-      redirect_to :back, alert: 'No download available'
+      flash[:alert] = 'No download available'
+      redirect_back(fallback_location: admin_background_job_path(id: params[:id]))
       return
     end
     unless File.readable?(background_job.results['zipfile'])
-      redirect_to :back, alert: 'File not found'
+      flash[:alert] = 'File not found'
+      redirect_back(fallback_location: admin_background_job_path(id: params[:id]))
       return
     end
 

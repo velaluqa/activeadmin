@@ -271,7 +271,7 @@ Devise::TokenAuthenticatable.setup do |config|
   # enables the expiration of a token after a session timeout,
   # only useful in connection with the devise timeoutable module,
   # defaults to false
-  config.expire_auth_token_on_timeout = true
+  config.token_expires_in = nil
 
   # set the authentication key name used by this module,
   # defaults to :auth_token

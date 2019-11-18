@@ -326,7 +326,7 @@ RSpec.describe HistoricReportQuery do
           query = HistoricReportQuery.create(resource_type: 'Patient')
           query.calculate_cache(@study.id)
           query.calculate_cache(@study.id)
-          entries = HistoricReportCacheEntry.order('"date" ASC').last(3)
+          entries = HistoricReportCacheEntry.order(date: :asc).last(3)
           expect(entries[0].date).to eq four_hours_ago
           expect(entries[0].values.length).to eq(1)
           expect(entries[0].values[0]).to eq(group: nil, count: 1, delta: 1)
@@ -425,7 +425,7 @@ RSpec.describe HistoricReportQuery do
           query.calculate_cache(@study.id)
           query.calculate_cache(@study.id)
           expect(query.cache_entries.count).to eq(7)
-          entries = HistoricReportCacheEntry.order('"date" ASC').last(7)
+          entries = HistoricReportCacheEntry.order(date: :asc).last(7)
           expect(entries[0].date).to eq @version1.created_at
           expect(entries[0].values).to include(group: nil, count: 1, delta: +1)
           expect(entries[0].values).to include(group: '0', count: 1, delta: +1)
@@ -491,7 +491,7 @@ CONFIG
           query = HistoricReportQuery.create(resource_type: 'RequiredSeries')
           query.calculate_cache(study.id)
           query.calculate_cache(study.id)
-          entries = HistoricReportCacheEntry.order('"date" ASC').last(10)
+          entries = HistoricReportCacheEntry.order(date: :asc).last(10)
           expect(entries.length).to eq(4)
           expect(entries[0].values).to include(group: nil, delta: 1, count: 1)
           expect(entries[1].values).to include(group: nil, delta: 1, count: 2)
@@ -507,11 +507,11 @@ CONFIG
         let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
         visit_types:
           baseline:
-          required_series:
-          baseline:
-          tqc: []
-        extra:
-          tqc: []
+            required_series:
+              baseline:
+                tqc: []
+              extra:
+                tqc: []
         image_series_properties: []
 CONFIG
         let!(:center) { create(:center, study: study) }
@@ -536,7 +536,7 @@ CONFIG
           )
           query.calculate_cache(study.id)
           query.calculate_cache(study.id)
-          entries = HistoricReportCacheEntry.order('"date" ASC').last(20)
+          entries = HistoricReportCacheEntry.order(date: :asc).last(20)
           expect(entries.length).to eq(5)
           expect(entries[0].values).to include(group: 'unassigned', delta: +1, count: 1)
           expect(entries[0].values).to include(group: nil,          delta: +1, count: 1)
@@ -583,7 +583,7 @@ CONFIG
             group_by: 'tqc_state'
           )
           query.calculate_cache(study.id)
-          entries = HistoricReportCacheEntry.order('"date" ASC')
+          entries = HistoricReportCacheEntry.order(date: :asc)
           expect(entries.length).to eq(2)
           expect(entries[0].values).to include(group: 'unassigned', delta: +1, count: 1)
           expect(entries[0].values).to include(group: nil,          delta: +1, count: 1)
@@ -611,11 +611,11 @@ CONFIG
     let!(:study) { create(:study, :locked, configuration: <<CONFIG.strip_heredoc) }
         visit_types:
           baseline:
-          required_series:
-          baseline:
-          tqc: []
-        extra:
-          tqc: []
+            required_series:
+              baseline:
+                tqc: []
+              extra:
+                tqc: []
         image_series_properties: []
 CONFIG
     let!(:center) { create(:center, study: study) }

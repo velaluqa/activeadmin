@@ -45,7 +45,7 @@ This starts the Rails server.
 
 ## Running Tests
 
-Tests use FactoryGirl for ad-hoc test data. This way we ensure our
+Tests use FactoryBot for ad-hoc test data. This way we ensure our
 tests to operate on predictable test data.
 
 First create the database and migrate, similar to the development

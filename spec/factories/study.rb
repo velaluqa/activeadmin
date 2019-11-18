@@ -1,22 +1,22 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :study do
     sequence(:name) { |n| "Study #{n}" }
 
     transient do
-      configuration(nil)
+      configuration { nil }
     end
 
     trait :production do
-      state Study.state_sym_to_int(:production)
+      state { Study.state_sym_to_int(:production) }
     end
 
     trait :building do
-      state Study.state_sym_to_int(:building)
+      state { Study.state_sym_to_int(:building) }
     end
 
     trait :with_centers do
       transient do
-        centers_count 3
+        centers_count { 3 }
       end
 
       after :create do |study, evaluator|
@@ -26,7 +26,22 @@ FactoryGirl.define do
 
     after(:create) do |study, evaluator|
       if evaluator.configuration.is_a?(String)
-        study.update_configuration!(evaluator.configuration)
+        temp_file = Tempfile.new.tap do |file|
+          file.write(evaluator.configuration)
+          file.close
+        end
+
+        result = Study::UploadConfiguration.(
+          params: {
+            id: study.id,
+            'study_contract_upload_configuration' => {
+              id: study.id,
+              file: Rack::Test::UploadedFile.new(temp_file.path)
+            }
+          }
+        )
+
+        raise result['contract.default'].errors.messages.inspect unless result.success?
       end
     end
 

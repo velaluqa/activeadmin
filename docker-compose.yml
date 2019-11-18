@@ -22,23 +22,27 @@ app:
     RAILS_ENV: development
     TRUSTED_IP: 172.18.0.1
     DISABLE_SPRING: 't'
-    # POSTGRES_HOST: postgres
-    # POSTGRES_DATABASE: erica_store_production
-    # POSTGRES_USERNAME: postgres
-    # POSTGRES_PASSWORD:
+    POSTGRES_HOST: postgres
+    POSTGRES_DATABASE: erica_v2_production
+    POSTGRES_USERNAME: postgres
+    POSTGRES_PASSWORD:
   links: &links
     - postgres
     - redis
     - worker
 test:
   build: *build
-  command: guard
+  command: bundle exec guard
   tty: true
   volumes: *volumes
   environment:
     <<: *environment
     RAILS_ENV: test
     SELENIUM_DRIVER_URL: http://chrome:4444/wd/hub
+    POSTGRES_HOST: postgres
+    POSTGRES_DATABASE: erica_store_test
+    POSTGRES_USERNAME: postgres
+    POSTGRES_PASSWORD:
   links:
     - postgres
     - redis

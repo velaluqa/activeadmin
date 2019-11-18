@@ -6,7 +6,7 @@ module ActiveAdmin
         def build_active_admin_head
           original_build_active_admin_head
 
-          within @head do
+          within(head) do
             render partial: 'layouts/script_current_user'
             render partial: 'layouts/script_studies'
           end

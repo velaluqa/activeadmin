@@ -89,8 +89,8 @@ CONFIG
         spect_3.set_tqc_result({ 'modality' => true }, user, 'First tqc')
         objects = visit.required_series_objects.map(&:attributes)
         expect(objects).to include(include('name' => 'SPECT_1', 'tqc_state' => nil))
-        expect(objects).to include(include('name' => 'SPECT_2', 'tqc_state' => 2))
-        expect(objects).to include(include('name' => 'SPECT_3', 'tqc_state' => 2))
+        expect(objects).to include(include('name' => 'SPECT_2', 'tqc_state' => 'passed'))
+        expect(objects).to include(include('name' => 'SPECT_3', 'tqc_state' => 'passed'))
         visit.visit_type = 'baseline2'
         visit.save!
         spect_2.reload
@@ -130,14 +130,14 @@ CONFIG
 
   describe '#required_series_spec' do
     describe 'for building study' do
-      let!(:study) { create(:study, configuration: <<CONFIG.strip_heredoc) }
-    visit_types:
-      baseline:
-        required_series:
-          SPECT_1: {}
-          SPECT_2: {}
-    image_series_properties: []
-CONFIG
+      let!(:study) { create(:study, configuration: <<~CONFIG) }
+        visit_types:
+          baseline:
+            required_series:
+              SPECT_1: {}
+              SPECT_2: {}
+        image_series_properties: []
+      CONFIG
       let!(:center) { create(:center, study: study) }
       let!(:patient) { create(:patient, center: center) }
       let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
@@ -149,17 +149,18 @@ CONFIG
     end
 
     describe 'for semantically invalid study' do
-      let!(:study) { create(:study, configuration: <<CONFIG.strip_heredoc) }
-    visit_types:
-      baseline:
-        required_series:
-          SPECT_1: {}
-          SPECT_2: {}
-CONFIG
+      let!(:study) { create(:study) }
       let!(:center) { create(:center, study: study) }
       let!(:patient) { create(:patient, center: center) }
       let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
       before(:each) do
+        study.update_configuration!(<<~CONFIG)
+          visit_types:
+            baseline:
+              required_series:
+                SPECT_1: {}
+                SPECT_2: {}
+        CONFIG
         study.lock_configuration!
         expect(visit.study.semantically_valid?).to be_falsy
       end
@@ -404,6 +405,7 @@ CONFIG
         required_series:
           SPECT1: {}
           SPECT2: {}
+    image_series_properties: []
 CONFIG
     let!(:center1) { create(:center, study: study1) }
     let!(:patient1) { create(:patient, center: center1) }
@@ -425,16 +427,16 @@ CONFIG
   end
 
   describe '#required_series_available?' do
-    let!(:study1) { create(:study, configuration: <<CONFIG.strip_heredoc) }
-    visit_types:
-      baseline:
-        required_series:
-          SPECT1: {}
-          SPECT2: {}
-      followup:
-        required_series: {}
-    image_series_properties: []
-CONFIG
+    let!(:study1) { create(:study, configuration: <<~CONFIG) }
+      visit_types:
+        baseline:
+          required_series:
+            SPECT1: {}
+            SPECT2: {}
+        followup:
+          required_series: {}
+      image_series_properties: []
+    CONFIG
     let!(:center1) { create(:center, study: study1) }
     let!(:patient1) { create(:patient, center: center1) }
     let!(:visit1) { create(:visit, patient: patient1, visit_type: nil) }
@@ -519,6 +521,7 @@ CONFIG
           'id' => nil,
           'study_id' => visit.patient.center.study_id,
           'study_name' => visit.patient.center.study.name,
+          'tag_list' => [],
           'text' => "FooBar##{visit.visit_number}",
           'result_id' => visit.id,
           'result_type' => 'Visit'
@@ -654,6 +657,15 @@ CONFIG
           @visit3111, @visit3112, @visit3211, @visit3212
         ]
     end
+  end
+
+  it 'does not allow reassignment of study' do
+    other_patient = create(:patient)
+    visit = create(:visit)
+    visit.patient = other_patient
+
+    expect(visit.save).to be_falsy
+    expect(visit.errors.messages).to include(patient: ['A visit cannot be reassigned to a patient in a different study.'])
   end
 
   describe 'versioning' do

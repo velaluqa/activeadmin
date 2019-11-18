@@ -6,11 +6,13 @@
     %li#visit_template_preview
 
 = javascript_include_tag 'patients/visit_templates'
-:coffeescript
-  $ ->
-    visitTemplatesForm
-      selected_study: #{local_assigns.fetch(:selected_study, nil).to_json}
-      visit_templates: #{local_assigns.fetch(:templates, {}).to_json}
-      preselect: #{local_assigns.fetch(:preselect, nil).to_json}
-      allow_clear: #{local_assigns.fetch(:allow_clear, nil).to_json}
-      create_patient: #{local_assigns.fetch(:create_patient, nil).to_json}
+:javascript
+  $(function() {
+    visitTemplatesForm({
+      selected_study: #{local_assigns.fetch(:selected_study, nil).to_json.html_safe},
+      visit_templates: #{local_assigns.fetch(:templates, {}).to_json.html_safe},
+      preselect: #{local_assigns.fetch(:preselect, nil).to_json.html_safe},
+      allow_clear: #{local_assigns.fetch(:allow_clear, nil).to_json.html_safe},
+      create_patient: #{local_assigns.fetch(:create_patient, nil).to_json.html_safe}
+    })
+  });

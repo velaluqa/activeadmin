@@ -13,7 +13,7 @@ require 'notification_observable/filter/schema'
 #
 # A trigger is defined by two attributes:
 #
-# * `[Array<String>] triggering_actions` — The CRUD actions performed on that resource, that trigger the `NotificationProfile`. Typically this means the ActiveRecord action (e.g. `create`, `update` or `destroy`).
+# * `[Array<String>] triggering_actions` — The CRUD actions performed on that resource, that trigger the `NotificationProfile`. Typically this means the ActiveRecord action (e.g. `create`, `ApplicationRecord
 # * `[String] triggering_resource` — The resource which is triggering this profile. Usually this is the model name within the ERICA system.
 #
 # ## Filter
@@ -117,9 +117,6 @@ class NotificationProfile < ActiveRecord::Base
   ].freeze
 
   has_paper_trail class_name: 'Version'
-
-  serialize :triggering_actions, StringArraySerializer
-  serialize :filters, HashArraySerializer
 
   has_many :notification_profile_users
   has_many :users, through: :notification_profile_users, dependent: :destroy

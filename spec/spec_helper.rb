@@ -1,6 +1,6 @@
 if ENV['COVERAGE']
   require 'simplecov'
-  SimpleCov.command_name 'RSpec'
+  SimpleCov.start 'rails'
 end
 
 # Turnip is a Gherkin language and runner implementation with better
@@ -72,7 +72,7 @@ require 'database_cleaner'
 
 # Drops are encapsulations for liquid templates which are created in a
 # potentially hostile environment (e.g. by the end-user).
-require 'liquid4-rails/matchers'
+require 'liquid-rails/matchers'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -102,6 +102,8 @@ RSpec::Sidekiq.configure do |config|
 end
 
 RSpec.configure do |config|
+  config.raise_error_for_unimplemented_steps = true
+
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
 
@@ -115,8 +117,8 @@ RSpec.configure do |config|
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
-  config.include FactoryGirl::Syntax::Methods
-  config.include Devise::TestHelpers, type: :controller
+  config.include FactoryBot::Syntax::Methods
+  config.include Devise::Test::ControllerHelpers, type: :controller
   config.include ValidationReport::RSpec::Helper
   config.extend ControllerMacros, type: :controller
   config.extend WithModel
@@ -132,8 +134,8 @@ RSpec.configure do |config|
   end
 
   config.before(:suite) do
-    FactoryGirl.reload
-    FactoryGirl.lint
+    FactoryBot.reload
+    FactoryBot.lint
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
     clear_data
@@ -151,12 +153,24 @@ RSpec.configure do |config|
     PaperTrail.enabled = true
   end
 
+  config.around(:each, silent_output: true) do |example|
+    original_stderr = $stderr
+    original_stdout = $stdout
+    $stderr = File.open(File::NULL, 'w')
+    $stdout = File.open(File::NULL, 'w')
+
+    example.run
+
+    $stderr = original_stderr
+    $stdout = original_stdout
+  end
+
   config.around(:each) do |example|
     clear_data
     DatabaseCleaner.cleaning do
       example.run
     end
-    ::PaperTrail.whodunnit = nil
+    ::PaperTrail.request.whodunnit = nil
   end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your

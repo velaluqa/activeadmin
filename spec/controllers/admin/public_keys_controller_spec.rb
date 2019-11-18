@@ -17,7 +17,7 @@ RSpec.describe Admin::PublicKeysController do
 
       it 'succeeds' do
         response = get :index
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -38,7 +38,7 @@ RSpec.describe Admin::PublicKeysController do
     end
 
     describe 'without current user' do
-      subject { get(:show, id: @public_key.id) }
+      subject { get(:show, params: { id: @public_key.id }) }
       it { expect(subject.status).to eq 302 }
       it { expect(subject).to redirect_to('/users/sign_in') }
     end
@@ -49,8 +49,8 @@ RSpec.describe Admin::PublicKeysController do
       end
 
       it 'succeeds' do
-        response = get(:show, id: @public_key.id)
-        expect(response).to be_success
+        response = get(:show, params: { id: @public_key.id })
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end
@@ -59,7 +59,7 @@ RSpec.describe Admin::PublicKeysController do
       login_user_with_abilities
 
       it 'denies access' do
-        response = get(:show, id: @public_key.id)
+        response = get(:show, params: { id: @public_key.id })
         expect(response).to redirect_to(admin_not_authorized_path)
       end
     end

@@ -1,8 +1,11 @@
 require 'exceptions'
 
 class UsersController < ApplicationController
-  before_filter :authenticate_user!
-  before_filter :set_user
+  before_action :authenticate_user!
+  before_action :set_user
+
+  skip_before_action(:ensure_valid_password)
+  skip_before_action(:ensure_valid_keypair)
 
   layout 'devise'
 

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :center do
     sequence(:name) { |n| "Center #{n}" }
     sequence(:code)

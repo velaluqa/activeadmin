@@ -22,11 +22,15 @@
 # * `index_permissions_on_subject`:
 #     * **`subject`**
 #
-class Permission < ActiveRecord::Base
+class Permission < ApplicationRecord
   ABILITY_REGEX = /^(.+)_(#{Ability::ACTIVITIES.keys.map { |subject| subject.to_s.underscore }.join('|')})$/
 
   belongs_to :role
   has_many :users, through: :role
+
+  scope :granting, ->(activity, subject) {
+    where(activity: activity.to_s, subject: subject.to_s)
+  }
 
   # Returns true if a UserRole exists with given activity for subject.
   def self.allow?(activity, subject)

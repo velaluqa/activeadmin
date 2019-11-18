@@ -33,7 +33,7 @@
 # * `index_notifications_on_version_id`:
 #     * **`version_id`**
 #
-class Notification < ActiveRecord::Base
+class Notification < ApplicationRecord
   has_paper_trail(
     class_name: 'Version',
     version: :paper_trail_version,
@@ -47,12 +47,11 @@ class Notification < ActiveRecord::Base
 
   belongs_to :notification_profile
   belongs_to :user
-  belongs_to :version
-  belongs_to :resource, polymorphic: true
+  belongs_to :version, optional: true
+  belongs_to :resource, polymorphic: true, optional: true
 
   validates :user, presence: true
   validates :notification_profile, presence: true
-  validates :version, presence: true
 
   # All notifications that have not yet been sent.
   scope :pending, -> { where(email_sent_at: nil) }

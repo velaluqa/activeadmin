@@ -19,6 +19,7 @@ RSpec.describe Study do
           'id' => nil,
           'study_id' => study.id,
           'study_name' => study.name,
+          'tag_list' => [],
           'text' => 'FooStudy',
           'result_id' => study.id,
           'result_type' => 'Study'

@@ -23,7 +23,7 @@ require 'domino_integration_client'
 # **`state`**                 | `integer`          | `default(0)`
 # **`updated_at`**            | `datetime`         |
 #
-class Study < ActiveRecord::Base
+class Study < ApplicationRecord
   has_paper_trail(
     class_name: 'Version',
     meta: {

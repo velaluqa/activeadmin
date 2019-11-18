@@ -22,7 +22,7 @@ ActiveAdmin.register Center do
       end
     end
 
-    before_filter :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
+    before_action :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
     def authorize_erica_remote
       return if params[:format].blank?
       authorize! :download_status_files, Center
@@ -80,7 +80,7 @@ ActiveAdmin.register Center do
     f.actions
   end
 
-  # filters
+  # actions
   filter :study, collection: lambda {
     if session[:selected_study_id].present?
       Study

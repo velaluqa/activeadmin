@@ -26,7 +26,7 @@ ActiveAdmin.register Image do
       end
     end
 
-    before_filter :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
+    before_action :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
     def authorize_erica_remote
       return if params[:format].blank?
       authorize! :download_status_files, Image
@@ -39,9 +39,9 @@ ActiveAdmin.register Image do
     column :id
     column 'File' do |image|
       if image.file_is_present?
-        status_tag('Present', :ok)
+        status_tag('Present', class: 'ok')
       else
-        status_tag('Missing', :error)
+        status_tag('Missing', class: 'error')
       end
     end
 
@@ -55,9 +55,9 @@ ActiveAdmin.register Image do
       row :image_storage_path
       row 'File' do
         if image.file_is_present?
-          status_tag('Present', :ok)
+          status_tag('Present', class: 'ok')
         else
-          status_tag('Missing', :error)
+          status_tag('Missing', class: 'error')
         end
       end
     end

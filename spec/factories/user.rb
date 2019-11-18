@@ -1,18 +1,23 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :user do
     transient do
-      with_user_roles([])
+      with_user_roles { [] }
     end
 
     name { Faker::Name.name }
-    username { |u| Faker::Internet.user_name(u.name, %w[. _ -]) }
-    password 'password'
+    username do |u|
+      Faker::Internet.user_name(
+        specifier: u.name,
+        separators: %w[. _ -]
+      )
+    end
+    password { 'password' }
     email { |_u| Faker::Internet.safe_email }
 
     confirmed_at { DateTime.now }
 
     trait :changed_password do
-      password_changed_at DateTime.now
+      password_changed_at { DateTime.now }
     end
 
     trait :with_keypair do

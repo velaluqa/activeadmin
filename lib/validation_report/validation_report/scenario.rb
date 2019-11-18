@@ -1,19 +1,12 @@
 module ValidationReport
   class Scenario
-    def initialize(turnip_scenario:, turnip_backgrounds:, feature:)
-      @turnip_scenario = turnip_scenario
-      @turnip_backgrounds = turnip_backgrounds
-      @feature = feature
-      @passed = false
-    end
+    attr_reader :steps, :feature
 
-    def steps
-      steps = (@turnip_backgrounds.map(&:steps).flatten +
-               @turnip_scenario.steps).map do |turnip_step|
-        turnip_step.instance_eval { @root_step }
-      end
-      steps.compact!
-      steps
+    def initialize(feature:, turnip_scenario:)
+      @turnip_scenario = turnip_scenario
+      @feature = feature
+      @steps = []
+      @passed = false
     end
 
     def name
@@ -30,9 +23,7 @@ module ValidationReport
 
     def last_change_version
       versions = [last_change_version_of_step_definitions, change_version]
-      if versions.include?(:unreleased)
-        return :unreleased
-      end
+      return :unreleased if versions.include?(:unreleased)
 
       versions.sort!
       versions.last
@@ -41,10 +32,7 @@ module ValidationReport
     # @return [Gem::Version, Symbol] last change version or :unreleased
     def last_change_version_of_step_definitions
       step_versions = steps.map(&:change_version)
-
-      if step_versions.include?(:unreleased)
-        return :unreleased
-      end
+      return :unreleased if step_versions.include?(:unreleased)
 
       step_versions.sort!
       step_versions.last

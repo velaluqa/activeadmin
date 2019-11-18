@@ -33,13 +33,13 @@ ActiveAdmin.register Patient do
       return selected_filters
     end
 
-    before_filter :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
+    before_action :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
     def authorize_erica_remote
       return if params[:format].blank?
       authorize! :download_status_files, Patient
     end
 
-    before_filter :transform_filter_params, only: :index
+    before_action :transform_filter_params, only: :index
     def transform_filter_params
       session[:current_images_filter] = nil if params[:clear_filter] == 'true'
 
@@ -232,7 +232,7 @@ ActiveAdmin.register Patient do
     visits = new_visits_list.map {|v| Visit.find(v.to_i)}
 
     available_visit_numbers = visits.map {|v| v.visit_number}.sort
-    next_free_visit_number = (@patient.visits.empty? ? 0 : @patient.visits.order('visit_number desc').first.visit_number+1)
+    next_free_visit_number = (@patient.visits.empty? ? 0 : @patient.visits.order(visit_number: :desc).first.visit_number+1)
 
     Visit.transaction do
       # first we set the visit_number to some unused number, so it won't clash with existing visit numbers when setting the correct one next

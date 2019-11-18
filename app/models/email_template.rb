@@ -13,6 +13,6 @@
 # **`template`**    | `text`             | `not null`
 # **`updated_at`**  | `datetime`         | `not null`
 #
-class EmailTemplate < ActiveRecord::Base
+class EmailTemplate < ApplicationRecord
   has_paper_trail class_name: 'Version'
 end

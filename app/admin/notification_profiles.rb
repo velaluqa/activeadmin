@@ -33,9 +33,9 @@ ActiveAdmin.register NotificationProfile do
     column :title
     column :is_enabled do |profile|
       if profile.is_enabled
-        status_tag('Enabled', :ok)
+        status_tag('Enabled', class: 'ok')
       else
-        status_tag('Disabled', :error)
+        status_tag('Disabled', class: 'error')
       end
     end
     column :triggering_actions do |profile|
@@ -55,7 +55,7 @@ ActiveAdmin.register NotificationProfile do
       end
       row :maximum_email_throttling_delay do
         delay = Email::THROTTLING_DELAYS.key(profile.maximum_email_throttling_delay)
-        status_tag(delay, :note)
+        status_tag(delay, class: 'note')
       end
     end
 
@@ -64,9 +64,9 @@ ActiveAdmin.register NotificationProfile do
         row :triggering_actions do
           profile.triggering_actions.each do |action|
             case action
-            when 'create' then status_tag(action, :ok)
-            when 'update' then status_tag(action, :warning)
-            when 'destroy' then status_tag(action, :error)
+            when 'create' then status_tag(action, class: 'ok')
+            when 'update' then status_tag(action, class: 'warning')
+            when 'destroy' then status_tag(action, class: 'error')
             end
           end
           ""

@@ -16,7 +16,7 @@
 # **`title`**       | `string`           | `not null`
 # **`updated_at`**  | `datetime`         |
 #
-class Role < ActiveRecord::Base
+class Role < ApplicationRecord
   has_paper_trail class_name: 'Version'
 
   attr_accessible(:title, :abilities)
@@ -62,7 +62,7 @@ SELECT
   # @param [ActiveRecord::Model, String] subject The subject to permit
   #   activity on
   def remove_permission(activity, subject)
-    permissions.where(activity: activity, subject: subject).destroy_all
+    permissions.granting(activity, subject).destroy_all
     permissions.reload
   end
 

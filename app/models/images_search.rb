@@ -11,7 +11,7 @@
 # **`study_id`**     | `integer`          |
 # **`text`**         | `string`           |
 #
-class ImagesSearch < ActiveRecord::Base
+class ImagesSearch < ApplicationRecord
   self.table_name = 'images_search'
 
   attr_accessible :text, :result_id, :result_type

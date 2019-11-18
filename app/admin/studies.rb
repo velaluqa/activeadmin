@@ -16,7 +16,7 @@ ActiveAdmin.register Study do
       1_000_000
     end
 
-    before_filter :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
+    before_action :authorize_erica_remote, only: :index, if: -> { ERICA.remote? }
     def authorize_erica_remote
       return if params[:format].blank?
       authorize! :download_status_files, Study
@@ -30,9 +30,9 @@ ActiveAdmin.register Study do
     end
     column :configuration do |study|
       if study.has_configuration?
-        status_tag('Available', :ok)
+        status_tag('Available', class: 'ok')
       else
-        status_tag('Missing', :error)
+        status_tag('Missing', class: 'error')
       end
     end
     column :state, sortable: :state do |study|
@@ -56,7 +56,7 @@ ActiveAdmin.register Study do
         if study.domino_integration_enabled?
           link_to(study.domino_db_url, study.domino_db_url)
         else
-          status_tag('Disabled', :warning, label: 'Domino integration not enabled')
+          status_tag('Disabled', class: 'warning', label: 'Domino integration not enabled')
         end
       end
       row :domino_server_name
@@ -151,7 +151,7 @@ ActiveAdmin.register Study do
 
     authorize!(:configure, @study)
 
-    result = Study::UploadConfiguration.(params, current_user: current_user)
+    result = Study::UploadConfiguration.(params: params, current_user: current_user)
     if result.success?
       return redirect_to({ action: :show }, notice: 'Configuration successfully uploaded.')
     end
@@ -186,7 +186,8 @@ ActiveAdmin.register Study do
     session[:selected_study_id] = @study.id
     session[:selected_study_name] = @study.name
 
-    redirect_to :back, notice: "Study #{@study.name} was selected for this session."
+    flash[:notice] = "Study #{@study.name} was selected for this session."
+    redirect_back(fallback_location: admin_studies_path)
   end
 
   action_item :select, only: :show, if: -> { session[:selected_study_id] != resource.id } do
@@ -204,11 +205,12 @@ ActiveAdmin.register Study do
   collection_action :deselect_study, method: :get do
     if session[:selected_study_id].nil?
       flash[:error] = 'No study selected for current session.'
-      redirect_to :back
+      redirect_back(fallback_location: root_url)
     else
       session[:selected_study_id] = nil
       session[:selected_study_name] = nil
-      redirect_to :back, notice: 'The study was deselected for the current session.'
+      flash[:notice] = 'The study was deselected for the current session.'
+      redirect_back(fallback_location: root_url)
     end
   end
 

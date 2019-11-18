@@ -1,9 +1,10 @@
 = javascript_include_tag "vendor/dicomParser"
 = javascript_include_tag "uploader/main"
-:coffeescript
-  $ ->
-    ImageUploader.router = new ImageUploader.Router()
-    Backbone.history.start()
+:javascript
+  $(function() {
+    ImageUploader.router = new ImageUploader.Router();
+    Backbone.history.start();
+  });
 #image-upload
   .panel-columns
     #study-select

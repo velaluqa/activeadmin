@@ -1,6 +1,6 @@
 - if current_user
-  :coffeescript
-    @currentUser = new ILR.User(#{current_user.permission_matrix.to_json})
+  :javascript
+    window.currentUser = new ILR.User(#{current_user.permission_matrix.to_json.html_safe});
 - else
-  :coffeescript
-    @currentUser = null
+  :javascript
+    window.currentUser = null;

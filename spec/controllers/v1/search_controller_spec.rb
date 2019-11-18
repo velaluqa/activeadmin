@@ -1,7 +1,7 @@
 RSpec.describe V1::SearchController, type: :controller do
   describe '#index' do
     describe 'without current user' do
-      subject { get :index, format: :json, query: 'Test' }
+      subject { get :index, format: :json, params: { query: 'Test' } }
       it { expect(subject).to have_http_status(:unauthorized) }
     end
 
@@ -17,8 +17,8 @@ RSpec.describe V1::SearchController, type: :controller do
       end
 
       it 'succeeds' do
-        response = get :index, format: :json, query: 'Test'
-        expect(response).to be_success
+        response = get :index, format: :json, params: { query: 'Test' }
+        expect(response).to be_successful
         expect(response).to have_http_status(200)
       end
     end

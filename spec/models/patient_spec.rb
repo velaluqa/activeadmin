@@ -20,6 +20,7 @@ RSpec.describe Patient do
           'id' => nil,
           'study_id' => patient.center.study_id,
           'study_name' => patient.center.study.name,
+          'tag_list' => [],
           'text' => 'FooBar',
           'result_id' => patient.id,
           'result_type' => 'Patient'
@@ -243,6 +244,15 @@ YAML
         expect(patient.visits.count).to eq 1
       end
     end
+  end
+
+  it 'does not allow reassignment of study' do
+    other_center = create(:center)
+    patient = create(:patient)
+    patient.center = other_center
+
+    expect(patient.save).to be_falsy
+    expect(patient.errors.messages).to include(center: ['A patient cannot be reassigned to a center in a different study.'])
   end
 
   describe 'versioning' do

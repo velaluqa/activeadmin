@@ -32,7 +32,7 @@
 # * `index_image_series_on_visit_id`:
 #     * **`visit_id`**
 #
-class ImageSeries < ActiveRecord::Base
+class ImageSeries < ApplicationRecord
   include DominoDocument
   after_commit :schedule_domino_sync
 
@@ -59,7 +59,7 @@ class ImageSeries < ActiveRecord::Base
     :properties_version
   )
 
-  belongs_to :visit
+  belongs_to :visit, optional: true
   belongs_to :patient
   has_many :images, dependent: :destroy
 
@@ -102,6 +102,8 @@ JOIN
 
   before_save :ensure_study_is_unchanged
   before_save :ensure_visit_is_for_patient
+
+  cattr_accessor :skip_update_state_callback
   before_save :update_state
 
   # before_validation :assign_series_number
@@ -167,7 +169,7 @@ JOIN
   end
 
   def wado_query
-    { id: id, name: name, images: images.order('id ASC') }
+    { id: id, name: name, images: images.order(id: :asc) }
   end
 
   def sample_image
@@ -341,25 +343,20 @@ JOIN
   end
 
   def ensure_study_is_unchanged
-    if patient_id_changed? && !patient_id_was.nil?
-      old_patient = Patient.find(patient_id_was)
+    return unless patient_id_changed? && patient_id_was
 
-      if old_patient.study != patient.study
-        errors[:patient] << 'An image series cannot be reassigned to a patient in a different study.'
-        return false
-      end
-    end
+    old_patient = Patient.find(patient_id_was)
+    return if old_patient.study == patient.study
 
-    true
+    errors[:patient] << 'An image series cannot be reassigned to a patient in a different study.'
+    throw(:abort)
   end
 
   def ensure_visit_is_for_patient
-    if visit && visit.patient != patient
-      errors[:visit] << 'The visits patient is different from this image series\' patient'
-      false
-    else
-      true
-    end
+    return unless visit && visit.patient != patient
+
+    errors[:visit] << 'The visits patient is different from this image series\' patient'
+    throw(:abort)
   end
 
   def assign_series_number
@@ -369,6 +366,8 @@ JOIN
   end
 
   def update_state
+    return if ImageSeries.skip_update_state_callback
+
     if visit_id_changed?
       old_visit_id = changes[:visit_id][0]
       new_visit_id = changes[:visit_id][1]

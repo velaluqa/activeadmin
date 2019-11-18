@@ -21,7 +21,7 @@
 # * `index_patients_on_center_id`:
 #     * **`center_id`**
 #
-class Patient < ActiveRecord::Base
+class Patient < ApplicationRecord
   include DominoDocument
 
   has_paper_trail(
@@ -207,16 +207,13 @@ JOIN
   protected
 
   def ensure_study_is_unchanged
-    if center_id_changed? && !center_id_was.nil?
-      old_center = Center.find(center_id_was)
+    return unless center_id_changed? && !center_id_was.nil?
 
-      if old_center.study != center.study
-        errors[:center] << 'A patient cannot be reassigned to a center in a different study.'
-        return false
-      end
-    end
+    old_center = Center.find(center_id_was)
+    return unless old_center.study != center.study
 
-    true
+    errors[:center] << 'A patient cannot be reassigned to a center in a different study.'
+    throw :abort
   end
 
   # When a visit template is set at create, all visits from the

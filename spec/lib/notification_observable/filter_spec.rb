@@ -4,7 +4,7 @@ RSpec.describe NotificationObservable::Filter do
       t.string :foo
       t.string :fu
       t.json :json_field
-      t.references :sub_model
+      t.references :sub_model, index: false
     end
     model do
       include NotificationFilter
@@ -16,7 +16,7 @@ RSpec.describe NotificationObservable::Filter do
         end.any?
       end
 
-      belongs_to :sub_model
+      belongs_to :sub_model, optional: true
     end
   end
 
@@ -33,10 +33,10 @@ RSpec.describe NotificationObservable::Filter do
   with_model :SubSubModel do
     table do |t|
       t.string :foobar
-      t.references :sub_model
+      t.references :sub_model, index: false
     end
     model do
-      belongs_to :sub_model
+      belongs_to :sub_model, optional: true
     end
   end
 

@@ -16,6 +16,16 @@
 #
 # This would use the information in config/locales/es.yml.
 #
+# The following keys must be escaped otherwise they will not be retrieved by
+# the default I18n backend:
+#
+# true, false, on, off, yes, no
+#
+# Instead, surround them with single quotes.
+#
+# en:
+#   'true': 'foo'
+#
 # To learn more, please read the Rails Internationalization guide
 # available at http://guides.rubyonrails.org/i18n.html.
 
@@ -30,7 +40,13 @@ en:
             what you do. This can lead to problems in project
             management, because the code is used to identify centers
             across documents.
-
+  activerecord:
+    errors:
+      models:
+        notification_profile:
+          attributes:
+            triggering_actions:
+              not_array: is not an array
   model:
     notification_profile:
       filter_triggering_user:

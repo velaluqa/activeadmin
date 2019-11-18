@@ -41,6 +41,6 @@ Feature: Delete Visits
     Given I sign in as a user with role "Image Manager"
     When I browse to visits list
     Then I see "FooPatient 10000 Visit Extraordinaire INCOMPLETE, NOT AVAILABLE PENDING ViewDelete"
-    When I follow link "Delete"
+    When I click link "Delete" and confirm
     Then I don't see "FooPatient 10000 Visit Exreairdubaire"
 

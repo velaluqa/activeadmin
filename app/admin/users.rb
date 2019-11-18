@@ -28,23 +28,23 @@ ActiveAdmin.register User do
     end
     column :key_pair do |user|
       if user.public_key.nil? || user.private_key.nil?
-        status_tag('Missing', :error)
+        status_tag('Missing', class: 'error')
       else
-        status_tag('Present', :ok)
+        status_tag('Present', class: 'ok')
       end
     end
     column :locked do |user|
       if user.access_locked?
-        status_tag('Locked', :error)
+        status_tag('Locked', class: 'error')
       else
-        status_tag('Unlocked', :ok)
+        status_tag('Unlocked', class: 'ok')
       end
     end
     column :confirmed do |user|
       if user.confirmed?
-        status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", :ok)
+        status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", class: 'ok')
       else
-        status_tag('Unconfirmed', :error)
+        status_tag('Unconfirmed', class: 'error')
       end
     end
     column 'Roles' do |user|
@@ -76,21 +76,21 @@ ActiveAdmin.register User do
       row :failed_attempts
       row :locked do
         if user.access_locked?
-          status_tag("Locked at #{pretty_format(user.locked_at)}", :error)
+          status_tag("Locked at #{pretty_format(user.locked_at)}", class: 'error')
         else
-          status_tag('Unlocked', :ok)
+          status_tag('Unlocked', class: 'ok')
         end
       end
       row :confirmed do
         if user.confirmed?
-          status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", :ok)
+          status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", class: 'ok')
         else
-          status_tag('Unconfirmed', :error)
+          status_tag('Unconfirmed', class: 'error')
         end
       end
       row :public_key do
         if user.public_key.nil?
-          status_tag('Missing', :error)
+          status_tag('Missing', class: 'error')
         else
           link_to 'Download Public Key', download_public_key_admin_user_path(user)
         end
@@ -100,7 +100,7 @@ ActiveAdmin.register User do
       end
       row :private_key do
         if user.private_key.nil?
-          status_tag('Missing', :error)
+          status_tag('Missing', class: 'error')
         else
           link_to 'Download Private Key', download_private_key_admin_user_path(user)
         end

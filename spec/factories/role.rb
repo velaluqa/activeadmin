@@ -1,10 +1,12 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :role do
     transient do
-      with_permissions({})
+      with_permissions do
+        {}
+      end
     end
 
-    title { Faker::Lorem.words(2).join(' ') }
+    title { Faker::Lorem.words(number: 2).join(' ') }
 
     before(:create) do |role, evaluator|
       evaluator.with_permissions.each_pair do |subjects, activities|

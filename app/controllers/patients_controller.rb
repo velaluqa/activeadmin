@@ -1,9 +1,9 @@
 class PatientsController < ApplicationController
-  before_filter :load_center, only: %i[index create]
-  before_filter :load_patients, only: [:index]
-  before_filter :load_the_patient, only: [:wado_query]
+  before_action :load_center, only: %i[index create]
+  before_action :load_patients, only: [:index]
+  before_action :load_the_patient, only: [:wado_query]
 
-  skip_before_filter :verify_authenticity_token, only: [:create]
+  skip_before_action :verify_authenticity_token, only: [:create]
 
   def index
     respond_to do |format|

@@ -44,7 +44,7 @@ ActiveAdmin.register_page 'Viewer Cart' do
 
   page_action :empty, method: :get do
     session[:viewer_cart] = []
-    redirect_to :back
+    redirect_back(fallback_location: admin_viewer_cart_path)
   end
   page_action :clear, method: :get do
     session[:viewer_cart] = []

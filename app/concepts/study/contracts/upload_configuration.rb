@@ -9,7 +9,7 @@ module Study::Contract
     property :id
     property :file, virtual: true
     property :file_cache, virtual: true, prepopulate: -> { file.try(:tempfile).try(:read) }
-    property :force, virtual: true, type: Types::Form::Bool
+    property :force, virtual: true, type: Types::Params::Bool
 
     validates :file, presence: true, if: -> { file_cache.blank? }
     validate :json_schema

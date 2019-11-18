@@ -1,10 +1,10 @@
 - if current_user
-  :coffeescript
-    @selectedStudyId = #{session[:selected_study_id].to_json}
-    @selectedStudyName = #{session[:selected_study_name].to_json}
-    @accessibleStudyCount = #{Study.accessible_by(current_ability).count}
+  :javascript
+    window.selectedStudyId = #{session[:selected_study_id].to_json.html_safe};
+    window.selectedStudyName = #{session[:selected_study_name].to_json.html_safe};
+    window.accessibleStudyCount = #{Study.accessible_by(current_ability).count};
 - else
-  :coffeescript
-    @selectedStudyId = null
-    @selectedStudyName = null
-    @accessibleStudyCount = 0
+  :javascript
+    window.selectedStudyId = null;
+    window.selectedStudyName = null;
+    window.accessibleStudyCount = 0;

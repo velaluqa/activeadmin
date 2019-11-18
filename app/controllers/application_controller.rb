@@ -1,9 +1,9 @@
 require 'exceptions'
 
 class ApplicationController < ActionController::Base
-  before_filter :authenticate_user_from_token!
-  before_filter(:ensure_valid_password, if: proc { !current_user.nil? })
-  before_filter(:ensure_valid_keypair, if: proc { !current_user.nil? })
+  before_action(:authenticate_user_from_token!)
+  before_action(:ensure_valid_password, if: proc { !current_user.nil? })
+  before_action(:ensure_valid_keypair, if: proc { !current_user.nil? })
   before_action(:set_paper_trail_whodunnit)
 
   protect_from_forgery
@@ -75,7 +75,8 @@ class ApplicationController < ActionController::Base
   end
 
   def ensure_valid_password
-    return true if current_user.has_valid_password?
+    return if current_user.has_valid_password?
+
     session[:after_validity_check_path] = request.fullpath
     respond_to do |format|
       format.html { redirect_to(users_change_password_path) }
@@ -84,7 +85,8 @@ class ApplicationController < ActionController::Base
   end
 
   def ensure_valid_keypair
-    return true if current_user.has_valid_keypair?
+    return if current_user.has_valid_keypair?
+
     session[:after_validity_check_path] = request.fullpath
     respond_to do |format|
       format.html { redirect_to(users_ensure_keypair_path) }

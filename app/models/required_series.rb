@@ -28,11 +28,11 @@
 #     * **`visit_id`**
 #     * **`name`**
 #
-class RequiredSeries < ActiveRecord::Base
+class RequiredSeries < ApplicationRecord
   include DominoDocument
 
   belongs_to :visit
-  belongs_to :image_series
+  belongs_to :image_series, optional: true
 
   after_save :update_image_series_state
   after_commit :schedule_domino_sync
@@ -203,7 +203,7 @@ JOIN
     {
       id: "#{visit.id}_#{name}",
       name: name,
-      images: assigned_image_series.images.order('id ASC')
+      images: assigned_image_series.images.order(id: :asc)
     }
   end
 
@@ -301,23 +301,24 @@ JOIN
 
   # TODO: Refactor into Operation
   def update_image_series_state
-    return unless image_series_id_changed?
-    if image_series_id_was.blank? && image_series_id.present?
+    return unless saved_change_to_image_series_id?
+
+    if image_series_id_before_last_save.blank? && image_series_id.present?
       ImageSeries.find(image_series_id).update_attributes(state: :required_series_assigned)
-    elsif image_series_id_was.present? && image_series_id.present?
+    elsif image_series_id_before_last_save.present? && image_series_id.present?
       ImageSeries.find(image_series_id).update_attributes(state: :required_series_assigned)
-      image_series_was = ImageSeries.find(image_series_id_was)
-      if RequiredSeries.where(visit: visit, image_series_id: image_series_id_was).where.not(name: name).exists?
-        image_series_was.update_attributes(state: :required_series_assigned)
+      image_series_before_last_save = ImageSeries.find(image_series_id_before_last_save)
+      if RequiredSeries.where(visit: visit, image_series_id: image_series_id_before_last_save).where.not(name: name).exists?
+        image_series_before_last_save.update_attributes(state: :required_series_assigned)
       else
-        image_series_was.update_attributes(state: :visit_assigned)
+        image_series_before_last_save.update_attributes(state: :visit_assigned)
       end
-    elsif image_series_id_was.present? && image_series_id.blank?
-      image_series_was = ImageSeries.find(image_series_id_was)
-      if RequiredSeries.where(visit: visit, image_series_id: image_series_id_was).where.not(name: name).exists?
-        image_series_was.update_attributes(state: :required_series_assigned)
+    elsif image_series_id_before_last_save.present? && image_series_id.blank?
+      image_series_before_last_save = ImageSeries.find(image_series_id_before_last_save)
+      if RequiredSeries.where(visit: visit, image_series_id: image_series_id_before_last_save).where.not(name: name).exists?
+        image_series_before_last_save.update_attributes(state: :required_series_assigned)
       else
-        image_series_was.update_attributes(state: :visit_assigned)
+        image_series_before_last_save.update_attributes(state: :visit_assigned)
       end
     end
   end

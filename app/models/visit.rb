@@ -41,7 +41,7 @@ require 'git_config_repository'
 # * `index_visits_on_visit_number`:
 #     * **`visit_number`**
 #
-class Visit < ActiveRecord::Base
+class Visit < ApplicationRecord
   include DominoDocument
   include NotificationFilter
 
@@ -72,7 +72,7 @@ class Visit < ActiveRecord::Base
 
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync
-  belongs_to :mqc_user, class_name: 'User'
+  belongs_to :mqc_user, class_name: 'User', optional: true
   has_many :required_series, dependent: :destroy
 
   scope :by_study_ids, ->(*ids) {
@@ -134,7 +134,7 @@ JOIN
   end
 
   # TODO: Replace with a less naive full-text search index
-  scope :filter, ->(query) {
+  scope :with_filter, ->(query) {
     return unless query
 
     words = query.split(' ')
@@ -605,32 +605,29 @@ JOIN_QUERY
   end
 
   def ensure_study_is_unchanged
-    if patient_id_changed? && !patient_id_was.nil?
-      old_patient = Patient.find(patient_id_was)
+    return unless patient_id_changed? && patient_id_was
 
-      if old_patient.study != patient.study
-        errors[:patient] << 'A visit cannot be reassigned to a patient in a different study.'
-        return false
-      end
-    end
+    old_patient = Patient.find(patient_id_was)
+    return unless old_patient.study != patient.study
 
-    true
+    errors[:patient] << 'A visit cannot be reassigned to a patient in a different study.'
+    throw :abort
   end
 
   def update_required_series_preset
-    return unless visit_type_changed?
+    return unless saved_change_to_visit_type?
 
-    if visit_type_was.blank? && visit_type.present?
+    if visit_type_before_last_save.blank? && visit_type.present?
       add_new_required_series(required_series_spec.keys)
-    elsif visit_type_was.present? && visit_type.present?
+    elsif visit_type_before_last_save.present? && visit_type.present?
       clean_changed_required_series
-    elsif visit_type_was.present? && visit_type.blank?
+    elsif visit_type_before_last_save.present? && visit_type.blank?
       remove_required_series
     end
   end
 
   def clean_changed_required_series
-    old_spec = study.required_series_spec(visit_type_was)
+    old_spec = study.required_series_spec(visit_type_before_last_save)
     new_spec = study.required_series_spec(visit_type)
 
     remove_orphaned_required_series(old_spec.keys - new_spec.keys)

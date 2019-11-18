@@ -24,7 +24,7 @@ Feature: Delete Study
     Given I sign in as a user with role "Image Manager"
     When I browse to studies list
     Then I see "FooStudy MISSING Building Select ViewDelete"
-    When I follow link "Delete"
+    When I click link "Delete" and confirm
     Then I don't see "FooStudy MISSING Building"
 
   # TODO: Discuss Scenario: Scoped permission to study

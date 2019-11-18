@@ -2,7 +2,7 @@ RSpec::Support.require_rspec_core 'formatters/base_text_formatter'
 
 module ValidationReport
   module RSpec
-    class Formatter < ::RSpec::Core::Formatters::ProgressFormatter
+    class Formatter < ::RSpec::Core::Formatters::DocumentationFormatter
       ::RSpec::Core::Formatters.register self, :start, :stop, :example_passed
 
       def start(_notification)
@@ -14,6 +14,7 @@ module ValidationReport
       end
 
       def example_passed(_notification)
+        super
         if _notification.example.file_path =~ /\.feature\z/
           ValidationReport.mark_current_scenario_as_passed
         end
