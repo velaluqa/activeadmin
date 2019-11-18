@@ -30,12 +30,20 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-# Install application dependencies. This is done separately to
-# leverage the Docker cache when building.
 RUN mkdir -p $APP_HOME
 WORKDIR $APP_HOME
+
+# Install application dependencies. This is done separately to
+# leverage the Docker cache when building.
 ADD Gemfile Gemfile.lock $APP_HOME/
 RUN bundle install --jobs 20 --retry 5
+
+COPY package.json package.json
+COPY yarn.lock yarn.lock
+COPY .npmrc .npmrc
+RUN npm config set registry=https://registry.npmjs.com/
+RUN mkdir -p /node_modules && ln -s ../node_modules node_modules
+RUN yarn install --frozen-lockfile
 
 # Allow other containers to use the app root (e.g. nginx container).
 VOLUME /app
