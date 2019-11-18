@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+### Breaking Changes
+
+* Update Rails to 5.2 and adjust all remaining dependencies
+
 ## 7.0.8
 
 *Development:*
