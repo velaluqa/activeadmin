@@ -4,21 +4,23 @@ MAINTAINER aandersen@velalu.qa
 ENV APP_HOME /app
 
 # Install distribution dependencies
-RUN apt-get update -qq && \
-    apt-get install -y \
-    build-essential \
-    libpq-dev \
-    nodejs \
-    libmagickwand-dev \
-    imagemagick \
-    zlib1g-dev \
-    locales \
-    cmake \
-    postgresql-client \
-    graphviz \
-    dcmtk \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+  && apt-get update -qq && \
+     apt-get install -y \
+     build-essential \
+     libpq-dev \
+     libmagickwand-dev \
+     imagemagick \
+     nodejs \
+     zlib1g-dev \
+     locales \
+     cmake \
+     postgresql-client \
+     graphviz \
+     dcmtk \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* \
+  && npm install -g yarn
 RUN gem install bundler -N -v '< 2'
 
 # Set the locale
