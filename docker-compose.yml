@@ -26,10 +26,21 @@ app:
     POSTGRES_DATABASE: erica_v2_production
     POSTGRES_USERNAME: postgres
     POSTGRES_PASSWORD:
+    WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
   links: &links
     - postgres
     - redis
+    - webpack
     - worker
+webpack:
+  container_name: erica_webpack
+  build: *build
+  environment: *environment
+  command: ./bin/webpack-dev-server --inline true
+  entrypoint: ""
+  volumes: *volumes
+  ports:
+    - '3035:3035'
 test:
   build: *build
   command: bundle exec guard

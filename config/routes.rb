@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  match('app/*path', to: 'spa#index', via: :get)
+  match('app', to: 'spa#index', via: :get)
+
   ActiveAdmin.routes(self)
 
   mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?
@@ -86,5 +89,5 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
-  root to: 'admin/dashboard#index'
+  root(to: redirect('/app'))
 end

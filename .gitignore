@@ -58,3 +58,10 @@ reports
 /images/
 /study_config_migration.yml
 /import
+
+/public/packs
+/public/packs-test
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+/.byebug_history
