@@ -145,6 +145,9 @@ gem 'haml_coffee_assets'
 gem 'sprockets-rails'
 gem 'sprockets', '~> 3.0'
 
+# Use webpacker & webpack for all modern assets
+gem 'webpacker', '~> 4.x'
+
 # Validate JSONB columns via JSONschema
 gem 'activerecord_json_validator'
 
