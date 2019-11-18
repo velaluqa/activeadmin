@@ -301,3 +301,7 @@ end
 step 'I dismiss popup' do
   page.driver.browser.switch_to.alert.dismiss
 end
+
+step 'I debug' do
+  debugger
+end
