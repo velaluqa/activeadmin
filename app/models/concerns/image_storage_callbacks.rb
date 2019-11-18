@@ -59,11 +59,8 @@ module ImageStorageCallbacks
     #
     # @return [Boolean] success
     def remove_image_storage_dir(path)
-      if File.exist?(path)
-        FileUtils.rm_r(path)
-      else
-        true
-      end
+      return true unless File.exist?(path)
+      FileUtils.rm_r(path)
     rescue SystemCallError => e
       Rails.logger.error "Failed to remove image storage for #{self} at #{path}: #{e}"
       false
@@ -84,6 +81,10 @@ module ImageStorageCallbacks
     # @return [String] image storage path
     def image_storage_path
       raise '#image_storage_path is not defined for model including ImageStorageCallbacks concern'
+    end
+
+    def absolute_image_storage_path
+      File.join(Rails.configuration.image_storage_root, image_storage_path)
     end
   end
 end
