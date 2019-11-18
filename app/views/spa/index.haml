@@ -1,0 +1,12 @@
+!!!
+%html
+  %head
+    %title ERICA
+    = csrf_meta_tags
+    = csp_meta_tag
+    = javascript_pack_tag 'spa'
+    = stylesheet_pack_tag 'spa'
+    %script
+      != "window.DMS_USER = #{current_user.attributes.slice('id', 'username', 'is_root_user').to_json}"
+  %body
+    #app
