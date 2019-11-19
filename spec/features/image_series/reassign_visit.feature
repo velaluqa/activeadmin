@@ -54,11 +54,11 @@ Feature: Reassign Visit
     And visit "30000" required series "SPECT_1" has tQC with:
       | comment | tQC results |
     And a role "Image Manager" with permissions:
-      | Study       | read                    |
-      | Center      | read                    |
-      | Patient     | read                    |
-      | ImageSeries | read, update            |
-      | Visit       | read, assign_visit, mqc |
+      | Study       | read                         |
+      | Center      | read                         |
+      | Patient     | read                         |
+      | ImageSeries | read, update                 |
+      | Visit       | read, assign_visit, read_tqc |
 
   Scenario: Different Visit Type - Removing Required Series Assignments
     Given I sign in as a user with role "Image Manager"

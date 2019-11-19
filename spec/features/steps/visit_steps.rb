@@ -28,7 +28,12 @@ step 'visit :visit_instance has required series :string assigned to :image_serie
   visit.change_required_series_assignment(required_series => image_series.id.to_s)
 end
 
-step 'visit :visit_instance required series :string has tQC with:' do |visit, required_series, tqc|
-  comment = tqc.to_h['comment']
-  visit.set_tqc_result(required_series, {}, @user, comment)
+step 'visit :visit_instance required series :string has tQC with:' do |visit, required_series, table|
+  tqc_spec = visit.required_series_spec[required_series].andand['tqc']
+  tqc_spec_keys = tqc_spec.map { |spec| spec['id'] }
+  tqc_results = table.to_h.slice(*tqc_spec_keys).transform_values do |value|
+    value == 'passed'
+  end
+  comment = table.to_h['comment']
+  visit.set_tqc_result(required_series, tqc_results, @user, comment)
 end
