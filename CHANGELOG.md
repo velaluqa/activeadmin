@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 7.0 - Unreleased
+
+### Fixed
+
+* <ERICA-6> Allow upload of unparsable DICOM files (e.g. for embedded PDF data)
+
 ## 7.0.9
 
 ### Fixed

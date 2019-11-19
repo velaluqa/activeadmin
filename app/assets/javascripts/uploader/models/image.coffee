@@ -53,10 +53,11 @@ class ImageUploader.Models.Image extends Backbone.Model
         start = new Date().getTime()
         dataSet = dicomParser.parseDicom(byteArray)
         end = new Date().getTime()
+        console.log dataSet
         if dataSet.warnings.length > 0
           @pushWarnings('parsing', dataSet.warnings)
         else
-          @pushWarnings('parsing', ['No pixeldata']) unless dataSet.elements.x7fe00010
+          @pushWarnings('parsing', ['No DICOM pixeldata']) unless dataSet.elements.x7fe00010
         @set
           state: 'parsed'
           parseTime: (end - start)
@@ -131,8 +132,15 @@ class ImageUploader.Models.Image extends Backbone.Model
       processData: false
       contentType: false
 
-  hasWarnings: ->
-    not _.isEmpty(@warnings)
+  hasWarnings: (action) ->
+    if action?
+      not _.isEmpty(@warnings[action])
+    else
+      not _.isEmpty(@warnings)
+
+  hasErrors: () ->
+    isSevere = (key, errors) -> key != 'parsing' and _.isEmpty(errors)
+    _.some(@warnings, isSevere)
 
   formatWarnings: ->
     _.chain(@warnings)
@@ -147,6 +155,7 @@ class ImageUploader.Models.Image extends Backbone.Model
     @warnings[action] ||= []
     for warning in warnings when warning not in @warnings[action]
       @warnings[action].push(warning)
+      console.log warning
     @trigger('warnings')
 
   clearWarnings: (action) ->

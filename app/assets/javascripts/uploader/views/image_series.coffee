@@ -169,6 +169,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     $select.trigger('change')
 
   renderWarnings: =>
+    @$('tr.image-series').toggleClass('has-errors', @model.hasErrors())
     @$('tr.image-series').toggleClass('has-warnings', @model.hasWarnings())
 
   renderDisabled: ->

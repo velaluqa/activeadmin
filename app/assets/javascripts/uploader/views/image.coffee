@@ -13,7 +13,6 @@ class ImageUploader.Views.Image extends Backbone.View
     @listenTo @model, 'change:state', @renderState
     @listenTo @model, 'warnings', @renderWarnings
 
-
   renderName: =>
     @$('td.name').html(@model.get('fileName'))
 
@@ -25,6 +24,7 @@ class ImageUploader.Views.Image extends Backbone.View
     @$('td.status').html(@model.get('state'))
 
   renderWarnings: =>
+    @$el.toggleClass('has-errors', @model.hasErrors())
     @$el.toggleClass('has-warnings', @model.hasWarnings())
 
   render: =>
