@@ -7,7 +7,9 @@ FactoryGirl.define do
     name { Faker::Name.name }
     username { |u| Faker::Internet.user_name(u.name, %w[. _ -]) }
     password 'password'
-    email { |_u| Faker::Internet.safe_email }
+    sequence(:email) do |n|
+      "person#{n}@example.com"
+    end
 
     confirmed_at { DateTime.now }
 

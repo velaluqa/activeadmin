@@ -9,6 +9,7 @@
 ### DevOps
 
 * Fix building manual via ubuntu 18.04 LTS docker image
+* Use sequence to generate unique e-mail addresses for test users
 
 ## 7.0.8
 
