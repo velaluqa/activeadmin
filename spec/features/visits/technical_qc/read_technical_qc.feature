@@ -34,6 +34,7 @@ Feature: Read Technical Quality Control Results
     And visit "10000" required series "SPECT_1" has tQC with:
       | slice_thickness | passed         |
       | comment         | Some nice pass |
+
   Scenario: Not logged in
     When I browse to tqc_results visit "10000" with:
       | required_series_names | SPECT_1 |
