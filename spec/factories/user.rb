@@ -12,7 +12,9 @@ FactoryBot.define do
       )
     end
     password { 'password' }
-    email { |_u| Faker::Internet.safe_email }
+    sequence(:email) do |n|
+      "person#{n}@example.com"
+    end
 
     confirmed_at { DateTime.now }
 

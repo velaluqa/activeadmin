@@ -321,7 +321,7 @@ ActiveAdmin.register Visit do
 
   member_action :tqc_results, :method => :get do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    authorize! :read_tqc, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)
@@ -353,7 +353,7 @@ ActiveAdmin.register Visit do
   end
   member_action :tqc, :method => :post do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    authorize! :perform_tqc, @visit
 
     required_series_name = params[:required_series_name]
     if(required_series_name.nil?)
@@ -379,7 +379,7 @@ ActiveAdmin.register Visit do
   end
   member_action :tqc_form, :method => :get do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    authorize! :perform_tqc, @visit
 
     @required_series_name = params[:required_series_name]
     if(@required_series_name.nil?)

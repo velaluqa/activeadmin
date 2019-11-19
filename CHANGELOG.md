@@ -6,6 +6,17 @@
 
 * Update Rails to 5.2 and adjust all remaining dependencies
 
+## 7.0.9
+
+### Fixed
+
+* <ERICA-2> Fixed role permission problem for permissions `perform_tqc` and `read_tqc`
+
+### DevOps
+
+* Fix building manual via ubuntu 18.04 LTS docker image
+* Use sequence to generate unique e-mail addresses for test users
+
 ## 7.0.8
 
 ### Fixed
