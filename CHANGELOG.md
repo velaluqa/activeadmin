@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 7.0 - Unreleased
+## 7.0.10
 
 ### Fixed
 
