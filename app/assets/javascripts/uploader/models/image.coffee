@@ -65,7 +65,7 @@ class ImageUploader.Models.Image extends Backbone.Model
           seriesInstanceUid: dataSet.string('x0020000e')
           seriesDescription: dataSet.string('x0008103e')
           seriesNumber: dataSet.string('x00200011')
-          seriesDateTime: @parseDateTime(dataSet, 'seriesDate')
+          seriesDateTime: @parseDateTime(dataSet, 'seriesDate', warnIfMissing: false)
           acquisitionDateTime: @parseDateTime(dataSet, 'acquisitionDate')
           contentDateTime: @parseDateTime(dataSet, 'contentDate')
           patient:
@@ -81,13 +81,14 @@ class ImageUploader.Models.Image extends Backbone.Model
 
     reader.readAsArrayBuffer(file)
 
-  parseDateTime: (dataSet, tag) ->
+  parseDateTime: (dataSet, tag, op = { warnIfMissing: true }) ->
     date = dataSet.string(@dateTimeTags[tag].date)
     time = dataSet.string(@dateTimeTags[tag].time)
     timezone = dataSet.string(@dateTimeTags.timezone)
 
     unless date?
-      @pushWarnings('parsing', ["Missing date for #{tag}"])
+      if op.warnIfMissing
+        @pushWarnings('parsing', ["Missing date part for `#{tag}`"])
       return
 
     year = parseInt(date[0..3], 10)
@@ -104,7 +105,8 @@ class ImageUploader.Models.Image extends Backbone.Model
       minutes = '0'
       seconds = '0'
       milliseconds = '000'
-      @pushWarnings('parsing', ["Missing time for #{tag}"])
+      if op.warnIfMissing
+        @pushWarnings('parsing', ["Missing time part for `#{tag}`"])
     new Date(Date.UTC(year, month, day, hours, minutes, seconds, milliseconds))
 
   @parse: (file) ->
