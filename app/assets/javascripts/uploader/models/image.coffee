@@ -111,6 +111,18 @@ class ImageUploader.Models.Image extends Backbone.Model
     image = new ImageUploader.Models.Image
     image.parse(file)
 
+  imagingDateTime: ->
+    if @get('seriesDateTime')?
+      @get('seriesDateTime')
+    else if not @get('contentDateTime')?
+      @get('acquisitionDateTime')
+    else if not @get('acquisitionDateTime')?
+      @get('contentDateTime')
+    else if @get('contentDateTime') < @get('acquisitionDateTime')
+      @get('acquisitionDateTime')
+    else
+      @get('contentDateTime')
+
   upload: ->
     formData = new FormData()
     formData.append('image[image_series_id]', @series.get('id'))

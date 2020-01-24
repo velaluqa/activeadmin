@@ -120,7 +120,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       id: @attributes.id,
       name: @attributes.name,
       patient_id: @attributes.patient_id,
-      imaging_date: @attributes.seriesDateTime,
+      imaging_date: @attributes.imagingDateTime,
       series_number: @attributes.seriesNumber,
       visit_id: @attributes.visit_id
     }
