@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## 7.0 - Unreleased
+## 7.0.11
 
 ### Fixed
 
+* <DEVOPS> Fix checking availability of PostGres database in `docker-entrypoint.sh`
 * <ERICA-9> Fix Image Upload for missing `Series Date` in DICOM files
   by falling back to `ContentDate` or `AquisitionDate`
 
