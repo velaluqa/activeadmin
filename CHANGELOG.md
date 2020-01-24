@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 7.0 - Unreleased
+
+### Fixed
+
+* <ERICA-9> Fix Image Upload for missing `Series Date` in DICOM files
+  by falling back to `ContentDate` or `AquisitionDate`
+
 ## 7.0.10
 
 ### Fixed

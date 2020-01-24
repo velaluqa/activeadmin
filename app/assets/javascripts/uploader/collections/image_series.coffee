@@ -23,6 +23,8 @@ class ImageUploader.Collections.ImageSeries extends Backbone.Collection
       instanceUid: image.get('seriesInstanceUid')
     unless series.get('seriesDateTime')?
       series.set(seriesDateTime: image.get('seriesDateTime'))
+    unless series.get('imagingDateTime')?
+      series.set(imagingDateTime: image.imagingDateTime())
     unless series.get('seriesNumber')?
       series.set(seriesNumber: image.get('seriesNumber'))
     series.add(image)

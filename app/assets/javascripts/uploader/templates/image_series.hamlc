@@ -5,7 +5,10 @@
     = @name
   %td.image-count= @imageCount
   %td.datetime
-    = JSON.stringify(@seriesDateTime)
+    - if @imagingDateTime?
+      = moment(@imagingDateTime).format('YYYY-MM-DD HH:mm:ss ZZ')
+    - else
+      Missing Date
   %td.warnings
     %a{ tabindex: '0', role: 'button', 'data-toggle' => 'popover', 'data-trigger' => 'focus' }
       %i.fa.fa-exclamation-triangle

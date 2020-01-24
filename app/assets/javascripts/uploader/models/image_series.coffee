@@ -22,6 +22,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     @listenTo @images, 'add remove', @updateWarnings
     @listenTo @images, 'change:state', @updateState
     @listenTo @images, 'warnings', => @trigger('warnings')
+    @listenTo this, 'change:imagingDateTime', => console.log('imagingDateChanged Yay')
 
   updateWarnings: (image) ->
     @trigger('warnings') if image.hasWarnings()
@@ -33,7 +34,8 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     hasSeriesWarnings or @images.some (image) -> image.hasWarnings(action)
 
   hasErrors: () ->
-    isSevere = (key, warnings) -> key != 'parsing' and _.isEmpty(warnings)
+    isError = (message) -> message.substring(0, 5) == "Error"
+    isSevere = (messages, key) -> _.some(messages, isError)
     hasSeriesErrors = _.some(@warnings, isSevere)
     hasImageErrors = @images.some (image) -> _.some(image.warnings, isSevere)
     hasSeriesErrors or hasImageErrors
@@ -43,7 +45,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       .chain(@warnings)
       .map (warnings, action) ->
         return [] unless warnings?
-        _(warnings).map (warning) -> "#{action.capitalize()}: #{warning}"
+        _(warnings).map (warning) -> "#{action.capitalize()} #{warning}"
       .flatten()
       .value()
     imageWarnings = @images
@@ -57,11 +59,11 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
     @warnings[action] = Array.ensureArray(warnings)
     @trigger('warnings')
 
-  pushWarnings: (action, warnings) ->
+  pushWarnings: (action, warnings, severity = "Warning") ->
     warnings = Array.ensureArray(warnings)
     @warnings[action] ?= []
     for warning in warnings when warning not in @warnings[action]
-      @warnings[action].push(warning)
+      @warnings[action].push("#{severity}: #{warning}")
     @trigger('warnings')
 
   clearWarnings: (action) ->
@@ -120,7 +122,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       id: @attributes.id,
       name: @attributes.name,
       patient_id: @attributes.patient_id,
-      imaging_date: @attributes.seriesDateTime,
+      imaging_date: @attributes.imagingDateTime,
       series_number: @attributes.seriesNumber,
       visit_id: @attributes.visit_id
     }
@@ -133,8 +135,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
         @set state: 'importing'
         @clearWarnings('create')
       error: (_, response) =>
-        console.log response.responseJSON?.errors
-        @pushWarnings('create', response.responseJSON?.errors)
+        @pushWarnings('create', response.responseJSON?.errors, "Error")
 
   saveAsImported: ->
     request =
@@ -145,7 +146,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       success: =>
         @clearWarnings('finish import')
       error: (response) =>
-        @pushWarnings('finish import', response.responseJSON?.errors)
+        @pushWarnings('finish import', response.responseJSON?.errors, "Error")
       cache: false
 
     $.ajax(request).then =>
@@ -161,7 +162,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
         @set state: 'visit_assigned'
         @clearWarnings('assign visit')
       error: (_, response) =>
-        @pushWarnings('assign visit', response.responseJSON?.errors)
+        @pushWarnings('assign visit', response.responseJSON?.errors, "Error")
 
   saveAssignedRequiredSeries: ->
     return unless @get('assignRequiredSeries')?
@@ -174,7 +175,7 @@ class ImageUploader.Models.ImageSeries extends Backbone.Model
       success: =>
         @clearWarnings('assign required series')
       error: (response) =>
-        @pushWarnings('assign required series', response.responseJSON?.errors)
+        @pushWarnings('assign required series', response.responseJSON?.errors, "Error")
       cache: false
 
     $.ajax(request).then =>
