@@ -38,7 +38,10 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @$('.image-count').html(@model.get('imageCount'))
 
   updateDateTime: =>
-    @$('.datetime').html(moment(@model.get('imagingDateTime')).format('YYYY-MM-DD HH:mm:ss ZZ'))
+    if @model.get('imagingDateTime')?
+      @$('.datetime').html(moment(@model.get('imagingDateTime')).format('YYYY-MM-DD HH:mm:ss ZZ'))
+    else
+      @$('.datetime').html('Missing Date')
 
   updateUploadState: =>
     state = @model.get('uploadState')
