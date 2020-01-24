@@ -34,9 +34,18 @@ trap_int_signal() {
 trap "trap_int_signal" INT
 
 echo "Checking postgres availability ..."
-until PGPASSWORD=$PASSWORD psql -h $HOST -U $USERNAME -c '\q' 2>/dev/null; do
-  echo "Postgres is unavailable - sleeping"
-  sleep 1
-done
-
+if [ "$USERNAME" == "postgres" ]; then
+    # `postgres` usually has permissions to create databases and
+    # connect to any DB. In `development` and `test` we make use of
+    # that.
+    until PGPASSWORD=$PASSWORD psql -h $HOST -U $USERNAME -c '\q' 2>/dev/null; do
+	echo "Postgres is unavailable - sleeping"
+	sleep 1
+    done
+else
+    until PGPASSWORD=$PASSWORD psql -h $HOST -U $USERNAME -c '\q' $DATABASE 2>/dev/null; do
+	echo "Postgres is unavailable - sleeping"
+	sleep 1
+    done
+fi
 exec "$@"
