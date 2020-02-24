@@ -2,6 +2,11 @@
 
 ## 7.0 - Unreleased
 
+### Fixed
+
+* Fix passing down correct version parameter to retrieve the correct
+  study configuration (affects Upload of Study Configuration)
+
 ### Patches
 
 * <devops> Display basic database user information upon start up for debugging
