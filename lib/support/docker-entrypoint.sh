@@ -33,7 +33,7 @@ trap_int_signal() {
 }
 trap "trap_int_signal" INT
 
-echo "Checking postgres availability ..."
+echo "Checking ${RAILS_ENV} database availability for ${USERNAME}@${HOST}/${DATABASE} ..."
 if [ "$USERNAME" == "postgres" ]; then
     # `postgres` usually has permissions to create databases and
     # connect to any DB. In `development` and `test` we make use of

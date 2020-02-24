@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 7.0 - Unreleased
+
+### Patches
+
+* <devops> Display basic database user information upon start up for debugging
+
 ## 7.0.11
 
 ### Fixed
