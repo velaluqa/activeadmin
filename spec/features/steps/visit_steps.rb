@@ -37,3 +37,12 @@ step 'visit :visit_instance required series :string has tQC with:' do |visit, re
   comment = table.to_h['comment']
   visit.set_tqc_result(required_series, tqc_results, @user, comment)
 end
+
+step 'visit :visit_instance has mQC with:' do |visit, table|
+  mqc_spec_keys = visit.mqc_spec.map { |spec| spec['id'] }
+  mqc_results = table.to_h.slice(*mqc_spec_keys).transform_values do |value|
+    value == 'passed'
+  end
+  comment = table.to_h['comment']
+  visit.set_mqc_result(mqc_results, @user, comment)
+end

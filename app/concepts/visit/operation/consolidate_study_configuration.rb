@@ -1,6 +1,7 @@
 class Visit::ConsolidateStudyConfiguration < Trailblazer::Operation
   step :extract_params
   step :unset_obsolete_visit_type
+  step :reset_mqc_for_updated_spec
   step :create_missing_required_series
   step :remove_obsolete_required_series
   step :reset_tqc_for_updated_required_series
@@ -19,8 +20,20 @@ class Visit::ConsolidateStudyConfiguration < Trailblazer::Operation
 
     unless expected_visit_types.include?(visit.visit_type)
       visit.visit_type = nil
+      visit.reset_mqc
       visit.save!
     end
+    true
+  end
+
+  def reset_mqc_for_updated_spec(ctx, visit:, visit_type_spec:, version_hash:, **)
+    return true if visit.mqc_state_sym == :pending
+    return true if visit.mqc_version == version_hash
+
+    new_spec = visit_type_spec[visit.visit_type]['mqc']
+    mqc_spec = visit.study.visit_type_spec(version: visit.mqc_version)[visit.visit_type]['mqc']
+
+    visit.reset_mqc if new_spec != mqc_spec
     true
   end
 

@@ -10,6 +10,10 @@ Feature: Lock Study Configuration
         baseline: 
           required_series: {}
         followup: 
+          mqc:
+          - id: consistency
+            label: Consistent?
+            type: bool
           required_series:
             SPECT_1:
               tqc:
@@ -190,32 +194,133 @@ Feature: Lock Study Configuration
     Then I see "Visit Type followup"
     And I see "SPECT_1 TESTSERIES PENDING"
     And I see "SPECT_2"
-    
-  # Scenario: Success
-  #   Given I sign in as a user with role "Study Manager"
-  #   And I browse to visit "30000"
-  #   Then I see "Visit Type baseline"
-  #   And study "TestStudy" has configuration
-  #     """
-  #     visit_types:
-  #       followup: 
-  #         required_series:
-  #           SPECT_1:
-  #             tqc: []
-  #           SPECT_2:
-  #             tqc: []
-  #       followup2: 
-  #         required_series:
-  #           SPECT_1:
-  #             tqc: []
-  #           SPECT_2:
-  #             tqc: []
-  #     image_series_properties: []
-  #     """
-  #   When I browse to study "TestStudy"
-  #   And I click "Lock"
-  #   Then I see "Study locked"
-  #   When I wait for all jobs in "ConsolidateStudyConfigurationForStudyWorker" queue
-  #   And I browse to visit "30000"
-  #   Then I see "Visit Type Empty"
 
+  Scenario: Technical Quality Control Specification Did Not Change
+    Given I sign in as a user with role "Study Manager"
+    And an image_series "TestSeries" with:
+      | image_count |              1 |
+      | patient     |    TestPatient |
+      | visit       |          40000 |
+      | state       | visit_assigned |
+    And visit "40000" has required series "SPECT_1" assigned to "TestSeries"
+    And visit "40000" required series "SPECT_1" has tQC with:
+      | modality | passed |
+    And I browse to visit "40000"
+    Then I see "Visit Type followup"
+    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see "SPECT_2"
+    And study "TestStudy" has configuration
+      """
+      visit_types:
+        followup: 
+          required_series:
+            SPECT_1:
+              tqc:
+              - id: modality
+                label: 'Correct?'
+                type: bool
+            SPECT_2:
+              tqc: []
+      image_series_properties: []
+      """
+    When I browse to study "TestStudy"
+    And I click "Unlock"
+    And I click "Lock"
+    Then I see "Study locked"
+    When I wait for all jobs in "ConsolidateStudyConfigurationForStudyWorker" queue
+    And I browse to visit "40000"
+    Then I see "Visit Type followup"
+    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see "SPECT_2"
+    
+  Scenario: Medical Quality Control Specification Changed
+    Given I sign in as a user with role "Study Manager"
+    And an image_series "TestSeries" with:
+      | image_count |              1 |
+      | patient     |    TestPatient |
+      | visit       |          40000 |
+      | state       | visit_assigned |
+    And visit "40000" has required series "SPECT_1" assigned to "TestSeries"
+    And visit "40000" required series "SPECT_1" has tQC with:
+      | modality | passed |
+    And visit "40000" has mQC with:
+      | consistency | passed |
+    And I browse to visit "40000"
+    Then I see "Visit Type followup"
+    And I see "M Qc State PERFORMED, PASSED"
+    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see "SPECT_2"
+    And study "TestStudy" has configuration
+      """
+      visit_types:
+        followup:
+          mqc:
+          - id: consistency
+            label: Really consistent?
+            type: bool
+          required_series:
+            SPECT_1:
+              tqc:
+              - id: modality
+                label: 'Correct?'
+                type: bool
+            SPECT_2:
+              tqc: []
+      image_series_properties: []
+      """
+    When I browse to study "TestStudy"
+    And I click "Unlock"
+    And I click "Lock"
+    Then I see "Study locked"
+    When I wait for all jobs in "ConsolidateStudyConfigurationForStudyWorker" queue
+    And I browse to visit "40000"
+    Then I see "Visit Type followup"
+    And I see "M Qc State PENDING"
+    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see "SPECT_2"
+
+  Scenario: Medical Quality Control Specification Did Not Change
+    Given I sign in as a user with role "Study Manager"
+    And an image_series "TestSeries" with:
+      | image_count |              1 |
+      | patient     |    TestPatient |
+      | visit       |          40000 |
+      | state       | visit_assigned |
+    And visit "40000" has required series "SPECT_1" assigned to "TestSeries"
+    And visit "40000" required series "SPECT_1" has tQC with:
+      | modality | passed |
+    And visit "40000" has mQC with:
+      | consistency | passed |
+    And I browse to visit "40000"
+    Then I see "Visit Type followup"
+    And I see "M Qc State PERFORMED, PASSED"
+    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see "SPECT_2"
+    And study "TestStudy" has configuration
+      """
+      visit_types:
+        followup:
+          mqc:
+          - id: consistency
+            label: Consistent?
+            type: bool
+          required_series:
+            SPECT_1:
+              tqc:
+              - id: modality
+                label: 'Correct?'
+                type: bool
+            SPECT_2:
+              tqc: []
+      image_series_properties: []
+      """
+    When I browse to study "TestStudy"
+    And I click "Unlock"
+    And I click "Lock"
+    Then I see "Study locked"
+    When I wait for all jobs in "ConsolidateStudyConfigurationForStudyWorker" queue
+    And I browse to visit "40000"
+    Then I see "Visit Type followup"
+    And I see "M Qc State PERFORMED, PASSED"
+    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see "SPECT_2"

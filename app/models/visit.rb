@@ -408,15 +408,6 @@ JOIN_QUERY
     true
   end
 
-  ##
-  # If defined returns the mqc_version for this visit. Otherwise it
-  # returns the locked version for the associated study.
-  #
-  # @return [String] The mqc version
-  def mqc_version
-    read_attribute(:mqc_version) || study.andand.locked_version
-  end
-
   def mqc_spec
     mqc_spec_at_version(mqc_version || study.locked_version)
   end
@@ -557,8 +548,6 @@ JOIN_QUERY
     "#{visit_type}(#{visit_number})"
   end
 
-  protected
-
   def reset_mqc
     self.mqc_user_id = nil
     self.mqc_date = nil
@@ -569,6 +558,8 @@ JOIN_QUERY
 
     save
   end
+
+  protected
 
   def mqc_to_domino
     result = {}

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 7.0 - Unreleased
+
+### Fixed
+
+* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Reset
+  medical quality control results when a new mQC specification is
+  locked for a study
+
 ## 7.0.12
 
 ### Fixed
