@@ -10,6 +10,8 @@
 ### Patches
 
 * <devops> Display basic database user information upon start up for debugging
+* <devops> Add optional `email` and `password` parameters to rake task
+  `erica:seed:root_user[:username, :email, :password]`
 
 ## 7.0.11
 
