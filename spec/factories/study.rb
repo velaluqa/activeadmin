@@ -32,6 +32,9 @@ FactoryGirl.define do
 
     trait :locked do
       after(:create) do |study, evaluator|
+        if evaluator.configuration.is_a?(String)
+          study.update_configuration!(evaluator.configuration)
+        end
         study.lock_configuration!
       end
     end
