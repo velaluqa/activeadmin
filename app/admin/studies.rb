@@ -238,6 +238,12 @@ ActiveAdmin.register Study do
     @study.locked_version = GitConfigRepository.new.current_version
     @study.save
 
+    ConsolidateStudyConfigurationForStudyWorker.perform_async(
+      @study.id,
+      :locked,
+      current_user.id
+    )
+
     redirect_to({ action: :show }, notice: 'Study locked')
   end
   member_action :unlock do

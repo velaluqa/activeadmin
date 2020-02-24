@@ -4,12 +4,17 @@
 
 ### Fixed
 
+* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Fix
+  consolidation of visit types, required series and technical qc
+  results after locking the study configuration at a specific version
 * Fix passing down correct version parameter to retrieve the correct
   study configuration (affects Upload of Study Configuration)
 
 ### Patches
 
 * <devops> Display basic database user information upon start up for debugging
+* <devops> Add optional `email` and `password` parameters to rake task
+  `erica:seed:root_user[:username, :email, :password]`
 
 ## 7.0.11
 

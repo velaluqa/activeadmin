@@ -20,6 +20,11 @@ step 'a study :string with configuration' do |name, config_yaml|
   tempfile.unlink
 end
 
+step 'study :string has configuration' do |name, config_yaml|
+  study = Study.where(name: name).first
+  study.update_configuration!(config_yaml)
+end
+
 step 'study :study_instance is locked' do |study|
-  study.lock!
+  study.lock_configuration!
 end

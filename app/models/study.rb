@@ -189,6 +189,15 @@ JOIN
     run_schema_validation(config)
   end
 
+  def version_hash(version: nil)
+    if version == :locked
+      return nil unless locked?
+      locked_version
+    else
+      GitConfigRepository.new.current_version
+    end
+  end
+
   def lock_configuration!
     self.state = :production
     self.locked_version = GitConfigRepository.new.current_version
