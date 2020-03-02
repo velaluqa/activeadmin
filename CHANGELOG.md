@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 7.0.14
+
+### Fixed
+
+* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Fix
+  consolidating to `locked` configuration in worker
+
 ## 7.0.13
 
 ### Fixed
