@@ -9,7 +9,7 @@ class Visit::ConsolidateStudyConfiguration < Trailblazer::Operation
   def extract_params(ctx, params:, **)
     ctx[:visit] = visit = Visit.find(params[:visit_id])
     ctx[:version] = version = params[:version]
-    ctx[:version_hash] = version_hash = visit.study.version_hash(version: version_hash)
+    ctx[:version_hash] = version_hash = visit.study.version_hash(version: version)
     ctx[:visit_type_spec] = visit.study.visit_type_spec(version: version_hash)
     ctx[:required_series_spec] = visit.required_series_spec(version: version_hash)
     true
