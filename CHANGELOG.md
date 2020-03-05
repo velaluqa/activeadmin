@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 7.0.15
+
+### Internal
+
+* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Add
+  `dry_run` parameter to configuration consolidation operation (this
+  helps identifying problematic destructive operations due to
+  oversight and can be integrated into the UI later on)
+
 ## 7.0.14
 
 ### Fixed
