@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 7.0.16
+
+### DevOps
+
+* Pass encrypted password to `erica:seed:root_user`
+* Add `erica:helper:generate_encrypted_password` task
+
 ## 7.0.15
 
 ### Internal
