@@ -8,6 +8,8 @@
   action permissions for image series assign visit and assign patient
 * <[ERICA-11](https://jira.pharmtrace.com/browse/ERICA-11)> Show
   required series in audit trail when filtered by resource
+* <[ERICA-12](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-12)>
+  Show link to visit for required series in audit trail
 
 ## 7.0.16
 

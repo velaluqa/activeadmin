@@ -27,7 +27,7 @@ Feature: Image Audit Trail
     When I sign in as a user with role "Test Role"
     And I browse to last defined image
     And I click link "Audit Trail" in "#title_bar"
-    Then I don't see "RequiredSeries SPECT"
+    Then I don't see "RequiredSeries 100FooPatient#10000 SPECT"
     And I see "Image Image #"
     And I don't see "ImageSeries Foo"
     And I don't see "Patient" within "#main_content"

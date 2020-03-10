@@ -140,7 +140,11 @@ ActiveAdmin.register Version do
       end
     end
     column :item do |version|
-      auto_link(version.item)
+      if version.item.is_a?(RequiredSeries)
+        auto_link(version.item.visit, "#{version.item.visit.name} #{version.item.name}")
+      else
+        auto_link(version.item)
+      end
     end
     column :event do |version|
       event = Admin::VersionsController.classify_event(version)
@@ -168,7 +172,11 @@ ActiveAdmin.register Version do
         end
       end
       row :item do
-        auto_link(version.item)
+        if version.item.is_a?(RequiredSeries)
+          auto_link(version.item.visit, "#{version.item.visit.name} #{version.item.name}")
+        else
+          auto_link(version.item)
+        end
       end
       row :event do
         event = Admin::VersionsController.classify_event(version)
