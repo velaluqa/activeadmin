@@ -3,7 +3,10 @@ FactoryGirl.define do
     sequence(:name) { |n| "Study #{n}" }
 
     transient do
-      configuration(nil)
+      configuration(<<~CONFIG)
+        visit_types: {}
+        image_series_properties: []
+      CONFIG
     end
 
     trait :production do
