@@ -337,3 +337,7 @@ ActiveAdmin.setup do |config|
   config.view_factory.title_bar = Pharmtrace::ActiveAdmin::TitleBar
   config.view_factory.footer = PharmTraceERICAFooter
 end
+
+ActiveAdmin::BaseController.class_eval do
+  helper ApplicationHelper
+end

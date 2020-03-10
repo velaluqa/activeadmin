@@ -47,9 +47,9 @@ Feature: Batch Assign Visit
     When I click link "Assign Selected Series to Visit"
     And I click "OK"
     Then I see "Not all selected image series belong to the same patient. Batch assignment can only be used for series from one patient which are not currently assigned to a visit."
-    Then I see the following values for row with "TestSeries":
+    Then I see a row for "TestSeries" with the following columns:
       | Visit |   |
-    Then I see the following values for row with "SecondSeries":
+    Then I see a row for "SecondSeries" with the following columns:
       | Visit |   |
 
   Scenario: Not unassigned
@@ -58,7 +58,7 @@ Feature: Batch Assign Visit
       | visit   |       10000 |
     And I sign in as a user with role "Image Manager"
     When I browse to image_series list
-    Then I see the following values for row with "AssignedSeries":
+    Then I see a row for "AssignedSeries" with the following columns:
       | Visit | 10TestPatient#10000 |
     When I select row for "TestSeries"
     And I select row for "AssignedSeries"
@@ -67,9 +67,9 @@ Feature: Batch Assign Visit
     When I click link "Assign Selected Series to Visit"
     And I click "OK"
     Then I see "Not all selected image series are currently unassigned. Batch assignment can only be used for series from one patient which are not currently assigned to a visit."
-    Then I see the following values for row with "TestSeries":
+    Then I see a row for "TestSeries" with the following columns:
       | Visit |   |
-    Then I see the following values for row with "AssignedSeries":
+    Then I see a row for "AssignedSeries" with the following columns:
       | Visit | 10TestPatient#10000 |
 
   Scenario: Success
@@ -84,5 +84,5 @@ Feature: Batch Assign Visit
     Then I see "Assign to Visit"
     When I select "10000" from "Visit"
     And I click the "Assign" button
-    Then I see the following values for row with "TestSeries":
+    Then I see a row for "TestSeries" with the following columns:
       | Visit | 10TestPatient#10000 |

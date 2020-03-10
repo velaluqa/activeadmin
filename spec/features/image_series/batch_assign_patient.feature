@@ -51,9 +51,9 @@ Feature: Batch Assign Patient
     When I click link "Assign Selected Series to Patient"
     And I click "OK"
     Then I see "Not all selected image series belong to the same study. Batch assignment can only be used for series of the same study."
-    Then I see the following values for row with "TestSeries":
+    Then I see a row for "TestSeries" with the following columns:
       | Patient | 10AssignedPatient |
-    Then I see the following values for row with "SecondSeries":
+    Then I see a row for "SecondSeries" with the following columns:
       | Patient | 300SecondPatient   |
 
   Scenario: Not all with unassigned visit
@@ -69,15 +69,15 @@ Feature: Batch Assign Patient
     When I click link "Assign Selected Series to Patient"
     And I click "OK"
     Then I see "Not all selected image series are currently unassigned. Batch assignment can only be used for series which are not currently assigned to a visit."
-    Then I see the following values for row with "TestSeries":
+    Then I see a row for "TestSeries" with the following columns:
       | Patient | 10AssignedPatient |
-    Then I see the following values for row with "SeriesWithVisit":
+    Then I see a row for "SeriesWithVisit" with the following columns:
       | Patient | 10TestPatient |
 
   Scenario: Success
     Given I sign in as a user with role "Image Manager"
     When I browse to image_series list
-    Then I see the following values for row with "TestSeries":
+    Then I see a row for "TestSeries" with the following columns:
       | Patient | 10AssignedPatient |
     When I select row for "TestSeries"
     And I click "Batch Actions"
@@ -87,6 +87,6 @@ Feature: Batch Assign Patient
     Then I see "Assign to Patient"
     When I select "TestPatient" from "Patient"
     And I click the "Assign" button
-    Then I see the following values for row with "TestSeries":
+    Then I see a row for "TestSeries" with the following columns:
       | Patient | 10TestPatient |
       

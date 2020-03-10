@@ -5,15 +5,37 @@
       %table{:border => 0, :cellspacing => 0, :cellpadding => 0}
         %tbody
           %tr
-            %th State
+            %th Visit State
             %td
-              - case @visit.state
-              - when :complete
-                %span.status_tag.Pending.warning Pending
-              - when :mqc_issues
-                %span.status_tag.Issues.error Performed, issues present
-              - when :mqc_passed
-                %span.status_tag.Passed.ok Passed
+              - case(@visit.state_sym)
+              - when :incomplete_na then
+                - arbre do
+                  = status_tag('Incomplete, not available')
+              - when :complete_tqc_passed then
+                - arbre do
+                  = status_tag('Complete, tQC of all series passed', :ok)
+              - when :incomplete_queried then
+                - arbre do
+                  = status_tag('Incomplete, queried', :warning)
+              - when :complete_tqc_pending then
+                - arbre do
+                  = status_tag('Complete, tQC not finished', :warning)
+              - when :complete_tqc_issues then
+                - arbre do
+                  = status_tag('Complete, tQC finished, not all series passed', :error)
+          %tr
+            %th Medical Assessment
+            %td
+              - case(@visit.mqc_state_sym)
+              - when :pending then
+                - arbre do
+                  = status_tag('Pending')
+              - when :issues then
+                - arbre do
+                  = status_tag('Performed, issues present', :error)
+              - when :passed then
+                - arbre do
+                  = status_tag('Performed, passed', :ok)
           %tr
             %th Date
             %td= pretty_format(@visit.mqc_date.localtime) unless @visit.mqc_date.nil?

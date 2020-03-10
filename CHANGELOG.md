@@ -12,6 +12,8 @@
   Show link to visit for required series in audit trail
 * <[ERICA-19](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-19)>
   Fix sort order of required series on show visit page
+* <[ERICA-21](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-21)>
+  Fix permissions for medical assessment
 
 ## 7.0.16
 

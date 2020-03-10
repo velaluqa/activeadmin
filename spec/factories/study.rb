@@ -3,14 +3,15 @@ FactoryGirl.define do
     sequence(:name) { |n| "Study #{n}" }
 
     transient do
-      configuration(<<~CONFIG)
-        visit_types: {}
-        image_series_properties: []
-      CONFIG
+      configuration(nil)
     end
 
     trait :production do
       state Study.state_sym_to_int(:production)
+      configuration(<<~CONFIG)
+        visit_types: {}
+        image_series_properties: []
+      CONFIG
     end
 
     trait :building do
@@ -37,6 +38,11 @@ FactoryGirl.define do
       after(:create) do |study, evaluator|
         if evaluator.configuration.is_a?(String)
           study.update_configuration!(evaluator.configuration)
+        else
+          study.update_configuration!(<<~CONFIG)
+            visit_types: {}
+            image_series_properties: []
+          CONFIG
         end
         study.lock_configuration!
       end

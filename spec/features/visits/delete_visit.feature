@@ -14,7 +14,9 @@ Feature: Delete Visits
           description: A simple visit type
           required_series: []
       """
-    And a center "FooCenter" for "FooStudy"
+    And a center "FooCenter" with:
+      | study | FooStudy |
+      | code  | 10       |
     And a patient "FooPatient" for "FooCenter"
     And a visit "10000" with:
       | patient     | FooPatient           |
@@ -40,7 +42,13 @@ Feature: Delete Visits
   Scenario: Successful
     Given I sign in as a user with role "Image Manager"
     When I browse to visits list
-    Then I see "FooPatient 10000 Visit Extraordinaire INCOMPLETE, NOT AVAILABLE PENDING ViewDelete"
-    When I follow link "Delete"
-    Then I don't see "FooPatient 10000 Visit Exreairdubaire"
+    Then I see a row with "10000" and the following columns:
+      | Patient      | 10FooPatient              |
+      | Visit Number | 10000                     |
+      | Description  | Visit Extraordinaire      |
+      | State        | INCOMPLETE, NOT AVAILABLE |
+    When I click link "Delete"
+    And I confirm alert
+    Then I don't see a row with "10000"
+      
 

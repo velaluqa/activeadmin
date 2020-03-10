@@ -16,16 +16,20 @@ Feature: Delete Study
     Given I sign in as a user with all permissions
     But I cannot destroy studies
     When I browse to studies list
-    Then I don't see "FooStudy MISSING Building Select ViewDelete"
+    Then I don't see a "Delete" link in row for "FooStudy"
     When I browse to study "FooStudy"
     Then I don't see "Delete Study"
 
   Scenario: Successful
     Given I sign in as a user with role "Image Manager"
     When I browse to studies list
-    Then I see "FooStudy MISSING Building Select ViewDelete"
-    When I follow link "Delete"
-    Then I don't see "FooStudy MISSING Building"
+    Then I see a row for "FooStudy" with the following columns:
+      | Name          | FooStudy |
+      | Configuration | MISSING  |
+      | State         | Building |
+    When I click link "Delete"
+    And I confirm alert
+    Then I don't see a row with "FooStudy"
 
   # TODO: Discuss Scenario: Scoped permission to study
   # TODO: Discuss Scenario: Scoped permission to center

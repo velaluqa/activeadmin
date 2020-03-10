@@ -33,10 +33,10 @@ Feature: Batch Assign Required Series
       | patient | FooPatient |
       | visit   |      10000 |
     And a role "Image Manager" with permissions:
-      | Study   | read                         |
-      | Center  | read, update                 |
-      | Patient | read, update, create         |
-      | Visit   | read, assign_required_series |
+      | Study   | read                                   |
+      | Center  | read, update                           |
+      | Patient | read, update, create                   |
+      | Visit   | read, assign_required_series, read_tqc |
 
   Scenario: Not logged in
     When I browse to assign_required_series_form visit "10000"
@@ -60,5 +60,10 @@ Feature: Batch Assign Required Series
     And I select "TestSeries2" from "SPECT_2"
     And I click the "Assign" button
     Then I am redirected to show visit "10000"
-    And I see "SPECT_1 TESTSERIES1 PENDING"
-    And I see "SPECT_2 TESTSERIES2 PENDING"
+    And I see a row for "SPECT_1" with the following columns:
+      | Assigned Image Series | TESTSERIES1 |
+      | tQC State             | PENDING     |
+    And I see a row for "SPECT_2" with the following columns:
+      | Assigned Image Series | TESTSERIES2 |
+      | tQC State             | PENDING     |
+

@@ -26,4 +26,8 @@ module ApplicationHelper
     )
     @renderer.render(str).html_safe
   end
+
+  def arbre(&block)
+    Arbre::Context.new(&block).to_s
+  end
 end

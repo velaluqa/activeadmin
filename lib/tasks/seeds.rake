@@ -64,14 +64,14 @@ namespace :erica do
                     Study => %i[read update create],
                     Center => %i[read update create],
                     Patient => %i[read update create],
-                    ImageSeries => %i[upload assign_patient assign_visit],
-                    Visit => %i[read assign_required_series technical_qc]
+                    ImageSeries => %i[read comment upload assign_patient assign_visit],
+                    Visit => %i[read create create_from_template comment assign_required_series read_tqc perform_tqc read_mqc perform_mqc]
                   })
       create_role('Medical QC', with_permissions: {
                     Study => %i[read],
                     Center => %i[read],
                     Patient => %i[read],
-                    Visit => %i[read assign_required_series technical_qc medical_qc]
+                    Visit => %i[read assign_required_series read_mqc perform_mqc]
                   })
       create_role('Audit', with_permissions: {
                     Study => :read,

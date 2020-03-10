@@ -196,6 +196,14 @@ JOIN_QUERY
     Visit::STATE_SYMS[sym]
   end
 
+  def has_mqc_results?
+    mqc_state_sym != :pending
+  end
+
+  def ready_for_mqc?
+    %i[complete_tqc_passed complete_tqc_issues incomplete_na].include?(state_sym)
+  end
+
   def state
     return -1 if read_attribute(:state).nil?
     read_attribute(:state)
