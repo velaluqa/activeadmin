@@ -20,12 +20,15 @@ Feature: ImageSeries Audit Trail
       | patient | FooPatient |
       | visit   |      10000 |
     And an image for image series "Foo"
+    And a required series "SPECT" for visit "10000" with:
+      | image_series | Foo |
 
   Scenario: ImageSeries-specific Audit Trail
     When I sign in as a user with role "Test Role"
     And I browse to image_series "Foo"
     And I click link "Audit Trail" in "#title_bar"
-    Then I see "Image Image #"
+    Then I see "RequiredSeries SPECT"
+    And I see "Image Image #"
     And I see "ImageSeries Foo"
     And I don't see "Patient" within "#main_content"
     And I don't see "Visit" within "#main_content"

@@ -6,6 +6,8 @@
 
 * <[ERICA-5](https://jira.pharmtrace.com/browse/ERICA-5)> Fix batch
   action permissions for image series assign visit and assign patient
+* <[ERICA-11](https://jira.pharmtrace.com/browse/ERICA-11)> Show
+  required series in audit trail when filtered by resource
 
 ## 7.0.16
 

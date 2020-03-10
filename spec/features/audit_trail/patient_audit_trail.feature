@@ -20,12 +20,15 @@ Feature: Patient Audit Trail
       | patient | FooPatient |
       | visit   |      10000 |
     And an image for image series "Foo"
+    And a required series "SPECT" for visit "10000" with:
+      | image_series | Foo |
 
   Scenario: Patient-specific Audit Trail
     When I sign in as a user with role "Test Role"
     And I browse to patient "FooPatient"
     And I click link "Audit Trail" in "#title_bar"
-    Then I see "Image Image #"
+    Then I see "RequiredSeries SPECT"
+    And I see "Image Image #"
     And I see "ImageSeries Foo"
     And I see "Visit 100FooPatient#10000"
     And I see "Patient 100FooPatient"
