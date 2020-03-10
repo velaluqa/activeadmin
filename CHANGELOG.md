@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Unreleased
+
+### Fixed
+
+* <[ERICA-5](https://jira.pharmtrace.com/browse/ERICA-5)> Fix batch
+  action permissions for image series assign visit and assign patient
+
 ## 7.0.16
 
 ### DevOps

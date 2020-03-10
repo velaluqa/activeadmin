@@ -194,6 +194,39 @@ step 'I click :string in :string row' do |locator, row_content|
   end
 end
 
+# TODO: Make this more explicit by filtering specific column.
+step 'I select row for :string' do |locator|
+  selected = 0
+  page.all("tr").each do |tr|
+    next unless tr.text.include?(locator)
+
+    selected += 1
+    tr.find(".collection_selection").click
+  end
+  raise "expected to select at least one table row with #{locator.inspect}" unless selected > 0
+  validation_report_screenshot
+end
+
+step 'I see the following values for row with :string:' do |locator, values|
+  found_rows = 0
+  page.all("table").each do |table|
+    columns = table.all("thead th").map(&:text)
+    table.all("tbody tr").each do |tr|
+      next unless tr.text.include?(locator)
+
+      found_rows += 1
+      values.to_h.each_pair do |key, expected_value|
+        raise "`#{key}` not found in #{columns.inspect}" unless columns.include?(key)
+        index = columns.index(key)
+        column_value = tr.all("td")[index].text
+        expect(column_value).
+          to eq(expected_value), "expected #{column_value.inspect} to equal #{expected_value.inspect} in column #{key.inspect} for row with #{locator.inspect}"
+      end
+    end
+  end
+  raise "expected to find at least one table row with #{locator.inspect}" unless found_rows > 0
+end
+
 step 'I see :string in :string row' do |text, row_content|
   page.all('tr').each do |td|
     next unless td.text.include?(row_content)

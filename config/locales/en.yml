@@ -37,3 +37,9 @@ en:
         exclude: Exclude triggering user
         include: Include triggering user
         only: Only target triggering user
+
+  active_admin:
+    batch_actions:
+      labels:
+        assign_to_visit: "Assign Selected Series to Visit"
+        assign_to_patient: "Assign Selected Series to Patient"

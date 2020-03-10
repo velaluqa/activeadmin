@@ -472,10 +472,10 @@ ActiveAdmin.register ImageSeries do
     image_series = ImageSeries.find(image_series_ids)
 
     patient = Patient.find(params[:patient_id])
-    authorize! :manage, patient
+    authorize! :read, patient
 
     image_series.each do |i_s|
-      authorize! :manage, i_s
+      authorize! :assign_patient, i_s
       next unless i_s.visit_id.nil?
 
       i_s.patient = patient
@@ -487,7 +487,8 @@ ActiveAdmin.register ImageSeries do
 
     redirect_to params[:return_url], :notice => 'The image series were assigned to the patient.'
   end
-  batch_action :assign_to_patient, :confirm => 'This will modify all selected image series. Are you sure?', :if => proc {can? :manage, ImageSeries}  do |selection|
+
+  batch_action :assign_to_patient, confirm: 'This will modify all selected image series. Are you sure?', if: proc { can? :assign_patient, ImageSeries } do |selection|
     failure = false
     study_id = nil
 
@@ -537,14 +538,19 @@ ActiveAdmin.register ImageSeries do
       end
 
       authorize! :create, Visit
-      visit = Visit.create(:patient => image_series.first.patient, :visit_number => params[:visit][:visit_number], :visit_type => params[:visit][:visit_type], :description => params[:visit][:description])
+      visit = Visit.create(
+        patient: image_series.first.patient,
+        visit_number: params[:visit][:visit_number],
+        visit_type: params[:visit][:visit_type],
+        description: params[:visit][:description]
+      )
     else
       visit = Visit.find(params[:visit_id])
     end
-    authorize! :manage, visit
+    authorize! :read, visit
 
     image_series.each do |i_s|
-      authorize! :manage, i_s
+      authorize! :assign_visit, i_s
       next unless i_s.visit_id.nil?
 
       i_s.visit = visit
@@ -553,7 +559,8 @@ ActiveAdmin.register ImageSeries do
 
     redirect_to params[:return_url], :notice => 'The image series were assigned to the visit.'
   end
-  batch_action :assign_to_visit, :confirm => 'This will modify all selected image series. Are you sure?', :if => proc {can? :manage, ImageSeries} do |selection|
+
+  batch_action :assign_to_visit, confirm: 'This will modify all selected image series. Are you sure?', if: proc { can? :assign_visit, ImageSeries } do |selection|
     patient_id = nil
     visits = []
     visit_types = []
@@ -566,12 +573,12 @@ ActiveAdmin.register ImageSeries do
         visit_types = (image_series.study ? image_series.study.visit_types : [])
       end
 
-      if(image_series.patient_id != patient_id)
+      if image_series.patient_id != patient_id
         flash[:error] = 'Not all selected image series belong to the same patient. Batch assignment can only be used for series from one patient which are not currently assigned to a visit.'
         redirect_to :back
         failure = true
         break
-      elsif(image_series.visit_id != nil)
+      elsif image_series.visit_id != nil
         flash[:error] = 'Not all selected image series are currently unassigned. Batch assignment can only be used for series from one patient which are not currently assigned to a visit.'
         redirect_to :back
         failure = true
@@ -597,20 +604,20 @@ ActiveAdmin.register ImageSeries do
       return
     end
 
-    if(params[:image_series][:visit_id] == 'new')
-      if(params[:image_series][:visit][:visit_type].blank?)
+    if params[:image_series][:visit_id] == 'new'
+      if params[:image_series][:visit][:visit_type].blank?
         flash[:error] = 'When creating a new visit, a visit type must be selected.'
         redirect_to :back
         return
       end
 
       visit = Visit.create(
-        :patient => @image_series.patient,
-        :visit_number => params[:image_series][:visit][:visit_number],
-        :visit_type => params[:image_series][:visit][:visit_type],
-        :description => params[:image_series][:visit][:description]
+        patient: @image_series.patient,
+        visit_number: params[:image_series][:visit][:visit_number],
+        visit_type: params[:image_series][:visit][:visit_type],
+        description: params[:image_series][:visit][:description]
       )
-    elsif(params[:image_series][:visit_id].blank?)
+    elsif params[:image_series][:visit_id].blank?
       visit = nil
     else
       visit = Visit.find(params[:image_series][:visit_id])
