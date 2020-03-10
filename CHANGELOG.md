@@ -10,6 +10,8 @@
   required series in audit trail when filtered by resource
 * <[ERICA-12](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-12)>
   Show link to visit for required series in audit trail
+* <[ERICA-19](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-19)>
+  Fix sort order of required series on show visit page
 
 ## 7.0.16
 

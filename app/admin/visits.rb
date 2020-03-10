@@ -170,32 +170,13 @@ ActiveAdmin.register Visit do
       row :image_storage_path
     end
 
-    required_series_objects = visit.required_series_objects
-    unless(params[:order].blank?)
-      split_position = params[:order].rindex('_')
-
-      unless(split_position.nil?)
-        key, direction = params[:order][0..split_position-1], params[:order][split_position+1..-1]
-
-        if(['name', 'image_series_id', 'tqc_date', 'tqc_user_id', 'tqc_state'].include?(key))
-          required_series_objects.sort! do |a, b|
-            a_val = a.instance_variable_get('@'+key)
-            b_val = b.instance_variable_get('@'+key)
-
-            if(a_val.nil? and b_val.nil?)
-              0
-            elsif(a_val.nil?)
-              -1
-            elsif(b_val.nil?)
-              1
-            else
-              a_val <=> b_val
-            end
-          end
-          required_series_objects.reverse! if (direction == 'desc')
-        end
+    _, order, direction = params[:order].andand.match(/^(.+)_(.+)/).to_a
+    required_series =
+      if order.present?
+        visit.required_series.order(order => direction)
+      else
+        visit.required_series
       end
-    end
 
     panel 'Required Series' do
       if !visit.study.semantically_valid?
@@ -206,8 +187,16 @@ ActiveAdmin.register Visit do
         text_node "Assigned visit type not found in study configuration. Maybe the study configuration changed in the meantime. Reassign a valid visit type to manage required series."
       elsif !visit.required_series_available?
         text_node "The study configuration does not provide any required series for this visit type."
+      elsif required_series.empty?
+        text_node "No required series found."
       else
-        render :partial => 'admin/visits/required_series', :locals => {:visit => visit, :required_series => required_series_objects, :qc_result_access => (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))} unless required_series_objects.empty?
+        render(
+          partial: 'admin/visits/required_series',
+          locals: {
+            visit: visit,
+            required_series: required_series
+          }
+        )
       end
     end
 
