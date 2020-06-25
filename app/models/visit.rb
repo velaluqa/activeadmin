@@ -196,6 +196,14 @@ JOIN_QUERY
     Visit::STATE_SYMS[sym]
   end
 
+  def has_mqc_results?
+    mqc_state_sym != :pending
+  end
+
+  def ready_for_mqc?
+    %i[complete_tqc_passed complete_tqc_issues incomplete_na].include?(state_sym)
+  end
+
   def state
     return -1 if read_attribute(:state).nil?
     read_attribute(:state)
@@ -408,15 +416,6 @@ JOIN_QUERY
     true
   end
 
-  ##
-  # If defined returns the mqc_version for this visit. Otherwise it
-  # returns the locked version for the associated study.
-  #
-  # @return [String] The mqc version
-  def mqc_version
-    read_attribute(:mqc_version) || study.andand.locked_version
-  end
-
   def mqc_spec
     mqc_spec_at_version(mqc_version || study.locked_version)
   end
@@ -557,8 +556,6 @@ JOIN_QUERY
     "#{visit_type}(#{visit_number})"
   end
 
-  protected
-
   def reset_mqc
     self.mqc_user_id = nil
     self.mqc_date = nil
@@ -569,6 +566,8 @@ JOIN_QUERY
 
     save
   end
+
+  protected
 
   def mqc_to_domino
     result = {}

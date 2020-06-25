@@ -27,10 +27,10 @@ Feature: Assign Required Series
       | patient | FooPatient |
       | visit   |      10000 |
     And a role "Image Manager" with permissions:
-      | Study   | read                         |
-      | Center  | read, update                 |
-      | Patient | read, update, create         |
-      | Visit   | read, assign_required_series |
+      | Study   | read                                   |
+      | Center  | read, update                           |
+      | Patient | read, update, create                   |
+      | Visit   | read, assign_required_series, read_tqc |
 
   Scenario: Not logged in
     When I browse to assign_required_series_form visit "10000" with:
@@ -42,13 +42,20 @@ Feature: Assign Required Series
     And I cannot assign_required_series visits
     When I browse to visit "10000"
     Then I don't see "Assign Required Series"
-    Then I don't see "SPECT_1 MISSING Assign"
+    And I don't see an "Assign" link in row for "SPECT_1"
     When I browse to assign_required_series_form visit "10000" with:
       | required_series_names | SPECT_1 |
     Then I see the unauthorized page
 
+  # TODO: Extract Feature: Reassign Required Series
+  # TODO: Scenario: Assign via visit action
+  # TODO: Scenario: Assign via `Assign` link from required series table
+
   Scenario: Assignment Successful
     Given I sign in as a user with role "Image Manager"
+    When I browse to visit "10000"
+    Then I see "Assign Required Series"
+    And I see an "Assign" link in row for "SPECT_1"
     When I browse to assign_required_series_form visit "10000" with:
       | required_series_names | SPECT_1 |
     Then I see "SPECT_1"
@@ -56,4 +63,6 @@ Feature: Assign Required Series
     When I select "TestSeries" from "SPECT_1"
     And I click the "Assign" button
     Then I am redirected to show visit "10000"
-    And I see "SPECT_1 TESTSERIES PENDING"
+    And I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PENDING    |

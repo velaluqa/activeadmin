@@ -53,10 +53,11 @@ class ImageUploader.Models.Image extends Backbone.Model
         start = new Date().getTime()
         dataSet = dicomParser.parseDicom(byteArray)
         end = new Date().getTime()
+        console.log dataSet
         if dataSet.warnings.length > 0
           @pushWarnings('parsing', dataSet.warnings)
         else
-          @pushWarnings('parsing', ['No pixeldata']) unless dataSet.elements.x7fe00010
+          @pushWarnings('parsing', ['No DICOM pixeldata']) unless dataSet.elements.x7fe00010
         @set
           state: 'parsed'
           parseTime: (end - start)
@@ -64,7 +65,7 @@ class ImageUploader.Models.Image extends Backbone.Model
           seriesInstanceUid: dataSet.string('x0020000e')
           seriesDescription: dataSet.string('x0008103e')
           seriesNumber: dataSet.string('x00200011')
-          seriesDateTime: @parseDateTime(dataSet, 'seriesDate')
+          seriesDateTime: @parseDateTime(dataSet, 'seriesDate', warnIfMissing: false)
           acquisitionDateTime: @parseDateTime(dataSet, 'acquisitionDate')
           contentDateTime: @parseDateTime(dataSet, 'contentDate')
           patient:
@@ -80,13 +81,14 @@ class ImageUploader.Models.Image extends Backbone.Model
 
     reader.readAsArrayBuffer(file)
 
-  parseDateTime: (dataSet, tag) ->
+  parseDateTime: (dataSet, tag, op = { warnIfMissing: true }) ->
     date = dataSet.string(@dateTimeTags[tag].date)
     time = dataSet.string(@dateTimeTags[tag].time)
     timezone = dataSet.string(@dateTimeTags.timezone)
 
     unless date?
-      @pushWarnings('parsing', ["Missing date for #{tag}"])
+      if op.warnIfMissing
+        @pushWarnings('parsing', ["Missing date part for `#{tag}`"])
       return
 
     year = parseInt(date[0..3], 10)
@@ -103,12 +105,25 @@ class ImageUploader.Models.Image extends Backbone.Model
       minutes = '0'
       seconds = '0'
       milliseconds = '000'
-      @pushWarnings('parsing', ["Missing time for #{tag}"])
+      if op.warnIfMissing
+        @pushWarnings('parsing', ["Missing time part for `#{tag}`"])
     new Date(Date.UTC(year, month, day, hours, minutes, seconds, milliseconds))
 
   @parse: (file) ->
     image = new ImageUploader.Models.Image
     image.parse(file)
+
+  imagingDateTime: ->
+    if @get('seriesDateTime')?
+      @get('seriesDateTime')
+    else if not @get('contentDateTime')?
+      @get('acquisitionDateTime')
+    else if not @get('acquisitionDateTime')?
+      @get('contentDateTime')
+    else if @get('contentDateTime') < @get('acquisitionDateTime')
+      @get('acquisitionDateTime')
+    else
+      @get('contentDateTime')
 
   upload: ->
     formData = new FormData()
@@ -131,8 +146,15 @@ class ImageUploader.Models.Image extends Backbone.Model
       processData: false
       contentType: false
 
-  hasWarnings: ->
-    not _.isEmpty(@warnings)
+  hasWarnings: (action) ->
+    if action?
+      not _.isEmpty(@warnings[action])
+    else
+      not _.isEmpty(@warnings)
+
+  hasErrors: () ->
+    isSevere = (key, errors) -> key != 'parsing' and _.isEmpty(errors)
+    _.some(@warnings, isSevere)
 
   formatWarnings: ->
     _.chain(@warnings)
@@ -147,6 +169,7 @@ class ImageUploader.Models.Image extends Backbone.Model
     @warnings[action] ||= []
     for warning in warnings when warning not in @warnings[action]
       @warnings[action].push(warning)
+      console.log warning
     @trigger('warnings')
 
   clearWarnings: (action) ->

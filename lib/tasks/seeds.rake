@@ -1,9 +1,9 @@
 namespace :erica do
   namespace :seed do
     desc 'Create an app administrator'
-    task :root_user, [:username] => [:environment] do |_, args|
+    task :root_user, [:username, :email, :encrypted_password] => [:environment] do |_, args|
       if args[:username].blank?
-        puts 'No username given, aborting.'
+        puts 'No username given, aborting. Use `rake erica:seed:root_user[username(, email)]`'
         next
       end
 
@@ -14,12 +14,16 @@ namespace :erica do
         puts "Account exists. Making sure '#{user.username}' is an unlocked application administrator with password 'change'."
       end
       user.name = args[:username]
-      user.email = 'admin@pharmtrace.com'
+      user.email = args[:email] || "admin@pharmtrace.com"
       user.is_root_user = true
       user.locked_at = nil
-      user.password_changed_at = nil
-      user.password = 'change'
-      user.password_confirmation = 'change'
+      user.password_changed_at = 1.year.from_now
+      if args[:encrypted_password]
+        user.encrypted_password = args[:encrypted_password]
+      else
+        user.password = 'change'
+        user.password_confirmation = 'change'
+      end
       user.confirmed_at = DateTime.now
       user.save!
     end
@@ -60,14 +64,14 @@ namespace :erica do
                     Study => %i[read update create],
                     Center => %i[read update create],
                     Patient => %i[read update create],
-                    ImageSeries => %i[upload assign_patient assign_visit],
-                    Visit => %i[read assign_required_series technical_qc]
+                    ImageSeries => %i[read comment upload assign_patient assign_visit],
+                    Visit => %i[read create create_from_template comment assign_required_series read_tqc perform_tqc read_mqc perform_mqc]
                   })
       create_role('Medical QC', with_permissions: {
                     Study => %i[read],
                     Center => %i[read],
                     Patient => %i[read],
-                    Visit => %i[read assign_required_series technical_qc medical_qc]
+                    Visit => %i[read assign_required_series read_mqc perform_mqc]
                   })
       create_role('Audit', with_permissions: {
                     Study => :read,

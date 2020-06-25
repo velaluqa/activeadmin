@@ -340,3 +340,7 @@ ActiveAdmin.setup do |config|
   config.view_factory.register title_bar: ActiveAdmin::Views::EricaTitleBar
   config.view_factory.register footer: ActiveAdmin::Views::EricaFooter
 end
+
+ActiveAdmin::BaseController.class_eval do
+  helper ApplicationHelper
+end

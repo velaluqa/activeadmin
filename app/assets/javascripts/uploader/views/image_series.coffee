@@ -23,7 +23,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
 
     @listenTo @model, 'change:imageCount', @updateImageCount
     @listenTo @model, 'change:showImages', @showHideImages
-    @listenTo @model, 'change:seriesDateTime', @updateDateTime
+    @listenTo @model, 'change:imagingDateTime', @updateDateTime
     @listenTo @model, 'change:imageCount change:uploadState change:uploadProgress', @updateUploadState
     @listenTo @model, 'change:assignVisitId', @updateRequiredSeriesSelectbox
     @listenTo @model, 'change:markedForUpload', @updateVisitsSelectbox
@@ -38,7 +38,10 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @$('.image-count').html(@model.get('imageCount'))
 
   updateDateTime: =>
-    @$('.datetime').html(@model.get('seriesDateTime'))
+    if @model.get('imagingDateTime')?
+      @$('.datetime').html(moment(@model.get('imagingDateTime')).format('YYYY-MM-DD HH:mm:ss ZZ'))
+    else
+      @$('.datetime').html('Missing Date')
 
   updateUploadState: =>
     state = @model.get('uploadState')
@@ -169,6 +172,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     $select.trigger('change')
 
   renderWarnings: =>
+    @$('tr.image-series').toggleClass('has-errors', @model.hasErrors())
     @$('tr.image-series').toggleClass('has-warnings', @model.hasWarnings())
 
   renderDisabled: ->
@@ -178,7 +182,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @$el.html @template
       name: @model.get('name')
       imageCount: @model.get('imageCount')
-      seriesDateTime: @model.get('seriesDateTime')
+      imagingDateTime: @model.get('imagingDateTime')
 
     @$('tr.image-series > td.warnings > a[data-toggle=popover]').popover
       placement: 'left'

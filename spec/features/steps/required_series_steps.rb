@@ -1,5 +1,5 @@
 step 'a/a required series :string for visit :visit_instance with:' do |name, visit, table|
-  @required_series = RequiredSeries.find_by(name: name, visit: visit)
+  @required_series = RequiredSeries.where(name: name, visit: visit).first_or_create
   options = {}
   table.to_a.each do |attribute, value|
     options[attribute.to_sym] = value

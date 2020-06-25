@@ -30,14 +30,20 @@ Feature: List Studies
     When I browse to study "FooStudy"
     And I click link "Select"
     And I browse to studies list
-    Then I see "FooStudy MISSING Building"
-    And I see "BarStudy MISSING Building"
+    Then I see a row for "FooStudy" with the following columns:
+      | Configuration | MISSING  |
+      | State         | Building |
+    And I see a row for "BarStudy" with the following columns:
+      | Configuration | MISSING  |
+      | State         | Building |
 
   Scenario: Scoped Permission to `FooStudy`
     Given I sign in as a user with role "Image Manager" scoped to study "FooStudy"
     When I browse to studies list
-    Then I see "FooStudy MISSING Building"
-    But I don't see "BarStudy MISSING Building"
+    Then I see a row for "FooStudy" with the following columns:
+      | Configuration | MISSING  |
+      | State         | Building |
+    And I don't see a row for "BarStudy"
     
   # TODO: Discuss Scenario: Scoped permission to center
   # TODO: Discuss Scenario: Scoped permission to patient

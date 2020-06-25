@@ -168,8 +168,8 @@ JOIN
     File.exist?(config_file_path)
   end
 
-  def semantically_valid?
-    validate == []
+  def semantically_valid?(version: nil)
+    validate(version) == []
   end
 
   def locked_semantically_valid?
@@ -182,17 +182,20 @@ JOIN
 
   def validate(version = nil)
     return nil unless has_configuration?
-    config = if version.nil?
-               current_configuration
-             else
-               configuration_at_version(version)
-             end
+
+    config = configuration(version: version)
     return nil if config.nil?
 
-    validation_errors = run_schema_validation(config)
-    return validation_errors unless validation_errors == []
+    run_schema_validation(config)
+  end
 
-    validation_errors
+  def version_hash(version: nil)
+    if version == :locked
+      return nil unless locked?
+      locked_version
+    else
+      GitConfigRepository.new.current_version
+    end
   end
 
   def lock_configuration!
@@ -268,6 +271,7 @@ JOIN
   def configuration(version: nil)
     version ||= locked? ? :locked : :current
     if version == :locked
+      return nil unless locked?
       locked_configuration
     elsif version == :current
       current_configuration
@@ -295,10 +299,9 @@ JOIN
   protected
 
   def run_schema_validation(config)
-    validator = SchemaValidation::StudyValidator.new
     return nil if config.nil?
 
-    validator.validate(config)
+    SchemaValidation::StudyValidator.new.validate(config)
   end
 
   # Notes://<server>/<replica id>/<view id>/<document unid>

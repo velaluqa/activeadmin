@@ -140,9 +140,12 @@ JOIN
   # @param version [Symbol, String] which version to get
   # @return [Array] the tqc spec for the required series
   def tqc_spec(version: nil)
-    return [] unless study.semantically_valid?
-    return [] unless visit.required_series_spec[name].is_a?(Hash)
-    visit.required_series_spec[name]['tqc']
+    return [] unless study.semantically_valid?(version: version)
+
+    required_series_spec = visit.required_series_spec(version: version)[name]
+    return [] unless required_series_spec.is_a?(Hash)
+
+    required_series_spec['tqc']
   end
 
   def tqc_spec_with_results(version: nil)

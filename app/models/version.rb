@@ -51,6 +51,10 @@ class Version < PaperTrail::Version
     (item_type LIKE 'ImageSeries' AND item_id IN
       (SELECT id FROM image_series WHERE image_series.patient_id IN
         (SELECT id FROM patients WHERE patients.center_id = :center_id))) OR
+    (item_type LIKE 'RequiredSeries' AND item_id IN
+      (SELECT id FROM required_series WHERE required_series.visit_id IN
+        (SELECT id FROM visits WHERE visits.patient_id IN
+          (SELECT id FROM patients WHERE patients.center_id = :center_id)))) OR
     (item_type LIKE 'Image' AND item_id IN
       (SELECT id FROM images WHERE images.image_series_id IN
         (SELECT id FROM image_series WHERE image_series.patient_id IN
@@ -63,6 +67,9 @@ WHERE
       (SELECT id FROM visits WHERE visits.patient_id = :patient_id)) OR
     (item_type LIKE 'ImageSeries' AND item_id IN
       (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)) OR
+    (item_type LIKE 'RequiredSeries' AND item_id IN
+      (SELECT id FROM required_series WHERE required_series.visit_id IN
+        (SELECT id FROM visits WHERE visits.patient_id = :patient_id))) OR
     (item_type LIKE 'Image' AND item_id IN
       (SELECT id FROM images WHERE images.image_series_id IN
         (SELECT id FROM image_series WHERE image_series.patient_id = :patient_id)))
@@ -72,6 +79,8 @@ WHERE
     (item_type LIKE 'Visit' AND item_id = :visit_id) OR
     (item_type LIKE 'ImageSeries' AND item_id IN
       (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)) OR
+    (item_type LIKE 'RequiredSeries' AND item_id IN
+      (SELECT id FROM required_series WHERE required_series.visit_id = :visit_id)) OR
     (item_type LIKE 'Image' AND item_id IN
       (SELECT id FROM images WHERE images.image_series_id IN
         (SELECT id FROM image_series WHERE image_series.visit_id = :visit_id)))
@@ -79,6 +88,8 @@ WHERE
   # TODO: #3353 - Use Version#image_series_id: association_chain.where(image_series_id: params[:audit_trail_view_id])
   scope :for_image_series, -> (image_series_id) { where(<<WHERE.strip_heredoc, image_series_id: image_series_id) }
     (item_type LIKE 'ImageSeries' AND item_id = :image_series_id) OR
+    (item_type LIKE 'RequiredSeries' AND item_id IN
+      (SELECT id FROM required_series WHERE required_series.image_series_id = :image_series_id)) OR
     (item_type LIKE 'Image' AND item_id IN
       (SELECT id FROM images WHERE images.image_series_id = :image_series_id))
 WHERE

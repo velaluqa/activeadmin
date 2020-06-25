@@ -20,15 +20,17 @@ Feature: Center Audit Trail
       | patient | FooPatient |
       | visit   |      10000 |
     And an image for image series "Foo"
+    And a required series "SPECT" for visit "10000" with:
+      | image_series | Foo |
 
   Scenario: Center-specific Audit Trail
     When I sign in as a user with role "Test Role"
     And I browse to center "FooCenter"
     And I click link "Audit Trail" in "#title_bar"
-    Then I see "Image Image #"
+    Then I see "RequiredSeries 100FooPatient#10000 SPECT"
+    And I see "Image Image #"
     And I see "ImageSeries Foo"
     And I see "Visit 100FooPatient#10000"
     And I see "Patient 100FooPatient"
     And I see "Center 100 - FooCenter"
     And I don't see "Study FooStudy"
-

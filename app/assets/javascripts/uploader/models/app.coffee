@@ -131,8 +131,8 @@ class ImageUploader.Models.App extends Backbone.Model
                 # ignore warnings here
         Promise.all([seriesCompleted..., uploadQueue.start()])
       .then =>
-        someWarnings = @imageSeries.some (series) -> series.hasWarnings()
-        if someWarnings
+        hasErrors = @imageSeries.some (series) -> series.hasErrors()
+        if hasErrors
           bootbox.alert('Something went wrong with the upload. Please check the error messages.')
         else
           bootbox.alert('Upload complete!')

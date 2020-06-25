@@ -98,20 +98,18 @@ ActiveAdmin.register Visit do
     column :description
     column :visit_type
     column :visit_date, sortable: false
-    if(can? :read_qc, Visit or (not Rails.application.config.is_erica_remote))
-      column :state, :sortable => :state do |visit|
-        next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
-
-        case(visit.state_sym)
-        when :incomplete_na then status_tag('Incomplete, not available')
-        when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', class: 'ok')
-        when :incomplete_queried then status_tag('Incomplete, queried', class: 'warning')
-        when :complete_tqc_pending then status_tag('Complete, tQC not finished', class: 'warning')
-        when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', class: 'error')
-        end
+    column :state, :sortable => :state do |visit|
+      case(visit.state_sym)
+      when :incomplete_na then status_tag('Incomplete, not available')
+      when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
+      when :incomplete_queried then status_tag('Incomplete, queried', :warning)
+      when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
+      when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', :error)
       end
+    end
+    if can? :read_mqc, Visit
       column 'mQC State', :mqc_state, :sortable => :mqc_state do |visit|
-        next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
+        next unless can? :read_mqc, visit
 
         case(visit.mqc_state_sym)
         when :pending then status_tag('Pending')
@@ -120,14 +118,15 @@ ActiveAdmin.register Visit do
         end
       end
       column 'mQC Date', :mqc_date do |visit|
-        next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
+        next unless can? :read_mqc, visit
 
         pretty_format(visit.mqc_date)
       end
       column 'mQC User', :mqc_user, :sortable => :mqc_user_id do |visit|
-        next unless (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
+        next unless can? :read_mqc, visit
+        next if visit.mqc_user.nil?
 
-        link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user)) unless visit.mqc_user.nil?
+        link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user))
       end
     end
     keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
@@ -142,16 +141,16 @@ ActiveAdmin.register Visit do
       row :description
       row :visit_type
       row :visit_date
-      if(can? :read_qc, visit or (not Rails.application.config.is_erica_remote))
-        row :state do
-          case(visit.state_sym)
-          when :incomplete_na then status_tag('Incomplete, not available')
-          when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', class: 'ok')
-          when :incomplete_queried then status_tag('Incomplete, queried', class: 'warning')
-          when :complete_tqc_pending then status_tag('Complete, tQC not finished', class: 'warning')
-          when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', class: 'error')
-          end
+      row :state do
+        case(visit.state_sym)
+        when :incomplete_na then status_tag('Incomplete, not available')
+        when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
+        when :incomplete_queried then status_tag('Incomplete, queried', :warning)
+        when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
+        when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', :error)
         end
+      end
+      if can? :read_mqc, visit
         row 'mQC State' do
           case(visit.mqc_state_sym)
           when :pending then status_tag('Pending')
@@ -170,32 +169,13 @@ ActiveAdmin.register Visit do
       row :image_storage_path
     end
 
-    required_series_objects = visit.required_series_objects
-    unless(params[:order].blank?)
-      split_position = params[:order].rindex('_')
-
-      unless(split_position.nil?)
-        key, direction = params[:order][0..split_position-1], params[:order][split_position+1..-1]
-
-        if(['name', 'image_series_id', 'tqc_date', 'tqc_user_id', 'tqc_state'].include?(key))
-          required_series_objects.sort! do |a, b|
-            a_val = a.instance_variable_get('@'+key)
-            b_val = b.instance_variable_get('@'+key)
-
-            if(a_val.nil? and b_val.nil?)
-              0
-            elsif(a_val.nil?)
-              -1
-            elsif(b_val.nil?)
-              1
-            else
-              a_val <=> b_val
-            end
-          end
-          required_series_objects.reverse! if (direction == 'desc')
-        end
+    _, order, direction = params[:order].andand.match(/^(.+)_(.+)/).to_a
+    required_series =
+      if order.present?
+        visit.required_series.order(order => direction)
+      else
+        visit.required_series
       end
-    end
 
     panel 'Required Series' do
       if !visit.study.semantically_valid?
@@ -206,8 +186,16 @@ ActiveAdmin.register Visit do
         text_node "Assigned visit type not found in study configuration. Maybe the study configuration changed in the meantime. Reassign a valid visit type to manage required series."
       elsif !visit.required_series_available?
         text_node "The study configuration does not provide any required series for this visit type."
+      elsif required_series.empty?
+        text_node "No required series found."
       else
-        render :partial => 'admin/visits/required_series', :locals => {:visit => visit, :required_series => required_series_objects, :qc_result_access => (can? :read_qc, visit or (not Rails.application.config.is_erica_remote))} unless required_series_objects.empty?
+        render(
+          partial: 'admin/visits/required_series',
+          locals: {
+            visit: visit,
+            required_series: required_series
+          }
+        )
       end
     end
 
@@ -271,11 +259,11 @@ ActiveAdmin.register Visit do
     column :created_at
     column :updated_at
     column :description
-    column('State') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.state_sym : ''}
-    column('Mqc Date') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.mqc_date : ''}
-    column('Mqc State') {|v| (can? :read_qc, v or (not Rails.application.config.is_erica_remote)) ? v.mqc_state_sym : ''}
-    column('Patient') {|v| v.patient.nil? ? '' : v.patient.name}
-    column('Visit Date') {|v| v.visit_date}
+    column('State') { |v| can?(:read_mqc, v) ? v.state_sym : '' }
+    column('Mqc Date') { |v| can?(:read_mqc, v) ? v.mqc_date : '' }
+    column('Mqc State') { |v| can?(:read_mqc, v) ? v.mqc_state_sym : '' }
+    column('Patient') { |v| v.patient.nil? ? '' : v.patient.name }
+    column('Visit Date') { |v| v.visit_date }
   end
 
   # filters
@@ -417,11 +405,7 @@ ActiveAdmin.register Visit do
 
   member_action :mqc_results, :method => :get do
     @visit = Visit.find(params[:id])
-    if(Rails.application.config.is_erica_remote)
-      authorize! :read_qc, @visit
-    else
-      authorize! :mqc, @visit unless can? :manage, @visit
-    end
+    authorize! :read_mqc, @visit
 
     mqc_version = @visit.mqc_version
     @mqc_spec = @visit.mqc_spec_with_results_at_version(mqc_version)
@@ -436,7 +420,7 @@ ActiveAdmin.register Visit do
   end
   member_action :mqc, :method => :post do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    authorize! :perform_mqc, @visit
 
     unless([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(@visit.state_sym))
       flash[:error] = 'mQC cannot be performed for a visit in this state.'
@@ -461,7 +445,7 @@ ActiveAdmin.register Visit do
   end
   member_action :mqc_form, :method => :get do
     @visit = Visit.find(params[:id])
-    authorize! :mqc, @visit unless can? :manage, @visit
+    authorize! :perform_mqc, @visit
 
     unless([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(@visit.state_sym))
       flash[:error] = 'mQC cannot be performed for a visit in this state.'
@@ -479,14 +463,12 @@ ActiveAdmin.register Visit do
     @page_title = "Perform mQC"
     render 'admin/visits/mqc_form'
   end
-  action_item :edit, :only => :show do
-    link_to('Perform mQC', mqc_form_admin_visit_path(resource)) if([:complete_tqc_passed, :complete_tqc_issues, :incomplete_na].include?(resource.state_sym) and (can? :mqc, resource or can? :manage, resource))
+  action_item :edit, only: :show, if: -> { resource.ready_for_mqc? && can?(:perform_mqc, resource) } do
+    link_to('Perform mQC', mqc_form_admin_visit_path(resource))
   end
-  action_item :edit, :only => :show do
-    link_to('mQC Results', mqc_results_admin_visit_path(resource)) if(resource.mqc_state_sym != :pending and (
-                                                                        (Rails.application.config.is_erica_remote and can? :read_qc, resource) or
-                                                                        (can? :mqc, resource or can? :manage, resource))
-                                                                     )
+
+  action_item :edit, only: :show, if: -> { resource.has_mqc_results? && can?(:read_mqc, resource) } do
+    link_to('mQC Results', mqc_results_admin_visit_path(resource))
   end
 
   member_action :edit_state, :method => :post do
@@ -502,6 +484,7 @@ ActiveAdmin.register Visit do
     end
     redirect_to params[:return_url]
   end
+
   member_action :edit_state_form, :method => :get do
     @visit = Visit.find(params[:id])
     authorize! :update_state, @visit

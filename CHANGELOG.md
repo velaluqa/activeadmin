@@ -6,6 +6,82 @@
 
 * Update Rails to 5.2 and adjust all remaining dependencies
 
+## 7.0.17
+
+### Fixed
+
+* <[ERICA-5](https://jira.pharmtrace.com/browse/ERICA-5)> Fix batch
+  action permissions for image series assign visit and assign patient
+* <[ERICA-11](https://jira.pharmtrace.com/browse/ERICA-11)> Show
+  required series in audit trail when filtered by resource
+* <[ERICA-12](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-12)>
+  Show link to visit for required series in audit trail
+* <[ERICA-19](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-19)>
+  Fix sort order of required series on show visit page
+* <[ERICA-21](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-21)>
+  Fix permissions for medical assessment
+
+## 7.0.16
+
+### DevOps
+
+* Pass encrypted password to `erica:seed:root_user`
+* Add `erica:helper:generate_encrypted_password` task
+
+## 7.0.15
+
+### Internal
+
+* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Add
+  `dry_run` parameter to configuration consolidation operation (this
+  helps identifying problematic destructive operations due to
+  oversight and can be integrated into the UI later on)
+
+## 7.0.14
+
+### Fixed
+
+* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Fix
+  consolidating to `locked` configuration in worker
+
+## 7.0.13
+
+### Fixed
+
+* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Reset
+  medical quality control results when a new mQC specification is
+  locked for a study
+
+## 7.0.12
+
+### Fixed
+
+* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Fix
+  consolidation of visit types, required series and technical qc
+  results after locking the study configuration at a specific version
+* Fix passing down correct version parameter to retrieve the correct
+  study configuration (affects Upload of Study Configuration)
+
+### Patches
+
+* <devops> Display basic database user information upon start up for debugging
+* <devops> Add optional `email` and `password` parameters to rake task
+  `erica:seed:root_user[:username, :email, :password]`
+
+## 7.0.11
+
+### Fixed
+
+* <DEVOPS> Fix checking availability of PostGres database in `docker-entrypoint.sh`
+* <ERICA-9> Fix Image Upload for missing `Series Date` in DICOM files
+  by falling back to `ContentDate` or `AquisitionDate`
+
+## 7.0.10
+
+### Fixed
+
+* <ERICA-6> Allow upload of unparsable DICOM files (e.g. for embedded PDF data)
+
 ## 7.0.9
 
 ### Fixed

@@ -171,7 +171,7 @@ body.admin_image_upload {
 	}
       }
 
-      tr.image-series:hover {
+      tr:hover {
 	background-color: rgba(#000, 0.05);
       }
 
@@ -213,9 +213,7 @@ body.admin_image_upload {
       }
 
       td.warnings {
-	padding: 10px 15px !important;
-
-	a { color: #dd3333; }
+        padding: 10px 15px !important;
       }
 
       td.required-series {
@@ -263,7 +261,31 @@ body.admin_image_upload {
     }
 
     tr.has-warnings {
-      background-color: rgba(#a00, 0.1);
+      background-color: rgba(#e90, 0.25);
+
+      td.warnings {
+        a { color: #d0b323; }
+      }
+
+      &:hover {
+        background-color: rgba(#e90, 0.35);
+      }
+
+      &> td.warnings a {
+        display: block;
+      }
+    }
+
+    tr.has-errors {
+      background-color: rgba(#a00, 0.25) !important;
+
+      td.warnings {
+        a { color: #dd3333; }
+      }
+
+      &:hover {
+        background-color: rgba(#a00, 0.35) !important;
+      }
 
       &> td.warnings a {
         display: block;

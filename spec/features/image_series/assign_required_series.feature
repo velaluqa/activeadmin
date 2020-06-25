@@ -1,3 +1,4 @@
+@js
 Feature: Assign Required Series
   In order to mark an image series for quality control,
   As authorized user that can assign required series,

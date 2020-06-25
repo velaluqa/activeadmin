@@ -26,14 +26,16 @@ Feature: Perform Technical Quality Control
       | patient    | TestPatient |
       | visit_type | baseline    |
     And an image_series "TestSeries" with:
-      | patient     | TestPatient |
-      | image_count | 5           |
-    And image_series "TestSeries" is assigned to visit "10000" and required_series "SPECT_1"
+      | image_count |              1 |
+      | patient     |    TestPatient |
+      | visit       |          10000 |
+      | state       | visit_assigned |
+    And visit "10000" has required series "SPECT_1" assigned to "TestSeries"
     And a role "Image Manager" with permissions:
-      | Study   | read                 |
-      | Center  | read, update         |
-      | Patient | read, update, create |
-      | Visit   | read, perform_tqc    |
+      | Study   | read                        |
+      | Center  | read, update                |
+      | Patient | read, update, create        |
+      | Visit   | read, perform_tqc, read_tqc |
 
   Scenario: Not logged in
     When I browse to tqc_form visit "10000"

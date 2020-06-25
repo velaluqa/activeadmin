@@ -78,7 +78,7 @@ class User < ApplicationRecord
   validates :username, uniqueness: true, presence: true
   validates :name, uniqueness: true, presence: true
   validates :email, uniqueness: true, presence: true, email: true
-  validates :password, confirmation: true, length: { minimum: 6 }, on: :create
+  validates :password, confirmation: true, length: { minimum: 6 }, if: -> { encrypted_password.blank? }, on: :create
   validates :password, confirmation: true, length: { minimum: 6 }, on: :update, allow_blank: true
   validates :signature_password, confirmation: true, length: { minimum: 6 }, on: :create, allow_blank: true
 

@@ -76,6 +76,9 @@ module ValidationReport
     private
     def comparison_hash(turnip_feature)
       hash = { steps: [], examples: [] }
+
+      return hash if turnip_feature.blank? || turnip_feature.children.blank?
+
       turnip_feature.children.select do |child|
         if child.is_a?(Turnip::Node::Background)
           hash[:steps] += child.steps
