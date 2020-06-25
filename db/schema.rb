@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2017_09_21_102504) do
+ActiveRecord::Schema.define(version: 2020_06_24_093541) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -149,6 +149,8 @@ ActiveRecord::Schema.define(version: 2017_09_21_102504) do
     t.integer "image_series_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string "mimetype"
+    t.string "sha256sum"
     t.index ["image_series_id"], name: "index_images_on_image_series_id"
   end
 

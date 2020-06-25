@@ -37,7 +37,11 @@ ActiveAdmin.register Image do
     selectable_column
     column :image_series
     column :id
-    column 'File' do |image|
+    column 'Type', sortable: "mimetype" do |image|
+      type = MimeMagic::TYPES[image.mimetype]
+      status_tag(type[2])
+    end
+    column 'Status' do |image|
       if image.file_is_present?
         status_tag('Present', class: 'ok')
       else
@@ -53,6 +57,21 @@ ActiveAdmin.register Image do
       row :image_series
       row :id
       row :image_storage_path
+      row 'Type' do
+        type = MimeMagic::TYPES[image.mimetype]
+        status_tag(type.andand[2])
+      end
+      row 'SHA256 checksum' do
+        if image.file_is_present?
+          sha256sum =
+            File.open(image.absolute_image_storage_path, 'rb') do |f|
+              Digest::SHA256.hexdigest(f.read)
+            end
+          status_tag(image.sha256sum, image.sha256sum == sha256sum ? :ok : :error)
+        else
+          status_tag('Missing file', :error)
+        end
+      end
       row 'File' do
         if image.file_is_present?
           status_tag('Present', class: 'ok')
@@ -71,7 +90,7 @@ ActiveAdmin.register Image do
   end
 
   action_item :edit, only: :show do
-    link_to('DICOM Metadata', dicom_metadata_admin_image_path(resource)) if resource.file_is_present?
+    link_to('DICOM Metadata', dicom_metadata_admin_image_path(resource)) if resource.dicom?
   end
 
   action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do

@@ -28,13 +28,13 @@ require 'git_config_repository'
 #
 # ### Indexes
 #
-# * `index_visits_on_mqc_results`:
+# * `index_visits_on_mqc_results` (_using_ gin):
 #     * **`mqc_results`**
 # * `index_visits_on_mqc_user_id`:
 #     * **`mqc_user_id`**
-# * `index_visits_on_old_assigned_image_series_index`:
+# * `index_visits_on_old_assigned_image_series_index` (_using_ gin):
 #     * **`old_assigned_image_series_index`**
-# * `index_visits_on_old_required_series`:
+# * `index_visits_on_old_required_series` (_using_ gin):
 #     * **`old_required_series`**
 # * `index_visits_on_patient_id`:
 #     * **`patient_id`**

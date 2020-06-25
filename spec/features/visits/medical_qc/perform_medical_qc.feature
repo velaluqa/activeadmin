@@ -58,7 +58,9 @@ Feature: Perform Medical Quality Control
   Scenario: Success; Medical QC positive
     Given I sign in as a user with role "Image Manager"
     When I browse to show visit "10000"
-    Then I see "SPECT TESTSERIES PASSED"
+    Then I see a row with "SPECT" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     When I click link "Perform mQC"
     Then I see "Perform mQC"
     When I select "Pass" from "Acceptable?"
@@ -68,7 +70,9 @@ Feature: Perform Medical Quality Control
   Scenario: Success; Medical QC negative
     Given I sign in as a user with role "Image Manager"
     When I browse to show visit "10000"
-    Then I see "SPECT TESTSERIES PASSED"
+    Then I see a row with "SPECT" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     When I click link "Perform mQC"
     Then I see "Perform mQC"
     When I select "Fail" from "Acceptable?"

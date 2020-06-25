@@ -169,7 +169,9 @@ Feature: Lock Study Configuration
       | modality | passed |
     And I browse to visit "40000"
     Then I see "Visit Type followup"
-    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     And I see "SPECT_2"
     And study "TestStudy" has configuration
       """
@@ -192,7 +194,9 @@ Feature: Lock Study Configuration
     When I wait for all jobs in "ConsolidateStudyConfigurationForStudyWorker" queue
     And I browse to visit "40000"
     Then I see "Visit Type followup"
-    And I see "SPECT_1 TESTSERIES PENDING"
+    And I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PENDING    |
     And I see "SPECT_2"
 
   Scenario: Technical Quality Control Specification Did Not Change
@@ -207,7 +211,9 @@ Feature: Lock Study Configuration
       | modality | passed |
     And I browse to visit "40000"
     Then I see "Visit Type followup"
-    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     And I see "SPECT_2"
     And study "TestStudy" has configuration
       """
@@ -230,7 +236,9 @@ Feature: Lock Study Configuration
     When I wait for all jobs in "ConsolidateStudyConfigurationForStudyWorker" queue
     And I browse to visit "40000"
     Then I see "Visit Type followup"
-    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     And I see "SPECT_2"
     
   Scenario: Medical Quality Control Specification Changed
@@ -248,7 +256,9 @@ Feature: Lock Study Configuration
     And I browse to visit "40000"
     Then I see "Visit Type followup"
     And I see "M Qc State PERFORMED, PASSED"
-    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     And I see "SPECT_2"
     And study "TestStudy" has configuration
       """
@@ -276,7 +286,9 @@ Feature: Lock Study Configuration
     And I browse to visit "40000"
     Then I see "Visit Type followup"
     And I see "M Qc State PENDING"
-    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     And I see "SPECT_2"
 
   Scenario: Medical Quality Control Specification Did Not Change
@@ -294,7 +306,9 @@ Feature: Lock Study Configuration
     And I browse to visit "40000"
     Then I see "Visit Type followup"
     And I see "M Qc State PERFORMED, PASSED"
-    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     And I see "SPECT_2"
     And study "TestStudy" has configuration
       """
@@ -322,5 +336,7 @@ Feature: Lock Study Configuration
     And I browse to visit "40000"
     Then I see "Visit Type followup"
     And I see "M Qc State PERFORMED, PASSED"
-    And I see "SPECT_1 TESTSERIES PASSED"
+    And I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     And I see "SPECT_2"

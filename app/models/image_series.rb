@@ -284,6 +284,14 @@ JOIN
     @force_update = val
   end
 
+  def has_dicom?
+    images.pluck(:mimetype).include?('application/dicom')
+  end
+
+  def mime_extensions
+    images.map(&:mime_extension).uniq.compact
+  end
+
   protected
 
   def properties_to_domino

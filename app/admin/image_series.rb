@@ -163,8 +163,16 @@ ActiveAdmin.register ImageSeries do
     column :name
     column :imaging_date
     column 'Import Date', :created_at
-    column :images do |image_series|
-      link_to('List', admin_images_path(:'q[image_series_id_eq]' => image_series.id))
+    column :files do |image_series|
+      link_to("#{image_series.images.count} #{"file".pluralize(image_series.images.count)}", admin_images_path(:'q[image_series_id_eq]' => image_series.id))
+    end
+    column :image_types do |image_series|
+      extensions = image_series.mime_extensions
+      if extensions.present?
+        status_tag(extensions.join(', '))
+      else
+        status_tag('NONE')
+      end
     end
     column :state, :sortable => :state do |image_series|
       case image_series.state_sym
@@ -193,7 +201,7 @@ ActiveAdmin.register ImageSeries do
       result = ''
 
       result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnlp'), :class => 'member_link')
-      result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank')
+      result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank') if image_series.has_dicom?
       result += link_to('Domino', image_series.lotus_notes_url, :class => 'member_link') unless(image_series.domino_unid.nil? or image_series.lotus_notes_url.nil? or Rails.application.config.is_erica_remote)
       if can?(:assign_visit, image_series)
         result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
@@ -217,6 +225,14 @@ ActiveAdmin.register ImageSeries do
       domino_link_row(image_series)
       row :images do
         link_to(image_series.images.size, admin_images_path(:'q[image_series_id_eq]' => image_series.id))
+      end
+      row :file_types do
+        extensions = image_series.mime_extensions
+        if extensions.present?
+          status_tag(extensions.join(', '))
+        else
+          status_tag('NONE')
+        end
       end
       row :image_storage_path
       row :imaging_date
@@ -455,7 +471,7 @@ ActiveAdmin.register ImageSeries do
     render 'admin/images/dicom_metadata'
   end
   action_item :edit, :only => :show do
-    link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(resource)) unless resource.images.empty?
+    link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(resource)) if resource.has_dicom?
   end
 
   collection_action :batch_assign_to_patient, :method => :post do

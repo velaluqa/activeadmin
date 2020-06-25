@@ -67,3 +67,4 @@ Feature: Download Visit Images
     When I click link "Download"
     Then I download zip file
     # TODO: Test zip file content
+

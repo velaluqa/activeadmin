@@ -8,6 +8,10 @@ table_for required_series, sortable: true, class: 'index_table index' do
       status_tag('Missing', class: 'error')
     end
   end
+  column :file_types do |required_series|
+    extensions = required_series.assigned_image_series.andand.mime_extensions
+    status_tag(extensions.join(', ')) if extensions.present?
+  end
   if can?(:read_tqc, visit)
     column 'tQC State', :tqc_state, :sortable => :tqc_state do |required_series|
       case required_series.tqc_state
@@ -39,7 +43,8 @@ table_for required_series, sortable: true, class: 'index_table index' do
       result += link_to('View tQC results', tqc_results_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link')
     end
     result += link_to('Open Viewer', viewer_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') unless required_series.assigned_image_series.nil?
-    result += link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') unless(required_series.assigned_image_series.nil? or required_series.assigned_image_series.images.empty?)
+    result += link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') if required_series.assigned_image_series.andand.has_dicom?
+
     result += link_to('Domino', required_series.lotus_notes_url, :class => 'member_link') unless(required_series.domino_unid.blank?)
 
     result.html_safe

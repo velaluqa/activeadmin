@@ -57,7 +57,9 @@ Feature: Read Technical Quality Control Results
       | Visit   | read, read_tqc       |
     And I sign in as a user with role "Image Manager"
     When I browse to show visit "10000"
-    Then I see "SPECT_1 TESTSERIES PASSED"
+    Then I see a row with "SPECT_1" and the following columns:
+      | Assigned Image Series | TESTSERIES |
+      | tQC State             | PASSED     |
     And I see "View tQC results"
     When I click link "View tQC results"
     Then I see "tQC results for SPECT_1"

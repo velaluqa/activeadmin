@@ -35,8 +35,19 @@ class ImageUploader.Models.Image extends Backbone.Model
   initialize: ->
     @warnings = {}
 
+
+  isDicom: (byteArray) =>
+    sub = ""
+    sub += String.fromCharCode(byteArray[i]) for i in [128...132]
+    sub == "DICM"
+
   parse: (file) ->
     @file = file
+
+    console.log(file)
+
+    # if file.type is "image/"
+    # else if file.type is "application/pdf"
 
     reader = new FileReader()
     reader.onload = =>
@@ -45,39 +56,44 @@ class ImageUploader.Models.Image extends Backbone.Model
       kb = byteArray.length / 1024
       mb = kb / 1024
       byteStr = if mb > 1 then "#{mb.toFixed(3)} MB" else "#{kb.toFixed(0)} KB"
-
       @set fileSize: byteStr
 
-      dataSet = null
-      try
-        start = new Date().getTime()
-        dataSet = dicomParser.parseDicom(byteArray)
-        end = new Date().getTime()
-        console.log dataSet
-        if dataSet.warnings.length > 0
-          @pushWarnings('parsing', dataSet.warnings)
-        else
-          @pushWarnings('parsing', ['No DICOM pixeldata']) unless dataSet.elements.x7fe00010
+      if @isDicom(byteArray)
+        dataSet = null
+        try
+          start = new Date().getTime()
+          dataSet = dicomParser.parseDicom(byteArray)
+          end = new Date().getTime()
+
+          if dataSet.warnings.length > 0
+            @pushWarnings('parsing', dataSet.warnings)
+          else
+            @pushWarnings('parsing', ['No DICOM pixeldata']) unless dataSet.elements.x7fe00010
+          @set
+            state: 'parsed'
+            parseTime: (end - start)
+            sopInstanceUid: dataSet.string('x00080018')
+            seriesInstanceUid: dataSet.string('x0020000e')
+            seriesDescription: dataSet.string('x0008103e')
+            seriesNumber: dataSet.string('x00200011')
+            seriesDateTime: @parseDateTime(dataSet, 'seriesDate', warnIfMissing: false)
+            acquisitionDateTime: @parseDateTime(dataSet, 'acquisitionDate')
+            contentDateTime: @parseDateTime(dataSet, 'contentDate')
+            patient:
+              name: dataSet.string('x00100010')
+              id: dataSet.string('x00100020')
+              birthDate: dataSet.string('x00100030')
+              sex: dataSet.string('x00100040')
+        catch error
+          console.log error
+          @set
+            state: 'parsing failed'
+            warnings: error
+      else
         @set
           state: 'parsed'
-          parseTime: (end - start)
-          sopInstanceUid: dataSet.string('x00080018')
-          seriesInstanceUid: dataSet.string('x0020000e')
-          seriesDescription: dataSet.string('x0008103e')
-          seriesNumber: dataSet.string('x00200011')
-          seriesDateTime: @parseDateTime(dataSet, 'seriesDate', warnIfMissing: false)
-          acquisitionDateTime: @parseDateTime(dataSet, 'acquisitionDate')
-          contentDateTime: @parseDateTime(dataSet, 'contentDate')
-          patient:
-            name: dataSet.string('x00100010')
-            id: dataSet.string('x00100020')
-            birthDate: dataSet.string('x00100030')
-            sex: dataSet.string('x00100040')
-      catch error
-        console.log error
-        @set
-          state: 'parsing failed'
-          warnings: error
+          seriesDescription: file.name
+          contentDateTime: file.lastModifiedDate
 
     reader.readAsArrayBuffer(file)
 

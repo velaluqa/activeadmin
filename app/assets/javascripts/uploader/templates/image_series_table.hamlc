@@ -3,8 +3,8 @@
     %tr
       %th.collapsible
       %th.name Series Name
-      %th.image-count Images
-      %th.datetime Imaging Date
+      %th.image-count Files
+      %th.datetime Date
       %th
       %th.upload-flag
         %input#mark-all-for-upload{ type: 'checkbox', name: 'mark-all-for-upload' }

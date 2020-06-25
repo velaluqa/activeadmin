@@ -6,8 +6,9 @@ class ImageUploader.Collections.ImageSeries extends Backbone.Collection
     naturalSort(model1.attributes.name, model2.attributes.name)
 
   findOrCreate: (options = {}) ->
-    series = @findWhere(instanceUid: options.instanceUid)
-    return series if series?
+    if options.instanceUid?
+      series = @findWhere(instanceUid: options.instanceUid)
+      return series if series?
 
     options.name = "Unnamed" unless options.name?
 

@@ -13,6 +13,8 @@ require 'tempfile'
 # **`created_at`**       | `datetime`         |
 # **`id`**               | `integer`          | `not null, primary key`
 # **`image_series_id`**  | `integer`          |
+# **`mimetype`**         | `string`           |
+# **`sha256sum`**        | `string`           |
 # **`updated_at`**       | `datetime`         |
 #
 # ### Indexes
@@ -21,6 +23,9 @@ require 'tempfile'
 #     * **`image_series_id`**
 #
 class Image < ApplicationRecord
+  class DicomReadError < StandardError; end
+  class DicomWriteError < StandardError; end
+
   has_paper_trail(
     class_name: 'Version',
     meta: {
@@ -95,9 +100,24 @@ JOIN
       tmp.write(file)
       tmp.close
 
-      tmp_dicom = DICOM::DObject.read(tmp.path)
-      tmp_dicom.patients_name = "#{image_series.patient.name}"
-      tmp_dicom.write(absolute_image_storage_path)
+      # TODO: Create PORO DicomFile.test?(path)
+      mimetype = File.open(tmp.path) { |f| MimeMagic.by_magic(f).type }
+      if mimetype == "application/dicom"
+        tmp_dicom = DICOM::DObject.read(tmp.path)
+        raise DicomReadError unless tmp_dicom.read?
+        tmp_dicom.patients_name = "#{image_series.patient.name}"
+        tmp_dicom.write(absolute_image_storage_path)
+        raise DicomWriteError unless tmp_dicom.written?
+      else
+        FileUtils.cp(tmp.path, absolute_image_storage_path)
+      end
+
+      self.mimetype = mimetype
+      self.sha256sum =
+        File.open(absolute_image_storage_path, 'rb') do |f|
+          Digest::SHA256.hexdigest(f.read)
+        end
+      save!
     ensure
       tmp.close
       tmp.unlink
@@ -163,6 +183,15 @@ JOIN
     case event_symbol
     when :image_series_change then ['Image Series Change', :ok]
     end
+  end
+
+  def dicom?
+    mimetype == "application/dicom"
+  end
+
+  def mime_extension
+    return nil unless mimetype
+    MimeMagic::TYPES[mimetype][0].first
   end
 
   protected

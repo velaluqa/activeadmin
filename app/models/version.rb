@@ -4,17 +4,18 @@
 #
 # ### Columns
 #
-# Name                  | Type               | Attributes
-# --------------------- | ------------------ | ---------------------------
-# **`created_at`**      | `datetime`         |
-# **`event`**           | `string`           | `not null`
-# **`id`**              | `integer`          | `not null, primary key`
-# **`item_id`**         | `integer`          | `not null`
-# **`item_type`**       | `string`           | `not null`
-# **`object`**          | `jsonb`            |
-# **`object_changes`**  | `jsonb`            |
-# **`study_id`**        | `integer`          |
-# **`whodunnit`**       | `string`           |
+# Name                            | Type               | Attributes
+# ------------------------------- | ------------------ | ---------------------------
+# **`created_at`**                | `datetime`         |
+# **`event`**                     | `string`           | `not null`
+# **`id`**                        | `integer`          | `not null, primary key`
+# **`item_id`**                   | `integer`          | `not null`
+# **`item_type`**                 | `string`           | `not null`
+# **`migrated_required_series`**  | `boolean`          | `default(FALSE), not null`
+# **`object`**                    | `jsonb`            |
+# **`object_changes`**            | `jsonb`            |
+# **`study_id`**                  | `integer`          |
+# **`whodunnit`**                 | `string`           |
 #
 # ### Indexes
 #

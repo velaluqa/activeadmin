@@ -116,6 +116,9 @@ gem 'sidekiq-scheduler'
 # Ruby DICOM lib
 gem 'dicom'
 
+# Identify mime type by header bytes of file content instead of file extension.
+gem 'mimemagic'
+
 # Zip file creation for image download in ERICA Remote
 gem 'rubyzip'
 

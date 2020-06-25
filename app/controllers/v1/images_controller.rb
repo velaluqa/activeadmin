@@ -16,7 +16,7 @@ class V1::ImagesController < V1::ApiController
           @image.destroy
           Rails.logger.error "Failed to write uploaded image to image storage: #{e.message}"
           e.backtrace.each { |line| Rails.logger.error(line) }
-          render json: { errors: ["Failed to write uploaded file to the image storage: #{e.message}"] }, status: :internal_server_error
+          render json: { errors: ["Error writing file to the image storage: #{e.message}"] }, status: :internal_server_error
           return
         end
         render json: @image.to_json, status: :created

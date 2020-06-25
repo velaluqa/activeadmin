@@ -196,6 +196,7 @@ ActiveAdmin.register Patient do
     link_to('Download images', download_images_admin_patient_path(resource)) if can? :download_images, resource
   end
 
+  # TODO: Use export_for_read as permission
   collection_action :batch_export_for_ericav1, :method => :post do
     if(params[:export_folder].blank?)
       flash[:error] = 'You have to specify an export folder.'
