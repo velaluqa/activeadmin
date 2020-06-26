@@ -7,8 +7,8 @@ FactoryBot.define do
     end
 
     trait :production do
-      state Study.state_sym_to_int(:production)
-      configuration(<<~CONFIG)
+      state { Study.state_sym_to_int(:production) }
+      configuration { <<~CONFIG }
         visit_types: {}
         image_series_properties: []
       CONFIG
