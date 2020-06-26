@@ -400,7 +400,7 @@ step 'I download zip file' do
       puts e.inspect
     end
   end
-  expect(no_downloads_el[:hidden]).to be_falsy
+  expect(no_downloads_el[:hidden]).to eq 'false'
 end
 
 step 'another window is opened' do
