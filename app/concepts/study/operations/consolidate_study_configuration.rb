@@ -13,10 +13,12 @@ class Study::ConsolidateStudyConfiguration < Trailblazer::Operation # :nodoc:
 
   def consolidate_visits(ctx, study:, dry_run:, version:, **)
     study.visits.pluck(:id).each do |visit_id|
-      result = Visit::ConsolidateStudyConfiguration.call(
-        visit_id: visit_id,
-        version: version,
-        dry_run: dry_run
+      result = Visit::ConsolidateStudyConfiguration.(
+        params: {
+          visit_id: visit_id,
+          version: version,
+          dry_run: dry_run
+        }
       )
       ctx[:changes][:added].push(*result[:changes][:added])
       ctx[:changes][:removed].push(*result[:changes][:removed])

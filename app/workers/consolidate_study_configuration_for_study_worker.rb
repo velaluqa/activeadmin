@@ -6,8 +6,10 @@ class ConsolidateStudyConfigurationForStudyWorker
   def perform(study_id, version = nil, user_id = nil)
     ::PaperTrail.whodunnit = user_id
     Study::ConsolidateStudyConfiguration.call(
-      study_id: study_id,
-      version: version
+      params: {
+        study_id: study_id,
+        version: version
+      }
     )
   ensure
     ::PaperTrail.whodunnit = nil

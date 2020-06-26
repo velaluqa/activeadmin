@@ -2,10 +2,12 @@ RSpec.describe Study::ConsolidateStudyConfiguration do
   let!(:user) { create(:user) }
   let(:dry_run) { false }
   let(:call_operation) do
-    Study::ConsolidateStudyConfiguration.call(
-      study_id: study.id,
-      version: :locked,
-      dry_run: dry_run
+    Study::ConsolidateStudyConfiguration.(
+      params: {
+        study_id: study.id,
+        version: :locked,
+        dry_run: dry_run
+      }
     )
   end
   let(:tracked_changes) { call_operation[:changes] }

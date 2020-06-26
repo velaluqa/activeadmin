@@ -11,10 +11,11 @@ class Visit::ConsolidateStudyConfiguration < Trailblazer::Operation
   # TODO: Invoke operation instead of current callback procedures.
   step(
     Wrap(
-      ->(*, &block) {
+      ->((ctx, flow_options), *, &block) {
         Visit.skip_callback(:save, :after, :update_required_series_preset)
         block.call
         Visit.set_callback(:save, :after, :update_required_series_preset)
+        true
       }
     ) {
       step :unset_obsolete_visit_type
@@ -31,6 +32,7 @@ class Visit::ConsolidateStudyConfiguration < Trailblazer::Operation
     ctx[:visit] = visit = Visit.find(params[:visit_id])
     ctx[:version] = version = params[:version]
     ctx[:version_hash] = visit.study.version_hash(version: version)
+
     true
   end
 
@@ -74,6 +76,7 @@ class Visit::ConsolidateStudyConfiguration < Trailblazer::Operation
     return true if dry_run
 
     visit.reset_mqc
+
     true
   end
 
@@ -94,6 +97,7 @@ class Visit::ConsolidateStudyConfiguration < Trailblazer::Operation
 
       visit.required_series.create(name: name)
     end
+
     true
   end
 
@@ -143,6 +147,7 @@ class Visit::ConsolidateStudyConfiguration < Trailblazer::Operation
 
       series.reset_tqc!
     end
+
     true
   end
 end
