@@ -4,7 +4,7 @@ class ConsolidateStudyConfigurationForStudyWorker
   sidekiq_options(queue: :default, retry: 5)
 
   def perform(study_id, version = nil, user_id = nil)
-    ::PaperTrail.whodunnit = user_id
+    ::PaperTrail.request.whodunnit = user_id
     Study::ConsolidateStudyConfiguration.call(
       params: {
         study_id: study_id,
@@ -12,6 +12,6 @@ class ConsolidateStudyConfigurationForStudyWorker
       }
     )
   ensure
-    ::PaperTrail.whodunnit = nil
+    ::PaperTrail.request.whodunnit = nil
   end
 end
