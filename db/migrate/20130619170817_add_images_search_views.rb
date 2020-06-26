@@ -1,4 +1,4 @@
-class AddImagesSearchViews < ActiveRecord::Migration
+class AddImagesSearchViews < ActiveRecord::Migration[4.2]
   def up
     puts ActiveRecord::Base.connection.adapter_name
     if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'

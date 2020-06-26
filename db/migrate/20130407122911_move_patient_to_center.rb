@@ -1,4 +1,4 @@
-class MovePatientToCenter < ActiveRecord::Migration
+class MovePatientToCenter < ActiveRecord::Migration[4.2]
   def up
     remove_column :patients, :session_id
     add_column :patients, :center_id, :integer

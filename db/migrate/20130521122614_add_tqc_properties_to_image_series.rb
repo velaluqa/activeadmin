@@ -1,4 +1,4 @@
-class AddTqcPropertiesToImageSeries < ActiveRecord::Migration
+class AddTqcPropertiesToImageSeries < ActiveRecord::Migration[4.2]
   def change
     add_column :image_series, :tqc_version, :string
     add_column :image_series, :tqc_date, :datetime

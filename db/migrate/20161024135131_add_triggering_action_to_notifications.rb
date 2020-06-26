@@ -1,4 +1,4 @@
-class AddTriggeringActionToNotifications < ActiveRecord::Migration
+class AddTriggeringActionToNotifications < ActiveRecord::Migration[4.2]
   def up
     add_column :notifications, :triggering_action, :string
     Notification.all.each do |notification|

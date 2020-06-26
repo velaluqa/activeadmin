@@ -1,4 +1,4 @@
-class MigrateBackgroundJobs < ActiveRecord::Migration
+class MigrateBackgroundJobs < ActiveRecord::Migration[4.2]
   def up
     unless Rails.configuration.mongoid.clients['default'].blank?
       require 'legacy/models/background_job'

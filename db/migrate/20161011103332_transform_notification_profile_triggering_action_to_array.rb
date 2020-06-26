@@ -1,4 +1,4 @@
-class TransformNotificationProfileTriggeringActionToArray < ActiveRecord::Migration
+class TransformNotificationProfileTriggeringActionToArray < ActiveRecord::Migration[4.2]
   def up
     add_column :notification_profiles, :triggering_actions, :jsonb, null: false, default: []
     NotificationProfile.all.each do |profile|

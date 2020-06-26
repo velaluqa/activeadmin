@@ -1,4 +1,4 @@
-class RemoveLegacyRolesColumns < ActiveRecord::Migration
+class RemoveLegacyRolesColumns < ActiveRecord::Migration[4.2]
   def change
     Role.destroy_all
     remove_column :roles, :subject_id, :integer, index: true

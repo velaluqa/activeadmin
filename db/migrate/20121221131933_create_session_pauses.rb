@@ -1,4 +1,4 @@
-class CreateSessionPauses < ActiveRecord::Migration
+class CreateSessionPauses < ActiveRecord::Migration[4.2]
   def change
     create_table :session_pauses do |t|
       t.datetime :start

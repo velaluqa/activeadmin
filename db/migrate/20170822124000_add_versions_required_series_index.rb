@@ -1,4 +1,4 @@
-class AddVersionsRequiredSeriesIndex < ActiveRecord::Migration
+class AddVersionsRequiredSeriesIndex < ActiveRecord::Migration[4.2]
   def change
     execute('CREATE INDEX idx_on_versions_rs_changes1 ON versions ((object ->> \'name\'))')
     execute('CREATE INDEX idx_on_versions_rs_changes2 ON versions ((object ->> \'visit_id\'))')

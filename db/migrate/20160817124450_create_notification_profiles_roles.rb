@@ -1,4 +1,4 @@
-class CreateNotificationProfilesRoles < ActiveRecord::Migration
+class CreateNotificationProfilesRoles < ActiveRecord::Migration[4.2]
   def change
     create_table :notification_profiles_roles, id: false do |t|
       t.references :notification_profile, null: false

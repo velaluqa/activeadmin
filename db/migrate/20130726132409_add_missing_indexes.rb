@@ -1,4 +1,4 @@
-class AddMissingIndexes < ActiveRecord::Migration
+class AddMissingIndexes < ActiveRecord::Migration[4.2]
   def change
     add_index :cases, :assigned_reader_id
     add_index :cases, :current_reader_id

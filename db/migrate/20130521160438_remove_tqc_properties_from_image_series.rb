@@ -1,4 +1,4 @@
-class RemoveTqcPropertiesFromImageSeries < ActiveRecord::Migration
+class RemoveTqcPropertiesFromImageSeries < ActiveRecord::Migration[4.2]
   def up
     remove_column :image_series, :tqc_version
     remove_column :image_series, :tqc_date

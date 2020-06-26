@@ -1,4 +1,4 @@
-class RemoveFormVersionFromForms < ActiveRecord::Migration
+class RemoveFormVersionFromForms < ActiveRecord::Migration[4.2]
   def up
     remove_column :forms, :form_version
   end

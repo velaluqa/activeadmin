@@ -1,4 +1,4 @@
-class AddEmailTemplateToNotificationsProfiles < ActiveRecord::Migration #:nodoc:
+class AddEmailTemplateToNotificationsProfiles < ActiveRecord::Migration[4.2]
   def up
     add_column :notification_profiles, :email_template_id, :integer
     if NotificationProfile.count > 0

@@ -1,4 +1,4 @@
-class ConvertVersionDataToJsonb < ActiveRecord::Migration
+class ConvertVersionDataToJsonb < ActiveRecord::Migration[4.2]
   def up
     add_column :versions, :new_object, :jsonb
     add_column :versions, :new_object_changes, :jsonb

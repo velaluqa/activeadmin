@@ -1,4 +1,4 @@
-class AddStudyToImagesSearchViews < ActiveRecord::Migration
+class AddStudyToImagesSearchViews < ActiveRecord::Migration[4.2]
   def up
     execute <<-SQL
       drop view if exists images_search;

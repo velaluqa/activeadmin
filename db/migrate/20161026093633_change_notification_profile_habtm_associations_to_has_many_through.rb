@@ -1,4 +1,4 @@
-class ChangeNotificationProfileHabtmAssociationsToHasManyThrough < ActiveRecord::Migration
+class ChangeNotificationProfileHabtmAssociationsToHasManyThrough < ActiveRecord::Migration[4.2]
   def up
     create_table :notification_profile_users do |t|
       t.references :notification_profile, null: false

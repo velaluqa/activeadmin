@@ -1,4 +1,4 @@
-class DropSessionPauses < ActiveRecord::Migration
+class DropSessionPauses < ActiveRecord::Migration[4.2]
   def up
     drop_table :session_pauses
   end

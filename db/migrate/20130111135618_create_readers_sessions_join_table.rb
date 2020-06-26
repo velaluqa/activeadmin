@@ -1,4 +1,4 @@
-class CreateReadersSessionsJoinTable < ActiveRecord::Migration
+class CreateReadersSessionsJoinTable < ActiveRecord::Migration[4.2]
   def change
     create_table :readers_sessions, id: false do |t|
       t.integer :user_id

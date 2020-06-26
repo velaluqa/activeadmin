@@ -1,4 +1,4 @@
-class CreateHistoricReportCacheEntries < ActiveRecord::Migration
+class CreateHistoricReportCacheEntries < ActiveRecord::Migration[4.2]
   def change
     create_table :historic_report_cache_entries do |t|
       t.references :historic_report_query, null: false, index: true

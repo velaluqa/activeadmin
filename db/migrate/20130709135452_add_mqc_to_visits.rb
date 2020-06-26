@@ -1,4 +1,4 @@
-class AddMqcToVisits < ActiveRecord::Migration
+class AddMqcToVisits < ActiveRecord::Migration[4.2]
   def change
     add_column :visits, :mqc_date, :datetime
     add_column :visits, :mqc_user_id, :integer

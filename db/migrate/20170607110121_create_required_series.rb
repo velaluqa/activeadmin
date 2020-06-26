@@ -1,4 +1,4 @@
-class CreateRequiredSeries < ActiveRecord::Migration
+class CreateRequiredSeries < ActiveRecord::Migration[4.2]
   def change
     create_table :required_series do |t|
       t.references :visit, null: false

@@ -1,4 +1,4 @@
-class CreateBackgroundJobs < ActiveRecord::Migration
+class CreateBackgroundJobs < ActiveRecord::Migration[4.2]
   def change
     create_table :background_jobs do |t|
       t.string :legacy_id
@@ -9,7 +9,7 @@ class CreateBackgroundJobs < ActiveRecord::Migration
       t.datetime :completed_at
       t.boolean :successful
       t.text :error_message
-      t.jsonb :results, null: false, default: '{}'
+      t.jsonb :results, null: false, default: {}
 
       t.timestamps null: true
     end

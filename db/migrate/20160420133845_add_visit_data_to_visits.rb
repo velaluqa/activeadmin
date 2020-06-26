@@ -1,4 +1,4 @@
-class AddVisitDataToVisits < ActiveRecord::Migration
+class AddVisitDataToVisits < ActiveRecord::Migration[4.2]
   def change
     add_column :visits, :assigned_image_series_index, :jsonb, null: false, default: {}
     add_column :visits, :required_series, :jsonb, null: false, default: {}
