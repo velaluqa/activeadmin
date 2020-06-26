@@ -62,7 +62,7 @@ module ValidationReport
       screenshots = substeps_and_screenshots.select { |s| s.is_a?(Screenshot) }
       substeps = substeps_and_screenshots.select { |s| s.is_a?(Step) }
       if screenshots.length > 1
-        throw "There should only be one screenshot per step."
+        Rails.logger.warn "There should only be one screenshot per step."
       elsif screenshots.length > 0
         screenshot_cell = "<a href=\"#{screenshots.first.path}\" target=\"_blank\">Open</a>"
       end
