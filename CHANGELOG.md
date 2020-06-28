@@ -7,6 +7,10 @@
 * <[ERICA-25](https://jira.pharmtrace.com/browse/ERICA-25)> Fix
   missing attributes for `RequiredSeriesDrop` and `VisitDrop`
 
+### DevOps
+
+* Ensure a password in CI testing environment for the `postgres` role
+
 ## 7.0.17
 
 ### Fixed
