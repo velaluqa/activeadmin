@@ -89,5 +89,5 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
-  root(to: redirect('/app'))
+  root(to: redirect('/admin'))
 end
