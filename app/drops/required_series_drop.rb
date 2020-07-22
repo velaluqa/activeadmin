@@ -1,16 +1,29 @@
 class RequiredSeriesDrop < EricaDrop # :nodoc:
   belongs_to(:visit)
+  belongs_to(:image_series)
 
-  desc 'Returns the name of the required series.', 'String'
+  desc 'User that performed the tQC.'
+  belongs_to(:tqc_user, class_name: 'UserDrop')
+
+  desc 'Name of the required series.', 'String'
   attribute(:name)
 
-  desc 'Returns the complete tQC results.', 'Hash<String, String>'
+  desc 'Results of the completed tQC.', 'Hash<String, String>'
   attribute(:tqc_results)
 
-  desc 'Returns tQC state.', 'String'
+  desc 'State of the tQC.', 'String'
   attribute(:tqc_state)
 
-  desc 'Returns a list of failed checks.', 'Array<String>'
+  desc 'User comment for that tQC.', 'String'
+  attribute(:tqc_comment)
+
+  desc 'Version of the study configuration at time of tQC.', :string
+  attribute(:tqc_version)
+
+  desc 'Date of the tQC.', :datetime
+  attribute(:tqc_date)
+
+  desc 'List of failed checks.', 'Array<String>'
   def failed_tqc_checks
     (object.tqc_results || {}).map do |name, value|
       name unless value

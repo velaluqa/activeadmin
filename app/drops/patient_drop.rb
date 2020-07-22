@@ -8,6 +8,9 @@ class PatientDrop < EricaDrop # :nodoc:
   desc 'The individual subject id of the patient.', :string
   attribute(:subject_id)
 
+  desc 'Name of the patient.', :string
+  attributes(:name)
+
   desc 'The folder with the images of the patient', :string
   attribute(:images_folder)
 

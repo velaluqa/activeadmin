@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 7.0.18
+
+### Fixed
+
+* <[ERICA-25](https://jira.pharmtrace.com/browse/ERICA-25)> Fix
+  missing attributes for `RequiredSeriesDrop` and `VisitDrop`
+
 ## 7.0.17
 
 ### Fixed

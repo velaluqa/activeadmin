@@ -1,12 +1,16 @@
 class VisitDrop < EricaDrop # :nodoc:
   belongs_to(:patient)
   has_many(:image_series)
+  has_many(:required_series)
 
   desc 'The user who performed the medical QC.'
   belongs_to(:mqc_user, class_name: 'UserDrop')
 
   desc 'State of the visit.', :integer
   attributes(:state)
+
+  desc 'Name of the visit.', :string
+  attributes(:name)
 
   desc 'Type of the visit.', :string
   attributes(:visit_type)
@@ -16,13 +20,6 @@ class VisitDrop < EricaDrop # :nodoc:
 
   desc 'Descriptions of the visit.', :string
   attributes(:description)
-
-  desc 'Required Series information.', :json
-  def required_series
-    object.required_series.keys.map do |name|
-      RequiredSeriesDrop.new(RequiredSeries.new(object, name))
-    end
-  end
 
   desc 'Index of the assigned image series.', :json
   attributes(:assigned_image_series_index)
