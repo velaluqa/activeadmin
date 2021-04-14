@@ -35,25 +35,40 @@ module Study::Contract
     private
 
     def json_schema
-      @parsed_config = YAML.load(file_cache)
-      validator = SchemaValidation::StudyValidator.new
-      json_errors = validator.validate(parsed_config)
-      json_errors.each do |json_error|
-        errors.add(:file, json_error.to_s)
-      end
+      @valid_by_json_schema ||=
+        begin
+          @parsed_config = YAML.load(file_cache)
+          validator = SchemaValidation::StudyValidator.new
+          json_errors = validator.validate(parsed_config)
+          unless json_errors.empty?
+            json_errors.each do |json_error|
+              errors.add(:file, json_error.to_s)
+            end
+
+            false
+          end
+
+          true
+        end
     rescue
       errors.add(:file, 'could not be parsed')
+
+      false
     end
 
     def affected_visits
+      return unless json_schema
       return if parsed_config.blank?
       return if deleted_visit_types.empty?
+
       errors.add(:force, "removed visit types will be deleted from all visits:<br> #{deleted_visit_types.join(', <br>')}")
     end
 
     def affected_required_series
+      return unless json_schema
       return if parsed_config.blank?
       return if deleted_required_series.empty?
+
       errors.add(:force, "removed required series will be deleted from all visits:<br> #{deleted_required_series.join(', <br>')}")
     end
 
