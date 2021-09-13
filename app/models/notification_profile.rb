@@ -263,7 +263,7 @@ JOIN
   end
 
   def to_s
-    props = [id, triggering_action, triggering_resource, filter.to_s]
+    props = [id, triggering_actions.join(" or "), triggering_resource, filter.to_s]
     "NotificationProfile[#{props.compact.join(', ')}]"
   end
 

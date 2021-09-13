@@ -6,6 +6,10 @@
 
 * Update Rails to 5.2 and adjust all remaining dependencies
 
+### Fixed
+
+* Fix string representation of notification profiles
+
 ## 7.0.17
 
 ### Fixed
