@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Unreleased
+
+### Fixed
+
+* Fix missing recipient select options for notification selects if a
+  study is selected for the session
+
 ## 7.0.18
 
 ### Fixed

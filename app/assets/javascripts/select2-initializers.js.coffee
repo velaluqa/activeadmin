@@ -28,6 +28,7 @@ window.initializeRecordSearch = ($elements = $('.select2-record-search')) ->
         data: (params) ->
           query =
             query: params.term
+            all_studies: $el.data('all-studies') || false
           query.models = $el.data('models') if $el.data('models')?
           query
         processResults: (data, params) ->
