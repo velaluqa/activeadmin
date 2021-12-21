@@ -1,4 +1,4 @@
-FROM ruby:2.3.7-stretch
+FROM ruby:2.4-buster
 MAINTAINER aandersen@velalu.qa
 
 ENV APP_HOME /app
@@ -14,6 +14,10 @@ RUN apt-get update -qq && \
     zlib1g-dev \
     locales \
     cmake \
+    texlive-base \
+    texlive-xetex \
+    texlive-fonts-recommended \
+    pandoc \
     postgresql-client \
     graphviz \
     dcmtk \

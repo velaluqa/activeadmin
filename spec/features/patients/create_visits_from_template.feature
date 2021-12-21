@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Create visits for a patient from template
+# category: Study Management
+# components:
+#   - patient
 Feature: Create Visits From Template
   In order to create additional predefined visits,
   As authorized user with the permission `create_from_template` for Visit,

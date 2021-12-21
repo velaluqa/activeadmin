@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Change the state of a visit
+# category: Image Management
+# components:
+#   - study
 Feature: Change State
   In order to manage quality control process,
   As authorized user to update state of visits,

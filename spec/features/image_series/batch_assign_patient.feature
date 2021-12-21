@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Assign image series to a patient
+# category: Image Management
+# components:
+#   - image series
 Feature: Batch Assign Patient
   In order to quickly assign a set of image series to a patient,
   As user is granted `image_series/assign_patient`,

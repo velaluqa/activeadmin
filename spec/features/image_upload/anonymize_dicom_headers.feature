@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Anonymize DICOM headers 
+# category: Image Upload
+# components:
+#   - image upload
 @js
 Feature: Anonymize DICOM Headers
   In order adhere to regulatory specifics,

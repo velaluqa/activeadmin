@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Lock a study configuration for production use
+# category: Study Configuration
+# components:
+#   - study
+#   - configuration
 Feature: Lock Study Configuration
   In order to work on a study with a fixed configuration,
   As authenticated user for `manage` for Study,
@@ -157,7 +164,7 @@ Feature: Lock Study Configuration
     And I don't see "SPECT_1"
     And I see "SPECT_2"
 
-  Scenario: Technical Quality Control Specification Changed
+  Scenario: Technical Quality Control Specification Changed -> Resets tqc state
     Given I sign in as a user with role "Study Manager"
     And an image_series "TestSeries" with:
       | image_count |              1 |

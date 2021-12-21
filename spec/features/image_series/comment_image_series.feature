@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Read and create comments for a specific image series
+# category: Communication
+# components:
+#   - image series
+#   - comments
 Feature: Comment Image Series
   In order to discuss specifics about a image series,
   As authorized user for `comment` image series,

@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Update study properties
+# category: Dashboard
+# components:
+#   - study
 @poltergeist @javascript
 Feature: List Accessible Studies
   In order to quickly start some actions on studies,

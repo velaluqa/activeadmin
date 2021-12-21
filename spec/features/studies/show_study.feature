@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Display a specific accessible study
+# category: Study Management
+# components:
+#   - study
 Feature: Show Visit
   In order to perform image management,
   As authorized user for read study,

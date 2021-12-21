@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Delete an existing visit
+# category: Image Management
+# components:
+#   - study
 Feature: Delete Visits
   In order to remove visits that are false or obsolete,
   As authorized user for deletion of visits,

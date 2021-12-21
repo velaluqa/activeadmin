@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Update study properties
+# category: Study Management
+# components:
+#   - study
 Feature: Update Study
   In order to adjust study details,
   As authorized user to update study,

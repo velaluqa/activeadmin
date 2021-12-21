@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Batch Assign image series to a required series
+# category: Image Management
+# components:
+#   - study
 Feature: Batch Assign Required Series
   In order to quickly mark assigned image series for quality control,
   As authorized user for assign required series,

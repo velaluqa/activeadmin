@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Create a new study
+# category: Study Management
+# components:
+#   - study
 Feature: Create Study
   In order to perform image managment and quality control,
   As authorized user for study creation,

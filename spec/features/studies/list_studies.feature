@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Display accessible studies
+# category: Study Management
+# components:
+#   - study
 Feature: List Studies
   In order to perform image management or quality control,
   As authorized user to list studies,

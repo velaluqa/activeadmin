@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Read and create comments for a specific center
+# category: Communication
+# components:
+#   - center
+#   - comments
 Feature: Comment Center
   In order to discuss specifics about a center,
   As authorized user for `comment` center,

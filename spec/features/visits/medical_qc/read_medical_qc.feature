@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Display medical quality control results
+# category: Quality Control
+# components:
+#   - visit
+#   - mqc
 @js
 Feature: Read Medical Quality Control
   In order to ensure quality of visit,

@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Overview of required series with their quality control properties 
+# category: Image Management
+# components:
+#   - visit
 Feature: List Required Series
   In order to manage a visit,
   As authorized user,

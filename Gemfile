@@ -5,8 +5,8 @@ end
 
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.6'
-gem 'railties', '4.2.6'
+gem 'rails', '4.2.8'
+gem 'railties', '4.2.8'
 
 # With Rails 4.0 some gems were extracted into separate gems, which
 # need to be installed separately. Some gems are deprecated and we
@@ -57,8 +57,8 @@ gem 'uglifier', '>= 1.0.3'
 # we need these even in production, for server-side judgement functions
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 gem 'execjs'
-gem 'libv8', '~> 3.11.8'
-gem 'therubyracer', platforms: :ruby
+gem 'libv8', '~> 3.16.14'
+gem 'therubyracer', '0.12.3', platforms: :ruby
 
 gem 'jquery-rails', '~> 3.1.4'
 gem 'jquery-ui-rails', '~> 5.0.0'

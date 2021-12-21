@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Update properties of a visit
+# category: Image Management
+# components:
+#   - visit
 Feature: Update Visit
   In order to adjust visit details,
   As authorized user (update visit),

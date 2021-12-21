@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Display accessible patients
+# category: Study Management
+# components:
+#   - patient
 Feature: List Patients
   In order to see which patients exist,
   As authorized user,

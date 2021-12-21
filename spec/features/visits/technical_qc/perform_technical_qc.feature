@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Perform technical quality control
+# category: Quality Control
+# components:
+#   - visit
+#   - tqc
 @js
 Feature: Perform Technical Quality Control
   In order to ensure technical quality of assigned image series,

@@ -1,0 +1,61 @@
+---
+title: Operational Qualification
+subtitle: ERICA SaaS
+version: "<%= version %>"
+author: Arthur Andersen
+date: <%= date %>
+documentclass: scrreprt
+toc: true
+toc-depth: 1
+header-includes:
+- \usepackage{csquotes}
+- \usepackage[automark,headsepline]{scrlayer-scrpage}
+- \clearpairofpagestyles
+- \cfoot[\pagemark]{\pagemark}
+- \lehead{\headmark}
+- \rohead{\headmark}
+- \pagestyle{scrheadings}
+- \usepackage{chngcntr}
+- \counterwithout{figure}{chapter}
+- \usepackage{lastpage}
+- \cfoot[\pagemark{} of \pageref{LastPage}]{\pagemark{} of \pageref{LastPage}}
+...
+# Introduction
+
+This Operational Qualification Report contains the test results of the
+operational qualification against the functional requirement
+specification for ERICA SaaS at version <%= version %>.
+The structure of this document follows that of the functional
+requirement specification and lists all test steps with their
+respective test result for tracability reasons.
+
+# Qualification Report
+
+<% require 'json' %>
+<% specs = JSON.parse(File.read("doc/functional_requirement_specification.json"))  %>
+<% specs.each do |spec| %>
+
+## <%= spec['category'] %> - <%= spec['title'] %>
+
+| Functional Requirement | <%= spec['title'] %>                                 |
+|------------------------|---------------------------------------|
+| Intent                 | <%= spec['goal'] %>   |
+| Category               | <%= spec['category'] %>                        |
+<% spec['components']&.each_with_index do |component, i| -%>
+| <%= i == 0 ? "Components" : " "*10 %>      | - <%= component %>                      |
+<% end -%>
+<% spec['side_effects']&.each_with_index do |effect, i| -%>
+| <%= i == 0 ? "Expected Side Effects" : " "*21 %>      | - <%= effect %>                      |
+<% end -%>
+
+<% spec['scenarios']&.each_with_index do |scenario, i| -%>
+### Scenario - <%= scenario["name"] %>
+
+| Test Step                                                           | Success? |
+|---------------------------------------------------------------------|----------|
+<% scenario['steps'].each do |step| -%>
+| <%= step.split("\n").first.gsub("\\n", "\\textbackslash{}n") %> <%= step.split(/^\|/).map { |row| row[/^(.*?)\|/, 1]&.strip }.compact.join(", ").gsub("\\n", "\\textbackslash{}n") %> | PASS      |
+<% end -%>
+
+<% end -%>
+<% end %>

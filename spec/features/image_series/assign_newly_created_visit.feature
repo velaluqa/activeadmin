@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Assign image series to a newly created visit
+# category: Image Management
+# components:
+#   - image series
 Feature: Assign Newly Created Visit
   In order to simplify image management for quality control,
   As authorized user that can assign image series to visits and create visits,

@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Assign required series upon upload
+# category: Image Upload
+# components:
+#   - image upload
 @js
 Feature: Assign Required Series
   In order simplify the image management process,

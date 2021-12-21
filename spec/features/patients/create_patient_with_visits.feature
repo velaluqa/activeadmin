@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Create patient with visits from template
+# category: Study Management
+# components:
+#   - patient
 Feature: Create Patient With Visits
   In order to enfore a specific study structure,
   As authorized user,

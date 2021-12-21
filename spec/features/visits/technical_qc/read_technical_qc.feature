@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Display technical quality control results
+# category: Quality Control
+# components:
+#   - visit
+#   - tqc
 @js
 Feature: Read Technical Quality Control Results
   In order to ensure technical quality of assigned image series,

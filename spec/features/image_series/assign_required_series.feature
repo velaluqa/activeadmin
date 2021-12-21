@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Assign image series to a visits required series
+# category: Image Management
+# components:
+#   - image series
 @js
 Feature: Assign Required Series
   In order to mark an image series for quality control,

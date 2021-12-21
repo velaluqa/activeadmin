@@ -1,3 +1,10 @@
+# user_requirement:  
+# user_role: Authenticated User
+# goal: Read and create comments for a specific visit
+# category: Communication
+# components:
+#   - visit
+#   - comments
 Feature: Comment Visit
   In order to discuss specifics about a visit, 
   As authorized user for `comment` visit,
