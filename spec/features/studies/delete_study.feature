@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Delete a study
+# category: Study Management
+# components:
+#   - study
 Feature: Delete Study
   In order to remove studies that are false or obsolete,
   As authorized user for deletion of studies,

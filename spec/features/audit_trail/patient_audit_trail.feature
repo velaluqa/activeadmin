@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Access filtered audit trail
+# category: Audit Trail
+# components:
+#   - audit trail
 Feature: Patient Audit Trail
   To investigate changes to a certain patient,
   As authorized user,

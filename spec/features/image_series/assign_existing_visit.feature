@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Assign image series to a visit
+# category: Image Management
+# components:
+#   - image series
 Feature: Assign Visit
   In order to mark an image series as candidate for quality control,
   As authorized user that can assign image series to visits,

@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Perform medical quality control
+# category: Quality Control
+# components:
+#   - visit
+#   - mqc
 @js
 Feature: Perform Medical Quality Control
   In order to ensure quality of assigned image series for visit,

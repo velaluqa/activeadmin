@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Download images of a specific patient
+# category: Export
+# components:
+#   - patient
 Feature: Download Patient Images
   In order to retrieve a local copy of images,
   As authorized user for `download_images`,

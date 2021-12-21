@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Read and create comments for a specific patient
+# category: Communication
+# components:
+#   - patient
+#   - comments
 Feature: Comment Patient
   In order to discuss specifics about a patient,
   As authorized user for `comment` patient,

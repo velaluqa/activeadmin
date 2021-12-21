@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Download images of a specific visit
+# category: Export
+# components:
+#   - visit
+#   - download worker
 Feature: Download Visit Images
   In order to retrieve a local copy of images,
   As authorized user for `download_images`,

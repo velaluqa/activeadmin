@@ -819,7 +819,7 @@ DEPENDENCIES
   kwalify
   less-rails
   letter_opener_web
-  libv8
+  libv8 (~> 3.16.14)
   liquid
   liquid-rails (~> 0.2.0)
   lol_dba
@@ -880,7 +880,7 @@ DEPENDENCIES
   sqlite3
   test-unit
   textpow!
-  therubyracer
+  therubyracer (= 0.12.3)
   timecop
   trailblazer-rails
   transactional_capybara

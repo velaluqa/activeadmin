@@ -33,6 +33,7 @@ class RequiredSeries < ApplicationRecord
 
   belongs_to :visit
   belongs_to :image_series, optional: true
+  belongs_to :tqc_user, class_name: 'User'
 
   after_save :update_image_series_state
   after_commit :schedule_domino_sync
@@ -55,7 +56,6 @@ class RequiredSeries < ApplicationRecord
     :tqc_user_id,
     :tqc_state,
     :tqc_comment,
-    :tqc_user,
     :domino_unid,
     :created_at,
     :updated_at
@@ -128,11 +128,6 @@ JOIN
       id: image_series_id,
       visit_id: visit_id
     ).first
-  end
-
-  def tqc_user
-    return nil if tqc_user_id.nil?
-    @tqc_user ||= User.where(id: tqc_user_id).first
   end
 
   # Returns the studies tqc specification of the required series.

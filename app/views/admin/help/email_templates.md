@@ -115,6 +115,10 @@ and relationships accessible from within email templates.
 
 <%= describe_liquid_drop('PermissionDrop') %>
 
+### RequiredSeries
+
+<%= describe_liquid_drop('RequiredSeriesDrop') %>
+
 ### Role
 
 <%= describe_liquid_drop('RoleDrop') %>

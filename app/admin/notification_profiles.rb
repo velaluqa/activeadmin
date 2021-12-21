@@ -137,6 +137,7 @@ ActiveAdmin.register NotificationProfile do
         input_html: {
           class: 'select2-record-search',
           'data-models' => 'User,Role',
+          'data-all-studies' => true,
           'data-placeholder' => 'All Users',
           'data-clear-value' => 'all',
           'data-template-prepend-type' => true,

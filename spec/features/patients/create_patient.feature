@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Add a new patient to a center
+# category: Study Management
+# components:
+#   - patient
 Feature: Create Patient
   In order to add new patients to centers,
   As authorized user,

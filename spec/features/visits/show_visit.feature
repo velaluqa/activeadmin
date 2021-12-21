@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Display a specific accessible visit
+# category: Image Management
+# components:
+#   - visit
 Feature: Show Visit
   In order to perform image management,
   As authorized user for show visit,

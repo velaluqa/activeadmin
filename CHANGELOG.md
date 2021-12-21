@@ -9,6 +9,19 @@
 ### Fixed
 
 * Fix string representation of notification profiles
+* Fix missing recipient select options for notification selects if a
+  study is selected for the session
+
+## 7.0.18
+
+### Fixed
+
+* <[ERICA-25](https://jira.pharmtrace.com/browse/ERICA-25)> Fix
+  missing attributes for `RequiredSeriesDrop` and `VisitDrop`
+
+### DevOps
+
+* Ensure a password in CI testing environment for the `postgres` role
 
 ## 7.0.17
 

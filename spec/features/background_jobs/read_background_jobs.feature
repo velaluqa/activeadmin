@@ -1,4 +1,12 @@
-Feature: Manage Background Job
+# user_requirement: 
+# user_role: Authenticated User
+# goal: To retrieve results of long running background jobs.
+# category: Background Jobs
+# components:
+#   - sidekiq
+# side_effects:
+#   - log to audit trail
+Feature: Download Archive of Background Job
   In order to manage background jobs,
   As authorized user for `download_images`,
   I can download an archive of all images of a visit.

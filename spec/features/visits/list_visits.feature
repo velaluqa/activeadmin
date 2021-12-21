@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Display accessible visits
+# category: Image Management
+# components:
+#   - visit
 Feature: List Visits
   In order to perform image management or quality control,
   As authorized user to list visits,

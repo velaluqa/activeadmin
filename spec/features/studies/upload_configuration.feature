@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Upload a new study configuration file
+# category: Study Configuration
+# components:
+#   - study
+#   - configuration
 Feature: Upload Configuration
   In order to configure a study,
   As authenticated user for `upload_config` for Study,

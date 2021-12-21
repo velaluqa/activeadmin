@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Create a new visit
+# category: Image Management
+# components:
+#   - study
 Feature: Create Visits
   In order to perform image managment and quality control,
   As authorized user for visit creation,

@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Reassign image series to a visit
+# category: Image Management
+# components:
+#   - image series
 Feature: Reassign Visit
   In order to keep existing required series assignments,
   As an authorized user to assign_visit to image series,

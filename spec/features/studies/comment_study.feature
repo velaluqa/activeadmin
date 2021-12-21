@@ -1,3 +1,10 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Read and create comments for a specific study
+# category: Communication
+# components:
+#   - study
+#   - comments
 Feature: Comment Study
   In order to discuss specifics about a study,
   As authorized user for `comment` study,

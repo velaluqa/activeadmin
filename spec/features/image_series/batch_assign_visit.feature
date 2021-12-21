@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Assign image series to a visit
+# category: Image Management
+# components:
+#   - image series
 Feature: Batch Assign Visit
   In order to quickly assign a set of image series to a visit,
   As user is granted `image_series/assign_visit`,

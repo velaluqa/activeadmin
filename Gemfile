@@ -47,8 +47,8 @@ gem 'uglifier'
 # we need these even in production, for server-side judgement functions
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 gem 'execjs'
-gem 'libv8'
-gem 'therubyracer', platforms: :ruby
+gem 'libv8', '~> 3.16.14'
+gem 'therubyracer', '0.12.3', platforms: :ruby
 
 gem 'jquery-rails'
 gem 'jquery-ui-rails'

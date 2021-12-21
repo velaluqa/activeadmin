@@ -4,6 +4,7 @@ describe PatientDrop do
   end
 
   it { is_expected.to have_attribute(:id) }
+  it { is_expected.to have_attribute(:name) }
   it { is_expected.to have_attribute(:subject_id) }
   it { is_expected.to have_attribute(:images_folder) }
   it { is_expected.to have_attribute(:export_history) }

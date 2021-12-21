@@ -1,3 +1,9 @@
+# user_requirement: 
+# user_role: Authenticated User
+# goal: Assign image series to a required series
+# category: Image Management
+# components:
+#   - study
 Feature: Assign Required Series
   In order to mark image series for quality control,
   As authorized user for assign required series,

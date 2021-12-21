@@ -1,0 +1,197 @@
+---
+title: Design Specification
+subtitle: ERICA SaaS
+version: "<%= version %>"
+author: Arthur Andersen
+date: <%= date %>
+documentclass: scrreprt
+toc: true
+lof: false
+toc-depth: 1
+header-includes:
+- \usepackage[automark,headsepline]{scrlayer-scrpage}
+- \usepackage{csquotes}
+- \clearpairofpagestyles
+- \cfoot[\pagemark]{\pagemark}
+- \lehead{\headmark}
+- \rohead{\headmark}
+- \pagestyle{scrheadings}
+- \usepackage{chngcntr}
+- \counterwithout{figure}{chapter}
+- \usepackage{lastpage}
+- \cfoot[\pagemark{} of \pageref{LastPage}]{\pagemark{} of \pageref{LastPage}}
+...
+# Introduction
+
+The ERICA SaaS system permits pharmtrace to prepare and conduct
+independent image reviews. The ERICA SaaS system is developed on
+behalf of pharmtrace following GCP, GAMP5, 21 CFR 11 and related
+rules. This specification describes the software design of the ERICA
+SaaS system. It is written to comply with said regulations as well as
+the pharmtrace ERICA SaaS validation plan. This Design Specification
+is to be read in conjunction with the ERICA SaaS User Requirements
+Specification (which include the ERICA SaaS system Functional
+Specification).
+
+It is written to comply with said regulations as well as the
+pharmtrace ERICA SaaS validation plan. This Design Specification is to
+be read in conjunction with the ERICA SaaS User Requirements
+Specification and the ERICA SaaS Functional Requirement Specification.
+
+# System Overview
+
+The user accesses the system via a modern web browser.
+
+The system consists of different components running in docker containers:
+
+- **Traefik Proxy** - Allows access via SSL-terminated connection to the application server
+- **Rails Application Server** - Serves the front-end and back-end of the system
+- **Sidekiq Background Worker** - Performs background jobs either scheduled or ad-hoc
+- **PostGreSQL Database** - Keeps all data of the system in a normalized data schema
+- **File Storage** - Keeps all image files
+
+![System Overview](./doc/system_overview.png)
+
+# Design and Development Considerations
+
+## Assumptions and Dependencies
+
+As a general rule it is to be used by trained personnel only. The
+system environment is Windows 10 and a modern web browser. Users are
+advised to use Google Chrome or Chromium. Other browser are to be
+supported and fully tested in the future.
+
+## General Constraints
+
+ERICA SaaS is designed to be accessible from any modern web browser. As
+web browsers differ across platforms the main target browser is to be
+Google Chrome browser. This is also the browser that all automated tests 
+
+The software is build as docker container which gets thoroughly tested
+upon release of a new ERICA SaaS version. Test reports are generated and
+published with each version via the Operation Qualification Report.
+
+## Software Development Methods & Guidelines
+
+Software development will use a combination of an incremental approach
+and rapid prototyping:
+
+- A first prototype with the most basic functionality will be developed. 
+- Separate prototypes will be programmed for immediate feedback from
+  users to the programmer. Prototypes are developed with the goal to
+  evolve to the final working system.
+
+Development of the ERICA SaaS is done by a single programmer.
+Consequently, specific guidelines for organization of programming in
+teamwork are not yet required.
+
+As a general rule, we adhere to the following best-practices and
+guidelines:
+
+### Test Driven Development
+
+Where possible we follow test-driven development. Test-driven
+development (TDD) is a software development process relying on
+software requirements being converted to test cases before software is
+fully developed, and tracking all software development by repeatedly
+testing the software against all test cases.
+
+- **feature tests** written in Gherkin language serve as functional specification
+- **integration tests** written in Ruby/Rspec
+- **unit tests** written in Ruby/Rspec
+
+### Keep it simple, stupid
+
+KISS, an acronym for keep it simple, stupid, is a design principle
+noted by the U.S. Navy in 1960. The KISS principle states that most
+systems work best if they are kept simple rather than made
+complicated; therefore, simplicity should be a key goal in design, and
+unnecessary complexity should be avoided.
+
+### You ain't Gonna Need It
+
+"You aren't gonna need it" (YAGNI) is a principle of extreme
+programming (XP) that states a programmer should not add functionality
+until deemed necessary.
+
+As we try to build software rapid prototyping, we adhere to the user
+requirement & functional specification.
+
+### Don't Repeat Yourself
+
+Don't repeat yourself (DRY, or sometimes do not repeat yourself) is a
+principle of software development aimed at reducing repetition of
+software patterns, replacing it with abstractions or using data
+normalization to avoid redundancy.
+
+The DRY principle is stated as "Every piece of knowledge must have a
+single, unambiguous, authoritative representation within a system".
+
+## Fluid Documentation
+
+Documentation is either the code itself or found in the `./doc`
+directory within the project repository. Following DRY principles the
+documentation is living in one specific location and merged into the
+resulting version-specific documents necessary according to the
+validation plan.
+
+- Release Documents
+  - Functional Requirement Specification generated from Feature Specs
+  - Software Design Specification 
+  - Operation Qualification according to functional specification
+    generated from the automated feature test report
+  - Installation Qualification generated after installation
+- Technical Documentation
+  - Code Coverage generated upon release via CI
+  - Class Documentation is exported via YARD Ruby gem 
+
+## Versioning
+
+Semantic versioning is used. Semantic versioning defines a consistent scheme of version numbering
+using a three-part version number:
+
+    [Major Version].[Minor Version].[Patch]
+
+The patch number is incremented for minor changes and bug fixes which do not change the software's
+API. The minor version is incremented for releases which add new, but backward-compatible, API
+features, and the major version is incremented for API changes which are not backward-compatible.
+
+# Architectural Strategies
+
+When designing the architecture we will follow these core values: 
+
+- **Platform-independence** - designed as a platform independent system accessible through a modern web browser.
+- **Scalablity** - designed to be scalable. Each component (e.g. application server, database server) can be 
+- **Configurability** - configurable for various study setups  
+
+The documentation of the architecture is done via ADRs (Architecture
+Decision Records) which define the context, decision and consequences
+of each decision made. This shall help documenting not only the state
+as is, but also the historical context in which the architecture was
+build.
+
+# System Architecture
+
+<% Dir["doc/adr/**.md"].sort.each_with_index do |adr_file, i| %>
+
+<% contents = File.read(adr_file) %>
+<% if contents.include?("`ACCEPTED`") %>
+<% num = adr_file.match(/\-(\d{4})\-/)[1] %>
+
+<% next if num == "0000" %>
+
+<%= "\\newpage" if i >= 2 %>
+
+<%= 
+  contents
+    .gsub(/^# ADR -/, "# ADR#{num} -")
+	.gsub(/\(\.\/(.*)\)/, "(./doc/ADR/\\1)")
+	.gsub(/^(Date: (.*))?## Status(.*)## Context/m, "## Context")
+	.gsub(/^(#+) /, "#\\1 ") 
+%>
+<% end %>
+<% end %>
+
+![ERD: Full Application Domain Model](./doc/domain_model.png)
+
+<%= File.read("doc/db_schema_description.md") %>

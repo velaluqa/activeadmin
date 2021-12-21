@@ -1,0 +1,66 @@
+---
+title: Functional Specification
+subtitle: ERICA SaaS
+version: "<%= version %>"
+author: Arthur Andersen
+date: <%= date %>
+documentclass: scrreprt
+toc: true
+lof: false
+toc-depth: 2
+header-includes:
+- \usepackage[automark,headsepline]{scrlayer-scrpage}
+- \clearpairofpagestyles
+- \cfoot[\pagemark]{\pagemark}
+- \lehead{\headmark}
+- \rohead{\headmark}
+- \pagestyle{scrheadings}
+- \usepackage{chngcntr}
+- \counterwithout{figure}{chapter}
+- \usepackage{lastpage}
+- \cfoot[\pagemark{} of \pageref{LastPage}]{\pagemark{} of \pageref{LastPage}}
+...
+# Introduction
+
+This document contains the functional requirement specification
+according to the URS for ERICA of version <%= version %>.
+
+# System Overview
+
+The user accesses the system via a modern web browser.
+
+The system consists of different components running in docker containers:
+
+- **Traefik Proxy** - Allows access via SSL-terminated connection to the application server
+- **Rails Application Server** - Serves the front-end and back-end of the system
+- **Sidekiq Background Worker** - Performs background jobs either scheduled or ad-hoc
+- **PostGreSQL Database** - Keeps all data of the system in a normalized data schema
+- **File Storage** - Keeps all document files
+
+![System Overview](./doc/system_overview.png)
+
+# Requirements
+
+## Functional Requirements
+
+<% require 'json' %>
+<% specs = JSON.parse(File.read("doc/functional_requirement_specification.json"))  %>
+<% specs.each do |spec| %>
+
+### <%= spec['category'] %> - <%= spec['title'] %>
+
+| Functional Requirement | <%= spec['title'] %>                                 |
+|------------------------|---------------------------------------|
+| Intent                 | <%= spec['goal'] %>   |
+| Category               | <%= spec['category'] %>                        |
+<% spec['components']&.each_with_index do |component, i| -%>
+| <%= i == 0 ? "Components" : " "*10 %>      | - <%= component %>                      |
+<% end -%>
+<% spec['side_effects']&.each_with_index do |effect, i| -%>
+| <%= i == 0 ? "Expected Side Effects" : " "*21 %>      | - <%= effect %>                      |
+<% end -%>
+<% spec['scenarios']&.each_with_index do |scenario, i| -%>
+| <%= i == 0 ? "Test Scenarios" : " "*14 %>      | - <%= scenario['name'] %>                      |
+<% end -%>
+<% end %>
+
