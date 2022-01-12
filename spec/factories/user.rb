@@ -4,6 +4,7 @@ FactoryBot.define do
       with_user_roles { [] }
     end
 
+    email { Faker::Internet.email }
     name { Faker::Name.name }
     username do |u|
       Faker::Internet.user_name(
@@ -12,9 +13,6 @@ FactoryBot.define do
       )
     end
     password { 'password' }
-    sequence(:email) do |n|
-      "person#{n}@example.com"
-    end
 
     confirmed_at { DateTime.now }
 
