@@ -5,7 +5,7 @@ end
 
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2.3'
+gem 'rails', '~> 5.2.6'
 gem 'bootsnap'
 
 # With Rails 4.0 some gems were extracted into separate gems, which
@@ -117,7 +117,7 @@ gem 'sidekiq-scheduler'
 gem 'dicom'
 
 # Identify mime type by header bytes of file content instead of file extension.
-gem 'mimemagic'
+gem 'marcel', '1.0.2'
 
 # Zip file creation for image download in ERICA Remote
 gem 'rubyzip'

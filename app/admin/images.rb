@@ -38,7 +38,7 @@ ActiveAdmin.register Image do
     column :image_series
     column :id
     column 'Type', sortable: "mimetype" do |image|
-      type = MimeMagic::TYPES[image.mimetype]
+      type = Marcel::Magic.new(image.mimetype).comment
       status_tag(type[2])
     end
     column 'Status' do |image|
@@ -58,7 +58,7 @@ ActiveAdmin.register Image do
       row :id
       row :image_storage_path
       row 'Type' do
-        type = MimeMagic::TYPES[image.mimetype]
+        type = Marcel::Magic.new(image.mimetype).comment
         status_tag(type.andand[2])
       end
       row 'SHA256 checksum' do

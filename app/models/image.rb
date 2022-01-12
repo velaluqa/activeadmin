@@ -101,7 +101,7 @@ JOIN
       tmp.close
 
       # TODO: Create PORO DicomFile.test?(path)
-      mimetype = File.open(tmp.path) { |f| MimeMagic.by_magic(f).type }
+      mimetype = File.open(tmp.path) { |f| Marcel::Magic.by_magic(f).type }
       if mimetype == "application/dicom"
         tmp_dicom = DICOM::DObject.read(tmp.path)
         raise DicomReadError unless tmp_dicom.read?
@@ -191,7 +191,8 @@ JOIN
 
   def mime_extension
     return nil unless mimetype
-    MimeMagic::TYPES[mimetype][0].first
+
+    Marcel::Magic.new(mimetype).comment
   end
 
   protected

@@ -11,6 +11,8 @@
 * Fix string representation of notification profiles
 * Fix missing recipient select options for notification selects if a
   study is selected for the session
+* Fix mimetype recognition after `mimemagic` was relicensed by
+  replacing it with `marcel` by the Rails core team
 
 ## 7.0.18
 
