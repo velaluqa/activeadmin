@@ -4,7 +4,7 @@
 # category: Study Management
 # components:
 #   - study
-Feature: Show Visit
+Feature: Show Study
   In order to perform image management,
   As authorized user for read study,
   I want to see all study details in a table view.
