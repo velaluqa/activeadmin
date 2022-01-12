@@ -16,7 +16,7 @@
 
 ### Fixed
 
-* <[ERICA-25](https://jira.pharmtrace.com/browse/ERICA-25)> Fix
+* ([ERICA-25](https://jira.pharmtrace.com/browse/ERICA-25)) Fix
   missing attributes for `RequiredSeriesDrop` and `VisitDrop`
 
 ### DevOps
@@ -27,15 +27,15 @@
 
 ### Fixed
 
-* <[ERICA-5](https://jira.pharmtrace.com/browse/ERICA-5)> Fix batch
+* ([ERICA-5](https://jira.pharmtrace.com/browse/ERICA-5)) Fix batch
   action permissions for image series assign visit and assign patient
-* <[ERICA-11](https://jira.pharmtrace.com/browse/ERICA-11)> Show
+* ([ERICA-11](https://jira.pharmtrace.com/browse/ERICA-11)) Show
   required series in audit trail when filtered by resource
-* <[ERICA-12](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-12)>
+* ([ERICA-12](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-12))
   Show link to visit for required series in audit trail
-* <[ERICA-19](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-19)>
+* ([ERICA-19](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-19))
   Fix sort order of required series on show visit page
-* <[ERICA-21](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-21)>
+* ([ERICA-21](https://jira.pharmtrace.com/projects/ERICA/issues/ERICA-21))
   Fix permissions for medical assessment
 
 ## 7.0.16
@@ -49,7 +49,7 @@
 
 ### Internal
 
-* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Add
+* ([ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)) Add
   `dry_run` parameter to configuration consolidation operation (this
   helps identifying problematic destructive operations due to
   oversight and can be integrated into the UI later on)
@@ -58,14 +58,14 @@
 
 ### Fixed
 
-* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Fix
+* ([ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)) Fix
   consolidating to `locked` configuration in worker
 
 ## 7.0.13
 
 ### Fixed
 
-* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Reset
+* ([ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)) Reset
   medical quality control results when a new mQC specification is
   locked for a study
 
@@ -73,7 +73,7 @@
 
 ### Fixed
 
-* <[ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)> Fix
+* ([ERICA-10](https://jira.pharmtrace.com/browse/ERICA-10)) Fix
   consolidation of visit types, required series and technical qc
   results after locking the study configuration at a specific version
 * Fix passing down correct version parameter to retrieve the correct
