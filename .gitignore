@@ -65,3 +65,8 @@ reports
 yarn-debug.log*
 .yarn-integrity
 /.byebug_history
+/doc/functional_requirement_specification.json
+/doc/system_overview.png
+/doc/domain_model.png
+/doc/db_schema_description.md
+/doc/*.*.*/
