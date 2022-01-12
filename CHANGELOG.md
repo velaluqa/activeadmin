@@ -13,6 +13,8 @@
   study is selected for the session
 * Fix mimetype recognition after `mimemagic` was relicensed by
   replacing it with `marcel` by the Rails core team
+* Required series - Fix `RequiredSeries#user` association for Rails
+  5.2 by making it optional
 
 ## 7.0.18
 

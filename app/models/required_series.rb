@@ -33,7 +33,7 @@ class RequiredSeries < ApplicationRecord
 
   belongs_to :visit
   belongs_to :image_series, optional: true
-  belongs_to :tqc_user, class_name: 'User'
+  belongs_to :tqc_user, class_name: 'User', optional: true
 
   after_save :update_image_series_state
   after_commit :schedule_domino_sync
