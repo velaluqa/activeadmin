@@ -4,7 +4,7 @@ class Users::SessionsController < Devise::SessionsController
   skip_before_action :verify_authenticity_token, only: :authenticate_user
 
   # Force generation of a CSRF token on login
-  after_action :generate_csrf_token, only: :create
+  # after_action :generate_csrf_token, only: :create
 
   def new
     @dont_display_navbar = true
