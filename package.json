@@ -2,7 +2,7 @@
   "dependencies": {
     "@babel/preset-react": "^7.7.0",
     "@formio/react": "^5.2.0",
-    "@rails/webpacker": "^4.2.0",
+    "@rails/webpacker": "^5.4.3",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "formiojs": "^4.13.12",
     "prop-types": "^15.7.2",
@@ -16,6 +16,6 @@
     "use-query-string": "^2.4.1"
   },
   "devDependencies": {
-    "webpack-dev-server": "^3.9.0"
+    "webpack-dev-server": "^4.7.4"
   }
 }

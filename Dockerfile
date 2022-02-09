@@ -1,10 +1,11 @@
 FROM ruby:2.6.5-stretch
 MAINTAINER aandersen@velalu.qa
 
+ARG RAILS_MASTER_KEY=""
 ENV APP_HOME /app
 
 # Install distribution dependencies
-RUN  curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+RUN  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
      apt-get update -qq && \
      apt-get install -y \
      build-essential \
@@ -53,14 +54,22 @@ RUN npm config set registry=https://registry.npmjs.com/
 RUN mkdir -p /node_modules && ln -s ../node_modules node_modules
 RUN yarn install --frozen-lockfile
 
-# Allow other containers to use the app root (e.g. nginx container).
-VOLUME /app
-
 # Add the application code.
 COPY . /app
+
+RUN pwd
+RUN ls -al /app/public
+
+RUN if [ -z $RAILS_MASTER_KEY ]; then unset RAILS_MASTER_KEY; fi; RAILS_ENV=production bundle exec rails assets:precompile
+RUN ls -al /app/public
+# RUN ls -al /app/public/packs
+# RUN cat /app/public/packs/manifest.json
 
 ENTRYPOINT ["lib/support/docker-entrypoint.sh"]
 
 EXPOSE 3000
+
+# Allow other containers to use the app root (e.g. nginx container).
+VOLUME /app
 
 CMD ["bin/rails", "s", "-b", "0.0.0.0"]

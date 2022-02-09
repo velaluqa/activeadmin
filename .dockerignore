@@ -1,5 +1,7 @@
 data/*
 tmp/*
+public/assets
+public/packs
 spec/data
 reports
 doc
