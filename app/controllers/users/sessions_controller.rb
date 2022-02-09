@@ -1,10 +1,7 @@
 class Users::SessionsController < Devise::SessionsController
   DeviseController.respond_to :json
 
-  skip_before_action :verify_authenticity_token, only: :authenticate_user
-
-  # Force generation of a CSRF token on login
-  # after_action :generate_csrf_token, only: :create
+  skip_before_action :verify_authenticity_token, only: [:create, :authenticate_user]
 
   def new
     @dont_display_navbar = true
@@ -26,11 +23,5 @@ class Users::SessionsController < Devise::SessionsController
     is_session_admin = can?(:manage, session)
 
     render json: { error_code: 0, success: true, is_session_admin: is_session_admin }
-  end
-
-  protected
-
-  def generate_csrf_token
-    form_authenticity_token
   end
 end
