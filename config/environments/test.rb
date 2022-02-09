@@ -65,6 +65,7 @@ Rails.application.configure do
   config.max_allowed_password_age = 1.month
 
   config.image_storage_root = config.data_directory + '/images'
+  config.form_pdf_root = config.data_directory + '/form_pdfs'
   config.image_export_root = config.data_directory + '/images_export'
 
   config.dcm2xml = '/usr/bin/dcm2xml'

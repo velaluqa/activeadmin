@@ -37,7 +37,8 @@
       width: $menu-width;
 
       &:before {
-	font-family: FontAwesome;
+        font-family: FontAwesome;
+        font-weight: 100;
         content: "\f0c9";
       }
     }
@@ -154,9 +155,10 @@
       white-space: nowrap;
 
       a:before {
-	font-family: FontAwesome;
-        font-size: 20px;
-        line-height: 45px;
+        font-family: FontAwesome;
+        font-weight: 100;
+        font-size: 16px;
+        line-height: 40px;
         color: $menu-link-color;
         width: $menu-width;
         text-align: center;
@@ -196,6 +198,9 @@
 
       &#image_upload > a:before { content: "\f0ee"; }
       &#image_hierarchy > a:before { content: "\f0e8"; }
+
+      &#form_definitions > a:before { content: "\f31c"; }
+      &#form_answers > a:before { content: "\f4ff"; }
 
       &#users > a:before { content: "\f007"; }
       &#roles > a:before { content: "\f0c0"; }

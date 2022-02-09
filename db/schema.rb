@@ -10,16 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_24_093541) do
+ActiveRecord::Schema.define(version: 2022_02_09_083207) do
 
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
+
+  create_enum :configuration_schema_specs, [
+    "formio_v1",
+  ], force: :cascade
+
+  create_enum :form_definition_status, [
+    "draft",
+    "final",
+  ], force: :cascade
 
   create_table "active_admin_comments", id: :serial, force: :cascade do |t|
     t.string "resource_id", null: false
     t.string "resource_type", null: false
-    t.string "author_type"
     t.integer "author_id"
+    t.string "author_type"
     t.text "body"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -82,10 +92,52 @@ ActiveRecord::Schema.define(version: 2020_06_24_093541) do
     t.index ["study_id"], name: "index_centers_on_study_id"
   end
 
+  create_table "configurations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "previous_configuration_id"
+    t.text "payload", null: false
+    t.string "configurable_type", null: false
+    t.uuid "configurable_id", null: false
+    t.enum "schema_spec", null: false, comment: "Specify the configuration schema for the given `configuration_type`.\n", enum_type: "configuration_schema_specs"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["configurable_id"], name: "index_configurations_on_configurable_id"
+    t.index ["previous_configuration_id"], name: "index_configurations_on_previous_configuration_id"
+  end
+
   create_table "email_templates", id: :serial, force: :cascade do |t|
     t.string "name", null: false
     t.string "email_type", null: false
     t.text "template", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "form_answers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "form_definition_id", null: false
+    t.uuid "configuration_id", null: false
+    t.text "signing_reason"
+    t.bigint "public_key_id", comment: "Public key used for signatures.\n"
+    t.jsonb "answers", comment: "Answers to the form.\n"
+    t.string "answers_signature", comment: "RSA Signature via private part of `public_key`.\n"
+    t.jsonb "annotated_images", comment: "List of annotated images including their checksum.\n"
+    t.string "annotated_images_signature", comment: "RSA Signature via private part of `public_key`.\n"
+    t.boolean "is_test_data", default: false, null: false
+    t.boolean "is_obsolete", default: false, null: false
+    t.datetime "signed_at"
+    t.datetime "submitted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["configuration_id"], name: "index_form_answers_on_configuration_id"
+    t.index ["form_definition_id"], name: "index_form_answers_on_form_definition_id"
+    t.index ["public_key_id"], name: "index_form_answers_on_public_key_id"
+  end
+
+  create_table "form_definitions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description", null: false
+    t.uuid "locked_configuration_id"
+    t.datetime "locked_at"
+    t.uuid "current_configuration_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -186,8 +238,8 @@ ActiveRecord::Schema.define(version: 2020_06_24_093541) do
 
   create_table "notifications", id: :serial, force: :cascade do |t|
     t.integer "notification_profile_id", null: false
-    t.string "resource_type"
     t.integer "resource_id"
+    t.string "resource_type"
     t.integer "version_id"
     t.integer "user_id", null: false
     t.datetime "email_sent_at"
@@ -286,10 +338,10 @@ ActiveRecord::Schema.define(version: 2020_06_24_093541) do
 
   create_table "taggings", id: :serial, force: :cascade do |t|
     t.integer "tag_id"
-    t.string "taggable_type"
     t.integer "taggable_id"
-    t.string "tagger_type"
+    t.string "taggable_type"
     t.integer "tagger_id"
+    t.string "tagger_type"
     t.string "context", limit: 128
     t.datetime "created_at"
     t.index ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], name: "taggings_idx", unique: true
@@ -305,8 +357,8 @@ ActiveRecord::Schema.define(version: 2020_06_24_093541) do
   create_table "user_roles", id: :serial, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "role_id", null: false
-    t.string "scope_object_type"
     t.integer "scope_object_id"
+    t.string "scope_object_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["role_id"], name: "index_user_roles_on_role_id"
@@ -356,7 +408,7 @@ ActiveRecord::Schema.define(version: 2020_06_24_093541) do
 
   create_table "versions", id: :serial, force: :cascade do |t|
     t.string "item_type", null: false
-    t.integer "item_id", null: false
+    t.string "item_id", null: false
     t.string "event", null: false
     t.string "whodunnit"
     t.datetime "created_at"
@@ -364,6 +416,9 @@ ActiveRecord::Schema.define(version: 2020_06_24_093541) do
     t.jsonb "object_changes"
     t.integer "study_id"
     t.boolean "migrated_required_series", default: false, null: false
+    t.uuid "form_definition_id"
+    t.uuid "form_answer_id"
+    t.uuid "configuration_id"
     t.index "((object ->> 'name'::text))", name: "idx_on_versions_rs_changes1"
     t.index "((object ->> 'visit_id'::text))", name: "idx_on_versions_rs_changes2"
     t.index "((object_changes #>> '{name,1}'::text[]))", name: "idx_on_versions_rs_changes3"

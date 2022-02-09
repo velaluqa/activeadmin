@@ -1,0 +1,67 @@
+.formcomponents {
+  height: 100%;
+  background: #f6f6f9;
+  padding-top: 15px;
+  overflow-y: auto;
+  padding-bottom: 15px;
+}
+
+.admin_form_definitions.edit_form_schema,
+.admin_form_definitions.update_form_schema,
+{
+  padding: 0 0 0 53px;
+
+  #wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #title_bar {
+    position: relative;
+    padding: 0;
+    flex: 0 0 53px;
+  }
+
+  #active_admin_content {
+    flex: 1 1 100%;
+    overflow-y: auto;
+    height: 100%;
+    padding-bottom: 35px;
+  }
+
+  #main_content_wrapper {
+    height: 100%;
+
+    #main_content {
+      height: 100%;
+
+      #builder {
+        height: 100%;
+
+        .formbuilder {
+          height: 100%;
+        }
+      }
+    }
+  }
+
+  #footer {
+    flex: 0 0 45px;
+    background: #fff;
+  }
+
+  .formio.formbuilder {
+    margin-top: -13px;
+    margin-left: -13px;
+  }
+  .formarea {
+    padding-top: 16px;
+  }
+  .card.preview-panel {
+    padding: 15px;
+  }
+}

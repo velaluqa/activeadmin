@@ -30,4 +30,19 @@ module ApplicationHelper
   def arbre(&block)
     Arbre::Context.new(&block).to_s
   end
+
+  def render_react_component(pack_name, options = {})
+    component_props =
+      options
+        .except(:layout)
+        .deep_transform_keys { |key| key.to_s.camelize(:lower) }
+
+    render(
+      partial: "admin/general/react_pack_component",
+      locals: {
+        pack_name: pack_name,
+        component_props: component_props
+      }
+    )
+  end
 end

@@ -80,6 +80,21 @@ Rails.application.routes.draw do
 
     resources :search
 
+    resources :forms do
+      resources(
+        :form_answers,
+        path: "answers",
+        only: %i[show new create edit]
+      )
+
+      member do
+        get :configuration
+        get :current_configuration
+        get :locked_configuration
+      end
+    end
+    resources :form_answers
+
     get 'report' => 'report#index'
   end
 

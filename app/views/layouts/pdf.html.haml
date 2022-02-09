@@ -1,0 +1,8 @@
+!!! 5
+%html
+  %head
+    %title= @title
+    -# = wicked_pdf_stylesheet_link_tag "external_form", :media => "all"
+    -# = wicked_pdf_javascript_include_tag "application"
+  %body
+    = yield

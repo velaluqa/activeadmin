@@ -27,6 +27,8 @@ class PublicKey < ApplicationRecord
 
   belongs_to :user
 
+  has_many :form_answers
+
   validates :user_id, :public_key, presence: true
   validates_uniqueness_of :active, if: :active, scope: :user_id
 

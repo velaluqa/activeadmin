@@ -1,0 +1,128 @@
+require "canonical_json"
+
+class V1::FormAnswersController < V1::ApiController
+  layout "external_form"
+
+  before_action :authenticate_user!
+
+  skip_before_action :authenticate_user!, if: :authenticating_signature_param?
+
+  def new
+    # display empty form
+    # authorize user
+    form_definition = FormDefinition.find(params[:form_id])
+
+    render_react(
+      "form_answers_new",
+      form_definition: form_definition.attributes,
+      configuration: form_definition.configuration.attributes,
+      form_layout: JSON.parse(form_definition.configuration.payload)
+    )
+  end
+
+  def create
+    # authorize user
+    # validate parameters
+    # create form answers
+    configuration = ::Configuration.find(form_params[:configuration_id])
+    answers = form_params[:answers]
+    signing_password = form_params[:signing_password]
+    answers_signature = nil
+    annotated_images_signature = nil
+
+    ap configuration
+    begin
+      answers_signature =
+        current_user.sign64(answers.to_h.to_canonical_json, signing_password)
+      annotated_images_signature =
+        current_user.sign64({}.to_json, signing_password)
+    rescue OpenSSL::PKey::RSAError => e
+      render(
+        json: {
+          status: 401,
+          error: e.to_s
+        },
+        status: 401
+      )
+      return
+    end
+
+    form_answer = FormAnswer.create!(
+      form_definition_id: params[:form_id],
+      configuration: configuration,
+      public_key: current_user.active_public_key,
+      answers: answers,
+      answers_signature: answers_signature,
+      annotated_images: {},
+      annotated_images_signature: annotated_images_signature,
+      submitted_at: DateTime.now
+    )
+
+    respond_to do |format|
+      format.json do
+        render(
+          json: {
+            status: 200,
+            form_answer_id: form_answer.id,
+            message: "submitted_and_signed"
+          },
+          status: 200
+        )
+      end
+    end
+  end
+
+  def show
+    # display form if editable otherwise only values
+    # authorize
+    form_answer = FormAnswer.find(params[:id])
+
+    respond_to do |format|
+      format.html do
+        render_react(
+          "form_answers_show",
+          form_answer: form_answer.attributes,
+          signature_user: form_answer.public_key.user.attributes,
+          form_definition: form_answer.form_definition.attributes,
+          form_layout: JSON.parse(form_answer.configuration.payload)
+        )
+      end
+      format.pdf do
+        send_data(
+          form_answer.pdfa,
+          filename: "form_answers.pdf",
+          disposition: 'inline'
+        )
+      end
+    end
+  end
+
+  def update
+
+  end
+
+  def submit
+    # json -> save values
+  end
+
+  private
+
+  def form_params
+    params.require(:form_answer).permit(
+      :configuration_id,
+      :signing_password,
+      answers: {}
+    )
+  end
+
+  def authenticating_signature_param?
+    return false unless params[:id]
+
+    form_answer = FormAnswer.find(params[:id])
+    params[:sig] == form_answer.answers_signature
+
+    ap sigH: params[:sigH], digest: Digest::SHA1.hexdigest(form_answer.answers_signature)
+
+    params[:sigH] == Digest::SHA1.hexdigest(form_answer.answers_signature)
+  end
+end

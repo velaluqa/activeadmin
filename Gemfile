@@ -14,6 +14,8 @@ gem 'bootsnap'
 # TODO: Remove protected attributes in favor of strong parameters
 gem 'protected_attributes_continued'
 
+gem 'draper'
+
 gem 'pg'
 gem 'sqlite3'
 
@@ -116,6 +118,9 @@ gem 'sidekiq-scheduler'
 # Ruby DICOM lib
 gem 'dicom'
 
+# Generate PDF via chrome and puppeteer.
+gem 'grover'
+
 # Identify mime type by header bytes of file content instead of file extension.
 gem 'marcel', '1.0.2'
 
@@ -153,6 +158,9 @@ gem 'webpacker', '~> 4.x'
 
 # Validate JSONB columns via JSONschema
 gem 'activerecord_json_validator'
+
+# Enum creation macros for migrations
+gem 'activerecord-postgres_enum'
 
 # Enhanced `Array#dig` and `Hash#dig` for digging nested array/hash structures.
 gem 'ruby_dig2'

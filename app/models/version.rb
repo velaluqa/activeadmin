@@ -34,7 +34,10 @@ class Version < PaperTrail::Version
     :object,
     :object_changes,
     :whodunnit,
-    :study_id
+    :study_id,
+    :form_definition_id,
+    :form_answer_id,
+    :configuration_id
   )
 
   belongs_to(:study, optional: true)
@@ -102,6 +105,9 @@ WHERE
     (item_type LIKE 'UserRole' and item_id IN
       (SELECT id FROM user_roles WHERE user_roles.user_id = :user_id))
 WHERE
+  scope :for_form_definition, -> (form_definition_id) { where(form_definition_id: form_definition_id) }
+  scope :for_form_answer, -> (form_answer_id) { where(form_answer_id: form_answer_id) }
+  scope :for_configuration, -> (configuration_id) { where(configuration_id: configuration_id) }
 
   def triggering_user
     case whodunnit

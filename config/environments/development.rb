@@ -12,6 +12,7 @@ Rails.application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
+
   # Show full error reports.
   config.consider_all_requests_local = true
 
@@ -61,6 +62,9 @@ Rails.application.configure do
   # number of complex assets.
   config.assets.debug = true
 
+  # Serve assets
+  config.action_controller.asset_host = "localhost:3000"
+
   # Raises error for missing translations
   config.action_view.raise_on_missing_translations = true
 
@@ -81,6 +85,7 @@ Rails.application.configure do
   config.max_allowed_password_age = 1.month
 
   config.image_storage_root = config.data_directory + '/images'
+  config.form_pdf_root = config.data_directory + '/form_pdfs'
   config.image_export_root = config.data_directory + '/images_export'
 
   config.dcm2xml = '/usr/bin/dcm2xml'

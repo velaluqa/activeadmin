@@ -23,6 +23,7 @@ table {
 @import "roles/general";
 @import "notification_profiles/json-editor";
 @import "email_templates/form";
+@import "form_definitions/builder";
 @import "help/general";
 @import "image_upload/general";
 @import "sidekiq/general";
@@ -45,4 +46,61 @@ form fieldset.inputs legend,
   color: #333333;
   background-color: #f5f5f5;
   border-color: #ddd;
+}
+
+a.nav-link {
+  border-radius: 0 !important;
+  border-top: 0 !important;
+}
+
+a.nav-link.active {
+  color: #495057;
+  background-color: #fff !important;
+  border-color: #fff #dee2e6 #fff !important;
+  border-radius: 0;
+}
+
+li.nav-item:first-child {
+.nav-link.active {
+  border-color: #fff #dee2e6 #fff #fff !important;
+  border-radius: 0;
+}
+}
+
+.formio-form .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.panel_contents pre {
+  margin-bottom: 0;
+}
+
+.formio-read-only {
+  .choices.form-group.formio-choices.is-disabled {
+    select.choices__input,
+    .choices__list--single button.choices__button,
+    .choices__list--dropdown {
+      display: none !important;
+    }
+  }
+  input.formio-select-autocomplete-input {
+    display: none !important;
+  }
+}
+
+#main_content {
+  .side-by-side {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+
+    .panel {
+      flex: 1 1 50%;
+
+      &:first-child {
+        margin-right: 15px;
+      }
+    }
+  }
 }

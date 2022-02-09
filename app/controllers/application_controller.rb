@@ -93,4 +93,31 @@ class ApplicationController < ActionController::Base
       format.json { render(json: { success: false, error: 'Password expired', error_code: 23 }, status: :unauthorized) }
     end
   end
+
+  def render_react(pack_name, options = {})
+    layout = options[:layout] || "external_react_spa"
+
+    @pack_name = pack_name
+    @component_props =
+      options
+        .except(:layout)
+        .deep_transform_keys { |key| key.to_s.camelize(:lower) }
+
+    render "v1/general/react_pack", layout: layout
+  end
+
+  def render_react_component(pack_name, options = {})
+    component_props =
+      options
+        .except(:layout)
+        .deep_transform_keys { |key| key.to_s.camelize(:lower) }
+
+    render(
+      partial: "v1/general/react_pack_component",
+      locals: {
+        pack_name: pack_name,
+        component_props: component_props
+      }
+    )
+  end
 end

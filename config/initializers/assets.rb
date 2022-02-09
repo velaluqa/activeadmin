@@ -15,10 +15,12 @@ Rails.application.config.assets.paths << Rails.root.join('vendor', 'assets', 'fo
 Rails.application.config.assets.precompile +=
   %w[
     application.css
+    external_form.css
     dashboard/main.js
     vendor/dicomParser.js
     uploader/main.js
     email_templates/form.js
+    email_templates/show.js
     patients/visit_templates.js
     forms_bootstrap_and_overrides.css
     image_hierarchy.js

@@ -32,6 +32,18 @@ services:
       - postgres
       - redis
       - worker
+      - webpack
+  webpack:
+    container_name: erica_webpack
+    build: *build
+    environment:
+      <<: *environment
+      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
+    command: ./bin/webpack-dev-server --no-inline
+    entrypoint: ""
+    volumes: *volumes
+    ports:
+      - '3035:3035'
   test:
     build: *build
     command: guard

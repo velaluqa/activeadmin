@@ -194,12 +194,22 @@ SELECT
     public_keys.active.last
   end
 
+
   def sign(data, signature_password)
     private_key = OpenSSL::PKey::RSA.new(self.private_key, signature_password)
 
     signature = private_key.sign(OpenSSL::Digest::RIPEMD160.new, data)
     pp OpenSSL.errors
     signature
+  end
+
+  def sign64(data, signature_password)
+    private_key = OpenSSL::PKey::RSA.new(self.private_key, signature_password)
+
+    signature = private_key.sign(OpenSSL::Digest::RIPEMD160.new, data)
+    pp OpenSSL.errors
+
+    Base64.encode64(signature)
   end
 
   def dashboard_configuration

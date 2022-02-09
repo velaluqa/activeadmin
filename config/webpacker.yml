@@ -64,8 +64,8 @@ development:
     public: 127.0.0.1:3035
     hmr: false
     # Inline should be set to true if using HMR
-    inline: true
-    overlay: true
+    inline: false
+    overlay: false
     compress: true
     disable_host_check: true
     use_local_ip: false
