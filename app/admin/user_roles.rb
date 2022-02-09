@@ -7,7 +7,7 @@ ActiveAdmin.register UserRole do
 
   actions :index, :new, :create, :edit, :update, :destroy
 
-  filter :scope_object, collection: -> { UserRole.accessible_scope_object_identifiers(current_ability) }
+  # filter :scope_object, collection: -> { UserRole.accessible_scope_object_identifiers(current_ability) }
   filter :role
   filter :permissions
 
