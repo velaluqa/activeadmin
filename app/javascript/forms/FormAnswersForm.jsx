@@ -46,9 +46,11 @@ export default ({ formDefinition, formLayout, configuration }) => {
           <div className="form-container">
             <h1>{formName}</h1>
             <Form
-              formReady={(formio) => (formio.nosubmit = true)}
+              formReady={(formio) => {
+                formio.nosubmit = true;
+                formio.submission = { data: query };
+              }}
               onChange={onChange}
-              submission={{ data: dirty ? formData : query }}
               form={formLayout}
             />
           </div>
