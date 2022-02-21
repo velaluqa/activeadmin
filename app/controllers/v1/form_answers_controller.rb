@@ -91,7 +91,7 @@ class V1::FormAnswersController < V1::ApiController
       format.pdf do
         send_data(
           form_answer.pdfa,
-          filename: "form_answers.pdf",
+          filename: "#{form_answer.form_definition.name}_answers_#{form_answer.public_key.user.name.gsub(" ", "_")}_#{form_answer.submitted_at.iso8601(3)}.pdf",
           disposition: 'inline'
         )
       end
