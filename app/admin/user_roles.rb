@@ -17,7 +17,7 @@ ActiveAdmin.register UserRole do
       if user_role.scope_object.nil?
         'system-wide'
       else
-        link_to user_role.scope_object
+        link_to user_role.scope_object, [:admin, user_role.scope_object]
       end
     end
     customizable_default_actions(current_ability)

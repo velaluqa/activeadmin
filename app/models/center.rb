@@ -90,6 +90,10 @@ SELECT
   before_destroy :ensure_no_patients
   before_save :ensure_study_is_unchanged
 
+  def to_s
+    "#{code} - #{name}"
+  end
+
   def full_name
     "#{code} - #{name}"
   end
