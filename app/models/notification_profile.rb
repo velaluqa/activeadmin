@@ -106,6 +106,15 @@ p #
 # **`updated_at`**                      | `datetime`         | `not null`
 #
 class NotificationProfile < ActiveRecord::Base
+  has_paper_trail(
+    class_name: 'Version',
+    version: :paper_trail_version,
+    versions: :paper_trail_versions,
+    meta: {
+      notification_profile_id: ->(notification_profile) { notification_profile.id },
+    }
+  )
+
   TRIGGERING_RESOURCES = %w[
     Study
     Center
