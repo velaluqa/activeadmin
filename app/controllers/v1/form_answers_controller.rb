@@ -120,9 +120,6 @@ class V1::FormAnswersController < V1::ApiController
     return false unless params[:id]
 
     form_answer = FormAnswer.find(params[:id])
-    params[:sig] == form_answer.answers_signature
-
-    ap sigH: params[:sigH], digest: Digest::SHA1.hexdigest(form_answer.answers_signature)
 
     params[:sigH] == Digest::SHA1.hexdigest(form_answer.answers_signature)
   end
