@@ -31,7 +31,7 @@ describe Migration::AddMissingVersionStudyId, silent_output: true do
     describe '::run' do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
-        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
+        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil, nil] + [@study.id] * 7)
       end
     end
   end
@@ -48,7 +48,7 @@ describe Migration::AddMissingVersionStudyId, silent_output: true do
     describe '::run' do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
-        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
+        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil, nil] + [@study.id] * 7)
       end
     end
   end
@@ -65,7 +65,7 @@ describe Migration::AddMissingVersionStudyId, silent_output: true do
     describe '::run' do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
-        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
+        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil, nil] + [@study.id] * 7)
       end
     end
   end
@@ -82,7 +82,7 @@ describe Migration::AddMissingVersionStudyId, silent_output: true do
     describe '::run' do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
-        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
+        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil, nil] + [@study.id] * 7)
       end
     end
   end
@@ -99,7 +99,7 @@ describe Migration::AddMissingVersionStudyId, silent_output: true do
     describe '::run' do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
-        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
+        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil, nil] + [@study.id] * 7)
       end
     end
   end
@@ -116,7 +116,7 @@ describe Migration::AddMissingVersionStudyId, silent_output: true do
     describe '::run' do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
-        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
+        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil, nil] + [@study.id] * 7)
       end
     end
   end
@@ -133,7 +133,7 @@ describe Migration::AddMissingVersionStudyId, silent_output: true do
     describe '::run' do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
-        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
+        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil, nil] + [@study.id] * 7)
       end
     end
   end
@@ -156,7 +156,7 @@ describe Migration::AddMissingVersionStudyId, silent_output: true do
     describe '::run' do
       it 'recreates all study ids' do
         Migration::AddMissingVersionStudyId.run
-        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil] + [@study.id] * 7)
+        expect(Version.order(:created_at).pluck(:study_id)).to eq([nil, nil, nil, nil] + [@study.id] * 7)
       end
     end
   end
