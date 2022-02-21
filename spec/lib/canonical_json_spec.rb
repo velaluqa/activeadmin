@@ -1,6 +1,6 @@
 require "canonical_json"
 
-fdescribe(Object) do
+describe(Object) do
   let(:array) do
     [
       '1',
