@@ -23,6 +23,6 @@ class FormAnswerDecorator < ApplicationDecorator
 
   def user_public_key
     user = public_key.user
-    link_to user.username, admin_public_key_path(public_key)
+    link_to user.name, admin_public_key_path(public_key)
   end
 end
