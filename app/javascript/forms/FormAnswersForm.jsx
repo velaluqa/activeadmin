@@ -1,12 +1,13 @@
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { Form } from "@formio/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useQueryString from "use-query-string";
 
 import SigningModal from "./SigningModal";
 import updateHistory from "../functions/updateHistory";
 
 export default ({ formDefinition, formLayout, configuration }) => {
+  const formio = useRef();
   const [query, setQuery] = useQueryString(window.location, updateHistory, {
     parseBooleans: true,
   });
@@ -24,9 +25,12 @@ export default ({ formDefinition, formLayout, configuration }) => {
     window.prefilledFormData = query;
   }, [JSON.stringify(query)]);
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    setSubmitting(true);
+  const handleSubmit = (e) => {
+    if (formio.current.checkValidity(null, false, null, true)) {
+      setSubmitting(true);
+    } else {
+      formio.current.submit();
+    }
   };
 
   const onChange = ({ isValid, data }) => {
@@ -46,10 +50,12 @@ export default ({ formDefinition, formLayout, configuration }) => {
           <div className="form-container">
             <h1>{formName}</h1>
             <Form
-              formReady={(formio) => {
-                formio.nosubmit = true;
-                formio.submission = { data: query };
+              formReady={(form) => {
+                formio.current = form;
+                formio.current.nosubmit = true;
+                formio.current.submission = { data: query };
               }}
+              options={{ highlightErrors: true }}
               onChange={onChange}
               form={formLayout}
             />
@@ -67,7 +73,11 @@ export default ({ formDefinition, formLayout, configuration }) => {
             className="form-container"
             style={{ padding: "16px", background: "#efefef" }}
           >
-            <Button color="primary" onClick={onSubmit} disabled={!formValid}>
+            <Button
+              color="primary"
+              onClick={handleSubmit}
+              disabled={!formValid}
+            >
               Submit Answers
             </Button>{" "}
             <Button onClick={() => setSubmitting(false)}>Reset</Button>
