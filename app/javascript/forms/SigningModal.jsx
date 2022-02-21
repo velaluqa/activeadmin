@@ -17,6 +17,7 @@ export default ({
   formId,
   configurationId,
   data,
+  signatureName,
   setFormAnswerId = () => {},
 }) => {
   const formRef = useRef();
@@ -76,12 +77,7 @@ export default ({
 
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        size="sm"
-        toggle={loading ? false : onClose}
-        centered
-      >
+      <Modal isOpen={isOpen} toggle={loading ? false : onClose} centered>
         <ModalHeader toggle={loading ? false : onClose}>
           Sign Results
         </ModalHeader>
@@ -109,9 +105,9 @@ export default ({
             </ModalFooter>
           </Modal>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter style={{ whiteSpace: "nowrap" }}>
           <Button color="primary" onClick={triggerSubmit} disabled={loading}>
-            Sign as {username}
+            Sign as {signatureName}
           </Button>{" "}
           <Button onClick={onClose} disabled={loading}>
             Cancel

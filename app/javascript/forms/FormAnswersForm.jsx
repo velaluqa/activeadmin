@@ -6,7 +6,7 @@ import useQueryString from "use-query-string";
 import SigningModal from "./SigningModal";
 import updateHistory from "../functions/updateHistory";
 
-export default ({ formDefinition, formLayout, configuration }) => {
+export default ({ user, formDefinition, formLayout, configuration }) => {
   const formio = useRef();
   const [query, setQuery] = useQueryString(window.location, updateHistory, {
     parseBooleans: true,
@@ -99,6 +99,7 @@ export default ({ formDefinition, formLayout, configuration }) => {
             isOpen={signing}
             configurationId={configurationId}
             formId={formId}
+            signatureName={user.name}
             onClose={() => setSigning(false)}
           />
         </ModalBody>

@@ -14,6 +14,7 @@ class V1::FormAnswersController < V1::ApiController
 
     render_react(
       "form_answers_new",
+      user: current_user.attributes.slice("id", "username", "name"),
       form_definition: form_definition.attributes,
       configuration: form_definition.configuration.attributes,
       form_layout: JSON.parse(form_definition.configuration.payload)
