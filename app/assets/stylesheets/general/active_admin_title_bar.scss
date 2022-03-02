@@ -51,24 +51,28 @@
 
   #titlebar_right {
     @extend .pull-right;
+    padding-right: 7.5px;
   }
 
   .action_items {
     font-size: 1.2em;
     margin-right: 15px;
+    padding: 0 7.5px;
   }
 
   .action_item {
-    a {
-      line-height: $menu-width;
-      margin: 0 7.5px;
+    a, label {
+      line-height: $menu-width*0.7;
+      margin: $menu-width*0.15 0;
+      padding: 0 7.5px;
       text-decoration: none;
       display: inline-block;
-      height: $menu-width;
+      height: $menu-width*0.7;
+      border-radius: 6px;
       color: $title-bar-link-color;
-      &:hover { color: $title-bar-link-hover-color; }
+      &:hover { color: $title-bar-link-hover-color; background-color: rgba(0,0,0,0.1) }
     }
-    a:before {
+    a:before, label:before {
       font-size: 1.2em;
       font-family: FontAwesome;
       margin: 0 7.5px 0 0;
@@ -87,6 +91,9 @@
     &.export_for_erica1 a:before { content: "\f56e"; }
     &.download_images a:before { content: "\f56d"; }
     &.reorder_visits a:before { content: "\f885"; }
+
+    &.upload a:before, &.upload label:before { content: "\f0ee"; }
+    &.save a:before { content: "\f00c"; }
 
     &.edit_dashboard a:before { content: "\f304"; }
     &.save_dashboard a:before { content: "\f00c"; }
