@@ -83,7 +83,7 @@ class V1::FormAnswersController < V1::ApiController
         render_react(
           "form_answers_show",
           form_answer: form_answer.attributes,
-          signature_user: form_answer.public_key.user.attributes,
+          signature_user: form_answer.public_key.user.attributes.pick(:id, :username, :name),
           form_definition: form_answer.form_definition.attributes,
           form_layout: JSON.parse(form_answer.configuration.payload)
         )
