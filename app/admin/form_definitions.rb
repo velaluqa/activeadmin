@@ -66,7 +66,12 @@ ActiveAdmin.register FormDefinition, name: "Form" do
         row :description
         row 'Current Configuration' do
           if can?(:read, form.current_configuration)
-            link_to form.current_configuration_id, admin_configuration_path(form.current_configuration)
+            html = ""
+            html << link_to(form.current_configuration_id, admin_configuration_path(form.current_configuration))
+            html << " ("
+            html << link_to("download", download_admin_configuration_path(form.current_configuration))
+            html << ")"
+            html.html_safe
           else
             form.current_configuration_id
           end

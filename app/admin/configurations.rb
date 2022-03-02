@@ -27,6 +27,15 @@ ActiveAdmin.register Configuration do
     end
   end
 
+  member_action :download, method: :get do
+    configuration = Configuration.find(params[:id])
+    send_data(
+      configuration.payload,
+      filename: "#{configuration.configurable.name}_#{configuration.id}.json",
+      disposition: 'attachment'
+    )
+  end
+
   action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
     url = admin_versions_path(
       audit_trail_view_type: 'configuration',
