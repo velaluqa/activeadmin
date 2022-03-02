@@ -125,6 +125,11 @@ ActiveAdmin.register FormDefinition, name: "Form" do
     link_to("Edit Form Schema", edit_form_schema_admin_form_definition_path(resource))
   end
 
+  action_item :upload, only: %i[edit_form_schema update_form_schema] do
+    input("upload-file", type:"file", id: "upload-file", accept: ".json", style: "display: none;")
+    label("Upload JSON", for: "upload-file", style: "cursor: pointer; font-weight: normal;")
+  end
+
   action_item :save, only: %i[edit_form_schema update_form_schema] do
     link_to("Save Form Schema", "#", id: "save_form_definition")
   end

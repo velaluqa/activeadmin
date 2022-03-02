@@ -21,10 +21,25 @@
 	  }
       }).then(function(builder) {
 	  window.builder = builder;
-	  builder.on('saveComponent', function() {
+	    builder.on('saveComponent', function() {
 	  });
+	  console.log(builder);
 
       });
+      function onChange(event) {
+	  var reader = new FileReader();
+	  reader.onload = onReaderLoad;
+	  reader.readAsText(event.target.files[0]);
+      }
+
+      function onReaderLoad(event){
+	  console.log(event.target.result);
+	  var obj = JSON.parse(event.target.result);
+	  console.log(obj);
+	  window.builder.setForm(obj)
+      }
+
+      $("#upload-file").on("change", onChange)
 
       $("#save_form_definition").click(function(e) {
 	  e.preventDefault();
