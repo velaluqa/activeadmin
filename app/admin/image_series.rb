@@ -18,11 +18,11 @@ ActiveAdmin.register ImageSeries do
     end
 
     def scoped_collection
-      if(session[:selected_study_id].nil?)
-        end_of_association_chain.includes(:patient => :center)
-      else
-        end_of_association_chain.includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
-      end
+      scope =
+        end_of_association_chain.includes(:images, :patient => :center)
+      return scope if session[:selected_study_id].nil?
+
+      scope.where('centers.study_id' => session[:selected_study_id])
     end
 
     def update
