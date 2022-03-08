@@ -1,4 +1,6 @@
 ActiveAdmin.register FormDefinition, name: "Form" do
+  decorate_with(FormDefinitionDecorator)
+
   menu(parent: 'read', priority: 10)
 
   permit_params(
@@ -18,20 +20,10 @@ ActiveAdmin.register FormDefinition, name: "Form" do
 
   index do
     selectable_column
-    column :name do |form|
-      link_to form.name, admin_form_definition_path(form)
-    end
-    column :status do |form|
-      if form.locked_at.nil?
-        status_tag("draft")
-      else
-        status_tag("locked", class: "ok")
-      end
-    end
+    column :name
+    column :status
     column :locked_at
-    column "Links" do |form|
-      link_to("Open Form", new_v1_form_form_answer_path(form.id), target: "_blank")
-    end
+    column "Links", :links
     customizable_default_actions(current_ability)
   end
 
@@ -39,8 +31,13 @@ ActiveAdmin.register FormDefinition, name: "Form" do
     f.inputs 'Details' do
       f.input(:name)
       f.input(:description)
+      # validate_study_id :none, :optional, :required
+      # validate_session_id :none, :optional, :required
+      # validate_resource :none, :optional, :required
+      # validate_resource_types :any, Visit, Required Series, Patient,
+      #   ImageSeries,
+      # sequence_scope :no_sequence, :form_definition, :session
     end
-
     f.actions
   end
 
@@ -51,7 +48,7 @@ ActiveAdmin.register FormDefinition, name: "Form" do
           render(
             partial: "form_preview",
             locals: {
-              form_layout: form.current_configuration.payload
+              form_layout: form.object.current_configuration.payload
             }
           )
         else
@@ -64,18 +61,7 @@ ActiveAdmin.register FormDefinition, name: "Form" do
         row :id
         row :name
         row :description
-        row 'Current Configuration' do
-          if can?(:read, form.current_configuration)
-            html = ""
-            html << link_to(form.current_configuration_id, admin_configuration_path(form.current_configuration))
-            html << " ("
-            html << link_to("download", download_admin_configuration_path(form.current_configuration))
-            html << ")"
-            html.html_safe
-          else
-            form.current_configuration_id
-          end
-        end
+        row :current_configuration
         row :locked_at
         row :created_at
         row :updated_at
