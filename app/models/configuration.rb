@@ -27,4 +27,12 @@ class Configuration < ApplicationRecord
     class_name: "Configuration",
     optional: true
   )
+
+  def data
+    JSON.parse(payload)
+  end
+
+  def data=(data)
+    self.payload = JSON.dump(data)
+  end
 end

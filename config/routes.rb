@@ -66,6 +66,8 @@ Rails.application.routes.draw do
   get 'wado' => 'wado#wado'
 
   namespace :v1 do
+    get 'dashboard' => 'dashboard#index'
+
     resources :images
     resources :image_series do
       member do
@@ -93,7 +95,11 @@ Rails.application.routes.draw do
         get :locked_configuration
       end
     end
-    resources :form_answers
+    resources :form_answers do
+      member do
+        post :sign
+      end
+    end
 
     get 'report' => 'report#index'
   end

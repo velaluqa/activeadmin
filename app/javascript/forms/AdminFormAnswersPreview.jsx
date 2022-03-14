@@ -20,7 +20,7 @@ const PdfFrame = ({ formAnswerId }) => {
 
 export default ({ formDefinition, formAnswer, configuration }) => {
   const answers = formAnswer.answers;
-  const formLayout = JSON.parse(configuration.payload);
+  const formLayout = JSON.parse(configuration.payload).layout;
 
   const [viewType, setViewType] = useStickyState(
     "viewer",
@@ -39,15 +39,17 @@ export default ({ formDefinition, formAnswer, configuration }) => {
             Viewer
           </NavLink>
         </NavItem>
-        <NavItem>
-          <NavLink
-            active={viewType === "pdf"}
-            onClick={() => setViewType("pdf")}
-            href="#"
-          >
-            PDF
-          </NavLink>
-        </NavItem>
+        {formAnswer.submittedAt && (
+          <NavItem>
+            <NavLink
+              active={viewType === "pdf"}
+              onClick={() => setViewType("pdf")}
+              href="#"
+            >
+              PDF
+            </NavLink>
+          </NavItem>
+        )}
         <NavItem>
           <NavLink
             active={viewType === "json"}
@@ -68,15 +70,7 @@ export default ({ formDefinition, formAnswer, configuration }) => {
         </NavItem>
       </Nav>
 
-      {viewType === "viewer" ? (
-        <div style={{ padding: 8 }}>
-          <Form
-            submission={{ data: answers }}
-            form={formLayout}
-            options={{ readOnly: true }}
-          />
-        </div>
-      ) : viewType === "pdf" ? (
+      {formAnswer.submittedAt && viewType === "pdf" ? (
         <div>
           <PdfFrame formAnswerId={formAnswer.id} />
         </div>
@@ -89,7 +83,13 @@ export default ({ formDefinition, formAnswer, configuration }) => {
           <pre>{JSON.stringify(formAnswer.answers, null, 2)}</pre>
         </div>
       ) : (
-        "Unknown"
+        <div style={{ padding: 8 }}>
+          <Form
+            submission={{ data: answers }}
+            form={formLayout}
+            options={{ readOnly: true }}
+          />
+        </div>
       )}
     </div>
   );

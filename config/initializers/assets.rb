@@ -29,4 +29,5 @@ Rails.application.config.assets.precompile +=
     role_form.js
     notification_profiles/filters_json_editor.js
     image_series_rearrange.js
+    form_answers/form.js
   ]

@@ -14,6 +14,8 @@ export default ({ formAnswer, signatureUser, formDefinition, formLayout }) => {
   });
   const { validate } = query || {};
 
+  console.log(signatureUser);
+
   const showSuccessMessage = query.message === "success";
   const hideSuccessMessage = () => {
     setQuery({ message: undefined });
@@ -24,7 +26,7 @@ export default ({ formAnswer, signatureUser, formDefinition, formLayout }) => {
   };
 
   return (
-    <div className="form-container">
+    <div className="form-container" style={{ marginTop: "70px" }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
       <link

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_09_083207) do
+ActiveRecord::Schema.define(version: 2022_03_11_101920) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -112,6 +112,15 @@ ActiveRecord::Schema.define(version: 2022_02_09_083207) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "form_answer_resources", force: :cascade do |t|
+    t.string "form_answer_id", null: false
+    t.string "resource_id", null: false
+    t.string "resource_type", null: false
+    t.index ["form_answer_id", "resource_id", "resource_type"], name: "form_answer_resources_primary_key_index", unique: true
+    t.index ["form_answer_id"], name: "index_form_answer_resources_on_form_answer_id"
+    t.index ["resource_id", "resource_type"], name: "form_answer_resources_resource_index"
+  end
+
   create_table "form_answers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "form_definition_id", null: false
     t.uuid "configuration_id", null: false
@@ -127,6 +136,12 @@ ActiveRecord::Schema.define(version: 2022_02_09_083207) do
     t.datetime "submitted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.integer "study_id"
+    t.integer "form_session_id"
+    t.integer "form_display_type_id"
+    t.datetime "published_at"
+    t.integer "sequence_number", default: 0, null: false
     t.index ["configuration_id"], name: "index_form_answers_on_configuration_id"
     t.index ["form_definition_id"], name: "index_form_answers_on_form_definition_id"
     t.index ["public_key_id"], name: "index_form_answers_on_public_key_id"
@@ -140,6 +155,14 @@ ActiveRecord::Schema.define(version: 2022_02_09_083207) do
     t.uuid "current_configuration_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "form_sessions", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_form_sessions_on_name"
   end
 
   create_table "forms", id: :serial, force: :cascade do |t|

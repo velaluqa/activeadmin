@@ -14,10 +14,10 @@ class V1::FormAnswersController < V1::ApiController
 
     render_react(
       "form_answers_new",
-      user: current_user.attributes.slice("id", "username", "name"),
+      current_user: current_user.attributes.slice("id", "username", "name"),
       form_definition: form_definition.attributes,
       configuration: form_definition.configuration.attributes,
-      form_layout: JSON.parse(form_definition.configuration.payload)
+      form_layout: form_definition.layout
     )
   end
 
@@ -31,7 +31,6 @@ class V1::FormAnswersController < V1::ApiController
     answers_signature = nil
     annotated_images_signature = nil
 
-    ap configuration
     begin
       answers_signature =
         current_user.sign64(answers.to_h.to_canonical_json, signing_password)
@@ -83,9 +82,9 @@ class V1::FormAnswersController < V1::ApiController
         render_react(
           "form_answers_show",
           form_answer: form_answer.attributes,
-          signature_user: form_answer.public_key.user.attributes.pick(:id, :username, :name),
+          signature_user: form_answer.public_key.user.attributes.pick("id", "name", "username"),
           form_definition: form_answer.form_definition.attributes,
-          form_layout: JSON.parse(form_answer.configuration.payload)
+          form_layout: form_answer.layout
         )
       end
       format.pdf do
@@ -98,12 +97,67 @@ class V1::FormAnswersController < V1::ApiController
     end
   end
 
+  def edit
+    # TODO: authorize
+    form_answer = FormAnswer.find(params[:id])
+
+    render_react(
+      "form_answers_edit",
+      form_answer: form_answer.attributes,
+      current_user: current_user.attributes.pick("id", "name", "username"),
+      form_definition: form_answer.form_definition.attributes,
+      form_layout: form_answer.layout
+    )
+  end
+
   def update
 
   end
 
-  def submit
-    # json -> save values
+  def sign
+    answers = form_params[:answers]
+    signing_password = form_params[:signing_password]
+    answers_signature = nil
+    annotated_images_signature = nil
+
+    begin
+      answers_signature =
+        current_user.sign64(answers.to_h.to_canonical_json, signing_password)
+      annotated_images_signature =
+        current_user.sign64({}.to_json, signing_password)
+    rescue OpenSSL::PKey::RSAError => e
+      render(
+        json: {
+          status: 401,
+          error: e.to_s
+        },
+        status: 401
+      )
+      return
+    end
+
+    form_answer = FormAnswer.find(params[:id])
+    form_answer.user = current_user
+    form_answer.public_key = current_user.active_public_key
+    form_answer.answers = answers
+    form_answer.answers_signature = answers_signature
+    form_answer.annotated_images = {}
+    form_answer.annotated_images_signature = annotated_images_signature
+    form_answer.submitted_at = DateTime.now
+    form_answer.save!
+
+    respond_to do |format|
+      format.json do
+        render(
+          json: {
+            status: 200,
+            form_answer_id: form_answer.id,
+            message: "submitted_and_signed"
+          },
+          status: 200
+        )
+      end
+    end
   end
 
   private
@@ -117,6 +171,7 @@ class V1::FormAnswersController < V1::ApiController
   end
 
   def authenticating_signature_param?
+    return false unless action_name == "show"
     return false unless params[:id]
 
     form_answer = FormAnswer.find(params[:id])

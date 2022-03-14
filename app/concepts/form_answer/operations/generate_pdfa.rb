@@ -27,7 +27,7 @@ class FormAnswer::GeneratePdfa < Trailblazer::Operation # :nodoc:
           form_answer: form_answer.attributes,
           signature_user: form_answer.public_key.user.attributes,
           form_definition: form_answer.form_definition.attributes,
-          form_layout: JSON.parse(form_answer.configuration.payload)
+          form_layout: form_answer.layout
         }.deep_transform_keys { |k| k.to_s.camelize(:lower) }
       }
     )
@@ -41,8 +41,6 @@ class FormAnswer::GeneratePdfa < Trailblazer::Operation # :nodoc:
     grover_pdf = Tempfile.open(%w[grover pdf], binmode: true)
     grover_pdf.write(pdf)
     grover_pdf.close
-
-    File.binwrite("/app/grover.test.pdf", pdf)
 
     answers_json = Tempfile.open(%w[answers json])
     answers_json.write(form_answer.answers.to_canonical_json)

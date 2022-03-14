@@ -71,6 +71,11 @@ li.nav-item:first-child {
   margin-bottom: 0;
 }
 
+form .formio-form .form-group {
+  margin-right: 0;
+  margin-left: 0;
+}
+
 .panel_contents pre {
   margin-bottom: 0;
 }
@@ -95,12 +100,44 @@ li.nav-item:first-child {
     align-items: flex-start;
     width: 100%;
 
-    .panel {
+    &> * {
       flex: 1 1 50%;
+    }
 
-      &:first-child {
-        margin-right: 15px;
+    &> * + * {
+      margin-left: 15px;
+    }
+  }
+}
+
+.form_answers.ui-sortable {
+  fieldset ol {
+    display: flex;
+    flex-direction: row;
+    
+    li.input {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 0;
+      
+      label {
+        display: none;
       }
+    }
+
+    li.ui-sortable-handle {
+      text-align: center;
+      width: 50px;
+      background: #eeeeee;
+      color: #999;
+      border-radius: 3px;
+      order: -1;
+      margin-left: 0;
+      margin-right: 16px;
+    }
+    
+    li + li {
+      margin-left: 16px;
     }
   }
 }

@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">
+<script src="https://cdn.form.io/formiojs/formio.full.min.js"></script>
+<div id="formio"></div>
+
+<script>
+  $(document).ready(function() {
+    var answersEl = document.getElementById("form_answer_answers_json");
+    Formio.createForm(document.getElementById('formio'), JSON.parse(<%= form_layout.to_json.html_safe %>)).then((form) => {
+      form.submission = {
+	data: JSON.parse(answersEl.value || "{}")
+      };
+      form.on("change", function(changed) {
+
+	console.log(answersEl, changed);
+	answersEl.value = JSON.stringify(changed.data)
+      });
+    });
+  })
+</script>

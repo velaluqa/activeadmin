@@ -8,7 +8,14 @@ ActiveAdmin.register FormDefinition, name: "Form" do
     :description,
     :id,
     :layout,
-    :previous_configuration_id
+    :previous_configuration_id,
+    :validates_user_id,
+    :validates_study_id,
+    :validates_form_session_id,
+    :validates_resource_id,
+    :validates_resource_type,
+    :listing,
+    :sequence_scope
   )
 
   controller do
@@ -31,12 +38,38 @@ ActiveAdmin.register FormDefinition, name: "Form" do
     f.inputs 'Details' do
       f.input(:name)
       f.input(:description)
-      # validate_study_id :none, :optional, :required
-      # validate_session_id :none, :optional, :required
-      # validate_resource :none, :optional, :required
-      # validate_resource_types :any, Visit, Required Series, Patient,
-      #   ImageSeries,
-      # sequence_scope :no_sequence, :form_definition, :session
+    end
+    f.inputs 'Form Answer Settings' do
+      f.input(
+        :validates_user_id,
+        as: :select,
+        include_blank: false,
+        collection: FormDefinition::VALIDATION_VALUES
+      )
+      f.input(
+        :validates_study_id,
+        as: :select,
+        include_blank: false,
+        collection: FormDefinition::VALIDATION_VALUES
+      )
+      f.input(
+        :validates_form_session_id,
+        as: :select,
+        include_blank: false,
+        collection: FormDefinition::VALIDATION_VALUES
+      )
+      f.input(
+        :validates_resource_id,
+        as: :select,
+        include_blank: false,
+        collection: FormDefinition::VALIDATION_VALUES
+      )
+      f.input(
+        :validates_resource_type,
+        as: :select,
+        include_blank: false,
+        collection: FormDefinition::RESOURCE_TYPES
+      )
     end
     f.actions
   end
@@ -44,27 +77,37 @@ ActiveAdmin.register FormDefinition, name: "Form" do
   show do |form|
     div class: "side-by-side" do
       panel("Form Preview") do
-        if form.current_configuration
-          render(
-            partial: "form_preview",
-            locals: {
-              form_layout: form.object.current_configuration.payload
-            }
-          )
-        else
+        if form.layout.empty?
           div style: "padding: 8px" do
             "Not yet configured"
           end
+        else
+          render(
+            partial: "form_preview",
+            locals: {
+              form_layout: JSON.dump(form.layout)
+            }
+          )
         end
       end
-      attributes_table do
-        row :id
-        row :name
-        row :description
-        row :current_configuration
-        row :locked_at
-        row :created_at
-        row :updated_at
+
+      div do
+        attributes_table do
+          row :id
+          row :name
+          row :description
+          row :current_configuration
+          row :locked_at
+          row :created_at
+          row :updated_at
+        end
+        attributes_table title: "Form Answer Settings" do
+          row :validates_user_id
+          row :validates_study_id
+          row :validates_form_session_id
+          row :validates_resource_id
+          row :validates_resource_type
+        end
       end
     end
   end
@@ -73,25 +116,33 @@ ActiveAdmin.register FormDefinition, name: "Form" do
   filter :description
 
   member_action :edit_form_schema, method: :get do
+    # TODO: Authorize for edit, form_definition
     @form_definition_id = params[:id]
     @form = FormDefinition.find(params[:id])
     @previous_configuration_id = @form.current_configuration.andand.id
-    @form_layout = @form.current_configuration.andand.payload || "{}"
+    @form_layout = JSON.dump(@form.current_configuration.andand.data.andand["layout"]) || "{}"
     render "edit_form_schema"
   end
 
   member_action :update_form_schema, method: :post do
+    # TODO: Move into trailblazer operation
+    # TODO: Authorize edit FormDefinition
     @form_definition_id = params[:id]
     form = FormDefinition.find(params[:id])
     if params[:layout] == form.current_configuration.andand.payload
       flash[:notice] = "Form layout did not change."
       redirect_to admin_form_definition_path(form)
     else
+      previous_configuration = Configuration.where(id: params[:previous_configuration_id]).first
+      data = {}
+      data = previous_configuration.data if previous_configuration
+      data["layout"] = JSON.parse(params[:layout])
+
       configuration = Configuration.create(
         previous_configuration_id: params[:previous_configuration_id],
         configurable: form,
         schema_spec: 'formio_v1',
-        payload: params[:layout]
+        payload: JSON.dump(data)
       )
 
       form.current_configuration_id = configuration.id
@@ -108,7 +159,7 @@ ActiveAdmin.register FormDefinition, name: "Form" do
   end
 
   action_item :edit, only: :show do
-    link_to("Edit Form Schema", edit_form_schema_admin_form_definition_path(resource))
+    link_to("Form Layout Editor", edit_form_schema_admin_form_definition_path(resource))
   end
 
   action_item :upload, only: %i[edit_form_schema update_form_schema] do

@@ -5,11 +5,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import FormAnswersNew from '../forms/FormAnswersNew';
+import Dashboard from '../user/Dashboard';
 
 document.addEventListener("DOMContentLoaded", () => {
   ReactDOM.render(
-    <FormAnswersNew {...window.componentProps} />,
+    <Dashboard {...window.componentProps} />,
     document.getElementById("app")
   );
 });

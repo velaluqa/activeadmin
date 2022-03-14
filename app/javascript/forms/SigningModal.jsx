@@ -14,12 +14,12 @@ import React, { useRef, useState } from "react";
 export default ({
   isOpen,
   onClose = () => {},
-  formId,
-  configurationId,
   data,
   signatureName,
-  setFormAnswerId = () => {},
+  onSign,
 }) => {
+  console.log(onSign);
+
   const formRef = useRef();
   const username = "aandersen";
   const [signingPassword, setSigningPassword] = useState("");
@@ -38,35 +38,20 @@ export default ({
     if (loading) return;
 
     setLoading(true);
-    fetch(`/v1/forms/${formId}/answers`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "X-CSRF-Token": $("meta[name=csrf-token]").attr("content"),
-      },
-      body: JSON.stringify({
-        form_answer: {
-          signing_password: signingPassword,
-          configuration_id: configurationId,
-          answers: data,
-        },
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ status, ...rest }) => {
-        if (status == 401) {
-          setError("Wrong password or corrupt signing key");
-          setShowError(true);
-        }
-        if (status == 200) {
-          window.location.replace(
-            `/v1/form_answers/${rest.form_answer_id}?message=success`
-          );
-        }
 
-        setLoading(false);
-      });
+    console.log("handle on sign ", onSign);
+
+    if (onSign) {
+      onSign({ answers: data, signingPassword })
+        .then((error) => {
+          setLoading(false);
+        })
+        .catch((error) => {
+          setLoading(false);
+          setError(error);
+          setShowError(true);
+        });
+    }
   };
 
   const triggerSubmit = () => {
@@ -93,6 +78,7 @@ export default ({
                 autoComplete="new-password"
                 onChange={(e) => setSigningPassword(e.target.value)}
                 value={signingPassword}
+                disabled={loading}
               />
             </FormGroup>
           </Form>

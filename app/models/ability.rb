@@ -13,6 +13,7 @@ class Ability
     EmailTemplate => %i[manage read update create destroy],
     ImageSeries => %i[manage read update create destroy comment upload assign_patient assign_visit],
     Image => %i[manage read update create destroy],
+    FormSession => %i[manage read update create destroy],
     FormDefinition => %i[manage read update create destroy],
     FormAnswer => %i[manage read update create destroy],
     NotificationProfile => %i[manage read update create destroy],
