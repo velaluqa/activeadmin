@@ -55,7 +55,7 @@ $ ->
     initializeSimpleSelects($fieldset.find('.initialize-select2'))
     initializeRecordSearch($fieldset.find('.select2-record-search'))
 
-  initializeSimpleSelects()
+  initializeSimpleSelects($("select:not(.select2-record-search, .no-auto-select2, .choices__input)"))
   initializeRecordSearch()
 
   $('body').on 'select2:open', (e) ->

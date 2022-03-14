@@ -267,7 +267,7 @@ ActiveAdmin.register Visit do
   end
 
   # filters
-  filter :patient, :collection => []
+  filter :patient, :collection => [], input_html: { class: "no-auto-select2"}
   filter :visit_number
   filter :description
   filter :visit_type
