@@ -1,15 +1,17 @@
 import React from "react";
+import useQueryString from "use-query-string";
 
 import FormAnswerForm from "./FormAnswerForm";
 import FormContainer from "./FormContainer";
 import signAndCreate from "./signAndCreate";
+import updateHistory from "../functions/updateHistory";
 
 export default ({ currentUser, formDefinition, formLayout, configuration }) => {
   const [query, setQuery] = useQueryString(window.location, updateHistory, {
     parseBooleans: true,
   });
 
-  const { referrer, ...prefilledFromQuery } = query;
+  const { referrer, ...prefilledFormData } = query;
 
   const { id: formId } = formDefinition;
   const { id: configurationId } = configuration;
