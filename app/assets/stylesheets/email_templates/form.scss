@@ -12,8 +12,8 @@ body.admin_email_templates {
       margin-top: 0;
       padding: 5px 0;
       label {
-	white-space: nowrap;
-	margin-right: 15px;
+        white-space: nowrap;
+        margin-right: 15px;
       }
     }
   }
@@ -38,17 +38,17 @@ body.admin_email_templates {
       float: right;
       margin: 0;
       a {
-	display: inline-block;
-	width: 46px;
-	height: 46px;
-	line-height: 46px;
-	text-align: center;
-	font-size: 16px;
-	color: #dedede;
-	text-decoration: none;
-	&:hover {
-	  background-color: rgba(255,2555,255, 0.1);
-	}
+        display: inline-block;
+        width: 46px;
+        height: 46px;
+        line-height: 46px;
+        text-align: center;
+        font-size: 16px;
+        color: #dedede;
+        text-decoration: none;
+        &:hover {
+          background-color: rgba(255,2555,255, 0.1);
+        }
       }
     }
   }
@@ -68,31 +68,46 @@ body.admin_email_templates {
     border-radius: 0 0 4px 4px;
   }
 
-  .iframe-wrapper {
-    position: absolute;
-    top: 45px;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  #email-template-preview-container {
+    fieldset {
+      height: 600px;
+      display: flex;
+      align-items: stretch;
+      flex-direction: column;
 
-    @media screen and (max-width: 992px) {
-      left: 0;
-      bottom: 0;
-    }
+      .select2 {
+        float: right;
+      }
 
-    background-color: #fff;
-    border-top: 1px solid $panel-default-border;
-    border-radius: 0 0 4px 4px;
+      .string.input {
+        label {
+          margin-left: 15px;
+        }
+      }
 
-    iframe {
-      transition: opacity ease-in-out .3s;
-      opacity: 1;
-      border: 0;
-    }
+      ol {
+        width: 100%;
+        flex: 0 0;
+      }
 
-    &.loading {
-      iframe {
-	opacity: 0.2;
+      div.iframe-wrapper {
+        flex: 1;
+        height: 100%;
+        background-color: #fff;
+        border-top: 1px solid $panel-default-border;
+        border-radius: 0 0 4px 4px;
+        iframe {
+          transition: opacity ease-in-out .3s;
+          opacity: 1;
+          border: 0;
+        }
+
+        &.loading {
+          iframe {
+            opacity: 0.2;
+          }
+        }
+
       }
     }
   }
@@ -105,35 +120,22 @@ body.admin_email_templates {
       padding: 0;
 
       &.padded {
-	fieldset {
-	  margin-left: 15px;
+        fieldset {
+          margin-left: 15px;
 
-	  @media screen and (max-width: 992px) {
-	    margin-left: 0;
-	  }
-	}
+          @media screen and (max-width: 992px) {
+            margin-left: 0;
+          }
+        }
 
-	@media screen and (max-width: 992px) {
-	  margin-top: 20px;
-	}
+        @media screen and (max-width: 992px) {
+          margin-top: 20px;
+        }
       }
     }
   }
 
   form .inputs li .select2.select2-container {
     margin-right: 4px;
-  }
-  .preview {
-    fieldset {
-      .select2 {
-	float: right;
-      }
-
-      .string.input {
-	label {
-	  margin-left: 15px;
-	}
-      }
-    }
   }
 }
