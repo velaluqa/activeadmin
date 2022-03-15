@@ -74,7 +74,6 @@ class FormAnswerDecorator < ApplicationDecorator
     [
       "#{form_definition.name} ",
       user ? " by #{user.name}" : "",
-      status
     ].join.html_safe
   end
 end

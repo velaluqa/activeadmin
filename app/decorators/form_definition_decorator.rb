@@ -3,6 +3,10 @@ class FormDefinitionDecorator < ApplicationDecorator
 
   include Draper::LazyHelpers
 
+  def display_name
+    object.name
+  end
+
   def name
     link_to(object.name, admin_form_definition_path(object))
   end
