@@ -9,9 +9,15 @@ ActiveAdmin.register FormAnswer do
 
   includes(:form_definition, :configuration, :user, public_key: :user)
 
+  scope :all, default: true
+  scope :draft
+  scope :published
+  scope :signed
+
   filter :form_session
   filter :form_definition
-  filter :configuration_id, as: :string
+  filter :form_answer_resources_resource_type, label: "Associated Resource Type", as: :select, collection: (FormDefinition::RESOURCE_TYPES - ["any"]).sort
+  filter :user, as: :select
   filter :is_test_data
   filter :is_obsolete
   filter :signed_at
@@ -38,9 +44,9 @@ ActiveAdmin.register FormAnswer do
   index do
     selectable_column
 
-    column :form_session
+    column :form_session, sortable: "form_sessions.name"
     column "#", :sequence_number
-    column :form_definition
+    column :form_definition, sortable: "form_definitions.name"
     column :resources
     column :status
     column "User", :user, sortable: "users.name"

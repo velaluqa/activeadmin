@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_11_101920) do
+ActiveRecord::Schema.define(version: 2022_03_15_164749) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -113,7 +113,7 @@ ActiveRecord::Schema.define(version: 2022_03_11_101920) do
   end
 
   create_table "form_answer_resources", force: :cascade do |t|
-    t.string "form_answer_id", null: false
+    t.uuid "form_answer_id", null: false
     t.string "resource_id", null: false
     t.string "resource_type", null: false
     t.index ["form_answer_id", "resource_id", "resource_type"], name: "form_answer_resources_primary_key_index", unique: true
