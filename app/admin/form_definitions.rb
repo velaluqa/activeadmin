@@ -28,8 +28,6 @@ ActiveAdmin.register FormDefinition, name: "Form" do
   index do
     selectable_column
     column :name
-    column :status
-    column :locked_at
     column "Links", :links
     customizable_default_actions(current_ability)
   end
