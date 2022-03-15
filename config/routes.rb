@@ -100,6 +100,7 @@ Rails.application.routes.draw do
         post :sign
       end
     end
+    resources :form_sessions, only: %i[show]
 
     get 'report' => 'report#index'
   end

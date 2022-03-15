@@ -14,8 +14,6 @@ export default ({ formAnswer, signatureUser, formDefinition, formLayout }) => {
   });
   const { validate } = query || {};
 
-  console.log(signatureUser);
-
   const showSuccessMessage = query.message === "success";
   const hideSuccessMessage = () => {
     setQuery({ message: undefined });

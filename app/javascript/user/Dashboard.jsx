@@ -24,12 +24,16 @@ import updateHistory from "../functions/updateHistory";
 const signedCount = (answers) =>
   filter(answers, ({ submittedAt }) => !!submittedAt).length;
 
-export default ({ formSessions, formAnswers }) => {
+export default ({ currentUser, formSessions, formAnswers }) => {
   const [query, setQuery] = useQueryString(window.location, updateHistory, {
     parseBooleans: true,
   });
 
   const { message } = query;
+
+  const startSession = (id) => {
+    window.location = `/v1/form_sessions/${id}?referrer=dashboard`;
+  };
 
   const openForm = (id) => {
     window.location = `/v1/form_answers/${id}/edit?referrer=dashboard`;
@@ -37,6 +41,7 @@ export default ({ formSessions, formAnswers }) => {
 
   return (
     <Container style={{ marginTop: "64px" }}>
+      <h4 style={{ margin: "32px 0" }}>Welcome back, {currentUser.name}!</h4>
       {formAnswers.length == 0 && formSessions.length == 0 && (
         <Alert>
           <h4 className="alert-heading">Well done!</h4>
@@ -51,34 +56,50 @@ export default ({ formSessions, formAnswers }) => {
               <CardSubtitle className="mb-2 text-muted" tag="h6">
                 Sessions contain a sequence of tasks for you to perform.
               </CardSubtitle>
-              <CardText>
-                <Table borderless>
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Session Name</th>
-                      <th>Tasks</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {formSessions.map(({ name, answers }, i) => (
+              {formSessions.length > 0 ? (
+                <CardText>
+                  <Table borderless>
+                    <thead>
                       <tr>
-                        <th scope="row">{i + 1}</th>
-                        <td>{name}</td>
-                        <td>
-                          {signedCount(answers)} / {answers.length}
-                        </td>
-                        <td style={{ textAlign: "right" }}>
-                          <Button color="primary" size="sm">
-                            Start Session
-                          </Button>
-                        </td>
+                        <th>#</th>
+                        <th>Session Name</th>
+                        <th>Tasks</th>
+                        <th></th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </CardText>
+                    </thead>
+                    <tbody>
+                      {formSessions.map(({ id, name, answers }, i) => (
+                        <tr>
+                          <th scope="row">{i + 1}</th>
+                          <td>{name}</td>
+                          <td>
+                            {signedCount(answers)} / {answers.length}
+                          </td>
+                          <td style={{ textAlign: "right" }}>
+                            <Button
+                              color="primary"
+                              size="sm"
+                              onClick={() => startSession(id)}
+                            >
+                              Start Session
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </CardText>
+              ) : (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "32px 16px",
+                    color: "#ccc",
+                  }}
+                >
+                  Currently no sessions available
+                </div>
+              )}
             </CardBody>
           </Card>
         </Col>
@@ -90,8 +111,8 @@ export default ({ formSessions, formAnswers }) => {
                 These tasks have been assigned to you or can be claimed by
                 anyone.
               </CardSubtitle>
-              <CardText>
-                {formAnswers.length > 0 ? (
+              {formAnswers.length > 0 ? (
+                <CardText>
                   <Table borderless>
                     <thead>
                       <tr>
@@ -128,18 +149,18 @@ export default ({ formSessions, formAnswers }) => {
                       )}
                     </tbody>
                   </Table>
-                ) : (
-                  <div
-                    style={{
-                      textAlign: "center",
-                      padding: "32px 16px",
-                      color: "#ccc",
-                    }}
-                  >
-                    Currently no tasks assigned
-                  </div>
-                )}
-              </CardText>
+                </CardText>
+              ) : (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "32px 16px",
+                    color: "#ccc",
+                  }}
+                >
+                  Currently no tasks available
+                </div>
+              )}
             </CardBody>
           </Card>
         </Col>

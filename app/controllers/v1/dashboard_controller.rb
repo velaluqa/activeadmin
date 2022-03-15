@@ -11,7 +11,7 @@ class V1::DashboardController < ApplicationController
 
     render_react(
       "user_dashboard",
-      user: current_user.attributes.slice("id", "username", "name"),
+      current_user: current_user.attributes.slice("id", "username", "name"),
       form_answers: form_answers.includes(:form_definition, form_answer_resources: :resource).map do |answer|
         answer.attributes
           .merge(

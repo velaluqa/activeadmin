@@ -47,4 +47,14 @@ ActiveAdmin.register FormSession do
 
     f.actions
   end
+
+  action_item :edit, only: :show do
+    link_to "Publish all Form Answers", publish_admin_form_session_path(resource) if resource.form_answers.draft.exists?
+  end
+
+  member_action :publish, method: :get do
+    form_session = FormSession.find(params[:id])
+    form_session.form_answers.draft.map(&:publish!)
+    redirect_back(fallback_location: admin_form_session_path(form_session))
+  end
 end

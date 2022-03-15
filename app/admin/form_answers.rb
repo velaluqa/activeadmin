@@ -195,6 +195,10 @@ ActiveAdmin.register FormAnswer do
     link_to('Audit Trail', url)
   end
 
+  action_item :edit, only: :show do
+    link_to "Publish", publish_admin_form_answer_path(resource) unless resource.published?
+  end
+
   member_action :publish, only: [:index] do
     answer = FormAnswer.find(params[:id])
     answer.published_at = DateTime.now

@@ -1,6 +1,8 @@
 class FormAnswer < ApplicationRecord
   include ConfigurationPathAccessor
 
+  before_create :set_sequence_number_for_session
+
   has_paper_trail(
     class_name: 'Version',
     meta: {
@@ -115,6 +117,16 @@ class FormAnswer < ApplicationRecord
     ERICA.form_pdf_path.join("#{id}.pdf").to_s
   end
 
+  def status
+    if signed?
+      "signed"
+    elsif published?
+      "published"
+    elsif draft?
+      "draft"
+    end
+  end
+
   def signed?
     valid_signature?
   end
@@ -133,5 +145,19 @@ class FormAnswer < ApplicationRecord
 
   def resource_labels
     form_answer_resources.map(&:resource).map(&:to_s).join(", ")
+  end
+
+  def publish!
+    self.published_at = DateTime.now
+    save!
+  end
+
+  private
+
+  def set_sequence_number_for_session
+    return unless form_session
+
+    last_sequence_number = form_session.form_answers.order(sequence_number: :desc).first.andand.sequence_number || 0
+    self.sequence_number = last_sequence_number + 1
   end
 end

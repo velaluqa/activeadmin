@@ -7,7 +7,7 @@ import {
   ModalHeader,
 } from "reactstrap";
 import { Form } from "@formio/react";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import useQueryString from "use-query-string";
 
 import SigningModal from "./SigningModal";
@@ -23,6 +23,7 @@ export default ({
   signable = true,
   savable = false,
   extraButtons = null,
+  formAnswerId,
 }) => {
   const formio = useRef();
   const [query, setQuery] = useQueryString(window.location, updateHistory, {
@@ -36,6 +37,7 @@ export default ({
   const [dirty, setDirty] = useState(false);
 
   const handleSubmit = (e) => {
+    console.log("handleSubmit", e);
     if (formio.current.checkValidity(null, false, null, true)) {
       setSubmitting(true);
     } else {
@@ -44,10 +46,23 @@ export default ({
   };
 
   const onChange = ({ isValid, data }) => {
+    console.log("onChange", isValid, data, formAnswerId);
     setFormData(data);
     setDirty(true);
     setFormValid(isValid);
   };
+
+  // useEffect(() => {
+  //   console.log("formAnswerId changed", formAnswerId, value);
+  //   setSubmitting(false);
+  //   setSigning(false);
+  //   setFormValid(false);
+  //   setDirty(false);
+  //   setFormData(value);
+  //   if (formio.current) {
+  //     formio.current.submission = { data: value };
+  //   }
+  // }, [formAnswerId, value]);
 
   return (
     <div style={{ flex: "1 1 100%", display: "flex", flexDirection: "column" }}>
