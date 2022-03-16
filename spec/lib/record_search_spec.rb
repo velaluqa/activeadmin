@@ -69,7 +69,7 @@ CONFIG
             'study_id' => nil,
             'study_name' => nil,
             'text' => "Visit Comment by #{user.name}",
-            'result_id' => study1.id,
+            'result_id' => active_admin_comment.id,
             'result_type' => 'Comment'
           )
       end
