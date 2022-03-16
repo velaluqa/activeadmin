@@ -29,7 +29,7 @@ class Configuration < ApplicationRecord
   )
 
   def data
-    JSON.parse(payload)
+    JSON.parse(payload[0] == "{" ? payload : "{}")
   end
 
   def data=(data)
