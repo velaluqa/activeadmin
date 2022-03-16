@@ -44,6 +44,11 @@ module NotificationObservable
 
         def relations
           @klass._reflections.values.map do |reflection|
+            # TODO: Add selectable options for polymorphic
+            # associations e.g. as "Related Visit Resource", "Related
+            # Study Resource", etc. for FormAnswer models.
+            # relation: { type: "Visit", attribute: { equals: "value" } }
+
             # Polymorphic relations do not have a `@klass`, but need
             # to be checked before calling `reflection.klass`, because
             # the `klass` method would try to find the class constant,
