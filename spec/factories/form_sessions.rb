@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :form_session do
-    name { "MyString" }
-    description { "MyString" }
+    sequence(:name) { |n| puts n; "Test Session #{n}" }
+    description { "" }
   end
 end
