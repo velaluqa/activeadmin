@@ -123,6 +123,8 @@ class NotificationProfile < ActiveRecord::Base
     Image
     Visit
     RequiredSeries
+    FormAnswer
+    FormSession
   ].freeze
 
   has_paper_trail class_name: 'Version'

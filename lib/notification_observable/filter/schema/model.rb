@@ -49,6 +49,11 @@ module NotificationObservable
             # the `klass` method would try to find the class constant,
             # which mustn't be defined for polymorphic relations.
             next if reflection.polymorphic?
+
+            # TODO: Allow :through relations by grabbing the other
+            # relations reflection information.
+            next if reflection.options[:through]
+
             # Through relations do not have a `@klass`.
             next unless reflection.andand.klass
             next if options[:ignore_relations].include?(reflection.klass)

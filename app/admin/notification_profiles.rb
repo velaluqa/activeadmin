@@ -122,7 +122,7 @@ ActiveAdmin.register NotificationProfile do
       f.input :triggering_resource, as: :select, collection: NotificationProfile::TRIGGERING_RESOURCES, input_html: { class: 'initialize-select2', 'data-placeholder': 'Select triggering resource' }
     end
 
-    f.inputs 'Filters', class: 'filters' do
+    f.inputs 'Filters', class: 'inputs filters' do
       f.input :filters_json, as: :hidden
       f.render partial: 'filters_json_editor'
     end
@@ -158,7 +158,7 @@ ActiveAdmin.register NotificationProfile do
       )
       f.input :only_authorized_recipients
       f.input :maximum_email_throttling_delay, as: :select, collection: Email.allowed_throttling_delays, input_html: { class: 'initialize-select2', 'data-placeholder': 'Select maximum email throttling delay' }
-      f.input :email_template_id, as: :select, collection: EmailTemplate.where(email_type: 'NotificationProfile'), input_html: { class: 'initialize-select2', 'data-placeholder': 'Select template' }
+      f.input :email_template, as: :select, collection: EmailTemplate.where(email_type: 'NotificationProfile'), input_html: { class: 'initialize-select2', 'data-placeholder': 'Select template' }
     end
 
     f.actions
@@ -171,6 +171,8 @@ ActiveAdmin.register NotificationProfile do
       render json: NotificationObservable::Filter::Schema.new(klass).schema.to_json
     rescue => e
       render status: 500, json: { error: "Error generating filter schema for model #{params[:triggering_resource].inspect}: #{e}" }
+      puts e.backtrace
+      puts e
     end
   end
 end
