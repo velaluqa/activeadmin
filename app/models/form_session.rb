@@ -1,4 +1,6 @@
 class FormSession < ApplicationRecord
+  has_paper_trail(class_name: 'Version',)
+
   has_many(:form_answers)
 
   validates :name, presence: true, length: { minimum: 4 }, uniqueness: true
