@@ -9,7 +9,21 @@ ActiveAdmin.register Visit do
   config.per_page = 100
 
   controller do
-    skip_load_and_authorize_resource :only => [:assign_required_series, :assign_required_series_form, :tqc_results, :tqc, :tqc_form, :mqc_results, :mqc, :mqc_form, :required_series_viewer, :required_series_dicom_metadata, :all_required_series_viewer]
+    skip_load_and_authorize_resource(
+      only: [
+        :assign_required_series,
+        :assign_required_series_form,
+        :tqc_results,
+        :tqc,
+        :tqc_form,
+        :mqc_results,
+        :mqc,
+        :mqc_form,
+        :required_series_viewer,
+        :required_series_dicom_metadata,
+        :all_required_series_viewer
+      ]
+    )
 
     def max_csv_records
       1_000_000
