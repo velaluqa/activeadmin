@@ -61,7 +61,7 @@ class Study < ApplicationRecord
     studies.id AS study_id,
     studies.name AS study_name,
     studies.name AS text,
-    studies.id AS result_id,
+    studies.id::varchar AS result_id,
     'Study'::varchar AS result_type
 SELECT
 

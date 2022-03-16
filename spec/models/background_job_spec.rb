@@ -9,7 +9,7 @@ RSpec.describe BackgroundJob do
           'study_id' => nil,
           'study_name' => nil,
           'text' => 'FooJob',
-          'result_id' => job.id,
+          'result_id' => job.id.to_s,
           'result_type' => 'BackgroundJob'
         }]
     end

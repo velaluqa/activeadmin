@@ -61,7 +61,7 @@ class Patient < ApplicationRecord
     centers.study_id AS study_id,
     studies.name AS study_name,
     centers.code || patients.subject_id AS text,
-    patients.id AS result_id,
+    patients.id::varchar AS result_id,
     'Patient'::varchar AS result_type
 SELECT
 

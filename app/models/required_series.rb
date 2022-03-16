@@ -73,7 +73,7 @@ class RequiredSeries < ApplicationRecord
     CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END ||
     ' - ' || required_series.name
     AS text,
-    required_series.id AS result_id,
+    required_series.id::varchar AS result_id,
     'RequiredSeries'::varchar AS result_type
 SELECT
 

@@ -61,6 +61,21 @@ class FormAnswer < ApplicationRecord
   validates :form_answer_resources, length: { maximum: 0, message: "is not allowed by form definition" }, if: -> { validates_resource_id == "none" }
   validates :form_answer_resources, length: { minimum: 0 }, if: -> { validates_resource_id == "optional" }
 
+
+  scope :searchable, -> { joins(:form_definition).select(<<~SELECT) }
+    NULL::integer AS study_id,
+    NULL::varchar AS study_name,
+    form_definitions.name AS text,
+    form_answers.id::varchar AS result_id,
+    'FormAnswer'::varchar AS result_type
+  SELECT
+
+  def self.granted_for(options = {})
+    activities = Array(options[:activity]) + Array(options[:activities])
+    user = options[:user] || raise("Missing 'user' option")
+    all
+  end
+
   def answers_json
     JSON.dump(answers)
   end

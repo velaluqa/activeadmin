@@ -48,7 +48,7 @@ class Image < ApplicationRecord
     centers.study_id AS study_id,
     studies.name AS study_name,
     image_series.series_number::text || '#' || images.id AS text,
-    images.id AS result_id,
+    images.id::varchar AS result_id,
     'Image'::varchar AS result_type
 SELECT
 

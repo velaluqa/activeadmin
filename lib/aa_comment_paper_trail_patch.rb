@@ -10,7 +10,7 @@ module ActiveAdminCommentPaperTrailPatch
       NULL::integer AS study_id,
       NULL::varchar AS study_name,
       concat(active_admin_comments.resource_type, ' Comment by ', users.name) AS text,
-      active_admin_comments.id AS result_id,
+      active_admin_comments.id::varchar AS result_id,
       'Comment'::varchar AS result_type
     SELECT
 

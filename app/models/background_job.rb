@@ -53,7 +53,7 @@ class BackgroundJob < ApplicationRecord
     NULL::integer AS study_id,
     NULL::varchar AS study_name,
     background_jobs.name AS text,
-    background_jobs.id AS result_id,
+    background_jobs.id::varchar AS result_id,
     'BackgroundJob'::varchar AS result_type
 SELECT
 

@@ -137,7 +137,7 @@ class User < ApplicationRecord
     NULL::integer AS study_id,
     NULL::varchar AS study_name,
     users.name AS text,
-    users.id AS result_id,
+    users.id::varchar AS result_id,
     'User'::varchar AS result_type
 SELECT
 

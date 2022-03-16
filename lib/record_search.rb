@@ -9,7 +9,7 @@
 # something like Apache SOLR or similar...)
 class RecordSearch
   MODELS =
-    %w[ActiveAdmin::Comment BackgroundJob Study Center Patient Visit ImageSeries Image User Role RequiredSeries].freeze
+    %w[BackgroundJob Study Center Patient Visit ImageSeries Image User Role RequiredSeries ActiveAdmin::Comment FormAnswer].freeze
 
   attr_accessor :user, :query, :study_id, :models
 
