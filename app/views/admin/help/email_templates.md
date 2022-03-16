@@ -83,70 +83,15 @@ Most ERICA database records can be accessed from within email
 templates. The following list of objects defines available attributes
 and relationships accessible from within email templates.
 
-### BackgroundJob
+<% drop_names = Dir["app/drops/*_drop.rb"].map { |file| File.read(file).match(/class ([A-Za-z]+)Drop </)[1] }.sort %>
 
-<%= describe_liquid_drop('BackgroundJobDrop') %>
+<% drop_names.each do |drop_name| %>
+<% unless drop_name == "EricaDrop" %>
+### <%= drop_name %>
 
-### Center
-
-<%= describe_liquid_drop('CenterDrop') %>
-
-### Comment
-
-<%= describe_liquid_drop('CommentDrop') %>
-
-### Image
-
-<%= describe_liquid_drop('ImageDrop') %>
-
-### ImageSeries
-
-<%= describe_liquid_drop('ImageSeriesDrop') %>
-
-### Notification
-
-<%= describe_liquid_drop('NotificationDrop') %>
-
-### NotificationProfile
-
-<%= describe_liquid_drop('NotificationProfileDrop') %>
-
-### Patient
-
-<%= describe_liquid_drop('PatientDrop') %>
-
-### Permission
-
-<%= describe_liquid_drop('PermissionDrop') %>
-
-### RequiredSeries
-
-<%= describe_liquid_drop('RequiredSeriesDrop') %>
-
-### Role
-
-<%= describe_liquid_drop('RoleDrop') %>
-
-### Study
-
-<%= describe_liquid_drop('StudyDrop') %>
-
-### User
-
-<%= describe_liquid_drop('UserDrop') %>
-
-### UserRole
-
-<%= describe_liquid_drop('UserRoleDrop') %>
-
-### Version
-
-<%= describe_liquid_drop('VersionDrop') %>
-
-### Visit
-
-<%= describe_liquid_drop('VisitDrop') %>
-
+<%= describe_liquid_drop("#{drop_name}Drop") %>
+<% end %>
+<% end %>
 
 ## Accessible Data
 
