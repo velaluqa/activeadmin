@@ -18,11 +18,8 @@ require 'aa_views_pages_base'
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICACommentMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICAKeywordsMixin::DSL)
-
-if Rails.application.config.is_erica_remote
-  ActiveAdmin::Comment
-  ActiveAdmin::Comment.send(:include, ActiveAdminCommentPaperTrailPatch)
-end
+ActiveAdmin::Comment
+ActiveAdmin::Comment.send(:include, ActiveAdminCommentPaperTrailPatch)
 
 ActiveAdmin.setup do |config|
   # == Site Title
