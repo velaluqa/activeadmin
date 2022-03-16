@@ -29,7 +29,7 @@ class RecordSearch
 
   def merged_query
     q = "SELECT * FROM (#{unioned_queries}) q WHERE q.text LIKE '%#{query}%'"
-    q << " AND q.study_id = '#{study_id}'" if study_id
+    q << " AND (q.study_id = '#{study_id}' OR q.study_id IS NULL)" if study_id
     q
   end
 

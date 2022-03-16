@@ -142,6 +142,16 @@ class FormAnswer < ApplicationRecord
     end
   end
 
+  def signature_status
+    if !answers_signature
+      "none"
+    elsif valid_signature?
+      "valid"
+    else
+      "invalid"
+    end
+  end
+
   def signed?
     valid_signature?
   end

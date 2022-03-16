@@ -35,6 +35,14 @@ class PublicKey < ApplicationRecord
   scope :active, -> { where(active: true) }
   scope :deactivated, -> { where(active: false) }
 
+  def status
+    if active?
+      "active"
+    else
+      "deactivated"
+    end
+  end
+
   def active?
     active
   end
