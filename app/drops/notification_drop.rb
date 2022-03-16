@@ -5,7 +5,11 @@ class NotificationDrop < EricaDrop # :nodoc:
 
   desc 'The resource the notification is about.', :polymorphic
   def resource
-    object.version.item || object.version.reify
+    item = object.version.item || object.version.reify
+
+    return CommentDrop.new(item) if item.class == ActiveAdmin::Comment
+
+    item
   end
 
   desc 'Which action triggered this notification (e.g. create, update, destroy)?', :string

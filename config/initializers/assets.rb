@@ -14,6 +14,9 @@ Rails.application.config.assets.paths << Rails.root.join('vendor', 'assets', 'fo
 # folder are already added.
 Rails.application.config.assets.precompile +=
   %w[
+    mail.css
+    bootstrap-toc.min.css
+    bootstrap-toc.min.js
     application.css
     external_form.css
     dashboard/main.js

@@ -53,6 +53,28 @@ CONFIG
     let!(:required_series22) { visit2.required_series.where(name: 'OTHER_2').first }
     let!(:user) { create(:user, is_root_user: true) }
 
+    let!(:active_admin_comment) { create(:active_admin_comment, resource: visit1, author: user) }
+
+    describe 'filtering for comments' do
+      let!(:search) do
+        RecordSearch.new(
+          user: user,
+          query: 'Comment'
+        )
+      end
+
+      it 'returns matched records' do
+        expect(search.results)
+          .to include(
+            'study_id' => nil,
+            'study_name' => nil,
+            'text' => "Visit Comment by #{user.name}",
+            'result_id' => study1.id,
+            'result_type' => 'Comment'
+          )
+      end
+    end
+
     describe 'not filtering models' do
       let!(:search) do
         RecordSearch.new(

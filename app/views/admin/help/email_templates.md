@@ -91,6 +91,10 @@ and relationships accessible from within email templates.
 
 <%= describe_liquid_drop('CenterDrop') %>
 
+### Comment
+
+<%= describe_liquid_drop('CommentDrop') %>
+
 ### Image
 
 <%= describe_liquid_drop('ImageDrop') %>

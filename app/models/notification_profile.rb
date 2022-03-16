@@ -116,6 +116,7 @@ class NotificationProfile < ActiveRecord::Base
   )
 
   TRIGGERING_RESOURCES = %w[
+    ActiveAdmin::Comment
     Study
     Center
     Patient
