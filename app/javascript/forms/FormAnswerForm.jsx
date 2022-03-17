@@ -1,3 +1,4 @@
+import { Beforeunload } from "react-beforeunload";
 import {
   Container,
   Button,
@@ -7,9 +8,10 @@ import {
   ModalHeader,
 } from "reactstrap";
 import { Form } from "@formio/react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import useQueryString from "use-query-string";
 
+import MessageModal from "./MessageModal";
 import SigningModal from "./SigningModal";
 import updateHistory from "../functions/updateHistory";
 
@@ -20,15 +22,18 @@ export default ({
   onSaveDraft,
   onSubmit,
   onSign,
+  onClose,
   signable = true,
   savable = false,
   extraButtons = null,
+  readonly = false,
   formAnswerId,
 }) => {
   const formio = useRef();
   const [query, setQuery] = useQueryString(window.location, updateHistory, {
     parseBooleans: true,
   });
+  const [message, setMessage] = useState(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [signing, setSigning] = useState(false);
@@ -37,7 +42,6 @@ export default ({
   const [dirty, setDirty] = useState(false);
 
   const handleSubmit = (e) => {
-    console.log("handleSubmit", e);
     if (formio.current.checkValidity(null, false, null, true)) {
       setSubmitting(true);
     } else {
@@ -46,26 +50,16 @@ export default ({
   };
 
   const onChange = ({ isValid, data }) => {
-    console.log("onChange", isValid, data, formAnswerId);
     setFormData(data);
     setDirty(true);
     setFormValid(isValid);
   };
 
-  // useEffect(() => {
-  //   console.log("formAnswerId changed", formAnswerId, value);
-  //   setSubmitting(false);
-  //   setSigning(false);
-  //   setFormValid(false);
-  //   setDirty(false);
-  //   setFormData(value);
-  //   if (formio.current) {
-  //     formio.current.submission = { data: value };
-  //   }
-  // }, [formAnswerId, value]);
-
   return (
     <div style={{ flex: "1 1 100%", display: "flex", flexDirection: "column" }}>
+      {dirty && (
+        <Beforeunload onBeforeunload={(event) => event.preventDefault()} />
+      )}
       <Container
         style={{
           flex: "1 1 100%",
@@ -80,26 +74,40 @@ export default ({
             formio.current.nosubmit = true;
             formio.current.submission = { data: value };
           }}
-          options={{ highlightErrors: true }}
+          options={{ highlightErrors: true, readOnly: readonly }}
           onChange={onChange}
           form={layout}
         />
       </Container>
-      <div style={{ background: "#efefef" }}>
-        <Container style={{ padding: "16px", textAlign: "right" }}>
-          {savable && (
-            <>
-              <Button color="secondary" onClick={() => onSaveDraft(formData)}>
-                Save Draft
-              </Button>{" "}
-            </>
-          )}
-          <Button color="primary" onClick={handleSubmit} disabled={!formValid}>
-            Submit Answers
-          </Button>{" "}
-          <Button onClick={() => setSubmitting(false)}>Reset</Button>
-        </Container>
-      </div>
+      {!readonly && (
+        <div style={{ background: "#efefef" }}>
+          <Container style={{ padding: "16px", textAlign: "right" }}>
+            {savable && (
+              <>
+                <Button
+                  color="secondary"
+                  onClick={() =>
+                    onSaveDraft({ answers: formData }).then(() => {
+                      setMessage("Draft saved!");
+                      setDirty(false);
+                    })
+                  }
+                >
+                  Save Draft
+                </Button>{" "}
+              </>
+            )}
+            <Button
+              color="primary"
+              onClick={handleSubmit}
+              disabled={!formValid}
+            >
+              Submit Form
+            </Button>{" "}
+            <Button onClick={onClose}>Close Form</Button>
+          </Container>
+        </div>
+      )}
       <Modal isOpen={submitting} size="xl" toggle={() => setSubmitting(false)}>
         <ModalHeader toggle={() => setSubmitting(false)}>Submit</ModalHeader>
         <ModalBody>
@@ -129,6 +137,7 @@ export default ({
           {extraButtons}
         </ModalFooter>
       </Modal>
+      <MessageModal message={message} hide={() => setMessage(null)} />
     </div>
   );
 };

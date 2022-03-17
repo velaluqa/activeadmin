@@ -7,6 +7,7 @@ class V1::DashboardController < ApplicationController
   # trailblazer find operation.
   def index
     form_answers = FormAnswer.without_session.answerable_by(current_user)
+    form_answers.map(&:unblock_expired!)
     form_sessions = FormSession.startable_by(current_user)
 
     render_react(

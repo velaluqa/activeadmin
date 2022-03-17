@@ -9,6 +9,7 @@
     "puppeteer": "^13.2.0",
     "qrcode.react": "^1.0.1",
     "react": "^16.12.0",
+    "react-beforeunload": "^2.5.2",
     "react-dom": "^16.12.0",
     "react-json-view": "^1.21.3",
     "react-json-view-compare": "^2.0.1",

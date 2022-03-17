@@ -75,6 +75,10 @@ ActiveAdmin.register FormAnswer do
           row :study unless form_answer.validates_study_id == "none"
           row :form_definition
           row :status
+          if form_answer.blocked?
+            row :blocking_user
+            row :blocked_at
+          end
           row :errors unless form_answer.valid?
           row :submitted_at
           row :signature_status

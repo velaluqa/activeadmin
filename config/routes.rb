@@ -98,6 +98,7 @@ Rails.application.routes.draw do
     resources :form_answers do
       member do
         post :sign
+        post :unblock
       end
     end
     resources :form_sessions, only: %i[show]

@@ -101,9 +101,18 @@ class V1::FormAnswersController < V1::ApiController
     # TODO: authorize
     form_answer = FormAnswer.find(params[:id])
 
+    unless form_answer.user
+      form_answer.unblock_expired!
+      form_answer.try_block_for!(current_user)
+    end
+
     render_react(
       "form_answers_edit",
-      form_answer: form_answer.attributes,
+      form_answer: form_answer
+        .attributes
+        .merge(
+          allow_saving_draft: form_answer.allow_saving_draft
+        ),
       current_user: current_user.attributes.pick("id", "name", "username"),
       form_definition: form_answer.form_definition.attributes,
       form_layout: form_answer.layout
@@ -111,7 +120,40 @@ class V1::FormAnswersController < V1::ApiController
   end
 
   def update
+    form_answer = FormAnswer.find(params[:id])
+    form_answer.answers = form_params[:answers]
+    form_answer.save!
 
+    respond_to do |format|
+      format.json do
+        render(
+          json: {
+            status: 200,
+            form_answer_id: form_answer.id,
+            message: "saved_draft"
+          },
+          status: 200
+        )
+      end
+    end
+  end
+
+  def unblock
+    form_answer = FormAnswer.find(params[:id])
+    form_answer.unblock!
+
+    respond_to do |format|
+      format.json do
+        render(
+          json: {
+            status: 200,
+            form_answer_id: form_answer.id,
+            message: "unblocked"
+          },
+          status: 200
+        )
+      end
+    end
   end
 
   def sign

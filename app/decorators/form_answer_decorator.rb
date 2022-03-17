@@ -27,6 +27,8 @@ class FormAnswerDecorator < ApplicationDecorator
       status_tag("invalid", class: "error")
     elsif signed?
       link_to status_tag("signed", class: "ok"), admin_public_key_path(public_key)
+    elsif blocked?
+      status_tag("blocked", class: "warning")
     elsif published?
       status_tag("published", class: "warning")
     elsif submitted_at

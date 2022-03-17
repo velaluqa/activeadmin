@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_15_164749) do
+ActiveRecord::Schema.define(version: 2022_03_17_095554) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -142,6 +142,8 @@ ActiveRecord::Schema.define(version: 2022_03_15_164749) do
     t.integer "form_display_type_id"
     t.datetime "published_at"
     t.integer "sequence_number", default: 0, null: false
+    t.integer "blocking_user_id"
+    t.datetime "blocked_at"
     t.index ["configuration_id"], name: "index_form_answers_on_configuration_id"
     t.index ["form_definition_id"], name: "index_form_answers_on_form_definition_id"
     t.index ["public_key_id"], name: "index_form_answers_on_public_key_id"

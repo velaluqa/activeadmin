@@ -32,6 +32,8 @@ class FormAnswer < ApplicationRecord
   belongs_to(:study, optional: true)
   belongs_to(:form_session, optional: true)
 
+  belongs_to(:blocking_user, class_name: "User", optional: true)
+
   scope :without_session, -> { where(form_session_id: nil) }
   scope :with_session, -> { where.not(form_session_id: nil) }
   scope :assigned_to, ->(user) { where(user_id: user.id) }
@@ -50,6 +52,7 @@ class FormAnswer < ApplicationRecord
   attr_configuration_path_accessor :validates_resource_id, %w[config form_answers validates_resource_id], default: "none"
   attr_configuration_path_accessor :validates_user_id, %w[config form_answers validates_user_id], default: "none"
   attr_configuration_path_accessor :validates_resource_type, %w[config form_answers validates_resource_type], default: "any"
+  attr_configuration_path_accessor :allow_saving_draft, %w[config form_answers allow_saving_draft], default: false
 
   attr_configuration_path_accessor :layout, %w[layout], default: {}
 
@@ -174,6 +177,32 @@ class FormAnswer < ApplicationRecord
 
   def publish!
     self.published_at = DateTime.now
+    save!
+  end
+
+  def unblock!
+    self.blocked_at = nil
+    self.blocking_user = nil
+    save!
+  end
+
+  def unblock_expired!
+    unblock! if block_expired?
+  end
+
+  def block_expired?
+    blocked? && blocked_at < 30.minutes.ago
+  end
+
+  def blocked?
+    blocked_at && blocking_user
+  end
+
+  def try_block_for!(user)
+    return if blocking_user && blocking_user != user
+
+    self.blocked_at = DateTime.now
+    self.blocking_user = user
     save!
   end
 

@@ -14,6 +14,7 @@ ActiveAdmin.register FormDefinition, name: "Form" do
     :validates_form_session_id,
     :validates_resource_id,
     :validates_resource_type,
+    :allow_saving_draft,
     :listing,
     :sequence_scope
   )
@@ -68,6 +69,10 @@ ActiveAdmin.register FormDefinition, name: "Form" do
         include_blank: false,
         collection: FormDefinition::RESOURCE_TYPES
       )
+      f.input(
+        :allow_saving_draft,
+        as: :boolean
+      )
     end
     f.actions
   end
@@ -105,6 +110,7 @@ ActiveAdmin.register FormDefinition, name: "Form" do
           row :validates_form_session_id
           row :validates_resource_id
           row :validates_resource_type
+          row :allow_saving_draft
         end
       end
     end

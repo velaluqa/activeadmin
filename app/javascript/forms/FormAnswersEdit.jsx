@@ -3,7 +3,9 @@ import useQueryString from "use-query-string";
 
 import FormAnswerForm from "./FormAnswerForm";
 import FormContainer from "./FormContainer";
+import saveDraft from "./saveDraft";
 import signAndSubmit from "./signAndSubmit";
+import unblockFormAnswer from "./unblockFormAnswer";
 import updateHistory from "../functions/updateHistory";
 
 export default ({
@@ -25,7 +27,24 @@ export default ({
     return null;
   }
 
-  const formAnswerId = formAnswer.id;
+  const {
+    id: formAnswerId,
+    blockedAt,
+    blockingUserId,
+    allowSavingDraft,
+  } = formAnswer;
+
+  const goBack = (message = null) => {
+    if (referrer === "dashboard") {
+      if (message) {
+        window.location = `/v1/dashboard?message=${message}`;
+      } else {
+        window.location = `/v1/dashboard`;
+      }
+    } else {
+      window.location = `/v1/form_answers/${formAnswerId}`;
+    }
+  };
 
   const signAnswers = ({ answers, signingPassword }) => {
     return signAndSubmit({
@@ -33,11 +52,17 @@ export default ({
       answers,
       signingPassword,
     }).then(() => {
-      if (referrer === "dashboard") {
-        window.location = `/v1/dashboard?message=submitted_and_signed`;
-      } else {
-        window.location = `/v1/form_answers/${formAnswerId}`;
-      }
+      goBack("submitted_and_signed");
+    });
+  };
+
+  const saveDraftAnswers = ({ answers }) => {
+    return saveDraft({ formAnswerId, answers });
+  };
+
+  const unblockForm = () => {
+    return unblockFormAnswer({ formAnswerId }).then(() => {
+      goBack();
     });
   };
 
@@ -48,6 +73,10 @@ export default ({
         value={{ ...formAnswer.answers, ...prefilledFromQuery }}
         layout={formLayout}
         onSign={signAnswers}
+        onSaveDraft={saveDraftAnswers}
+        onClose={unblockForm}
+        readonly={!!blockedAt && blockingUserId != currentUser.id}
+        savable={allowSavingDraft}
         signable
       />
     </FormContainer>

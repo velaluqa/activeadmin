@@ -39,6 +39,7 @@ class FormDefinition < ApplicationRecord
   attr_configuration_path_accessor :validates_resource_id, %w[config form_answers validates_resource_id], default: "none"
   attr_configuration_path_accessor :validates_user_id, %w[config form_answers validates_user_id], default: "none"
   attr_configuration_path_accessor :validates_resource_type, %w[config form_answers validates_resource_type], default: "any"
+  attr_configuration_path_accessor :allow_saving_draft, %w[config form_answers allow_saving_draft], default: false
 
   attr_configuration_path_accessor :layout, %w[layout], default: {}
 
@@ -76,6 +77,7 @@ class FormDefinition < ApplicationRecord
     data["config"]["form_answers"]["validates_user_id"] = validates_user_id
     data["config"]["form_answers"]["validates_resource_id"] = validates_resource_id
     data["config"]["form_answers"]["validates_resource_type"] = validates_resource_type
+    data["config"]["form_answers"]["allow_saving_draft"] = allow_saving_draft == "1"
 
     new_configuration = Configuration.create(
       previous_configuration_id: previous_configuration.andand.id,

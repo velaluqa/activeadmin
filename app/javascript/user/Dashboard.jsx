@@ -124,7 +124,17 @@ export default ({ currentUser, formSessions, formAnswers }) => {
                     </thead>
                     <tbody>
                       {formAnswers.map(
-                        ({ id, formDefinition, formAnswerResources }, i) => (
+                        (
+                          {
+                            id,
+                            formDefinition,
+                            formAnswerResources,
+                            blockedAt,
+                            blockingUserId,
+                            ...formAnswer
+                          },
+                          i
+                        ) => (
                           <tr>
                             <th scope="row">{i + 1}</th>
                             <td>{formDefinition.name}</td>
@@ -136,13 +146,34 @@ export default ({ currentUser, formSessions, formAnswers }) => {
                               )}
                             </td>
                             <td style={{ textAlign: "right" }}>
-                              <Button
-                                color="primary"
-                                size="sm"
-                                onClick={() => openForm(id)}
-                              >
-                                Open
-                              </Button>
+                              {console.log(formAnswer)}
+                              {!!blockedAt &&
+                              blockingUserId != currentUser.id ? (
+                                <Button
+                                  color="warning"
+                                  size="sm"
+                                  onClick={() => openForm(id)}
+                                >
+                                  Blocked
+                                </Button>
+                              ) : !!blockedAt &&
+                                blockingUserId == currentUser.id ? (
+                                <Button
+                                  color="success"
+                                  size="sm"
+                                  onClick={() => openForm(id)}
+                                >
+                                  Continue
+                                </Button>
+                              ) : (
+                                <Button
+                                  color="primary"
+                                  size="sm"
+                                  onClick={() => openForm(id)}
+                                >
+                                  Open
+                                </Button>
+                              )}
                             </td>
                           </tr>
                         )
