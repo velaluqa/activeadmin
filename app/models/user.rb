@@ -47,6 +47,19 @@ require 'email_validator'
 #     * **`username`**
 #
 class User < ApplicationRecord
+  EXPORT_COLUMNS = [
+    :id,
+    :username,
+    :name,
+    :sign_in_count,
+    :last_sign_in_at,
+    :failed_attempts,
+    :password_changed_at,
+    :locked_at,
+    :created_at,
+    :updated_at
+  ]
+
   has_paper_trail class_name: 'Version'
 
   devise(
@@ -220,6 +233,14 @@ SELECT
   # Devise does create jobs before commit. So we have to postpone
   # emails until the user is committed to the database.
   after_commit :send_pending_notifications
+
+  def as_json(options = {})
+    super(options.merge(only: EXPORT_COLUMNS))
+  end
+
+  def to_xml(options = {})
+    super(options.merge(only: EXPORT_COLUMNS))
+  end
 
   protected
 
