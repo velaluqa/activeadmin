@@ -7,6 +7,12 @@ ActiveAdmin.register User do
 
   config.comments = false
 
+  csv  do
+    User::EXPORT_COLUMNS.each do |name|
+      column(name)
+    end
+  end
+
   controller do
     def max_csv_records
       1_000_000

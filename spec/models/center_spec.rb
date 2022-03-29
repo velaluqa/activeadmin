@@ -22,7 +22,7 @@ RSpec.describe Center do
               'study_id' => center.study_id,
               'study_name' => center.study.name,
               'text' => "#{center.code} - FooCenter",
-              'result_id' => center.id,
+              'result_id' => center.id.to_s,
               'tag_list' => [],
               'result_type' => 'Center'
             }

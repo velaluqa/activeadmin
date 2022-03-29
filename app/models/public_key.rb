@@ -27,11 +27,21 @@ class PublicKey < ApplicationRecord
 
   belongs_to :user
 
+  has_many :form_answers
+
   validates :user_id, :public_key, presence: true
   validates_uniqueness_of :active, if: :active, scope: :user_id
 
   scope :active, -> { where(active: true) }
   scope :deactivated, -> { where(active: false) }
+
+  def status
+    if active?
+      "active"
+    else
+      "deactivated"
+    end
+  end
 
   def active?
     active

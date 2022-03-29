@@ -47,6 +47,19 @@ require 'email_validator'
 #     * **`username`**
 #
 class User < ApplicationRecord
+  EXPORT_COLUMNS = [
+    :id,
+    :username,
+    :name,
+    :sign_in_count,
+    :last_sign_in_at,
+    :failed_attempts,
+    :password_changed_at,
+    :locked_at,
+    :created_at,
+    :updated_at
+  ]
+
   has_paper_trail class_name: 'Version'
 
   devise(
@@ -137,7 +150,7 @@ class User < ApplicationRecord
     NULL::integer AS study_id,
     NULL::varchar AS study_name,
     users.name AS text,
-    users.id AS result_id,
+    users.id::varchar AS result_id,
     'User'::varchar AS result_type
 SELECT
 
@@ -194,12 +207,22 @@ SELECT
     public_keys.active.last
   end
 
+
   def sign(data, signature_password)
     private_key = OpenSSL::PKey::RSA.new(self.private_key, signature_password)
 
     signature = private_key.sign(OpenSSL::Digest::RIPEMD160.new, data)
     pp OpenSSL.errors
     signature
+  end
+
+  def sign64(data, signature_password)
+    private_key = OpenSSL::PKey::RSA.new(self.private_key, signature_password)
+
+    signature = private_key.sign(OpenSSL::Digest::RIPEMD160.new, data)
+    pp OpenSSL.errors
+
+    Base64.encode64(signature)
   end
 
   def dashboard_configuration
@@ -210,6 +233,14 @@ SELECT
   # Devise does create jobs before commit. So we have to postpone
   # emails until the user is committed to the database.
   after_commit :send_pending_notifications
+
+  def as_json(options = {})
+    super(options.merge(only: EXPORT_COLUMNS))
+  end
+
+  def to_xml(options = {})
+    super(options.merge(only: EXPORT_COLUMNS))
+  end
 
   protected
 

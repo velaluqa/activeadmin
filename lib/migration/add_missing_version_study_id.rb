@@ -66,8 +66,8 @@ JOIN
 JOIN versions AS parent_versions
 ON (
   parent_versions.item_type = '#{parent_type(item_type)}' AND (
-    parent_versions.item_id = (versions.object ->> '#{parent_key(item_type)}')::integer OR
-    parent_versions.item_id = ((versions.object_changes ->> '#{parent_key(item_type)}')::jsonb ->> 1)::integer
+    parent_versions.item_id = (versions.object ->> '#{parent_key(item_type)}')::varchar OR
+    parent_versions.item_id = ((versions.object_changes ->> '#{parent_key(item_type)}')::jsonb ->> 1)::varchar
   )
 )
 JOIN

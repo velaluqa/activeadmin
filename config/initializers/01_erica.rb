@@ -30,6 +30,10 @@ class ERICA
       Rails.root + Pathname.new(Rails.application.config.image_storage_root)
     end
 
+    def form_pdf_path
+      Rails.root + Pathname.new(Rails.application.config.form_pdf_root)
+    end
+
     def image_export_path
       Rails.root.join(Rails.application.config.image_export_root)
     end

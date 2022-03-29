@@ -8,7 +8,7 @@ RSpec.describe Image do
           'study_id' => image.image_series.patient.center.study.id,
           'study_name' => image.image_series.patient.center.study.name,
           'text' => "#{image.image_series.series_number}##{image.id}",
-          'result_id' => image.id,
+          'result_id' => image.id.to_s,
           'result_type' => 'Image'
         }]
     end

@@ -32,7 +32,8 @@ window.initializeRecordSearch = ($elements = $('.select2-record-search')) ->
           query.models = $el.data('models') if $el.data('models')?
           query
         processResults: (data, params) ->
-          groups = ['Study', 'Center', 'Patient', 'Visit', 'RequiredSeries', 'ImageSeries', 'Image', 'BackgroundJob', 'Role', 'User']
+          groups = ['Study', 'Center', 'Patient', 'Visit', 'RequiredSeries', 'ImageSeries', 'Image', 'BackgroundJob', 'Role', 'User', 'Comment', 'FormAnswer']
+          console.log(groups, data)
           grouped = _
             .chain(data)
             .map (obj) ->
@@ -55,7 +56,7 @@ $ ->
     initializeSimpleSelects($fieldset.find('.initialize-select2'))
     initializeRecordSearch($fieldset.find('.select2-record-search'))
 
-  initializeSimpleSelects()
+  initializeSimpleSelects($("select:not(.select2-record-search, .no-auto-select2, .choices__input)"))
   initializeRecordSearch()
 
   $('body').on 'select2:open', (e) ->

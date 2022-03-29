@@ -5,7 +5,7 @@ require 'aa_erica_keywords'
 ActiveAdmin.register ImageSeries do
   menu(parent: 'store', priority: 30)
 
-  actions :all, except: [:create]
+  actions(:index, :show, :update, :edit, :destroy)
 
   scope :all, :default => true
   scope 'No Visit Assigned', :not_assigned
@@ -18,11 +18,11 @@ ActiveAdmin.register ImageSeries do
     end
 
     def scoped_collection
-      if(session[:selected_study_id].nil?)
-        end_of_association_chain.includes(:patient => :center)
-      else
-        end_of_association_chain.includes(:patient => :center).where('centers.study_id' => session[:selected_study_id])
-      end
+      scope =
+        end_of_association_chain.includes(:images, :patient => :center)
+      return scope if session[:selected_study_id].nil?
+
+      scope.where('centers.study_id' => session[:selected_study_id])
     end
 
     def update
@@ -344,7 +344,7 @@ ActiveAdmin.register ImageSeries do
   end
 
   # filters
-  filter :visit, :collection => []
+  filter :visit, :collection => [], input_html: { class: "no-auto-select2" }
   filter :series_number
   filter :name
   filter :imaging_date

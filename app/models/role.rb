@@ -35,7 +35,7 @@ class Role < ApplicationRecord
     NULL::integer AS study_id,
     NULL::varchar AS study_name,
     roles.title AS text,
-    roles.id AS result_id,
+    roles.id::varchar AS result_id,
     'Role'::varchar AS result_type
 SELECT
 

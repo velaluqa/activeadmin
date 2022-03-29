@@ -2,19 +2,27 @@
 
 ## Unreleased
 
-### Breaking Changes
+### Minor Changes
 
 * Update Rails to 5.2 and adjust all remaining dependencies
+* Enhance navigation button stylesheets by adding hover hinting background color indicating possible interaction and adjusting icon size
+* Feature - Form Functionality for basic independant read sessions and single forms
+* Feature - Allow uploading any file format (e.g. PDFs, JPEG, etc.)
+* Feature - Add react front-end dependencies for future integration of modern single-page application components similar to PDMS
+* Feature - Use select2 (enhanced filterable select box component) for all select fields in ERICA
+* Feature - Allow notification profiles to trigger for active admin comment events
 
 ### Fixed
 
 * Fix string representation of notification profiles
-* Fix missing recipient select options for notification selects if a
-  study is selected for the session
+* Fix missing notification profile recipients in select field if a
+  study is selected for the current user's browser session
 * Fix mimetype recognition after `mimemagic` was relicensed by
   replacing it with `marcel` by the Rails core team
-* Required series - Fix `RequiredSeries#user` association for Rails
-  5.2 by making it optional
+* Fix tracking notification profile and email template changes in audit trail
+* Fix link label to scopes (e.g. Center, Study or Patient) in users `UserRole` list
+* Fix user exports by not publishing users public/private keys via CSV, JSON or XML
+* Fix email template preview in show and edit view of email templates
 
 ## 7.0.18
 

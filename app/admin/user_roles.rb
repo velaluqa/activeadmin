@@ -7,7 +7,7 @@ ActiveAdmin.register UserRole do
 
   actions :index, :new, :create, :edit, :update, :destroy
 
-  filter :scope_object, collection: -> { UserRole.accessible_scope_object_identifiers(current_ability) }
+  # filter :scope_object, collection: -> { UserRole.accessible_scope_object_identifiers(current_ability) }
   filter :role
   filter :permissions
 
@@ -17,7 +17,7 @@ ActiveAdmin.register UserRole do
       if user_role.scope_object.nil?
         'system-wide'
       else
-        link_to user_role.scope_object
+        link_to user_role.scope_object, [:admin, user_role.scope_object]
       end
     end
     customizable_default_actions(current_ability)

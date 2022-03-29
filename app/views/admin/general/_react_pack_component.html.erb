@@ -1,0 +1,5 @@
+<script>
+  window.componentProps = <%= component_props.to_json.html_safe %>;
+</script>
+<%= javascript_pack_tag pack_name %>
+<div id="<%= pack_name %>"></div>

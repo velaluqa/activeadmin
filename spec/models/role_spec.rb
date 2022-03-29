@@ -132,7 +132,7 @@ RSpec.describe Role do
           'study_id' => nil,
           'study_name' => nil,
           'text' => role.title,
-          'result_id' => role.id,
+          'result_id' => role.id.to_s,
           'result_type' => 'Role'
         }]
     end

@@ -9,7 +9,7 @@
 # something like Apache SOLR or similar...)
 class RecordSearch
   MODELS =
-    %w[BackgroundJob Study Center Patient Visit ImageSeries Image User Role RequiredSeries].freeze
+    %w[BackgroundJob Study Center Patient Visit ImageSeries Image User Role RequiredSeries ActiveAdmin::Comment FormAnswer].freeze
 
   attr_accessor :user, :query, :study_id, :models
 
@@ -29,7 +29,7 @@ class RecordSearch
 
   def merged_query
     q = "SELECT * FROM (#{unioned_queries}) q WHERE q.text LIKE '%#{query}%'"
-    q << " AND q.study_id = '#{study_id}'" if study_id
+    q << " AND (q.study_id = '#{study_id}' OR q.study_id IS NULL)" if study_id
     q
   end
 

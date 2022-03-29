@@ -1,0 +1,11 @@
+<link rel="stylesheet" href="/vendor/formio.full.min.css">
+<script src="/vendor/formio.full.min.js"></script>
+<div style="padding: 8px;">
+  <div id="formio"></div>
+</div>
+
+<script>
+  $(document).ready(function() {
+      Formio.createForm(document.getElementById('formio'), JSON.parse(<%= form_layout.to_json.html_safe %>));
+  })
+</script>

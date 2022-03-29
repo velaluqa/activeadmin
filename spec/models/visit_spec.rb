@@ -523,7 +523,7 @@ CONFIG
           'study_name' => visit.patient.center.study.name,
           'tag_list' => [],
           'text' => "FooBar##{visit.visit_number}",
-          'result_id' => visit.id,
+          'result_id' => visit.id.to_s,
           'result_type' => 'Visit'
         }]
     end

@@ -1,6 +1,10 @@
 body.admin_notification_profiles {
-  fieldset.filters {
+  fieldset.inputs.filters {
     padding-top: 40px;
+
+    h3 {
+      background-color: transparent !important;
+    }
   }
 }
 

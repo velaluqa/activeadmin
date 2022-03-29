@@ -50,6 +50,9 @@ ActiveAdmin.register Version do
       when 'image' then association_chain.for_image(params[:audit_trail_view_id])
       when 'role' then association_chain.for_role(params[:audit_trail_view_id])
       when 'user' then association_chain.for_user(params[:audit_trail_view_id])
+      when 'form_definition' then association_chain.for_form_definition(params[:audit_trail_view_id])
+      when 'form_answer' then association_chain.for_form_answer(params[:audit_trail_view_id])
+      when 'configuration' then association_chain.for_configuration(params[:audit_trail_view_id])
       else association_chain
       end.accessible_by(current_ability)
     end

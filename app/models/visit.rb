@@ -98,7 +98,7 @@ class Visit < ApplicationRecord
     visits.visit_number ||
     CASE WHEN visits.repeatable_count > 0 THEN ('.' || visits.repeatable_count) ELSE '' END
     AS text,
-    visits.id AS result_id,
+    visits.id::varchar AS result_id,
     'Visit'::varchar AS result_type
 SELECT
 

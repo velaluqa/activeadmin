@@ -1,10 +1,11 @@
 FROM ruby:2.6.5-stretch
 MAINTAINER aandersen@velalu.qa
 
+ARG RAILS_MASTER_KEY=""
 ENV APP_HOME /app
 
 # Install distribution dependencies
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+RUN  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
      apt-get update -qq && \
      apt-get install -y \
      build-essential \
@@ -15,9 +16,12 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
      imagemagick \
      libmagickwand-dev \
      libpq-dev \
+     chromium \
+     libatk-bridge2.0-0 gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget \
      locales \
      nodejs \
      pandoc \
+     argyll ghostscript \
      postgresql-client \
      texlive-base \
      texlive-fonts-recommended \
@@ -50,14 +54,22 @@ RUN npm config set registry=https://registry.npmjs.com/
 RUN mkdir -p /node_modules && ln -s ../node_modules node_modules
 RUN yarn install --frozen-lockfile
 
-# Allow other containers to use the app root (e.g. nginx container).
-VOLUME /app
-
 # Add the application code.
 COPY . /app
+
+RUN pwd
+RUN ls -al /app/public
+
+RUN if [ -z $RAILS_MASTER_KEY ]; then unset RAILS_MASTER_KEY; fi; RAILS_ENV=production bundle exec rails assets:precompile
+RUN ls -al /app/public
+# RUN ls -al /app/public/packs
+# RUN cat /app/public/packs/manifest.json
 
 ENTRYPOINT ["lib/support/docker-entrypoint.sh"]
 
 EXPOSE 3000
+
+# Allow other containers to use the app root (e.g. nginx container).
+VOLUME /app
 
 CMD ["bin/rails", "s", "-b", "0.0.0.0"]

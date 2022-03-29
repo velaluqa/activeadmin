@@ -226,6 +226,7 @@ module Migration
           .where('((object_changes ->> \'visit_type\')::jsonb ->> 1) = ?', visit_type)
           .distinct
           .pluck(:item_id)
+          .map(&:to_i)
       end
 
       def config_change_removed_visit_type(study_id, time, visit_type, previous_config, whodunnit: nil)
@@ -283,6 +284,7 @@ module Migration
                       .where('((object_changes ->> \'visit_type\')::jsonb ->> 1) = ?', visit_type)
                       .distinct
                       .pluck(:item_id)
+                      .map(&:to_i)
         RequiredSeries
           .where(visit_id: visit_ids, name: required_series)
           .where('created_at < ?', time)
@@ -292,7 +294,7 @@ module Migration
       end
 
       def migrate_visit_destroy(version)
-        RequiredSeries.where(visit_id: version.item_id).each do |required_series|
+        RequiredSeries.where(visit_id: version.item_id.to_i).each do |required_series|
           destroy_required_series(version.study_id, version.created_at, required_series)
         end
       end
@@ -311,11 +313,11 @@ module Migration
         puts "Create Required Series Presets: #{required_series_names.join(',')}"
         required_series_names.each do |name|
           puts "--- Checking existing required series"
-          next if RequiredSeries.where(visit_id: version.item_id, name: name).exists?
+          next if RequiredSeries.where(visit_id: version.item_id.to_i, name: name).exists?
           puts "--- Creating required series"
           required_series =
             RequiredSeries.create!(
-              visit_id: version.item_id,
+              visit_id: version.item_id.to_i,
               name: name,
               created_at: version.created_at,
               updated_at: version.created_at
@@ -327,7 +329,7 @@ module Migration
             event: 'create',
             object: nil,
             object_changes: {
-              visit_id: [nil, version.item_id],
+              visit_id: [nil, version.item_id.to_i],
               name: [nil, name],
               created_at: [nil, version.created_at.as_json],
               updated_at: [nil, version.created_at.as_json]
@@ -343,7 +345,7 @@ module Migration
       def remove_required_series_presets(version, required_series_names)
         puts "Remove Required Series Presets: #{required_series_names.join(',')}"
         required_series_names.each do |name|
-          required_series = RequiredSeries.where(visit_id: version.item_id, name: name).first
+          required_series = RequiredSeries.where(visit_id: version.item_id.to_i, name: name).first
           next if required_series.blank?
           destroy_required_series(version.study_id, version.created_at, required_series)
         end
@@ -396,7 +398,7 @@ module Migration
           study_id: visit_version.study_id
         )
         puts "--- Checking existing required series "
-        required_series = RequiredSeries.where(id: latest_version.item_id).first
+        required_series = RequiredSeries.where(id: latest_version.item_id.to_i).first
         return if required_series.nil?
         attributes = changes.transform_values { |_, new| new }
         puts "--- Updating existing required series"
@@ -440,7 +442,7 @@ CLAUSE
         was, becomes = visit_version.complete_changes['required_series']
         ((was.andand.keys || []) + (becomes.andand.keys || [])).uniq.map do |required_series_name|
           {
-            visit_id: visit_version.item_id,
+            visit_id: visit_version.item_id.to_i,
             name: required_series_name,
             changes: extract_changes(visit_version, required_series_name)
           }

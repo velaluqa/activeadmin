@@ -73,7 +73,7 @@ JOIN
     centers.study_id AS study_id,
     studies.name AS study_name,
     centers.code || ' - ' || centers.name AS text,
-    centers.id AS result_id,
+    centers.id::varchar AS result_id,
     'Center'::varchar AS result_type
 SELECT
 
@@ -89,6 +89,10 @@ SELECT
 
   before_destroy :ensure_no_patients
   before_save :ensure_study_is_unchanged
+
+  def to_s
+    "#{code} - #{name}"
+  end
 
   def full_name
     "#{code} - #{name}"

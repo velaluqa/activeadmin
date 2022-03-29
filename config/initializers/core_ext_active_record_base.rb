@@ -1,7 +1,8 @@
 module ActiveRecord
   class Base # :nodoc:
     def self.find_by_ref(ref)
-      match = ref.match(/^(?<klass>\w+)_(?<id>\d+)$/)
+      match = ref.match(/^(?<klass>\w+)_(?<id>[a-zA-Z0-9\-]+)$/)
+      return ActiveAdmin::Comment.find(match[:id]) if match[:klass] == "Comment"
       match[:klass].constantize.find(match[:id])
     end
 

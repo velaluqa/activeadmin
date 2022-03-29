@@ -66,6 +66,8 @@ Rails.application.routes.draw do
   get 'wado' => 'wado#wado'
 
   namespace :v1 do
+    get 'dashboard' => 'dashboard#index'
+
     resources :images
     resources :image_series do
       member do
@@ -79,6 +81,27 @@ Rails.application.routes.draw do
     resources :visits
 
     resources :search
+
+    resources :forms do
+      resources(
+        :form_answers,
+        path: "answers",
+        only: %i[show new create edit]
+      )
+
+      member do
+        get :configuration
+        get :current_configuration
+        get :locked_configuration
+      end
+    end
+    resources :form_answers do
+      member do
+        post :sign
+        post :unblock
+      end
+    end
+    resources :form_sessions, only: %i[show]
 
     get 'report' => 'report#index'
   end

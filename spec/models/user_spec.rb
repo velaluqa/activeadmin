@@ -7,13 +7,13 @@ RSpec.describe User do
     let!(:user) { create(:user) }
 
     it 'selects search fields' do
-      expect(User.searchable.as_json)
+      expect(User.searchable.map(&:attributes))
         .to eq [{
           'id' => nil,
           'study_id' => nil,
           'study_name' => nil,
           'text' => user.name,
-          'result_id' => user.id,
+          'result_id' => user.id.to_s,
           'result_type' => 'User'
         }]
     end

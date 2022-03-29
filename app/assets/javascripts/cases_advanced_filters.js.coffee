@@ -7,6 +7,7 @@ replace_stock_patient_filter = ->
 $(document).ready ->
   return unless $('body').hasClass('admin_cases')
   hide_fake_sidebar_entry()
+
   replace_stock_patient_filter()
   
   $('#q_patient_id').select2({

@@ -3,6 +3,8 @@
 
 require "marcel/magic"
 
+Mime::Type.register "application/pdf", :pdf
+
 Marcel::Magic.add(
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   magic: [[0, "PK\003\004", [[0..5000, '[Content_Types].xml', [[0..5000, 'ppt/']]]]]],

@@ -1,0 +1,79 @@
+%!
+% This is a modified version of the Ghostscript 9.27 PDFA_def.ps file with 
+% that creates a PDF/A-3 file with an embedded attachment
+
+% Define entries in the document Info dictionary :
+/ICCProfile (/usr/share/color/argyll/ref/sRGB.icm) % Customize
+def
+
+[ /Title (<%= title %>) /DOCINFO pdfmark        % Customize
+
+% Define an ICC profile :
+
+[/_objdef {icc_PDFA} /type /stream /OBJ pdfmark
+[{icc_PDFA}
+<<
+  /N currentpagedevice /ProcessColorModel known {
+    currentpagedevice /ProcessColorModel get dup /DeviceGray eq
+    {pop 1} {
+      /DeviceRGB eq
+      {3}{4} ifelse
+    } ifelse
+  } {
+    (ERROR, unable to determine ProcessColorModel) == flush
+  } ifelse
+>> /PUT pdfmark
+[{icc_PDFA} ICCProfile (r) file /PUT pdfmark
+
+% Define the output intent dictionary :
+
+[/_objdef {OutputIntent_PDFA} /type /dict /OBJ pdfmark
+[{OutputIntent_PDFA} <<
+  /Type /OutputIntent             % Must be so (the standard requires).
+  /S /GTS_PDFA1                   % Must be so (the standard requires).
+  /DestOutputProfile {icc_PDFA}            % Must be so (see above).
+  /OutputConditionIdentifier (sRGB)      % Customize
+>> /PUT pdfmark
+
+% New code starts here.
+
+<% embedded_files.each_with_index do |file, i| %>
+
+/MyFileName<%= i %> (<%= file[:filename] %>) def
+/MyFileToEmbed<%= i %> (<%= file[:path] %>) def
+/MyMimeType<%= i %> (<%= file[:mimetype] %>) def
+/MyDescription<%= i %> (<%= file[:mimetype] %>) def
+
+% Define the embedded file objects
+[/_objdef {myfileinfo<%= i %>} /type /dict /OBJ pdfmark
+[/_objdef {fstream<%= i %>} /type /stream  /OBJ pdfmark
+
+% Load the file to embed
+[{fstream<%= i %>} MyFileToEmbed<%= i %> (r) file  /PUT pdfmark
+
+% assign the stream information
+[{fstream<%= i %>} <<
+    /Type /EmbeddedFile
+    /Subtype MyMimeType<%= i %> cvn
+  >> /PUT pdfmark
+
+% assign the file information
+[{myfileinfo<%= i %>} <<
+    /Type /Filespec
+%    /Desc (<%= file[:description] %>) % optional, see page 103, table 44
+    /F MyFileName<%= i %>
+    /UF MyFileName<%= i %>
+    /AFRelationship /Supplement
+    /EF <<
+      /F {fstream<%= i %>}
+    >>
+  >> /PUT pdfmark
+    
+% Embed the stream
+[/Name MyFileName<%= i %> /FS {myfileinfo<%= i %>} /EMBED pdfmark
+[{fstream<%= i %>} /CLOSE pdfmark
+<% end %>
+
+% Updated last line from the original PDFA_defs.ps
+[{Catalog} <</OutputIntents [ {OutputIntent_PDFA} ] /AF [{myfileinfo}] >> /PUT pdfmark
+

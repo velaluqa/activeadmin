@@ -60,7 +60,7 @@ RSpec.describe ImageSeries do
           'study_name' => series.patient.center.study.name,
           'tag_list' => [],
           'text' => 'FooSeries (123)',
-          'result_id' => series.id,
+          'result_id' => series.id.to_s,
           'result_type' => 'ImageSeries'
         }]
     end

@@ -8,12 +8,16 @@ services:
   redis:
     image: redis:3.2
   test:
-    build: .
+    build:
+      context: .
+      args:
+        RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
     image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
     command: 'rake setup:db ci'
     environment:
       RAILS_ENV: test
       SELENIUM_DRIVER_URL: http://chrome:4444/wd/hub
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: testenv
     privileged: true

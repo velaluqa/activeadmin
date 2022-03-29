@@ -6,12 +6,16 @@ class Ability
   ACTIVITIES = {
     BackgroundJob => %i[manage read update create destroy],
     Sidekiq => %i[manage],
+    Configuration => %i[read],
     Study  => %i[manage read update create destroy comment read_reports configure],
     Center => %i[manage read update create destroy comment],
     Patient => %i[manage read update create destroy comment download_images],
     EmailTemplate => %i[manage read update create destroy],
     ImageSeries => %i[manage read update create destroy comment upload assign_patient assign_visit],
     Image => %i[manage read update create destroy],
+    FormSession => %i[manage read update create destroy],
+    FormDefinition => %i[manage read update create destroy],
+    FormAnswer => %i[manage read update create destroy],
     NotificationProfile => %i[manage read update create destroy],
     Notification => %i[manage read update create destroy],
     User => %i[manage read update create destroy generate_keypair],
@@ -28,6 +32,19 @@ class Ability
     ImageSeries => %i[upload assign_patient assign_visit],
     Visit => %i[assign_required_series]
   }.freeze
+
+  def can_with_undecorate?(action, subject, attribute = nil, *extra_args)
+    undecorated_subject = Draper.undecorate(subject)
+
+    can_without_undecorate?(
+      action,
+      undecorated_subject,
+      attribute,
+      *extra_args
+    )
+  end
+  alias_method :can_without_undecorate?, :can?
+  alias_method :can?, :can_with_undecorate?
 
   def initialize(current_user)
     @current_user = current_user
