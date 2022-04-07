@@ -200,6 +200,15 @@ step 'I click :string in :string row' do |locator, row_content|
   end
 end
 
+step 'I hover :string in :string row' do |locator, row_content|
+  page.all('tr').each do |td|
+    next unless td.text.include?(row_content)
+
+    el = td.find('.hoverable', text: locator)
+    el.hover
+  end
+end
+
 # TODO: Make this more explicit by filtering specific column.
 step 'I select row for :string' do |locator|
   selected = 0

@@ -84,6 +84,7 @@ SELECT
 
     self.successful = true
     self.results = results
+    self.progress = 1.0
 
     save
   end

@@ -10,6 +10,10 @@ class ERICA
       !Rails.application.config.is_erica_remote
     end
 
+    def backup_path
+      Rails.root + Pathname.new(Rails.application.config.backup_root)
+    end
+
     def data_path
       Rails.root + Pathname.new(Rails.application.config.data_directory)
     end
