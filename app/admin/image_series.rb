@@ -455,6 +455,25 @@ ActiveAdmin.register ImageSeries do
     redirect_back(fallback_location: admin_image_series_index_path)
   end
 
+  member_action :clean_dicom_tag, :method => :delete do
+    @image_series = ImageSeries.find(params[:id])
+    authorize! :clean_dicom_metadata, @image_series
+
+    background_job = BackgroundJob.create(
+      name: "Clean DICOM tag #{params[:tag]} for image series #{@image_series.name}",
+      user_id: current_user.id
+    )
+
+    CleanDicomTagWorker.perform_async(
+      background_job.id.to_s,
+      "ImageSeries",
+      params[:id],
+      params[:tag]
+    )
+
+    redirect_to admin_background_job_path(background_job)
+  end
+
   member_action :dicom_metadata, :method => :get do
     @image_series = ImageSeries.find(params[:id])
     authorize! :read, @image_series

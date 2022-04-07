@@ -22,4 +22,12 @@
               %td
                 = "#{element[:name]} "
                 %span.dicom_tag_key= "(#{element[:tag]})"
+                - if can?(:clean_dicom_metadata, @image_series)
+                  .custom-dropdown
+                    %span.hoverable
+                      %i.fa-xs.fal.fa-minus-octagon
+                      clean
+                    .custom-dropdown-menu
+                      %ul
+                        %li= link_to "clean tag for image series", clean_dicom_tag_admin_image_series_path(@image_series, tag: element[:tag]), method: :delete, data: { confirm: "Do you really want to clean the tag for all DICOM files of this image series?"}
               %td= pretty_print_dicom_tag(element[:value], element[:vr])
