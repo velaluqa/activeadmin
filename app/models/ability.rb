@@ -7,7 +7,7 @@ class Ability
     BackgroundJob => %i[manage read update create destroy],
     Sidekiq => %i[manage],
     Configuration => %i[read],
-    Study  => %i[manage read update create destroy comment read_reports configure],
+    Study  => %i[manage read update create destroy comment read_reports configure clean_dicom_metadata],
     Center => %i[manage read update create destroy comment],
     Patient => %i[manage read update create destroy comment download_images],
     EmailTemplate => %i[manage read update create destroy],

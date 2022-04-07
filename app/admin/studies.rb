@@ -285,6 +285,25 @@ ActiveAdmin.register Study do
     end
   end
 
+  member_action :clean_dicom_tag, :method => :delete do
+    @study = Study.find(params[:id])
+    authorize! :clean_dicom_metadata, @study
+
+    background_job = BackgroundJob.create(
+      name: "Clean DICOM tag #{params[:tag]} for study #{@study.name}",
+      user_id: current_user.id
+    )
+
+    CleanDicomTagWorker.perform_async(
+      background_job.id.to_s,
+      "Study",
+      params[:id],
+      params[:tag]
+    )
+
+    redirect_to admin_background_job_path(background_job)
+  end
+
   viewer_cartable(:study)
   erica_keywordable(:tags, 'Allowed Keywords') if Rails.application.config.is_erica_remote
 end

@@ -53,6 +53,7 @@ class CleanDicomTagWorker
     klass =
       case scope_classname
       when "ImageSeries" then ImageSeries
+      when "Study" then Study
       else raise "Unknown scope `#{scope}`"
       end
     klass.find(scope_id)
