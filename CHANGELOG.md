@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+### Minor Changes
+
+* Feature - Allow cleaning DICOM tag values for all images of a whole image series or a whole study (depending on authorization)
+
 ## 7.1.0
 
 ### Minor Changes
