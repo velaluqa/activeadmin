@@ -87,6 +87,7 @@ Rails.application.configure do
   config.image_storage_root = config.data_directory + '/images'
   config.form_pdf_root = config.data_directory + '/form_pdfs'
   config.image_export_root = config.data_directory + '/images_export'
+  config.backup_root = config.data_directory + '/backup'
 
   config.dcm2xml = '/usr/bin/dcm2xml'
   config.dcmconv = '/usr/bin/dcmconv'
