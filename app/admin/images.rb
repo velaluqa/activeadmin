@@ -86,6 +86,8 @@ ActiveAdmin.register Image do
     @image = Image.find(params[:id])
     authorize! :read, @image
 
+    @image_series = @image.image_series
+
     @dicom_meta_header, @dicom_metadata = @image.dicom_metadata_as_arrays
   end
 
