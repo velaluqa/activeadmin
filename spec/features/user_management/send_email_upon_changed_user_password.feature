@@ -3,7 +3,6 @@ Feature: Send e-Mail Upon Changed User Password
   As a user with an account,
   I want to be informed about the change of my password via e-mail.
   
-  @focus
   Scenario: Send e-mail
     Given a role "User Manager" with permissions:
      | User | manage |
