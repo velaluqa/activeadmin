@@ -38,8 +38,12 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Don't care if the mailer can't send.
-  config.action_mailer.delivery_method = :letter_opener_web
   config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'mailcatcher-dev',
+    port: 1025
+  }
 
   # Default URL for Devise.
   routes.default_url_options[:host] = 'localhost:3000'

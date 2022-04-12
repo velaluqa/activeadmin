@@ -194,9 +194,8 @@ step 'I click link :string in :string' do |locator, selector|
 end
 
 step 'I click :string in :string row' do |locator, row_content|
-  page.all('tr').each do |td|
-    next unless td.text.include?(row_content)
-    td.click_link(locator)
+  within("tr", text: row_content) do
+    click_link(locator)
   end
 end
 
@@ -338,10 +337,10 @@ step 'I don\'t see a row with/for :string and/with the following columns:' do |l
 end
 
 step 'I see :string in :string row' do |text, row_content|
-  page.all('tr').each do |td|
-    next unless td.text.include?(row_content)
-    expect(td.text).to include(text)
+  within('tr', text: row_content) do
+    expect(page).to have_content(text)
   end
+
   validation_report_screenshot
 end
 

@@ -7,6 +7,18 @@ step 'a user :string' do |username|
   )
 end
 
+step 'a user :string with:' do |username, attributes|
+  FactoryBot.create(
+    :user,
+    :changed_password,
+    :with_keypair,
+    attributes
+      .rows_hash
+      .symbolize_keys
+      .merge(username: username)
+  )
+end
+
 step 'a user :string with role :string' do |username, role|
   step("a user \"#{username}\"")
   step("user \"#{username}\" belongs to role \"#{role}\"")
@@ -31,4 +43,14 @@ step 'user :user_instance belongs to role :role_instance scoped to :model_instan
   user_role = user.user_roles.where(role: role).first
   expect(user_role).not_to be_nil
   expect(user_role.scope_object).to eq(scope_object)
+end
+
+step 'I change the password of :string to :string' do |username, password|
+  step "I browse to \"/admin/users\""
+  step "I see \"#{username}\""
+  step "I click \"Edit\" in \"#{username}\" row"
+  step "I fill in \"Password\" with \"#{password}\""
+  step "I fill in \"Password confirmation\" with \"#{password}\""
+  step "I click button \"Update User\""
+  step "I see \"User was successfully updated\""
 end

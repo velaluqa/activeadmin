@@ -3,6 +3,9 @@ if ENV['COVERAGE']
   SimpleCov.start 'rails'
 end
 
+require 'sidekiq/testing'
+Sidekiq::Testing.fake!
+
 # Turnip is a Gherkin language and runner implementation with better
 # formats for step definitions.
 require 'turnip'
@@ -57,6 +60,7 @@ require 'webmock/rspec'
 selenium_remote_uri = URI.parse(ENV.fetch('SELENIUM_DRIVER_URL'))
 WebMock.disable_net_connect!(
   allow: [
+    "mailcatcher-test:1080",
     "#{selenium_remote_uri.host}:#{selenium_remote_uri.port}",
     Capybara.app_host
   ]
@@ -165,7 +169,14 @@ RSpec.configure do |config|
     $stdout = original_stdout
   end
 
+  config.around(:each, type: :feature) do |example|
+    Sidekiq::Testing.inline! do
+      example.run
+    end
+  end
+
   config.around(:each) do |example|
+    Net::HTTP.new('mailcatcher-test', '1080').delete('/messages')
     clear_data
     DatabaseCleaner.cleaning do
       example.run

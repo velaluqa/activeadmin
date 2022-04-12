@@ -10,6 +10,14 @@ services:
     image: redis
     ports:
       - 6379:6379
+  mailcatcher-dev:
+    image: schickling/mailcatcher
+    ports:
+      - 1080:1080
+  mailcatcher-test:
+    image: schickling/mailcatcher
+    ports:
+      - 1080
   app:
     build: &build .
     command: rails s -b 0.0.0.0 -p 3000
@@ -33,6 +41,7 @@ services:
       - redis
       - worker
       - webpack
+      - mailcatcher-dev
   webpack:
     container_name: erica_webpack
     build: *build
@@ -57,6 +66,7 @@ services:
       - postgres
       - redis
       - chrome
+      - mailcatcher-test
   worker:
     build: *build
     command: bundle exec sidekiq
