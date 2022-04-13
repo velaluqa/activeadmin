@@ -1,16 +1,17 @@
-<h2>Change your password</h2>
+<div class="bg-head">
+  <h3>Change your password</h3>
+</div>
 
-<%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :put }) do |f| %>
-  <%= devise_error_messages! %>
+<%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :put }, class: 'form-group') do |f| %>
   <%= f.hidden_field :reset_password_token %>
 
-  <div><%= f.label :password, "New password" %><br />
-  <%= f.password_field :password, :autofocus => true %></div>
+  <div class="form-group form-group-lg"><%= f.label :password, "New password", class: "sr-only" %>
+  <%= f.password_field :password, :autofocus => true, placeholder: "New password", class: 'form-control' %></div>
 
-  <div><%= f.label :password_confirmation, "Confirm new password" %><br />
-  <%= f.password_field :password_confirmation %></div>
+  <div class="form-group form-group-lg"><%= f.label :password_confirmation, "Confirm new password", class: "sr-only" %>
+  <%= f.password_field :password_confirmation , placeholder: "Confirm new password", class: 'form-control' %></div>
 
-  <div><%= f.submit "Change my password" %></div>
+  <div><%= f.submit "Change my password", class: 'btn btn-lg btn-primary pull-right' %></div>
 <% end %>
 
 <%= render "devise/shared/links" %>

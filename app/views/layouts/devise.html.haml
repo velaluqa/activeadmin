@@ -7,6 +7,7 @@
     = csrf_meta_tags
   %body
     .container
+      = render 'devise/shared/error_messages', object: resource
       - flash.each do |name, msg|
         - if msg.is_a?(String)
           %div{ class: "alert alert-#{name.to_sym == :notice ? "success" : "danger"}"}
