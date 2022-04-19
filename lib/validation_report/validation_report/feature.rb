@@ -13,7 +13,7 @@ module ValidationReport
     end
 
     def description
-      @turnip_feature.description.strip
+      (@turnip_feature.description || "").strip
     end
 
     def scenarios
