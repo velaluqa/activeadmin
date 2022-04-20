@@ -84,5 +84,9 @@ class ERICA
     def maximum_email_throttling_delay
       Rails.application.config.maximum_email_throttling_delay
     end
+
+    def version
+      StudyServer::Application.config.erica_version.join('.')
+    end
   end
 end
