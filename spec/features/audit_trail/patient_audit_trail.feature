@@ -34,7 +34,7 @@ Feature: Patient Audit Trail
     And I browse to patient "FooPatient"
     And I click link "Audit Trail" in "#title_bar"
     Then I see "RequiredSeries 100FooPatient#10000 SPECT"
-    And I see "Image Image #"
+    And I see "Image Foo#1"
     And I see "ImageSeries Foo"
     And I see "Visit 100FooPatient#10000"
     And I see "Patient 100FooPatient"

@@ -34,7 +34,7 @@ Feature: ImageSeries Audit Trail
     And I browse to image_series "Foo"
     And I click link "Audit Trail" in "#title_bar"
     Then I see "RequiredSeries 100FooPatient#10000 SPECT"
-    And I see "Image Image #"
+    And I see "Image Foo#1"
     And I see "ImageSeries Foo"
     And I don't see "Visit 100FooPatient#10000"
     And I don't see "Patient 100FooPatient"

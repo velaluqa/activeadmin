@@ -7,6 +7,7 @@
 * Feature - Allow cleaning DICOM tag values for all images of a whole image series or a whole study (depending on authorization)
 * Feature - Display nested DICOM attributes and `SQ` VR accordingly
 * Permissions - Manage access to DICOM metadata via the new `read_dicom_metadata` permission for `ImageSeries`
+* Change - Use `[name of image series]#[position of image in series]` as new text representation of images (e.g. in image view or audit trail record references)
 
 ### DevOps
 
