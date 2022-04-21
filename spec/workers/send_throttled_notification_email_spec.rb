@@ -1,4 +1,4 @@
-describe SendThrottledNotificationEmail do
+describe SendThrottledNotificationEmail, mailer: :test do
   it { is_expected.to be_processed_in :notifications }
   it { is_expected.to be_retryable(5) }
 

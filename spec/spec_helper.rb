@@ -175,6 +175,12 @@ RSpec.configure do |config|
     end
   end
 
+  config.around(:each, mailer: :test) do |example|
+    ActionMailer::Base.delivery_method = :test
+    example.run
+    ActionMailer::Base.delivery_method = :smtp
+  end
+
   config.around(:each) do |example|
     Net::HTTP.new('mailcatcher-test', '1080').delete('/messages')
     clear_data
