@@ -2,37 +2,14 @@
   %h3 DICOM Meta Header
   .panel_contents
     .attributes_table
-      %table
+      %table.dicom_metadata
         %tbody
-          - @dicom_meta_header.each do |element|
-            %tr
-              %td
-                = "#{element[:name]} "
-                %span.dicom_tag_key= "(#{element[:tag]})"
-              %td= pretty_print_dicom_tag(element[:value], element[:vr])
+          = dicom_metadata_rows(@dicom_meta_header, level: 0)
 
 .panel
   %h3 DICOM Metadata
   .panel_contents
     .attributes_table
-      %table
+      %table.dicom_metadata
         %tbody
-          - @dicom_metadata.each do |element|
-            %tr
-              %td
-                = "#{element[:name]} "
-                %span.dicom_tag_key= "(#{element[:tag]})"
-                - can_for_image_series = can?(:clean_dicom_metadata, @image_series)
-                - can_for_study = can?(:clean_dicom_metadata, @image_series.study)
-                - if can_for_image_series || can_for_study
-                  .custom-dropdown
-                    %span.hoverable
-                      %i.fa-xs.fal.fa-minus-octagon
-                      clean
-                    .custom-dropdown-menu
-                      %ul
-                        - if can_for_image_series
-                          %li= link_to "clean tag for image series", clean_dicom_tag_admin_image_series_path(@image_series, tag: element[:tag]), method: :delete, data: { confirm: "Do you really want to clean that tag (#{element[:name]} - #{element[:tag]}) for all DICOM files of this image series #{@image_series.name}?"}
-                        - if can_for_study
-                          %li= link_to "clean tag for study", clean_dicom_tag_admin_study_path(@image_series.study, tag: element[:tag]), method: :delete, data: { confirm: "Do you really want to clean that tag (#{element[:name]} - #{element[:tag]}) for all DICOM files of this study #{@image_series.study.name}?"}
-              %td= pretty_print_dicom_tag(element[:value], element[:vr])
+          = dicom_metadata_rows(@dicom_metadata, level: 0)

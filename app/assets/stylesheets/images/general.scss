@@ -1,0 +1,48 @@
+.dicom_tag_vr {
+  opacity: 0.5;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 0.8em;
+  padding: 0 !important;
+  float: right;
+}
+
+table.dicom_metadata {
+  tr {
+    &:hover {
+      background: #eee;
+    }
+    th {
+      width: 35% !important;
+    }
+    td, th {
+      padding: 0 !important;
+      vertical-align: middle !important;
+      height: 36px;
+      line-height: 35.5px !important;
+
+      span {
+        padding: 8px;
+      }
+    }
+  }
+}
+
+.dicom_seq_length {
+  opacity: 0.5;
+  font-style: italic;
+}
+
+.dicom_metadata_row_indent {
+  display: inline-block;
+  height: 36px;
+  background: #ddd;
+}
+
+.dicom_value_hint {
+  padding-left: 0 !important;
+}
+
+.dicom_value_null {
+  opacity: 0.5;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}

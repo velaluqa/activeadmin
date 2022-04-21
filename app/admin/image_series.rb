@@ -201,7 +201,7 @@ ActiveAdmin.register ImageSeries do
       result = ''
 
       result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnlp'), :class => 'member_link')
-      result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank') if image_series.has_dicom?
+      result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank') if image_series.has_dicom? && can?(:read_dicom_metadata, image_series)
       result += link_to('Domino', image_series.lotus_notes_url, :class => 'member_link') unless(image_series.domino_unid.nil? or image_series.lotus_notes_url.nil? or Rails.application.config.is_erica_remote)
       if can?(:assign_visit, image_series)
         result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
@@ -480,7 +480,7 @@ ActiveAdmin.register ImageSeries do
 
   member_action :dicom_metadata, :method => :get do
     @image_series = ImageSeries.find(params[:id])
-    authorize! :read, @image_series
+    authorize! :read_dicom_metadata, @image_series
 
     sample_image = @image_series.sample_image
     if(sample_image.nil?)
@@ -489,12 +489,12 @@ ActiveAdmin.register ImageSeries do
     end
     authorize! :read, sample_image
 
-    @dicom_meta_header, @dicom_metadata = sample_image.dicom_metadata_as_arrays
+    @dicom_meta_header, @dicom_metadata = sample_image.dicom_metadata
 
     render 'admin/images/dicom_metadata'
   end
   action_item :edit, :only => :show do
-    link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(resource)) if resource.has_dicom?
+    link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(resource)) if resource.has_dicom? && can?(:read_dicom_metadata, resource)
   end
 
   collection_action :batch_assign_to_patient, :method => :post do

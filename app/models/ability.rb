@@ -11,7 +11,7 @@ class Ability
     Center => %i[manage read update create destroy comment],
     Patient => %i[manage read update create destroy comment download_images],
     EmailTemplate => %i[manage read update create destroy],
-    ImageSeries => %i[manage read update create destroy comment upload assign_patient assign_visit clean_dicom_metadata],
+    ImageSeries => %i[manage read update create destroy comment upload assign_patient assign_visit read_dicom_metadata clean_dicom_metadata],
     Image => %i[manage read update create destroy],
     FormSession => %i[manage read update create destroy],
     FormDefinition => %i[manage read update create destroy],

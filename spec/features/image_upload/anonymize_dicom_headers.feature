@@ -29,12 +29,12 @@ Feature: Anonymize DICOM Headers
       | code  |        1 |
     And a patient "FooPatient" for "FooCenter"
     And a role "Image Manager" with permissions:
-      | Study       | read         |
-      | Center      | read         |
-      | Patient     | read         |
-      | ImageSeries | read, upload |
-      | Image       | read         |
-      | Visit       | read         |
+      | Study       | read                              |
+      | Center      | read                              |
+      | Patient     | read                              |
+      | ImageSeries | read, read_dicom_metadata, upload |
+      | Image       | read                              |
+      | Visit       | read                              |
 
   Scenario: Not logged in
     When I browse to image_upload page
@@ -63,5 +63,5 @@ Feature: Anonymize DICOM Headers
     When I browse to image_series list
     And I click "Metadata" in "SCOUT 3-PLANE RT" row
     Then another window is opened
-    And I see "PatientName (0010,0010) 1FooPatient"
+    And I see "1FooPatient" in "PatientName" row
 

@@ -1,0 +1,13 @@
+- can_for_image_series = can?(:clean_dicom_metadata, @image_series)
+- can_for_study = can?(:clean_dicom_metadata, @image_series.study)
+- if can_for_image_series || can_for_study
+  .custom-dropdown
+    %span.hoverable
+      %i.fa-xs.fal.fa-minus-octagon
+      clean
+    .custom-dropdown-menu
+      %ul
+        - if can_for_image_series
+          %li= link_to "clean tag for image series", clean_dicom_tag_admin_image_series_path(@image_series, tag: element[:tag]), method: :delete, data: { confirm: "Do you really want to clean the tag #{element[:name]} (#{element[:tag]}) for all DICOM files of the image series \"#{@image_series.name}\"? This will remove the specified tag from #{@image_series.images.count} DICOM files in storage!"}
+        - if can_for_study
+          %li= link_to "clean tag for study", clean_dicom_tag_admin_study_path(@image_series.study, tag: element[:tag]), method: :delete, data: { confirm: "Do you really want to clean the tag #{element[:name]} (#{element[:tag]}) for all DICOM files of the study \"#{@image_series.study.name}\"? This will remove the specified tag from #{@image_series.study.images.count} DICOM files in storage!"}

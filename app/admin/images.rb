@@ -48,7 +48,16 @@ ActiveAdmin.register Image do
         status_tag('Missing', class: 'error')
       end
     end
+    column "View" do |image|
+      next "" unless image.dicom? && can?(:read_dicom_metadata, image.image_series)
 
+      link_to(
+        'Metadata',
+        dicom_metadata_admin_image_path(image),
+        class: 'member_link',
+        target: '_blank'
+      )
+    end
     customizable_default_actions(current_ability)
   end
 
@@ -84,15 +93,17 @@ ActiveAdmin.register Image do
 
   member_action :dicom_metadata, method: :get do
     @image = Image.find(params[:id])
-    authorize! :read, @image
+    authorize! :read_dicom_metadata, @image.image_series
 
     @image_series = @image.image_series
 
-    @dicom_meta_header, @dicom_metadata = @image.dicom_metadata_as_arrays
+    @dicom_meta_header, @dicom_metadata = @image.dicom_metadata
   end
 
   action_item :edit, only: :show do
-    link_to('DICOM Metadata', dicom_metadata_admin_image_path(resource)) if resource.dicom?
+    next unless resource.dicom? && can?(:read_dicom_metadata, resource.image_series)
+
+    link_to('DICOM Metadata', dicom_metadata_admin_image_path(resource))
   end
 
   action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do

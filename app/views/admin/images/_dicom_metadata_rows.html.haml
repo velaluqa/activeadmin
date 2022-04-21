@@ -1,0 +1,21 @@
+- metadata.each_pair do |tag, element|
+  %tr
+    %th
+      = dicom_metadata_row_indent(level)
+      %span.dicom_tag_key= "(#{element[:tag]})"
+      %span= "#{element[:name]} "
+      %span.dicom_tag_vr= element[:vr]
+    %td
+      - if element[:vr] == "SQ"
+        %span.dicom_seq_length= "#{element[:items] ? element[:items].length : 0} Items"
+      - else
+        %span= pretty_print_dicom_tag(element[:value], element[:vr])
+      - if level == 0 && element[:vr] != "SQ"
+        = dicom_metadata_row_dropdown(@image_series, element)
+  - if element[:items] && element[:items].length > 0
+    - element[:items].each_with_index do |item, index|
+      %tr
+        %th{ colspan: "2" }
+          = dicom_metadata_row_indent(level+1)
+          %span= "Item #{index}"
+      = dicom_metadata_rows(element[:items][index], level: level + 2)

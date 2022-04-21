@@ -17,9 +17,9 @@ Feature: Clean specific DICOM tag for study
 
   Background:
     Given a role "Image Manager" with permissions:
-      | Study       | clean_dicom_metadata |
-      | ImageSeries | read                 |
-      | Image       | read                 |
+      | Study       | clean_dicom_metadata      |
+      | ImageSeries | read, read_dicom_metadata |
+      | Image       | read                      |
 
     Given a study "A"
     And a center "A" for "A"
@@ -43,8 +43,8 @@ Feature: Clean specific DICOM tag for study
 
   Scenario: Unauthorized
     Given a role "Image Reader" with permissions:
-      | ImageSeries | read |
-      | Image       | read |
+      | ImageSeries | read, read_dicom_metadata |
+      | Image       | read                      |
     When I sign in as a user with role "Image Reader"
     And I browse to dicom_metadata ImageSeries "IS_A1"
     Then I see "Not allowed" in "PatientName" row
@@ -52,8 +52,8 @@ Feature: Clean specific DICOM tag for study
 
   Scenario: Authorized for image series, but not for study 
     Given a role "Image Reader" with permissions:
-      | ImageSeries | read, clean_dicom_metadata |
-      | Image       | read                       |
+      | ImageSeries | read, read_dicom_metadata, clean_dicom_metadata |
+      | Image       | read                                            |
     When I sign in as a user with role "Image Reader"
     And I browse to dicom_metadata ImageSeries "IS_A1"
     Then I see "Not allowed" in "PatientName" row

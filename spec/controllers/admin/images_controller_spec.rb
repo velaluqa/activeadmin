@@ -111,6 +111,7 @@ RSpec.describe Admin::ImagesController do
 
     describe 'for authorized user' do
       login_user_with_abilities do
+        can :read_dicom_metadata, ImageSeries
         can :read, Image
       end
 
