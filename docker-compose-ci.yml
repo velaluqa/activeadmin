@@ -28,6 +28,11 @@ services:
       - postgres
       - redis
       - chrome
+      - mailcatcher-test
+  mailcatcher-test:
+    image: schickling/mailcatcher
+    ports:
+      - 1080
   chrome:
     image: selenium/standalone-chrome
     environment:

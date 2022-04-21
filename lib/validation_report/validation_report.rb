@@ -11,6 +11,8 @@ module ValidationReport
   extend RSpec::Helper
 
   def self.setup
+    require File.expand_path('validation_report/patches/turnip', File.dirname(__FILE__))
+
     @current_feature = nil
     @current_scenario = nil
     @current_step = nil
@@ -173,4 +175,3 @@ module ValidationReport
 end
 
 require File.expand_path('validation_report/rspec/formatter', File.dirname(__FILE__))
-require File.expand_path('validation_report/patches/turnip', File.dirname(__FILE__))

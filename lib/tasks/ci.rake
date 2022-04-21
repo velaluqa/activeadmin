@@ -6,7 +6,7 @@ namespace :ci do
 
   namespace :test do
     task units: ['ci:prepare'] do
-      sh 'COVERAGE=true bundle exec rspec --format ValidationReport::RSpec::Formatter --format html -o reports/unit.html --format JUnit -o reports/rspec_report.xml'
+      sh 'COVERAGE=yes bundle exec rspec --fail-fast=15 --format documentation --format html -o reports/unit.html --format JUnit -o reports/rspec_report.xml'
     end
   end
   task test: ['ci:test:units']
@@ -193,7 +193,6 @@ namespace :ci do
     puts "Writing #{file}"
     File.write(file,JSON.dump(specs))
   end
-
 end
 
 task ci: [

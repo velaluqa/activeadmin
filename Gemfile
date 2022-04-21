@@ -231,14 +231,14 @@ group :development, :test do
   gem 'yard-activerecord', github: 'velaluqa/yard-activerecord', require: false
   gem 'yard-activesupport-concern', require: false
 
-  gem 'capybara'
+  gem 'capybara', '~> 3.36.0'
   gem 'puma' # for capybara
 
   # Lock capybara-screenshot because it's being monkey-patched for the
   # validation report
   gem 'capybara-screenshot'
   gem 'database_cleaner'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '~> 4.1.0'
   gem 'transactional_capybara'
   gem 'yarjuf'
 

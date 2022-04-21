@@ -21,16 +21,28 @@ require 'validation_report/validation_report'
 # Add <base> to saved HTML pages so that the browser can load
 # respective assets when opening failing pages.
 
+# TODO: Update turnip to > 4.3.0 in order to fix deprecated driver method.
+# Monkey path deprecated `RegistrationContainer::has_key?` function.
+# This is because at this moment we cannot update Turnip for a patch.
+module Capybara
+  class RegistrationContainer
+    def has_key?(name)
+      !!@registered[name]
+    end
+  end
+end
+
 Capybara.register_driver(:selenium) do |app|
+  caps = Selenium::WebDriver::Remote::Capabilities.chrome(
+    "goog:chromeOptions" => {
+      "args" => %w[start-maximized no-sandbox disable-gpu]
+    }
+  )
   driver = Capybara::Selenium::Driver.new(
     app,
     browser: :remote,
     url: ENV.fetch('SELENIUM_DRIVER_URL'),
-    desired_capabilities: Selenium::WebDriver::Remote::Capabilities.chrome(
-      chromeOptions: {
-        args: %w[start-maximized no-sandbox disable-gpu]
-      }
-    ),
+    capabilities: [caps],
     http_client: Selenium::WebDriver::Remote::Http::Default.new
   )
   # Taken from https://github.com/teamcapybara/capybara/blob/12c065154809cc1ea075753e54b3eb51477a748a/spec/selenium_spec_chrome_remote.rb#L56

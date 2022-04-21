@@ -59,6 +59,7 @@ Feature: Anonymize DICOM Headers
     Then I see "SCOUT 3-PLANE RT"
     When I select "SCOUT 3-PLANE RT" for upload
     And I click the "Upload Image Series" button
+    And I wait 15 seconds
     Then I see "Upload complete!"
     When I browse to image_series list
     And I click "Metadata" in "SCOUT 3-PLANE RT" row
