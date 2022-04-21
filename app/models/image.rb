@@ -135,15 +135,30 @@ JOIN
 
     dicom_meta_header = {}
     unless dicom_metadata_doc.root.elements['meta-header'].nil?
-      dicom_metadata_doc.root.elements['meta-header'].each_element('element') do |e|
-        dicom_meta_header[e.attributes['tag']] = { tag: e.attributes['tag'], name: e.attributes['name'], vr: e.attributes['vr'], value: e.text } unless e.text.blank?
+      dicom_metadata_doc.root.elements['meta-header'].each_element_with_attribute('tag') do |e|
+        dicom_meta_header[e.attributes['tag']] = {
+          tag: e.attributes['tag'],
+          name: e.attributes['name'],
+          vr: e.attributes['vr'],
+          value: e.text
+        }
       end
     end
 
     dicom_metadata = {}
     unless dicom_metadata_doc.root.elements['data-set'].nil?
-      dicom_metadata_doc.root.elements['data-set'].each_element('element') do |e|
-        dicom_metadata[e.attributes['tag']] = { tag: e.attributes['tag'], name: e.attributes['name'], vr: e.attributes['vr'], value: e.text } unless e.text.blank?
+      dicom_metadata_doc.root.elements['data-set'].each_element_with_attribute('tag') do |e|
+        if e.attributes['vr'] == "SQ"
+          dicom_metadata[e.attributes['tag']] =
+            wrap_dicom_sequence_from_xml(e)
+        else
+          dicom_metadata[e.attributes['tag']] = {
+            tag: e.attributes['tag'],
+            name: e.attributes['name'],
+            vr: e.attributes['vr'],
+            value: e.text
+          }
+        end
       end
     end
 
@@ -160,19 +175,23 @@ JOIN
 
     dicom_meta_header = []
     unless dicom_metadata_doc.root.elements['meta-header'].nil?
-      dicom_metadata_doc.root.elements['meta-header'].each_element('element') do |e|
+      dicom_metadata_doc.root.elements['meta-header'].each_element('element,sequence') do |e|
         dicom_meta_header << { tag: e.attributes['tag'], name: e.attributes['name'], vr: e.attributes['vr'], value: e.text } unless e.text.blank?
       end
     end
 
     dicom_metadata = []
     unless dicom_metadata_doc.root.elements['data-set'].nil?
-      dicom_metadata_doc.root.elements['data-set'].each_element('element') do |e|
+      dicom_metadata_doc.root.elements['data-set'].each_element_with_attribute('tag') do |e|
         dicom_metadata << { tag: e.attributes['tag'], name: e.attributes['name'], vr: e.attributes['vr'], value: e.text } unless e.text.blank?
       end
     end
 
     [dicom_meta_header, dicom_metadata]
+  end
+
+  def dicom
+    DICOM::DObject.read(image_path.to_s)
   end
 
   def self.classify_audit_trail_event(c)
@@ -209,5 +228,32 @@ JOIN
     end
 
     dicom_metadata_doc
+  end
+
+  def wrap_dicom_sequence_from_xml(element)
+    seq = {
+      tag: element.attributes['tag'],
+      name: element.attributes['name'],
+      vr: element.attributes['vr'],
+      items: []
+    }
+    element.each_element('item') do |item_element|
+      item = {}
+      item_element.each_element_with_attribute('tag') do |e|
+        if e.attributes['vr'] == "SQ"
+          item[e.attributes['tag']] =
+            wrap_dicom_sequence_from_xml(e)
+        else
+          item[e.attributes['tag']] = {
+            tag: e.attributes['tag'],
+            name: e.attributes['name'],
+            vr: e.attributes['vr'],
+            value: e.text
+          }
+        end
+      end
+      seq[:items] << item
+    end
+    seq
   end
 end

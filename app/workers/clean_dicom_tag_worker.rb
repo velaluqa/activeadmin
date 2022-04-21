@@ -21,11 +21,25 @@ class CleanDicomTagWorker
     FileUtils.cp(image_path, backup_file_path(image))
 
     dicom = DICOM::DObject.read(image_path.to_s)
+
     if dicom.exists?(tag)
-      dicom[tag].value = "redacted"
+      dicom[tag].value = ""
     else
-      dicom.add_element(tag, "redacted")
+      dicom.add_element(tag, "")
     end
+
+    original_attributes_seq = dicom[DICOM::Tag.OriginalAttributesSequence]
+    original_attributes_seq ||= DICOM::Sequence.new(DICOM::Tag.OriginalAttributesSequence, parent: dicom)
+    original_attributes = original_attributes_seq.add_item
+
+    original_attributes.add_element(DICOM::Tag.AttributeModificationDateTime, DateTime.now.utc.strftime("%Y%m%d%H%M%S.%6N"))
+    original_attributes.add_element(DICOM::Tag.ModifyingSystem, "Pharmtrace ERICA SaaS #{ERICA.version}")
+    original_attributes.add_element(DICOM::Tag.ReasonForTheAttributeModification, "COERCE")
+
+    modified_attributes_seq = DICOM::Sequence.new(DICOM::Tag.ModifiedAttributesSequence, parent: original_attributes)
+    modified_attributes = modified_attributes_seq.add_item
+    modified_attributes.add_element(tag, "")
+
     dicom.write(image_path.to_s)
 
     image.sha256sum = Digest::SHA256.hexdigest(File.read(image_path.to_s))

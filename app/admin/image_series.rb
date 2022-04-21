@@ -459,8 +459,12 @@ ActiveAdmin.register ImageSeries do
     @image_series = ImageSeries.find(params[:id])
     authorize! :clean_dicom_metadata, @image_series
 
+    tag = params[:tag]
+    tag_keyword = DICOM::Tag.keyword(tag)
+    tag_label = tag_keyword ? "#{tag_keyword} (#{tag})" : tag
+
     background_job = BackgroundJob.create(
-      name: "Clean DICOM tag #{params[:tag]} for image series #{@image_series.name}",
+      name: "Clean DICOM tag #{tag_label} for image series #{@image_series.name}",
       user_id: current_user.id
     )
 
@@ -468,7 +472,7 @@ ActiveAdmin.register ImageSeries do
       background_job.id.to_s,
       "ImageSeries",
       params[:id],
-      params[:tag]
+      tag
     )
 
     redirect_to admin_background_job_path(background_job)

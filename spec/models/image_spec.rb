@@ -14,6 +14,19 @@ RSpec.describe Image do
     end
   end
 
+  describe '#dicom_metadata' do
+    let!(:image) { create(:image) }
+    let(:metadata) { image.dicom_metadata }
+
+    it 'sequences as nested hashes' do
+      expect(metadata[1]).to include("0040,0275" => include(name: "RequestAttributesSequence", tag: "0040,0275", vr: "SQ"))
+
+      items = metadata[1]["0040,0275"][:items]
+      expect(items).to be_an(Array)
+      expect(items).to include(include("0040,0007" => include(name: "ScheduledProcedureStepDescription")))
+    end
+  end
+
   describe 'image storage' do
     before(:each) do
       @study = create(:study, id: 1)

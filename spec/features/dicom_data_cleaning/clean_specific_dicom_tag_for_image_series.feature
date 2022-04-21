@@ -50,12 +50,13 @@ Feature: Clean specific DICOM tag for image series
 
     When I hover "clean" in "PatientName" row
     And I click link "clean tag for image series" and confirm
-    Then I see "Clean DICOM tag 0010,0010 for image series IS1"
+    Then I see "Clean DICOM tag PatientName (0010,0010) for image series IS1"
     And I wait for all jobs in "CleanDicomTagWorker" queue
 
     And I browse to dicom_metadata ImageSeries "IS1"
-    Then I see "redacted" in "PatientName" row
+    Then I don't see "Not allowed"
 
-    And I browse to dicom_metadata ImageSeries "IS2"
+    When I browse to dicom_metadata ImageSeries "IS2"
     Then I see "Not allowed" in "PatientName" row
+    
 

@@ -289,8 +289,12 @@ ActiveAdmin.register Study do
     @study = Study.find(params[:id])
     authorize! :clean_dicom_metadata, @study
 
+    tag = params[:tag]
+    tag_keyword = DICOM::Tag.keyword(tag)
+    tag_label = tag_keyword ? "#{tag_keyword} (#{tag})" : tag
+
     background_job = BackgroundJob.create(
-      name: "Clean DICOM tag #{params[:tag]} for study #{@study.name}",
+      name: "Clean DICOM tag #{tag_label} for study #{@study.name}",
       user_id: current_user.id
     )
 
@@ -298,7 +302,7 @@ ActiveAdmin.register Study do
       background_job.id.to_s,
       "Study",
       params[:id],
-      params[:tag]
+      tag
     )
 
     redirect_to admin_background_job_path(background_job)

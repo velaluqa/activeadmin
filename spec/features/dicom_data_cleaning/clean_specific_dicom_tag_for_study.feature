@@ -72,14 +72,14 @@ Feature: Clean specific DICOM tag for study
     When I hover "clean" in "PatientName" row
     Then I see "clean tag for study"
     When I click link "clean tag for study" and confirm
-    Then I see "Clean DICOM tag 0010,0010 for study A"
+    Then I see "Clean DICOM tag PatientName (0010,0010) for study A"
     And I wait for all jobs in "CleanDicomTagWorker" queue
 
     And I browse to dicom_metadata ImageSeries "IS_A1"
-    Then I see "redacted" in "PatientName" row
+    Then I don't see "Not allowed"
 
     And I browse to dicom_metadata ImageSeries "IS_A2"
-    Then I see "redacted" in "PatientName" row
+    Then I don't see "Not allowed"
 
     And I browse to dicom_metadata ImageSeries "IS_B1"
     Then I see "Not allowed" in "PatientName" row
