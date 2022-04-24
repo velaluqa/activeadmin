@@ -1,5 +1,5 @@
 --colour
---format ValidationReport::RSpec::Formatter
+--format documentation
 --tag ~slow
 --require turnip/rspec
 --require spec_helper
