@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.2.0
+
 ### Minor Changes
 
 * Feature - Allow cleaning DICOM tag values for all images of a whole image series or a whole study (depending on authorization)
@@ -12,7 +14,7 @@
 ### DevOps
 
 * Replace `letter_opener` gem by `mailcatcher` docker container to extract mail catching from the Rails application itself
-* Run background workers `inline!` for `feature` tests
+* Remove validation report formatter due to CI errors (Needs to be fixed in next major release)
 
 ## 7.1.0
 
