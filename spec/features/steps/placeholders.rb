@@ -49,6 +49,10 @@ placeholder :admin_path do
     '/admin/dashboard'
   end
 
+  match(/audit trail/) do
+    '/admin/versions'
+  end
+
   match(/([^ $\n]+) page/) do |page_name|
     Rails.application.routes.url_helpers
       .send("admin_#{page_name.underscore}_path")

@@ -5,7 +5,7 @@
 # components:
 #   - DICOM de-identification
 #   - data cleaning
-@js
+@js @sidekiq_fake
 Feature: Clean specific DICOM tag for image series
   In order to remove identifying personal information from uploaded DICOM data,
   as authorized user for clean_dicom_metadata for image series,
@@ -19,6 +19,7 @@ Feature: Clean specific DICOM tag for image series
     Given a role "Image Manager" with permissions:
       | ImageSeries | read, read_dicom_metadata, clean_dicom_metadata |
       | Image       | read                                            |
+      | Version     | read                                            |
 
     Given a study "A"
     And a center "A" for "A"
@@ -59,4 +60,7 @@ Feature: Clean specific DICOM tag for image series
     When I browse to dicom_metadata ImageSeries "IS2"
     Then I see "Not allowed" in "PatientName" row
     
+    When I browse to audit trail
+    Then I see "Test User" in "IS1#1 FILE CHANGE" row
+    But I don't see "IS2#1 FILE CHANGE"
 

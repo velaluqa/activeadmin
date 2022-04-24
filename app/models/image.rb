@@ -195,12 +195,22 @@ JOIN
   end
 
   def self.classify_audit_trail_event(c)
-    :image_series_change if c.keys == ['image_series_id']
+    if c.keys == ['image_series_id']
+      :image_series_change
+    elsif c.keys.include?('sha256sum')
+      if c['sha256sum'][0].nil?
+        :file_upload
+      else
+        :file_change
+      end
+    end
   end
 
   def self.audit_trail_event_title_and_severity(event_symbol)
     case event_symbol
     when :image_series_change then ['Image Series Change', :ok]
+    when :file_change then ['File Change', :warning]
+    when :file_upload then ['File Upload', :ok]
     end
   end
 

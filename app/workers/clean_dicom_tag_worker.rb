@@ -49,6 +49,8 @@ class CleanDicomTagWorker
   def perform(job_id, scope_classname, scope_id, tag)
     job = BackgroundJob.find(job_id)
 
+    ::PaperTrail.request.whodunnit = job.user_id
+
     object = find_scope_object(scope_classname, scope_id)
     image_count = object.images.count
 
@@ -59,6 +61,8 @@ class CleanDicomTagWorker
     end
 
     job.finish_successfully()
+  ensure
+    ::PaperTrail.request.whodunnit = nil
   end
 
   private
