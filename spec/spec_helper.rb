@@ -181,13 +181,13 @@ RSpec.configure do |config|
     $stdout = original_stdout
   end
 
-  config.around(:each, type: :feature, sidekiq_fake: false) do |example|
+  config.around(:each, sidekiq_inline: true) do |example|
     Sidekiq::Testing.inline! do
       example.run
     end
   end
 
-  config.around(:each, type: :feature, sidekiq_fake: true) do |example|
+  config.around(:each, sidekiq_fake: true) do |example|
     Sidekiq::Testing.fake! do
       example.run
     end

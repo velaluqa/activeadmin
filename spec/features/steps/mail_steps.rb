@@ -1,4 +1,5 @@
 step 'I open the mail inbox' do
+  Sidekiq::Worker.drain_all
   visit("http://mailcatcher-test:1080")
 end
 
