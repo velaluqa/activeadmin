@@ -20,11 +20,6 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
     "formio_v1",
   ], force: :cascade
 
-  create_enum :form_definition_status, [
-    "draft",
-    "final",
-  ], force: :cascade
-
   create_table "active_admin_comments", id: :serial, force: :cascade do |t|
     t.string "resource_id", null: false
     t.string "resource_type", null: false
@@ -444,10 +439,6 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
     t.uuid "form_definition_id"
     t.uuid "form_answer_id"
     t.uuid "configuration_id"
-    t.index "((object ->> 'name'::text))", name: "idx_on_versions_rs_changes1"
-    t.index "((object ->> 'visit_id'::text))", name: "idx_on_versions_rs_changes2"
-    t.index "((object_changes #>> '{name,1}'::text[]))", name: "idx_on_versions_rs_changes3"
-    t.index "((object_changes #>> '{visit_id,1}'::text[]))", name: "idx_on_versions_rs_changes4"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
