@@ -181,6 +181,12 @@ RSpec.configure do |config|
     $stdout = original_stdout
   end
 
+  config.around(:each, type: :feature) do |example|
+    Rails.application.routes.default_url_options[:host] = "#{Capybara.server_host}:#{Capybara.server_port}"
+    example.run
+    Rails.application.routes.default_url_options[:host] = 'localhost:3000'
+  end
+
   config.around(:each, sidekiq_inline: true) do |example|
     Sidekiq::Testing.inline! do
       example.run

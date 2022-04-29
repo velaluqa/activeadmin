@@ -8,6 +8,34 @@ step 'I sign in as a user' do
   step('I see "Signed in successfully"')
 end
 
+step 'I browse to the login page' do
+  step('I browse to "/users/sign_in/"')
+end
+
+step 'I request a password reset for :string' do |email|
+  step('I click "Forgot your password?"')
+  step("I fill in \"Email\" with \"#{email}\"")
+  step('I click button "Send me reset password instructions"')
+end
+
+step 'I reset my password to :string' do |password|
+  step("I fill in \"New password\" with \"#{password}\"")
+  step("I fill in \"Confirm new password\" with \"#{password}\"")
+  step('I click "Change my password"')
+  step('I see "Your password has been changed successfully. You are now signed in."')
+end
+
+step 'I sign out' do
+  step('I click "Logout"')
+end
+
+step 'I sign in as :string with password :string' do |username, password|
+  step("I fill in \"Username\" with \"#{username}\"")
+  step("I fill in \"Password\" with \"#{password}\"")
+  step('I click button "Sign in"')
+  step('I see "Signed in successfully"')
+end
+
 step 'a test user with a test role' do
   @current_user_role = FactoryBot.create(:role)
   @current_user =

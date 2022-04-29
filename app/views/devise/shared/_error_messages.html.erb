@@ -1,0 +1,14 @@
+<% if object.errors.any? %>
+<div id="error_explanation">
+    <div class="alert alert-danger alert-dismissable">
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+    
+        <% object.errors.full_messages.each do |msg| %>
+        <p><%= msg %></p>
+        <% end %>
+
+    </div>
+</div>
+<% end %>
+
+
