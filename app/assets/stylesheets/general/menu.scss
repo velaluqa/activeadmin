@@ -216,6 +216,7 @@
 
       &#current_user > a:before { content: "\f2bd"; }
       &#logout > a:before { content: "\f08b"; }
+      &#stop_impersonating > a:before { content: "\f08b"; }
 
       a {
         padding: 0 20px 0 0;

@@ -1,3 +1,25 @@
+step 'I see the navigation menu for :string with entries:' do |user_fullname, table|
+  within("#header .navigation-wrapper") do
+    expect(page).to have_link(user_fullname), "expected to find #{user_fullname.inspect} in #{page.text.inspect}" 
+
+    table.each do |(entry)|
+      expect(page).to have_link(entry), "expected to find #{entry.inspect} in #{page.text.inspect}" 
+    end
+  end
+end
+
+step 'I click :string in the navigation menu' do |link_text|
+  within("#header .navigation-wrapper") do
+    step("I click \"#{link_text}\"")
+  end
+end
+
+step "I don't see :string in the navigation menu" do |link_text|
+  within("#header .navigation-wrapper") do
+    step("I don't see \"#{link_text}\"")
+  end
+end
+
 step 'I sign in as a user' do
   step('a test user with a test role')
   step('I browse to the dashboard')

@@ -70,6 +70,9 @@ gem 'kgio'
 gem 'raindrops'
 gem 'unicorn'
 
+# used for user impersonation
+gem 'pretender'
+
 # authentication/authorization
 gem 'cancancan'
 gem 'devise'

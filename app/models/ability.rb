@@ -18,7 +18,7 @@ class Ability
     FormAnswer => %i[manage read update create destroy],
     NotificationProfile => %i[manage read update create destroy],
     Notification => %i[manage read update create destroy],
-    User => %i[manage read update create destroy generate_keypair],
+    User => %i[manage read update create destroy generate_keypair impersonate],
     UserRole => %i[manage read update create destroy],
     PublicKey => %i[manage read update create destroy],
     RequiredSeries => %i[manage read update],

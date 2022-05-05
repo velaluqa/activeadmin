@@ -285,6 +285,22 @@ ActiveAdmin.setup do |config|
         if: proc { !menu['versions'].children.empty? }
       )
     end
+    
+    admin.build_menu :utility_navigation do |menu|
+      admin.add_current_user_to_menu (menu)
+      menu.add  id: "logout", priority: 20,
+                label: -> { I18n.t "active_admin.logout" },
+                html_options: { method: :delete },
+                url: -> { render_or_call_method_or_proc_on self, active_admin_namespace.logout_link_path },
+                if:  -> { current_active_admin_user? && !session["impersonated_user_id"] }
+              
+      menu.add  id: "stop_impersonating",
+                priority: 20,
+                label: -> { "Stop Impersonating" },
+                url: -> { "/admin/users/stop_impersonating" },
+                if:  -> { current_active_admin_user? && session["impersonated_user_id"] }
+               
+    end
   end
 
   # == Download Links
