@@ -38,7 +38,7 @@
         - when 'bool'
           %li.input.select
             = hidden_field_tag(field_name, '0')
-            = label_tag(nil, spec['label'])
+            = label_tag(field_name, spec['label'])
             = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false)
             - unless spec['description'].nil?
               %p.inline-hints= spec['description']

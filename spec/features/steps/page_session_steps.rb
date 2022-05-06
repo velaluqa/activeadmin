@@ -209,7 +209,7 @@ step 'I hover :string in :string row' do |locator, row_content|
 end
 
 # TODO: Make this more explicit by filtering specific column.
-step 'I select row for :string' do |locator|
+step 'I select row of :string' do |locator|
   selected = 0
   page.all("tr").each do |tr|
     next unless tr.text.include?(locator)

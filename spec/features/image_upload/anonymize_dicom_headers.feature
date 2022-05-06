@@ -57,7 +57,7 @@ Feature: Anonymize DICOM Headers
     And I see "FooPatient"
     When I select a DICOM folder for "Choose Directory"
     Then I see "SCOUT 3-PLANE RT"
-    When I select "SCOUT 3-PLANE RT" for upload
+    When I select image series "SCOUT 3-PLANE RT" for upload
     And I click the "Upload Image Series" button
     And I wait 15 seconds
     Then I see "Upload complete!"

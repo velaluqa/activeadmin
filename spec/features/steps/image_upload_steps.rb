@@ -11,7 +11,7 @@ step 'I select a DICOM folder for :string' do |field_name|
   validation_report_screenshot
 end
 
-step 'I select :string for upload' do |series|
+step 'I select image series :string for upload' do |series|
   page.all('tr').each do |tr|
     tr.check if tr.text.include?(series)
   end

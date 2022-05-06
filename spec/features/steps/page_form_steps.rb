@@ -2,11 +2,10 @@ step 'I select :string from :string' do |value, field|
   find(:select, field).find(:option, text: /#{value}/).select_option
 end
 
-step 'I fill in :string with :string' do |field, value|
-  field = find_field(field)
+step 'I fill in :string with :string' do |field_name, value|
+  field = find_field(field_name)
   if field[:class].include?("select2-hidden-accessible")
-    label = find("label", text: "Resource")
-    within("[id=#{label[:for]}] + span") do
+    within("[id=#{field[:id]}] + span") do
       find("input").set(value)
     end
   else
@@ -48,4 +47,24 @@ step "I search :string for :string and select :string" do |search, field_name, s
   step "I fill in \"#{field_name}\" with \"#{search}\""
   step "I see \"#{select_option}\""
   step "I click select option \"#{select_option}\""
+end
+
+step "I select :string for row :string" do |select_option, row_text|
+  field = within("tr", text: /#{row_text}/) { find("select") }
+  if field[:class].include?("select2-hidden-accessible")
+    find("[id=#{field[:id]}] + span").click
+    find(:xpath, ".//li[./@role = 'treeitem']", text: select_option).click
+  else
+    field.set(value)
+  end
+end
+
+step "I select :string for :string" do |select_option, label|
+  field = find_field(label)
+  if field[:class].include?("select2-hidden-accessible")
+    find("[id=#{field[:id]}] + span").click
+    find(:xpath, ".//li[./@role = 'treeitem']", text: select_option).click
+  else
+    field.set(value)
+  end
 end

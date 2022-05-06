@@ -5,6 +5,7 @@
 ### Patches / Fixes
 
 * Fix - (ERICA-139) Fix clearing filter on image series view
+* Fix - (ERICA-140) Fix requiring comment when tQC answers are set to fail
 
 ## 7.2.0
 

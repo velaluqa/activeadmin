@@ -58,7 +58,7 @@ Feature: Assign Required Series
     And I see "FooPatient"
     When I select a DICOM folder for "Choose Directory"
     Then I see "SCOUT 3-PLANE RT"
-    When I select "SCOUT 3-PLANE RT" for upload
+    When I select image series "SCOUT 3-PLANE RT" for upload
     And I select visit "10000" for "SCOUT 3-PLANE RT"
     And I select required series "SPECT_1" for "SCOUT 3-PLANE RT"
     And I click the "Upload Image Series" button
