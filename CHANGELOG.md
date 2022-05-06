@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Patches / Fixes
+
+* Fix - (ERICA-139) Fix clearing filter on image series view
+
 ## 7.2.0
 
 ### Minor Changes
