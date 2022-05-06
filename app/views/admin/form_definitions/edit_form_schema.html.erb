@@ -36,7 +36,7 @@
 	  console.log(event.target.result);
 	  var obj = JSON.parse(event.target.result);
 	  console.log(obj);
-	  window.builder.setForm(obj)
+	  window.builder.setForm(obj.layout);
       }
 
       $("#upload-file").on("change", onChange)

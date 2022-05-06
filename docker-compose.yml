@@ -95,3 +95,5 @@ services:
     environment:
       SCREEN_WIDTH: 1920
       SCREEN_HEIGHT: 1080
+    volumes:
+      - ./spec/files:/app/spec/files

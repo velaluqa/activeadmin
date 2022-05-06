@@ -6,6 +6,7 @@
 
 * Fix - (ERICA-139) Fix clearing filter on image series view
 * Fix - (ERICA-140) Fix requiring comment when tQC answers are set to fail
+* Fix - (ERICA-138) Fix restoring form from downloaded form definition json
 
 ## 7.2.0
 

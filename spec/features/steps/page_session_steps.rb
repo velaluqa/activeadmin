@@ -426,3 +426,9 @@ end
 step 'I debug' do
   debugger
 end
+
+step 'I see a form with:' do |table|
+  table.to_a.flatten.each do |label|
+    expect(page).to have_field(label)
+  end
+end

@@ -39,6 +39,12 @@ step 'I provide string for file field :string' do |locator, file_contents|
   attach_file(locator, file.path)
 end
 
+step 'I provide file :string for :string' do |filename, field|
+  page.attach_file("/app/spec/files/#{filename}") do
+    find("label", text: field).click
+  end
+end
+
 step 'I click select option :string' do |locator|
   find(:xpath, ".//li[./@role = 'treeitem']", text: locator).click
 end
