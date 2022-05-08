@@ -1,5 +1,20 @@
 @ImageUploader ?= {}
 @ImageUploader.Models ?= {}
+nonAllowedMimeTypes = [
+  'application/zip',
+  'application/gzip'
+  'application/rar'
+  'application/x-tar'
+  'application/vnd.rar'
+  'application/x-7z-compressed'
+]
+nonAllowedExtensions = [
+  'rar'
+  '7z'
+  'tar'
+  'gz'
+]
+
 class ImageUploader.Models.Image extends Backbone.Model
   dateTimeTags:
     seriesDate:
@@ -46,8 +61,12 @@ class ImageUploader.Models.Image extends Backbone.Model
 
     console.log(file)
 
-    # if file.type is "image/"
-    # else if file.type is "application/pdf"
+    fileExtension = _.last(file.name.split("."))
+    isAllowed =
+      if _.includes(nonAllowedMimeTypes, file.type) or _.includes(nonAllowedExtensions, fileExtension)
+        false
+      else
+        true
 
     reader = new FileReader()
     reader.onload = =>
@@ -90,10 +109,17 @@ class ImageUploader.Models.Image extends Backbone.Model
             state: 'parsing failed'
             warnings: error
       else
-        @set
-          state: 'parsed'
-          seriesDescription: file.name
-          contentDateTime: file.lastModifiedDate
+        if isAllowed
+          @set
+            state: 'parsed'
+            seriesDescription: file.name
+            contentDateTime: file.lastModifiedDate
+        else
+          @set
+            state: 'parsing failed'
+            seriesDescription: file.name
+            contentDateTime: file.lastModifiedDate
+            warnings: "File type not allowed"
 
     reader.readAsArrayBuffer(file)
 

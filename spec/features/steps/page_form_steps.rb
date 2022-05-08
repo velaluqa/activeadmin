@@ -40,6 +40,9 @@ step 'I provide string for file field :string' do |locator, file_contents|
 end
 
 step 'I provide file :string for :string' do |filename, field|
+  # Selenium does not support directory file fields.
+  field_id = find_field(field, visible: :all)[:id]
+  page.execute_script("document.getElementById('#{field_id}').webkitdirectory = false")
   page.attach_file("/app/spec/files/#{filename}") do
     find("label", text: field).click
   end
