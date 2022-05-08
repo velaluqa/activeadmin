@@ -104,11 +104,16 @@ ActiveAdmin.register User do
       row 'Past public keys' do
         link_to(user.public_keys.count, admin_public_keys_path(:'q[user_id_eq]' => user.id))
       end
-      row :private_key do
-        if user.private_key.nil?
-          status_tag('Missing', class: 'error')
-        else
-          link_to 'Download Private Key', download_private_key_admin_user_path(user)
+      if user.id == current_user.id
+        row :private_key do
+          if user.private_key.nil?
+            status_tag('Missing', class: 'error')
+          # TODO: Add when impersonating is implemented
+          # elsif user.id != true_user.id
+          #   status_tag('Hidden While Impersonated', class: 'error')
+          else
+            link_to 'Download Private Key', download_private_key_admin_user_path(user)
+          end
         end
       end
       row 'Roles' do |user|
@@ -173,8 +178,11 @@ ActiveAdmin.register User do
 
     send_data @user.public_key, filename: "#{@user.username}.pub" unless @user.public_key.nil?
   end
+
   member_action :download_private_key do
     @user = User.find(params[:id])
+
+    return access_denied if @user.id != current_user.id
 
     send_data @user.private_key, filename: "#{@user.username}.key" unless @user.private_key.nil?
   end
