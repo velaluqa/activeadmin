@@ -9,6 +9,8 @@
 * Fix - (ERICA-138) Fix restoring form from downloaded form definition json
 * Fix - (ERICA-98) Fix by denying downloading private keys of other users
 * Fix - (ERICA-141) Fix XML export of resources
+* Fix - (ERICA-137) Fix rejecting archive files at image upload
+* Fix - (ERICA-136) Fix recognition of mp4 and similar
 
 ## 7.2.0
 

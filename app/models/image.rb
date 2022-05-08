@@ -220,8 +220,8 @@ JOIN
 
   def mime_extension
     return nil unless mimetype
-
-    Marcel::Magic.new(mimetype).comment
+    return 'dicom' if dicom?
+    Marcel::Magic.new(mimetype).extensions.first
   end
 
   def row_number

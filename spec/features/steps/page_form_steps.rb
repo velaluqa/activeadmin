@@ -45,6 +45,21 @@ step 'I provide file :string for :string' do |filename, field|
   end
 end
 
+step 'I provide directory :string for :string' do |filename, field|
+  # Selenium cannot handle a directory, this option is non-standard,
+  # though.
+  field_id = find_field(field, visible: :all)[:id]
+  page.execute_script("document.getElementById('#{field_id}').webkitdirectory = false")
+
+  attach_file(
+    field,
+    Dir[Rails.root.join("spec/files/#{filename}/*")],
+    visible: :all
+  )
+
+  validation_report_screenshot
+end
+
 step 'I click select option :string' do |locator|
   find(:xpath, ".//li[./@role = 'treeitem']", text: locator).click
 end
