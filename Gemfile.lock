@@ -787,6 +787,7 @@ PLATFORMS
 
 DEPENDENCIES
   activeadmin
+  activemodel-serializers-xml
   activerecord-postgres_enum
   activerecord_json_validator
   acts-as-taggable-on (~> 6.0.0)

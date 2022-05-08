@@ -8,6 +8,7 @@
 * Fix - (ERICA-140) Fix requiring comment when tQC answers are set to fail
 * Fix - (ERICA-138) Fix restoring form from downloaded form definition json
 * Fix - (ERICA-98) Fix by denying downloading private keys of other users
+* Fix - (ERICA-141) Fix XML export of resources
 
 ## 7.2.0
 

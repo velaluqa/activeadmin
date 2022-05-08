@@ -8,6 +8,10 @@ source 'https://rubygems.org'
 gem 'rails', '~> 5.2.6'
 gem 'bootsnap'
 
+# XML serialization was removed from rails 5 and extracted into its
+# own gem.
+gem "activemodel-serializers-xml"
+
 # With Rails 4.0 some gems were extracted into separate gems, which
 # need to be installed separately. Some gems are deprecated and we
 # should make sure to remove the dependency within our app.
