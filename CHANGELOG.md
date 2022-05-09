@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.2.1
+
 ### Patches / Fixes
 
 * Fix - (ERICA-139) Fix clearing filter on image series view
