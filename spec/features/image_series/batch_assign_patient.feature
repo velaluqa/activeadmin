@@ -36,7 +36,7 @@ Feature: Batch Assign Patient
     Given I sign in as a user with all permissions
     But I cannot assign_patient image_series
     When I browse to image_series list
-    And I select row for "TestSeries"
+    And I select row of "TestSeries"
     And I click "Batch Actions"
     Then I don't see "Assign Selected Series to Patient"
 
@@ -50,8 +50,8 @@ Feature: Batch Assign Patient
       | patient | SecondPatient |
     And I sign in as a user with role "Image Manager"
     When I browse to image_series list
-    And I select row for "TestSeries"
-    And I select row for "SecondSeries"
+    And I select row of "TestSeries"
+    And I select row of "SecondSeries"
     And I click "Batch Actions"
     Then I see "Assign Selected Series to Patient"
     When I click link "Assign Selected Series to Patient"
@@ -68,8 +68,8 @@ Feature: Batch Assign Patient
       | visit   |       10000 |
     And I sign in as a user with role "Image Manager"
     When I browse to image_series list
-    And I select row for "TestSeries"
-    And I select row for "SeriesWithVisit"
+    And I select row of "TestSeries"
+    And I select row of "SeriesWithVisit"
     And I click "Batch Actions"
     Then I see "Assign Selected Series to Patient"
     When I click link "Assign Selected Series to Patient"
@@ -85,7 +85,7 @@ Feature: Batch Assign Patient
     When I browse to image_series list
     Then I see a row for "TestSeries" with the following columns:
       | Patient | 10AssignedPatient |
-    When I select row for "TestSeries"
+    When I select row of "TestSeries"
     And I click "Batch Actions"
     Then I see "Assign Selected Series to Patient"
     When I click link "Assign Selected Series to Patient"

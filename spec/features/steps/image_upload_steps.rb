@@ -11,10 +11,18 @@ step 'I select a DICOM folder for :string' do |field_name|
   validation_report_screenshot
 end
 
-step 'I select :string for upload' do |series|
+step 'I select (image )series :string for upload' do |series|
   page.all('tr').each do |tr|
     tr.check if tr.text.include?(series)
   end
+  validation_report_screenshot
+end
+
+step 'I select following (image )series for upload:' do |selectable|
+  selectable.to_a.flatten.each do |series|
+    first('tr', text: "#{series} ").check
+  end
+
   validation_report_screenshot
 end
 

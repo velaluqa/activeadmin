@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 7.2.1
+
+### Patches / Fixes
+
+* Fix - (ERICA-139) Fix clearing filter on image series view
+* Fix - (ERICA-140) Fix requiring comment when tQC answers are set to fail
+* Fix - (ERICA-138) Fix restoring form from downloaded form definition json
+* Fix - (ERICA-98) Fix by denying downloading private keys of other users
+* Fix - (ERICA-141) Fix XML export of resources
+* Fix - (ERICA-137) Fix rejecting archive files at image upload
+* Fix - (ERICA-136) Fix recognition of mp4 and similar
+
 ## 7.2.0
 
 ### Minor Changes

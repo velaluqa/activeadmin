@@ -26,3 +26,5 @@ Marcel::Magic.add(
   parents: %w[application/zip],
   comment: 'Word 2007 document'
 )
+
+Marcel::MimeType.extend 'video/quicktime', extensions: %w[mov]

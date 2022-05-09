@@ -36,7 +36,7 @@ Feature: Batch Assign Visit
     Given I sign in as a user with all permissions
     But I cannot assign_visit image_series
     When I browse to image_series list
-    And I select row for "TestSeries"
+    And I select row of "TestSeries"
     And I click "Batch Actions"
     Then I don't see "Assign Selected Series to Visit"
 
@@ -46,8 +46,8 @@ Feature: Batch Assign Visit
       | patient | SecondPatient |
     And I sign in as a user with role "Image Manager"
     When I browse to image_series list
-    And I select row for "TestSeries"
-    And I select row for "SecondSeries"
+    And I select row of "TestSeries"
+    And I select row of "SecondSeries"
     And I click "Batch Actions"
     Then I see "Assign Selected Series to Visit"
     When I click link "Assign Selected Series to Visit"
@@ -66,8 +66,8 @@ Feature: Batch Assign Visit
     When I browse to image_series list
     Then I see a row for "AssignedSeries" with the following columns:
       | Visit | 10TestPatient#10000 |
-    When I select row for "TestSeries"
-    And I select row for "AssignedSeries"
+    When I select row of "TestSeries"
+    And I select row of "AssignedSeries"
     And I click "Batch Actions"
     Then I see "Assign Selected Series to Visit"
     When I click link "Assign Selected Series to Visit"
@@ -81,7 +81,7 @@ Feature: Batch Assign Visit
   Scenario: Success
     Given I sign in as a user with role "Image Manager"
     When I browse to image_series list
-    And I select row for "TestSeries"
+    And I select row of "TestSeries"
     And I click "Batch Actions"
     Then I see "Assign Selected Series to Visit"
     When I click link "Assign Selected Series to Visit"

@@ -4,10 +4,12 @@ hide_fake_sidebar_entry = ->
 $(document).ready ->
   hide_fake_sidebar_entry()
 
+  console.log "Running advanced filter"
   return unless filter_select2_id?
+  console.log "Running advanced select2 ????"
 
   $('.clear_filters_btn').off('click')
-  $('.clear_filteRs_btn').on 'click', ->
+  $('.clear_filters_btn').on 'click', ->
     window.location.search = '?clear_filter=true'
     false
 

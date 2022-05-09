@@ -237,7 +237,7 @@ step 'I hover :string in :string row' do |locator, row_content|
 end
 
 # TODO: Make this more explicit by filtering specific column.
-step 'I select row for :string' do |locator|
+step 'I select row of :string' do |locator|
   selected = 0
   page.all("tr").each do |tr|
     next unless tr.text.include?(locator)
@@ -453,4 +453,28 @@ end
 
 step 'I debug' do
   debugger
+end
+
+step 'I see a form with:' do |table|
+  table.to_a.flatten.each do |label|
+    expect(page).to have_field(label)
+  end
+end
+
+step 'I see the following :string xml entries:' do |tag_name, records|
+  within("html") do
+    records.hashes.each do |record|
+      record.each_pair do |tag, value|
+        expect(page).to have_content("<#{tag}>#{value}</#{tag}>")
+      end
+    end
+  end
+end
+
+step 'I see :string xml entries with the following attributes:' do |tag, attributes|
+  within("html") do
+    attributes.to_a.flatten.each do |tag|
+      expect(page).to have_content("<#{tag}")
+    end
+  end
 end

@@ -38,8 +38,7 @@ ActiveAdmin.register Image do
     column :image_series
     column :id
     column 'Type', sortable: "mimetype" do |image|
-      type = Marcel::Magic.new(image.mimetype).comment
-      status_tag(type[2])
+      status_tag(image.mime_extension)
     end
     column 'Status' do |image|
       if image.file_is_present?

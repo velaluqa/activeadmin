@@ -344,7 +344,7 @@ ActiveAdmin.register ImageSeries do
   end
 
   # filters
-  filter :visit, :collection => [], input_html: { class: "no-auto-select2" }
+  filter :visit, label: "Resource", :collection => [], input_html: { class: "no-auto-select2" }
   filter :series_number
   filter :name
   filter :imaging_date
