@@ -440,6 +440,8 @@ GEM
     premailer-rails (1.10.3)
       actionmailer (>= 3)
       premailer (~> 1.7, >= 1.7.9)
+    pretender (0.4.0)
+      actionpack (>= 5.2)
     proc_extensions (0.2)
       sourcify (~> 0.5)
     protected_attributes_continued (1.5.0)
@@ -854,6 +856,7 @@ DEPENDENCIES
   paper_trail (~> 9.0)
   pg
   premailer-rails
+  pretender
   protected_attributes_continued
   pry
   pry-byebug

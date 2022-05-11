@@ -1,9 +1,10 @@
 require 'exceptions'
 
 class ApplicationController < ActionController::Base
+  impersonates :user
   before_action(:authenticate_user_from_token!)
-  before_action(:ensure_valid_password, if: proc { !current_user.nil? })
-  before_action(:ensure_valid_keypair, if: proc { !current_user.nil? })
+  before_action(:ensure_valid_password, if: proc { current_user && current_user.id == true_user.id })
+  before_action(:ensure_valid_keypair, if: proc { current_user && current_user.id == true_user.id })
   before_action(:set_paper_trail_whodunnit)
 
   protect_from_forgery

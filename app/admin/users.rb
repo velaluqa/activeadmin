@@ -56,6 +56,11 @@ ActiveAdmin.register User do
     column 'Roles' do |user|
       link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
     end
+    column do |user|
+      if can?(:impersonate, user)
+        link_to 'Impersonate', impersonate_admin_user_path(user)
+      end
+    end
     customizable_default_actions(current_ability)
   end
 
@@ -172,6 +177,18 @@ ActiveAdmin.register User do
   filter :username
   filter :name
   filter :roles
+
+  member_action :impersonate, method: :get do
+    @user = User.find(params[:id])
+    authorize! :impersonate, @user
+    impersonate_user(@user)
+    redirect_to admin_users_path
+  end
+
+  collection_action :stop_impersonating, method: :get do
+    stop_impersonating_user
+    redirect_to admin_users_path
+  end
 
   member_action :download_public_key do
     @user = User.find(params[:id])
