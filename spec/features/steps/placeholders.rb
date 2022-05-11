@@ -23,6 +23,12 @@ class TurnipHelper
   end
 end
 
+placeholder :count do
+  match(/(\d+)/) do |count|
+    count.to_i
+  end
+end
+
 placeholder :activity do
   match(/([^ $\n]+)/) do |activity|
     activities = Ability::ACTIVITIES.values.flatten.uniq

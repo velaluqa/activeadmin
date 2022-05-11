@@ -3,6 +3,14 @@ step 'I open the mail inbox' do
   visit("http://mailcatcher-test:1080")
 end
 
+step 'user :string received :count mails with subject :string' do |username, count, subject|
+  step("I open the mail inbox")
+  @user = User.where(username: username).first
+  all("tr", text: @user.email, count: count).each do |mail|
+    expect(mail).to have_content(subject)
+  end
+end
+
 step 'I receive an e-mail to :string with subject :string' do |email, subject|
   step "I open the mail inbox"
   step "I see \"#{subject}\" in \"#{email}\" row"

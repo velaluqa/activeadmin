@@ -57,6 +57,22 @@ Then start the test runner via:
 
     docker-compose run test
 
+To drop and then migrate test databse afresh do so via:
+
+    docker-compose run test rake db:drop db:create db:migrate
+
+## Running Bundle Commands
+
+When a new gem is installed, it might be essential to rebuild containers for changes to take effect.
+
+To install gems:
+
+   docker-compose run app bundle install
+
+To lock gems in the Gemfile.lock do:
+
+   docker-compose run app bundle lock
+
 ## Running Rake Tasks
 
 To run rake tasks you have to do it in the docker environment like so:

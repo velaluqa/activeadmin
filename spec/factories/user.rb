@@ -26,6 +26,10 @@ FactoryBot.define do
       end
     end
 
+    trait :unconfirmed do
+      confirmed_at { nil }
+    end
+
     before(:create) do |user, evaluator|
       evaluator.with_user_roles.each do |role_obj|
         case role_obj
