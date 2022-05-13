@@ -95,6 +95,9 @@ ActiveAdmin.register User do
       row :confirmed do
         if user.confirmed?
           status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", class: 'ok')
+        elsif can?(:create, user)
+          status_tag('Unconfirmed', class: 'error')
+          link_to("Resend confirmation", resend_confirmation_admin_user_path)
         else
           status_tag('Unconfirmed', class: 'error')
         end
@@ -177,6 +180,14 @@ ActiveAdmin.register User do
   filter :username
   filter :name
   filter :roles
+
+  member_action :resend_confirmation, method: :get do
+    @user = User.find(params[:id])
+    authorize!(:create, @user)
+    @user.resend_confirmation_instructions
+    flash[:notice] = "The user will receive another confirmation e-Mail shortly."
+    redirect_to admin_user_path
+  end
 
   member_action :impersonate, method: :get do
     @user = User.find(params[:id])

@@ -1,3 +1,16 @@
+step 'an unconfirmed user :string with:' do |username, attributes|
+  FactoryBot.create(
+    :user,
+    :changed_password,
+    :with_keypair,
+    :unconfirmed,
+    attributes
+      .rows_hash
+      .symbolize_keys
+      .merge(username: username)
+  )
+end
+
 step 'a user :string' do |username|
   FactoryBot.create(
     :user,
