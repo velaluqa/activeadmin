@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Minor Changes
+
+* Feature - Allow user to recover forgotten passwords
+* Feature - Allow authorized users (administrators) to resend email confirmation instructions
+* Fix - Fix assigning a visit from the edit image series form if the image series was not yet assigned
+
 ## 7.2.1
 
 ### Patches / Fixes
