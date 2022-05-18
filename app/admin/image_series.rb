@@ -60,12 +60,15 @@ ActiveAdmin.register ImageSeries do
       end
       params[:image_series].delete(:force_update)
 
-      original_required_series_assignment = original_visit.required_series_assignment
-      unassigned_required_series = {}
-      currently_assigned_required_series.each do |required_series|
-        unassigned_required_series[required_series.name] = required_series.attributes
-        required_series.unassign_image_series!
+      if original_visit
+        original_required_series_assignment = original_visit.required_series_assignment
+        unassigned_required_series = {}
+        currently_assigned_required_series.each do |required_series|
+          unassigned_required_series[required_series.name] = required_series.attributes
+          required_series.unassign_image_series!
+        end
       end
+
       if original_visit && new_visit && original_visit.visit_type == new_visit.visit_type
         new_visit.change_required_series_assignment(original_required_series_assignment)
 
