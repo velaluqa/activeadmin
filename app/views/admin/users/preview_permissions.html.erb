@@ -1,0 +1,55 @@
+<div class="panel">
+  <h3>User Permission Matrix</h3>
+  <div class="panel_contents">
+    <div class="permissions_matrix show">
+      <% Ability::ACTIVITIES.each_pair do |subject, activities| %>
+      <li class="permission <%= subject %>">
+	<label><%= subject %></label>
+	<div class="activities">
+	  <% activities.each do |activity| %>
+	  <% ability = "#{activity}_#{subject.to_s.underscore}" %>
+	  <% user_permission = @full_permissions[subject.to_s].andand[activity] || {} %>
+	  <% is_system_wide = user_permission[:system_wide] %>
+	  <% scoped_subjects = user_permission[:scoped_to] || {} %>
+	  <% is_scoped = !scoped_subjects.empty? %>
+	  <% is_granted = is_system_wide || is_scoped %>
+
+	  <span class="activity <%= activity %>">
+	    <div class="custom-dropdown">
+	      <span class="hoverable">
+		<%= check_box_tag "role[abilities][]", ability, is_granted, id: ability, disabled: true %>
+		<label for="<%= ability %>">
+		  <%= activity %>
+		  <% if is_scoped && !is_system_wide %>*<% end %>
+		</label>
+	      </span>
+	      <% if is_granted %>
+	      <div class="custom-dropdown-menu bottom">
+		<ul>
+		  <% if is_system_wide %>
+		  <li>
+		    <%= activity %> granted system-wide
+		  </li>
+		  <% elsif is_scoped %>
+		  <li>
+		    <%= activity %> granted for:
+		  </li>
+		  <% scoped_subjects.each_pair do |subject_type, subjects| %>
+		  <li>
+		    - <%= subject_type %>: <%= subjects.uniq.join(", ") %>
+		  </li>
+		  <% end %>
+		  <% end %>
+		</ul>
+	      </div>
+	      <% end %>
+	    </div>
+	  </span>
+	  <% end %>
+	</div>
+      </li>
+      <% end %>
+    </div>
+  </div>
+</div>
+

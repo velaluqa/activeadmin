@@ -181,6 +181,17 @@ ActiveAdmin.register User do
   filter :name
   filter :roles
 
+  member_action :preview_permissions, method: :get do
+    @user = User.find(params[:id])
+    @full_permissions = @user.full_permission_matrix
+
+    render :preview_permissions
+  end
+
+  action_item :preview_permissions, only: :show, priority: 0 do
+    link_to "Preview Permissions", preview_permissions_admin_user_path(resource)
+  end
+
   member_action :resend_confirmation, method: :get do
     @user = User.find(params[:id])
     authorize!(:create, @user)

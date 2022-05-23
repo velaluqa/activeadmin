@@ -146,6 +146,33 @@ class User < ApplicationRecord
     matrix
   end
 
+  def full_permission_matrix
+    full_permissions = {}
+    user_roles.each do |user_role|
+      user_role.permissions.each do |permission|
+        subject = permission.subject.name
+        full_permissions[subject] ||= {}
+        if permission.activity == :manage
+          Ability::ACTIVITIES[permission.subject].each do |activity|
+            full_permissions[subject][activity] ||= {}
+            full_permissions[subject][activity][:system_wide] ||= user_role.scope_object_id.nil?
+            full_permissions[subject][activity][:scoped_to] ||= {}
+            full_permissions[subject][activity][:scoped_to][user_role.scope_object_type] ||= []
+            full_permissions[subject][activity][:scoped_to][user_role.scope_object_type].push(user_role.scope_object.to_s) if user_role.scope_object_type
+          end
+        else
+          activity = permission.activity
+          full_permissions[subject][activity] ||= {}
+          full_permissions[subject][activity][:system_wide] ||= user_role.scope_object_id.nil?
+          full_permissions[subject][activity][:scoped_to] ||= {}
+          full_permissions[subject][activity][:scoped_to][user_role.scope_object_type] ||= []
+          full_permissions[subject][activity][:scoped_to][user_role.scope_object_type].push(user_role.scope_object.to_s) if user_role.scope_object_type
+        end
+      end
+    end
+    full_permissions
+  end
+
   scope :searchable, -> { select(<<SELECT.strip_heredoc) }
     NULL::integer AS study_id,
     NULL::varchar AS study_name,
