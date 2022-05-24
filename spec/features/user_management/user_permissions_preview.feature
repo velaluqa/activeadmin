@@ -25,6 +25,12 @@ Feature: Preview User Permissions
       | Center  | read, update |
       | Patient | read, update |
 
+  Scenario: Unauthorized
+    Given a user "unauthorized.user"
+    When I sign in as user "unauthorized.user"
+    And I browse to preview_permissions for user "inspectable.user"
+    Then I see "Not Authorized"
+
   Scenario: System-wide and Scoped to one study
     Given user "inspectable.user" belongs to role "System-wide role" 
     And user "inspectable.user" belongs to role "Scoped to study role" scoped to study "FooStudy" 
