@@ -6,6 +6,7 @@
 
 * Fix - #5780 - Fix inconsistent image series form behavior when changing patient or visit, by removing the patient and visit fields
 * Fix - #5783 - Remove "Batch assign image series to patient" as we currently do not adjust DICOM metadata automatically
+* Fix - #5784 - Remove create permission for image series
 
 ## 7.2.1
 
