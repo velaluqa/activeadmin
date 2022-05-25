@@ -202,6 +202,27 @@ SELECT
     [:id]
   end
 
+  def confirm!(args={})
+    pending_any_confirmation do
+  
+      self.confirmed_at = Time.now.utc
+  
+      saved = if pending_reconfirmation?
+        skip_reconfirmation!
+        self.email = unconfirmed_email
+        self.unconfirmed_email = nil
+  
+        # We need to validate in such cases to enforce e-mail uniqueness
+        save(validate: true)
+      else
+        save(validate: args[:ensure_valid] == true)
+      end
+  
+      after_confirmation if saved
+      saved
+    end
+  end
+
   def has_valid_password?
     !(password_changed_at.nil? || password_changed_at < Rails.application.config.max_allowed_password_age.ago)
   end
