@@ -56,6 +56,7 @@ Capybara.default_driver = :selenium # Same effect like a @javascript tag everywh
 Capybara.server = :puma, { Silent: true }
 Capybara.server_host = Socket.ip_address_list.detect{ |addr| addr.ipv4_private? }.ip_address
 Capybara.server_port = 3000
+Capybara.default_max_wait_time = 10
 Capybara.app_host = "http://#{Capybara.server_host}:#{Capybara.server_port}"
 
 # Capybara starts the webserver in another thread. Running feature
