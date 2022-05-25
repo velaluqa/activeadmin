@@ -4,6 +4,7 @@
 # category: Image Management
 # components:
 #   - image series
+@skip
 Feature: Batch Assign Patient
   In order to quickly assign a set of image series to a patient,
   As user is granted `image_series/assign_patient`,
