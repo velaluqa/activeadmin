@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.2.2
+
 ### Patches / Fixes
 
 * Fix - #5780 - Fix inconsistent image series form behavior when changing patient or visit, by removing the patient and visit fields
