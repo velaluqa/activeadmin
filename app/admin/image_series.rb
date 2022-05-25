@@ -60,12 +60,15 @@ ActiveAdmin.register ImageSeries do
       end
       params[:image_series].delete(:force_update)
 
-      original_required_series_assignment = original_visit.required_series_assignment
-      unassigned_required_series = {}
-      currently_assigned_required_series.each do |required_series|
-        unassigned_required_series[required_series.name] = required_series.attributes
-        required_series.unassign_image_series!
+      if original_visit
+        original_required_series_assignment = original_visit.required_series_assignment
+        unassigned_required_series = {}
+        currently_assigned_required_series.each do |required_series|
+          unassigned_required_series[required_series.name] = required_series.attributes
+          required_series.unassign_image_series!
+        end
       end
+
       if original_visit && new_visit && original_visit.visit_type == new_visit.visit_type
         new_visit.change_required_series_assignment(original_required_series_assignment)
 
@@ -287,44 +290,45 @@ ActiveAdmin.register ImageSeries do
   form do |f|
     resource.visit_id = params[:visit_id].to_i unless params[:visit_id].blank?
     f.inputs 'Details' do
-      patients = Patient.accessible_by(current_ability).order(:subject_id, :id)
-      if f.object.persisted?
-        patients = patients.of_study(f.object.study)
-      elsif session[:selected_study_id].present?
-        patients = patients.of_study(session[:selected_study_id])
-      end
-      f.input(
-        :patient,
-        collection: patients,
-        input_html: {
-          class: 'initialize-select2',
-          'data-placeholder': 'Select patient'
-        }
-      )
+      # TODO: Add again after all related issues are resolved. Read #5780
+      # patients = Patient.accessible_by(current_ability).order(:subject_id, :id)
+      # if f.object.persisted?
+      #   patients = patients.of_study(f.object.study)
+      # elsif session[:selected_study_id].present?
+      #   patients = patients.of_study(session[:selected_study_id])
+      # end
+      # f.input(
+      #   :patient,
+      #   collection: patients,
+      #   input_html: {
+      #     class: 'initialize-select2',
+      #     'data-placeholder': 'Select patient'
+      #   }
+      # )
 
-      visits = Visit.accessible_by(current_ability).order(:visit_number)
-      if f.object.persisted?
-        visits = visits.of_study(f.object.study)
-      elsif session[:selected_study_id].present?
-        visits = visits.of_study(session[:selected_study_id])
-      end
-      f.input(
-        :visit,
-        collection: visits,
-        input_html: {
-          class: 'initialize-select2',
-          'data-placeholder': 'Select visit'
-        }
-      )
+      # TODO: Add again after all related issues are resolved. Read #5780
+      # visits = Visit.accessible_by(current_ability).order(:visit_number)
+      # if f.object.persisted?
+      #   visits = visits.of_study(f.object.study)
+      # elsif session[:selected_study_id].present?
+      #   visits = visits.of_study(session[:selected_study_id])
+      # end
+      # f.input(
+      #   :visit,
+      #   collection: visits,
+      #   input_html: {
+      #     class: 'initialize-select2',
+      #     'data-placeholder': 'Select visit'
+      #   }
+      # )
 
-      f.input :series_number#, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
       f.input :name
       f.input :imaging_date, :as => :datepicker
       if f.object.persisted?
         f.object.force_update = (params[:force_update] || 'false')
         f.input :force_update, :as => :hidden
       end
-      f.input :comment
+      f.input :series_number#, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
     end
 
     f.actions
