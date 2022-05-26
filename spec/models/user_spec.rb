@@ -63,7 +63,7 @@ RSpec.describe User do
           'BackgroundJob' => %i[read update create destroy],
           'Study' => %i[read],
           'ImageSeries' => %i[upload],
-          'User' => %i[read update generate_keypair],
+          'User' => %i[read update generate_keypair change_password],
           'PublicKey' => %i[read update]
         )
       end
@@ -90,7 +90,7 @@ RSpec.describe User do
           'Center' => %i[manage],
           'Image' => %i[read],
           'Visit' => %i[assign_required_series],
-          'User' => %i[read update generate_keypair],
+          'User' => %i[read update generate_keypair change_password],
           'PublicKey' => %i[read update]
         }
         expect(@user.permission_matrix).to eq(expected)

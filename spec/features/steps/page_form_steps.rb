@@ -1,9 +1,15 @@
+step 'I fill in the comments textarea with :string' do |value|
+  find_field("active_admin_comment_body").set(value)
+end
+
 step 'I select :string from :string' do |value, field|
   find(:select, field).find(:option, text: /#{value}/).select_option
 end
 
 step 'I fill in :string with :string' do |field_name, value|
-  field = find_field(field_name)
+  label = find(:label, text: /^#{field_name}\*?$/)
+  label_for = label[:for]
+  field = find_field(label_for)
   if field[:class].include?("select2-hidden-accessible")
     within("[id=#{field[:id]}] + span") do
       find("input").set(value)
