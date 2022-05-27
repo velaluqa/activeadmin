@@ -64,7 +64,7 @@ Feature: Reassign Visit
       | Center      | read                         |
       | Patient     | read                         |
       | ImageSeries | read, update                 |
-      | Visit       | read, assign_visit, read_tqc |
+      | Visit       | read, read_tqc               |
 
   Scenario: Different Visit Type - Removing Required Series Assignments
     Given I sign in as a user with role "Image Manager"

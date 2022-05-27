@@ -95,11 +95,10 @@ ActiveAdmin.register User do
       row :confirmed do
         if user.confirmed?
           status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", class: 'ok')
-        elsif can?(:create, user)
-          status_tag('Unconfirmed', class: 'error')
-          link_to("Resend confirmation", resend_confirmation_admin_user_path)
         else
           status_tag('Unconfirmed', class: 'error')
+          a("Resend confirmation", href: resend_confirmation_admin_user_path) if can?(:create, user)
+          a("Confirm e-mail address", href: confirm_mail_admin_user_path) if can?(:confirm_mail, user)
         end
       end
       row :public_key do
@@ -191,6 +190,13 @@ ActiveAdmin.register User do
 
   action_item :preview_permissions, only: :show, priority: 0 do
     link_to "Preview Permissions", preview_permissions_admin_user_path(resource) if can?(:read, resource)
+  end
+  
+  member_action :confirm_mail, method: :get do
+    @user = User.find(params[:id])
+    authorize!(:confirm_mail, @user)
+    @user.confirm!
+    redirect_to admin_user_path
   end
 
   member_action :resend_confirmation, method: :get do
