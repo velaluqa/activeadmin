@@ -7,6 +7,19 @@ ActiveAdmin.register FormSession do
     form_answers_attributes: [:id, :sequence_number]
   )
 
+  controller do
+    def destroy
+      form_session = FormSession.find(params[:id])
+      if form_session.form_answers.exists?
+        flash[:error] = 'Cannot delete session with associated form data.'
+        redirect_back(fallback_location: admin_form_sessions_path)
+        return
+      end
+
+      destroy!
+    end
+  end
+
   index do
     selectable_column
     column :name

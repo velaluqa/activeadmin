@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Patches / Fixes
+
+* Fix - (ERICA-158) Only allow deletion of empty form sessions
+
 ## 7.2.2
 
 ### Patches / Fixes
