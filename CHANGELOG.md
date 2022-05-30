@@ -6,6 +6,10 @@
 
 * Fix - (ERICA-158) Only allow deletion of empty form sessions
 
+### Dev/DevOps
+
+* Fix - Ensure database is cleaned before testing test data factories
+
 ## 7.2.2
 
 ### Patches / Fixes
