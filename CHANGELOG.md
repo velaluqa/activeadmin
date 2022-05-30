@@ -5,6 +5,7 @@
 ### Patches / Fixes
 
 * Fix - (ERICA-158) Only allow deletion of empty form sessions
+* Fix - (ERICA-154) Fix tracking role permission changes in audit trail
 
 ### Dev/DevOps
 

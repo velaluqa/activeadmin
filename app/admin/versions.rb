@@ -143,7 +143,18 @@ ActiveAdmin.register Version do
       end
     end
     column :item do |version|
-      if version.item.is_a?(RequiredSeries)
+      if version.item_type == "Permission"
+        role_id, activity, subject =
+          if version.object
+            o = version.object
+            [o["role_id"], o["activity"], o["subject"]]
+          else
+            c = version.object_changes
+            [c["role_id"][1], c["activity"][1], c["subject"][1],]
+          end
+        role = Role.where(id: role_id).first
+        status_tag("#{role.title}: #{activity} #{subject}")
+      elsif version.item.is_a?(RequiredSeries)
         auto_link(version.item.visit, "#{version.item.visit.name} #{version.item.name}")
       else
         auto_link(version.item)

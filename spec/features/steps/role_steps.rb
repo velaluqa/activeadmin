@@ -7,3 +7,12 @@ step 'a role :string with permissions:' do |title, permissions|
     end
   end
 end
+
+step 'permission :string for :string was revoked' do |permission, role_name|
+  role = Role.where(title: role_name).first
+  activity, subject = permission.split(" ")
+  unless Ability::ACTIVITIES[subject.constantize].include?(activity.to_sym)
+    fail "Permission #{activity} not known for subject #{subject}"
+  end
+  role.remove_permission(activity, subject)
+end
