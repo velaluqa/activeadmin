@@ -17,7 +17,7 @@ Feature: Download Archive of Background Job
     And a patient "TestPatient" for "TestCenter"
     And an image_series "TestSeries" for "TestPatient" with 10 images
     And a role "Background Job Manager" with permissions:
-      | BackgroundJob | manage |
+      | BackgroundJob | read |
     And a user "h.maulwurf"
     And a user "m.mustermann"
     And a background job "Test Job for h.maulwurf" for user "h.maulwurf"

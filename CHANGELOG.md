@@ -8,6 +8,9 @@
 * Fix - (ERICA-154) Fix tracking role permission changes in audit trail
 * Fix - (ERICA-157) Do not allow deletion of signed form answers
 * Fix - (ERICA-155) Do not allow updating of signed form answers
+* Fix - (ERICA-153) Show user column for background jobs & remove
+  `create` & `update` permissions from the set of role permissions for
+  background jobs as they were not applicable
 
 ### Dev/DevOps
 
