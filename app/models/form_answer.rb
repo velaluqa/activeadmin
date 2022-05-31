@@ -156,7 +156,7 @@ class FormAnswer < ApplicationRecord
   end
 
   def signed?
-    valid_signature?
+    answers_signature.present? || annotated_images_signature.present?
   end
 
   def published?
