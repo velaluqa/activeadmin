@@ -7,6 +7,7 @@
 * Fix - (ERICA-158) Only allow deletion of empty form sessions
 * Fix - (ERICA-154) Fix tracking role permission changes in audit trail
 * Fix - (ERICA-157) Do not allow deletion of signed form answers
+* Fix - (ERICA-155) Do not allow updating of signed form answers
 
 ### Dev/DevOps
 

@@ -10,7 +10,14 @@ step 'I fill in :string with :string' do |field_name, value|
     end
   else
     field.set(value)
+
+    # This expectation is necessary to make selenium wait until the
+    # text is completely entered. Otherwise the next step might begin
+    # too early causing only a part of the `value` to be sent with a
+    # form upon submit.
+    expect(page).to have_field(field_name, with: value)
   end
+
   validation_report_screenshot
 end
 
@@ -91,4 +98,11 @@ step "I select :string for :string" do |select_option, label|
   else
     field.set(value)
   end
+end
+
+step 'I see field :string with value :string' do |locator, value|
+  label_element = find(:label, text: /^#{locator}\*?$/)
+  label_for = label_element[:for]
+
+  expect(page).to have_field(label_for, with: value)
 end

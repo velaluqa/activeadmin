@@ -40,6 +40,17 @@ ActiveAdmin.register FormAnswer do
   controller do
     helper :application
 
+    def edit
+      form_answer = FormAnswer.find(params[:id])
+      if form_answer.signed?
+        flash[:error] = "Cannot update signed form answers"
+        redirect_back(fallback_location: admin_form_answers_path)
+        return
+      end
+
+      edit!
+    end
+
     def destroy
       form_answer = FormAnswer.find(params[:id])
       if form_answer.signed?
