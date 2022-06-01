@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 7.2.3
 
 ### Patches / Fixes
 
