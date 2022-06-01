@@ -1,4 +1,4 @@
-image: registry.vela/velaluqa/gitlab-ci-build-images:ruby-2.3.4-docker-compose
+image: registry.vela/velaluqa/gitlab-ci-build-images:ruby-2.3.8-docker-compose
 
 variables:
   BUNDLE_GEMFILE: Gemfile-ci

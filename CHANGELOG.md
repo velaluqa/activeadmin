@@ -15,6 +15,7 @@
 ### Dev/DevOps
 
 * Fix - Ensure database is cleaned before testing test data factories
+* Update - Update CI pipeline docker versions (docker 19 & docker-compose 1.25)
 
 ## 7.2.2
 
