@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 
 services:
   postgres:
@@ -13,6 +13,7 @@ services:
       args:
         RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
     image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+    cache_from: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-cache
     command: 'rake setup:db ci'
     environment:
       RAILS_ENV: test
