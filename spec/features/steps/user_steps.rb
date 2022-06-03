@@ -1,3 +1,23 @@
+step 'a locked user :string' do |username|
+  FactoryBot.create(
+    :user,
+    :changed_password,
+    :with_keypair,
+    :locked,
+    username: username
+  )
+end
+
+step 'unconfirmed user :string' do |username|
+  FactoryBot.create(
+    :user,
+    :changed_password,
+    :with_keypair,
+    :unconfirmed,
+    username: username
+  )
+end
+
 step 'an unconfirmed user :string with:' do |username, attributes|
   FactoryBot.create(
     :user,

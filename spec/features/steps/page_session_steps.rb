@@ -1,3 +1,27 @@
+step "I don't see the :string field" do |form_field|
+  expect(page).not_to have_field(form_field)
+end
+
+step 'I try to sign in as :string with incorrect password :string' do |username, password|
+  step("I fill in \"Username\" with \"#{username}\"")
+  step("I fill in \"Password\" with \"#{password}\"")
+  step('I click "Sign in"')
+end
+
+step 'I try to sign in as :string :count times with incorrect password :string' do |username, count, password|
+  count.times do
+    step("I fill in \"Username\" with \"#{username}\"")
+    step("I fill in \"Password\" with \"#{password}\"")
+    step('I click "Sign in"')
+  end
+end
+
+step 'I see the navigation menu with entries:' do |table|
+  table.each do |(entry)|
+    expect(page).to have_link(entry), "expected to find #{entry.inspect} in #{page.text.inspect}" 
+  end
+end
+
 step 'I see the navigation menu for :string with entries:' do |user_fullname, table|
   within("#header .navigation-wrapper") do
     expect(page).to have_link(user_fullname), "expected to find #{user_fullname.inspect} in #{page.text.inspect}" 
@@ -49,6 +73,12 @@ end
 
 step 'I sign out' do
   step('I click "Logout"')
+end
+
+step "I try to sign in as :string" do |username|
+  step("I fill in \"Username\" with \"#{username}\"")
+  step("I fill in \"Password\" with 'password'")
+  step('I click button "Sign in"')
 end
 
 step 'I sign in as :string with password :string' do |username, password|

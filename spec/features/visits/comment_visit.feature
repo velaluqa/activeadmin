@@ -34,7 +34,7 @@ Feature: Comment Visit
     Given I sign in as a user with role "Image Manager"
     When I browse to visit "1000"
     Then I see "COMMENTS (0)"
-    When I fill in "active_admin_comment_body" with "Some new comment for the feature test"
+    When I fill in the comments textarea with "Some new comment for the feature test"
     And I click the "Add Comment" button
     Then I see "COMMENTS (1)"
     And I see "Some new comment for the feature test"

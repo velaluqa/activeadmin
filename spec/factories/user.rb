@@ -30,6 +30,10 @@ FactoryBot.define do
       confirmed_at { nil }
     end
 
+    trait :locked do
+      locked_at { DateTime.now }
+    end
+
     before(:create) do |user, evaluator|
       evaluator.with_user_roles.each do |role_obj|
         case role_obj
