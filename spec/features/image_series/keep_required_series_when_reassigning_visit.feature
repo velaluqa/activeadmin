@@ -1,10 +1,11 @@
 # user_requirement: 
 # user_role: Authenticated User
-# goal: Reassign image series to a visit
+# goal: Keep Required Series When Reassigning Visit
 # category: Image Management
 # components:
 #   - image series
-Feature: Reassign Visit
+@skip
+Feature: Keep Required Series When Reassigning Visit
   In order to keep existing required series assignments,
   As an authorized user to assign_visit to image series,
   I am asked whether to override or reset required series assignments when assigning a different visit.

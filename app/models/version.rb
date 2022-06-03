@@ -99,7 +99,14 @@ WHERE
 WHERE
   # TODO: #3353 - Use Version#image_series_id: association_chain.where(image_id: params[:audit_trail_view_id])
   scope :for_image, -> (image_id) { where('item_type LIKE \'Image\' AND item_id = ?', image_id) }
-  scope :for_role, -> (image_id) { where('item_type LIKE \'Role\' AND item_id = ?', image_id) }
+  scope :for_role, -> (role_id) { where(<<WHERE.strip_heredoc, role_id: role_id) }
+    (item_type LIKE 'Role' AND item_id = :role_id) OR
+    (item_type LIKE 'Permission' AND
+      (
+        object->'role_id' = :role_id OR
+        object_changes->'role_id'->1 = :role_id
+      ))
+WHERE
   scope :for_user, -> (user_id) { where(<<WHERE.strip_heredoc, user_id: user_id) }
     (item_type LIKE 'User' AND item_id = :user_id) OR
     (item_type LIKE 'UserRole' and item_id IN

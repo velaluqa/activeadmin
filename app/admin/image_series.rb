@@ -290,44 +290,45 @@ ActiveAdmin.register ImageSeries do
   form do |f|
     resource.visit_id = params[:visit_id].to_i unless params[:visit_id].blank?
     f.inputs 'Details' do
-      patients = Patient.accessible_by(current_ability).order(:subject_id, :id)
-      if f.object.persisted?
-        patients = patients.of_study(f.object.study)
-      elsif session[:selected_study_id].present?
-        patients = patients.of_study(session[:selected_study_id])
-      end
-      f.input(
-        :patient,
-        collection: patients,
-        input_html: {
-          class: 'initialize-select2',
-          'data-placeholder': 'Select patient'
-        }
-      )
+      # TODO: Add again after all related issues are resolved. Read #5780
+      # patients = Patient.accessible_by(current_ability).order(:subject_id, :id)
+      # if f.object.persisted?
+      #   patients = patients.of_study(f.object.study)
+      # elsif session[:selected_study_id].present?
+      #   patients = patients.of_study(session[:selected_study_id])
+      # end
+      # f.input(
+      #   :patient,
+      #   collection: patients,
+      #   input_html: {
+      #     class: 'initialize-select2',
+      #     'data-placeholder': 'Select patient'
+      #   }
+      # )
 
-      visits = Visit.accessible_by(current_ability).order(:visit_number)
-      if f.object.persisted?
-        visits = visits.of_study(f.object.study)
-      elsif session[:selected_study_id].present?
-        visits = visits.of_study(session[:selected_study_id])
-      end
-      f.input(
-        :visit,
-        collection: visits,
-        input_html: {
-          class: 'initialize-select2',
-          'data-placeholder': 'Select visit'
-        }
-      )
+      # TODO: Add again after all related issues are resolved. Read #5780
+      # visits = Visit.accessible_by(current_ability).order(:visit_number)
+      # if f.object.persisted?
+      #   visits = visits.of_study(f.object.study)
+      # elsif session[:selected_study_id].present?
+      #   visits = visits.of_study(session[:selected_study_id])
+      # end
+      # f.input(
+      #   :visit,
+      #   collection: visits,
+      #   input_html: {
+      #     class: 'initialize-select2',
+      #     'data-placeholder': 'Select visit'
+      #   }
+      # )
 
-      f.input :series_number#, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
       f.input :name
       f.input :imaging_date, :as => :datepicker
       if f.object.persisted?
         f.object.force_update = (params[:force_update] || 'false')
         f.input :force_update, :as => :hidden
       end
-      f.input :comment
+      f.input :series_number#, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
     end
 
     f.actions
@@ -500,64 +501,65 @@ ActiveAdmin.register ImageSeries do
     link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(resource)) if resource.has_dicom? && can?(:read_dicom_metadata, resource)
   end
 
-  collection_action :batch_assign_to_patient, :method => :post do
-    if(params[:patient_id].nil?)
-      flash[:error] = 'You have to select a patient to assign these image series to.'
-      redirect_back(fallback_location: admin_image_series_index_path)
-      return
-    elsif(params[:image_series].nil?)
-      flash[:error] = 'You have to specify at least one image series to assign to this patient.'
-      redirect_back(fallback_location: admin_image_series_index_path)
-      return
-    end
+  # TODO: Remove batch assign to patient. See: #5783
+  # collection_action :batch_assign_to_patient, :method => :post do
+  #   if(params[:patient_id].nil?)
+  #     flash[:error] = 'You have to select a patient to assign these image series to.'
+  #     redirect_back(fallback_location: admin_image_series_index_path)
+  #     return
+  #   elsif(params[:image_series].nil?)
+  #     flash[:error] = 'You have to specify at least one image series to assign to this patient.'
+  #     redirect_back(fallback_location: admin_image_series_index_path)
+  #     return
+  #   end
 
-    image_series_ids = params[:image_series].split(' ')
-    image_series = ImageSeries.find(image_series_ids)
+  #   image_series_ids = params[:image_series].split(' ')
+  #   image_series = ImageSeries.find(image_series_ids)
 
-    patient = Patient.find(params[:patient_id])
-    authorize! :read, patient
+  #   patient = Patient.find(params[:patient_id])
+  #   authorize! :read, patient
 
-    image_series.each do |i_s|
-      authorize! :assign_patient, i_s
-      next unless i_s.visit_id.nil?
+  #   image_series.each do |i_s|
+  #     authorize! :assign_patient, i_s
+  #     next unless i_s.visit_id.nil?
 
-      i_s.patient = patient
-      unless(i_s.series_number.blank? or i_s.patient.image_series.where(:series_number => i_s.series_number).empty?)
-        i_s.series_number = nil
-      end
-      i_s.save
-    end
+  #     i_s.patient = patient
+  #     unless(i_s.series_number.blank? or i_s.patient.image_series.where(:series_number => i_s.series_number).empty?)
+  #       i_s.series_number = nil
+  #     end
+  #     i_s.save
+  #   end
 
-    redirect_to params[:return_url], :notice => 'The image series were assigned to the patient.'
-  end
+  #   redirect_to params[:return_url], :notice => 'The image series were assigned to the patient.'
+  # end
 
-  batch_action :assign_to_patient, confirm: 'This will modify all selected image series. Are you sure?', if: proc { can? :assign_patient, ImageSeries } do |selection|
-    failure = false
-    study_id = nil
+  # batch_action :assign_to_patient, confirm: 'This will modify all selected image series. Are you sure?', if: proc { can? :assign_patient, ImageSeries } do |selection|
+  #   failure = false
+  #   study_id = nil
 
-    ImageSeries.find(selection).each do |image_series|
-      study_id = image_series.study.id if study_id.nil?
+  #   ImageSeries.find(selection).each do |image_series|
+  #     study_id = image_series.study.id if study_id.nil?
 
-      if(image_series.study.id != study_id)
-        flash[:error] = 'Not all selected image series belong to the same study. Batch assignment can only be used for series of the same study.'
-        redirect_back(fallback_location: admin_image_series_index_path)
-        failure = true
-        break
-      elsif(image_series.visit_id != nil)
-        flash[:error] = 'Not all selected image series are currently unassigned. Batch assignment can only be used for series which are not currently assigned to a visit.'
-        redirect_back(fallback_location: admin_image_series_index_path)
-        failure = true
-        break
-      end
-    end
-    next if failure
+  #     if(image_series.study.id != study_id)
+  #       flash[:error] = 'Not all selected image series belong to the same study. Batch assignment can only be used for series of the same study.'
+  #       redirect_back(fallback_location: admin_image_series_index_path)
+  #       failure = true
+  #       break
+  #     elsif(image_series.visit_id != nil)
+  #       flash[:error] = 'Not all selected image series are currently unassigned. Batch assignment can only be used for series which are not currently assigned to a visit.'
+  #       redirect_back(fallback_location: admin_image_series_index_path)
+  #       failure = true
+  #       break
+  #     end
+  #   end
+  #   next if failure
 
-    @return_url = request.referer
-    patients = Study.find(study_id).patients
+  #   @return_url = request.referer
+  #   patients = Study.find(study_id).patients
 
-    @page_title = 'Assign to Patient'
-    render 'admin/image_series/assign_to_patient', :locals => {:selection => selection, :patients => patients}
-  end
+  #   @page_title = 'Assign to Patient'
+  #   render 'admin/image_series/assign_to_patient', :locals => {:selection => selection, :patients => patients}
+  # end
 
   collection_action :batch_assign_to_visit, :method => :post do
     if(params[:visit_id].blank?)

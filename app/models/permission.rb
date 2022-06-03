@@ -23,6 +23,8 @@
 #     * **`subject`**
 #
 class Permission < ApplicationRecord
+  has_paper_trail class_name: 'Version'
+
   ABILITY_REGEX = /^(.+)_(#{Ability::ACTIVITIES.keys.map { |subject| subject.to_s.underscore }.join('|')})$/
 
   belongs_to :role
@@ -93,5 +95,20 @@ class Permission < ApplicationRecord
 
   def to_s
     "Permission[#{activity} #{subject}]"
+  end
+
+  def self.classify_audit_trail_event(c)
+    if c.empty?
+      :revoked
+    else
+      :granted
+    end
+  end
+
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    case event_symbol
+    when :granted then ['Granted', :ok]
+    when :revoked then ['Revoked', :error]
+    end
   end
 end

@@ -1,4 +1,4 @@
-image: registry.vela/velaluqa/gitlab-ci-build-images:ruby-2.3.4-docker-compose
+image: registry.vela/velaluqa/gitlab-ci-build-images:ruby-2.3.8-docker-compose
 
 variables:
   BUNDLE_GEMFILE: Gemfile-ci
@@ -12,8 +12,12 @@ stages:
 
 build:
   stage: build
-  script: docker-compose build test
-
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-cache || true
+    - docker-compose build test
+    - docker tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-cache
+    - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-cache
 test:
   stage: test
   script:

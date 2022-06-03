@@ -1,6 +1,29 @@
 # CHANGELOG
 
-## Unreleased
+## 7.2.3
+
+### Patches / Fixes
+
+* Fix - (ERICA-158) Only allow deletion of empty form sessions
+* Fix - (ERICA-154) Fix tracking role permission changes in audit trail
+* Fix - (ERICA-157) Do not allow deletion of signed form answers
+* Fix - (ERICA-155) Do not allow updating of signed form answers
+* Fix - (ERICA-153) Show user column for background jobs & remove
+  `create` & `update` permissions from the set of role permissions for
+  background jobs as they were not applicable
+
+### Dev/DevOps
+
+* Fix - Ensure database is cleaned before testing test data factories
+* Update - Update CI pipeline docker versions (docker 19 & docker-compose 1.25)
+
+## 7.2.2
+
+### Patches / Fixes
+
+* Fix - #5780 - Fix inconsistent image series form behavior when changing patient or visit, by removing the patient and visit fields
+* Fix - #5783 - Remove "Batch assign image series to patient" as we currently do not adjust DICOM metadata automatically
+* Fix - #5784 - Remove create permission for image series
 
 ### Minor Changes
 
