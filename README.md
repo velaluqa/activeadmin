@@ -61,23 +61,47 @@ To drop and then migrate test databse afresh do so via:
 
     docker-compose run test rake db:drop db:create db:migrate
 
+To run a specific feature test file do so via:
+
+    docker-compose run test rspec <path to file>
+
+    e.g docker-compose run test rspec spec/features/authentication/login.feature
+
+To run a specific spec file do so via:
+
+    docker-compose run test rspec <path to file>.
+
+    e.g docker-compose run test rspec spec/models/user_spec.rb.
+
 ## Running Bundle Commands
 
 When a new gem is installed, it might be essential to rebuild containers for changes to take effect.
 
 To install gems:
 
-   docker-compose run app bundle install
+    docker-compose run app bundle install
 
 To lock gems in the Gemfile.lock do:
 
-   docker-compose run app bundle lock
+    docker-compose run app bundle lock
+
+## Running some terminal commands
+
+To start the rails console do so via:
+
+    docker-compose run app rails console.
+
+To start the irb shell do so via:
+
+    docker-compose run app irb shell.
 
 ## Running Rake Tasks
 
 To run rake tasks you have to do it in the docker environment like so:
 
     docker-compose run app rake <task>
+
+    e.g docker-compose run app rake routes (This prints out all the url routes of the application)
 
 ## Write Turnip step definitions
 
@@ -87,6 +111,18 @@ The validation report requires a few things:
   use `step` instead (and provide a string parameter) to make them
   appear as a substep in the validation report.
 * Call `validation_report_screenshot` where appropriate.
+
+## Master key information
+
+The master key is important for encrypting the application's `config/credentials.yml.enc` file.
+
+To generate a new master key if there is none existing do so via:
+   
+   EDITOR=<editor type> rails credentials:edit.
+
+   e.g EDITOR=vim rails credentials:edit (for vim editor).
+       
+   EDITOR="code --wait" rails credentials:edit (for VS Code).
 
 ## Upgrade from 3.0.0 to 6.0.0
 
