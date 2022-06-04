@@ -1,3 +1,4 @@
+@skip
 Feature: Update Image Series
   In order to update an image series,
   As authorized user for `edit` image series,
