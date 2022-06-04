@@ -6,8 +6,8 @@ class Ability
   ACTIVITIES = {
     BackgroundJob => %i[manage read destroy],
     Sidekiq => %i[manage],
-    Configuration => %i[read],
-    Study  => %i[manage read update create destroy comment read_reports configure clean_dicom_metadata],
+    Configuration => %i[manage read],
+    Study  => %i[manage read update create destroy comment read_reports configure clean_dicom_metadata change_domino_config],
     Center => %i[manage read update create destroy comment],
     Patient => %i[manage read update create destroy comment download_images],
     EmailTemplate => %i[manage read update create destroy],
@@ -24,7 +24,7 @@ class Ability
     RequiredSeries => %i[manage read update],
     Role => %i[manage read update create destroy],
     Visit => %i[manage read update create destroy comment download_images create_from_template update_state assign_required_series read_tqc perform_tqc read_mqc perform_mqc],
-    Version => %i[manage read update create destroy]
+    Version => %i[manage read update create destroy git_commits]
   }.freeze
 
   UNSCOPABLE_ACTIVITIES = {
@@ -35,6 +35,8 @@ class Ability
 
   def can_with_undecorate?(action, subject, attribute = nil, *extra_args)
     undecorated_subject = Draper.undecorate(subject)
+
+    return false unless available?(action, undecorated_subject)
 
     can_without_undecorate?(
       action,
@@ -154,7 +156,7 @@ class Ability
     end
 
     unless can?(:manage, PublicKey)
-      can %i[read update generate_keypair change_password], PublicKey, ['public_keys.user_id = ?', current_user.id] do |public_key|
+      can %i[read update], PublicKey, ['public_keys.user_id = ?', current_user.id] do |public_key|
         public_key.user == current_user
       end
     end
@@ -169,5 +171,32 @@ class Ability
     if can?(:upload, ImageSeries)
       can :read, ActiveAdmin::Page, name: 'Image Upload', namespace_name: 'admin'
     end
+  end
+
+  private
+
+  def all_available?(actions, subject)
+    actions.map { |action| available?(action, subject) }.all?
+  end
+
+  def available?(action, subject)
+    return all_available?(action, subject) if action.is_a?(Array)
+
+    # Basic ActiveAdmin actions should always be available
+    return true if %i[create read edit update destroy].include?(action)
+
+    is_available =
+      case subject
+      when ApplicationRecord, PaperTrail::Version
+        Array(ACTIVITIES[subject.class]).include?(action)
+      else
+        !ACTIVITIES.key?(subject) || ACTIVITIES[subject].include?(action)
+      end
+
+    if !is_available && !Rails.env.production?
+      raise "#{action} is not available for #{subject}. You might want to add it to Ability::ACTIVITIES"
+    end
+
+    is_available
   end
 end

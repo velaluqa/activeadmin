@@ -1,4 +1,48 @@
 RSpec.describe Ability do
+  describe "#can?" do
+    before(:each) do
+      @current_user = create(:user, is_root_user: true)
+      @ability = Ability.new(@current_user)
+    end
+
+    describe "production environment" do
+      it "returns false for non-existent abilities" do
+        Rails.stub(env: ActiveSupport::StringInquirer.new("production"))
+
+        expect(@ability.can?(:nonexistent_action, User)).to be_falsy
+        expect(@ability.can?(:nonexistent_action, @current_user)).to be_falsy
+      end
+    end
+
+    describe "development environment" do
+      it "returns false for non-existent abilities" do
+        Rails.stub(env: ActiveSupport::StringInquirer.new("development"))
+
+        expect {
+          @ability.can?(:nonexistent_action, User)
+        }.to raise_error(/nonexistent_action is not available/)
+
+        expect {
+          @ability.can?(:nonexistent_action, @current_user)
+        }.to raise_error(/nonexistent_action is not available/)
+      end
+    end
+
+    describe "test environment" do
+      it "returns false for non-existent abilities" do
+        Rails.stub(env: ActiveSupport::StringInquirer.new("test"))
+
+        expect {
+          @ability.can?(:nonexistent_action, User)
+        }.to raise_error(/nonexistent_action is not available/)
+
+        expect {
+          @ability.can?(:nonexistent_action, @current_user)
+        }.to raise_error(/nonexistent_action is not available/)
+      end
+    end
+  end
+
   context 'with existing study records' do
     before(:each) do
       @study1 = create(:study)
@@ -58,10 +102,6 @@ RSpec.describe Ability do
 
       it 'allows the user to update his own public key' do
         expect(@ability.can?(:update, @public_key)).to be_truthy
-      end
-
-      it 'allows the user to generate_keypair his own public key' do
-        expect(@ability.can?(:generate_keypair, @public_key)).to be_truthy
       end
 
       it 'denies other permissions' do
