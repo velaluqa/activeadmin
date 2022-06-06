@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Unreleased
+
+### Patches / Fixes
+
+* Fix - Only allow deletion of empty studies
 ## 7.2.3
 
 ### Patches / Fixes

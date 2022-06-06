@@ -26,6 +26,21 @@ Feature: Delete Study
     When I browse to study "FooStudy"
     Then I don't see "Delete Study"
 
+  Scenario: Reject deletion of studies with centers
+    Given a center "TestCenter" for "FooStudy"
+    And a patient "TestPatient" for "TestCenter"
+    When I sign in as a user with role "Image Manager"
+    And I browse to studies list
+    Then I see a row for "FooStudy" with the following columns:
+      | Name          | FooStudy |
+      | Configuration | MISSING  |
+      | State         | Building |
+    When I click link "Delete"
+    And I confirm alert
+    Then I see "Cannot delete study with centers"
+    When I browse to studies list
+    Then I see a row with "FooStudy"
+
   Scenario: Successful
     Given I sign in as a user with role "Image Manager"
     When I browse to studies list

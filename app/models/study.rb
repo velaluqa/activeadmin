@@ -85,13 +85,6 @@ SELECT
 JOIN
   end
 
-  before_destroy do
-    unless centers.empty?
-      errors.add :base, 'You cannot delete a study that still has centers associated with it.'
-      return false
-    end
-  end
-
   before_save do
     if changes.include?('domino_db_url') || changes.include?('domino_server_name')
       update_notes_links_base_uri
