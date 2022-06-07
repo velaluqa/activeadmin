@@ -54,7 +54,7 @@ ActiveAdmin.register User do
       end
     end
     column 'Roles' do |user|
-      link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
+      link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id) if can?(:read, Role) && can?(:read, UserRole)
     end
     column do |user|
       if can?(:impersonate, user)
@@ -123,8 +123,10 @@ ActiveAdmin.register User do
           end
         end
       end
-      row 'Roles' do |user|
-        link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
+      if can?(:read, Role) && can?(:read, UserRole)
+        row 'Roles' do |user|
+          link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
+        end
       end
     end
   end

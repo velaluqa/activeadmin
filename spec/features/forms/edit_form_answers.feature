@@ -39,7 +39,7 @@ Feature: Edit Form Answers
     When I click "Update Form answer"
     Then I see "Form answer was successfully updated"
     When I click "Raw"
-    Then I see "Some Brand New Value"
+    Then I see "Form answer was successfully updated"
     
     
 
