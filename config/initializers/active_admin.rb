@@ -248,7 +248,9 @@ ActiveAdmin.setup do |config|
         label: 'immediate',
         priority: 0,
         if: proc { !menu['immediate'].children.empty? }
-      )
+      ) do |immediate|
+        immediate.add label: "Tasks", url: "/v1/dashboard"
+      end
       menu.add(
         label: 'store',
         priority: 10,

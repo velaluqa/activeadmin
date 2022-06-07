@@ -5,6 +5,8 @@
 ### Patches / Fixes
 
 * Fix - Only allow deletion of empty studies
+* Fix - Make link to tasks dashboard visible to any user
+
 ## 7.2.3
 
 ### Patches / Fixes
