@@ -6,6 +6,7 @@
 
 * Fix - Only allow deletion of empty studies
 * Fix - Make link to tasks dashboard visible to any user
+* Fix - Fix updating notification profiles for authorized non-root users
 
 ## 7.2.3
 

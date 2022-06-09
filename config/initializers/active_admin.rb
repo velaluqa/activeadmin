@@ -342,6 +342,18 @@ end
 
 ActiveAdmin::BaseController.class_eval do
   helper ApplicationHelper
+
+  def authorize_one!(actions, subject)
+    unless actions.any? { |a| can?(a, subject) }
+      raise CanCan::AccessDenied.new(current_user, actions, subject)
+    end
+  end
+
+  def authorize_combination!(*combinations)
+    unless combinations.any? { |a, s| can?(a, s) }
+      raise CanCan::AccessDenied.new(current_user, combinations)
+    end
+  end
 end
 
 # Taken from https://github.com/DocSpring/inherited_resources/commit/20d2eae2ee7b56c8a8494a6fb5fbc5afbb0bec7b#diff-86482bddc1bf1df5782fea3d119772887ef90a779693ccd114cc518cb700be22
