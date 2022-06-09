@@ -4,7 +4,6 @@
 # category: Image Management
 # components:
 #   - image series
-@skip
 Feature: Keep Required Series When Reassigning Visit
   In order to keep existing required series assignments,
   As an authorized user to assign_visit to image series,
@@ -64,7 +63,7 @@ Feature: Keep Required Series When Reassigning Visit
       | Study       | read                         |
       | Center      | read                         |
       | Patient     | read                         |
-      | ImageSeries | read, update                 |
+      | ImageSeries | read, update, assign_visit   |
       | Visit       | read, read_tqc               |
 
   Scenario: Different Visit Type - Removing Required Series Assignments

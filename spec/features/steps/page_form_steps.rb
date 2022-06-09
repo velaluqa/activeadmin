@@ -112,3 +112,7 @@ step 'I see field :string with value :string' do |locator, value|
 
   expect(page).to have_field(label_for, with: value)
 end
+
+step "I fill in number field :string with :count" do |field_name, count|
+  fill_in(field_name, with: count)
+end
