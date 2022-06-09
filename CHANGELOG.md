@@ -7,6 +7,7 @@
 * Fix - Only allow deletion of empty studies
 * Fix - Make link to tasks dashboard visible to any user
 * Fix - Fix updating notification profiles for authorized non-root users
+* Fix - Add notice to form answer PDFs regarding signed data
 
 ## 7.2.3
 

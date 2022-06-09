@@ -13,7 +13,8 @@ export default ({
 }) => {
   const link = `${
     window.location.origin
-  }/v1/form_answers/${formAnswerId}?sigH=${sha1(signature)}&validate=true`;
+  }/v1/form_answers/${formAnswerId}?sigH=${sha1(signature)}`;
+
   return (
     <div style={{ marginTop: 32, display: "inline-block", maxWidth: "450px" }}>
       <a href={link} style={{ textDecoration: "none", color: "black" }}>
