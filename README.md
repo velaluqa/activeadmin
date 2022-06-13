@@ -16,11 +16,30 @@ machine:
 -   Docker (`> 1.10.3`)
 -   Docker Compose (`> 1.6.2`)
 
+All ruby dependencies are listed in `Gemfile.lock`.
+
+## Setup
+
+### Install Master Key
+
+The master key is important for encrypting and decrypting the
+application's `config/credentials.yml.enc` file.
+
+Usually you want to install the projects master key. Ask your
+colleagues where to get the master key from and install it to
+`./config/master.key`.
+
+For further information regarding the Rails master key, [see the
+magnificent Rails
+Guides](https://edgeguides.rubyonrails.org/security.html#environmental-security).
+
+### Build containers
+
 Now build the containers properly.
 
     docker-compose build
 
-## Preparing Development Database
+### Preparing Development Database
 
 Before we can run our development server, we need to bootstrap the
 databases for the `development` environment.
@@ -57,21 +76,62 @@ Then start the test runner via:
 
     docker-compose run test
 
-To drop and then migrate test databse afresh do so via:
+### Running specific tests
+
+To run a specific feature test file do so via:
+
+    docker-compose run test rspec <path to file>
+
+For example you can run `spec/features/authentication/login.feature` specifically:
+
+    docker-compose run test rspec spec/features/authentication/login.feature
+
+The same applies to any other RSpec file. To run a specific spec file do so via:
+
+    docker-compose run test rspec <path to file>.
+
+E.g.
+
+    docker-compose run test rspec spec/models/user_spec.rb.
+
+### Cleaning the database
+
+Rarely the database cleaning while running your tests in Guard fails. This leaves the database in a state that makes tests fail (either due to taken unique keys residing in the database or because results do not match the expectations).
+
+To solve that you can drop the database and recreate it:
 
     docker-compose run test rake db:drop db:create db:migrate
 
 ## Running Bundle Commands
 
-When a new gem is installed, it might be essential to rebuild containers for changes to take effect.
+When a new gem is installed, it might be essential to rebuild
+containers for changes to take effect.
 
-To install gems:
+After adding Gems to your `Gemfile` you need to lock the bundle:
 
-   docker-compose run app bundle install
+    docker-compose run app bundle lock
+	
+This will generate the `Gemfile.lock` file.
 
-To lock gems in the Gemfile.lock do:
+Then you can rebuild your containers:
 
-   docker-compose run app bundle lock
+    docker-compose build app worker webpack
+
+If you had containers running you should recreate all your containers
+by stopping and removing them first. For that you can use
+`docker-compose down`:
+
+    docker-compose down
+
+## Running Rails console
+
+To start the rails console do so via:
+
+    docker-compose run app rails console.
+
+To start the irb shell do so via:
+
+    docker-compose run app irb
 
 ## Running Rake Tasks
 
@@ -79,149 +139,98 @@ To run rake tasks you have to do it in the docker environment like so:
 
     docker-compose run app rake <task>
 
+For example printing all routes available use `rake routes`:
+
+    docker-compose run app rake routes
+
 ## Write Turnip step definitions
 
+For validation we create a report describing the actions performed to
+test a specific feature along with screenshots as proof that these
+actions were actually tested.
+  
 The validation report requires a few things:
+
+### High-level steps reusing existing step definitions
+
+The feature test may profit from combining a verbose set of smaller
+steps into higher-level steps that describe e.g. the user interactions
+or expectation in a more concise way.
+
+For example:
+
+```feature
+Given a user "confirmed.user"
+When I browse to the login page
+And I fill in "Username" with "confirmed.user"
+And I fill in "Password" with "wrong password"
+And I click "Sign in"
+And I fill in "Username" with "confirmed.user"
+And I fill in "Password" with "wrong password"
+And I click "Sign in"
+And I fill in "Username" with "confirmed.user"
+And I fill in "Password" with "wrong password"
+And I click "Sign in"
+Then I see "Your account is locked"
+```
+
+Could be written as:
+
+```feature
+When I browse to the login page
+And I try to sign in as "confirmed.user" 3 times with incorrect password "any.password"
+```
+
+```rb
+step 'I try to sign in as :string :count times with incorrect password :string' do |username, count, password|
+  count.times do
+    step("I fill in \"Username\" with \"#{username}\"")
+    step("I fill in \"Password\" with \"#{password}\"")
+    step('I click "Sign in"')
+  end
+end
+```
 
 * Do not use `send` in your step definitions to call subsequent steps,
   use `step` instead (and provide a string parameter) to make them
   appear as a substep in the validation report.
-* Call `validation_report_screenshot` where appropriate.
+  
+### Create screenshots
+ 
+In order to generate screenshots for each step call
+`validation_report_screenshot` where appropriate.
 
-## Upgrade from 3.0.0 to 6.0.0
+Typically you would want to take a screenshot when:
 
-This process may take a long time.
+- after changing something on the page (e.g. `When I fill in "Input
+  Field" with "Some text typed into the input box"`)
+- performing an expectation on the page (e.g. `Then I see "My peculiar
+  text"`, testing that some text is displayed on the page. The
+  screenshot is taken after the Capybara expectation for it to scroll
+  the respective text into view.)
 
-### Configure docker to include `import` volume
+### Debugging feature scenarios
 
-Use this example as a hint.
+You have different possibilities to hook into your code. Generally you
+can run a debugger:
 
-**Remember to change the database name in config/database.yml.dev**
+- in the feature scenario itself by adding `When I debug`. This will
+  start the debugger REPL in its own step
+- in the code segment (e.g. in you controller action method run
+  `debugger`). This way you will have access to the variables and
+  database state at that specific location.
+  
+Frequent scenarios:
 
-```yaml
-postgres:
-  image: postgres:9.6
-  ports:
-    - 5432:5432
-  volumes:
-    - ./tmp/postgresql_data_3_0_0/9.6/data:/var/lib/postgresql/data
-redis:
-  image: redis
-  ports:
-    - 6379:6379
-app:
-  build: &build .
-  command: rails s -b 0.0.0.0 -p 3000
-  tty: true
-  volumes: &volumes
-    - .:/app
-    - ./config/database.yml.dev:/app/config/database.yml
-    - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
-    - ./tmp:/app/tmp
-    - ./import/data:/app/data
-  ports:
-    - 3000:3000
-  environment: &environment
-    DB_USERNAME: postgres
-    DB_PASSWORD:
-    TRUSTED_IP: 172.18.0.1
-  links: &links
-    - postgres
-    - redis
-    - worker
-test:
-  build: *build
-  command: guard
-  tty: true
-  volumes: *volumes
-  environment:
-    <<: *environment
-    RAILS_ENV: test
-  links:
-    - postgres
-    - redis
-worker:
-  build: *build
-  command: bundle exec sidekiq
-  volumes: *volumes
-  environment: *environment
-  links:
-    - postgres
-    - redis
-https:
-  image: nginx
-  ports:
-    - 443:443
-    - 80:80
-  volumes:
-    - ./nginx.conf:/etc/nginx/nginx.conf
-    - ./erica.conf:/etc/nginx/conf.d/default.conf
-  volumes_from:
-    - app:rw
-  links:
-    - app
-```
+**I cannot see what I expect!**
 
-### Extract data directory
+- Did you setup the database correctly? 
+- What is inside the database?
+- Are you accessing the right data?
 
-```
-cd import
-mkdir -p pts028.2017.06.26-01-10.data
-tar xfzv pts028.2017.06.26-01-10.data.tar.gz -C pts028.2017.06.26-01-10.data
-ln -sf pts028.2017.06.26-01-10.data/data data
-```
+Use the debugger and run your ActiveRecord queries by hand, is the
+data correct?
 
-### Import MongoDB data
+# Upgrade instructions
 
-```
-cd import
-mkdir -p pts027.2017.06.26-01-10.dump
-tar xfzv pts027.2017.06.26-01-10.dump.tar.gz -C pts027.2017.06.26-01-10.dump
-doco up -d mongo
-doco exec ericastore_mongo_1 mongorestore /import/pts027.2017.06.26-01-10.dump/
-```
-
-
-### Import PostGreSQL data
-
-```
-doco exec ericastore_postgres_1 su postgres -s /bin/bash -c "gunzip -c /import/pts021.2017.06.26-01-10.dump.gz | psql"
-```
-
-### Update PostGreSQL from 9.1 to 9.6
-
-```
-docker run --rm \
-  -v /home/arthur/projects/pharmtrace/erica_store_v2/tmp/postgresql_data_3_0_0/9.1/data:/var/lib/postgresql/9.1/data \
-  -v /home/arthur/projects/pharmtrace/erica_store_v2/tmp/postgresql_data_3_0_0/9.6/data:/var/lib/postgresql/9.6/data \
-  tianon/postgres-upgrade:9.1-to-9.6
-```
-
-### Migrate MongoDB data to PostGres
-
-For this we have some migrations in the `migrate-mongo-data` branch.
-
-```
-# Check out the branch
-git checkout feature-migrate-mongo
-
-# Run migrations
-rake db:migrate
-
-# Fill missing gaps in
-rake fill_gaps_in_audit_trail
-rake migrate_mongo_patient_data
-rake migrate_mongo_visit_data
-
-# Check out develop
-git checkout develop
-
-# Migrate to latest rails database structure (quick)
-rake db:migrate
-
-# Create study_id refs for versions (~5min)
-rake erica:migration:add_missing_version_study_id
-
-# Migrate required series presets
-rake erica:migration:migrate_required_series
-```
+- [Upgrade 3.0.0 to 6.0.0](./doc/)
