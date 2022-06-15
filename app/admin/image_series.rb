@@ -290,37 +290,40 @@ ActiveAdmin.register ImageSeries do
   form do |f|
     resource.visit_id = params[:visit_id].to_i unless params[:visit_id].blank?
     f.inputs 'Details' do
-      # TODO: Add again after all related issues are resolved. Read #5780
-      # patients = Patient.accessible_by(current_ability).order(:subject_id, :id)
-      # if f.object.persisted?
-      #   patients = patients.of_study(f.object.study)
-      # elsif session[:selected_study_id].present?
-      #   patients = patients.of_study(session[:selected_study_id])
-      # end
-      # f.input(
-      #   :patient,
-      #   collection: patients,
-      #   input_html: {
-      #     class: 'initialize-select2',
-      #     'data-placeholder': 'Select patient'
-      #   }
-      # )
+      patients = Patient.of_study(f.object.study).order(:subject_id, :id)
+      visits = Visit.of_study(f.object.study).order(:visit_number)
+      
+      if can?(:assign_patient, image_series)
+        f.input(
+          :patient,
+          collection: patients,
+          input_html: {
+            class: 'initialize-select2',
+            'data-placeholder': 'Select patient'
+          }
+        )
+      else
+        f.input(
+          :patient, as: :readonly,
+          input_html: {value: image_series.patient}
+        )
+      end
 
-      # TODO: Add again after all related issues are resolved. Read #5780
-      # visits = Visit.accessible_by(current_ability).order(:visit_number)
-      # if f.object.persisted?
-      #   visits = visits.of_study(f.object.study)
-      # elsif session[:selected_study_id].present?
-      #   visits = visits.of_study(session[:selected_study_id])
-      # end
-      # f.input(
-      #   :visit,
-      #   collection: visits,
-      #   input_html: {
-      #     class: 'initialize-select2',
-      #     'data-placeholder': 'Select visit'
-      #   }
-      # )
+      if can?(:assign_visit, image_series)
+        f.input(
+          :visit,
+          collection: visits,
+          input_html: {
+            class: 'initialize-select2',
+            'data-placeholder': 'Select visit'
+          }
+        )
+      else
+        f.input(
+          :visit, as: :readonly,
+          input_html: {value: image_series.visit.try(:name) || 'Not Assigned Visit'}
+        )
+      end
 
       f.input :name
       f.input :imaging_date, :as => :datepicker
@@ -328,7 +331,7 @@ ActiveAdmin.register ImageSeries do
         f.object.force_update = (params[:force_update] || 'false')
         f.input :force_update, :as => :hidden
       end
-      f.input :series_number#, :hint => (f.object.persisted? ? '' : 'Leave blank to automatically assign the next available series number.'), :required => f.object.persisted?
+      f.input :series_number
     end
 
     f.actions
