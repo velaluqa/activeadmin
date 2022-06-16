@@ -33,6 +33,7 @@
 //= require bootbox
 //= require erica_menu
 //= require_self
+//= require cable
 
-bootbox.setDefaults({ size: 'small' });
-$.fn.select2.defaults.set( "theme", "bootstrap" );
+bootbox.setDefaults({ size: "small" });
+$.fn.select2.defaults.set("theme", "bootstrap");

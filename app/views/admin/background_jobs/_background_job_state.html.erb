@@ -1,0 +1,10 @@
+<div id="background_job_state_<%= background_job.id %>" data-updated-at="<%= background_job.updated_at.iso8601(3) %>">
+  <%- if background_job.finished? && !background_job.failed? %>
+    <%= status_tag('Completed', class: 'ok') %>
+  <%- elsif background_job.failed? %>
+    <%= status_tag('Failed', class: 'error') %>
+  <%- else %>
+    <% ap background_job.progress %>
+    <%= status_tag('Running', class: 'warning', label: 'Running: ' + ('%.2f' % (background_job.progress * 100)) + '% completed') %>
+  <%- end %>
+</div>

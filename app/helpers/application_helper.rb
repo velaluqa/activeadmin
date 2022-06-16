@@ -31,6 +31,10 @@ module ApplicationHelper
     Arbre::Context.new(&block).to_s
   end
 
+  def status_tag(status, options = {})
+    ActiveAdmin::Views::StatusTag.new.status_tag(status, options)
+  end
+
   def render_react_component(pack_name, options = {})
     component_props =
       options

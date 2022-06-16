@@ -39,8 +39,8 @@ Feature: Download Patient Images
     Then I am redirected to the latest background_job
     And I see "Your download will be available shortly."
     When I wait for all jobs in "DownloadImagesWorker" queue
-    And I browse to the latest background_job
-    Then I see "Zip file Download"
+    Then I see "COMPLETED" in "State" row
+    And I see "Zip file Download"
     When I click link "Download"
     Then I download zip file
     # TODO: Test zip file content
@@ -53,8 +53,8 @@ Feature: Download Patient Images
     Then I am redirected to the latest background_job
     And I see "Your download will be available shortly."
     When I wait for all jobs in "DownloadImagesWorker" queue
-    And I browse to the latest background_job
-    Then I see "Zip file Download"
+    Then I see "COMPLETED" in "State" row
+    And I see "Zip file Download"
     When I click link "Download"
     Then I download zip file
     # TODO: Test zip file content
