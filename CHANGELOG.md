@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## Unrelease
+
+### Minor Changes
+
+* Feature - Allow user to recover forgotten passwords
+* Feature - Allow authorized users (administrators) to resend email confirmation instructions
+* Feature - Allow authorized users (administrators) to impersonate other users of the system
+* Feature - Allow authorized users (administrators) to confirm a user manually in the user settings
+
+### Patches / Fixes
+
+* Fix - Only allow users with `assign_patient` permission for `ImageSeries` to re-/assign a patient
+* Fix - Only allow users with `assign_visit` permission for `ImageSeries` to re-/assign a visit
+* Fix - Fix assigning a visit from the edit image series form if the
+  image series was not yet assigned to a visit
+* Fix - Fix saving downloaded images from background job to
+  app-specific tmp directory, in order to keep downloadable background
+  job files between version updates
+* Fix - Only display `Roles` link in users list if the current user is authorized to view the roles
+
+### Dev / DevOps
+
+* Check validity of granted permission in feature test files (when a
+  permission is not defined, the granting operation will fail and let
+  the developer know, that this permission needs to be defined first)
+
 ## 7.2.3
 
 ### Patches / Fixes
@@ -24,13 +50,6 @@
 * Fix - #5780 - Fix inconsistent image series form behavior when changing patient or visit, by removing the patient and visit fields
 * Fix - #5783 - Remove "Batch assign image series to patient" as we currently do not adjust DICOM metadata automatically
 * Fix - #5784 - Remove create permission for image series
-
-### Minor Changes
-
-* Feature - Allow user to recover forgotten passwords
-* Feature - Allow authorized users (administrators) to resend email confirmation instructions
-* Feature - Allow authorized users (administrators) to impersonate other users of the system
-* Fix - Fix assigning a visit from the edit image series form if the image series was not yet assigned
 
 ## 7.2.1
 
