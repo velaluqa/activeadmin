@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unrelease
+## Unreleased
 
 ### Minor Changes
 
@@ -25,6 +25,15 @@
 * Check validity of granted permission in feature test files (when a
   permission is not defined, the granting operation will fail and let
   the developer know, that this permission needs to be defined first)
+
+## 7.2.4
+
+### Patches / Fixes
+
+* Fix - Only allow deletion of empty studies
+* Fix - Make link to tasks dashboard visible to any user
+* Fix - Fix updating notification profiles for authorized non-root users
+* Fix - Add notice to form answer PDFs regarding signed data
 
 ## 7.2.3
 

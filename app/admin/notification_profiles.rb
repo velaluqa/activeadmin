@@ -165,7 +165,8 @@ ActiveAdmin.register NotificationProfile do
   end
 
   collection_action :filters_schema, method: :get, format: :json do
-    authorize! [:create, :update], NotificationProfile
+    authorize_one! [:create, :update], NotificationProfile
+
     begin
       klass = params[:triggering_resource].constantize
       render json: NotificationObservable::Filter::Schema.new(klass).schema.to_json

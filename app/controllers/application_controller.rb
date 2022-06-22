@@ -2,6 +2,19 @@ require 'exceptions'
 
 class ApplicationController < ActionController::Base
   impersonates :user
+
+  def authorize_one!(actions, subject)
+    unless actions.any? { |a| can?(a, subject) }
+      raise CanCan::AccessDenied.new(current_user, actions, subject)
+    end
+  end
+
+  def authorize_combination!(*combinations)
+    unless combinations.any? { |a, s| can?(a, s) }
+      raise CanCan::AccessDenied.new(current_user, combinations)
+    end
+  end
+
   before_action(:authenticate_user_from_token!)
   before_action(:ensure_valid_password, if: proc { current_user && current_user.id == true_user.id })
   before_action(:ensure_valid_keypair, if: proc { current_user && current_user.id == true_user.id })

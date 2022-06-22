@@ -190,7 +190,13 @@ SELECT
 
   def can?(activity, subject)
     @ability ||= Ability.new(self)
-    @ability.can?(activity, subject)
+    if activity.is_a?(Array)
+      activity.any? do |action|
+        @ability.can?(action, subject)
+      end
+    else
+      @ability.can?(activity, subject)
+    end
   end
 
   # HACK: to allow mongoid-history to store the modifier using an ActiveRecord model (this model)

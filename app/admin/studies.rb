@@ -21,6 +21,17 @@ ActiveAdmin.register Study do
       return if params[:format].blank?
       authorize! :download_status_files, Study
     end
+
+    def destroy
+      study = Study.find(params[:id])
+      if study.centers.exists?
+        flash[:error] = 'Cannot delete study with centers.'
+        redirect_back(fallback_location: admin_studies_path)
+        return
+      end
+
+      destroy!
+    end
   end
 
   index do
