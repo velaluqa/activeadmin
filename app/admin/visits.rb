@@ -637,7 +637,7 @@ ActiveAdmin.register Visit do
   end
   member_action :download_images, :method => :get do
     background_job = start_download_images(params[:id])
-    redirect_to admin_background_job_path(background_job), :notice => 'Your download will be available shortly. Please refresh this page to see whether it is available yet.'
+    redirect_to admin_background_job_path(background_job), :notice => 'Your download will be available shortly.'
   end
   action_item :edit, :only => :show do
     link_to('Download images', download_images_admin_visit_path(resource)) if can? :download_images, resource

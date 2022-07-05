@@ -57,6 +57,24 @@ class BackgroundJob < ApplicationRecord
     'BackgroundJob'::varchar AS result_type
 SELECT
 
+  after_save :broadcast_job_update
+
+  def broadcast_job_update
+    ActionCable.server.broadcast(
+      "background_jobs_channel",
+      job_id: id,
+      finished: finished?,
+      updated_at: updated_at,
+      html: ApplicationController.new.render_to_string(
+        template: "admin/background_jobs/_background_job_state",
+        layout: nil,
+        locals: {
+          background_job: self
+        }
+      )
+    )
+  end
+
   ##
   # Find out whether this job has finished.
   #

@@ -36,13 +36,12 @@ ActiveAdmin.register BackgroundJob do
     column :name
     column :created_at
     column 'State', sortable: :completed do |background_job|
-      if background_job.finished? && !background_job.failed?
-        status_tag('Completed', class: 'ok')
-      elsif background_job.failed?
-        status_tag('Failed', class: 'error')
-      else
-        status_tag('Running', class: 'warning', label: 'Running: ' + ('%.2f' % (background_job.progress * 100)) + '% completed')
-      end
+      render(
+        partial: "background_job_state",
+        locals: {
+          background_job: background_job
+        }
+      )
     end
     column :completed_at
     column :user
@@ -57,13 +56,12 @@ ActiveAdmin.register BackgroundJob do
       row :name
       row :user
       row 'State' do
-        if background_job.finished? && !background_job.failed?
-          status_tag('Completed', class: 'ok')
-        elsif background_job.failed?
-          status_tag('Failed', class: 'error')
-        else
-          status_tag('Running', class: 'warning', label: 'Running: ' + ('%.2f' % (background_job.progress * 100)) + '% completed')
-        end
+        render(
+          partial: "background_job_state",
+          locals: {
+            background_job: background_job
+          }
+        )
       end
       row :error_message if background_job.failed? && !background_job.error_message.blank?
       row :created_at

@@ -45,6 +45,7 @@ class Patient < ApplicationRecord
   belongs_to :center
   has_many :visits, dependent: :destroy
   has_many :image_series, dependent: :destroy
+  has_many :images, through: :image_series
 
   has_many :user_roles, as: :scope_object, dependent: :destroy
 

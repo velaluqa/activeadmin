@@ -21,6 +21,8 @@ class DownloadImagesWorker
         File.open(Rails.root.join(image.absolute_image_storage_path).to_s, 'r', &:read)
       )
     end
+
+    @images_done += 1
   end
 
   def add_image_series(zip, image_series, create_folder = true)
@@ -34,6 +36,8 @@ class DownloadImagesWorker
     image_series.images.each do |image|
       add_image(zip, image)
     end
+
+    @job.set_progress(@images_done, @images_count)
 
     zip.dir.chdir('..') if create_folder
   end
@@ -89,7 +93,7 @@ class DownloadImagesWorker
   end
 
   def perform(job_id, resource_type, resource_id)
-    job = BackgroundJob.find(job_id)
+    @job = BackgroundJob.find(job_id)
 
     resource = case resource_type
                when 'Patient'
@@ -97,9 +101,12 @@ class DownloadImagesWorker
                when 'Visit'
                  Visit.find(resource_id)
                else
-                 job.fail('Invalid resource type: ' + resource_type.to_s)
+                 @job.fail('Invalid resource type: ' + resource_type.to_s)
                  return
                end
+
+    @images_count = resource.images.count * 1.5
+    @images_done = 0
 
     # TODO: create proper output directory structure
     image_storage_path = Rails.root.join(Rails.application.config.image_storage_root, resource.image_storage_path, '**/*').to_s
@@ -116,8 +123,21 @@ class DownloadImagesWorker
       when Visit
         add_visit(zipfile, resource)
       end
+
+      @keep_updating = true
+      Thread.new do
+        while @keep_updating
+          @images_done += (@images_count.to_f - @images_done.to_f) * 0.1
+          @job.set_progress(@images_done, @images_count)
+          sleep 1
+        end
+      end
     end
 
-    job.finish_successfully('zipfile' => output_path)
+    @job.finish_successfully('zipfile' => output_path)
+  rescue => error
+    @job.fail(error.message)
+  ensure
+    @keep_updating = false
   end
 end
