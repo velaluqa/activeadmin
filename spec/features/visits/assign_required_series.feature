@@ -56,12 +56,30 @@ Feature: Assign Required Series
   # TODO: Extract Feature: Reassign Required Series
   # TODO: Scenario: Assign via visit action
   # TODO: Scenario: Assign via `Assign` link from required series table
+  
+  Scenario: Try to assign required series from image series view
+    Given a study "TestStudy"
+    And a center "TestCenter" for "TestStudy"
+    And a patient "TestPatient" for "TestCenter" 
+    And a visit "1000" for "TestPatient" 
+    And an image_series "TestSeries" with:
+      | visit | TestPatient#1000 |
+    When I sign in as a user with role "Image Manager"
+    And I browse to visit "1000"
+    And I click "Assign Required Series"
+    Then I see "The associated visit has no required series. This could be due to an invalid study config, no assigned visit type or an empty visit type."
+    When I browse to assign_required_series_form visit "1000" with:
+      | required_series_names | SPECT_1 |
+    Then I see "This visit does not have required series specified by the given parameter."
 
   Scenario: Assignment Successful
     Given I sign in as a user with role "Image Manager"
     When I browse to visit "10000"
     Then I see "Assign Required Series"
     And I see an "Assign" link in row for "SPECT_1"
+    When I browse to assign_required_series_form visit "10000" with:
+      | required_series_names | NON_EXISTENT_SPECT_2 |
+    Then I see "This visit does not have required series specified by the given parameter."
     When I browse to assign_required_series_form visit "10000" with:
       | required_series_names | SPECT_1 |
     Then I see "SPECT_1"

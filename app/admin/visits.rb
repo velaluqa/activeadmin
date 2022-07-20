@@ -301,17 +301,24 @@ ActiveAdmin.register Visit do
     @visit = Visit.find(params[:id])
     authorize! :assign_required_series, @visit
 
-    @required_series_names = params[:required_series_names]
-    if(@required_series_names.nil?)
-      @required_series_names = @visit.required_series_names
-    else
-      @required_series_names = @required_series_names.split(',')
-    end
-    if(@required_series_names.nil?)
-      flash[:error] = 'This visit has no required series defined. Either the study config is invalid, the visit doesn\'t have a visit type or its visit type doesn\'t define any required series.'
+    @required_series_names = params[:required_series_names].andand.split(',') || @visit.required_series_names
+    if(@required_series_names.blank?)
+      flash[:error] = 'The associated visit has no required series. This could be due to an invalid study config, no assigned visit type or an empty visit type.'
       redirect_back(fallback_location: admin_visit_path(id: params[:id]))
       return
     end
+
+    @required_series_names = params[:required_series_names].andand.split(',')
+    @required_series_names ||= @visit.required_series_names
+    @required_series_names = @visit.required_series_names & @required_series_names
+
+    if @required_series_names.blank?
+      flash[:error] = 'This visit does not have required series specified by the given parameter.'
+
+      redirect_back(fallback_location: admin_visit_path(id: params[:id]))
+      return
+    end
+
     @current_assignment = @visit.required_series_assignment
 
     @page_title = 'Assign image series as required series'
