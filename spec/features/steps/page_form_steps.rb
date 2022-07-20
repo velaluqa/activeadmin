@@ -116,3 +116,7 @@ end
 step "I fill in number field :string with :count" do |field_name, count|
   fill_in(field_name, with: count)
 end
+
+step "I choose :string from :string" do |name, resource|
+  select2(name, from: resource, search: true)
+end

@@ -249,6 +249,9 @@ group :development, :test do
   gem 'transactional_capybara'
   gem 'yarjuf'
 
+  # for working with capybara and select2 JS library
+  gem 'capybara-select-2'
+
   gem 'spring'
   gem 'spring-commands-rspec'
 

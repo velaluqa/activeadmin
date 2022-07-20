@@ -1,0 +1,7 @@
+panel "Recipients list" do
+    table_for candidates, class: "index_table index" do
+        column "Full Name", :name
+        column "Username", :username
+        column "Email", :email
+    end
+end
