@@ -292,7 +292,7 @@ ActiveAdmin.register ImageSeries do
     f.inputs 'Details' do
       patients = Patient.of_study(f.object.study).order(:subject_id, :id)
       visits = Visit.of_study(f.object.study).order(:visit_number)
-      
+
       if can?(:assign_patient, image_series)
         f.input(
           :patient,
@@ -645,43 +645,100 @@ ActiveAdmin.register ImageSeries do
     @image_series = ImageSeries.find(params[:id])
     authorize! :assign_visit, @image_series
 
+    original_visit = @image_series.visit
     visit_id = params[:image_series][:visit_id]
-    if visit_id != 'new' && Visit.where(id: visit_id).first.nil?
-      flash[:error] = 'Please choose a visit or "Create New Visit" from the visit select box.'
-      redirect_back(fallback_location: admin_image_series_path(id: params[:id]))
-      return
-    end
+    visit = nil
 
-    if params[:image_series][:visit_id] == 'new'
-      if params[:image_series][:visit][:visit_type].blank?
+    currently_assigned_required_series = @image_series.assigned_required_series
+    currently_assigned_required_series_names = @image_series.assigned_required_series.pluck(:name)
+
+    force_update = params[:image_series][:force_update] == "true"
+
+    if visit_id == 'new'
+      visit_params = params[:image_series][:visit]
+
+      if visit_params[:visit_type].blank?
         flash[:error] = 'When creating a new visit, a visit type must be selected.'
-        redirect_back(fallback_location: admin_image_series_path(id: params[:id]))
+        render "assign_visit_form"
         return
       end
 
-      visit = Visit.create(
+      visit = Visit.new(
         patient: @image_series.patient,
-        visit_number: params[:image_series][:visit][:visit_number],
-        visit_type: params[:image_series][:visit][:visit_type],
-        description: params[:image_series][:visit][:description]
+        visit_number: visit_params[:visit_number],
+        visit_type: visit_params[:visit_type],
+        description: visit_params[:description]
       )
-    elsif params[:image_series][:visit_id].blank?
-      visit = nil
-    else
-      visit = Visit.find(params[:image_series][:visit_id])
-    end
-
-    if(visit and visit.patient_id != @image_series.patient_id)
-      flash[:error] = 'Visit doesn\'t belong to the image series curent patient. To change the patient, please \'Edit\' the image series.'
-      redirect_back(fallback_location: admin_image_series_path(id: params[:id]))
-      return
+    elsif visit_id.present?
+      visit = Visit.find(visit_id)
     end
 
     @image_series.visit = visit
+
+    if visit.nil?
+      flash[:error] = 'Please choose a visit or "Create New Visit" from the visit select box.'
+      render "assign_visit_form"
+      return
+    end
+
+    if !force_update && original_visit && visit&.visit_type != original_visit&.visit_type
+      flash[:error] = 'The new visit has a different visit type than the current visit. Therefore, this image series will lose all its assignments to required series of the current visit, including all tQC results. If you want to continue, press "Assign visit" again.'
+      @image_series.force_update = "true"
+
+      render "assign_visit_form"
+      return
+    end
+
+    if visit.present?
+      new_visit_assignment = visit.required_series_assignment
+      already_assigned_required_series_names = currently_assigned_required_series_names.select do |required_series_name|
+        new_visit_assignment[required_series_name].present?
+      end
+
+      if !force_update && already_assigned_required_series_names.present?
+        flash[:error] = 'The following required series in the new visit will have their assignment and tQC results overwritten by this change: '+already_assigned_required_series_names.join(", ")+'. If you want to continue, press "Assign Visit" again.'
+        @image_series.force_update = "true"
+
+        render "assign_visit_form"
+        return
+      end
+    end
+
+    if original_visit
+      original_required_series_assignment = original_visit.required_series_assignment
+      unassigned_required_series = {}
+      currently_assigned_required_series.each do |required_series|
+        unassigned_required_series[required_series.name] = required_series.attributes
+        required_series.unassign_image_series!
+      end
+    end
+
+    # setting tqc result
+    if original_visit && visit && original_visit.visit_type == visit.visit_type
+      visit.change_required_series_assignment(original_required_series_assignment)
+
+      currently_assigned_required_series_names.each do |required_series_name|
+        next if unassigned_required_series[required_series_name].nil?
+        visit.set_tqc_result(required_series_name,
+                                 unassigned_required_series[required_series_name]['tqc_results'],
+                                 unassigned_required_series[required_series_name]['tqc_user_id'],
+                                 unassigned_required_series[required_series_name]['tqc_comment'],
+                                 unassigned_required_series[required_series_name]['tqc_date'],
+                                 unassigned_required_series[required_series_name]['tqc_version'])
+      end
+    end
+
+    if visit.patient_id != @image_series.patient_id
+      flash[:error] = 'Visit doesn\'t belong to the image series current patient. To change the patient, please \'Edit\' the image series.'
+      render "assign_visit_form"
+      return
+    end
+
     @image_series.save
 
-    redirect_to params[:return_url], :notice => 'Image Series successfully assigned to visit.'
+    redirect_to admin_image_series_path(id: params[:id]), :notice => 'Image Series successfully assigned to visit.'
   end
+
   member_action :assign_visit_form, :method => :get do
     @image_series = ImageSeries.find(params[:id])
     authorize! :assign_visit, @image_series

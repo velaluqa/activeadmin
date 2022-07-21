@@ -70,5 +70,5 @@ Feature: Assign Newly Created Visit
     And I select "followup" from "Visit type"
     And I fill in "Description" with "Newly created visit"
     And I click the "Assign Visit" button
-    Then I am redirected to image_series list
+    Then I am redirected to image_series "TestSeries"
     And I see "#20000"
