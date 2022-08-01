@@ -46,4 +46,23 @@ class RecordSearch
         .try(:to_sql)
     end
   end
+
+  def self.find_record(record_search_id)
+    type, id = record_search_id.split("_")
+    case type
+    when "BackgroundJob" then BackgroundJob.find(id)
+    when "Study" then Study.find(id)
+    when "Center" then Center.find(id)
+    when "Patient" then Patient.find(id)
+    when "Visit" then Visit.find(id)
+    when "ImageSeries" then ImageSeries.find(id)
+    when "Image" then Image.find(id)
+    when "User" then User.find(id)
+    when "Role" then Role.find(id)
+    when "RequiredSeries" then RequiredSeries.find(id)
+    when "Comment" then ActiveAdmin::Comments.find(id)
+    when "FormAnswer" then FormAnswer.find(id)
+    else fail "Unknown record search type #{type.inspect}"
+    end
+  end
 end

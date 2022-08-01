@@ -16,7 +16,7 @@ class Ability
     FormSession => %i[manage read update create destroy],
     FormDefinition => %i[manage read update create destroy],
     FormAnswer => %i[manage read update create destroy],
-    NotificationProfile => %i[manage read update create destroy],
+    NotificationProfile => %i[manage read update create destroy simulate_recipients],
     Notification => %i[manage read update create destroy],
     User => %i[manage read update create destroy generate_keypair impersonate confirm_mail unlock change_password],
     UserRole => %i[manage read update create destroy],

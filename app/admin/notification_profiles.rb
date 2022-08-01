@@ -1,3 +1,5 @@
+require "record_search"
+
 ActiveAdmin.register NotificationProfile do
   menu(
     parent: 'notifications',
@@ -40,6 +42,11 @@ ActiveAdmin.register NotificationProfile do
     end
     column :triggering_actions do |profile|
       profile.triggering_actions.join(', ')
+    end
+    column :simulate_recipients do |profile|
+       if can?(:simulate_recipients, profile)
+        link_to 'Simulate recipients', simulate_recipients_form_admin_notification_profile_path(profile)
+       end
     end
     column :triggering_resource
     customizable_default_actions(current_ability)
@@ -162,6 +169,24 @@ ActiveAdmin.register NotificationProfile do
     end
 
     f.actions
+  end
+
+  member_action :simulate_recipients_form, method: :get do
+    @notification_profile = NotificationProfile.find(params[:id])
+    authorize! :simulate_recipients, @notification_profile
+  end
+
+  member_action :simulate_recipients, method: :post do
+    @notification_profile = NotificationProfile.find(params[:id])
+    authorize! :simulate_recipients, @notification_profile
+
+    @resource = RecordSearch.find_record(params[:resource])
+
+    @candidates = @notification_profile.recipient_candidates(current_user).to_a.select do |user|
+      !@notification_profile.only_authorized_recipients || user.can?(:read, @resource)
+    end
+    
+    render "admin/notification_profiles/simulate_recipients"
   end
 
   collection_action :filters_schema, method: :get, format: :json do

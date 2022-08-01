@@ -139,6 +139,7 @@ GEM
     capybara-screenshot (1.0.23)
       capybara (>= 1.0, < 4)
       launchy
+    capybara-select-2 (0.5.1)
     childprocess (4.1.0)
     choice (0.2.0)
     code_analyzer (0.4.8)
@@ -809,6 +810,7 @@ DEPENDENCIES
   cancancan
   capybara (~> 3.36.0)
   capybara-screenshot
+  capybara-select-2
   coderay
   coffee-rails
   database_cleaner
