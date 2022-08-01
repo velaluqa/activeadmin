@@ -36,7 +36,9 @@ step 'a/an image_series :string with:' do |name, table|
 
   @image_series = build(:image_series, options)
   @image_series.tag_list = tag_list if tag_list
-  @image_series.save!
+  unless @image_series.save
+    fail "Cannot save image series: #{@image_series.errors.messages}"
+  end
 
   if image_count > 0
     1.upto(image_count) do |i|

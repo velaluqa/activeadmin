@@ -82,6 +82,7 @@
   - image series is assigned to another patient
 - Fix - (#6056) Display proper item name for deleted records in audit
   trail. Before deleted records had a blank item column.
+- Fix - Display parsing errors when uploading invalid study configuration
 
 ### Dev / DevOps
 

@@ -79,5 +79,5 @@ visit_types:
         label: 'Is there any non-invisible SNAFU in the intermediate background?'
         type: bool
       - id: negative
-        label: "Isn\'t there not no stuff going on?"
+        label: "Isn't there not no stuff going on?"
         type: bool

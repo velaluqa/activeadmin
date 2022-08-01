@@ -504,9 +504,7 @@ end
 
 step 'I see :string xml entries with the following attributes:' do |tag, attributes|
   within("html") do
-    attributes.to_a.flatten.each do |tag|
-      expect(page).to have_content("<#{tag}")
-    end
+    expect(page).to have_css(".folder", text: /\A#{tag}.*#{attributes.to_a.flatten.join(".*")}/m), "expected to find #{tag} with columns:\n\n#{attributes.to_a.flatten.join("\n")}"
   end
 end
 

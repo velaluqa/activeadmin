@@ -6,6 +6,7 @@
 #
 # Name                      | Type               | Attributes
 # ------------------------- | ------------------ | ---------------------------
+# **`cache`**               | `jsonb`            | `not null`
 # **`comment`**             | `string`           |
 # **`created_at`**          | `datetime`         |
 # **`domino_unid`**         | `string`           |
@@ -33,6 +34,8 @@
 #     * **`visit_id`**
 #
 class ImageSeries < ApplicationRecord
+  EXPORT_COLUMNS = %w[id name visit_id created_at updated_at patient_id imaging_date domino_unid series_number state comment properties properties_version tag_list].freeze
+
   include DominoDocument
   after_commit :schedule_domino_sync
 
@@ -300,6 +303,14 @@ JOIN
     images.map(&:mime_extension).uniq.compact
   end
 
+  def as_json(options = {})
+    super({ only: EXPORT_COLUMNS }.merge(options))
+  end
+
+  def to_xml(options = {})
+    super({ only: EXPORT_COLUMNS }.merge(options))
+  end
+
   protected
 
   def eventually_update_dicom_tags
@@ -406,7 +417,6 @@ JOIN
       end
     end
   end
-
   # reassigning an image series to a different visit:
   # * check if new visit has same visit type as current visit
   # * if yes:

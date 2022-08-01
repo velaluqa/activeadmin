@@ -6,6 +6,7 @@
 #
 # Name                  | Type               | Attributes
 # --------------------- | ------------------ | ---------------------------
+# **`cache`**           | `jsonb`            | `not null`
 # **`center_id`**       | `integer`          |
 # **`created_at`**      | `datetime`         |
 # **`data`**            | `jsonb`            | `not null`

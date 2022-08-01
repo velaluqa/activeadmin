@@ -8,6 +8,7 @@
 # TODO: Use a more performant, sophisticated full-text search (maybe
 # something like Apache SOLR or similar...)
 class RecordSearch
+  FIELDS = %w[study_id study_name text result_id result_type]
   MODELS =
     %w[BackgroundJob Study Center Patient Visit ImageSeries Image User Role RequiredSeries ActiveAdmin::Comment FormAnswer].freeze
 

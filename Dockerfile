@@ -1,11 +1,11 @@
-FROM ruby:2.6.5-stretch
+FROM ruby:2.6.10-buster
 MAINTAINER aandersen@velalu.qa
 
 ARG RAILS_MASTER_KEY=""
 ENV APP_HOME /app
 
 # Install distribution dependencies
-RUN  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+RUN  curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
      apt-get update -qq && \
      apt-get install -y \
      build-essential \

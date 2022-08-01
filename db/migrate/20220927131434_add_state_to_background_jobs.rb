@@ -6,6 +6,7 @@ class AddStateToBackgroundJobs < ActiveRecord::Migration[5.2]
 
     reversible do |dir|
       dir.up do
+        BackgroundJob.skip_callback(:save, :after, :broadcast_job_update)
         BackgroundJob.find_each do |job|
           if job.completed
             if job.successful

@@ -11,6 +11,7 @@ require 'dicom/file_utils'
 #
 # Name                   | Type               | Attributes
 # ---------------------- | ------------------ | ---------------------------
+# **`cache`**            | `jsonb`            | `not null`
 # **`created_at`**       | `datetime`         |
 # **`id`**               | `integer`          | `not null, primary key`
 # **`image_series_id`**  | `integer`          |

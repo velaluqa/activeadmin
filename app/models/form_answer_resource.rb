@@ -1,3 +1,29 @@
+# ## Schema Information
+#
+# Table name: `form_answer_resources`
+#
+# ### Columns
+#
+# Name                  | Type               | Attributes
+# --------------------- | ------------------ | ---------------------------
+# **`form_answer_id`**  | `uuid`             | `not null`
+# **`id`**              | `bigint(8)`        | `not null, primary key`
+# **`resource_id`**     | `string`           | `not null`
+# **`resource_type`**   | `string`           | `not null`
+#
+# ### Indexes
+#
+# * `form_answer_resources_primary_key_index` (_unique_):
+#     * **`form_answer_id`**
+#     * **`resource_id`**
+#     * **`resource_type`**
+# * `form_answer_resources_resource_index`:
+#     * **`resource_id`**
+#     * **`resource_type`**
+# * `index_form_answer_resources_on_form_answer_id`:
+#     * **`form_answer_id`**
+#
+
 class FormAnswerResource < ApplicationRecord
   has_paper_trail(
     class_name: 'Version',

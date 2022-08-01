@@ -6,10 +6,13 @@
 #
 # Name                            | Type               | Attributes
 # ------------------------------- | ------------------ | ---------------------------
+# **`configuration_id`**          | `uuid`             |
 # **`created_at`**                | `datetime`         |
 # **`event`**                     | `string`           | `not null`
+# **`form_answer_id`**            | `uuid`             |
+# **`form_definition_id`**        | `uuid`             |
 # **`id`**                        | `integer`          | `not null, primary key`
-# **`item_id`**                   | `integer`          | `not null`
+# **`item_id`**                   | `string`           | `not null`
 # **`item_type`**                 | `string`           | `not null`
 # **`migrated_required_series`**  | `boolean`          | `default(FALSE), not null`
 # **`object`**                    | `jsonb`            |
@@ -19,6 +22,14 @@
 #
 # ### Indexes
 #
+# * `idx_on_versions_rs_changes1`:
+#     * **`((object ->> 'name'::text))`**
+# * `idx_on_versions_rs_changes2`:
+#     * **`((object ->> 'visit_id'::text))`**
+# * `idx_on_versions_rs_changes3`:
+#     * **`((object_changes #>> '{name,1}'::text[]))`**
+# * `idx_on_versions_rs_changes4`:
+#     * **`((object_changes #>> '{visit_id,1}'::text[]))`**
 # * `index_versions_on_item_type_and_item_id`:
 #     * **`item_type`**
 #     * **`item_id`**

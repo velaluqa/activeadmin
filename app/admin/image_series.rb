@@ -14,6 +14,12 @@ ActiveAdmin.register ImageSeries do
 
   config.per_page = 100
 
+  csv do
+    ImageSeries::EXPORT_COLUMNS.each do |name|
+      column(name)
+    end
+  end
+
   controller do
     def max_csv_records
       1_000_000

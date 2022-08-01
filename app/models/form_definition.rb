@@ -1,3 +1,21 @@
+# ## Schema Information
+#
+# Table name: `form_definitions`
+#
+# ### Columns
+#
+# Name                            | Type               | Attributes
+# ------------------------------- | ------------------ | ---------------------------
+# **`created_at`**                | `datetime`         | `not null`
+# **`current_configuration_id`**  | `uuid`             |
+# **`description`**               | `text`             | `not null`
+# **`id`**                        | `uuid`             | `not null, primary key`
+# **`locked_at`**                 | `datetime`         |
+# **`locked_configuration_id`**   | `uuid`             |
+# **`name`**                      | `string`           | `not null`
+# **`updated_at`**                | `datetime`         | `not null`
+#
+
 class FormDefinition < ApplicationRecord
   include ConfigurationPathAccessor
 

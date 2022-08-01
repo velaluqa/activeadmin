@@ -18,6 +18,7 @@
 # **`name`**           | `string`           | `not null`
 # **`progress`**       | `float`            | `default(0.0), not null`
 # **`results`**        | `jsonb`            | `not null`
+# **`state`**          | `enum`             | `default("scheduled"), not null`
 # **`successful`**     | `boolean`          |
 # **`updated_at`**     | `datetime`         |
 # **`user_id`**        | `integer`          |
@@ -28,9 +29,7 @@
 #     * **`completed`**
 # * `index_background_jobs_on_legacy_id`:
 #     * **`legacy_id`**
-# * `index_background_jobs_on_name`:
-#     * **`name`**
-# * `index_background_jobs_on_results`:
+# * `index_background_jobs_on_results` (_using_ gin):
 #     * **`results`**
 # * `index_background_jobs_on_user_id`:
 #     * **`user_id`**

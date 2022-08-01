@@ -50,8 +50,12 @@ module Study::Contract
 
           true
         end
-    rescue
-      errors.add(:file, 'could not be parsed')
+    rescue Psych::SyntaxError => e
+      errors.add(:file, "parsing error: #{e}")
+
+      false
+    rescue => e
+      errors.add(:file, "internal server error")
 
       false
     end

@@ -11,7 +11,7 @@ ActiveAdmin.register User do
 
   config.comments = false
 
-  csv  do
+  csv do
     User::EXPORT_COLUMNS.each do |name|
       column(name)
     end

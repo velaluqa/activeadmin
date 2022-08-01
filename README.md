@@ -1,3 +1,4 @@
+
 # ERICA
 
 This document describes all the steps necessary to get this project up

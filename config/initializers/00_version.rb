@@ -1,1 +1,1 @@
-StudyServer::Application.config.erica_version = [7, 2, 6]
+StudyServer::Application.config.erica_version = [7, 3, 0, "Developer Preview"]
