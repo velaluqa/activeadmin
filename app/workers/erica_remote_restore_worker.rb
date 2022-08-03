@@ -1,8 +1,9 @@
 require 'remote/remote_restore'
+require 'sidekiq_background_job'
 
 class ERICARemoteRestoreWorker
-  include Sidekiq::Worker
-
+  include SidekiqBackgroundJob
+  
   def perform(job_id, export_id)
     job = BackgroundJob.find(job_id)
 

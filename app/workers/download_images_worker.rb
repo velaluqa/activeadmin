@@ -1,11 +1,12 @@
 require 'tempfile'
+require 'sidekiq_background_job'
 
 require 'zip'
 require 'zip/filesystem'
 
 class DownloadImagesWorker
-  include Sidekiq::Worker
-
+  include SidekiqBackgroundJob
+  
   # output directory structure:
   # patient.name
   # - patient.visits.each do
