@@ -26,7 +26,6 @@ Feature: Reject Archive File Uploads
       | Center      | read                              |
       | Patient     | read                              |
       | ImageSeries | read, read_dicom_metadata, upload |
-      | Image       | read                              |
       | Visit       | read                              |
 
   Scenario: Uploading ZIP is denied

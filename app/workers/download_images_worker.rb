@@ -113,7 +113,7 @@ class DownloadImagesWorker
     image_storage_path = Rails.root.join(Rails.application.config.image_storage_root, resource.image_storage_path, '**/*').to_s
     images = Dir.glob(image_storage_path)
 
-    output_dir_path = Pathname.new("/app/tmp").join('erica/download_images_worker')
+    output_dir_path = ERICA.data_path.join('workers/download_images_worker')
     FileUtils.mkdir_p(output_dir_path.to_s)
     output_path = output_dir_path.join('images_' + job_id.to_s + '.zip').to_s
 

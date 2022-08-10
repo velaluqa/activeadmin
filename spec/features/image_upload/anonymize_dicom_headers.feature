@@ -33,7 +33,6 @@ Feature: Anonymize DICOM Headers
       | Center      | read                              |
       | Patient     | read                              |
       | ImageSeries | read, read_dicom_metadata, upload |
-      | Image       | read                              |
       | Visit       | read                              |
 
   Scenario: Not logged in

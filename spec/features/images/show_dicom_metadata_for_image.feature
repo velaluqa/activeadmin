@@ -8,13 +8,11 @@ Feature: Show DICOM metadata for image
     And a DICOM image for image series "IS"
     And a role "Authorized" with permissions:
       | ImageSeries | read, read_dicom_metadata |
-      | Image       | read                      |
     And a user "authorized.user" with role "Authorized"
 
   Scenario: Unauthorized
     Given a role "Unauthorized" with permissions:
       | ImageSeries | read |
-      | Image       | read |
     And a user "unauthorized.user" with role "Unauthorized"
     When I sign in as user "unauthorized.user"
     And I browse to image_series list
@@ -31,6 +29,7 @@ Feature: Show DICOM metadata for image
     When I sign in as user "authorized.user"
     And I browse to image_series list
     And I click "1 file" in "IS" row 
+    # And I debug
     Then I see "Metadata"
     When I click "Metadata" in "IS" row
     Then another window is opened

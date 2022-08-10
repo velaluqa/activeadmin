@@ -25,7 +25,7 @@ ERROR
     def self.granted_for(options)
       activities = extract_permissible_activities(options)
       user = options[:user] || raise("Missing 'user' option")
-      subject = options[:subject].andand.to_s || to_s
+      subject = options[:subject].andand.to_s || permission_subject_default.to_s
 
       return all if user.is_root_user?
 
@@ -34,6 +34,12 @@ ERROR
             .where(permissions: { activity: activities, subject: subject })
             .where('user_roles.user_id = ?', user.id)
       where(id: sql)
+    end
+
+    ##
+    # Can be overwritten in order to proxy permissions from another model.
+    def self.permission_subject_default
+      self
     end
 
     ##
@@ -51,7 +57,7 @@ ERROR
     def hierarchy_grants?(options)
       activities = self.class.extract_permissible_activities(options)
       user = options[:user] || raise("Missing 'user' option")
-      subject = options[:subject].andand.to_s || to_s
+      subject = options[:subject].andand.to_s || permission_subject_default.to_s
 
       return true if user.is_root_user?
 

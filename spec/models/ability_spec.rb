@@ -113,7 +113,7 @@ RSpec.describe Ability do
     describe 'for user with system permissions only' do
       before(:each) do
         @role1 = create(:role, with_permissions: { Study => :manage })
-        @role2 = create(:role, with_permissions: { Image => :read })
+        @role2 = create(:role, with_permissions: { ImageSeries => :read })
         @current_user = create(:user, with_user_roles: [@role1, @role2])
         @ability = Ability.new(@current_user)
       end
@@ -156,7 +156,7 @@ RSpec.describe Ability do
     describe 'for user with scoped permissions only, it' do
       before(:each) do
         @role1 = create(:role, with_permissions: { Study => :manage })
-        @role2 = create(:role, with_permissions: { Image => :read })
+        @role2 = create(:role, with_permissions: { ImageSeries => :read })
         @current_user =
           create(:user, with_user_roles: [[@role1, @study1], [@role2, @study1]])
         @ability = Ability.new(@current_user)
@@ -198,7 +198,7 @@ RSpec.describe Ability do
     describe 'for user with doubly scoped permissions, it' do
       before(:each) do
         @role =
-          create(:role, with_permissions: { Study => :manage, Image => :read })
+          create(:role, with_permissions: { Study => :manage, ImageSeries => :read })
         @current_user =
           create(:user, with_user_roles: [[@role, @study1], [@role, @center1]])
         @ability = Ability.new(@current_user)
@@ -239,8 +239,8 @@ RSpec.describe Ability do
 
     describe 'for user with mixed permissions, it' do
       before(:each) do
-        @role1 = create(:role, with_permissions: { [Study, Image] => :manage })
-        @role2 = create(:role, with_permissions: { [Study, Image] => :read })
+        @role1 = create(:role, with_permissions: { [Study, ImageSeries] => :manage })
+        @role2 = create(:role, with_permissions: { [Study, ImageSeries] => :read })
         @role3 = create(:role, with_permissions: { Version => :read })
         @role4 = create(:role, with_permissions: { User => :manage })
         @current_user =
@@ -281,9 +281,9 @@ RSpec.describe Ability do
       end
 
       it 'denies non-authorized activity and subjects' do
-        expect(@ability.can?(:update, ImageSeries)).to be_falsy
-        expect(@ability.can?(:update, @image_series1)).to be_falsy
-        expect(@ability.can?(:update, @image_series2)).to be_falsy
+        expect(@ability.can?(:update, Patient)).to be_falsy
+        expect(@ability.can?(:update, @patient1)).to be_falsy
+        expect(@ability.can?(:update, @patient2)).to be_falsy
       end
 
       it 'denies managing users, since its role is scoped' do

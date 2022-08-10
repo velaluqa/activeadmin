@@ -19,7 +19,6 @@ Feature: Upload Non-DICOM Files
       | Patient     | read         |
       | Visit       | read         |
       | ImageSeries | read, upload |
-      | Image       | read         |
 
   Scenario: Upload Images file formats (jpg, gif, png, tiff, svg)     
     When I sign in as a user with role "Image Manager"

@@ -74,7 +74,7 @@ RSpec.describe User do
       before(:each) do
         @role1 = create(:role, with_permissions: {
                           Study => %i[manage read],
-                          Image => %i[read]
+                          ImageSeries => %i[read]
                         })
         @role2 = create(:role, with_permissions: {
                           Study => %i[manage read],
@@ -89,7 +89,7 @@ RSpec.describe User do
           'BackgroundJob' => %i[read destroy],
           'Study' => %i[manage],
           'Center' => %i[manage],
-          'Image' => %i[read],
+          'ImageSeries' => %i[read],
           'Visit' => %i[assign_required_series],
           'User' => %i[read update generate_keypair change_password],
           'PublicKey' => %i[read update]

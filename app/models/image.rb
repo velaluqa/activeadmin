@@ -71,6 +71,10 @@ SELECT
 JOIN
   end
 
+  def self.permission_subject_default
+    ImageSeries
+  end
+
   def study
     image_series.andand.study
   end

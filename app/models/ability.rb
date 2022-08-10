@@ -12,7 +12,6 @@ class Ability
     Patient => %i[manage read update create destroy comment download_images],
     EmailTemplate => %i[manage read update create destroy],
     ImageSeries => %i[manage read update destroy comment upload assign_patient assign_visit read_dicom_metadata clean_dicom_metadata],
-    Image => %i[manage read update create destroy],
     FormSession => %i[manage read update create destroy],
     FormDefinition => %i[manage read update create destroy],
     FormAnswer => %i[manage read update create destroy],
@@ -104,7 +103,23 @@ class Ability
           define_unscopable_ability(subject, activity)
         elsif subject.try(:scopable_permissions?)
           define_scopable_ability(subject, activity)
+          proxy_image_activity(activity) if subject == ImageSeries
         end
+      end
+    end
+  end
+
+  def proxy_image_activity(activity)
+    return unless any_permission?(ImageSeries, activity)
+
+    can activity, Image do |image|
+      if image.new_record?
+        can?(activity, ImageSeries)
+      else
+        ImageSeries
+          .granted_for(user: current_user, activity: activity)
+          .where(id: image.image_series_id)
+          .exists?
       end
     end
   end
