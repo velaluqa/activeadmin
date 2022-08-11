@@ -1,6 +1,8 @@
-class PatientReadExportWorker
-  include Sidekiq::Worker
+require 'sidekiq_background_job'
 
+class PatientReadExportWorker
+  include SidekiqBackgroundJob
+  
   def case_list
     @case_list ||= StringIO.new.tap do |str|
       str.puts('patient,images,type')

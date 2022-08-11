@@ -1,5 +1,7 @@
+require 'sidekiq_background_job'
+
 class CleanDicomTagWorker
-  include Sidekiq::Worker
+  include SidekiqBackgroundJob
 
   def backup_file_path(image)
     date = Date.today.strftime('%Y-%m-%d')
