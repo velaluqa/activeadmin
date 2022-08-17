@@ -80,7 +80,7 @@ WebMock.disable_net_connect!(
   allow: [
     "mailcatcher-test:1080",
     "#{selenium_remote_uri.host}:#{selenium_remote_uri.port}",
-    Capybara.app_host
+    Capybara.app_host,
   ]
 )
 

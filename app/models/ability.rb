@@ -11,7 +11,7 @@ class Ability
     Center => %i[manage read update create destroy comment read_tags update_tags create_tags],
     Patient => %i[manage read update create destroy comment download_images read_tags update_tags create_tags],
     EmailTemplate => %i[manage read update create destroy],
-    ImageSeries => %i[manage read update destroy comment upload assign_patient assign_visit read_dicom_metadata clean_dicom_metadata read_tags update_tags create_tags],
+    ImageSeries => %i[manage read update destroy comment upload assign_patient assign_visit viewer read_dicom_metadata clean_dicom_metadata read_tags update_tags create_tags],
     FormSession => %i[manage read update create destroy],
     FormDefinition => %i[manage read update create destroy],
     FormAnswer => %i[manage read update create destroy],
@@ -180,10 +180,19 @@ class Ability
 
   def define_page_abilities
     can :read, ActiveAdmin::Page, name: 'Dashboard', namespace_name: 'admin'
-    can :read, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
+
+    if can?(:viewer, ImageSeries)
+      can :read, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
+      can :start, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
+      can :clear, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
+      can :remove, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
+      can :empty, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
+    end
+
     if can?(:manage, Sidekiq)
       can :read, ActiveAdmin::Page, name: 'Sidekiq', namespace_name: 'admin'
     end
+
     if can?(:upload, ImageSeries)
       can :read, ActiveAdmin::Page, name: 'Image Upload', namespace_name: 'admin'
     end
