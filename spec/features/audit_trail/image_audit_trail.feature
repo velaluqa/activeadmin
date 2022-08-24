@@ -12,7 +12,7 @@ Feature: Image Audit Trail
   Background:
     Given a role "Test Role" with permissions:
        | Version | read |
-       | Image   | read |
+       | ImageSeries   | read |
     And a study "FooStudy"
     And a center "FooCenter" with:
       | study | FooStudy |
