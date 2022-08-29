@@ -34,7 +34,7 @@ ActiveAdmin.register Center do
     column :study, sortable: :study_id
     column :code
     column :name
-    keywords_column(:tags, 'Keywords') if ERICA.remote?
+    tags_column(:tags, 'Tags') if can?(:read_tags, Center)
 
     customizable_default_actions(current_ability) do |resource|
       resource.patients.empty? ? [] : [:destroy]
@@ -48,7 +48,7 @@ ActiveAdmin.register Center do
       row :name
       domino_link_row(center)
       row :image_storage_path
-      keywords_row(center, :tags, 'Keywords') if ERICA.remote?
+      tags_row(center, :tags, 'Tags', can?(:update_tags, center))
     end
     active_admin_comments if can?(:comment, center)
   end
@@ -92,10 +92,10 @@ ActiveAdmin.register Center do
   }
   filter :name
   filter :code
-  keywords_filter(:tags, 'Keywords') if ERICA.remote?
+  tags_filter(:tags, 'Tags')
 
   viewer_cartable(:center)
-  erica_keywordable(:tags, 'Keywords') if ERICA.remote?
+  erica_taggable(:tags, 'Tags')
 
   action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
     url = admin_versions_path(

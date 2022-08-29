@@ -143,7 +143,7 @@ ActiveAdmin.register Visit do
         link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user))
       end
     end
-    keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+    tags_column(:tags, 'Tags') if can?(:read_tags, Visit)
 
     customizable_default_actions(current_ability)
   end
@@ -178,7 +178,7 @@ ActiveAdmin.register Visit do
           end
         end
       end
-      keywords_row(visit, :tags, 'Keywords') if Rails.application.config.is_erica_remote
+      tags_row(visit, :tags, 'Tags', can?(:update_tags, visit))
       domino_link_row(visit)
       row :image_storage_path
     end
@@ -285,7 +285,7 @@ ActiveAdmin.register Visit do
   filter :visit_number
   filter :description
   filter :visit_type
-  keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+  tags_filter(:tags, 'Tags')
 
   member_action :assign_required_series, :method => :post do
     @visit = Visit.find(params[:id])
@@ -651,7 +651,7 @@ ActiveAdmin.register Visit do
   end
 
   viewer_cartable(:visit)
-  erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+  erica_taggable(:tags, 'Tags')
 
   action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
     url = admin_versions_path(

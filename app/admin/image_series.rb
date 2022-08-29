@@ -198,7 +198,7 @@ ActiveAdmin.register ImageSeries do
       end
     end
     comment_column(:comment, 'Comment')
-    keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+    tags_column(:tags, 'Tags') if can?(:read_tags, ImageSeries)
 
     column 'View (in)' do |image_series|
       result = ''
@@ -255,7 +255,7 @@ ActiveAdmin.register ImageSeries do
         end
       end
       comment_row(image_series, :comment, 'Comment')
-      keywords_row(image_series, :tags, 'Keywords') if Rails.application.config.is_erica_remote
+      tags_row(image_series, :tags, 'Tags', can?(:update_tags, image_series))
       row 'Required Series' do
         assigned_required_series = image_series.assigned_required_series.pluck(:name)
         if(assigned_required_series.empty?)
@@ -357,7 +357,7 @@ ActiveAdmin.register ImageSeries do
   filter :imaging_date
   filter :created_at, :label => 'Import Date'
   filter :comment
-  keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+  tags_filter(:tags, 'Tags')
 
   member_action :viewer, :method => :get do
     @image_series = ImageSeries.find(params[:id])
@@ -867,7 +867,7 @@ ActiveAdmin.register ImageSeries do
 
   viewer_cartable(:image_series)
   erica_commentable(:comment, 'Comment')
-  erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+  erica_taggable(:tags, 'Tags')
 
   action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
     url = admin_versions_path(

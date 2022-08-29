@@ -8,11 +8,20 @@ end
 
 step 'a visit :string with:' do |visit_number, table|
   options = { visit_number: visit_number }
+  tag_list = nil
+
   table.to_a.each do |attribute, value|
-    options[attribute.to_sym] = value
+    if attribute == "tags"
+      tag_list = value
+    else
+      options[attribute.to_sym] = value
+    end
     options[:patient] = Patient.find_by(subject_id: value) if attribute == 'patient'
   end
-  create(:visit, options)
+
+  visit = create(:visit, options)
+  visit.tag_list = tag_list if tag_list
+  visit.save
 end
 
 step 'a visit with:' do |table|

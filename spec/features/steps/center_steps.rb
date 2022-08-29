@@ -8,9 +8,18 @@ end
 
 step 'a center :string with:' do |name, table|
   options = { name: name }
+  tag_list = nil
+
   table.to_a.each do |attribute, value|
-    options[attribute.to_sym] = value
+    if attribute == "tags"
+      tag_list = value
+    else
+      options[attribute.to_sym] = value
+    end
     options[:study] = Study.find_by(name: value) if attribute == 'study'
   end
-  create(:center, options)
+
+  center = create(:center, options)
+  center.tag_list = tag_list if tag_list
+  center.save
 end

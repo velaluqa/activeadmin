@@ -90,7 +90,7 @@ ActiveAdmin.register Patient do
     selectable_column
     column :center, :sortable => 'centers.code'
     column :subject_id
-    keywords_column(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+    tags_column(:tags, 'Tags') if can?(:read_tags, Patient)
 
     customizable_default_actions(current_ability)
   end
@@ -101,7 +101,7 @@ ActiveAdmin.register Patient do
       row :subject_id
       domino_link_row(patient)
       row :image_storage_path
-      keywords_row(patient, :tags, 'Keywords') if Rails.application.config.is_erica_remote
+      tags_row(patient, :tags, 'Tags', can?(:update_tags, patient))
       row :patient_data_raw do
         CodeRay.scan(JSON::pretty_generate(patient.data || {}), :json).div(:css => :class).html_safe
       end
@@ -157,7 +157,7 @@ ActiveAdmin.register Patient do
   # filters
   filter :center, :collection => []
   filter :subject_id, :label => 'Subject ID'
-  keywords_filter(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+  tags_filter(:tags, 'Tags')
 
   action_item :audit_trail, only: :show, if: -> { can?(:read, Version) } do
     url = admin_versions_path(
@@ -306,5 +306,5 @@ ActiveAdmin.register Patient do
   end
 
   viewer_cartable(:patient)
-  erica_keywordable(:tags, 'Keywords') if Rails.application.config.is_erica_remote
+  erica_taggable(:tags, 'Tags')
 end
