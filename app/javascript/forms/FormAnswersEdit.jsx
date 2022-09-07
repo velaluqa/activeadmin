@@ -1,7 +1,10 @@
 import React from "react";
 import useQueryString from "use-query-string";
 
+import { some } from "lodash";
+
 import FormAnswerForm from "./FormAnswerForm";
+import FormAnswerResourceViewer from "./FormAnswerResourceViewer";
 import FormContainer from "./FormContainer";
 import saveDraft from "./saveDraft";
 import signAndSubmit from "./signAndSubmit";
@@ -10,6 +13,7 @@ import updateHistory from "../functions/updateHistory";
 
 export default ({
   formAnswer,
+  formAnswerResources,
   currentUser,
   formDefinition,
   configuration,
@@ -67,18 +71,23 @@ export default ({
   };
 
   return (
-    <FormContainer name={formDefinition.name}>
-      <FormAnswerForm
-        currentUser={currentUser}
-        value={{ ...formAnswer.answers, ...prefilledFromQuery }}
-        layout={formLayout}
-        onSign={signAnswers}
-        onSaveDraft={saveDraftAnswers}
-        onClose={unblockForm}
-        readonly={!!blockedAt && blockingUserId != currentUser.id}
-        savable={allowSavingDraft}
-        signable
-      />
-    </FormContainer>
+    <div style={{ display: "flex", height: "100%", flexDirection: "row" }}>
+      {some(formAnswerResources, { hasDicom: true }) && (
+        <FormAnswerResourceViewer formAnswerId={formAnswerId} />
+      )}
+      <FormContainer name={formDefinition.name}>
+        <FormAnswerForm
+          currentUser={currentUser}
+          value={{ ...formAnswer.answers, ...prefilledFromQuery }}
+          layout={formLayout}
+          onSign={signAnswers}
+          onSaveDraft={saveDraftAnswers}
+          onClose={unblockForm}
+          readonly={!!blockedAt && blockingUserId != currentUser.id}
+          savable={allowSavingDraft}
+          signable
+        />
+      </FormContainer>
+    </div>
   );
 };

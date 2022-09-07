@@ -297,6 +297,10 @@ JOIN
     name
   end
 
+  def has_dicom?
+    image_series.with_dicom.exists?
+  end
+
   protected
 
   def run_schema_validation(config)

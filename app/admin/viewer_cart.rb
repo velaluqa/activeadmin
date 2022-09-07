@@ -46,11 +46,13 @@ ActiveAdmin.register_page 'Viewer Cart' do
     session[:viewer_cart] = []
     redirect_back(fallback_location: admin_viewer_cart_path)
   end
+
   page_action :clear, method: :get do
     session[:viewer_cart] = []
 
     redirect_to({ action: :index }, notice: 'Viewer cart cleared.')
   end
+
   page_action :remove, method: :get do
     type = params[:type]
     id = params[:id]
@@ -65,7 +67,14 @@ ActiveAdmin.register_page 'Viewer Cart' do
     redirect_to({ action: :index }, notice: 'Item removed from cart.')
   end
 
-  page_action :start, method: :get do
+  page_action :viewer, method: :get do
+    @router_basename = "/admin/viewer_cart"
+    @wado_rs_endpoint = "#{request.base_url}/dicomweb/viewer_cart/all/rs"
+
+    render "shared/dicom_viewer", layout: nil
+  end
+
+  page_action :start_weasis, method: :get do
     current_user.ensure_authentication_token!
 
     if session[:viewer_cart].nil?
@@ -76,7 +85,8 @@ ActiveAdmin.register_page 'Viewer Cart' do
 
     @wado_query_urls = session[:viewer_cart].map do |item|
       case item[:type]
-      when :image_series then wado_query_image_series_url(item[:id], format: :xml, authentication_token: current_user.authentication_token)
+      when :image_series then
+        wado_query_image_series_url(item[:id], format: :xml, authentication_token: current_user.authentication_token)
       when :visit then wado_query_visit_url(item[:id], format: :xml, authentication_token: current_user.authentication_token)
       when :patient then wado_query_patient_url(item[:id], format: :xml, authentication_token: current_user.authentication_token)
       when :center then wado_query_center_url(item[:id], format: :xml, authentication_token: current_user.authentication_token)
@@ -90,6 +100,15 @@ ActiveAdmin.register_page 'Viewer Cart' do
       type: 'application/x-java-jnlp-file',
       filename: 'viewer.jnlp',
       disposition: 'attachment'
+    )
+  end
+
+  page_action :start, method: :get do
+    render(
+      'shared/_dicom_viewer_iframe',
+      locals: {
+        viewer_url: "#{admin_viewer_cart_viewer_path}/all"
+      }
     )
   end
 end

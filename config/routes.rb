@@ -52,7 +52,7 @@ Rails.application.routes.draw do
       get 'wado_query'
     end
   end
-  resources :images, only: [:create] do
+  resources :images, only: [:create, :show] do
   end
 
   resources :images_search, only: [] do
@@ -97,12 +97,42 @@ Rails.application.routes.draw do
       member do
         post :sign
         post :unblock
+        get :viewer
       end
     end
     resources :form_sessions, only: %i[show]
 
     get 'report' => 'report#index'
   end
+
+  # TODO: Removed in favor of WADOURI
+  get(
+    "/dicomweb/*scope/*scope_id/rs/studies/*study_uid/series/*series_uid/instances/*instance_uid/frames/*frame_number",
+    to: "qido#query_frame"
+  )
+  get(
+    "/dicomweb/*scope/*scope_id/rs/studies/*study_uid/series/*series_uid/instances",
+    to: "qido#query_instances"
+  )
+  get(
+    "/dicomweb/*scope/*scope_id/rs/studies/*study_uid/series/*series_uid/metadata",
+    to: "qido#query_metadata"
+    )
+  get(
+    "/dicomweb/*scope/*scope_id/rs/studies/*study_uid/series",
+    to: "qido#query_series"
+    )
+  get(
+    "/dicomweb/*scope/*scope_id/rs/studies",
+    to: "qido#query_studies"
+  )
+
+  # Override paths to allow for client-side routing
+  get "/admin/image_series/*id/viewer/*path", to: "admin/image_series#viewer"
+  get "/admin/viewer_cart/viewer/*path", to: "admin/viewer_cart#viewer"
+  get "/admin/visits/*id/viewer/*scope", to: "admin/visits#viewer"
+  get "/admin/visits/*id/viewer/*scope/*path", to: "admin/visits#viewer"
+  get "/v1/form_answers/*id/viewer/*path", to: "v1/form_answers#viewer"
 
   authenticate :user, ->(user) { user.can?(:manage, Sidekiq) } do
     require 'sidekiq/web'

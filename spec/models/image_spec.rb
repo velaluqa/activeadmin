@@ -149,6 +149,42 @@ RSpec.describe Image do
       expect(@image.dicom_metadata[1]["0002,0010"][:value]).to eq("1.2.840.10008.1.2.1")
       expect(dicom.patients_name.value).to eq "#{@image.image_series.patient.name}"
     end
+
+    it "caches dicomweb metadata for patient" do
+      expectedKeys = ["00080005", "00080020", "00080030", "00080050", "00080090", "00100010", "00100020", "0020000D", "00200010"]
+
+      @image = create(:image)
+      @image.write_anonymized_file(File.new('spec/files/test.dicom'))
+
+      Sidekiq::Worker.drain_all
+      @image.reload
+
+      expect(@image.image_series.patient.cache["dicomwebMetadata"].keys).to match_array(expectedKeys)
+    end
+
+    it "caches dicomweb metadata for image series" do
+      expectedKeys =  ["00080005", "00080060", "0008103E", "0020000D", "0020000E", "00200011"]
+
+      @image = create(:image)
+      @image.write_anonymized_file(File.new('spec/files/test.dicom'))
+
+      Sidekiq::Worker.drain_all
+      @image.reload
+
+      expect(@image.image_series.cache["dicomwebMetadata"].keys).to match_array(expectedKeys)
+    end
+
+    it "caches dicomweb metadata for image" do
+      expectedKeys = ["00080016", "00080018", "00080060", "0020000D", "0020000E", "00200032", "00200037", "00280002", "00280004", "00280010", "00280011", "00280030", "00280100", "00280101", "00280102", "00280103", "00281050", "00281051"]
+
+      @image = create(:image)
+      @image.write_anonymized_file(File.new('spec/files/test.dicom'))
+
+      Sidekiq::Worker.drain_all
+      @image.reload
+
+      expect(@image.cache["dicomwebMetadata"].keys).to match_array(expectedKeys)
+    end
   end
 
   describe 'versioning' do

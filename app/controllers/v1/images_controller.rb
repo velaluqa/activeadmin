@@ -1,4 +1,10 @@
 class V1::ImagesController < V1::ApiController
+  def show
+    image = Image.find(params[:id])
+    ap image.dicom_metadata
+    send_file image.absolute_image_storage_path, status: :ok, type: 'application/dicom'
+  end
+
   def create
     authorize_combination! [:create, Image], [:upload, ImageSeries]
 

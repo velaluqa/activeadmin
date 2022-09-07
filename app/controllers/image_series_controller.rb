@@ -14,7 +14,13 @@ class ImageSeriesController < ApplicationController
   def create
     authorize! :create, ImageSeries
 
-    image_series = ImageSeries.create(name: params[:image_series][:name], patient: @patient, visit_id: nil, imaging_date: params[:image_series][:imaging_date], state: :imported)
+    image_series = ImageSeries.create(
+      name: params[:image_series][:name],
+      patient: @patient,
+      visit_id: nil,
+      imaging_date: params[:image_series][:imaging_date],
+      state: :imported
+    )
 
     respond_to do |format|
       format.json { render json: { success: !image_series.nil?, image_series: image_series } }

@@ -1,6 +1,8 @@
 class DominoTrashWorker
   include Sidekiq::Worker
 
+  sidekiq_options(queue: :domino)
+
   # This worker is designed to throw exceptions on all errors/misuses, since Sidekiq handles those nicely
 
   def perform(study_domino_db_url, domino_unid, domino_document_form)

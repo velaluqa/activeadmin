@@ -208,6 +208,7 @@ class Ability
     if can?(:viewer, ImageSeries)
       can :read, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
       can :start, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
+      can :viewer, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
       can :clear, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
       can :remove, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'
       can :empty, ActiveAdmin::Page, name: 'Viewer Cart', namespace_name: 'admin'

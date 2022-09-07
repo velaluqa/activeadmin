@@ -124,6 +124,7 @@ gem 'sidekiq-scheduler'
 
 # Ruby DICOM lib
 gem 'dicom'
+gem 'rmagick'
 
 # Generate PDF via chrome and puppeteer.
 gem 'grover'

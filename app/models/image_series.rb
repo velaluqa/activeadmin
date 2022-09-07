@@ -65,6 +65,7 @@ class ImageSeries < ApplicationRecord
   belongs_to :visit, optional: true
   belongs_to :patient
   has_many :images, dependent: :destroy
+  has_many :required_series
 
   after_destroy :unassign_assigned_required_series!
 
@@ -72,6 +73,7 @@ class ImageSeries < ApplicationRecord
   validates_presence_of :name, :patient_id, :imaging_date
 
   scope :not_assigned, -> { where(visit_id: nil) }
+  scope :with_dicom, -> { joins(:images).where(images: { mimetype: "application/dicom"}).distinct }
 
   scope :by_study_ids, ->(*ids) {
     joins(patient: :center)
@@ -103,6 +105,10 @@ SELECT
       INNER JOIN roles ON user_roles.role_id = roles.id
       INNER JOIN permissions ON roles.id = permissions.role_id
 JOIN
+  end
+
+  def self.permission_subject_default
+    ImageSeries
   end
 
   before_save :ensure_study_is_unchanged
@@ -161,6 +167,32 @@ JOIN
     else
       patient.study
     end
+  end
+
+  def dicomweb_metadata
+    cache["dicomwebMetadata"] || {}
+  end
+
+  def dicom_metadata(filter_tags: nil)
+    metadata = images.dicom.first.andand.dicom_metadata_from_json
+
+    return nil unless metadata
+
+    metadata.slice!(*filter_tags) if filter_tags
+    metadata.merge(
+      "0020000D" => {
+        "vr" => "UI",
+        "Value" => [
+          "#{Rails.application.config.wado_dicom_prefix}#{patient.id}"
+        ]
+      },
+      "0020000E" => {
+        "vr" => "UI",
+        "Value" => [
+          "#{Rails.application.config.wado_dicom_prefix}#{id}"
+        ]
+      }
+    )
   end
 
   def image_storage_path

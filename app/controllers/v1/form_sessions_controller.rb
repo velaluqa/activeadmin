@@ -39,13 +39,7 @@ class V1::FormSessionsController < V1::ApiController
         "status" => answer.status,
         "form_definition" => answer.form_definition.attributes,
         "form_layout" => answer.layout,
-        "form_answer_resources" => answer.form_answer_resources.map(&method(:load_form_answer_resource))
+        "form_answer_resources" => answer.form_answer_resources.map(&:attributes_with_resource)
       )
-  end
-
-  def load_form_answer_resource(resource)
-    resource
-      .attributes
-      .merge("resource" => resource.resource.attributes)
   end
 end

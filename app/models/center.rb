@@ -93,6 +93,10 @@ SELECT
   before_save :ensure_study_is_unchanged
   after_update :eventually_update_dicom_tags
 
+  def has_dicom?
+    image_series.with_dicom.exists?
+  end
+
   def to_s
     "#{code} - #{name}"
   end

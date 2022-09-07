@@ -221,6 +221,7 @@ ActiveRecord::Schema.define(version: 2022_12_14_132751) do
     t.string "comment"
     t.jsonb "properties", default: {}, null: false
     t.string "properties_version"
+    t.jsonb "cache", default: {}, null: false
     t.index ["patient_id", "series_number"], name: "index_image_series_on_patient_id_and_series_number"
     t.index ["patient_id"], name: "index_image_series_on_patient_id"
     t.index ["series_number"], name: "index_image_series_on_series_number"
@@ -233,6 +234,7 @@ ActiveRecord::Schema.define(version: 2022_12_14_132751) do
     t.datetime "updated_at"
     t.string "mimetype"
     t.string "sha256sum"
+    t.jsonb "cache", default: {}, null: false
     t.index ["image_series_id"], name: "index_images_on_image_series_id"
   end
 
@@ -291,6 +293,7 @@ ActiveRecord::Schema.define(version: 2022_12_14_132751) do
     t.string "domino_unid"
     t.jsonb "data", default: {}, null: false
     t.jsonb "export_history", default: [], null: false
+    t.jsonb "cache", default: {}, null: false
     t.index ["center_id"], name: "index_patients_on_center_id"
   end
 

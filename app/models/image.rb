@@ -1,5 +1,6 @@
 require 'tempfile'
 require 'dicom/file_utils'
+require 'rmagick'
 
 #
 #
@@ -45,6 +46,7 @@ class Image < ApplicationRecord
     joins(image_series: { patient: :center })
       .where(centers: { study_id: Array[ids].flatten })
   }
+  scope :dicom, -> { where(mimetype: "application/dicom") }
 
   scope :searchable, -> { join_study.select(<<SELECT.strip_heredoc) }
     centers.study_id AS study_id,
@@ -129,8 +131,66 @@ JOIN
       Digest::SHA256.hexdigest(f.read)
     end
     save!
+    EnsureDicomwebMetadataCacheWorker.perform_async("image", [id])
+    # EnsureDicomwebFramedataCacheWorker.perform_async("image", [id])
   ensure
     tmp.unlink
+  end
+
+  def dicomweb_metadata
+    ap cache
+    cache["dicomwebMetadata"] || {}
+  end
+
+  def dicom_metadata_json(filter_tags: nil)
+    metadata = dicom_metadata_from_json
+
+    return nil unless metadata
+
+    metadata.slice!(*filter_tags) if filter_tags
+    metadata.merge(
+      "0020000D" => {
+        "vr" => "UI",
+        "Value" => [
+          "#{Rails.application.config.wado_dicom_prefix}#{image_series.patient.id}"
+        ]
+      },
+      "0020000E" => {
+        "vr" => "UI",
+        "Value" => [
+          "#{Rails.application.config.wado_dicom_prefix}#{image_series.id}"
+        ]
+      },
+      "00080018" => {
+        "vr" => "UI",
+        "Value" => [
+          "#{Rails.application.config.wado_dicom_prefix}#{id}"
+        ]
+      }
+    )
+  end
+
+  def dicom_metadata_from_json
+    return nil unless dicom?
+
+    file_path = absolute_image_storage_path
+    json = `#{Rails.application.config.dcm2json} --quiet '#{file_path}'`
+    utf8_json = json
+                  .encode('UTF-8', 'ISO-8859-1')
+                  .scan(/[[:print:]]/)
+                  .join
+                  .gsub("\\u0000", "")
+
+    JSON.parse(utf8_json, :quirks_mode => true)
+  rescue => e
+    ap(
+      error: e,
+      backtrace: e.backtrace,
+      image_id: id
+    )
+
+    puts utf8_json
+    nil
   end
 
   # TODO: Extract into separate PORO.

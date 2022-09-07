@@ -2,14 +2,14 @@ import { Container, Navbar, NavbarBrand, NavbarText } from "reactstrap";
 import React, { useState } from "react";
 import useQueryString from "use-query-string";
 
-import { find, findIndex } from "lodash";
+import { find, findIndex, some } from "lodash";
 
 import FormAnswerForm from "./FormAnswerForm";
+import FormAnswerResourceViewer from "./FormAnswerResourceViewer";
 import signAndSubmit from "./signAndSubmit";
 import updateHistory from "../functions/updateHistory";
 
 export default (props) => {
-  console.log(props);
   const { currentUser, formSession, formAnswers } = props;
 
   const [query, setQuery] = useQueryString(window.location, updateHistory, {
@@ -26,6 +26,7 @@ export default (props) => {
   );
 
   const formAnswer = find(formAnswers, { sequenceNumber, status: "published" });
+  const formAnswerResources = formAnswer.formAnswerResources;
   const formAnswersIndex = findIndex(formAnswers, {
     sequenceNumber,
     status: "published",
@@ -71,23 +72,36 @@ export default (props) => {
   // when saving the form answer, step to the next form answer
   // otherwise step to the next
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Navbar color="light" light expand="md">
-        <Container>
-          <NavbarBrand href="/v1/dashboard">{formSession.name}</NavbarBrand>
-          <NavbarText>
-            Task {formAnswersIndex + 1} of {formAnswersLength}
-          </NavbarText>
-        </Container>
-      </Navbar>
-      <FormAnswerForm
-        key={formAnswer.id}
-        currentUser={currentUser}
-        value={{ ...formAnswer.answers }}
-        layout={formLayout}
-        onSign={signAnswers}
-        signable
-      />
+    <div style={{ display: "flex", height: "100%", flexDirection: "row" }}>
+      {some(formAnswerResources, { hasDicom: true }) && (
+        <FormAnswerResourceViewer formAnswerId={formAnswerId} />
+      )}
+
+      <div
+        style={{
+          flex: "1 1 100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Navbar color="light" light expand="md">
+          <Container>
+            <NavbarBrand href="/v1/dashboard">{formSession.name}</NavbarBrand>
+            <NavbarText>
+              Task {formAnswersIndex + 1} of {formAnswersLength}
+            </NavbarText>
+          </Container>
+        </Navbar>
+        <FormAnswerForm
+          key={formAnswer.id}
+          currentUser={currentUser}
+          value={{ ...formAnswer.answers }}
+          layout={formLayout}
+          onSign={signAnswers}
+          signable
+        />
+      </div>
     </div>
   );
 };

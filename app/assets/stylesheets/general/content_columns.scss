@@ -1,0 +1,51 @@
+#main_content {
+  .content-columns {
+    display: flex;
+    margin: -15px -15px 0 -15px;
+    height: calc(100vh - 53px);
+
+    .resource-properties {
+      padding: 15px 15px 0 15px;
+      max-width: 25vw;
+      overflow-y: auto;
+    }
+
+    .dicom-viewer-iframe {
+      flex: 1 1 100%;
+      margin-left: 0px;
+      height: 100%;
+      width: 100%;
+      border: 0;
+    }
+  }
+}
+
+.admin_image_series,
+.admin_viewer_cart.start,
+.admin_visits.webviewer,
+.admin_visits.tqc_form,
+.admin_visits.mqc_form {
+  .erica_footer {
+    display: none;
+  }
+
+  #active_admin_content {
+    padding-bottom: 0;
+  }
+}
+
+.admin_viewer_cart.start,
+.admin_visits.webviewer {
+  #main_content {
+    display: flex;
+    height: calc(100vh - 53px);
+    margin: -15px -15px 0 -15px;
+  }
+
+  .dicom-viewer-iframe {
+    flex: 1 1 100%;
+    height: 100%;
+    width: 100%;
+    border: 0;
+  }
+}

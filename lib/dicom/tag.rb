@@ -12,9 +12,14 @@ module DICOM
       def [](tag)
         tags[tag]
       end
-     
+
       def name(tag)
         tags[tag][:name]
+      end
+
+      def by_id(id)
+        tag = "#{id[0...4]},#{id[4...9]}"
+        tags[tag]
       end
 
       def keyword(tag)

@@ -7,6 +7,8 @@ require 'zip/filesystem'
 class DownloadImagesWorker
   include SidekiqBackgroundJob
 
+  sidekiq_options(queue: :high, retry: 5)
+
   # output directory structure:
   # patient.name
   # - patient.visits.each do

@@ -92,8 +92,10 @@ Rails.application.configure do
   config.form_pdf_root = config.data_directory + '/form_pdfs'
   config.image_export_root = config.data_directory + '/images_export'
   config.backup_root = config.data_directory + '/backup'
+  config.cache_root = config.data_directory + '/cache'
 
   config.dcm2xml = '/usr/bin/dcm2xml'
+  config.dcm2json = '/usr/bin/dcm2json'
   config.dcmconv = '/usr/bin/dcmconv'
   config.dcmj2pnm = '/usr/bin/dcmj2pnm'
   config.dcmdjpeg = '/usr/bin/dcmdjpeg'

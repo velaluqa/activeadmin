@@ -132,7 +132,7 @@ class WadoController < ApplicationController
 
     @image = Image.where(id: image_id).first
     authorize! :read, @image
-    pp @image
+
     return head :not_found if @image.nil?
   end
 

@@ -41,6 +41,7 @@ placeholder :admin_path do
       .send("admin_#{page_name.underscore}_path")
   end
 
+  # match e.g. -> the latest image_series
   match(/the latest ([^ $]+)/) do |model_name|
     model_name = model_name.classify
     record = model_name.constantize.last
@@ -48,6 +49,8 @@ placeholder :admin_path do
       .send("admin_#{model_name.singularize.underscore}_path", record)
   end
 
+  # match e.g.
+  # -> show for image_series "TestSeries"
   match(/([^ $\n]+) (for )?([^ $]+) "([^$\n]+)"/) do |action, _, model_name, identifier|
     method = "admin_#{model_name.underscore}_path"
     method = "#{action}_#{method}" if action != 'show'
@@ -57,6 +60,7 @@ placeholder :admin_path do
          .send(method, record)
   end
 
+  # match e.g. -> image_series \"TestSeries\"
   match(/([^ $]+) "([^$\n]+)"/) do |model_name, identifier|
     model_name = model_name.classify
     record = TurnipHelper.find_record(model_name, identifier)
@@ -64,6 +68,7 @@ placeholder :admin_path do
          .send("admin_#{model_name.singularize.underscore}_path", record)
   end
 
+  # match e.g. -> image_series list
   match(/([^$\n]+) list/) do |model_name|
     if model_name.underscore.pluralize == model_name.underscore.singularize
       Rails.application.routes.url_helpers
@@ -74,6 +79,9 @@ placeholder :admin_path do
     end
   end
 
+  # match e.g.
+  # -> image_series edit form
+  # -> image_series edit
   match(/([^ $\n]+) ([^ $]+)( form)?/) do |action, model_name|
     method = "admin_#{model_name.underscore}_path"
     method = "#{action}_#{method}" if action != 'index'

@@ -1,5 +1,67 @@
 module V1
   class ImageSeriesController < V1::ApiController
+    def viewer
+      series_instance_uid = nil
+      study_instance_uid = nil
+
+      image_series = ImageSeries.find(params[:id])
+      instances = image_series.images.map do |image|
+        meta = image.dicom_metadata[1]
+
+        series_instance_uid ||= meta["0020,000e"].andand[:value]
+        study_instance_uid ||= meta["0020,000d"].andand[:value]
+        sop_instance_uid = meta["0008,0018"].andand[:value]
+
+        {
+          "metadata": {
+                        "Columns": image.dicom_metadata[1]["0028,0011"][:value].to_i,
+                       "Rows": image.dicom_metadata[1]["0028,0010"][:value].to_i,
+                       "InstanceNumber": image.dicom_metadata[1]["0020,0013"][:value].to_i,
+                       "AcquisitionNumber": meta["0020,0012"][:value].to_i,
+                       "PhotometricInterpretation": meta["0028,0004"][:value],
+                       "BitsAllocated": meta["0028,0100"][:value].to_i,
+                       "BitsStored": meta["0028,0100"][:value].to_i,
+                       "PixelRepresentation": meta["0028,0103"][:value].to_i,
+                       "SamplesPerPixel": meta["0028,0002"][:value].to_i,
+                       "PixelSpacing": meta["0028,0030"].andand[:value].to_f,
+                       "HighBit": meta["0028,0102"][:value].to_i,
+                       # "ImageOrientationPatient": meta["0020,0037"].andand[:value],
+                       # "ImagePositionPatient": meta["0020,0032"].andand[:value],
+                       "FrameOfReferenceUID": meta["0020,0052"].andand[:value],
+                       "ImageType": meta["0008,0008"].andand[:value].split('\\'),
+                       "Modality": meta["0008,0060"].andand[:value],
+                       "SOPInstanceUID": sop_instance_uid,
+                       "SeriesInstanceUID": series_instance_uid,
+                       "StudyInstanceUID": study_instance_uid
+                      },
+         "url": "dicomweb://localhost:3000/v1/images/#{image.id}"
+        }
+      end
+      render json: {
+               "studies": [
+                            {
+                              "StudyInstanceUID": study_instance_uid,
+                             "StudyDescription": "BRAIN SELLA",
+                             "StudyDate": "20010108",
+                             "StudyTime": "120022",
+                             "PatientName": "MISTER^MR",
+                             "PatientId": "832040",
+                             "series": [
+                                         {
+                                           "SeriesDescription": "SAG T-1",
+                                          "SeriesInstanceUID": series_instance_uid,
+                                          "SeriesNumber": 2,
+                                          "SeriesDate": "20010108",
+                                          "SeriesTime": "120318",
+                                          "Modality": "MR",
+                                          "instances": instances
+                                         }
+                                       ]
+                            }
+                          ]
+             }
+    end
+
     def create
       authorize_one! %i[create upload], ImageSeries
 

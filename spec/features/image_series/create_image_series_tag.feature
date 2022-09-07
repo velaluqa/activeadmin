@@ -6,7 +6,7 @@ Feature: Create Simple Image Series Tags
   Background:
     Given an image_series "Test Series"
     And a role "Authorized Role" with permissions:
-      | ImageSeries | read, read_tags, update_tags, create_tags |
+      | ImageSeries | read, create_tags, read_tags, update_tags |
     And a role "Unauthorized Role" with permissions:
       | ImageSeries | read, read_tags |
 

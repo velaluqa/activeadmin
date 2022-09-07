@@ -1,28 +1,30 @@
 = javascript_include_tag('mqc_validation')
-= form_tag(mqc_admin_visit_path(@visit), :method => :post, :class => 'formtastic form', :id => 'mqc_form') do
-  = field_set_tag('<span>mQC Questions</span>'.html_safe, :class => 'inputs') do
-    %ol
-      - @mqc_spec.each do |spec|
-        - field_name = 'mqc_result['+spec['id']+']'
-        - current_value = @visit.mqc_results.andand[spec['id']]
-        - case spec['type']
-        - when 'bool'
-          %li.input.select
-            = hidden_field_tag(field_name, '0')
-            = label_tag(field_name, spec['label'])
-            = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false)
-            - unless spec['description'].nil?
-              %p.inline-hints= spec['description']
-  = field_set_tag('<span>Comment / Observation</span>'.html_safe, :class => 'inputs') do
-    %ol
-      %li.input.string
-        = label_tag('mqc_comment', 'Comment', :id => 'mqc_comment_label')
-        = text_field_tag('mqc_comment', @visit.mqc_comment)
-        %p.inline-hints#mqc_comment_hint A comment is required if any of the above criteria were answered with 'Fail'
+= form_tag(mqc_admin_visit_path(@visit), :method => :post, :class => 'formtastic form content-columns', :id => 'mqc_form') do
+  = render(partial: 'shared/dicom_viewer_iframe', locals: {viewer_url: "#{viewer_admin_visit_path(@visit)}/all_rs" })
+  .resource-properties{ style: "max-width: 40vw;" }
+    = field_set_tag('<span>mQC Questions</span>'.html_safe, :class => 'inputs') do
+      %ol
+        - @mqc_spec.each do |spec|
+          - field_name = 'mqc_result['+spec['id']+']'
+          - current_value = @visit.mqc_results.andand[spec['id']]
+          - case spec['type']
+          - when 'bool'
+            %li.input.select
+              = hidden_field_tag(field_name, '0')
+              = label_tag(field_name, spec['label'])
+              = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false)
+              - unless spec['description'].nil?
+                %p.inline-hints= spec['description']
+    = field_set_tag('<span>Comment / Observation</span>'.html_safe, :class => 'inputs') do
+      %ol
+        %li.input.string
+          = label_tag('mqc_comment', 'Comment', :id => 'mqc_comment_label')
+          = text_field_tag('mqc_comment', @visit.mqc_comment)
+          %p.inline-hints#mqc_comment_hint A comment is required if any of the above criteria were answered with 'Fail'
 
-  = field_set_tag(nil, :class => 'actions') do
-    %ol
-      %li.action.input_action
-        = submit_tag('Save mQC Results')
-      %li.cancel
-        = link_to('Cancel', admin_visit_path(@visit))
+    = field_set_tag(nil, :class => 'actions') do
+      %ol
+        %li.action.input_action
+          = submit_tag('Save mQC Results')
+        %li.cancel
+          = link_to('Cancel', admin_visit_path(@visit))

@@ -103,5 +103,8 @@
 
     &.deselect a:before { content: "\f00d"; }
     &.cancel a:before { content: "\f00d"; }
+
+    &.maximize_window a:before { content: "\f2d0"; }
+    &.details a:before { content: "\f30f"; }
   }
 }

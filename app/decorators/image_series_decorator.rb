@@ -49,7 +49,7 @@ class ImageSeriesDecorator < ApplicationDecorator
   end
 
   def viewer
-    link_to('View in Viewer', viewer_admin_image_series_path(model, :format => 'jnlp'))
+    link_to('View in Viewer', weasis_viewer_admin_image_series_path(model, :format => 'jnlp'))
   end
 
   def import_date

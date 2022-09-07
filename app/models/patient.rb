@@ -115,6 +115,23 @@ JOIN
     end
   end
 
+  def dicomweb_metadata
+    cache["dicomwebMetadata"] || {}
+  end
+
+  def dicom_metadata(filter_tags: nil)
+    metadata = images.dicom.first.andand.dicom_metadata_from_json
+
+    return nil unless metadata
+
+    metadata.slice!(*filter_tags) if filter_tags
+    metadata.merge(
+      "0020000D" => {
+        "vr"=> "UI","Value"=>["#{Rails.application.config.wado_dicom_prefix}#{id}"]
+      }
+    )
+  end
+
   def next_series_number
     return 1 if image_series.empty?
     image_series.order('series_number DESC').first.series_number + 1
@@ -179,6 +196,10 @@ JOIN
 
   def to_s
     name
+  end
+
+  def has_dicom?
+    image_series.with_dicom.exists?
   end
 
   def visit_template_applicable?(template)

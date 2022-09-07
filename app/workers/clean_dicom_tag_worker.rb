@@ -62,6 +62,11 @@ class CleanDicomTagWorker
       increment_progress!
     end
 
+    EnsureDicomwebMetadataCacheWorker.perform_async(
+      "image",
+      object.images.pluck(:id)
+    )
+
     succeed!
   end
 

@@ -1,5 +1,8 @@
 ---
 :queues:
-  - default
-  - notifications
-  - mailers
+  - [critical, 7]
+  - [high, 6]
+  - [default, 5]
+  - [notifications, 4]
+  - [mailers, 4]
+  - [domino, 3]

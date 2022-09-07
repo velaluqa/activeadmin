@@ -1,0 +1,11 @@
+= form_tag(simulate_recipients_admin_notification_profile_path(@notification_profile), :method => :post, :class => 'formtastic form', :id => 'simulate_recipients_form') do
+  = field_set_tag('<span>Simulate Recipients</span>'.html_safe, :class => 'inputs') do
+    %ol
+      %li.input.select
+        = select_tag(:resource, options_for_select([]), :include_blank => false, :input_html => { class: 'select2-record-search' })
+  = field_set_tag(nil, :class => 'actions') do
+    %ol
+      %li.action.input_action
+        = submit_tag('Show Recipients')
+      %li.cancel
+        = link_to('Cancel', admin_notification_profile_path(@notification_profile))

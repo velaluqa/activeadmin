@@ -14,6 +14,10 @@ class ERICA
       Rails.root + Pathname.new(Rails.application.config.backup_root)
     end
 
+    def cache_path
+      Rails.root + Pathname.new(Rails.application.config.cache_root)
+    end
+
     def data_path
       Rails.root + Pathname.new(Rails.application.config.data_directory)
     end

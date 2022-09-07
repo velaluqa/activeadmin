@@ -117,7 +117,7 @@ span.label {
 #active_admin_content {
   @extend .clearfix;
   padding-top: 15px;
-  padding-bottom: 90px;
+  padding-bottom: 45px;
 
   &.without_sidebar {
     #main_content_wrapper { @extend .col-md-12; }

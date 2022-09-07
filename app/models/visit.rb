@@ -75,6 +75,7 @@ class Visit < ApplicationRecord
   has_many :images, through: :image_series
   belongs_to :mqc_user, class_name: 'User', optional: true
   has_many :required_series, dependent: :destroy
+  has_many :required_image_series, through: :required_series, source: :image_series
 
   scope :by_study_ids, ->(*ids) {
     joins(patient: { center: :study })
@@ -164,6 +165,11 @@ JOIN_QUERY
     patient_id = patient.id if patient.is_a?(ActiveRecord::Base)
     where(patient_id: patient_id)
   }
+
+  def has_dicom?
+    required_image_series.with_dicom.exists? ||
+      image_series.with_dicom.exists?
+  end
 
   def name
     "#{patient.andand.name}##{visit_number}"

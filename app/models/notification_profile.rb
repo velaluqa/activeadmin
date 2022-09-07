@@ -58,7 +58,7 @@ require 'notification_observable/filter/schema'
 # resource. For that, see the ~only_authorized_users~ attribute.
 #
 # ## Throttling
-p #
+#
 # We do not want the user to be spammed by e-mails for each and every
 # action done in the ERICA system. Thus sending e-mails can be
 # throttled on a per-profile basis.
@@ -242,6 +242,12 @@ JOIN
         version: version
       )
     end.compact
+  end
+
+  def recipient_candidates_for_version(version)
+    recipient_candidates(version.triggering_user).keep_if do |user|
+      !only_authorized_recipients || user.can?(:read, version.item || version.reify)
+    end
   end
 
   # TODO: Extract triggering profiles into separate Operation object.

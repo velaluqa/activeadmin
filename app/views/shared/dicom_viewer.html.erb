@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="OHIF DICOM Viewer Integration for ERICA" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="theme-color" content="#000000" />
+    <meta http-equiv="cleartype" content="on" />
+    <meta name="MobileOptimized" content="320" />
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>DICOM Viewer</title>
+  </head>
+
+  <body>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <div id="root"></div>
+
+    <script>
+window.config = {
+	disableServersCache: true,
+	routerBasename: '<%= @router_basename %>',
+	showStudyList: false,
+	whiteLabeling: {
+	  /* Optional: Should return a React component to be rendered in the "Logo" section of the application's Top Navigation bar */
+	  createLogoComponentFn: function(React) {
+	    return React.createElement('a', {
+	      target: '_self',
+	      rel: 'noopener noreferrer',
+	      className: 'header-brand',
+	      href: '/',
+	      style: {
+		display: 'block',
+		textIndent: '-9999px',
+		backgroundSize: 'contain',
+		backgroundRepeat: 'no-repeat',
+		width: '200px',
+	      },
+	    });
+	  },
+	},
+	servers: {
+	  dicomWeb: [
+	    {
+	      name: 'erica',
+	      wadoUriRoot: '/wado',
+	      qidoRoot: '<%= @wado_rs_endpoint.html_safe %>',
+	      wadoRoot: '<%= @wado_rs_endpoint.html_safe %>',
+	      qidoSupportsIncludeField: true,
+	      imageRendering: 'wadouri',
+	      thumbnailRendering: 'wadouri',
+	    },
+	  ],
+	},
+	hotkeys: [
+	  { commandName: 'rotateViewportCW', label: 'Rotate Right', keys: ['r'] },
+	  { commandName: 'rotateViewportCCW', label: 'Rotate Left', keys: ['l'] },
+	  { commandName: 'invertViewport', label: 'Invert', keys: ['i'] },
+	  {
+	    commandName: 'flipViewportVertical',
+	    label: 'Flip Horizontally',
+	    keys: ['h'],
+	  },
+	  {
+	    commandName: 'flipViewportHorizontal',
+	    label: 'Flip Vertically',
+	    keys: ['v'],
+	  },
+	],
+      };
+
+document.addEventListener("DOMContentLoaded", function() {
+      console.log(window, document)
+      var containerId = "root";
+      var componentRenderedOrUpdatedCallback = function(){
+	console.log('OHIF Viewer rendered/updated');
+	console.log(window.config);
+      }
+
+      console.log(window.config)
+      window.OHIFViewer.installViewer(window.config, containerId, componentRenderedOrUpdatedCallback);
+});
+    </script>
+    <script src="/vendor/@ohif/viewer@4.12.30/dist/index.umd.js"></script>
+    <script
+      src="/vendor/@ohif/extension-dicom-microscopy@0.50.5/dist/index.umd.js"
+      ></script>
+    <script
+      src="/vendor/@ohif/extension-dicom-rt@0.7.11/dist/index.umd.js"
+      ></script>
+  </body>
+
+</html>

@@ -22,6 +22,14 @@
 - Feature - (ERICA-165, #6010) Automatically split multi-frame DICOM
   files in background jobs after the upload of a multi-frame image
   file completed
+* Feature - (ERICA-170, #4325) Add Web DICOM viewer via OHIF tools
+  * Viewer Cart - View selected resources in the web browser if permission granted
+  * Show Image Series - View DICOM image series inline if permission granted
+  * Show Visit - View required series in the web browser if permission granted
+  * Show Visit - View assigned image series in the web browser if permission granted
+  * Answer Form - View DICOM images of assigned form answer resource
+    (study, center, patient, visit, required series, image series,
+    etc.) in the web browser as an aside
 
 ### Patches / Fixes
 

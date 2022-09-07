@@ -43,12 +43,12 @@ if can?(:read, RequiredSeries)
       if required_series.assigned_image_series.present? && required_series.tqc_state != 'pending' && can?(:read_tqc, visit)
         result += link_to('View tQC results', tqc_results_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link')
       end
-      result += link_to('Open Viewer', viewer_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') unless required_series.assigned_image_series.nil?
+      result += link_to('Open Viewer', webviewer_admin_visit_path(required_series.visit, scope: required_series.name), :class => 'member_link') unless required_series.assigned_image_series.nil?
       result += link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') if required_series.assigned_image_series.andand.has_dicom? && can?(:read_dicom_metadata, required_series.assigned_image_series)
   
       result += link_to('Domino', required_series.lotus_notes_url, :class => 'member_link') unless(required_series.domino_unid.blank?)
   
       result.html_safe
     end
-  end  
+  end
 end

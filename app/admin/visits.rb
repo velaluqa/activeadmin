@@ -23,7 +23,9 @@ ActiveAdmin.register Visit do
         :mqc_form,
         :required_series_viewer,
         :required_series_dicom_metadata,
-        :all_required_series_viewer
+        :all_required_series_viewer,
+        :webviewer,
+        :viewer
       ]
     )
 
@@ -114,7 +116,7 @@ ActiveAdmin.register Visit do
     column :description
     column :visit_type
     column :visit_date, sortable: false
-    column :state, :sortable => :state 
+    column :state, :sortable => :state
     if can? :read_mqc, Visit
       column 'mQC State', :mqc_state, :sortable => :mqc_state do |visit|
         next unless can? :read_mqc, visit
@@ -280,6 +282,17 @@ ActiveAdmin.register Visit do
     @required_series_names = params[:required_series_names].andand.split(',') || @visit.required_series_names
     if(@required_series_names.blank?)
       flash[:error] = 'The associated visit has no required series. This could be due to an invalid study config, no assigned visit type or an empty visit type.'
+      redirect_back(fallback_location: admin_visit_path(id: params[:id]))
+      return
+    end
+
+    @required_series_names = params[:required_series_names].andand.split(',')
+    @required_series_names ||= @visit.required_series_names
+    @required_series_names = @visit.required_series_names & @required_series_names
+
+    if @required_series_names.blank?
+      flash[:error] = 'This visit does not have required series specified by the given parameter.'
+
       redirect_back(fallback_location: admin_visit_path(id: params[:id]))
       return
     end
@@ -504,7 +517,7 @@ ActiveAdmin.register Visit do
       result = false
       if(expected.is_a?(Array))
         expected.each do |allowed_value|
-          if(allowed_value.is_a?(Numeric) and not actual_as_numeric.nil?)
+          if allowed_value.is_a?(Numeric) && actual_as_numeric.present?
             if(allowed_value == actual_as_numeric)
               result = true
               break
@@ -550,7 +563,7 @@ ActiveAdmin.register Visit do
       return
     end
 
-    redirect_to viewer_admin_image_series_path(@required_series.assigned_image_series)
+    redirect_to weasis_viewer_admin_image_series_path(@required_series.assigned_image_series)
   end
   member_action :required_series_dicom_metadata, :method => :get do
     @visit = Visit.find(params[:id])
@@ -572,11 +585,54 @@ ActiveAdmin.register Visit do
 
     redirect_to dicom_metadata_admin_image_series_path(@required_series.assigned_image_series)
   end
-  action_item :edit, :only => :tqc_form do
-    link_to('Open Viewer', required_series_viewer_admin_visit_path(resource, :required_series_name => params[:required_series_name]), :target => '_blank') unless params[:required_series_name].nil?
+  action_item :maximize_window, :only => :tqc_form do
+    link_to('Open Viewer', webviewer_admin_visit_path(resource, scope: params[:required_series_name]), :target => '_blank') unless params[:required_series_name].nil?
   end
-  action_item :edit, :only => :tqc_form do
-    link_to('DICOM Metadata', required_series_dicom_metadata_admin_visit_path(resource, :required_series_name => params[:required_series_name]), :target => '_blank') unless params[:required_series_name].nil?
+  action_item :details, :only => :tqc_form do
+    required_series = resource.required_series.where(name: params[:required_series_name]).first
+
+    link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(required_series.image_series), :target => '_blank') if required_series
+  end
+
+  member_action :viewer, method: :get do
+    # authorize
+    # Manually find the `resource` as active admin would otherwise
+    # perform a lazy authorization causing an error:
+    resource = Visit.find(params[:id])
+
+    scope_query = Base64.strict_encode64(
+      JSON.dump(
+        visit_id: resource.id,
+        series: params[:scope] || "all_rs"
+      )
+    )
+
+    @router_basename = "/admin/visits/#{resource.id}"
+    @wado_rs_endpoint = "#{request.base_url}/dicomweb/visit/#{scope_query}/rs"
+
+    render "shared/dicom_viewer", layout: nil
+  end
+
+  member_action :webviewer, method: :get do
+    scope_query = params[:scope] || "all_rs"
+
+    # Manually find the `resource` as active admin would otherwise
+    # perform a lazy authorization causing an error:
+    resource = Visit.find(params[:id])
+    required_series = resource.required_series.where(name: scope_query).first
+    # authorize
+
+    @page_title = case scope_query
+                  when "all_rs" then "Assigned Required Series"
+                  when "all" then "All Image Series"
+                  else required_series.name
+                  end
+    render(
+      'shared/_dicom_viewer_iframe',
+      locals: {
+        viewer_url: viewer_admin_visit_path(resource) + "/" + scope_query
+      }
+    )
   end
 
   member_action :all_required_series_viewer, :method => :get do
@@ -602,8 +658,8 @@ ActiveAdmin.register Visit do
     )
   end
 
-  action_item :view, :only => [:show, :mqc_form, :mqc_results] do
-    link_to('Viewer (RS)', all_required_series_viewer_admin_visit_path(resource))
+  action_item :maximize_window, :only => [:show, :mqc_form, :mqc_results] do
+    link_to('Viewer (RS)', webviewer_admin_visit_path(resource, scope: "all_rs"), target: "_blank")
   end
 
   controller do

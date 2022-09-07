@@ -6,4 +6,8 @@ class ApplicationRecord < ActiveRecord::Base
 
     to_s
   end
+
+  def has_dicom?
+    false
+  end
 end

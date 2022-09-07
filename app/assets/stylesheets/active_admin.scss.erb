@@ -4,6 +4,7 @@
 @import "general/spinner";
 @import "general/active_admin_bootstrap_select2";
 @import "general/custom_dropdown";
+@import "general/content_columns";
 
 body {
   font-family: 'Roboto', sans-serif;
@@ -142,4 +143,57 @@ form .formio-form .form-group {
       margin-left: 16px;
     }
   }
+}
+
+body.tqc_form .inputs li,
+body.mqc_form .inputs li {
+  label {
+    @extend .col-sm-10;
+    padding-left: 0;
+  }
+
+  input[type="text"],
+      input[type="password"],
+      input[type="datetime"],
+      input[type="datetime-local"],
+      input[type="date"],
+      input[type="month"],
+      input[type="time"],
+      input[type="week"],
+      input[type="number"],
+      input[type="email"],
+      input[type="url"],
+      input[type="search"],
+      input[type="tel"],
+      input[type="color"],
+      select,
+      textarea {
+	@extend .col-sm-2;
+	padding: $padding-base-vertical $padding-base-horizontal;
+	width: 100%;
+	max-width: initial;
+      }
+      .select2 {
+	@extend .col-sm-2;
+	width: 16.6666666667% !important;
+	padding: 0;
+      }
+
+      p.inline-errors {
+	color: $brand-warning;
+	display: inline-block;
+	margin: 0px 10px;
+	line-height: $input-height-base;
+      }
+
+      p.inline-hints {
+	@extend .col-sm-12;
+	@extend .col-sm-offset-0;
+	@extend small;
+
+	position: relative;
+	display: block;
+	padding: 0;
+	margin-top: 10px;
+      }
 }

@@ -87,6 +87,12 @@ SELECT
     )
   end
 
+  # TODO:
+  # def self.perform_async(options)
+  #   params = options.delete(:params)
+  #   worker_klass = options.delete(:worker)
+  # end
+
   ##
   # Find out whether this job has finished.
   #

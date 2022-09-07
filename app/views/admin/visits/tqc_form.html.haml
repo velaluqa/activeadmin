@@ -1,57 +1,59 @@
 = javascript_include_tag('tqc_validation')
-= form_tag(tqc_admin_visit_path(@visit, :required_series_name => @required_series.name), :method => :post, :class => 'formtastic form', :id => 'tqc_form') do
-  .panel
-    %h3 Automatic DICOM tQC
-    .panel_contents
-      %table
-        %thead
-          %tr
-            %th DICOM tag
-            %th Expected
-            %th Actual Value
-            %th Pass/Fail?
-        %tbody
-          - @dicom_tqc_spec.each do |spec|
+= form_tag(tqc_admin_visit_path(@visit, :required_series_name => @required_series.name), :method => :post, :class => 'formtastic form content-columns', :id => 'tqc_form') do
+  = render(partial: 'shared/dicom_viewer_iframe', locals: {viewer_url: "#{viewer_admin_visit_path(@visit)}/#{params[:required_series_name]}" })
+  .resource-properties{ style: "max-width: 40vw;" }
+    .panel
+      %h3 Automatic DICOM tQC
+      .panel_contents
+        %table
+          %thead
             %tr
-              - field_name = 'tqc_result['+spec['id']+']'
-              %td
-                = spec['label']
-                %span.dicom_tag_key= "(#{spec['dicom_tag']})"
-              %td= (spec['expected'].is_a?(Array) ? spec['expected'].join(', ') : spec['expected'].to_s)
-              %td
-                - if spec['actual_value'].nil?
-                  %span.status_tag.Missing.error N/A
-                - else
-                  = spec['actual_value']
-              %td
-                - current_value = (@required_series.tqc_results.nil? ? nil : @required_series.tqc_results[spec['id']])
-                - current_value = (spec['result'] == true) if current_value.nil?
-                = hidden_field_tag('result_'+field_name, (spec['result'] == true ? '1' : '0'))
-                = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false, :class => 'dicom_value_tqc')
+              %th DICOM tag
+              %th Expected
+              %th Actual Value
+              %th Pass/Fail?
+          %tbody
+            - @dicom_tqc_spec.each do |spec|
+              %tr
+                - field_name = 'tqc_result['+spec['id']+']'
+                %td
+                  = spec['label']
+                  %span.dicom_tag_key= "(#{spec['dicom_tag']})"
+                %td= (spec['expected'].is_a?(Array) ? spec['expected'].join(', ') : spec['expected'].to_s)
+                %td
+                  - if spec['actual_value'].nil?
+                    %span.status_tag.Missing.error N/A
+                  - else
+                    = spec['actual_value']
+                %td
+                  - current_value = (@required_series.tqc_results.nil? ? nil : @required_series.tqc_results[spec['id']])
+                  - current_value = (spec['result'] == true) if current_value.nil?
+                  = hidden_field_tag('result_'+field_name, (spec['result'] == true ? '1' : '0'))
+                  = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false, :class => 'dicom_value_tqc')
 
-  = field_set_tag('<span>tQC Questions</span>'.html_safe, :class => 'inputs') do
-    %ol
-      - @manual_tqc_spec.each do |spec|
-        - field_name = 'tqc_result['+spec['id']+']'
-        - current_value = (@required_series.tqc_results.nil? ? nil : @required_series.tqc_results[spec['id']])
-        - case spec['type']
-        - when 'bool'
-          %li.input.select
-            = hidden_field_tag(field_name, '0')
-            = label_tag(field_name, spec['label'])
-            = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false)
-            - unless spec['description'].nil?
-              %p.inline-hints= spec['description']
-  = field_set_tag('<span>Comment / Observation</span>'.html_safe, :class => 'inputs') do
-    %ol
-      %li.input.string
-        = label_tag('tqc_comment', 'Comment', :id => 'tqc_comment_label')
-        = text_field_tag('tqc_comment', @required_series.tqc_comment)
-        %p.inline-hints#tqc_comment_hint A comment is required if any of the above criteria were answered with 'Fail'
+    = field_set_tag('<span>tQC Questions</span>'.html_safe, :class => 'inputs') do
+      %ol
+        - @manual_tqc_spec.each do |spec|
+          - field_name = 'tqc_result['+spec['id']+']'
+          - current_value = (@required_series.tqc_results.nil? ? nil : @required_series.tqc_results[spec['id']])
+          - case spec['type']
+          - when 'bool'
+            %li.input.select
+              = hidden_field_tag(field_name, '0')
+              = label_tag(field_name, spec['label'])
+              = select_tag(field_name, options_for_select([['Fail', '0'], ['Pass', '1']], (current_value ? '1' : '0')), :include_blank => false)
+              - unless spec['description'].nil?
+                %p.inline-hints= spec['description']
+    = field_set_tag('<span>Comment / Observation</span>'.html_safe, :class => 'inputs') do
+      %ol
+        %li.input.string
+          = label_tag('tqc_comment', 'Comment', :id => 'tqc_comment_label')
+          = text_field_tag('tqc_comment', @required_series.tqc_comment)
+          %p.inline-hints#tqc_comment_hint A comment is required if any of the above criteria were answered with 'Fail'
 
-  = field_set_tag(nil, :class => 'actions') do
-    %ol
-      %li.action.input_action
-        = submit_tag('Save tQC Results')
-      %li.cancel
-        = link_to('Cancel', admin_visit_path(@visit))
+    = field_set_tag(nil, :class => 'actions') do
+      %ol
+        %li.action.input_action
+          = submit_tag('Save tQC Results')
+        %li.cancel
+          = link_to('Cancel', admin_visit_path(@visit))

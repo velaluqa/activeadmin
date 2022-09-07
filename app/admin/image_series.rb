@@ -182,46 +182,60 @@ ActiveAdmin.register ImageSeries do
   end
 
   show do |image_series|
-    attributes_table do
-      row :patient
-      row :visit
-      row :series_number
-      row :name
-      domino_link_row(image_series)
-      row :files
-      row :image_types
-      row :image_storage_path
-      row :imaging_date
-      row :import_date
-      row :state
-      comment_row(image_series, :comment, 'Comment')
-      tags_row(image_series, :tags, 'Tags', can?(:update_tags, image_series))
-      row 'Required Series' do
-        assigned_required_series = image_series.assigned_required_series.pluck(:name)
-        if(assigned_required_series.empty?)
-          "None assigned"
-        else
-          ul do
-            assigned_required_series.each do |required_series_name|
-              li { required_series_name }
+    div class: image_series.has_dicom? ? "content-columns" : "" do
+      if image_series.has_dicom?
+        render(
+          partial: 'shared/dicom_viewer_iframe',
+          locals: {
+            viewer_url: "#{viewer_admin_image_series_path(image_series)}/999.999.999.#{image_series.patient_id}"
+          }
+        )
+      end
+
+      div class: "resource-properties" do
+        attributes_table do
+          row :patient
+          row :visit
+          row :series_number
+          row :name
+          domino_link_row(image_series)
+          row :files
+          row :image_types
+          row :image_storage_path
+          row :imaging_date
+          row :import_date
+          row :state
+          comment_row(image_series, :comment, 'Comment')
+          tags_row(image_series, :tags, 'Tags') if can?(:read_tags, ImageSeries)
+          row 'Required Series' do
+            assigned_required_series = image_series.assigned_required_series.pluck(:name)
+            if(assigned_required_series.empty?)
+              "None assigned"
+            else
+              ul do
+                assigned_required_series.each do |required_series_name|
+                  li { required_series_name }
+                end
+              end
             end
           end
+          row :viewer
         end
+
+        properties_version = image_series.properties_version || image_series.study.andand.locked_version
+        study_config = image_series.study.andand.configuration_at_version(properties_version)
+        if image_series.study && study_config && image_series.study.semantically_valid_at_version?(properties_version) && image_series.properties
+          properties_spec = study_config['image_series_properties']
+
+          render :partial => 'admin/image_series/properties_table',
+                 :locals => {
+                   :spec => properties_spec,
+                   :values => image_series.properties
+                 }
+        end
+        active_admin_comments if can?(:comment, image_series)
       end
-      row :viewer
     end
-
-    properties_version = image_series.properties_version || image_series.study.andand.locked_version
-    study_config = image_series.study.andand.configuration_at_version(properties_version)
-    if image_series.study && study_config && image_series.study.semantically_valid_at_version?(properties_version) && image_series.properties
-      properties_spec = study_config['image_series_properties']
-
-      render :partial => 'admin/image_series/properties_table',
-             :locals => {
-               :spec => properties_spec,
-               :values => image_series.properties
-             }    end
-    active_admin_comments if can?(:comment, image_series)
   end
 
   form do |f|
@@ -306,7 +320,17 @@ ActiveAdmin.register ImageSeries do
   filter :comment
   tags_filter(:tags, 'Tags')
 
-  member_action :viewer, :method => :get do
+  member_action :viewer, method: :get do
+    @image_series = ImageSeries.find(params[:id])
+    authorize! :read, @image_series
+
+    @router_basename = "/admin/image_series/#{params[:id]}"
+    @wado_rs_endpoint = "#{request.base_url}/dicomweb/image_series/#{@image_series.id}/rs"
+
+    render "shared/dicom_viewer", layout: nil
+  end
+
+  member_action :weasis_viewer, :method => :get do
     @image_series = ImageSeries.find(params[:id])
     authorize! :read, @image_series
 

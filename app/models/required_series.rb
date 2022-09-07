@@ -299,6 +299,10 @@ JOIN
     end
   end
 
+  def has_dicom?
+    image_series.has_dicom?
+  end
+
   private
 
   # TODO: Refactor into Operation

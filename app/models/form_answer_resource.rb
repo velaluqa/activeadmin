@@ -50,6 +50,13 @@ class FormAnswerResource < ApplicationRecord
     errors.add(:resource_identifier, "cannot be assigned multiple times")
   end
 
+  def attributes_with_resource
+    attributes.merge(
+      resource: resource.attributes,
+      has_dicom: resource.has_dicom?
+    )
+  end
+
   # TODO: Extract into class method helper: attr_polymorphic_identifier :resource
   def resource_identifier
     return nil unless resource

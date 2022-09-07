@@ -82,6 +82,7 @@ class V1::FormAnswersController < V1::ApiController
         render_react(
           "form_answers_show",
           form_answer: form_answer.attributes,
+          form_answer_resources: form_answer.form_answer_resources.map(&:attributes),
           signature_user: form_answer.public_key.user.attributes.pick("id", "name", "username"),
           form_definition: form_answer.form_definition.attributes,
           form_layout: form_answer.layout
@@ -113,6 +114,7 @@ class V1::FormAnswersController < V1::ApiController
         .merge(
           allow_saving_draft: form_answer.allow_saving_draft
         ),
+      form_answer_resources: form_answer.form_answer_resources.map(&:attributes_with_resource),
       current_user: current_user.attributes.pick("id", "name", "username"),
       form_definition: form_answer.form_definition.attributes,
       form_layout: form_answer.layout
@@ -200,6 +202,15 @@ class V1::FormAnswersController < V1::ApiController
         )
       end
     end
+  end
+
+  def viewer
+    resource = FormAnswer.find(params[:id])
+
+    @router_basename = "/v1/form_answers/#{resource.id}"
+    @wado_rs_endpoint = "#{request.base_url}/dicomweb/form_answer/#{resource.id}/rs"
+
+    render "shared/dicom_viewer", layout: nil
   end
 
   private

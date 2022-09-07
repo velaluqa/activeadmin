@@ -1,6 +1,8 @@
 class DominoSyncWorker
   include Sidekiq::Worker
 
+  sidekiq_options(queue: :domino)
+
   # This worker is designed to throw exceptions on all errors/misuses, since Sidekiq handles those nicely
 
   def perform(resource_class_name, resource_id)

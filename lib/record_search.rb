@@ -65,7 +65,7 @@ class RecordSearch
     when "User" then User.find(id)
     when "Role" then Role.find(id)
     when "RequiredSeries" then RequiredSeries.find(id)
-    when "Comment" then ActiveAdmin::Comments.find(id)
+    when "ActiveAdmin::Comments" then ActiveAdmin::Comments.find(id)
     when "FormAnswer" then FormAnswer.find(id)
     else fail "Unknown record search type #{type.inspect}"
     end
