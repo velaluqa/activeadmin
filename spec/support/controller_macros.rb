@@ -21,9 +21,24 @@ module ControllerMacros
       @current_user = FactoryBot.create(:user, :changed_password, :with_keypair)
       sign_in @current_user
 
-      ability = Class.new { attr_accessor :current_user }.new
+      ability_class = Class.new do
+        attr_accessor :current_user
+        include CanCan::Ability
+
+        def can_with_undecorate?(action, subject, attribute = nil, *extra_args)
+          undecorated_subject = Draper.undecorate(subject)
+          can_without_undecorate?(
+            action,
+            undecorated_subject,
+            attribute,
+            *extra_args
+          )
+        end
+        alias_method :can_without_undecorate?, :can?
+        alias_method :can?, :can_with_undecorate?
+      end
+      ability = ability_class.new
       ability.current_user = @current_user
-      ability.extend(CanCan::Ability)
       ability.instance_eval(&block) if block_given?
 
       begin

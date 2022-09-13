@@ -1,4 +1,6 @@
 ActiveAdmin.register PublicKey do
+  decorate_with(PublicKeyDecorator)
+
   menu false
   config.comments = false
 
@@ -17,16 +19,8 @@ ActiveAdmin.register PublicKey do
   index do
     selectable_column
     column :user, sortable: :user_id
-    column :status, sortable: :deactivated_at do |public_key|
-      if public_key.active?
-        status_tag('Active', class: 'ok')
-      else
-        status_tag('Deactivated', label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
-      end
-    end
-    column :public_key do |public_key|
-      link_to('Download', download_admin_public_key_path(public_key))
-    end
+    column :status, sortable: :deactivated_at 
+    column :public_key 
 
     actions
   end
@@ -34,16 +28,8 @@ ActiveAdmin.register PublicKey do
   show do |public_key|
     attributes_table do
       row :user
-      row :status do
-        if public_key.active?
-          status_tag('Active', class: 'ok')
-        else
-          status_tag('Deactivated', label: 'Deactivated at ' + pretty_format(public_key.deactivated_at))
-        end
-      end
-      row :public_key do
-        link_to('Download', download_admin_public_key_path(public_key))
-      end
+      row :status 
+      row :public_key
     end
   end
 

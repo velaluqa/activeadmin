@@ -106,6 +106,14 @@ JOIN
     Study::STATE_SYMS[read_attribute(:state)]
   end
 
+  def building?
+    Study::STATE_SYMS[read_attribute(:state)] == :building
+  end
+
+  def production?
+    Study::STATE_SYMS[read_attribute(:state)] == :production
+  end
+
   def state=(sym)
     sym = sym.to_sym if sym.is_a? String
     index =
