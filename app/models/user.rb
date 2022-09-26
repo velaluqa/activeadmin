@@ -72,6 +72,8 @@ class User < ApplicationRecord
     :token_authenticatable
   )
 
+  acts_as_taggable
+
   attr_accessible(
     :username,
     :name,

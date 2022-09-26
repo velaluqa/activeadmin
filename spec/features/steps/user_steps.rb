@@ -40,16 +40,26 @@ step 'a user :string' do |username|
   )
 end
 
-step 'a user :string with:' do |username, attributes|
-  FactoryBot.create(
+step 'a user :string with:' do |username, table|
+  options = {username: username}
+  tag_list = nil
+
+  table.to_a.each do |attribute, value|
+    if attribute == "tags"
+      tag_list = value
+    else
+      options[attribute.to_sym] = value
+    end
+  end
+
+  user = FactoryBot.create(
     :user,
     :changed_password,
     :with_keypair,
-    attributes
-      .rows_hash
-      .symbolize_keys
-      .merge(username: username)
+    options
   )
+  user.tag_list = tag_list if tag_list
+  user.save
 end
 
 step 'a user :string with role :string' do |username, role|

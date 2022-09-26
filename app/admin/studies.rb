@@ -56,6 +56,7 @@ ActiveAdmin.register Study do
         'n/A'
       end
     end
+    tags_column(:tags, 'Tags') if can?(:read_tags, Study)
 
     customizable_default_actions(current_ability)
   end
@@ -79,7 +80,8 @@ ActiveAdmin.register Study do
       row :state do
         study.state.to_s.camelize + (study.locked_version.nil? ? '' : " (Version: #{study.locked_version})")
       end
-      keywords_row(study, :tags, 'Allowed Keywords', can?(:define_keywords, study)) if Rails.application.config.is_erica_remote
+      
+      tags_row(study, :tags, 'Tags', can?(:update_tags, study))
 
       if study.has_configuration?
         row :configuration_validation do
@@ -134,6 +136,7 @@ ActiveAdmin.register Study do
   # filters
   filter :name
   filter :state, as: :check_boxes, collection: Study::STATE_SYMS.each_with_index.map { |state, i| [state, i] }
+  tags_filter(:tags, 'Tags')
 
   member_action :download_current_configuration do
     @study = Study.find(params[:id])
@@ -285,17 +288,6 @@ ActiveAdmin.register Study do
     link_to 'Unlock', unlock_admin_study_path(resource)
   end
 
-  member_action :autocomplete_tags do
-    study = Study.find(params[:id])
-    authorize! :edit_keywords, study
-
-    tags = study.tags_on(params[:context]).where('name LIKE ?', params[:q] + '%').order(:name)
-
-    respond_to do |format|
-      format.json { render json: tags.map { |t| { id: t.name, name: t.name } } }
-    end
-  end
-
   member_action :clean_dicom_tag, :method => :delete do
     @study = Study.find(params[:id])
     authorize! :clean_dicom_metadata, @study
@@ -320,5 +312,5 @@ ActiveAdmin.register Study do
   end
 
   viewer_cartable(:study)
-  erica_keywordable(:tags, 'Allowed Keywords') if Rails.application.config.is_erica_remote
+  erica_taggable(:tags, 'Tags')
 end

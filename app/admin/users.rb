@@ -1,3 +1,5 @@
+require 'aa_erica_keywords'
+
 ActiveAdmin.register User do
   menu(
     parent: 'users',
@@ -61,6 +63,7 @@ ActiveAdmin.register User do
         link_to 'Impersonate', impersonate_admin_user_path(user)
       end
     end
+    tags_column(:tags, 'Tags') if can?(:read_tags, User)
     customizable_default_actions(current_ability)
   end
 
@@ -128,6 +131,7 @@ ActiveAdmin.register User do
           link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
         end
       end
+      tags_row(user, :tags, 'Tags', can?(:update_tags, user))
     end
   end
 
@@ -181,6 +185,7 @@ ActiveAdmin.register User do
   filter :username
   filter :name
   filter :roles
+  tags_filter(:tags, 'Tags')
 
   member_action :preview_permissions, method: :get do
     @user = User.find(params[:id])
@@ -276,4 +281,6 @@ ActiveAdmin.register User do
     )
     link_to('Audit Trail', url)
   end
+
+  erica_taggable(:tags, "Tags")
 end

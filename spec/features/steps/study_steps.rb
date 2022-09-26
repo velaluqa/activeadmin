@@ -4,10 +4,19 @@ end
 
 step 'a study :string with:' do |name, table|
   options = { name: name }
+  tag_list = nil
+
   table.to_a.each do |attribute, value|
-    options[attribute.to_sym] = value
+    if attribute == "tags"
+      tag_list = value
+    else
+      options[attribute.to_sym] = value
+    end
   end
-  create(:study, options)
+
+  study = build(:study, options)
+  study.tag_list = tag_list if tag_list
+  study.save
 end
 
 step 'a study :string with configuration' do |name, config_yaml|

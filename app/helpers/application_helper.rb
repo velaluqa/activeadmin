@@ -15,6 +15,11 @@ module ApplicationHelper
     Rails.application.routes.url_helpers.send(method, model)
   end
 
+  def autocomplete_tags_path(model, options = {})
+    method = "autocomplete_tags_admin_#{model.class.to_s.underscore}_path"
+    Rails.application.routes.url_helpers.send(method, model, options)
+  end
+
   def markdown(str)
     @renderer ||= Redcarpet::Markdown.new(
       RedcarpetInlineRenderer,

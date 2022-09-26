@@ -1,17 +1,17 @@
 module ActiveAdmin
   module Views
     class IndexAsTable
-      def keywords_column(context, label)
+      def tags_column(context, label)
         label ||= context.to_s.humanize
 
         column label do |resource|
-          can_edit = can? :edit_keywords, resource
+          can_edit = can? :update_tags, resource
 
           if resource.tags_on(context).empty?
-            link_to('Add ' + label, url_for(action: :edit_erica_keywords_form, id: resource.id, return_url: request.fullpath)) if can_edit
+            link_to('Add ' + label, url_for(action: :edit_erica_tags_form, id: resource.id, return_url: request.fullpath)) if can_edit
           else
             tag_list = resource.tag_list_on(context).map { |t| link_to(t, action: :index, q: { context.to_s.singularize + '_taggings_tag_name_eq' => t }) }.join(', ')
-            tag_list += link_to(' <i class="fa fa-pencil"></i>'.html_safe, url_for(action: :edit_erica_keywords_form, id: resource.id, return_url: request.fullpath), class: 'member_link') if can_edit
+            tag_list += link_to(' <i class="fa fa-pencil"></i>'.html_safe, url_for(action: :edit_erica_tags_form, id: resource.id, return_url: request.fullpath), class: 'member_link') if can_edit
 
             tag_list.html_safe
           end
@@ -20,17 +20,17 @@ module ActiveAdmin
     end
 
     class AttributesTable
-      def keywords_row(resource, context, label, can_edit = nil)
+      def tags_row(resource, context, label, can_edit = nil)
         label ||= context.to_s.humanize
 
-        can_edit = can? :edit_keywords, resource if can_edit.nil?
+        can_edit = can? :update_tags, resource if can_edit.nil?
 
         row label do
           if resource.tags_on(context).empty?
-            link_to('Add ' + label, url_for(action: :edit_erica_keywords_form, id: resource.id, return_url: request.fullpath)) if can_edit
+            link_to('Add ' + label, url_for(action: :edit_erica_tags_form, id: resource.id, return_url: request.fullpath)) if can_edit
           else
             tag_list = resource.tag_list_on(context).map { |t| link_to(t, action: :index, q: { context.to_s.singularize + '_taggings_tag_name_eq' => t }) }.join(', ')
-            tag_list += link_to(' <i class="fa fa-pencil"></i>'.html_safe, url_for(action: :edit_erica_keywords_form, id: resource.id, return_url: request.fullpath), class: 'member_link') if can_edit
+            tag_list += link_to(' <i class="fa fa-pencil"></i>'.html_safe, url_for(action: :edit_erica_tags_form, id: resource.id, return_url: request.fullpath), class: 'member_link') if can_edit
 
             tag_list.html_safe
           end
@@ -41,12 +41,12 @@ module ActiveAdmin
 
   module Filters
     module DSL
-      def keywords_filter(context, label)
+      def tags_filter(context, label)
         label ||= context.to_s.humanize
 
         field_name = context.to_s.singularize + '_taggings_tag_name'
-        filter field_name.to_sym, label: label, as: :select, collection: ActsAsTaggableOn::Tag.pluck(:name), input_html: {
-          class: 'tagfilter'
+        filter field_name.to_sym, label: label, as: :select, if: proc { can?(:read_tags, resource_class) }, collection: -> { resource_class.tag_counts_on(context).map { |tag| ["#{tag.name} (#{tag.taggings_count})", tag.name] } }, input_html: {
+          class: 'tagfilter no-auto-select2'
         }
       rescue StandardError => e
         # TODO: Clean up this mess! We actually have to check, whether
@@ -64,20 +64,37 @@ module ActiveAdmin
 
   module ERICAKeywordsMixin
     module DSL
-      def erica_keywordable(context, label)
+      def erica_taggable(context, label)
         label ||= context.to_s.humanize
 
-        member_action :edit_erica_keywords, method: :post do
+        member_action :autocomplete_tags do
           @resource = resource_class.find(params[:id])
-          authorize! :edit_keywords, @resource
+          authorize! :update_tags, @resource
 
-          # verify keywords are valid for this study
-          if @resource.is_a?(Study)
-            authorize! :define_keywords, @resource
-            new_keywords = params[:keywords]
+          term = params[:q]
+          context = params[:context]
+
+          tags = resource_class
+                   .tags_on(context)
+                   .where('name LIKE ?', "#{term}%")
+                   .order(:name)
+                   .pluck(:name)
+
+          respond_to do |format|
+            format.json { render json: tags }
+          end
+        end
+
+        member_action :edit_erica_tags, method: :post do
+          @resource = resource_class.find(params[:id])
+
+          authorize! :update_tags, @resource
+
+          if can?(:create_tags, @resource)
+            new_keywords = params[:tags]
           else
-            new_keywords = ActsAsTaggableOn::DefaultParser.new(params[:keywords]).parse
-            new_keywords &= @resource.study.tag_list_on(context)
+            available_keywords = resource_class.tag_counts_on(context).map(&:name)
+            new_keywords = params[:tags] & available_keywords
           end
 
           @resource.set_tag_list_on(context, new_keywords)
@@ -89,9 +106,10 @@ module ActiveAdmin
             redirect_to params[:return_url], notice: label + ' changed.'
           end
         end
-        member_action :edit_erica_keywords_form, method: :get do
+
+        member_action :edit_erica_tags_form, method: :get do
           @resource = resource_class.find(params[:id])
-          authorize! :edit_keywords, @resource
+          authorize! :update_tags, @resource
 
           @return_url = params[:return_url]
           @page_title = 'Edit ' + label

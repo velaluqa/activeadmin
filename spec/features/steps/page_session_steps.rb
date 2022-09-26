@@ -530,3 +530,15 @@ step 'I see :string xml entries with the following attributes:' do |tag, attribu
     end
   end
 end
+
+step "I click the pencil icon in :string row" do |row_content|
+  within('tr', text: row_content) do
+    find(:css, "i.fa.fa-pencil").click
+  end
+end
+
+step "I don't see the edit pencil icon in :string row" do |row_content|
+  within('tr', text: row_content) do
+    expect(page).not_to have_css("i.fa.fa-pencil")
+  end
+end

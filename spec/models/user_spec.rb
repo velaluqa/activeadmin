@@ -12,6 +12,7 @@ RSpec.describe User do
           'id' => nil,
           'study_id' => nil,
           'study_name' => nil,
+          'tag_list' => nil,
           'text' => user.name,
           'result_id' => user.id.to_s,
           'result_type' => 'User'

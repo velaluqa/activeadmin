@@ -174,4 +174,57 @@ RSpec.describe Admin::VisitsController do
       end
     end
   end
+
+  describe "#edit_erica_tags" do
+    before(:each) do
+      @visit = create(:visit)
+    end
+
+    describe 'unauthorized' do
+      login_user_with_abilities do
+        can :read_tags, Visit
+        can :update_tags, Visit
+      end
+
+      it 'denies creating new tags' do
+        expect(@visit.tag_list).to be_empty
+
+        response = post(
+          :edit_erica_tags,
+          params: {
+            id: @visit.id,
+            tags: ["new tag"]
+          }
+        )
+
+        @visit.reload
+
+        expect(@visit.tag_list).to be_empty
+      end
+    end
+
+    describe 'authorized' do
+      login_user_with_abilities do
+        can :read_tags, Visit
+        can :update_tags, Visit
+        can :create_tags, Visit
+      end
+
+      it 'adds the tag to the visit' do
+        expect(@visit.tag_list).to be_empty
+
+        response = post(
+          :edit_erica_tags,
+          params: {
+            id: @visit.id,
+            tags: ["new tag"]
+          }
+        )
+
+        @visit.reload
+
+        expect(@visit.tag_list).to eq(["new tag"])
+      end
+    end
+  end
 end
