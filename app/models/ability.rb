@@ -53,6 +53,7 @@ class Ability
 
     if current_user.is_root_user?
       can :manage, ACTIVITIES.keys
+      can :manage, Image
     else
       define_system_wide_abilities
       define_scopable_abilities
