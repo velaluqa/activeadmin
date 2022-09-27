@@ -401,16 +401,10 @@ ActiveAdmin.register ImageSeries do
     tag_keyword = DICOM::Tag.keyword(tag)
     tag_label = tag_keyword ? "#{tag_keyword} (#{tag})" : tag
 
-    background_job = BackgroundJob.create(
+    background_job = CleanDicomTagWorker.perform_async(
+      "ImageSeries", params[:id], tag,
       name: "Clean DICOM tag #{tag_label} for image series #{@image_series.name}",
       user_id: current_user.id
-    )
-
-    CleanDicomTagWorker.perform_async(
-      background_job.id.to_s,
-      "ImageSeries",
-      params[:id],
-      tag
     )
 
     redirect_to admin_background_job_path(background_job)

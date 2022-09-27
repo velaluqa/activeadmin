@@ -4,7 +4,7 @@ class Ability
   attr_reader :current_user
 
   ACTIVITIES = {
-    BackgroundJob => %i[manage read destroy],
+    BackgroundJob => %i[manage read destroy cancel],
     Sidekiq => %i[manage],
     Configuration => %i[manage read],
     Study  => %i[manage read update create destroy comment read_reports read_tags create_tags update_tags configure clean_dicom_metadata change_domino_config],

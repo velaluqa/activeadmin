@@ -115,4 +115,17 @@ ActiveAdmin.register BackgroundJob do
 
     send_file background_job.results['zipfile'], type: 'application/zip'
   end
+
+  member_action :cancel_job, method: :get do
+    background_job = BackgroundJob.find(params[:id])
+    authorize!(:cancel, background_job)
+
+    background_job.cancel!
+
+    redirect_back(fallback_location: admin_background_job_path(id: params[:id]))
+  end
+
+  action_item :cancel, only: :show, if: -> { resource.cancellable? && can?(:cancel, resource) } do
+    link_to("Cancel Background Job", cancel_job_admin_background_job_path(resource))
+  end
 end

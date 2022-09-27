@@ -55,7 +55,7 @@ Feature: Download Visit Images
     Then I am redirected to the latest background_job
     And I see "Your download will be available shortly."
     When I wait for all jobs in "DownloadImagesWorker" queue
-    Then I see "COMPLETED" in "State" row
+    Then I see "SUCCEEDED" in "State" row
     And I see "Zip file Download"
     When I click link "Download"
     Then I download zip file
@@ -69,7 +69,7 @@ Feature: Download Visit Images
     Then I am redirected to the latest background_job
     And I see "Your download will be available shortly."
     When I wait for all jobs in "DownloadImagesWorker" queue
-    Then I see "COMPLETED" in "State" row
+    Then I see "SUCCEEDED" in "State" row
     And I see "Zip file Download"
     When I click link "Download"
     Then I download zip file

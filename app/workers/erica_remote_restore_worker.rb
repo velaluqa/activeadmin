@@ -4,9 +4,7 @@ require 'sidekiq_background_job'
 class ERICARemoteRestoreWorker
   include SidekiqBackgroundJob
   
-  def perform(job_id, export_id)
-    job = BackgroundJob.find(job_id)
-
+  def perform_job(export_id)
     remote = RemoteRestore.new(export_id)
 
     remote.extract_archive!
@@ -23,9 +21,6 @@ class ERICARemoteRestoreWorker
 
     remote.cleanup
 
-    job.finish_successfully({})
-  rescue => error
-    job.fail(error.message)
-    raise error
+    succeed!
   end
 end
