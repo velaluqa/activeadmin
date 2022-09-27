@@ -54,7 +54,8 @@ respective test result for tracability reasons.
 | Test Step                                                           | Success? |
 |---------------------------------------------------------------------|----------|
 <% scenario['steps'].each do |step| -%>
-| <%= step.split("\n").first.gsub("\\n", "\\textbackslash{}n") %> <%= step.split(/^\|/).map { |row| row[/^(.*?)\|/, 1]&.strip }.compact.join(", ").gsub("\\n", "\\textbackslash{}n") %> | PASS      |
+<%- if step[0] != "#" -%>| <%= step.split("\n").first.gsub("\\n", "\\textbackslash{}n") %> <%= step.split(/^\|/).map { |row| row[/^(.*?)\|/, 1]&.strip }.compact.join(", ").gsub("\\n", "\\textbackslash{}n") %> | <%= if %w[When Then And But Given].include?(step.split(" ")[0]) then "PASSED" else "" end %>      |
+<%- end -%>
 <% end -%>
 
 <% end -%>
