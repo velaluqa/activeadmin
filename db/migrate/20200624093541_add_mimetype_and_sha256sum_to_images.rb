@@ -5,8 +5,9 @@ class AddMimetypeAndSha256sumToImages < ActiveRecord::Migration[4.2][4.2]
 
     reversible do |dir|
       dir.up do
-        Image.find_each do |image|
+        Image.where("sha256sum is null").find_each do |image|
           puts "Calculating checksum for #{image.image_storage_path} ..."
+          next unless File.exists?(image.absolute_image_storage_path)
           checksum =
             File.open(image.absolute_image_storage_path, 'rb') do |f|
             Digest::SHA256.hexdigest(f.read)
