@@ -26,6 +26,7 @@
   permission is not defined, the granting operation will fail and let
   the developer know, that this permission needs to be defined first)
 * Fix adding mimetype migration error for existing images
+* Fix generation of release documentation generation
 
 ## 7.2.4
 

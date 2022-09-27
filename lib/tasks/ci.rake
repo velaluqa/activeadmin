@@ -106,7 +106,7 @@ namespace :ci do
       command = [
         "pandoc",
         md_file,
-        "--pdf-engine=xelatex",
+        "--latex-engine=xelatex",
         "-f markdown+raw_tex",
         "--data-dir=./doc/tex-junk",
         "--template=./doc/vendor/documentation_latex_template.tex",

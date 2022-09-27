@@ -24,6 +24,7 @@ RUN  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
      argyll ghostscript \
      postgresql-client \
      texlive-base \
+     texlive-luatex \
      texlive-fonts-recommended \
      texlive-xetex \
      zlib1g-dev \
