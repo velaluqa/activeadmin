@@ -3,6 +3,8 @@ require 'aa_erica_comment'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register ImageSeries do
+  decorate_with(ImageSeriesDecorator)
+
   menu(parent: 'store', priority: 30)
 
   actions(:index, :show, :update, :edit, :destroy)
@@ -155,66 +157,20 @@ ActiveAdmin.register ImageSeries do
   index do
     selectable_column
     column :id
-    if(session[:selected_study_id].blank?)
-      column :study do |image_series|
-        link_to(image_series.study.name, admin_study_path(image_series.study)) unless image_series.study.nil?
-      end
-    end
+    column :study_name if session[:selected_study_id].blank?
     column :patient, :sortable => :patient_id
     column :visit, :sortable => :visit_id
     column :series_number
     column :name
     column :imaging_date
-    column 'Import Date', :created_at
-    column :files do |image_series|
-      link_to("#{image_series.images.count} #{"file".pluralize(image_series.images.count)}", admin_images_path(:'q[image_series_id_eq]' => image_series.id))
-    end
-    column :image_types do |image_series|
-      extensions = image_series.mime_extensions
-      if extensions.present?
-        status_tag(extensions.join(', '))
-      else
-        status_tag('NONE')
-      end
-    end
-    column :state, :sortable => :state do |image_series|
-      case image_series.state_sym
-      when :importing
-        status_tag('Importing', class: 'note')
-      when :imported
-        status_tag('Imported', class: 'error')
-      when :visit_assigned
-        status_tag('Visit assigned', class: 'warning')
-      when :required_series_assigned
-        assigned_required_series = image_series.assigned_required_series.pluck(:name)
-
-        label = '<ul>'
-        label += assigned_required_series.map {|ars| '<li>'+ars+'</li>'}.join('')
-        label += '</ul>'
-
-        ('<div class="status_tag required_series_assigned ok">'+label+'</div>').html_safe
-      when :not_required
-        status_tag('Not relevant for read')
-      end
-    end
+    column :import_date
+    column :files
+    column :image_types
+    column :state
     comment_column(:comment, 'Comment')
     tags_column(:tags, 'Tags') if can?(:read_tags, ImageSeries)
 
-    column 'View (in)' do |image_series|
-      result = ''
-
-      result += link_to('Viewer', viewer_admin_image_series_path(image_series, :format => 'jnlp'), :class => 'member_link')
-      result += link_to('Metadata', dicom_metadata_admin_image_series_path(image_series), :class => 'member_link', :target => '_blank') if image_series.has_dicom? && can?(:read_dicom_metadata, image_series)
-      result += link_to('Domino', image_series.lotus_notes_url, :class => 'member_link') unless(image_series.domino_unid.nil? or image_series.lotus_notes_url.nil? or Rails.application.config.is_erica_remote)
-      if can?(:assign_visit, image_series)
-        result += link_to('Assign Visit', assign_visit_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
-      end
-      if image_series.visit && can?(:assign_required_series, image_series.visit)
-        result += link_to('Assign RS', assign_required_series_form_admin_image_series_path(image_series, :return_url => request.fullpath), :class => 'member_link')
-      end
-
-      result.html_safe
-    end
+    column :view_in
 
     customizable_default_actions(current_ability)
   end
@@ -226,34 +182,12 @@ ActiveAdmin.register ImageSeries do
       row :series_number
       row :name
       domino_link_row(image_series)
-      row :images do
-        link_to(image_series.images.size, admin_images_path(:'q[image_series_id_eq]' => image_series.id))
-      end
-      row :file_types do
-        extensions = image_series.mime_extensions
-        if extensions.present?
-          status_tag(extensions.join(', '))
-        else
-          status_tag('NONE')
-        end
-      end
+      row :files
+      row :image_types
       row :image_storage_path
       row :imaging_date
-      row 'Import Date' do
-        pretty_format(image_series.created_at)
-      end
-      row :state do
-        case image_series.state_sym
-        when :imported
-          status_tag('Imported', class: 'error')
-        when :visit_assigned
-          status_tag('Visit assigned', class: 'warning')
-        when :required_series_assigned
-          status_tag('Required series assigned', class: 'ok')
-        when :not_required
-          status_tag('Not relevant for read')
-        end
-      end
+      row :import_date
+      row :state
       comment_row(image_series, :comment, 'Comment')
       tags_row(image_series, :tags, 'Tags', can?(:update_tags, image_series))
       row 'Required Series' do
@@ -268,9 +202,7 @@ ActiveAdmin.register ImageSeries do
           end
         end
       end
-      row 'Viewer' do
-        link_to('View in Viewer', viewer_admin_image_series_path(image_series, :format => 'jnlp'))
-      end
+      row :viewer
     end
 
     properties_version = image_series.properties_version || image_series.study.andand.locked_version
@@ -282,8 +214,7 @@ ActiveAdmin.register ImageSeries do
              :locals => {
                :spec => properties_spec,
                :values => image_series.properties
-             }
-    end
+             }    end
     active_admin_comments if can?(:comment, image_series)
   end
 

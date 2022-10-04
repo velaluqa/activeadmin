@@ -2,6 +2,8 @@ require 'aa_domino'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register Visit do
+  decorate_with(VisitDecorator)
+
   menu(parent: 'store', priority: 40)
 
   actions :index, :show if Rails.application.config.is_erica_remote
@@ -112,15 +114,7 @@ ActiveAdmin.register Visit do
     column :description
     column :visit_type
     column :visit_date, sortable: false
-    column :state, :sortable => :state do |visit|
-      case(visit.state_sym)
-      when :incomplete_na then status_tag('Incomplete, not available')
-      when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
-      when :incomplete_queried then status_tag('Incomplete, queried', :warning)
-      when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
-      when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', :error)
-      end
-    end
+    column :state, :sortable => :state 
     if can? :read_mqc, Visit
       column 'mQC State', :mqc_state, :sortable => :mqc_state do |visit|
         next unless can? :read_mqc, visit
@@ -141,7 +135,7 @@ ActiveAdmin.register Visit do
         next if visit.mqc_user.nil?
 
         link_to(visit.mqc_user.name, admin_user_path(visit.mqc_user))
-      end
+      end 
     end
     tags_column(:tags, 'Tags') if can?(:read_tags, Visit)
 
@@ -155,28 +149,10 @@ ActiveAdmin.register Visit do
       row :description
       row :visit_type
       row :visit_date
-      row :state do
-        case(visit.state_sym)
-        when :incomplete_na then status_tag('Incomplete, not available')
-        when :complete_tqc_passed then status_tag('Complete, tQC of all series passed', :ok)
-        when :incomplete_queried then status_tag('Incomplete, queried', :warning)
-        when :complete_tqc_pending then status_tag('Complete, tQC not finished', :warning)
-        when :complete_tqc_issues then status_tag('Complete, tQC finished, not all series passed', :error)
-        end
-      end
+      row :state
       if can? :read_mqc, visit
-        row 'mQC State' do
-          case(visit.mqc_state_sym)
-          when :pending then status_tag('Pending')
-          when :issues then status_tag('Performed, issues present', class: 'error')
-          when :passed then status_tag('Performed, passed', class: 'ok')
-          end
-        end
-        if(visit.mqc_version)
-          row 'mQC Configuration' do
-            link_to('Download', download_configuration_at_version_admin_study_path(visit.study, config_version: visit.mqc_version))
-          end
-        end
+        row 'mQC State', &:mqc_state
+        row :mqc_configuration if visit.mqc_version
       end
       tags_row(visit, :tags, 'Tags', can?(:update_tags, visit))
       domino_link_row(visit)

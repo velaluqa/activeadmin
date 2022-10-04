@@ -1,6 +1,8 @@
 require 'aa_erica_keywords'
 
 ActiveAdmin.register User do
+  decorate_with(UserDecorator)
+
   menu(
     parent: 'users',
     priority: 10,
@@ -27,42 +29,16 @@ ActiveAdmin.register User do
 
   index do
     selectable_column
-    column :name, sortable: :name do |user|
-      link_to user.name, admin_user_path(user)
-    end
+    column :name, sortable: :name
     column :username
     column :email do |user|
       user.email || '-'
     end
-    column :key_pair do |user|
-      if user.public_key.nil? || user.private_key.nil?
-        status_tag('Missing', class: 'error')
-      else
-        status_tag('Present', class: 'ok')
-      end
-    end
-    column :locked do |user|
-      if user.access_locked?
-        status_tag('Locked', class: 'error')
-      else
-        status_tag('Unlocked', class: 'ok')
-      end
-    end
-    column :confirmed do |user|
-      if user.confirmed?
-        status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", class: 'ok')
-      else
-        status_tag('Unconfirmed', class: 'error')
-      end
-    end
-    column 'Roles' do |user|
-      link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id) if can?(:read, Role) && can?(:read, UserRole)
-    end
-    column do |user|
-      if can?(:impersonate, user)
-        link_to 'Impersonate', impersonate_admin_user_path(user)
-      end
-    end
+    column :key_pair
+    column :locked
+    column :confirmed
+    column :roles
+    column :impersonate
     tags_column(:tags, 'Tags') if can?(:read_tags, User)
     customizable_default_actions(current_ability)
   end
@@ -73,47 +49,21 @@ ActiveAdmin.register User do
       row :username
       row :email
       row :sign_in_count
-      row :currently_signed_in do
-        if user.current_sign_in_at.nil?
-          'No'
-        else
-          "Yes, since #{pretty_format(user.current_sign_in_at)} from #{user.current_sign_in_ip}"
-        end
-      end
-      row :last_sign_in do
-        if user.last_sign_in_at.nil?
-          'Never'
-        else
-          "#{pretty_format(user.last_sign_in_at)} from #{user.last_sign_in_ip}"
-        end
-      end
+      row :currently_signed_in
+      row :last_sign_in
       row :failed_attempts
-      row :locked do
-        if user.access_locked?
-          status_tag("Locked at #{pretty_format(user.locked_at)}", class: 'error')
-        else
-          status_tag('Unlocked', class: 'ok')
-        end
-      end
+      row :locked
       row :confirmed do
         if user.confirmed?
           status_tag("Confirmed at #{pretty_format(user.confirmed_at)}", class: 'ok')
         else
           status_tag('Unconfirmed', class: 'error')
-          a("Resend confirmation", href: resend_confirmation_admin_user_path) if can?(:create, user)
+          a("Resend confirmation", href: resend_confirmation_admin_user_path) if can?(:create, user) 
           a("Confirm e-mail address", href: confirm_mail_admin_user_path) if can?(:confirm_mail, user)
         end
       end
-      row :public_key do
-        if user.public_key.nil?
-          status_tag('Missing', class: 'error')
-        else
-          link_to 'Download Public Key', download_public_key_admin_user_path(user)
-        end
-      end
-      row 'Past public keys' do
-        link_to(user.public_keys.count, admin_public_keys_path(:'q[user_id_eq]' => user.id))
-      end
+      row :public_key
+      row :past_public_keys
       if user.id == current_user.id
         row :private_key do
           if user.private_key.nil?
@@ -126,12 +76,8 @@ ActiveAdmin.register User do
           end
         end
       end
-      if can?(:read, Role) && can?(:read, UserRole)
-        row 'Roles' do |user|
-          link_to "#{user.user_roles.count} Roles", admin_user_user_roles_path(user_id: user.id)
-        end
-      end
       tags_row(user, :tags, 'Tags', can?(:update_tags, user))
+      row :roles if can?(:read, Role) && can?(:read, UserRole)
     end
   end
 

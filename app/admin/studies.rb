@@ -3,6 +3,8 @@ require 'schema_validation'
 require 'aa_erica_keywords'
 
 ActiveAdmin.register Study do
+  decorate_with(StudyDecorator)
+
   menu(parent: 'store', priority: 0)
 
   actions :index, :show if ERICA.remote?
@@ -36,26 +38,10 @@ ActiveAdmin.register Study do
 
   index do
     selectable_column
-    column :name, sortable: :name do |study|
-      link_to study.name, admin_study_path(study)
-    end
-    column :configuration do |study|
-      if study.has_configuration?
-        status_tag('Available', class: 'ok')
-      else
-        status_tag('Missing', class: 'error')
-      end
-    end
-    column :state, sortable: :state do |study|
-      study.state.to_s.camelize
-    end
-    column 'Select for Session' do |study|
-      if can? :read, study
-        link_to('Select', select_for_session_admin_study_path(study))
-      else
-        'n/A'
-      end
-    end
+    column :name, sortable: :name
+    column :configuration
+    column :state, sortable: :state
+    column :select_for_session
     tags_column(:tags, 'Tags') if can?(:read_tags, Study)
 
     customizable_default_actions(current_ability)
@@ -64,30 +50,15 @@ ActiveAdmin.register Study do
   show do |study|
     attributes_table do
       row :name
-      row :domino_db_url do
-        if study.domino_integration_enabled?
-          link_to(study.domino_db_url, study.domino_db_url)
-        else
-          status_tag('Disabled', class: 'warning', label: 'Domino integration not enabled')
-        end
-      end
+      row :domino_db_url 
       row :domino_server_name
-      row :notes_links_base_uri do
-        link_to(study.notes_links_base_uri, study.notes_links_base_uri) unless study.notes_links_base_uri.nil?
-      end
+      row :notes_links_base_uri 
       row :image_storage_path
 
-      row :state do
-        study.state.to_s.camelize + (study.locked_version.nil? ? '' : " (Version: #{study.locked_version})")
-      end
-      
+      row :state 
       tags_row(study, :tags, 'Tags', can?(:update_tags, study))
 
-      if study.has_configuration?
-        row :configuration_validation do
-          render 'admin/shared/schema_validation_results', errors: study.validate
-        end
-      end
+      row :configuration_validation if study.has_configuration? 
       row :configuration do
         current = {}
         if study.has_configuration?
@@ -278,12 +249,12 @@ ActiveAdmin.register Study do
     redirect_to({ action: :show }, notice: 'Form unlocked')
   end
 
-  action_item :lock, only: :show, if: -> { resource.state == :building } do
+  action_item :lock, only: :show, if: -> { resource.building? } do
     next unless can? :manage, study
     link_to 'Lock', lock_admin_study_path(resource)
   end
 
-  action_item :unlock, only: :show, if: -> { resource.state == :production } do
+  action_item :unlock, only: :show, if: -> { resource.production? } do
     next unless can? :manage, study
     link_to 'Unlock', unlock_admin_study_path(resource)
   end
