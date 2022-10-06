@@ -611,10 +611,12 @@ ActiveAdmin.register Visit do
       visit = Visit.find(visit_id)
       authorize! :download_images, visit
 
-      background_job = BackgroundJob.create(:name => "Download images for visit #{visit.name}", :user_id => current_user.id)
-
-      DownloadImagesWorker.perform_async(background_job.id.to_s, 'Visit', visit_id)
-
+      background_job = DownloadImagesWorker.perform_async(
+        "Visit", params[:id],
+        name: "Download images for visit #{visit.name}",
+        user_id: current_user.id
+      )
+  
       return background_job
     end
   end

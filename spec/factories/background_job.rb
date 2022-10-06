@@ -5,18 +5,27 @@ FactoryBot.define do
 
     name { Faker::Lorem.words(number: 3) }
 
-    trait :complete do
-      completed { true }
-      progress { 1.0 }
-      completed_at { DateTime.now }
+    trait :running do
+      state { :running }
+    end
+
+    trait :cancelling do
+      state { :cancelling }
+    end
+
+    trait :cancelled do
+      state { :cancelled }
     end
 
     trait :successful do
-      successful { true }
+      progress { 1.0 }
+      completed_at { DateTime.now }
+      state { :successful }
     end
 
     trait :failed do
-      successful { false }
+      completed_at { DateTime.now }
+      state { :failed }
     end
 
     trait :with_zipfile do

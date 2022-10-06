@@ -33,7 +33,6 @@ RSpec.describe BackgroundJob do
   describe 'before destroy' do
     it 'removes zip files' do
       background_job = create(:background_job,
-                              :complete,
                               :successful,
                               :with_zipfile)
       zipfile = background_job.results['zipfile']
@@ -52,67 +51,108 @@ RSpec.describe BackgroundJob do
 
   describe '#finished?' do
     it 'returns true if complete' do
-      job = create(:background_job, :complete)
+      job = create(:background_job, :successful)
       expect(job.finished?).to be_truthy
+      expect(job.scheduled?).to be_falsy
     end
 
     it 'returns false if not complete' do
       job = create(:background_job)
       expect(job.finished?).to be_falsy
+      expect(job.scheduled?).to be_truthy
     end
   end
 
   describe '#failed?' do
     it 'returns false when successful' do
-      job = create(:background_job, :complete, :successful)
+      job = create(:background_job, :successful)
       expect(job.failed?).to be_falsy
     end
 
     it 'returns true when failed' do
-      job = create(:background_job, :complete, :failed)
+      job = create(:background_job, :failed)
       expect(job.failed?).to be_truthy
     end
   end
 
-  describe '#finish_successfully' do
+  describe '#succeed!' do
     context 'without results' do
       before(:each) do
         @job = create(:background_job)
-        @job.finish_successfully('foo' => 'bar')
+        @job.succeed!('foo' => 'bar')
         @job = BackgroundJob.find(@job.id)
       end
 
-      it { expect(@job.completed).to be_truthy }
-      it { expect(@job.successful).to be_truthy }
       it { expect(@job.completed_at).not_to be_nil }
+      it { expect(@job.successful?).to be_truthy }
       it { expect(@job.results).to eq('foo' => 'bar') }
     end
 
-    context 'with results' do
+    context 'without results' do
       before(:each) do
         @job = create(:background_job)
-        @job.finish_successfully
+        @job.succeed!
         @job = BackgroundJob.find(@job.id)
       end
 
-      it { expect(@job.completed).to be_truthy }
-      it { expect(@job.successful).to be_truthy }
       it { expect(@job.completed_at).not_to be_nil }
+      it { expect(@job.successful?).to be_truthy }
       it { expect(@job.results).to eq({}) }
     end
   end
 
-  describe '#fail' do
+  describe '#fail!' do
     before(:each) do
       @job = create(:background_job)
-      @job.fail('Serious error message')
+      @job.fail!('Serious error message')
       @job = BackgroundJob.find(@job.id)
     end
 
-    it { expect(@job.completed).to be_truthy }
-    it { expect(@job.successful).to be_falsy }
     it { expect(@job.completed_at).not_to be_nil }
+    it { expect(@job.failed?).to be_truthy }
     it { expect(@job.error_message).to eq('Serious error message') }
+  end
+
+  describe '#cancel!' do
+    before(:each) do
+      @job = create(:background_job, :running)
+      @job.cancel!('Cancel message')
+      @job = BackgroundJob.find(@job.id)
+    end
+
+    it { expect(@job.completed_at).to be_nil }
+    it { expect(@job.cancelling?).to be_truthy }
+    it { expect(@job.error_message).to eq('Cancel message') }
+
+    context "for finished jobs" do
+      it "does nothing" do
+        @job = create(:background_job, :successful)
+        @job.cancel!('Cancel message')
+        @job = BackgroundJob.find(@job.id)
+        expect(@job.cancelling?).to be_falsy
+
+        @job = create(:background_job, :failed)
+        @job.cancel!('Cancel message')
+        @job = BackgroundJob.find(@job.id)
+        expect(@job.cancelling?).to be_falsy
+
+        @job = create(:background_job, :cancelled)
+        @job.cancel!('Cancel message')
+        @job = BackgroundJob.find(@job.id)
+        expect(@job.cancelling?).to be_falsy
+      end
+    end
+  end
+
+  describe '#confirm_cancelled!' do
+    before(:each) do
+      @job = create(:background_job, :cancelling)
+      @job.confirm_cancelled!
+      @job = BackgroundJob.find(@job.id)
+    end
+
+    it { expect(@job.completed_at).not_to be_nil }
+    it { expect(@job.cancelled?).to be_truthy }
   end
 
   describe '#set_progress' do

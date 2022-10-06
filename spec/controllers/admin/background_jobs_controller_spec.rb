@@ -65,7 +65,7 @@ RSpec.describe Admin::BackgroundJobsController do
 
   describe '#destroy' do
     before(:each) do
-      @background_job = create(:background_job, :complete)
+      @background_job = create(:background_job, :successful)
     end
 
     describe 'without current user' do

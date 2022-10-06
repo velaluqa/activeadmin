@@ -59,6 +59,17 @@ SELECT
 
   after_save :broadcast_job_update
 
+  enum(
+    state: {
+      scheduled: "scheduled",
+      running: "running",
+      successful: "successful",
+      failed: "failed",
+      cancelling: "cancelling",
+      cancelled: "cancelled"
+    }
+  )
+
   def broadcast_job_update
     ActionCable.server.broadcast(
       "background_jobs_channel",
@@ -80,27 +91,17 @@ SELECT
   #
   # @return [Boolean] whether this job has finished
   #
-  # TODO: Refactor to use `completed_at` as indicator for completed jobs.
   def finished?
-    completed
-  end
-
-  ##
-  # Find out whether this job has failed.
-  #
-  # @return [Boolean] whether this job has failed
-  def failed?
-    completed && !successful
+    completed_at.present?
   end
 
   ##
   # Save this BackgroundJob as successful.
   #
   # @param [Hash] results The results (default: {})
-  def finish_successfully(results = {})
-    finish
-
-    self.successful = true
+  def succeed!(results = {})
+    self.completed_at = Time.now
+    self.state = :successful
     self.results = results
     self.progress = 1.0
 
@@ -111,11 +112,38 @@ SELECT
   # Save this BackgroundJob as failed.
   #
   # @param [String] error_message the error message
-  def fail(error_message)
-    finish
-
-    self.successful = false
+  def fail!(error_message)
+    self.completed_at = Time.now
+    self.state = :failed
     self.error_message = error_message
+
+    save
+  end
+
+  ##
+  # Save this BackgroundJob as failed.
+  #
+  # @param [String] message the error message
+  def cancel!(message = nil)
+    return unless cancellable?
+
+    self.state = :cancelling
+    self.error_message = message
+
+    save
+  end
+
+  def cancellable?
+    scheduled? || running?
+  end
+
+  ##
+  # Save this BackgroundJob as failed.
+  #
+  # @param [String] message the error message
+  def confirm_cancelled!
+    self.completed_at = Time.now
+    self.state = :cancelled
 
     save
   end
@@ -131,20 +159,6 @@ SELECT
   end
 
   protected
-
-  ##
-  # Update this job as completed.
-  #
-  # TODO: Refactor to use `completed_at` as sole completion
-  # indicator.
-  #
-  # @param [Boolean] save whether to save the model (default: false)
-  def finish(save = false)
-    self.completed = true
-    self.completed_at = Time.now
-
-    self.save if save
-  end
 
   ##
   # If the job is finished and it has a zipfile referenced in its

@@ -10,11 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_17_095554) do
+ActiveRecord::Schema.define(version: 2022_09_27_131434) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
+
+  create_enum :background_jobs_state_type, [
+    "scheduled",
+    "running",
+    "cancelling",
+    "successful",
+    "failed",
+    "cancelled",
+  ], force: :cascade
 
   create_enum :configuration_schema_specs, [
     "formio_v1",
@@ -23,8 +32,8 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
   create_table "active_admin_comments", id: :serial, force: :cascade do |t|
     t.string "resource_id", null: false
     t.string "resource_type", null: false
-    t.integer "author_id"
     t.string "author_type"
+    t.integer "author_id"
     t.text "body"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -46,6 +55,7 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
     t.jsonb "results", default: {}, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.enum "state", default: "scheduled", null: false, enum_type: "background_jobs_state_type"
     t.index ["completed"], name: "index_background_jobs_on_completed"
     t.index ["legacy_id"], name: "index_background_jobs_on_legacy_id"
     t.index ["results"], name: "index_background_jobs_on_results", using: :gin
@@ -211,6 +221,7 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
     t.string "comment"
     t.jsonb "properties", default: {}, null: false
     t.string "properties_version"
+    t.jsonb "cache", default: {}, null: false
     t.index ["patient_id", "series_number"], name: "index_image_series_on_patient_id_and_series_number"
     t.index ["patient_id"], name: "index_image_series_on_patient_id"
     t.index ["series_number"], name: "index_image_series_on_series_number"
@@ -223,6 +234,7 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
     t.datetime "updated_at"
     t.string "mimetype"
     t.string "sha256sum"
+    t.jsonb "cache", default: {}, null: false
     t.index ["image_series_id"], name: "index_images_on_image_series_id"
   end
 
@@ -258,8 +270,8 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
 
   create_table "notifications", id: :serial, force: :cascade do |t|
     t.integer "notification_profile_id", null: false
-    t.integer "resource_id"
     t.string "resource_type"
+    t.integer "resource_id"
     t.integer "version_id"
     t.integer "user_id", null: false
     t.datetime "email_sent_at"
@@ -281,6 +293,7 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
     t.string "domino_unid"
     t.jsonb "data", default: {}, null: false
     t.jsonb "export_history", default: [], null: false
+    t.jsonb "cache", default: {}, null: false
     t.index ["center_id"], name: "index_patients_on_center_id"
   end
 
@@ -358,10 +371,10 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
 
   create_table "taggings", id: :serial, force: :cascade do |t|
     t.integer "tag_id"
-    t.integer "taggable_id"
     t.string "taggable_type"
-    t.integer "tagger_id"
+    t.integer "taggable_id"
     t.string "tagger_type"
+    t.integer "tagger_id"
     t.string "context", limit: 128
     t.datetime "created_at"
     t.index ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], name: "taggings_idx", unique: true
@@ -377,8 +390,8 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
   create_table "user_roles", id: :serial, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "role_id", null: false
-    t.integer "scope_object_id"
     t.string "scope_object_type"
+    t.integer "scope_object_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["role_id"], name: "index_user_roles_on_role_id"
@@ -439,6 +452,10 @@ ActiveRecord::Schema.define(version: 2022_03_17_095554) do
     t.uuid "form_definition_id"
     t.uuid "form_answer_id"
     t.uuid "configuration_id"
+    t.index "((object ->> 'name'::text))", name: "idx_on_versions_rs_changes1"
+    t.index "((object ->> 'visit_id'::text))", name: "idx_on_versions_rs_changes2"
+    t.index "((object_changes #>> '{name,1}'::text[]))", name: "idx_on_versions_rs_changes3"
+    t.index "((object_changes #>> '{visit_id,1}'::text[]))", name: "idx_on_versions_rs_changes4"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 

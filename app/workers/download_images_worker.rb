@@ -6,7 +6,7 @@ require 'zip/filesystem'
 
 class DownloadImagesWorker
   include SidekiqBackgroundJob
-  
+
   # output directory structure:
   # patient.name
   # - patient.visits.each do
@@ -38,7 +38,7 @@ class DownloadImagesWorker
       add_image(zip, image)
     end
 
-    @job.set_progress(@images_done, @images_count)
+    set_progress!(@images_count)
 
     zip.dir.chdir('..') if create_folder
   end
@@ -63,6 +63,7 @@ class DownloadImagesWorker
     end
 
     visit.image_series.select { |is| is.assigned_required_series.empty? }.each do |image_series|
+      return cancel_worker! if cancelling?
       add_image_series(zip, image_series, true)
     end
 
@@ -85,6 +86,7 @@ class DownloadImagesWorker
     zip.dir.chdir(unassigned_image_series_dir)
 
     patient.image_series.select { |is| is.visit.nil? }.each do |image_series|
+      return cancel_worker! if cancelling?
       add_image_series(zip, image_series, true)
     end
 
@@ -93,8 +95,7 @@ class DownloadImagesWorker
     zip.dir.chdir('..')
   end
 
-  def perform(job_id, resource_type, resource_id)
-    @job = BackgroundJob.find(job_id)
+  def perform_job(resource_type, resource_id)
 
     resource = case resource_type
                when 'Patient'
@@ -102,7 +103,7 @@ class DownloadImagesWorker
                when 'Visit'
                  Visit.find(resource_id)
                else
-                 @job.fail('Invalid resource type: ' + resource_type.to_s)
+                 fail!('Invalid resource type: ' + resource_type.to_s)
                  return
                end
 
@@ -115,7 +116,7 @@ class DownloadImagesWorker
 
     output_dir_path = ERICA.data_path.join('workers/download_images_worker')
     FileUtils.mkdir_p(output_dir_path.to_s)
-    output_path = output_dir_path.join('images_' + job_id.to_s + '.zip').to_s
+    output_path = output_dir_path.join("images_#{job_id}.zip").to_s
 
     Zip::File.open(output_path, Zip::File::CREATE) do |zipfile|
       case resource
@@ -129,15 +130,13 @@ class DownloadImagesWorker
       Thread.new do
         while @keep_updating
           @images_done += (@images_count.to_f - @images_done.to_f) * 0.1
-          @job.set_progress(@images_done, @images_count)
+          set_progress!(@images_done)
           sleep 1
         end
       end
     end
 
-    @job.finish_successfully('zipfile' => output_path)
-  rescue => error
-    @job.fail(error.message)
+    succeed!('zipfile' => output_path)
   ensure
     @keep_updating = false
   end

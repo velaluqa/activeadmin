@@ -48,23 +48,21 @@ class CleanDicomTagWorker
     image.save
   end
 
-  def perform(job_id, scope_classname, scope_id, tag)
-    job = BackgroundJob.find(job_id)
-
-    ::PaperTrail.request.whodunnit = job.user_id
-
+  def perform_job(scope_classname, scope_id, tag)
     object = find_scope_object(scope_classname, scope_id)
     image_count = object.images.count
 
+    set_progress_total!(image_count)
+
     object.images.each_with_index do |image, i|
+      return cancel_worker! if cancelling?
+
       clean_tag_for_image(image, tag)
 
-      job.set_progress(i, image_count)
+      increment_progress!
     end
 
-    job.finish_successfully()
-  ensure
-    ::PaperTrail.request.whodunnit = nil
+    succeed!
   end
 
   private

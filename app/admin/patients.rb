@@ -169,9 +169,12 @@ ActiveAdmin.register Patient do
 
   controller do
     def export_patients_for_ericav1(export_folder, patient_ids)
-      background_job = BackgroundJob.create(:name => 'Export '+patient_ids.size.to_s+' Patients for ERICAv1 to '+export_folder, :user_id => current_user.id)
 
-      PatientReadExportWorker.perform_async(background_job.id.to_s, export_folder, patient_ids)
+      background_job = PatientReadExportWorker.perform_async(
+        "Patient", params[:id],
+        name: 'Export '+patient_ids.size.to_s+' Patients for ERICAv1 to '+export_folder,
+        user_id: current_user.id
+      )
 
       return background_job
     end
@@ -180,10 +183,12 @@ ActiveAdmin.register Patient do
       patient = Patient.find(patient_id)
       authorize! :download_images, patient
 
-      background_job = BackgroundJob.create(:name => "Download images for patient #{patient.name}", :user_id => current_user.id)
-
-      DownloadImagesWorker.perform_async(background_job.id.to_s, 'Patient', patient_id)
-
+      background_job = DownloadImagesWorker.perform_async(
+        "Patient", params[:id],
+        name: "Download images for patient #{patient.name}",
+        user_id: current_user.id
+      )
+  
       return background_job
     end
   end

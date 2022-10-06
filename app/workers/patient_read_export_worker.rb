@@ -9,32 +9,32 @@ class PatientReadExportWorker
     end
   end
 
-  def perform(job_id, export_folder_name, patient_ids)
-    job = BackgroundJob.find(job_id)
+  def perform_job(export_folder_name, patient_ids)
 
     export_path = ERICA.image_export_path.join(export_folder_name)
     if export_path.exist? && !export_path.directory?
-      job.fail("The export target folder #{export_path} exists, but is not a folder.")
+      fail!("The export target folder #{export_path} exists, but is not a folder.")
       return
     end
 
     begin
       patients = Patient.find(patient_ids)
     rescue ActiveRecord::RecordNotFound => e
-      job.fail("Not all selected patients were found: #{e.message}")
+      fail!("Not all selected patients were found: #{e.message}")
       return
     end
 
     patients.each_with_index do |patient, index|
+      return cancel_worker! if cancelling?
       export_log = export_patient(patient, export_path)
 
       patient.export_history = Array(patient.export_history).push(export_log)
       patient.save
 
-      job.set_progress(index + 1, patients.size)
+      set_progress!(index + 1)
     end
 
-    job.finish_successfully('Case List' => case_list.string)
+    succeed!('Case List' => case_list.string)
   end
 
   def export_patient(patient, export_path)
