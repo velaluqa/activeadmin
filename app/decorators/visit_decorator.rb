@@ -21,13 +21,13 @@ class VisitDecorator < ApplicationDecorator
     if model.state_sym == :incomplete_na
       status_tag('Incomplete, not available')
     elsif model.state_sym == :complete_tqc_passed
-      status_tag('Complete, tQC of all series passed', :ok)
+      status_tag('Complete, tQC of all series passed', class: 'ok')
     elsif model.state_sym == :incomplete_queried
-      status_tag('Incomplete, queried', :warning)
+      status_tag('Incomplete, queried', class: 'warning')
     elsif model.state_sym == :complete_tqc_pending
-      status_tag('Complete, tQC not finished', :warning)
+      status_tag('Complete, tQC not finished', class: 'warning')
     elsif model.state_sym == :complete_tqc_issues
-      status_tag('Complete, tQC finished, not all series passed', :error)
+      status_tag('Complete, tQC finished, not all series passed', class: 'error')
     end
   end
 end

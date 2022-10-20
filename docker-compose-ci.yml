@@ -5,6 +5,7 @@ services:
     image: postgres:9.6
     environment:
       - POSTGRES_PASSWORD=testenv
+    command: postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off
   redis:
     image: redis:3.2
   test:
@@ -22,6 +23,9 @@ services:
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: testenv
+      KNAPSACK_TEST_FILE_PATTERN: "spec/**{,/*/**}/{*_spec.rb,*.feature}"
+      CI_NODE_TOTAL: ${CI_NODE_TOTAL}
+      CI_NODE_INDEX: ${CI_NODE_INDEX}
     privileged: true
     volumes:
       - ${DOCKER_PWD:-.}/reports:/app/reports # Artifacts
@@ -40,4 +44,5 @@ services:
     environment:
       SCREEN_WIDTH: 1920
       SCREEN_HEIGHT: 1080
+      SE_NODE_SESSION_TIMEOUT: 11000
     shm_size: 2GB

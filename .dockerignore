@@ -12,3 +12,6 @@ import
 .bundle
 .dockerignore
 .gitlab-ci.yml
+docker-compose-ci.yml
+docker-compose.yml
+docker-compose-prod.yml

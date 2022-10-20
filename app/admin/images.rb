@@ -75,9 +75,10 @@ ActiveAdmin.register Image do
             File.open(image.absolute_image_storage_path, 'rb') do |f|
               Digest::SHA256.hexdigest(f.read)
             end
-          status_tag(image.sha256sum, image.sha256sum == sha256sum ? :ok : :error)
+          status_tag(image.sha256sum, class: 'ok') if image.sha256sum == sha256sum
+          status_tag(image.sha256sum, class: 'error') if image.sha256sum != sha256sum
         else
-          status_tag('Missing file', :error)
+          status_tag('Missing file', class: 'error')
         end
       end
       row 'File' do

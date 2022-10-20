@@ -1,3 +1,8 @@
+# knapsack integration
+require 'knapsack'
+
+Knapsack::Adapters::RSpecAdapter.bind
+
 if ENV['COVERAGE']
   require 'simplecov'
   SimpleCov.start 'rails'
@@ -121,8 +126,10 @@ end
 RSpec.configure do |config|
   config.raise_error_for_unimplemented_steps = true
 
-  config.filter_run focus: true
-  config.run_all_when_everything_filtered = true
+  config.filter_run_when_matching :focus
+
+  # config.filter_run focus: true
+  # config.run_all_when_everything_filtered = true
 
   # select2 rspec configuration
   config.include CapybaraSelect2
@@ -152,6 +159,16 @@ RSpec.configure do |config|
     FileUtils.mkdir_p('spec/data/studies')
     FileUtils.mkdir_p('spec/data/forms')
     FileUtils.mkdir_p('spec/data/sessions')
+  end
+
+  config.before(:all) do
+    GC.disable
+  end
+  
+  config.after(:all) do
+    GC.enable
+    GC.start
+    GC.disable
   end
 
   config.before(:suite) do
@@ -220,7 +237,7 @@ RSpec.configure do |config|
     end
     ::PaperTrail.request.whodunnit = nil
   end
-
+  
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.

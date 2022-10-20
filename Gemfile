@@ -200,6 +200,9 @@ group :development do
 end
 
 group :test do
+  gem 'test-prof', '~> 1.0'
+  gem 'stackprof', require: false
+  gem 'ruby-prof', require: false
   gem 'rspec-sidekiq'
   gem 'webmock'
 end
@@ -214,6 +217,9 @@ group :development, :test do
   gem 'pry-rails'
   gem 'pry-remote'
   gem 'pry-stack_explorer'
+
+  # this improves CI test suite performance
+  gem 'knapsack'
 
   # Rubocop ensures the ruby style guide.
   gem 'rubocop'

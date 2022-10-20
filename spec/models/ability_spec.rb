@@ -7,7 +7,7 @@ RSpec.describe Ability do
 
     describe "production environment" do
       it "returns false for non-existent abilities" do
-        Rails.stub(env: ActiveSupport::StringInquirer.new("production"))
+        allow(Rails).to receive_messages(env: ActiveSupport::StringInquirer.new("production"))
 
         expect(@ability.can?(:nonexistent_action, User)).to be_falsy
         expect(@ability.can?(:nonexistent_action, @current_user)).to be_falsy
@@ -16,7 +16,7 @@ RSpec.describe Ability do
 
     describe "development environment" do
       it "returns false for non-existent abilities" do
-        Rails.stub(env: ActiveSupport::StringInquirer.new("development"))
+        allow(Rails).to receive_messages(env: ActiveSupport::StringInquirer.new("development"))
 
         expect {
           @ability.can?(:nonexistent_action, User)
@@ -30,7 +30,7 @@ RSpec.describe Ability do
 
     describe "test environment" do
       it "returns false for non-existent abilities" do
-        Rails.stub(env: ActiveSupport::StringInquirer.new("test"))
+        allow(Rails).to receive_messages(env: ActiveSupport::StringInquirer.new("test"))
 
         expect {
           @ability.can?(:nonexistent_action, User)

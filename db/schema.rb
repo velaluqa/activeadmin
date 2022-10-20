@@ -32,8 +32,8 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
   create_table "active_admin_comments", id: :serial, force: :cascade do |t|
     t.string "resource_id", null: false
     t.string "resource_type", null: false
-    t.string "author_type"
     t.integer "author_id"
+    t.string "author_type"
     t.text "body"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -221,7 +221,6 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
     t.string "comment"
     t.jsonb "properties", default: {}, null: false
     t.string "properties_version"
-    t.jsonb "cache", default: {}, null: false
     t.index ["patient_id", "series_number"], name: "index_image_series_on_patient_id_and_series_number"
     t.index ["patient_id"], name: "index_image_series_on_patient_id"
     t.index ["series_number"], name: "index_image_series_on_series_number"
@@ -234,7 +233,6 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
     t.datetime "updated_at"
     t.string "mimetype"
     t.string "sha256sum"
-    t.jsonb "cache", default: {}, null: false
     t.index ["image_series_id"], name: "index_images_on_image_series_id"
   end
 
@@ -270,8 +268,8 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
 
   create_table "notifications", id: :serial, force: :cascade do |t|
     t.integer "notification_profile_id", null: false
-    t.string "resource_type"
     t.integer "resource_id"
+    t.string "resource_type"
     t.integer "version_id"
     t.integer "user_id", null: false
     t.datetime "email_sent_at"
@@ -293,7 +291,6 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
     t.string "domino_unid"
     t.jsonb "data", default: {}, null: false
     t.jsonb "export_history", default: [], null: false
-    t.jsonb "cache", default: {}, null: false
     t.index ["center_id"], name: "index_patients_on_center_id"
   end
 
@@ -371,14 +368,21 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
 
   create_table "taggings", id: :serial, force: :cascade do |t|
     t.integer "tag_id"
-    t.string "taggable_type"
     t.integer "taggable_id"
-    t.string "tagger_type"
+    t.string "taggable_type"
     t.integer "tagger_id"
+    t.string "tagger_type"
     t.string "context", limit: 128
     t.datetime "created_at"
+    t.index ["context"], name: "index_taggings_on_context"
     t.index ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], name: "taggings_idx", unique: true
+    t.index ["tag_id"], name: "index_taggings_on_tag_id"
     t.index ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context"
+    t.index ["taggable_id", "taggable_type", "tagger_id", "context"], name: "taggings_idy"
+    t.index ["taggable_id"], name: "index_taggings_on_taggable_id"
+    t.index ["taggable_type"], name: "index_taggings_on_taggable_type"
+    t.index ["tagger_id", "tagger_type"], name: "index_taggings_on_tagger_id_and_tagger_type"
+    t.index ["tagger_id"], name: "index_taggings_on_tagger_id"
   end
 
   create_table "tags", id: :serial, force: :cascade do |t|
@@ -390,8 +394,8 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
   create_table "user_roles", id: :serial, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "role_id", null: false
-    t.string "scope_object_type"
     t.integer "scope_object_id"
+    t.string "scope_object_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["role_id"], name: "index_user_roles_on_role_id"
