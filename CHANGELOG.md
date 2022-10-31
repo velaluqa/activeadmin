@@ -8,6 +8,16 @@
 * Feature - Allow authorized users (administrators) to resend email confirmation instructions
 * Feature - Allow authorized users (administrators) to impersonate other users of the system
 * Feature - Allow authorized users (administrators) to confirm a user manually in the user settings
+* Feature - Allow tagging of studies
+* Feature - Allow tagging of centers
+* Feature - Allow tagging of patients
+* Feature - Allow tagging of visits
+* Feature - Allow tagging of image series
+* Feature - Allow tagging of users
+* Feature - Allow killing/removing background jobs
+* Feature - Automatically update background job status on background jobs list and background jobs show page
+* Permission Change - Consolidate image access permissions through `Image Series` resource. All access to images is controlled by granting permissions to image series instead of images.
+* Feature - Show list of potential recipients for notification profiles
 
 ### Patches / Fixes
 
@@ -19,6 +29,7 @@
   app-specific tmp directory, in order to keep downloadable background
   job files between version updates
 * Fix - Only display `Roles` link in users list if the current user is authorized to view the roles
+* Fix - Fix message when assigning required series without proper study configuration
 
 ### Dev / DevOps
 
@@ -27,6 +38,8 @@
   the developer know, that this permission needs to be defined first)
 * Fix adding mimetype migration error for existing images
 * Fix generation of release documentation generation
+* Maintenance - Show maintenance page if a file `.maintenance` exists
+* Maintenance - Refactored active admin view code for reusability
 
 ## 7.2.4
 
