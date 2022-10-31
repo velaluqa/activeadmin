@@ -40,14 +40,14 @@ RSpec.describe Image do
     it 'handles create' do
       expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image = create(:image, id: 1, image_series: @image_series)
-      image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      image.write_anonymized_file(File.new('spec/files/test.dicom'))
       expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
     end
 
     it 'handles update' do
       expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image = create(:image, id: 1, image_series: @image_series)
-      image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      image.write_anonymized_file(File.new('spec/files/test.dicom'))
       expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image.image_series_id = 2
       image.save
@@ -58,7 +58,7 @@ RSpec.describe Image do
     it 'handles destroy' do
       expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image = create(:image, id: 1, image_series: @image_series)
-      image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      image.write_anonymized_file(File.new('spec/files/test.dicom'))
       expect(File).to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
       image.destroy
       expect(File).not_to exist(ERICA.image_storage_path.join('1/1/1/__unassigned/1/1'))
@@ -134,10 +134,19 @@ RSpec.describe Image do
   describe '#write_anonymized_file' do
     it 'anonymizes a file and writes it to the image_storage' do
       @image = create(:image)
-      @image.write_anonymized_file(File.read('spec/files/test.dicom'))
+      @image.write_anonymized_file(File.new('spec/files/test.dicom'))
       dicom = DICOM::DObject.read('spec/files/test.dicom')
       expect(dicom.patients_name.value).to eq 'WRIX'
       dicom = DICOM::DObject.read(@image.absolute_image_storage_path)
+      expect(dicom.patients_name.value).to eq "#{@image.image_series.patient.name}"
+    end
+
+    it 'handles explicit big endian files by conversion to explicit little endian' do
+      @image = create(:image)
+      @image.write_anonymized_file(File.new('spec/files/test_bigendian.dicom'))
+      dicom = DICOM::DObject.read(@image.absolute_image_storage_path)
+      expect(@image.dicom_metadata).to be_a(Array)
+      expect(@image.dicom_metadata[1]["0002,0010"][:value]).to eq("1.2.840.10008.1.2.1")
       expect(dicom.patients_name.value).to eq "#{@image.image_series.patient.name}"
     end
   end

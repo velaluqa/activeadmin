@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 7.2.5
+
+### Patches / Fixes
+
+* Fix - (ERICA-160) Fix metadata issue by converting big endian
+  transfer syntax to explicit little endian upon upload
+
 ## 7.2.4
 
 ### Patches / Fixes
