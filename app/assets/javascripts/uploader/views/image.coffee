@@ -10,6 +10,7 @@ class ImageUploader.Views.Image extends Backbone.View
   initialize: ->
     @listenTo @model, 'change:fileName', @renderName
     @listenTo @model, 'change:fileSize', @renderSize
+    @listenTo @model, 'change:numberOfFrames', @renderNumberOfFrames
     @listenTo @model, 'change:state', @renderState
     @listenTo @model, 'warnings', @renderWarnings
 
@@ -18,6 +19,9 @@ class ImageUploader.Views.Image extends Backbone.View
 
   renderSize: =>
     @$('td.size').html(@model.get('fileSize'))
+
+  renderNumberOfFrames: =>
+    @$('td.numberOfFrames').html(@model.get('numberOfFrames'))
 
   renderState: =>
     @$('td.status').attr(class: "#{@model.get('state')} status")

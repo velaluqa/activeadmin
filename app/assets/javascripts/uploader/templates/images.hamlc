@@ -1,6 +1,7 @@
 %table
   %thead
     %th Filename
+    %th # of Frames
     %th Size
     %th Status
     %th

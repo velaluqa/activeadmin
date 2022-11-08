@@ -21,7 +21,8 @@ class ImageUploader.Collections.ImageSeries extends Backbone.Collection
   addImage: (image) =>
     series = @findOrCreate
       name: image.get('seriesDescription')
-      instanceUid: image.get('seriesInstanceUid')
+      instanceUid: if image.get('numberOfFrames') > 1 then image.get('sopInstanceUid') else image.get('seriesInstanceUid')
+
     unless series.get('seriesDateTime')?
       series.set(seriesDateTime: image.get('seriesDateTime'))
     unless series.get('imagingDateTime')?

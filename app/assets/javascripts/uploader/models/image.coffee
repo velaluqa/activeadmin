@@ -95,6 +95,7 @@ class ImageUploader.Models.Image extends Backbone.Model
             sopInstanceUid: dataSet.string('x00080018')
             seriesInstanceUid: dataSet.string('x0020000e')
             seriesDescription: dataSet.string('x0008103e')
+            numberOfFrames: parseInt(dataSet.string('x00280008') || "1")
             seriesNumber: dataSet.string('x00200011')
             seriesDateTime: @parseDateTime(dataSet, 'seriesDate', warnIfMissing: false)
             acquisitionDateTime: @parseDateTime(dataSet, 'acquisitionDate')

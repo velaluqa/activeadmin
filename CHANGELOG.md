@@ -8,6 +8,8 @@
   transfer syntax to explicit little endian upon upload
 * Fix - Image Upload - (ERICA-166) Fix reading acquisition date from
   datetime DICOM field if available
+* Fix - Image Upload - (ERICA-164) Fix recognizing multi-frame images
+  as separate image series upon parsing
 
 ## 7.2.4
 

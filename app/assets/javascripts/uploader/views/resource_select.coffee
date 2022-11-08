@@ -18,17 +18,14 @@ class ImageUploader.Views.ResourceSelect extends Backbone.View
     @collection = @model[@selectableCollection]
 
     @listenTo @model, "change:#{@selectableAttribute}", =>
-      console.log 'render because of attribute change', @selectableAttribute
       @render()
     @listenTo @collection, 'request', =>
       @state = 'request'
       @render()
     @listenTo @collection, 'sync', =>
-      console.log 'render because of sync', @selectableCollection
       @state = 'sync'
       @render()
     @listenTo @collection, 'reset', =>
-      console.log 'render because of reset', @selectableCollection
       @state = 'reset'
       @render()
 
