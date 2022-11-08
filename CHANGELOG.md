@@ -4,8 +4,10 @@
 
 ### Patches / Fixes
 
-* Fix - (ERICA-160) Fix metadata issue by converting big endian
+* Fix - Image Upload - (ERICA-160) Fix metadata issue by converting big endian
   transfer syntax to explicit little endian upon upload
+* Fix - Image Upload - (ERICA-166) Fix reading acquisition date from
+  datetime DICOM field if available
 
 ## 7.2.4
 
