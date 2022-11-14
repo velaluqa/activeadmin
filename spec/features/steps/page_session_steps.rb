@@ -302,19 +302,11 @@ step 'I select row of :string' do |locator|
 end
 
 step 'I see a row with/for :string' do |str|
-  found_rows = 0
-  page.all("tr").each do |tr|
-    found_rows += 1 if tr.text.include?(str)
-  end
-  expect(found_rows).to(be > 0, "expected to find at least one row with #{str.inspect}")
+  expect(page).to have_css("tr", text: str)
 end
 
 step 'I don\'t see a row with/for :string' do |str|
-  found_rows = 0
-  page.all("tr").each do |tr|
-    found_rows += 1 if tr.text.include?(str)
-  end
-  expect(found_rows).to eq(0), "expected not to find a row with #{str.inspect}"
+  expect(page).not_to have_css("tr", text: str)
 end
 
 step 'I see a column :string' do |name|
@@ -354,46 +346,35 @@ step 'I see a row with the following columns:' do |values|
   expect(found_rows).to(be > 0, "expected to find at least one table row with the respective values (#{values.to_a.map { |pair| pair.join(": ") }.join(", ")})")
 end
 
-step 'I see a/an :string link/button in row for :string' do |link, selector|
-  page.all('tr').each do |tr|
-    next unless tr.text.include?(selector)
-
-    links = tr.all('a, button').map(&:text)
-    expect(links).to include(link), "expected to see a #{link.inspect} link or button in row for #{selector.inspect}"
+step 'I see a/an :string link in row for :string' do |link, selector|
+  within('tbody tr', text: selector) do
+    expect(page).to have_css('td a', text: link)
   end
 end
 
-step 'I don\'t see a/an :string link/button in row for :string' do |link, selector|
-  page.all('tr').each do |tr|
-    next unless tr.text.include?(selector)
-
-    links = tr.all('a, button').map(&:text)
-    expect(links).not_to include(link), "expected not to see a #{link.inspect} link or button in row for #{selector.inspect}"
+step 'I don\'t see a/an :string link in row for :string' do |link, selector|
+  within('tbody tr', text: selector) do
+    expect(page).not_to have_css('td a', text: link)
   end
 end
 
 step 'I see a row with/for :string and/with the following columns:' do |locator, values|
-  found_rows = 0
-  page.all("table").each do |table|
-    columns = table.all("thead th").map(&:text)
-    table.all("tbody tr").each do |tr|
-      next unless tr.text.include?(locator)
+  within("table.index_table") do
+    columns = page.all("thead th").map(&:text)
+    within("tbody tr", text: locator) do
 
-      found_rows += 1
       values.to_h.each_pair do |key, expected_value|
         expect(columns).to include(key), "expected table columns (#{columns.join(', ')}) to include #{key.inspect}"
 
         index = columns.index(key)
-        column_value = tr.all("td")[index].text
+        column_value = page.all("td")[index].text
 
         expect(column_value)
           .to eq(expected_value), "expected #{column_value.inspect} to equal #{expected_value.inspect} in column #{key.inspect}"
       end
     end
   end
-
-  expect(found_rows).to(be > 0, "expected to find at least one table row with #{locator.inspect} and the respective values")
-end
+end  
 
 step 'I don\'t see a row with/for :string and/with the following columns:' do |locator, values|
   found_rows = 0

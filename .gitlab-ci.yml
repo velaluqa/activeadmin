@@ -3,7 +3,6 @@ image: registry.vela/velaluqa/gitlab-ci-build-images:ruby-2.3.8-docker-compose
 variables:
   BUNDLE_GEMFILE: Gemfile-ci
   COMPOSE_FILE: docker-compose-ci.yml
-  COMPOSE_PROJECT_NAME: $CI_PIPELINE_ID
 
 stages:
   - build
@@ -18,18 +17,77 @@ build:
     - docker-compose build test
     - docker tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-cache
     - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-cache
-test:
+
+.test_node: &test_node_config
   stage: test
+  variables: &test_node_variables
+    CI_NODE_TOTAL: 6
   script:
     - export DOCKER_PWD=$(echo /cache/$(hostname)/*/${CI_PROJECT_NAME}/ | awk '{sub(/^\/cache/,"/srv/build-cache")}1')
     - docker-compose run test bundle exec rake db:create db:migrate
-    - docker-compose run test bundle exec rake ci
+    - docker-compose run test bundle exec rake knapsack:rspec
   after_script:
     - docker-compose down
   artifacts:
     paths:
       - reports
       - tmp/capybara
+
+# test:
+#   stage: test
+#   script:
+#     - export DOCKER_PWD=$(echo /cache/$(hostname)/*/${CI_PROJECT_NAME}/ | awk '{sub(/^\/cache/,"/srv/build-cache")}1')
+#     - docker-compose run test bundle exec rake db:create db:migrate
+#     - docker-compose run -e KNAPSACK_GENERATE_REPORT=true test rspec spec
+#     - docker-compose run test bundle exec rake ci
+#   after_script:
+#     - docker-compose down
+#   artifacts:
+#     paths:
+#       - reports
+#       - tmp/capybara
+
+test_ci_node_0:
+  <<: *test_node_config
+  variables:
+    <<: *test_node_variables
+    COMPOSE_PROJECT_NAME: ${CI_PIPELINE_ID}_0
+    CI_NODE_INDEX: 0
+
+test_ci_node_1:
+  <<: *test_node_config
+  variables:
+    <<: *test_node_variables
+    COMPOSE_PROJECT_NAME: ${CI_PIPELINE_ID}_1
+    CI_NODE_INDEX: 1
+
+test_ci_node_2:
+  <<: *test_node_config
+  variables:
+    <<: *test_node_variables
+    COMPOSE_PROJECT_NAME: ${CI_PIPELINE_ID}_2
+    CI_NODE_INDEX: 2
+
+test_ci_node_3:
+  <<: *test_node_config
+  variables:
+    <<: *test_node_variables
+    COMPOSE_PROJECT_NAME: ${CI_PIPELINE_ID}_3
+    CI_NODE_INDEX: 3
+
+test_ci_node_4:
+  <<: *test_node_config
+  variables:
+    <<: *test_node_variables
+    COMPOSE_PROJECT_NAME: ${CI_PIPELINE_ID}_4
+    CI_NODE_INDEX: 4
+
+test_ci_node_5:
+  <<: *test_node_config
+  variables:
+    <<: *test_node_variables
+    COMPOSE_PROJECT_NAME: ${CI_PIPELINE_ID}_5
+    CI_NODE_INDEX: 5
 
 docs:publish:
   stage: deploy

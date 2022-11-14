@@ -94,6 +94,19 @@ E.g.
 
     docker-compose run test rspec spec/models/user_spec.rb.
 
+## Test parallelization
+
+We use Knapsack gem (https://github.com/KnapsackPro/knapsack) to run tests in parallel on the CI. To do this effectively it's essentially required that the following is done:
+
+    - Generate a JSON report file (knapsack_rspec_report.json). This file contains the time taken to run all available rspec examples in seconds.
+      you can generate this file by running the command below. this can be done locally (for testing purposes), but more importantly on
+      the CI as the objective is to split the test running time across a few parallel nodes on the CI.
+
+    docker-compose run -e KNAPSACK_GENERATE_REPORT=true test rspec spec
+
+    - Re-generate the JSON report file whenever changes are made in terms of new step definitions,
+      addition of new test files etc. the essence is to have an updated report file.
+    
 ### Cleaning the database
 
 Rarely the database cleaning while running your tests in Guard fails. This leaves the database in a state that makes tests fail (either due to taken unique keys residing in the database or because results do not match the expectations).
