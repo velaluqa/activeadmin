@@ -31,6 +31,16 @@
 * Fix - Only display `Roles` link in users list if the current user is authorized to view the roles
 * Fix - Fix message when assigning required series without proper study configuration
 * Fix - (#5759) Edit Image Series - Fix displaying only visits related to the selected patient
+* Fix - (ERICA-149, #5994) Consolidate permissions options
+  * Add permission documentation for complex permission options
+  * Rename `ImageSeries` `assign_patient` to `reassign_patient`
+  * Remove `BackgroundJob` `update`
+  * Remove `Version` `update`, `create` and `destroy`
+  * Remove `RequiredSeries` `update`
+  * Do not show required series for a visit if the permission to
+    `read` `RequiredSeries` is not granted
+  * Only show granted permissions in role permission overview & user
+    permission overview
 * Fix - (ERICA-150, #5993) Edit Form Session - Display form answer details to distinguish between reorderable form answers
 * Fix - (ERICA-161, #5988) Destroy Image Series - Unassign required
   series and reset technical QC results

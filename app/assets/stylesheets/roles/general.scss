@@ -28,6 +28,12 @@
 
   li.permission {
     padding: 8px 5px 4px 10px;
+    display: flex;
+
+    label {
+      flex: 0 0 15%;
+      width: 16vw;
+    }
 
     &:hover {
       background: rgba(#999, 0.1);
@@ -35,7 +41,10 @@
   }
 
   .activities {
+
     .activity {
+      display: block;
+      width: 100%;
       margin-right: 20px;
     }
 
@@ -44,7 +53,7 @@
       top: -3px;
     }
 
-    .activity, .activity label {
+    .activity label {
       display: inline-block;
       width: auto;
       float: none;

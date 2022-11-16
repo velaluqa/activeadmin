@@ -33,10 +33,11 @@ Feature: Assign Required Series
       | patient | FooPatient |
       | visit   |      10000 |
     And a role "Image Manager" with permissions:
-      | Study   | read                                   |
-      | Center  | read, update                           |
-      | Patient | read, update, create                   |
-      | Visit   | read, assign_required_series, read_tqc |
+      | Study          | read                                   |
+      | Center         | read, update                           |
+      | Patient        | read, update, create                   |
+      | Visit          | read, assign_required_series, read_tqc |
+      | RequiredSeries | read                                   |
 
   Scenario: Not logged in
     When I browse to assign_required_series_form visit "10000" with:

@@ -230,7 +230,7 @@ ActiveAdmin.register ImageSeries do
           .for_patient(resource.patient_id)
           .order(:visit_number)
 
-      if can?(:assign_patient, image_series)
+      if can?(:reassign_patient, image_series)
         f.input(
           :patient,
           collection: patients,

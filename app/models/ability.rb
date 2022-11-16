@@ -3,6 +3,30 @@ class Ability
 
   attr_reader :current_user
 
+  DOCS = {
+    Visit => {
+      assign_required_series: [
+        "Note: In order to allow required series assignment upon image upload, grant \"assign visit\" for image series."
+      ]
+    },
+    BackgroundJob => {
+      "*" => [
+        "If granted, the user can [activity] background jobs of other users.",
+        "If not granted a user can only access their own background jobs"
+      ],
+    },
+    Sidekiq => {
+      manage: [
+        "Grants access to the systems console of Sidekiq, which runs the background jobs"
+      ]
+    },
+    Study => {
+      read_reports: [
+        "Grants reading reports on the ERICA dashboard"
+      ],
+    }
+  }
+
   ACTIVITIES = {
     BackgroundJob => %i[manage read destroy cancel],
     Sidekiq => %i[manage],
@@ -11,7 +35,7 @@ class Ability
     Center => %i[manage read update create destroy comment read_tags update_tags create_tags],
     Patient => %i[manage read update create destroy comment download_images read_tags update_tags create_tags],
     EmailTemplate => %i[manage read update create destroy],
-    ImageSeries => %i[manage read update destroy comment upload assign_patient assign_visit viewer read_dicom_metadata clean_dicom_metadata read_tags update_tags create_tags],
+    ImageSeries => %i[manage read update destroy comment upload reassign_patient assign_visit viewer read_dicom_metadata clean_dicom_metadata read_tags update_tags create_tags],
     FormSession => %i[manage read update create destroy],
     FormDefinition => %i[manage read update create destroy],
     FormAnswer => %i[manage read update create destroy],
@@ -20,15 +44,15 @@ class Ability
     User => %i[manage read update create destroy generate_keypair impersonate confirm_mail unlock change_password read_tags create_tags update_tags],
     UserRole => %i[manage read update create destroy],
     PublicKey => %i[manage read update create destroy],
-    RequiredSeries => %i[manage read update],
+    RequiredSeries => %i[manage read],
     Role => %i[manage read update create destroy],
     Visit => %i[manage read update create destroy comment download_images read_tags update_tags create_tags create_from_template update_state assign_required_series read_tqc perform_tqc read_mqc perform_mqc],
-    Version => %i[manage read update create destroy git_commits]
+    Version => %i[manage read git_commits]
   }.freeze
 
   UNSCOPABLE_ACTIVITIES = {
-    BackgroundJob => %i[manage read update create destroy],
-    ImageSeries => %i[upload assign_patient assign_visit],
+    BackgroundJob => %i[manage read create destroy],
+    ImageSeries => %i[upload reassign_patient assign_visit],
     Visit => %i[assign_required_series]
   }.freeze
 
@@ -160,7 +184,7 @@ class Ability
   # and his own public keys.
   def define_basic_abilities
     unless can?(:manage, BackgroundJob)
-      can %i[read update create destroy], BackgroundJob, ['background_jobs.user_id = ?', current_user.id] do |background_job|
+      can %i[read create destroy], BackgroundJob, ['background_jobs.user_id = ?', current_user.id] do |background_job|
         background_job.user == current_user
       end
     end
@@ -196,6 +220,16 @@ class Ability
     if can?(:upload, ImageSeries)
       can :read, ActiveAdmin::Page, name: 'Image Upload', namespace_name: 'admin'
     end
+  end
+
+  # Doc
+  def self.documentation(subject, activity) 
+    [
+      *(DOCS[subject].andand["*"] || []).map do |doc|
+        doc.gsub("[activity]", activity.to_s)
+      end,
+      *DOCS[subject].andand[activity]
+    ]
   end
 
   private

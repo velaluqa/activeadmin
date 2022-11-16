@@ -42,10 +42,11 @@ Feature: Perform Technical Quality Control
       | state       | visit_assigned |
     And visit "10000" has required series "SPECT_1" assigned to "TestSeries"
     And a role "Image Manager" with permissions:
-      | Study   | read                        |
-      | Center  | read, update                |
-      | Patient | read, update, create        |
-      | Visit   | read, perform_tqc, read_tqc |
+      | Study          | read                        |
+      | Center         | read, update                |
+      | Patient        | read, update, create        |
+      | Visit          | read, perform_tqc, read_tqc |
+      | RequiredSeries | read                        |
 
   Scenario: Not logged in
     When I browse to tqc_form visit "10000"

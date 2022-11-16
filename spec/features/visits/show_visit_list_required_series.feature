@@ -42,10 +42,11 @@ Feature: List Required Series
       | visit_type  | followup                        |
       | description | Visit type with required series |
     And a role "Image Manager" with permissions:
-      | Study   | read                 |
-      | Center  | read, update         |
-      | Patient | read, update, create |
-      | Visit   | read                 |
+      | Study            | read                 |
+      | Center           | read, update         |
+      | Patient          | read, update, create |
+      | Visit            | read                 |
+      | RequiredSeries   | read                 |
 
   # TODO: Scenario: Study not locked
   # TODO: Scenario: Study not semantically valid
