@@ -8,7 +8,7 @@ module ActiveAdmin
           render partial: 'admin/shared/viewer_cart', locals: { cart: cart }
         end
 
-        batch_action :add_to_viewer_cart do |selection|
+        batch_action :add_to_viewer_cart, if: proc{ can? :viewer, ImageSeries } do |selection|
           session[:viewer_cart] ||= []
 
           selection.each do |id|

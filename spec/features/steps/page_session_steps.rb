@@ -413,6 +413,11 @@ step "I don't see :string in :string row" do |text, row_content|
   validation_report_screenshot
 end
 
+step "I don't see :string in :string list" do |text, resource|
+  step("I browse to #{resource} list")
+  step("I don't see \"#{text}\"")
+end
+
 step 'I pry' do
   binding.pry
 end
