@@ -25,7 +25,7 @@ class FormDefinitionDecorator < ApplicationDecorator
     return "" unless configuration
 
     links = ""
-    links << create_form_answer_link
+    links << create_form_answer_link if can?(:create, FormAnswer)
     links << " "
     links << open_form_link if object.free_form?
     links.html_safe
