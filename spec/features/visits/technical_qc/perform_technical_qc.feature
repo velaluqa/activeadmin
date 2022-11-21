@@ -74,6 +74,7 @@ Feature: Perform Technical Quality Control
       | Assigned Image Series | TESTSERIES |
       | tQC State             | PASSED     |
     And I see "View tQC results"
+    And I see "Perform tQC"
     
   Scenario: Automatic DICOM QC failed
     Given I sign in as a user with role "Image Manager"
