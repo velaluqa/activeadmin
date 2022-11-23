@@ -184,7 +184,7 @@ class Ability
   # and his own public keys.
   def define_basic_abilities
     unless can?(:manage, BackgroundJob)
-      can %i[read create destroy], BackgroundJob, ['background_jobs.user_id = ?', current_user.id] do |background_job|
+      can %i[read create], BackgroundJob, ['background_jobs.user_id = ?', current_user.id] do |background_job|
         background_job.user == current_user
       end
     end

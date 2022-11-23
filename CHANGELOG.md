@@ -42,6 +42,9 @@
   * Only show granted permissions in role permission overview & user
     permission overview
 * Fix - (ERICA-150, #5993) Edit Form Session - Display form answer details to distinguish between reorderable form answers
+* Fix - (ERICA-153, #5984) Permissions - Do not grant `destroy`
+  `BackgroundJob` permission automatically for a users own background
+  jobs
 * Fix - (ERICA-161, #5988) Destroy Image Series - Unassign required
   series and reset technical QC results
 * Fix - (ERICA-163, #5981) Show/Edit Notification Template - Allow
