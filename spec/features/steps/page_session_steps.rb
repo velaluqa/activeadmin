@@ -251,6 +251,17 @@ step "I don't see :string within :string" do |content, locator|
   validation_report_screenshot
 end
 
+step "I see in given order:" do |elements| 
+  expect(page).to have_text(/#{elements.to_a.flatten.join(".*")}/m)
+end
+
+step "I drag the draggable of :string onto the draggable of :string" do |from, to|
+  source = within(".ui-sortable > fieldset > ol", text: from) { page.find('.ui-sortable-handle') }
+  target = within(".ui-sortable > fieldset > ol", text: to) { page.find('.ui-sortable-handle') }
+  source.drag_onto(target)
+end
+
+
 step 'I am redirected to :admin_path' do |path|
   expect(page.current_path).to eq(path)
 end

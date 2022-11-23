@@ -171,8 +171,20 @@ class FormAnswer < ApplicationRecord
     form_definition.name
   end
 
+  def user_label
+    user.try(:name)
+  end
+
   def resource_labels
     form_answer_resources.map(&:resource).map(&:to_s).join(", ")
+  end
+
+  def published_at_label
+    published_at || "Not published"
+  end
+
+  def submitted_at_label
+    submitted_at || "Not submitted"
   end
 
   def publish!
@@ -210,6 +222,7 @@ class FormAnswer < ApplicationRecord
 
   def set_sequence_number_for_session
     return unless form_session
+    return if sequence_number
 
     last_sequence_number = form_session.form_answers.order(sequence_number: :desc).first.andand.sequence_number || 0
     self.sequence_number = last_sequence_number + 1

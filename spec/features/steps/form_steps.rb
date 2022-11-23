@@ -32,6 +32,8 @@ step ":string form data with:" do |form_definition_name, attributes|
   }
 
   attributes.to_a.each do |attribute, value|
+    next if attribute == "resource"
+
     options[attribute.to_sym] =
       case attribute
       when "form_session" then FormSession.where(name: value).first
@@ -39,7 +41,20 @@ step ":string form data with:" do |form_definition_name, attributes|
       end
   end
 
-  FactoryBot.create(:form_answer, options)
+  form_answer = FactoryBot.build(:form_answer, options)
+
+  attributes.to_a.each do |attribute, value|
+    next unless attribute == "resource"
+
+    type, identifier = value.split(" ")
+    resource = TurnipHelper.find_record(type, identifier)
+
+    form_answer.form_answer_resources.build(
+      resource: resource
+    )
+  end
+
+  form_answer.save!
 end
 
 step 'a form answer for :string signed by user :string with data:' do |form_definition_name, signee_username, answers_table|
