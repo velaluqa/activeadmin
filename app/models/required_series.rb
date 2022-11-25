@@ -305,14 +305,16 @@ JOIN
       ImageSeries.find(image_series_id).update_attributes(state: :required_series_assigned)
     elsif image_series_id_before_last_save.present? && image_series_id.present?
       ImageSeries.find(image_series_id).update_attributes(state: :required_series_assigned)
-      image_series_before_last_save = ImageSeries.find(image_series_id_before_last_save)
+      image_series_before_last_save = ImageSeries.where(id: image_series_id_before_last_save).first
+      return if image_series_before_last_save.nil?
       if RequiredSeries.where(visit: visit, image_series_id: image_series_id_before_last_save).where.not(name: name).exists?
         image_series_before_last_save.update_attributes(state: :required_series_assigned)
       else
         image_series_before_last_save.update_attributes(state: :visit_assigned)
       end
     elsif image_series_id_before_last_save.present? && image_series_id.blank?
-      image_series_before_last_save = ImageSeries.find(image_series_id_before_last_save)
+      image_series_before_last_save = ImageSeries.where(id: image_series_id_before_last_save).first 
+      return if image_series_before_last_save.nil?
       if RequiredSeries.where(visit: visit, image_series_id: image_series_id_before_last_save).where.not(name: name).exists?
         image_series_before_last_save.update_attributes(state: :required_series_assigned)
       else

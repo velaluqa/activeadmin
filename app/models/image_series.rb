@@ -63,6 +63,8 @@ class ImageSeries < ApplicationRecord
   belongs_to :patient
   has_many :images, dependent: :destroy
 
+  after_destroy :unassign_assigned_required_series!
+
   # validates_uniqueness_of :series_number, :scope => :patient_id
   validates_presence_of :name, :patient_id, :imaging_date
 
@@ -220,6 +222,10 @@ JOIN
 
     assigned_required_series.each(&:domino_sync)
   end
+
+  def unassign_assigned_required_series!
+    RequiredSeries.where(image_series_id: id).each(&:unassign_image_series!)
+  end  
 
   def assigned_required_series
     RequiredSeries.where(visit: visit, image_series: self)
