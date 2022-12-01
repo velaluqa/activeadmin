@@ -14,6 +14,19 @@ step 'an email template :string' do |name|
   create(:email_template, options)
 end
 
+step 'an email template :string with:' do |name, template|
+  options = { name: name, template: template }
+  create(:email_template, options)
+end
+
+step 'I see the rendered email template with:' do |template|
+  expect(page).to have_css("iframe")
+
+  within_frame(find("iframe")) do
+    expect(page).to have_text(template)
+  end
+end
+
 step 'a notification profile :string with:' do |name, table|
   options = { title: name }
 

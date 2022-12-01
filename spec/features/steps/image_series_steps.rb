@@ -34,10 +34,10 @@ step 'a/an image_series :string with:' do |name, table|
     options[:visit] = Visit.find_by(visit_number: value) if attribute == 'visit'
   end
 
-  @image_series = create(:image_series, options)
+  @image_series = build(:image_series, options)
   @image_series.tag_list = tag_list if tag_list
-  @image_series.save
-  
+  @image_series.save!
+
   if image_count > 0
     1.upto(image_count) do |i|
       create(:image, image_series_id: @image_series.id)
