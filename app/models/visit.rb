@@ -159,6 +159,11 @@ JOIN_QUERY
     study_id = study.id if study.is_a?(ActiveRecord::Base)
     joins(patient: :center).where(centers: { study_id: study_id })
   }
+  scope :for_patient, ->(patient) {
+    patient_id = patient
+    patient_id = patient.id if patient.is_a?(ActiveRecord::Base)
+    where(patient_id: patient_id)
+  }
 
   def name
     "#{patient.andand.name}##{visit_number}"

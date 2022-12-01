@@ -219,10 +219,16 @@ ActiveAdmin.register ImageSeries do
   end
 
   form do |f|
+    resource.patient_id = params[:patient_id].to_i unless params[:patient_id].blank?
     resource.visit_id = params[:visit_id].to_i unless params[:visit_id].blank?
+
     f.inputs 'Details' do
       patients = Patient.of_study(f.object.study).order(:subject_id, :id)
-      visits = Visit.of_study(f.object.study).order(:visit_number)
+      visits =
+        Visit
+          .of_study(f.object.study)
+          .for_patient(resource.patient_id)
+          .order(:visit_number)
 
       if can?(:assign_patient, image_series)
         f.input(
@@ -230,7 +236,8 @@ ActiveAdmin.register ImageSeries do
           collection: patients,
           input_html: {
             class: 'initialize-select2',
-            'data-placeholder': 'Select patient'
+            'data-placeholder': 'Select patient',
+            'data-reload-get-param': 'patient_id'
           }
         )
       else
@@ -251,8 +258,11 @@ ActiveAdmin.register ImageSeries do
         )
       else
         f.input(
-          :visit, as: :readonly,
-          input_html: {value: image_series.visit.try(:name) || 'Not Assigned Visit'}
+          :visit,
+          as: :readonly,
+          input_html: {
+            value: image_series.visit.try(:name) || 'Not Assigned Visit'
+          }
         )
       end
 

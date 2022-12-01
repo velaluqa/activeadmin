@@ -171,7 +171,7 @@ end
 
 step 'I cannot :activity :subject' do |activity, subject|
   @current_user_role.remove_permission(activity, subject)
-  expect(@current_user.can?(activity, subject)).to be_falsy
+  expect(Ability.new(@current_user).can?(activity, subject)).to be_falsy
 end
 
 step 'I browse to :string' do |path|

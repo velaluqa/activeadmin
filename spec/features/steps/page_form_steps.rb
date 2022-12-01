@@ -96,6 +96,22 @@ step "I select :string for row :string" do |select_option, row_text|
   end
 end
 
+step "I see select :string with options:" do |locator, select_options|
+  select2_open label: locator
+  select_options.to_a.flatten.each do |option|
+    expect(page).to have_css("li.select2-results__option", text: option)
+  end
+  select2_close
+end
+
+step "I see select :string without options:" do |locator, select_options|
+  select2_open label: locator
+  select_options.to_a.flatten.each do |option|
+    expect(page).not_to have_css("li.select2-results__option", text: option)
+  end
+  select2_close
+end
+
 step "I select :string for :string" do |select_option, label|
   field = find_field(label)
   if field[:class].include?("select2-hidden-accessible")
