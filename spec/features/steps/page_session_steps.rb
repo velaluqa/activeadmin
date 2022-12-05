@@ -435,46 +435,18 @@ step 'I wait for all jobs in :string queue' do |queue|
 end
 
 step 'I download zip file' do
+  ap "DOWNLOADCOUNT"
+  ap DownloadHelper.downloads
+  DownloadHelper.wait_for_download
+  ap DownloadHelper.downloads
+  expect(DownloadHelper.downloads).to include(include(".zip"))
+
   clear_downloads_js =
     "document.querySelector('downloads-manager').shadowRoot.querySelector('downloads-toolbar').shadowRoot.querySelector('button.clear-all').click()"
-  download_count_js =
-    "document.querySelector('downloads-manager').shadowRoot.querySelectorAll('downloads-item').length"
-  no_downloads_el_js =
-    "document.querySelector('downloads-manager').shadowRoot.querySelector('#no-downloads')"
-
   page.driver.browser.get('chrome://downloads/')
-  ts = Time.now
-
-  begin
-    download_count = page.evaluate_script(download_count_js)
-  rescue e
-    puts e.inspect
-  end
-  until (Time.now - ts) > Capybara.default_max_wait_time || download_count == 1 || !sleep(0.1)
-    begin
-      download_count = page.evaluate_script(download_count_js)
-    rescue e
-      puts e.inspect
-    end
-  end
-  expect(download_count).to eq(1)
-  expect(page).to have_content(".zip\n")
   validation_report_screenshot
   page.evaluate_script(clear_downloads_js)
-  ts = Time.now
-  begin
-    no_downloads_el = page.evaluate_script(no_downloads_el_js)
-  rescue e
-    puts e.inspect
-  end
-  until Time.now - ts > Capybara.default_max_wait_time || !no_downloads_el[:hidden] || !sleep(0.1)
-    begin
-      no_downloads_el = page.evaluate_script(no_downloads_el_js)
-    rescue e
-      puts e.inspect
-    end
-  end
-  expect(no_downloads_el[:hidden]).to eq 'false'
+  DownloadHelper.clear_downloads
 end
 
 step 'I confirm popup' do

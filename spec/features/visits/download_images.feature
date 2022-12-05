@@ -57,7 +57,7 @@ Feature: Download Visit Images
     When I wait for all jobs in "DownloadImagesWorker" queue
     Then I see "SUCCEEDED" in "State" row
     And I see "Zip file Download"
-    When I click link "Download"
+    When I click "Download" in "Zip file" row
     Then I download zip file
     # TODO: Test zip file content
 
@@ -71,7 +71,7 @@ Feature: Download Visit Images
     When I wait for all jobs in "DownloadImagesWorker" queue
     Then I see "SUCCEEDED" in "State" row
     And I see "Zip file Download"
-    When I click link "Download"
+    When I click "Download" in "Zip file" row
     Then I download zip file
     # TODO: Test zip file content
 

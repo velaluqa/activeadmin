@@ -25,28 +25,20 @@ build:
     CI_NODE_TOTAL: 6
   script:
     - export DOCKER_PWD=$(echo /cache/$(hostname)/*/${CI_PROJECT_NAME}/ | awk '{sub(/^\/cache/,"/srv/build-cache")}1')
+    - echo $DOCKER_PWD
+    - mkdir -p ${DOCKER_PWD}/tmp/downloads
+    - chmod a+rwx ${DOCKER_PWD}/tmp/downloads
+    - echo $DOCKER_PWD/tmp/downloads
+    - ls -al $DOCKER_PWD/tmp/downloads
     - docker-compose run test bundle exec rake db:create db:migrate
     - docker-compose run test bundle exec rake knapsack:rspec
   after_script:
     - docker-compose down
   artifacts:
+    when: always
     paths:
       - reports
       - tmp/capybara
-
-# test:
-#   stage: test
-#   script:
-#     - export DOCKER_PWD=$(echo /cache/$(hostname)/*/${CI_PROJECT_NAME}/ | awk '{sub(/^\/cache/,"/srv/build-cache")}1')
-#     - docker-compose run test bundle exec rake db:create db:migrate
-#     - docker-compose run -e KNAPSACK_GENERATE_REPORT=true test rspec spec
-#     - docker-compose run test bundle exec rake ci
-#   after_script:
-#     - docker-compose down
-#   artifacts:
-#     paths:
-#       - reports
-#       - tmp/capybara
 
 test_ci_node_0:
   <<: *test_node_config
