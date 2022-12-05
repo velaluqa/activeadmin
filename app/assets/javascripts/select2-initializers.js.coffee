@@ -1,10 +1,19 @@
 window.initializeSimpleSelects = ($elements = $('.initialize-select2')) ->
   $elements.each (i, el) ->
     $el = $(el)
-    $el.select2
+    reloadGetParam = $el.data("reload-get-param")
+
+    $select2 = $el.select2
       placeholder: $el.data('placeholder')
       allowClear: $el.data('allow-clear') or false
       minimumResultsForSearch: if $el.data('hide-search') then Infinity else 5
+    if reloadGetParam?
+      $select2.on 'change', (e) ->
+        url = new URL(window.location)
+        searchParams = url.searchParams
+        searchParams.set(reloadGetParam, e.target.value)
+        url.search = searchParams.toString()
+        window.location = url.toString()
 
 window.initializeRecordSearch = ($elements = $('.select2-record-search')) ->
   $elements.each (i, el) ->

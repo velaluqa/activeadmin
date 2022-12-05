@@ -30,6 +30,7 @@
   job files between version updates
 * Fix - Only display `Roles` link in users list if the current user is authorized to view the roles
 * Fix - Fix message when assigning required series without proper study configuration
+* Fix - (#5759) Edit Image Series - Fix displaying only visits related to the selected patient
 
 ### Dev / DevOps
 
