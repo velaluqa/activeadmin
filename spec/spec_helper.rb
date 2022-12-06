@@ -19,6 +19,7 @@ Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
 load 'spec/features/steps/placeholders.rb', true
 require 'capybara/rspec'
 require 'capybara-screenshot/rspec'
+load 'spec/download_helper.rb'
 
 # Require after capybara-screenshot and turnip which get monkey-patched
 require 'validation_report/validation_report'
@@ -40,7 +41,14 @@ end
 Capybara.register_driver(:selenium) do |app|
   caps = Selenium::WebDriver::Remote::Capabilities.chrome(
     "goog:chromeOptions" => {
-      "args" => %w[start-maximized no-sandbox disable-gpu]
+      "args" => %w[start-maximized no-sandbox disable-gpu],
+      "prefs" => {
+        "download" => {
+          "default_directory" => DownloadHelper::PATH,
+          "directory_upgrade" => true,
+          "prompt_for_download" => false
+        }
+      }
     }
   )
   driver = Capybara::Selenium::Driver.new(
@@ -164,7 +172,7 @@ RSpec.configure do |config|
   config.before(:all) do
     GC.disable
   end
-  
+
   config.after(:all) do
     GC.enable
     GC.start
@@ -172,6 +180,7 @@ RSpec.configure do |config|
   end
 
   config.before(:suite) do
+    DownloadHelper.set_write_permissions!
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
     DatabaseCleaner.cleaning do

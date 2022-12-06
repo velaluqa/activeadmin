@@ -31,6 +31,8 @@ services:
     volumes:
       - ${DOCKER_PWD:-.}/reports:/app/reports # Artifacts
       - ${DOCKER_PWD:-.}/.git:/app/.git:ro    # Validation Report requires access to git history
+      - ${DOCKER_PWD:-.}/tmp/capybara:/app/tmp/capybara
+      - ${DOCKER_PWD:-.}/tmp/downloads:/downloads
     links:
       - postgres
       - redis
@@ -41,9 +43,11 @@ services:
     ports:
       - 1080
   chrome:
-    image: selenium/standalone-chrome
+    image: selenium/standalone-chrome:108.0-chromedriver-108.0-grid-4.7.0-20221202
     environment:
       SCREEN_WIDTH: 1920
       SCREEN_HEIGHT: 1080
       SE_NODE_SESSION_TIMEOUT: 11000
     shm_size: 2GB
+    volumes:
+      - ${DOCKER_PWD:-.}/tmp/downloads:/downloads

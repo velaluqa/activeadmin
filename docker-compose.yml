@@ -28,6 +28,7 @@ services:
       - .:/app
       - ./config/erica_remotes.yml.dev:/app/config/erica_remotes.yml
       - ./tmp:/app/tmp
+      - ./tmp/downloads:/downloads
     ports:
       - 3000:3000
     environment: &environment
@@ -90,8 +91,8 @@ services:
     links:
       - app
   chrome:
-    image: selenium/standalone-chrome-debug
-    #image: selenium/standalone-chrome
+    #image: selenium/standalone-chrome-debug
+    image: selenium/standalone-chrome:108.0-chromedriver-108.0-grid-4.7.0-20221202
     ports:
       - 5900:5900
     environment:
@@ -99,3 +100,4 @@ services:
       SCREEN_HEIGHT: 1080
     volumes:
       - ./spec/files:/app/spec/files
+      - ./tmp/downloads:/downloads
