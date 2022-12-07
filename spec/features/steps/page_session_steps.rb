@@ -441,12 +441,17 @@ step 'I download zip file' do
   ap DownloadHelper.downloads
   expect(DownloadHelper.downloads).to include(include(".zip"))
 
-  clear_downloads_js =
-    "document.querySelector('downloads-manager').shadowRoot.querySelector('downloads-toolbar').shadowRoot.querySelector('button.clear-all').click()"
   page.driver.browser.get('chrome://downloads/')
+
   validation_report_screenshot
-  page.evaluate_script(clear_downloads_js)
-  DownloadHelper.clear_downloads
+
+  page.evaluate_script(<<~JS)
+    document
+      .querySelector('downloads-manager').shadowRoot
+      .querySelector('downloads-toolbar').shadowRoot
+      .querySelector('button.clear-all')
+      .click()
+  JS
 end
 
 step 'I confirm popup' do

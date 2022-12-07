@@ -167,6 +167,7 @@ RSpec.configure do |config|
     FileUtils.mkdir_p('spec/data/studies')
     FileUtils.mkdir_p('spec/data/forms')
     FileUtils.mkdir_p('spec/data/sessions')
+    DownloadHelper.clear_downloads
   end
 
   config.before(:all) do
