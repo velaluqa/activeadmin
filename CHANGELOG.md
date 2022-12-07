@@ -31,6 +31,7 @@
 * Fix - Only display `Roles` link in users list if the current user is authorized to view the roles
 * Fix - Fix message when assigning required series without proper study configuration
 * Fix - (#5759) Edit Image Series - Fix displaying only visits related to the selected patient
+* Fix - (ERICA-150, #5993) Edit Form Session - Display form answer details to distinguish between reorderable form answers
 
 ### Dev / DevOps
 

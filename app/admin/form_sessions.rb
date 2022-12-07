@@ -1,6 +1,6 @@
 ActiveAdmin.register FormSession do
   menu(parent: 'read', priority: 0)
-
+    
   permit_params(
     :name,
     :description,
@@ -52,9 +52,14 @@ ActiveAdmin.register FormSession do
     end
 
     f.inputs 'Tasks' do
+
       f.has_many :form_answers, new_record: false, sortable: :sequence_number, sortable_start: 1 do |fa|
         fa.input :form_definition_label, as: :readonly, input_html: { disabled: true }
         fa.input :resource_labels, as: :readonly, input_html: { disabled: true }
+        fa.input :status, as: :readonly, input_html: { disabled: true }
+        fa.input :user_label, as: :readonly, input_html: { disabled: true }
+        fa.input :published_at_label, as: :readonly, input_html: { disabled: true }
+        fa.input :submitted_at_label, as: :readonly, input_html: { disabled: true }
       end
     end
 

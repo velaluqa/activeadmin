@@ -6,7 +6,7 @@ Feature: Destroy Form Session
   Notes:
 
   - Sessions with signed form answers cannot be destroyed
-  
+
   Scenario: Cannot destroy form session with form answers
     Given a role "Authorized" with permissions:
       | FormSession    | read, destroy |
@@ -19,7 +19,7 @@ Feature: Destroy Form Session
     When I sign in as user "authorized.user"
     And I browse to form_sessions list
     And I click "View" in "TestSession" row
-    Then I see "1 TestForm DRAFT"
+    Then I see "0 TestForm DRAFT"
     And I click link "Delete Form Session" and confirm
     Then I see "Cannot delete session with associated form data."
     

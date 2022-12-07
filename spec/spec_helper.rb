@@ -15,6 +15,7 @@ Sidekiq::Testing.fake!
 # formats for step definitions.
 require 'turnip'
 require 'turnip/capybara'
+require 'turnip_helper'
 Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
 load 'spec/features/steps/placeholders.rb', true
 require 'capybara/rspec'
@@ -37,6 +38,33 @@ module Capybara
     end
   end
 end
+
+module CapybaraExtension
+  def drag_by(right_by, down_by)
+    base.drag_by(right_by, down_by)
+  end
+
+  def drag_onto(other)
+    base_y = base.rect.y
+    other_y = other.rect.y
+    offset =
+      if base_y > other_y
+        other_y - base_y - 10
+      else
+        other_y - base_y + 10
+      end
+    drag_by(0, offset)
+  end
+end
+
+module CapybaraSeleniumExtension
+  def drag_by(right_by, down_by)
+    driver.browser.action.drag_and_drop_by(native, right_by, down_by).perform
+  end
+end
+
+::Capybara::Selenium::Node.send :include, CapybaraSeleniumExtension
+::Capybara::Node::Element.send :include, CapybaraExtension
 
 Capybara.register_driver(:selenium) do |app|
   caps = Selenium::WebDriver::Remote::Capabilities.chrome(
