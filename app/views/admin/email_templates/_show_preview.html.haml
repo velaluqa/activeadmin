@@ -11,7 +11,7 @@
         %fieldset.inputs.headless
           %ol
             %li.string.input.optional.stringish
-              %label Resource for Preview
+              %label{ for: "preview-resource" } Resource for Preview
               %select#preview-resource{ name: 'email_template[preview_record]', style: 'width: 200px', 'data-placeholder' => 'Please select a resource' }
           .iframe-wrapper
             .spinner

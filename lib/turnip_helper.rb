@@ -15,6 +15,7 @@ class TurnipHelper
           image_series.images.order(id: :asc)[image_index.to_i - 1]
         when 'User' then User.find_by(username: identifier)
         when 'Role' then Role.find_by(title: identifier)
+        when 'EmailTemplate' then EmailTemplate.find_by(name: identifier)
         end
       fail "Cannot find #{type} with identifier #{identifier}" if record.nil?
 

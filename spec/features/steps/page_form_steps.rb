@@ -97,26 +97,34 @@ step "I select :string for row :string" do |select_option, row_text|
 end
 
 step "I see select :string with options:" do |locator, select_options|
-  select2_open label: locator
+  was_open = page.has_css?('.select2-container--open', wait: 0)
+
+  select2_open from: locator unless was_open
   select_options.to_a.flatten.each do |option|
     expect(page).to have_css("li.select2-results__option", text: option)
   end
-  select2_close
+  select2_close unless was_open
 end
 
 step "I see select :string without options:" do |locator, select_options|
-  select2_open label: locator
+  was_open = page.has_css?('.select2-container--open', wait: 0)
+
+  select2_open from: locator unless was_open
   select_options.to_a.flatten.each do |option|
     expect(page).not_to have_css("li.select2-results__option", text: option)
   end
-  select2_close
+  select2_close unless was_open
 end
 
 step "I select :string for :string" do |select_option, label|
   field = find_field(label)
   if field[:class].include?("select2-hidden-accessible")
-    find("[id=#{field[:id]}] + span").click
-    find(:xpath, ".//li[./@role = 'treeitem']", text: select_option).click
+    was_open = page.has_css?('.select2-container--open', wait: 0)
+
+    select2_open from: label unless was_open
+    select2_select(select_option, from: label)
+
+    select2_close unless was_open
   else
     field.set(value)
   end
@@ -135,4 +143,11 @@ end
 
 step "I choose :string from :string" do |name, resource|
   select2(name, from: resource, search: true)
+end
+
+step "I search :string for select for :string" do |search, label|
+  was_open = page.has_css?('.select2-container--open', wait: 0)
+
+  select2_open(from: label) unless was_open
+  select2_search(search, from: label)
 end

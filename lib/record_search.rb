@@ -28,7 +28,11 @@ class RecordSearch
   private
 
   def merged_query
-    q = "SELECT * FROM (#{unioned_queries}) q WHERE q.text LIKE '%#{query}%'"
+    keyword_queries = query.split(" ").map do |keyword|
+      "(LOWER(q.text) LIKE '%#{keyword.downcase}%' OR LOWER(q.result_type) LIKE '#{keyword.downcase}%')"
+    end.join(" AND ")
+
+    q = "SELECT * FROM (#{unioned_queries}) q WHERE #{keyword_queries}"
     q << " AND (q.study_id = '#{study_id}' OR q.study_id IS NULL)" if study_id
     q
   end
