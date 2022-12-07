@@ -32,6 +32,8 @@
 * Fix - Fix message when assigning required series without proper study configuration
 * Fix - (#5759) Edit Image Series - Fix displaying only visits related to the selected patient
 * Fix - (ERICA-150, #5993) Edit Form Session - Display form answer details to distinguish between reorderable form answers
+* Fix - (ERICA-161, #5988) Destroy Image Series - Unassign required
+  series and reset technical QC results
 * Fix - (ERICA-163, #5981) Show/Edit Notification Template - Allow
   searching by resource type. You can now type in multiple terms that
   are matched against the resource name and resource type (e.g. "visit
