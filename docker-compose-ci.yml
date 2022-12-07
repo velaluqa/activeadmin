@@ -51,3 +51,4 @@ services:
     shm_size: 2GB
     volumes:
       - ${DOCKER_PWD:-.}/tmp/downloads:/downloads
+      - ${DOCKER_PWD:-.}/spec/files:/app/spec/files
