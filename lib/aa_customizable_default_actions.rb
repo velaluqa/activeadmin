@@ -25,7 +25,16 @@ module ActiveAdmin
             links << link_to(I18n.t('active_admin.edit'), edit_resource_path(resource), class: 'member_link edit_link')
           end
           if controller.action_methods.include?('destroy') && !except.include?(:destroy)
-            links << link_to(I18n.t('active_admin.delete'), resource_path(resource), method: :delete, data: { confirm: I18n.t('active_admin.delete_confirmation') }, class: 'member_link delete_link')
+            links << link_to(
+              I18n.t('active_admin.delete'),
+              resource_path(resource),
+              method: :delete,
+              data: {
+                override_prompt_param: "versions_comment",
+                override_prompt_text: I18n.t('active_admin.delete_confirmation') + "\n" + "Please provide a reason for performing your action:"
+              },
+              class: 'member_link delete_link'
+            )
           end
           links
         end

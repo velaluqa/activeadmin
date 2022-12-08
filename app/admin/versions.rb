@@ -204,6 +204,7 @@ ActiveAdmin.register Version do
           auto_link(User.find_by_id(version.whodunnit.to_i))
         end
       end
+      row :comment
       if version.event == 'destroy'
         row :record do
           render 'admin/versions/object', object: version.object, item_type: version.item_type.constantize

@@ -34,6 +34,7 @@ class Version < PaperTrail::Version
     :object,
     :object_changes,
     :whodunnit,
+    :comment,
     :study_id,
     :form_definition_id,
     :form_answer_id,
