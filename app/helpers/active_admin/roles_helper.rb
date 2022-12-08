@@ -7,6 +7,7 @@ module ActiveAdmin::RolesHelper
         subject: subject,
         ability: "#{activity}_#{subject.to_s.underscore}",
         checked: role.allows_any?([activity, :manage], subject),
+        state: options[:state] || "show",
         disabled: options[:disabled] || (activity != :manage && role.allows?(:manage, subject))
       }
     )

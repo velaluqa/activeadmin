@@ -58,10 +58,11 @@ Feature: Read Technical Quality Control Results
     
   Scenario: Authorized
     Given a role "Image Manager" with permissions:
-      | Study   | read                 |
-      | Center  | read, update         |
-      | Patient | read, update, create |
-      | Visit   | read, read_tqc       |
+      | Study            | read                 |
+      | Center           | read, update         |
+      | Patient          | read, update, create |
+      | Visit            | read, read_tqc       |
+      | RequiredSeries   | read                 |
     And I sign in as a user with role "Image Manager"
     When I browse to show visit "10000"
     Then I see a row with "SPECT_1" and the following columns:

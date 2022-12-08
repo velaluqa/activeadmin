@@ -58,13 +58,13 @@ namespace :erica do
                     Study => %i[read],
                     Center => %i[read update create],
                     Patient => %i[read update create],
-                    ImageSeries => %i[upload assign_patient assign_visit]
+                    ImageSeries => %i[upload reassign_patient assign_visit]
                   })
       create_role('Image Manager', with_permissions: {
                     Study => %i[read update create],
                     Center => %i[read update create],
                     Patient => %i[read update create],
-                    ImageSeries => %i[read comment upload assign_patient assign_visit],
+                    ImageSeries => %i[read comment upload reassign_patient assign_visit],
                     Visit => %i[read create create_from_template comment assign_required_series read_tqc perform_tqc read_mqc perform_mqc]
                   })
       create_role('Medical QC', with_permissions: {

@@ -36,11 +36,12 @@ Feature: Assign Visit
     And an image_series "TestSeries" with:
       | patient | FooPatient |
     And a role "Image Manager" with permissions:
-      | Study       | read                 |
-      | Center      | read                 |
-      | Patient     | read                 |
-      | ImageSeries | read, assign_visit   |
-      | Visit       | read, read_tqc       |
+      | Study          | read                      |
+      | Center         | read                      |
+      | Patient        | read                      |
+      | Visit          | read, read_tqc            |
+      | RequiredSeries | read                      |
+      | ImageSeries    | read, assign_visit        |
 
   Scenario: Not logged in
     When I browse to assign_visit_form image_series "TestSeries"

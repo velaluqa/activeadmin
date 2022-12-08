@@ -1,52 +1,54 @@
-table_for required_series, sortable: true, class: 'index_table index' do
-  column :name
-  column :assigned_image_series, :sortable => :image_series_id do |required_series|
-    assigned_series = required_series.assigned_image_series
-    if assigned_series
-      status_tag('Assigned', class: 'ok', label: link_to(assigned_series.name, admin_image_series_path(assigned_series)).html_safe)
-    else
-      status_tag('Missing', class: 'error')
-    end
-  end
-  column :file_types do |required_series|
-    extensions = required_series.assigned_image_series.andand.mime_extensions
-    status_tag(extensions.join(', ')) if extensions.present?
-  end
-  if can?(:read_tqc, visit)
-    column 'tQC State', :tqc_state, :sortable => :tqc_state do |required_series|
-      case required_series.tqc_state
-      when 'pending'
-        status_tag('Pending', class: 'warning')
-      when 'issues'
-        status_tag('Performed, issues present', class: 'error')
-      when 'passed'
-        status_tag('Passed', class: 'ok')
+if can?(:read, RequiredSeries)
+  table_for required_series, sortable: true, class: 'index_table index' do
+    column :name
+    column :assigned_image_series, :sortable => :image_series_id do |required_series|
+      assigned_series = required_series.assigned_image_series
+      if assigned_series
+        status_tag('Assigned', class: 'ok', label: link_to(assigned_series.name, admin_image_series_path(assigned_series)).html_safe)
+      else
+        status_tag('Missing', class: 'error')
       end
     end
-    column 'tQC Date', :tqc_date, :sortable => :tqc_date do |required_series|
-      pretty_format(required_series.tqc_date.localtime) unless required_series.tqc_date.nil?
+    column :file_types do |required_series|
+      extensions = required_series.assigned_image_series.andand.mime_extensions
+      status_tag(extensions.join(', ')) if extensions.present?
     end
-    column 'tQC User', :tqc_user,  :sortable => :tqc_user_id do |required_series|
-      link_to(required_series.tqc_user.name, admin_user_path(required_series.tqc_user)) unless required_series.tqc_user.nil?
+    if can?(:read_tqc, visit)
+      column 'tQC State', :tqc_state, :sortable => :tqc_state do |required_series|
+        case required_series.tqc_state
+        when 'pending'
+          status_tag('Pending', class: 'warning')
+        when 'issues'
+          status_tag('Performed, issues present', class: 'error')
+        when 'passed'
+          status_tag('Passed', class: 'ok')
+        end
+      end
+      column 'tQC Date', :tqc_date, :sortable => :tqc_date do |required_series|
+        pretty_format(required_series.tqc_date.localtime) unless required_series.tqc_date.nil?
+      end
+      column 'tQC User', :tqc_user,  :sortable => :tqc_user_id do |required_series|
+        link_to(required_series.tqc_user.name, admin_user_path(required_series.tqc_user)) unless required_series.tqc_user.nil?
+      end
     end
-  end
-  column do |required_series|
-    result = ''
-
-    if can?(:assign_required_series, required_series.visit)
-      result += link_to((required_series.image_series_id.nil? ? 'Assign' : 'Reassign'), assign_required_series_form_admin_visit_path(visit, :required_series_names => required_series.name), :class => 'member_link')
+    column do |required_series|
+      result = ''
+  
+      if can?(:assign_required_series, required_series.visit)
+        result += link_to((required_series.image_series_id.nil? ? 'Assign' : 'Reassign'), assign_required_series_form_admin_visit_path(visit, :required_series_names => required_series.name), :class => 'member_link')
+      end
+      if required_series.assigned_image_series.present? && can?(:perform_tqc, visit)
+        result += link_to('Perform tQC', tqc_form_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link')
+      end
+      if required_series.assigned_image_series.present? && required_series.tqc_state != 'pending' && can?(:read_tqc, visit)
+        result += link_to('View tQC results', tqc_results_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link')
+      end
+      result += link_to('Open Viewer', viewer_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') unless required_series.assigned_image_series.nil?
+      result += link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') if required_series.assigned_image_series.andand.has_dicom? && can?(:read_dicom_metadata, required_series.assigned_image_series)
+  
+      result += link_to('Domino', required_series.lotus_notes_url, :class => 'member_link') unless(required_series.domino_unid.blank?)
+  
+      result.html_safe
     end
-    if required_series.assigned_image_series.present? && can?(:perform_tqc, visit)
-      result += link_to('Perform tQC', tqc_form_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link')
-    end
-    if required_series.assigned_image_series.present? && required_series.tqc_state != 'pending' && can?(:read_tqc, visit)
-      result += link_to('View tQC results', tqc_results_admin_visit_path(visit, :required_series_name => required_series.name), :class => 'member_link')
-    end
-    result += link_to('Open Viewer', viewer_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') unless required_series.assigned_image_series.nil?
-    result += link_to('DICOM Metadata', dicom_metadata_admin_image_series_path(required_series.assigned_image_series), :class => 'member_link') if required_series.assigned_image_series.andand.has_dicom? && can?(:read_dicom_metadata, required_series.assigned_image_series)
-
-    result += link_to('Domino', required_series.lotus_notes_url, :class => 'member_link') unless(required_series.domino_unid.blank?)
-
-    result.html_safe
-  end
+  end  
 end

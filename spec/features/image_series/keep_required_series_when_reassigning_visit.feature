@@ -60,11 +60,12 @@ Feature: Keep Required Series When Reassigning Visit
     And visit "30000" required series "SPECT_1" has tQC with:
       | comment | tQC results |
     And a role "Image Manager" with permissions:
-      | Study       | read                         |
-      | Center      | read                         |
-      | Patient     | read                         |
-      | ImageSeries | read, update, assign_visit   |
-      | Visit       | read, read_tqc               |
+      | Study          | read                         |
+      | Center         | read                         |
+      | Patient        | read                         |
+      | Visit          | read, read_tqc               |
+      | RequiredSeries | read                         |
+      | ImageSeries    | read, update, assign_visit   |
 
   Scenario: Different Visit Type - Removing Required Series Assignments
     Given I sign in as a user with role "Image Manager"

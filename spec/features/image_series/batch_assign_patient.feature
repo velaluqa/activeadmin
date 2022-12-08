@@ -24,10 +24,10 @@ Feature: Batch Assign Patient
     And an image_series "TestSeries" with:
       | patient | AssignedPatient |
     And a role "Image Manager" with permissions:
-      | Study       | read                 |
-      | Center      | read                 |
-      | Patient     | read                 |
-      | ImageSeries | read, assign_patient |
+      | Study       | read                    |
+      | Center      | read                    |
+      | Patient     | read                    |
+      | ImageSeries | read, reassign_patient |
 
   Scenario: Not Logged In
     When I browse to image_series list
@@ -35,7 +35,7 @@ Feature: Batch Assign Patient
 
   Scenario: Unauthorized to assign patient
     Given I sign in as a user with all permissions
-    But I cannot assign_patient image_series
+    But I cannot reassign_patient image_series
     When I browse to image_series list
     And I select row of "TestSeries"
     And I click "Batch Actions"

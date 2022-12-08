@@ -50,8 +50,9 @@ Feature: Lock Study Configuration
       | visit_type  | followup                        |
       | description | Visit type with required series |
     And a role "Study Manager" with permissions:
-      | Study | manage |
-      | Visit | manage |
+      | Study          | manage                    |
+      | Visit          | manage                    |
+      | RequiredSeries | read                      |
 
   Scenario: Not Logged In
     When I browse to upload_config_form study "TestStudy"

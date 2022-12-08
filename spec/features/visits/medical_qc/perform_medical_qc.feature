@@ -41,10 +41,11 @@ Feature: Perform Medical Quality Control
       | state       | visit_assigned |
     And visit "10000" has required series "SPECT" assigned to "TestSeries"
     And a role "Image Manager" with permissions:
-      | Study   | read                                  |
-      | Center  | read, update                          |
-      | Patient | read, update, create                  |
-      | Visit   | read, read_tqc, perform_mqc, read_mqc |
+      | Study            | read                                  |
+      | Center           | read, update                          |
+      | Patient          | read, update, create                  |
+      | Visit            | read, read_tqc, perform_mqc, read_mqc |
+      | RequiredSeries   | read                                  |
     And visit "10000" required series "SPECT" has tQC with:
       | acceptable | passed |
     # And visit "10000" has mQC with:

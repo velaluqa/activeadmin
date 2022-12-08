@@ -22,12 +22,12 @@ Feature: Update Image Series with patient and visit
       | patient | FooPatient       |
       | visit   | 10000            |
     And a role "Authorized Role" with permissions:
-      | ImageSeries | read, assign_patient, assign_visit |
+      | ImageSeries | read, reassign_patient, assign_visit |
 
   Scenario: Unauthorized to assign visit or reassign patient
     When I sign in as a user with all permissions
     But I cannot assign_visit image_series
-    And I cannot assign_patient image_series
+    And I cannot reassign_patient image_series
     When I browse to image_series list
     And I click "Edit" in "TestSeries" row
     Then I see "DETAILS"
@@ -51,7 +51,7 @@ Feature: Update Image Series with patient and visit
   
   Scenario: Unauthorized to assign patient but can assign visit
     When I sign in as a user with all permissions
-    But I cannot assign_patient image_series
+    But I cannot reassign_patient image_series
     When I browse to image_series list
     And I click "Edit" in "TestSeries" row
     Then I see "DETAILS"
