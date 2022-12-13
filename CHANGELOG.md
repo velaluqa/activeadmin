@@ -35,6 +35,11 @@
 * Fix - Only display `Roles` link in users list if the current user is authorized to view the roles
 * Fix - Fix message when assigning required series without proper study configuration
 * Fix - (#5759) Edit Image Series - Fix displaying only visits related to the selected patient
+* Fix - (ERICA-143, #5996) Edit Image Series - Fix reassigning image
+  series to new patient
+  * Allow reassignment without visit
+  * Keep patient number and visit selection after first submit (when
+    confirming the action)
 * Fix - (ERICA-149, #5994) Consolidate permissions options
   * Add permission documentation for complex permission options
   * Rename `ImageSeries` `assign_patient` to `reassign_patient`
@@ -45,10 +50,24 @@
     `read` `RequiredSeries` is not granted
   * Only show granted permissions in role permission overview & user
     permission overview
-* Fix - (ERICA-150, #5993) Edit Form Session - Display form answer details to distinguish between reorderable form answers
+* Fix - (ERICA-150, #5993) Edit Form Session - Display form answer
+  details to distinguish between reorderable form answers
+* Fix - (ERICA-151, #5992) Show Visit - Only show metadata link if
+  permission is granted
+* Fix - (ERICA-152, #5990) Show Visit - Allow to re-do tQC
 * Fix - (ERICA-153, #5984) Permissions - Do not grant `destroy`
   `BackgroundJob` permission automatically for a users own background
   jobs
+* Fix - (ERICA-154, #5983) Change Role Permissions - Fix logging
+  changes of the set of permissions to the audit trail
+* Fix - (ERICA-155, #5985) Update Form Answer - Deny update of
+  signed form answers
+* Fix - (ERICA-156, #5991) Form Definitions List - Only show `Create
+  Task` link if permission for `create` `Form Answers` is granted
+* Fix - (ERICA-157, #5986) Delete Form Answer - Deny deletion of
+  signed form answers
+* Fix - (ERICA-158, #5987) Delete Form Session - Deny deletion of
+  form sessions with form answers
 * Fix - (ERICA-161, #5988) Destroy Image Series - Unassign required
   series and reset technical QC results
 * Fix - (ERICA-163, #5981) Show/Edit Notification Template - Allow
@@ -95,6 +114,8 @@
   datetime DICOM field if available
 * Fix - Image Upload - (ERICA-164) Fix recognizing multi-frame images
   as separate image series upon parsing
+* Fix test suite - Replace download tests by checking downloaded files
+  instead of chrome download manager user interface
 
 ## 7.2.4
 
