@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_27_131434) do
+ActiveRecord::Schema.define(version: 2022_12_08_100622) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -27,6 +27,11 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
 
   create_enum :configuration_schema_specs, [
     "formio_v1",
+  ], force: :cascade
+
+  create_enum :form_definition_status, [
+    "draft",
+    "final",
   ], force: :cascade
 
   create_table "active_admin_comments", id: :serial, force: :cascade do |t|
@@ -221,6 +226,7 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
     t.string "comment"
     t.jsonb "properties", default: {}, null: false
     t.string "properties_version"
+    t.jsonb "cache", default: {}, null: false
     t.index ["patient_id", "series_number"], name: "index_image_series_on_patient_id_and_series_number"
     t.index ["patient_id"], name: "index_image_series_on_patient_id"
     t.index ["series_number"], name: "index_image_series_on_series_number"
@@ -233,6 +239,7 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
     t.datetime "updated_at"
     t.string "mimetype"
     t.string "sha256sum"
+    t.jsonb "cache", default: {}, null: false
     t.index ["image_series_id"], name: "index_images_on_image_series_id"
   end
 
@@ -291,6 +298,7 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
     t.string "domino_unid"
     t.jsonb "data", default: {}, null: false
     t.jsonb "export_history", default: [], null: false
+    t.jsonb "cache", default: {}, null: false
     t.index ["center_id"], name: "index_patients_on_center_id"
   end
 
@@ -374,15 +382,8 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
     t.string "tagger_type"
     t.string "context", limit: 128
     t.datetime "created_at"
-    t.index ["context"], name: "index_taggings_on_context"
     t.index ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], name: "taggings_idx", unique: true
-    t.index ["tag_id"], name: "index_taggings_on_tag_id"
     t.index ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context"
-    t.index ["taggable_id", "taggable_type", "tagger_id", "context"], name: "taggings_idy"
-    t.index ["taggable_id"], name: "index_taggings_on_taggable_id"
-    t.index ["taggable_type"], name: "index_taggings_on_taggable_type"
-    t.index ["tagger_id", "tagger_type"], name: "index_taggings_on_tagger_id_and_tagger_type"
-    t.index ["tagger_id"], name: "index_taggings_on_tagger_id"
   end
 
   create_table "tags", id: :serial, force: :cascade do |t|
@@ -456,6 +457,7 @@ ActiveRecord::Schema.define(version: 2022_09_27_131434) do
     t.uuid "form_definition_id"
     t.uuid "form_answer_id"
     t.uuid "configuration_id"
+    t.string "comment"
     t.index "((object ->> 'name'::text))", name: "idx_on_versions_rs_changes1"
     t.index "((object ->> 'visit_id'::text))", name: "idx_on_versions_rs_changes2"
     t.index "((object_changes #>> '{name,1}'::text[]))", name: "idx_on_versions_rs_changes3"

@@ -134,4 +134,8 @@ class ApplicationController < ActionController::Base
       }
     )
   end
+
+  def info_for_paper_trail
+    { comment: params[:versions_comment] }
+  end
 end

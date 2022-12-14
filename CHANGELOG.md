@@ -18,6 +18,7 @@
 * Feature - Automatically update background job status on background jobs list and background jobs show page
 * Permission Change - Consolidate image access permissions through `Image Series` resource. All access to images is controlled by granting permissions to image series instead of images.
 * Feature - Show list of potential recipients for notification profiles
+* Feature - (ERICA-168, #6041) Allow prompts for comments on particular actions (e.g. delete record)
 
 ### Patches / Fixes
 
@@ -51,6 +52,7 @@
   searching by resource type. You can now type in multiple terms that
   are matched against the resource name and resource type (e.g. "visit
   6000 #1" would match the visit named "Lyon6000#1")
+* Fix - (ERICA-157, #5986) - Block destroy of signed form answers
 
 ### Dev / DevOps
 

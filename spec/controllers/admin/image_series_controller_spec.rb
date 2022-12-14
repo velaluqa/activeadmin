@@ -63,6 +63,33 @@ RSpec.describe Admin::ImageSeriesController do
     end
   end
 
+  describe '#destroy' do
+    let(:image_series) { create(:image_series) }
+
+    describe "with param `versions_comment`" do
+      let(:versions_comment) { "This is a comment" }
+
+      login_user_with_abilities do
+        can :read, ImageSeries
+        can :destroy, ImageSeries
+      end
+
+      it 'writes the comment to tracked versions' do
+        delete(:destroy, params: { id: image_series.id, versions_comment: versions_comment })
+
+        expect(subject).to redirect_to('/admin/image_series')
+        expect(ImageSeries.where(id: image_series.id).first).to be_nil
+
+        destroy_version = Version.where(
+          item_id: image_series.id,
+          item_type: "ImageSeries",
+          event: "destroy"
+        ).first
+        expect(destroy_version.attributes).to include("comment" => versions_comment)
+      end
+    end
+  end
+
   describe 'member_action :viewer' do
     before(:each) do
       @image_series = create(:image_series)

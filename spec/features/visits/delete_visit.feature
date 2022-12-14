@@ -32,6 +32,7 @@ Feature: Delete Visits
       | Center  | read, update         |
       | Patient | read, update, create |
       | Visit   | read, destroy        |
+      | Version | read                 |
 
   Scenario: Not logged in
     When I browse to visits list
@@ -54,6 +55,13 @@ Feature: Delete Visits
       | Description  | Visit Extraordinaire      |
       | State        | INCOMPLETE, NOT AVAILABLE |
     When I click link "Delete"
-    And I confirm alert
+    And I dismiss popup
+    Then I see a row with "10000"
+    When I click link "Delete"
+    And I provide "This is a comment" for browser prompt and confirm
+    And I browse to visits list
     Then I don't see a row with "10000"
+    When I click "Audit Trail" in the navigation menu
+    And I click "View" in the first "Visit" row
+    Then I see "This is a comment" in "Comment" row
 

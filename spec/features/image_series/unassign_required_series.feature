@@ -40,6 +40,7 @@ Feature: Unassign required series when deleting assigned image series
       | Visit           | read, perform_tqc, read_tqc |
       | RequiredSeries  | read                        |
       | ImageSeries     | read, destroy               |
+      | Version         | read                        |
 
   Scenario: Unassign required series
     Given I sign in as a user with role "Image Manager"
@@ -58,7 +59,13 @@ Feature: Unassign required series when deleting assigned image series
     And I see "View tQC results"
     When I browse to image_series list
     And I click "Delete" in "TestSeries" row
-    And I confirm alert
+    And I dismiss popup
+    Then I see a row with "TestSeries"
+    When I click link "Delete"
+    And I provide "This is a comment" for browser prompt and confirm
+    And I click "Audit Trail" in the navigation menu
+    And I click "View" in the first "ImageSeries" row
+    Then I see a row with "This is a comment"
     When I browse to show visit "10000"
     Then I see "MISSING" in "SPECT_1" row
     

@@ -13,6 +13,7 @@ Feature: Delete Study
     Given a study "FooStudy"
     And a role "Image Manager" with permissions:
       | Study   | read, destroy        |
+      | Version | read                 |
 
   Scenario: Not logged in
     When I browse to studies list
@@ -49,8 +50,15 @@ Feature: Delete Study
       | Configuration | MISSING  |
       | State         | Building |
     When I click link "Delete"
-    And I confirm alert
+    And I dismiss popup
+    Then I see a row with "FooStudy"
+    When I click link "Delete"
+    And I provide "This is a comment" for browser prompt and confirm
+    And I browse to studies list
     Then I don't see a row with "FooStudy"
+    When I click "Audit Trail" in the navigation menu
+    And I click "View" in the first "Study" row
+    Then I see a row with "This is a comment"
 
   # TODO: Discuss Scenario: Scoped permission to study
   # TODO: Discuss Scenario: Scoped permission to center

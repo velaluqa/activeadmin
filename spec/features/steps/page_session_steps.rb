@@ -516,3 +516,13 @@ step "I don't see the edit pencil icon in :string row" do |row_content|
     expect(page).not_to have_css("i.fa.fa-pencil")
   end
 end
+
+step "I provide :string for browser prompt and confirm" do |text|
+  accept_prompt(with: text)
+end
+
+step 'I click :string in the first :string row' do |locator, row_content|
+  within("tr", text: row_content, match: :first) do
+    click_link(locator)
+  end
+end

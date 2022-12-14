@@ -37,3 +37,51 @@
 
 bootbox.setDefaults({ size: "small" });
 $.fn.select2.defaults.set("theme", "bootstrap");
+
+var rails = $.rails;
+$.rails.handleMethod = function (link) {
+  var overridePromptParam = link.data("override-prompt-param"),
+    overridePromptText = link.data("override-prompt-text");
+
+  var href;
+  if (overridePromptParam) {
+    var promptValue = prompt(overridePromptText);
+    if (promptValue === null) return;
+
+    var url = new URL(rails.href(link));
+    var params = url.searchParams;
+    params.set(overridePromptParam, promptValue);
+    url.search = params.toString();
+    href = url.toString();
+  } else {
+    href = rails.href(link);
+  }
+
+  var method = link.data("method"),
+    target = link.attr("target"),
+    csrfToken = rails.csrfToken(),
+    csrfParam = rails.csrfParam(),
+    form = $('<form method="post" action="' + href + '"></form>'),
+    metadataInput =
+      '<input name="_method" value="' + method + '" type="hidden" />';
+
+  if (
+    csrfParam !== undefined &&
+    csrfToken !== undefined &&
+    !rails.isCrossDomain(href)
+  ) {
+    metadataInput +=
+      '<input name="' +
+      csrfParam +
+      '" value="' +
+      csrfToken +
+      '" type="hidden" />';
+  }
+
+  if (target) {
+    form.attr("target", target);
+  }
+
+  form.hide().append(metadataInput).appendTo("body");
+  form.submit();
+};

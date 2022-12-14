@@ -5,7 +5,8 @@ Feature: Destroy Users
 
   Background:
      Given a role "User Manager" with permissions:
-       | User    | read, destroy |
+       | User    | read, destroy        |
+       | Version | read                 |
      And a user "authorized.user" with:
       | name | Alex Authorized |
      And user "authorized.user" belongs to role "User Manager"
@@ -27,8 +28,13 @@ Feature: Destroy Users
      And I browse to users list
      Then I see "Delete" in "other.user" row
      When I click "Delete" in "other.user" row
-     And I confirm alert
-     Then I see "User was successfully destroyed"
-     When I browse to users list
+     And I dismiss popup
+     Then I see a row with "other.user"
+     When I click "Delete" in "other.user" row
+     And I provide "This is a comment" for browser prompt and confirm
+     And I browse to users list
      Then I don't see a row with "other.user"
+     When I click "Audit Trail" in the navigation menu
+     And I click "View" in the first "Alex Authorized" row
+     Then I see "This is a comment" in "Comment" row
      
