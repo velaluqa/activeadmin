@@ -1,4 +1,5 @@
 %td.name
+%td.numberOfFrames
 %td.size
 %td.status
 %td.warnings

@@ -1,4 +1,5 @@
 require 'tempfile'
+require 'dicom/file_utils'
 
 #
 #
@@ -99,33 +100,39 @@ JOIN
 
   def write_anonymized_file(file)
     tmp = Tempfile.new('image_to_anonymize')
-    begin
-      tmp.binmode
-      tmp.write(file)
-      tmp.close
 
-      # TODO: Create PORO DicomFile.test?(path)
-      mimetype = File.open(tmp.path) { |f| Marcel::Magic.by_magic(f).type }
-      if mimetype == "application/dicom"
-        tmp_dicom = DICOM::DObject.read(tmp.path)
-        raise DicomReadError unless tmp_dicom.read?
-        tmp_dicom.patients_name = "#{image_series.patient.name}"
-        tmp_dicom.write(absolute_image_storage_path)
-        raise DicomWriteError unless tmp_dicom.written?
+    mimetype = ::File.open(file.path) { |f| Marcel::Magic.by_magic(f).type }
+    if DICOM::FileUtils.test?(file.path)
+
+      # Later down the pipeline we encountered issues with a mixture of
+      # little and big endian transfer syntax. This is a work-around:
+      # Converting uploaded dicom files from explicit big endian to
+      # explicit little endian transfersyntax.
+      if DICOM::FileUtils.big_endian?(file.path)
+        DICOM::FileUtils.copy_little_endian(file.path, tmp.path)
       else
-        FileUtils.cp(tmp.path, absolute_image_storage_path)
+        FileUtils.cp(file.path, tmp.path)
       end
 
-      self.mimetype = mimetype
-      self.sha256sum =
-        File.open(absolute_image_storage_path, 'rb') do |f|
-          Digest::SHA256.hexdigest(f.read)
-        end
-      save!
-    ensure
-      tmp.close
-      tmp.unlink
+      tmp_dicom = DICOM::DObject.read(tmp.path)
+      raise DicomReadError unless tmp_dicom.read?
+
+      tmp_dicom.patients_name = "#{image_series.patient.name}"
+      tmp_dicom.write(absolute_image_storage_path)
+
+      raise DicomWriteError unless tmp_dicom.written?
+    else
+      FileUtils.cp(file.path, absolute_image_storage_path)
     end
+
+    self.mimetype = mimetype
+    self.sha256sum =
+      File.open(absolute_image_storage_path, 'rb') do |f|
+      Digest::SHA256.hexdigest(f.read)
+    end
+    save!
+  ensure
+    tmp.unlink
   end
 
   # TODO: Extract into separate PORO.

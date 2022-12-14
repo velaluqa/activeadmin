@@ -23,6 +23,7 @@ class ImageUploader.Models.Image extends Backbone.Model
     acquisitionDate:
       date: 'x00080022'
       time: 'x00080032'
+      datetime: 'x0008002a'
     contentDate:
       date: 'x00080023'
       time: 'x00080033'
@@ -94,6 +95,7 @@ class ImageUploader.Models.Image extends Backbone.Model
             sopInstanceUid: dataSet.string('x00080018')
             seriesInstanceUid: dataSet.string('x0020000e')
             seriesDescription: dataSet.string('x0008103e')
+            numberOfFrames: parseInt(dataSet.string('x00280008') || "1")
             seriesNumber: dataSet.string('x00200011')
             seriesDateTime: @parseDateTime(dataSet, 'seriesDate', warnIfMissing: false)
             acquisitionDateTime: @parseDateTime(dataSet, 'acquisitionDate')
@@ -127,28 +129,39 @@ class ImageUploader.Models.Image extends Backbone.Model
     date = dataSet.string(@dateTimeTags[tag].date)
     time = dataSet.string(@dateTimeTags[tag].time)
     timezone = dataSet.string(@dateTimeTags.timezone)
+    datetime = dataSet.string(@dateTimeTags[tag].datetime)
 
-    unless date?
+    unless date? or datetime?
       if op.warnIfMissing
         @pushWarnings('parsing', ["Missing date part for `#{tag}`"])
       return
 
-    year = parseInt(date[0..3], 10)
-    month = parseInt(date[4..5], 10) - 1
-    day = parseInt(date[6..7], 10)
+    if datetime?
+      year = parseInt(datetime[0..3], 10)
+      month = parseInt(datetime[4..5], 10) - 1
+      day = parseInt(datetime[6..7], 10)
+      hours = parseInt(datetime[8..9], 10)
+      minutes = parseInt(datetime[10..11], 10)
+      seconds = parseInt(datetime[12..13], 10)
+      milliseconds = parseInt(datetime[15..17].paddingRight('000'), 10)
+    else if date?
+      year = parseInt(date[0..3], 10)
+      month = parseInt(date[4..5], 10) - 1
+      day = parseInt(date[6..7], 10)
 
-    if time?
-      hours = parseInt(time[0..1], 10)
-      minutes = parseInt(time[2..3], 10)
-      seconds = parseInt(time[4..5], 10)
-      milliseconds = parseInt(time[7..9].paddingRight('000'), 10)
-    else
-      hours = '0'
-      minutes = '0'
-      seconds = '0'
-      milliseconds = '000'
-      if op.warnIfMissing
-        @pushWarnings('parsing', ["Missing time part for `#{tag}`"])
+      if time?
+        hours = parseInt(time[0..1], 10)
+        minutes = parseInt(time[2..3], 10)
+        seconds = parseInt(time[4..5], 10)
+        milliseconds = parseInt(time[7..9].paddingRight('000'), 10)
+      else
+        hours = '0'
+        minutes = '0'
+        seconds = '0'
+        milliseconds = '000'
+        if op.warnIfMissing
+          @pushWarnings('parsing', ["Missing time part for `#{tag}`"])
+
     new Date(Date.UTC(year, month, day, hours, minutes, seconds, milliseconds))
 
   @parse: (file) ->

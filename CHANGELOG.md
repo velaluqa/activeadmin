@@ -64,6 +64,17 @@
 * Maintenance - Show maintenance page if a file `.maintenance` exists
 * Maintenance - Refactored active admin view code for reusability
 
+## 7.2.5
+
+### Patches / Fixes
+
+* Fix - Image Upload - (ERICA-160) Fix metadata issue by converting big endian
+  transfer syntax to explicit little endian upon upload
+* Fix - Image Upload - (ERICA-166) Fix reading acquisition date from
+  datetime DICOM field if available
+* Fix - Image Upload - (ERICA-164) Fix recognizing multi-frame images
+  as separate image series upon parsing
+
 ## 7.2.4
 
 ### Patches / Fixes
