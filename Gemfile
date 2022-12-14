@@ -221,6 +221,9 @@ group :development, :test do
   # this improves CI test suite performance
   gem 'knapsack'
 
+  # Profiling memory usage
+  gem 'memory_profiler'
+
   # Rubocop ensures the ruby style guide.
   gem 'rubocop'
   gem 'rubocop-checkstyle_formatter', require: false
@@ -261,9 +264,9 @@ group :development, :test do
   gem 'spring'
   gem 'spring-commands-rspec'
 
-  gem 'rspec'
-  gem 'rspec-mocks'
-  gem 'rspec-rails'
+  gem 'rspec', '~> 3.10'
+  gem 'rspec-mocks', '~> 3.10'
+  gem 'rspec-rails', '~> 5.1'
   gem 'shoulda-matchers'
   gem 'with_model'
   # Spec delegation via ActiveSupport's #delegate method.
@@ -276,7 +279,10 @@ group :development, :test do
   #
   # Lock turnip because it's being monkey-patched for the validation
   # report
-  gem 'turnip', '3.1.0'
+  gem 'turnip'
+
+  # Extension of rspec's default documentation formatter for turnip
+  gem 'turnip_documentation_formatter'
 
   gem 'guard'
   gem 'guard-livereload'

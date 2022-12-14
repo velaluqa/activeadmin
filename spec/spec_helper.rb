@@ -16,6 +16,7 @@ Sidekiq::Testing.fake!
 require 'turnip'
 require 'turnip/capybara'
 require 'turnip_helper'
+require "turnip_documentation_formatter"
 Dir.glob('spec/features/steps/**/*_steps.rb') { |f| load f, true }
 load 'spec/features/steps/placeholders.rb', true
 require 'capybara/rspec'

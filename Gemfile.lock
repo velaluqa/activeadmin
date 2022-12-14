@@ -167,6 +167,11 @@ GEM
     crass (1.0.6)
     css_parser (1.7.0)
       addressable
+    cucumber-gherkin (25.0.2)
+      cucumber-messages (~> 19.1, >= 19.1.4)
+    cucumber-messages (19.1.4)
+    cuke_modeler (3.18.0)
+      cucumber-gherkin (< 26.0)
     database_cleaner (1.7.0)
     debug_inspector (0.0.3)
     declarative (0.0.20)
@@ -184,7 +189,7 @@ GEM
     devise-token_authenticatable (1.1.0)
       devise (>= 4.0.0, < 5.0.0)
     dicom (0.9.8)
-    diff-lcs (1.3)
+    diff-lcs (1.5.0)
     diffy (3.3.0)
     disposable (0.6.3)
       declarative (>= 0.0.9, < 1.0.0)
@@ -382,6 +387,7 @@ GEM
       mini_mime (>= 0.1.1)
     marcel (1.0.2)
     matrix (0.4.2)
+    memory_profiler (1.0.1)
     meta_request (0.7.2)
       rack-contrib (>= 1.1, < 3)
       railties (>= 3.0.0, < 7)
@@ -566,30 +572,30 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     rexml (3.2.5)
-    rspec (3.9.0)
-      rspec-core (~> 3.9.0)
-      rspec-expectations (~> 3.9.0)
-      rspec-mocks (~> 3.9.0)
-    rspec-core (3.9.0)
-      rspec-support (~> 3.9.0)
-    rspec-expectations (3.9.0)
+    rspec (3.12.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
+    rspec-core (3.12.0)
+      rspec-support (~> 3.12.0)
+    rspec-expectations (3.12.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.9.0)
-    rspec-mocks (3.9.0)
+      rspec-support (~> 3.12.0)
+    rspec-mocks (3.12.1)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.9.0)
-    rspec-rails (3.9.0)
-      actionpack (>= 3.0)
-      activesupport (>= 3.0)
-      railties (>= 3.0)
-      rspec-core (~> 3.9.0)
-      rspec-expectations (~> 3.9.0)
-      rspec-mocks (~> 3.9.0)
-      rspec-support (~> 3.9.0)
+      rspec-support (~> 3.12.0)
+    rspec-rails (5.1.2)
+      actionpack (>= 5.2)
+      activesupport (>= 5.2)
+      railties (>= 5.2)
+      rspec-core (~> 3.10)
+      rspec-expectations (~> 3.10)
+      rspec-mocks (~> 3.10)
+      rspec-support (~> 3.10)
     rspec-sidekiq (3.0.3)
       rspec-core (~> 3.0, >= 3.0.0)
       sidekiq (>= 2.4.0)
-    rspec-support (3.9.0)
+    rspec-support (3.12.0)
     rubocop (0.76.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
@@ -744,9 +750,12 @@ GEM
     transactional_capybara (0.2.0)
       capybara
     tty-which (0.4.1)
-    turnip (3.1.0)
-      gherkin (~> 5.0)
+    turnip (4.4.0)
+      cuke_modeler (~> 3.15)
       rspec (>= 3.0, < 4.0)
+    turnip_documentation_formatter (0.1)
+      rspec (~> 3.10)
+      turnip (~> 4.4)
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
     uber (0.1.0)
@@ -858,6 +867,7 @@ DEPENDENCIES
   liquid-rails (~> 0.2.0)
   lol_dba
   marcel (= 1.0.2)
+  memory_profiler
   meta_request
   mongoid (~> 6.0)
   mongoid-history (~> 0.5.0)
@@ -885,9 +895,9 @@ DEPENDENCIES
   reek
   reform-rails
   rest-client
-  rspec
-  rspec-mocks
-  rspec-rails
+  rspec (~> 3.10)
+  rspec-mocks (~> 3.10)
+  rspec-rails (~> 5.1)
   rspec-sidekiq
   rubocop
   rubocop-checkstyle_formatter
@@ -922,7 +932,8 @@ DEPENDENCIES
   timecop
   trailblazer-rails
   transactional_capybara
-  turnip (= 3.1.0)
+  turnip
+  turnip_documentation_formatter
   uglifier
   ultraviolet
   unicorn
