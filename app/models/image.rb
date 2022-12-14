@@ -199,7 +199,7 @@ JOIN
   end
 
   def dicom
-    DICOM::DObject.read(image_path.to_s)
+    DICOM::DObject.read(absolute_image_storage_path.to_s)
   end
 
   def self.classify_audit_trail_event(c)
@@ -220,6 +220,14 @@ JOIN
     when :file_change then ['File Change', :warning]
     when :file_upload then ['File Upload', :ok]
     end
+  end
+
+  def update_checksum!
+    self.sha256sum =
+      File.open(absolute_image_storage_path, 'rb') do |f|
+        Digest::SHA256.hexdigest(f.read)
+      end
+    save!
   end
 
   def dicom?

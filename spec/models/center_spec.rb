@@ -208,4 +208,26 @@ RSpec.describe Center do
       end
     end
   end
+
+  describe "callback #eventually_update_dicom_tags" do
+    let!(:study) { create(:study) }
+    let!(:center) { create(:center, study: study, code: "10") }
+    let!(:patient) { create(:patient, center: center, subject_id: "10") }
+    let!(:image_series) { create(:image_series, with_images: 1, patient: patient) }
+    let!(:user) { create(:user) }
+    let(:image) { image_series.images.first }
+
+    describe "updating `code`" do
+      it 'updates DICOM tag `patient_name` for all associated images through background job' do
+        expect(image.dicom.patients_name.value).to eq("1010")
+
+        center.code = "20"
+        center.save
+
+        Sidekiq::Worker.drain_all
+
+        expect(image.dicom.patients_name.value).to eq("2010")
+      end
+    end
+  end
 end

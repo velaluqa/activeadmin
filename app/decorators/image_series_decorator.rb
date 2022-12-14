@@ -1,7 +1,7 @@
 class ImageSeriesDecorator < ApplicationDecorator
-  delegate_all
-  
   include Draper::LazyHelpers
+
+  delegate_all
 
   def state
    if model.state_sym == :importing

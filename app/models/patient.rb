@@ -95,6 +95,7 @@ JOIN
   }
 
   before_save :ensure_study_is_unchanged
+  after_update :eventually_update_dicom_tags
 
   def form_answers
     FormAnswer.where(patient_id: id)
@@ -206,6 +207,17 @@ JOIN
   end
 
   protected
+
+  def eventually_update_dicom_tags
+    return unless saved_change_to_center_id? || saved_change_to_subject_id?
+
+    UpdateDicomTagsWorker.perform_async(
+      "Patient",
+      id,
+      name: "Update DICOM tags after patient update",
+      user_id: PaperTrail.request.whodunnit
+    )
+  end
 
   def ensure_study_is_unchanged
     return unless center_id_changed? && !center_id_was.nil?

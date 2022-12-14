@@ -43,6 +43,8 @@ class Center < ApplicationRecord
 
   belongs_to :study
   has_many :patients
+  has_many :image_series, through: :patients
+  has_many :images, through: :image_series
 
   has_many :user_roles, as: :scope_object, dependent: :destroy
 
@@ -89,6 +91,7 @@ SELECT
 
   before_destroy :ensure_no_patients
   before_save :ensure_study_is_unchanged
+  after_update :eventually_update_dicom_tags
 
   def to_s
     "#{code} - #{name}"
@@ -158,6 +161,17 @@ SELECT
   end
 
   protected
+
+  def eventually_update_dicom_tags
+    return unless saved_change_to_code?
+
+    UpdateDicomTagsWorker.perform_async(
+      "Center",
+      id,
+      name: "Update DICOM tags after center update",
+      user_id: PaperTrail.request.whodunnit
+    )
+  end
 
   def ensure_no_patients
     return if patients.empty?

@@ -108,6 +108,8 @@ JOIN
   cattr_accessor :skip_update_state_callback
   before_save :update_state
 
+  after_update :eventually_update_dicom_tags
+
   # before_validation :assign_series_number
 
   STATE_SYMS = %i[importing imported visit_assigned required_series_assigned not_required].freeze
@@ -299,6 +301,17 @@ JOIN
   end
 
   protected
+
+  def eventually_update_dicom_tags
+    return unless saved_change_to_patient_id?
+
+    UpdateDicomTagsWorker.perform_async(
+      "ImageSeries",
+      id,
+      name: "Update DICOM tags after reassignment of image series",
+      user_id: PaperTrail.request.whodunnit
+    )
+  end
 
   def properties_to_domino
     properties_version = if study.nil?

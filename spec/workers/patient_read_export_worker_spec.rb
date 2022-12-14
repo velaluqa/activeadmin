@@ -16,7 +16,7 @@ CONFIG
     describe 'missing patient' do
 
       before(:each) do
-        PatientReadExportWorker.new.perform(background_job.id, study.name.to_s, [23])
+        PatientReadExportWorker.new.perform(background_job.id, {}, study.name.to_s, [23])
       end
 
       it 'fails with error message' do
@@ -45,7 +45,7 @@ CONFIG
       before(:each) do
         FileUtils.mkdir_p(target_path.dirname)
         FileUtils.touch(target_path.to_s)
-        PatientReadExportWorker.new.perform(background_job.id, study.name.to_s, [23])
+        PatientReadExportWorker.new.perform(background_job.id, {}, study.name.to_s, [23])
       end
 
       it 'fails with error message' do
@@ -65,7 +65,7 @@ CONFIG
       let!(:required_series12) { RequiredSeries.where(visit: visit, name: 'SPECT_2').first.tap { |rs| rs.update_attributes(image_series_id: image_series2.id) } }
 
       before(:each) do
-        PatientReadExportWorker.new.perform(background_job.id, study.name.to_s, [patient.id])
+        PatientReadExportWorker.new.perform(background_job.id, {}, study.name.to_s, [patient.id])
       end
 
       it 'sets background job to success' do
