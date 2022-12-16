@@ -53,6 +53,7 @@
   are matched against the resource name and resource type (e.g. "visit
   6000 #1" would match the visit named "Lyon6000#1")
 * Fix - (ERICA-157, #5986) - Block destroy of signed form answers
+* Fix - (ERICA-162, #5982) - Fix audit trail classification for required series
 
 ### Dev / DevOps
 
