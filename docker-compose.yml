@@ -7,7 +7,7 @@ services:
     volumes:
       - ./tmp/postgresql_data_3_0_0/9.6/data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD:password
+      POSTGRES_PASSWORD: password
   redis:
     image: redis
     ports:
@@ -37,7 +37,7 @@ services:
     environment: &environment
       RAILS_ENV: development
       TRUSTED_IP: 172.18.0.1
-      DISABLE_SPRING: 't'
+      DISABLE_SPRING: "t"
       POSTGRES_HOST: postgres
       # POSTGRES_DATABASE: erica_store_production
       POSTGRES_USERNAME: postgres
@@ -58,7 +58,7 @@ services:
     entrypoint: ""
     volumes: *volumes
     ports:
-      - '3035:3035'
+      - "3035:3035"
   test:
     build: *build
     command: guard
@@ -98,7 +98,6 @@ services:
     image: selenium/standalone-chrome:108.0-chromedriver-108.0-grid-4.7.0-20221202
     ports:
       - 5900:5900
-    shm_size: '512mb'
     environment:
       SCREEN_WIDTH: 1920
       SCREEN_HEIGHT: 1080

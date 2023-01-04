@@ -94,7 +94,7 @@ class Permission < ApplicationRecord
   end
 
   def to_s
-    "Permission[#{activity} #{subject}]"
+    "#{role.title} #{activity} #{subject}"
   end
 
   def self.classify_audit_trail_event(c)

@@ -7,6 +7,8 @@ FactoryBot.define do
     triggering_actions { %w[create update destroy] }
     triggering_resource { 'Visit' }
 
+    users { [] }
+    roles { [] }
     filters { [] }
 
     only_authorized_recipients { true }

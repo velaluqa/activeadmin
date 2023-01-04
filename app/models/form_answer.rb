@@ -218,6 +218,10 @@ class FormAnswer < ApplicationRecord
     save!
   end
 
+  def versions_item_name
+    "Form Answer: #{form_definition.name}"
+  end
+
   private
 
   def set_sequence_number_for_session

@@ -24,4 +24,8 @@ class NotificationProfileUser < ApplicationRecord
 
   belongs_to :notification_profile
   belongs_to :user
+
+  def versions_item_name
+    user&.name
+  end
 end

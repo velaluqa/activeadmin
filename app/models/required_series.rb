@@ -258,6 +258,10 @@ JOIN
     ensure_domino_document_exists
   end
 
+  def versions_item_name
+    "#{visit.name} #{name}"
+  end
+
   protected
 
   def tqc_to_domino

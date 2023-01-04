@@ -59,6 +59,6 @@ Feature: Clean specific DICOM tag for image series
     Then I see "Not allowed" in "PatientName" row
     
     When I browse to audit trail
-    Then I see "Test User" in "IS1#1 FILE CHANGE" row
-    But I don't see "IS2#1 FILE CHANGE"
+    Then I see "Test User" in "Image of IS1 FILE CHANGE" row
+    But I don't see "Image of IS2 FILE CHANGE"
 

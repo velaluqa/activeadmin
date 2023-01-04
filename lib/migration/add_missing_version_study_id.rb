@@ -3,6 +3,8 @@ module Migration
   class AddMissingVersionStudyId
     class << self
       def run
+        Version.skip_callback(:save, :before, :add_item_name_as_string)
+
         fill_study_versions
         fill_center_versions
         fill_patient_versions
@@ -10,6 +12,8 @@ module Migration
         fill_image_versions
         fill_visit_versions
         fill_notification_versions
+
+        Version.set_callback(:save, :before, :add_item_name_as_string)
       end
 
       def fill_study_versions
@@ -60,6 +64,7 @@ JOIN
       end
 
       def fill_versions(item_type: nil, join_query: nil)
+       
         puts "Finding #{item_type} versions study_ids"
 
         join_query ||= <<JOIN
@@ -83,6 +88,7 @@ JOIN
         update_statements.each do |statement|
           Version.connection.execute(statement)
         end
+        # debugger
       end
 
       private

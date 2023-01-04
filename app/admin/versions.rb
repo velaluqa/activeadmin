@@ -143,21 +143,16 @@ ActiveAdmin.register Version do
       end
     end
     column :item do |version|
-      if version.item_type == "Permission"
-        role_id, activity, subject =
-          if version.object
-            o = version.object
-            [o["role_id"], o["activity"], o["subject"]]
-          else
-            c = version.object_changes
-            [c["role_id"][1], c["activity"][1], c["subject"][1],]
-          end
-        role = Role.where(id: role_id).first
-        status_tag("#{role.title}: #{activity} #{subject}")
-      elsif version.item.is_a?(RequiredSeries)
-        auto_link(version.item.visit, "#{version.item.visit.name} #{version.item.name}")
+      if version.item.present?
+        auto_link(version.item, version.item_name)
       else
-        auto_link(version.item)
+        last_version = Version
+          .where(
+            item_type: version.item_type, 
+            item_id: version.item_id
+          )
+          .last
+        auto_link(last_version, version.item_name)
       end
     end
     column :event do |version|
@@ -185,6 +180,8 @@ ActiveAdmin.register Version do
         else version.item_type
         end
       end
+
+
       row :item do
         if version.item.is_a?(RequiredSeries)
           auto_link(version.item.visit, "#{version.item.visit.name} #{version.item.name}")
@@ -192,6 +189,8 @@ ActiveAdmin.register Version do
           auto_link(version.item)
         end
       end
+
+
       row :event do
         event = Admin::VersionsController.classify_event(version)
         event_title, event_severity = Admin::VersionsController.event_title_and_severity(version.item_type, event)

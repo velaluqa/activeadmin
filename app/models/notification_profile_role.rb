@@ -23,4 +23,8 @@ class NotificationProfileRole < ApplicationRecord
 
   belongs_to :notification_profile
   belongs_to :role
+
+  def versions_item_name
+    role&.title
+  end
 end

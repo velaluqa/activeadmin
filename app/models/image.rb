@@ -244,6 +244,10 @@ JOIN
     ActiveRecord::Base.connection.execute("SELECT * FROM (SELECT *, row_number() OVER (ORDER BY id ASC) FROM images WHERE image_series_id = #{image_series_id}) images_with_row_number WHERE id = #{id}")[0]["row_number"]
   end
 
+  def versions_item_name
+    "Image of #{image_series.name}"
+  end
+
   def to_s
     "#{image_series.name}##{row_number}"
   end

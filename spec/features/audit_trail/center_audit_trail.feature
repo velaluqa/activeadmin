@@ -4,6 +4,7 @@
 # category: Audit Trail
 # components:
 #   - audit trail
+
 Feature: Center Audit Trail
   To investigate changes to a certain center,
   As authorized user,
@@ -34,9 +35,9 @@ Feature: Center Audit Trail
     And I browse to center "FooCenter"
     And I click link "Audit Trail" in "#title_bar"
     Then I see "RequiredSeries 100FooPatient#10000 SPECT"
-    And I see "Image Foo#1"
+    And I see "Image of Foo"
     And I see "ImageSeries Foo"
-    And I see "Visit 100FooPatient#10000"
+    And I see "Visit 1"
     And I see "Patient 100FooPatient"
-    And I see "Center 100 - FooCenter"
+    And I see "Center FooCenter"
     And I don't see "Study FooStudy"
