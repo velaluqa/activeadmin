@@ -63,6 +63,8 @@
 * Fix generation of release documentation generation
 * Maintenance - Show maintenance page if a file `.maintenance` exists
 * Maintenance - Refactored active admin view code for reusability
+* Testing - Update `turnip` to 4.4 and add `turnip_documentation_formatter`
+* Testing - Update `rspec` to 3.12 and `rspec-rails` to 5.1
 
 ## 7.2.5
 
