@@ -337,4 +337,29 @@ JOIN
     return if missing?
     FileUtils.ln_sf(image_series.id.to_s, ERICA.image_storage_path.join(image_storage_path))
   end
+
+  def self.classify_audit_trail_event(c)
+    c.delete('domino_unid')
+
+    return if c.empty?
+
+    if %w[issues passed].include?(c["tqc_state"].andand[1]) && c['tqc_user_id'] && c['tqc_user_id'][1].present? && c['tqc_date'] && c['tqc_date'][1].present?
+      :tqc_performed
+    elsif c["tqc_state"].andand[1] == "pending" && c['tqc_user_id'] && c['tqc_user_id'][1].blank? && c['tqc_date'] && c['tqc_date'][1].blank?
+      :tqc_reset
+    elsif c["image_series_id"] && c["image_series_id"][1].present?
+      :series_assigned
+    elsif c["image_series_id"] && c["image_series_id"][1].blank?
+      :series_unassigned
+    end
+  end
+
+  def self.audit_trail_event_title_and_severity(event_symbol)
+    case event_symbol
+    when :tqc_performed then ['TQC Performed', :ok]
+    when :series_assigned then ['Image Series Assigned', :ok]
+    when :tqc_reset then ['TQC Reset', :warning]
+    when :series_unassigned then ['Image Series Unassigned', :warning]
+    end
+  end
 end

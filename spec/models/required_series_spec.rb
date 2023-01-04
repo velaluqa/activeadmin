@@ -186,6 +186,53 @@ CONFIG
     end
   end
 
+  describe "RequiredSeries#classify_audit_trail_event" do
+    it "classifies :tqc_reset" do
+      c = {
+        'tqc_user_id' => [5, nil],
+        'tqc_date' => ["2021-12-12", nil],
+        'tqc_state' => ["issues", "pending"],
+        'updated_at' => ["2021-12-12T15:00:00Z", "2021-12-12T16:00:00Z"]
+      }
+      expect(RequiredSeries.classify_audit_trail_event(c)).to eq(:tqc_reset)
+    end
+
+    it 'classifies :tqc_performed' do
+      c = {
+        'tqc_user_id' => [nil, 5],
+        'tqc_date' => [nil, "2021-12-12"],
+        'tqc_state' => ["pending", "issues"],
+        'updated_at' => ["2021-12-12T15:00:00Z", "2021-12-12T16:00:00Z"]
+      }
+      expect(RequiredSeries.classify_audit_trail_event(c)).to eq(:tqc_performed)
+      c = {
+        'tqc_user_id' => [nil, 5],
+        'tqc_date' => [nil, "2021-12-12"],
+        'tqc_state' => ["pending", "passed"],
+        'updated_at' => ["2021-12-12T15:00:00Z", "2021-12-12T16:00:00Z"]
+      }
+      expect(RequiredSeries.classify_audit_trail_event(c)).to eq(:tqc_performed)
+    end
+
+    it 'classifies :series_assigned' do
+      c = {
+        'image_series_id' => [nil, 5],
+        'tqc_state' => [nil, "pending"],
+        'updated_at' => ["2021-12-12T15:00:00Z", "2021-12-12T16:00:00Z"]
+      }
+      expect(RequiredSeries.classify_audit_trail_event(c)).to eq(:series_assigned)
+    end
+
+    it 'classifies :series_unassigned' do
+      c = {
+        'image_series_id' => [5, nil],
+        'tqc_state' => ["pending", nil],
+        'updated_at' => ["2021-12-12T15:00:00Z", "2021-12-12T16:00:00Z"]
+      }
+      expect(RequiredSeries.classify_audit_trail_event(c)).to eq(:series_unassigned)
+    end
+  end
+
   describe '#domino_document_query' do
     let!(:study) { create(:study) }
     let!(:center) { create(:center, study: study) }
