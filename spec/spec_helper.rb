@@ -137,6 +137,7 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include ValidationReport::RSpec::Helper
+  config.include WaitUntil, type: :feature
   config.extend ControllerMacros, type: :controller
   config.extend WithModel
 
