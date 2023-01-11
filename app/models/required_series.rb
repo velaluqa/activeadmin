@@ -39,26 +39,12 @@ class RequiredSeries < ApplicationRecord
   after_commit :schedule_domino_sync
 
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version',
+    },
     meta: {
       study_id: ->(series) { series.study.andand.id }
     }
-  )
-
-  attr_accessible(
-    :visit,
-    :visit_id,
-    :name,
-    :image_series_id,
-    :tqc_results,
-    :tqc_date,
-    :tqc_version,
-    :tqc_user_id,
-    :tqc_state,
-    :tqc_comment,
-    :domino_unid,
-    :created_at,
-    :updated_at
   )
 
   scope :join_study, -> { joins(visit: { patient: { center: :study } }) }
@@ -310,23 +296,23 @@ JOIN
     return unless saved_change_to_image_series_id?
 
     if image_series_id_before_last_save.blank? && image_series_id.present?
-      ImageSeries.find(image_series_id).update_attributes(state: :required_series_assigned)
+      ImageSeries.find(image_series_id).update(state: :required_series_assigned)
     elsif image_series_id_before_last_save.present? && image_series_id.present?
-      ImageSeries.find(image_series_id).update_attributes(state: :required_series_assigned)
+      ImageSeries.find(image_series_id).update(state: :required_series_assigned)
       image_series_before_last_save = ImageSeries.where(id: image_series_id_before_last_save).first
       return if image_series_before_last_save.nil?
       if RequiredSeries.where(visit: visit, image_series_id: image_series_id_before_last_save).where.not(name: name).exists?
-        image_series_before_last_save.update_attributes(state: :required_series_assigned)
+        image_series_before_last_save.update(state: :required_series_assigned)
       else
-        image_series_before_last_save.update_attributes(state: :visit_assigned)
+        image_series_before_last_save.update(state: :visit_assigned)
       end
     elsif image_series_id_before_last_save.present? && image_series_id.blank?
       image_series_before_last_save = ImageSeries.where(id: image_series_id_before_last_save).first 
       return if image_series_before_last_save.nil?
       if RequiredSeries.where(visit: visit, image_series_id: image_series_id_before_last_save).where.not(name: name).exists?
-        image_series_before_last_save.update_attributes(state: :required_series_assigned)
+        image_series_before_last_save.update(state: :required_series_assigned)
       else
-        image_series_before_last_save.update_attributes(state: :visit_assigned)
+        image_series_before_last_save.update(state: :visit_assigned)
       end
     end
   end

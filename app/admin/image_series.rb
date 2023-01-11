@@ -20,6 +20,18 @@ ActiveAdmin.register ImageSeries do
     end
   end
 
+  permit_params(
+    :name,
+    :visit_id,
+    :patient_id,
+    :imaging_date,
+    :series_number,
+    :state,
+    :comment,
+    :visit,
+    :patient,
+  )
+
   controller do
     def max_csv_records
       1_000_000

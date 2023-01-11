@@ -107,12 +107,11 @@ require 'notification_observable/filter/schema'
 #
 class NotificationProfile < ApplicationRecord
   has_paper_trail(
-    class_name: 'Version',
-    version: :paper_trail_version,
-    versions: :paper_trail_versions,
-    meta: {
-      notification_profile_id: ->(notification_profile) { notification_profile.id },
-    }
+    versions: {
+      class_name: 'Version',
+      name: :paper_trail_versions
+    },
+    version: :paper_trail_version
   )
 
   TRIGGERING_RESOURCES = %w[

@@ -35,9 +35,11 @@
 #
 class Notification < ApplicationRecord
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version',
+      name: :paper_trail_versions
+    },
     version: :paper_trail_version,
-    versions: :paper_trail_versions,
     meta: {
       study_id: ->(notification) { notification.study.andand.id }
     }

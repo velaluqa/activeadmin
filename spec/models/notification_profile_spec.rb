@@ -523,7 +523,11 @@ RSpec.describe NotificationProfile do
       t.string :foo, null: true
     end
     model do
-      has_paper_trail class_name: 'Version'
+      has_paper_trail(
+        versions: {
+          class_name: 'Version'
+        }
+      )
 
       has_one :test_model
     end
@@ -539,7 +543,11 @@ RSpec.describe NotificationProfile do
     model do
       include NotificationFilter
 
-      has_paper_trail class_name: 'Version'
+      has_paper_trail(
+        versions: {
+          class_name: 'Version'
+        }
+      )
 
       has_many :multi_models
       belongs_to :extra_model, optional: true

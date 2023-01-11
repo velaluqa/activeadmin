@@ -42,7 +42,7 @@ CONFIG
     let!(:spect_1) { RequiredSeries.where(visit: visit, name: 'SPECT_1').first }
 
     before(:each) do
-      spect_1.update_attributes(
+      spect_1.update(
         tqc_state: 'passed',
         tqc_results: {},
         tqc_date: Time.now,
@@ -79,7 +79,7 @@ CONFIG
 
     describe 'reassigning' do
       before(:each) do
-        spect_1.update_attributes(
+        spect_1.update(
           tqc_state: 'passed',
           tqc_results: {},
           tqc_date: Time.now,
@@ -139,7 +139,7 @@ CONFIG
 
     describe 'for image series assigned once' do
       before(:each) do
-        spect_1.update_attributes(
+        spect_1.update(
           tqc_state: 'passed',
           tqc_results: {},
           tqc_date: Time.now,
@@ -351,7 +351,7 @@ CONFIG
 
       before(:each) do
         required_series.image_series = image_series
-        required_series.update_attributes(
+        required_series.update(
           image_series: image_series,
           tqc_date: DateTime.now,
           tqc_results: {

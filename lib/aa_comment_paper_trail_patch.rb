@@ -2,7 +2,7 @@ module ActiveAdminCommentPaperTrailPatch
   extend ActiveSupport::Concern
 
   included do
-    has_paper_trail class_name: 'Version'
+    has_paper_trail versions: { class_name: 'Version' }
 
     belongs_to :user, foreign_key: :author_id
 
@@ -13,6 +13,10 @@ module ActiveAdminCommentPaperTrailPatch
       active_admin_comments.id::varchar AS result_id,
       'Comment'::varchar AS result_type
     SELECT
+
+    def self.accessible_by(*)
+      all
+    end
 
     def self.granted_for(options = {})
       activities = Array(options[:activity]) + Array(options[:activities])

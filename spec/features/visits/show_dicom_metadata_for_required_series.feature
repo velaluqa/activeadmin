@@ -19,22 +19,23 @@ Feature: Show DICOM metadata for required series
       """
     And a center "FooCenter" for "FooStudy"
     And a patient "FooPatient" for "FooCenter"
-    And a visit "TestVisit" with:
+    And a visit "10000" with:
       | patient     | FooPatient           |
       | visit_type  | followup             |
       | description | Visit Extraordinaire |
     And an image_series "TestSeries" with:
-      | patient     |    FooPatient       |
-      | visit       |    TestVisit        |
-      | state       | visit_assigned |
+      | patient | FooPatient     |
+      | visit   | 10000          |
+      | state   | visit_assigned |
     And a DICOM image for image series "TestSeries"
-    And visit "TestVisit" has required series "SPECT_1" assigned to "TestSeries"
+    And visit "10000" has required series "SPECT_1" assigned to "TestSeries"
     And a role "Authorized" with permissions:
       | ImageSeries    | read, read_dicom_metadata |
       | Visit          | read                      |
       | RequiredSeries | read                      |
     And a user "authorized.user" with role "Authorized"
 
+  @focus
   Scenario: Unauthorized
     Given a role "Unauthorized" with permissions:
       | ImageSeries    | read |
@@ -42,14 +43,14 @@ Feature: Show DICOM metadata for required series
       | RequiredSeries | read |
     And a user "unauthorized.user" with role "Unauthorized"
     When I sign in as user "unauthorized.user"
-    And I browse to visit "TestVisit"
+    And I browse to visit "10000"
     Then I don't see "DICOM Metadata"
     When I browse to dicom_metadata ImageSeries "TestSeries"
     Then I see "You are not authorized to perform this action"
 
   Scenario: Open metadata from visit view
     When I sign in as user "authorized.user"
-    And I browse to visit "TestVisit"
+    And I browse to visit "10000"
     Then I see "DICOM Metadata"
     When I click "DICOM Metadata"
     And I see "PatientName"

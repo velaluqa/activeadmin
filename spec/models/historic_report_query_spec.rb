@@ -311,15 +311,15 @@ RSpec.describe HistoricReportQuery do
 
         before(:each) do
           @study = create(:study)
-          Version.last.update_attributes!(created_at: six_hours_ago, updated_at: six_hours_ago)
+          Version.last.update!(created_at: six_hours_ago)
           center = create(:center, study: @study)
-          Version.last.update_attributes!(created_at: six_hours_ago, updated_at: six_hours_ago)
+          Version.last.update!(created_at: six_hours_ago)
           patient1 = create(:patient, center: center)
-          Version.last.update_attributes!(created_at: four_hours_ago, updated_at: four_hours_ago)
+          Version.last.update!(created_at: four_hours_ago)
           create(:patient, center: center)
-          Version.last.update_attributes!(created_at: three_hours_ago, updated_at: three_hours_ago)
+          Version.last.update!(created_at: three_hours_ago)
           patient1.destroy
-          Version.last.update_attributes!(created_at: one_hour_ago, updated_at: one_hour_ago)
+          Version.last.update!(created_at: one_hour_ago)
         end
 
         it 'creates full cache' do
@@ -347,16 +347,16 @@ RSpec.describe HistoricReportQuery do
 
         before(:each) do
           @study = create(:study)
-          Version.last.update_attributes!(created_at: six_hours_ago, updated_at: six_hours_ago)
+          Version.last.update!(created_at: six_hours_ago)
           center = create(:center, study: @study)
-          Version.last.update_attributes!(created_at: six_hours_ago, updated_at: six_hours_ago)
+          Version.last.update!(created_at: six_hours_ago)
           patient1 = create(:patient, center: center)
-          Version.last.update_attributes!(created_at: four_hours_ago, updated_at: four_hours_ago)
+          Version.last.update!(created_at: four_hours_ago)
           create(:patient, center: center)
           @version4 = Version.last
-          @version4.update_attributes!(created_at: three_hours_ago, updated_at: three_hours_ago)
+          @version4.update!(created_at: three_hours_ago)
           patient1.destroy
-          Version.last.update_attributes!(created_at: one_hour_ago, updated_at: one_hour_ago)
+          Version.last.update!(created_at: one_hour_ago)
         end
 
         it 'completes the full cache' do
@@ -573,8 +573,8 @@ CONFIG
           # Set the `created_at` times to the same datetimes. The
           # RequiredSeries were created through assigning a visit type.
           datetime1 = DateTime.now
-          Version.where(item_type: 'RequiredSeries').first.update_attributes!(created_at: datetime1)
-          Version.where(item_type: 'RequiredSeries').last.update_attributes!(created_at: datetime1)
+          Version.where(item_type: 'RequiredSeries').first.update!(created_at: datetime1)
+          Version.where(item_type: 'RequiredSeries').last.update!(created_at: datetime1)
         end
 
         it 'creates full cache' do

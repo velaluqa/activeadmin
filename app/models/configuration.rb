@@ -25,7 +25,9 @@
 
 class Configuration < ApplicationRecord
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       form_definition_id: ->(configuration) {
         configuration.configurable_id if configuration.configurable_type == "FormDefinition"

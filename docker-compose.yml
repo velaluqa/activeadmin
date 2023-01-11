@@ -96,6 +96,7 @@ services:
   chrome:
     #image: selenium/standalone-chrome-debug
     image: selenium/standalone-chrome:108.0-chromedriver-108.0-grid-4.7.0-20221202
+    shm_size: '512mb'
     ports:
       - 5900:5900
     environment:

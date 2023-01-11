@@ -40,27 +40,14 @@ class ImageSeries < ApplicationRecord
   after_commit :schedule_domino_sync
 
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       study_id: ->(series) { series.study.andand.id }
     }
   )
   acts_as_taggable
-
-  attr_accessible(
-    :name,
-    :visit_id,
-    :patient_id,
-    :imaging_date,
-    :domino_unid,
-    :series_number,
-    :state,
-    :comment,
-    :visit,
-    :patient,
-    :properties,
-    :properties_version
-  )
 
   belongs_to :visit, optional: true
   belongs_to :patient

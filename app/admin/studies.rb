@@ -13,6 +13,15 @@ ActiveAdmin.register Study do
   scope :building
   scope :production
 
+  permit_params(
+    :name,
+    :locked_version,
+    :domino_db_url,
+    :domino_server_name,
+    :notes_links_base_uri,
+    :state
+  )
+
   controller do
     def max_csv_records
       1_000_000
@@ -137,7 +146,7 @@ ActiveAdmin.register Study do
 
     authorize!(:configure, @study)
 
-    result = Study::UploadConfiguration.(params: params, current_user: current_user)
+    result = Study::Operation::UploadConfiguration.(params: params, current_user: current_user)
     if result.success?
       return redirect_to({ action: :show }, notice: 'Configuration successfully uploaded.')
     end

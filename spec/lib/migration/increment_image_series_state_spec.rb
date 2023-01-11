@@ -19,9 +19,9 @@ describe Migration::IncrementImageSeriesState, silent_output: true do
     let!(:image_series) { create(:image_series, visit: visit, patient: patient) }
 
     before(:each) do
-      image_series.update_attributes(state: 1)
-      image_series.update_attributes(state: 2)
-      image_series.update_attributes(state: 3)
+      image_series.update(state: 1)
+      image_series.update(state: 2)
+      image_series.update(state: 3)
 
       Migration::IncrementImageSeriesState.run
 

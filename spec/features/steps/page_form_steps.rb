@@ -77,7 +77,7 @@ step 'I provide directory :string for :string' do |filename, field|
 end
 
 step 'I click select option :string' do |locator|
-  find(:xpath, ".//li[./@role = 'treeitem']", text: locator).click
+  find(:xpath, ".//li[./@role = 'option']", text: locator).click
 end
 
 step "I search :string for :string and select :string" do |search, field_name, select_option|
@@ -90,7 +90,7 @@ step "I select :string for row :string" do |select_option, row_text|
   field = within("tr", text: /#{row_text}/) { find("select") }
   if field[:class].include?("select2-hidden-accessible")
     find("[id=#{field[:id]}] + span").click
-    find(:xpath, ".//li[./@role = 'treeitem']", text: select_option).click
+    find(:xpath, ".//li[./@role = 'option']", text: select_option).click
   else
     field.set(value)
   end

@@ -9,33 +9,25 @@
             %td
               - case(@visit.state_sym)
               - when :incomplete_na then
-                - arbre do
-                  = status_tag('Incomplete, not available')
+                = status_tag('Incomplete, not available')
               - when :complete_tqc_passed then
-                - arbre do
-                  = status_tag('Complete, tQC of all series passed', class: 'ok')
+                = status_tag('Complete, tQC of all series passed', class: 'ok')
               - when :incomplete_queried then
-                - arbre do
-                  = status_tag('Incomplete, queried', class: 'warning')
+                = status_tag('Incomplete, queried', class: 'warning')
               - when :complete_tqc_pending then
-                - arbre do
-                  = status_tag('Complete, tQC not finished', class: 'warning')
+                = status_tag('Complete, tQC not finished', class: 'warning')
               - when :complete_tqc_issues then
-                - arbre do
-                  = status_tag('Complete, tQC finished, not all series passed', class: 'error')
+                = status_tag('Complete, tQC finished, not all series passed', class: 'error')
           %tr
             %th Medical Assessment
             %td
               - case(@visit.mqc_state_sym)
               - when :pending then
-                - arbre do
-                  = status_tag('Pending')
+                = status_tag('Pending')
               - when :issues then
-                - arbre do
-                  = status_tag('Performed, issues present', class: 'error')
+                = status_tag('Performed, issues present', class: 'error')
               - when :passed then
-                - arbre do
-                  = status_tag('Performed, passed', class: 'ok')                
+                = status_tag('Performed, passed', class: 'ok')                
           %tr
             %th Date
             %td= pretty_format(@visit.mqc_date.localtime) unless @visit.mqc_date.nil?

@@ -8,7 +8,7 @@ class AddUsernameToUsers < ActiveRecord::Migration[4.2]
 
     User.reset_column_information
     User.all.each do |u|
-      u.update_attributes!(username: u.email)
+      u.update!(username: u.email)
     end
   end
 end

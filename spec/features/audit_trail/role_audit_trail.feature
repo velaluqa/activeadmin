@@ -4,6 +4,7 @@
 # category: Audit Trail
 # components:
 #   - audit trail
+
 Feature: Role Audit Trail
   To investigate changes to a certain user,
   As authorized user,
@@ -21,4 +22,3 @@ Feature: Role Audit Trail
     Then I see "CREATE" in "Role Test Role" row
     And I see "Test Role read Version GRANTED"
     And I see "Test Role read User REVOKED"
-

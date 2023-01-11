@@ -1,8 +1,8 @@
-RSpec.describe Study::ConsolidateStudyConfiguration do
+RSpec.describe Study::Operation::ConsolidateStudyConfiguration do
   let!(:user) { create(:user) }
   let(:dry_run) { false }
   let(:call_operation) do
-    Study::ConsolidateStudyConfiguration.(
+    Study::Operation::ConsolidateStudyConfiguration.(
       params: {
         study_id: study.id,
         version: :locked,
@@ -158,8 +158,8 @@ RSpec.describe Study::ConsolidateStudyConfiguration do
           image_series_properties: []
         CONFIG
         study.lock_configuration!
-        visit_baseline.update_attributes(visit_type: 'baseline')
-        visit_followup.update_attributes(visit_type: 'followup')
+        visit_baseline.update(visit_type: 'baseline')
+        visit_followup.update(visit_type: 'followup')
       end
 
       it 'adds the required series' do

@@ -19,7 +19,11 @@
 #     * **`role_id`**
 #
 class NotificationProfileRole < ApplicationRecord
-  has_paper_trail class_name: 'Version'
+  has_paper_trail(
+    versions: {
+      class_name: 'Version'
+    }
+  )
 
   belongs_to :notification_profile
   belongs_to :role

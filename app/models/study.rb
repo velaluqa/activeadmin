@@ -25,21 +25,14 @@ require 'domino_integration_client'
 #
 class Study < ApplicationRecord
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       study_id: :id
     }
   )
   acts_as_taggable
-
-  attr_accessible(
-    :name,
-    :locked_version,
-    :domino_db_url,
-    :domino_server_name,
-    :notes_links_base_uri,
-    :state
-  )
 
   has_many :user_roles, as: :scope_object, dependent: :destroy
 

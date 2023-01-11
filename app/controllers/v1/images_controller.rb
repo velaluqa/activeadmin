@@ -17,7 +17,7 @@ class V1::ImagesController < V1::ApiController
           return
         end
         begin
-          @image.write_anonymized_file(image_params[:file][:data])
+          @image.write_anonymized_file(file_params[:file][:data])
 
           if DICOM::FileUtils.multi_frame?(@image.absolute_image_storage_path)
             SplitMultiFrameDicomWorker.perform_async(
@@ -41,6 +41,10 @@ class V1::ImagesController < V1::ApiController
   protected
 
   def image_params
-    params.require(:image).permit(:image_series_id, file: %i[name data])
+    params.require(:image).permit(:image_series_id)
+  end
+
+  def file_params
+    params.require(:image).permit(file: %i[name data])
   end
 end

@@ -12,7 +12,6 @@ Rails.application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
-
   # Show full error reports.
   config.consider_all_requests_local = true
 
@@ -50,12 +49,13 @@ Rails.application.configure do
   config.action_mailer.default_options = {
     from: 'noreply@pharmtrace.com'
   }
+
   config.action_mailer.perform_caching = false
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
-  # Raise an error on page load if there are pending migrations
+  # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
   # Highlight code that triggered database queries in logs.

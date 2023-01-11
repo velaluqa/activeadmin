@@ -46,29 +46,14 @@ class Visit < ApplicationRecord
   include NotificationFilter
 
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       study_id: ->(visit) { visit.study.andand.id }
     }
   )
   acts_as_taggable
-
-  attr_accessible(
-    :patient_id,
-    :visit_number,
-    :description,
-    :visit_type,
-    :state,
-    :domino_unid,
-    :patient,
-    :assigned_image_series_index,
-    :required_series,
-    :mqc_date,
-    :mqc_user_id,
-    :mqc_state,
-    :mqc_user,
-    :mqc_results
-  )
 
   belongs_to :patient
   has_many :image_series, after_add: :schedule_domino_sync, after_remove: :schedule_domino_sync

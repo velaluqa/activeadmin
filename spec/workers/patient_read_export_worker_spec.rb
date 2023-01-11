@@ -61,8 +61,8 @@ CONFIG
       let!(:visit) { create(:visit, patient: patient, visit_type: 'baseline') }
       let!(:image_series1) { create(:image_series, visit: visit, patient: patient) }
       let!(:image_series2) { create(:image_series, visit: visit, patient: patient) }
-      let!(:required_series11) { RequiredSeries.where(visit: visit, name: 'SPECT_1').first.tap { |rs| rs.update_attributes(image_series_id: image_series1.id) } }
-      let!(:required_series12) { RequiredSeries.where(visit: visit, name: 'SPECT_2').first.tap { |rs| rs.update_attributes(image_series_id: image_series2.id) } }
+      let!(:required_series11) { RequiredSeries.where(visit: visit, name: 'SPECT_1').first.tap { |rs| rs.update(image_series_id: image_series1.id) } }
+      let!(:required_series12) { RequiredSeries.where(visit: visit, name: 'SPECT_2').first.tap { |rs| rs.update(image_series_id: image_series2.id) } }
 
       before(:each) do
         PatientReadExportWorker.new.perform(background_job.id, {}, study.name.to_s, [patient.id])
