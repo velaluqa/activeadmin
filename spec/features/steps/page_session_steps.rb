@@ -438,6 +438,10 @@ step 'I wait :number seconds' do |seconds|
   sleep(seconds.to_i)
 end
 
+step 'I wait for all jobs to finish' do
+  Sidekiq::Worker.drain_all
+end
+
 step 'I wait for all jobs in :string queue' do |queue|
   available_workers =
     Dir['app/workers/**/*'].entries.map do |file|

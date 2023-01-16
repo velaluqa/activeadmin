@@ -31,7 +31,6 @@ Feature: Upload Non-DICOM Files
       | test.tiff |
       | test.svg  |
     And I click "Upload Image Series"
-    And I wait 5 seconds
     Then I see "Upload complete"
     When I browse to image_series list
     Then I see "JPG" in "test.jpg" row
@@ -49,7 +48,6 @@ Feature: Upload Non-DICOM Files
       | test.mov |
       | test.avi |
     And I click "Upload Image Series"
-    And I wait 5 seconds
     Then I see "Upload complete"
     When I browse to image_series list
     Then I see "MP4" in "test.mp4" row
@@ -63,7 +61,6 @@ Feature: Upload Non-DICOM Files
     And I select following series for upload:
       | test.pdf |
     And I click "Upload Image Series"
-    And I wait 5 seconds
     Then I see "Upload complete"
     When I browse to image_series list
     Then I see "PDF" in "test.pdf" row
@@ -80,7 +77,6 @@ Feature: Upload Non-DICOM Files
       | test.pptx |
       | test.ppt  |
     And I click "Upload Image Series"
-    And I wait 5 seconds
     Then I see "Upload complete"
     When I browse to image_series list
     Then I see "DOCX" in "test.docx" row

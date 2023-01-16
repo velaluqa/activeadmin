@@ -25,7 +25,6 @@ Feature: Recognize multi-frame DICOM files as separate image series
       | Center      | read                              |
       | Patient     | read                              |
       | ImageSeries | read, read_dicom_metadata, upload |
-      | Image       | read                              |
       | Visit       | read                              |
 
   Scenario: Correct identification of multi-frame image files as separate image series 

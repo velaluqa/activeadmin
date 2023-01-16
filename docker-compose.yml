@@ -98,6 +98,7 @@ services:
     environment:
       SCREEN_WIDTH: 1920
       SCREEN_HEIGHT: 1080
+    shm_size: 512m
     volumes:
       - ./spec/files:/app/spec/files
       - ./tmp/downloads:/downloads

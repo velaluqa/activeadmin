@@ -50,7 +50,7 @@ class ImageUploader.Views.ImageSeries extends Backbone.View
     @$('.upload-state .progress').toggleClass('uploading', state is 'uploading')
     @$('.upload-state .progress').toggleClass('uploaded', state is 'uploaded')
     @$('.upload-state .progress-bar').css width: "#{progress}%"
-    @$('.upload-state .label').html(@model.getUploadStateLabel())
+    @$('.upload-state .label').html("<div class=\"lds-spinner\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>" + @model.getUploadStateLabel())
 
   stopPropagation: (e) ->
     e.stopPropagation()

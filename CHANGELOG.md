@@ -19,6 +19,9 @@
 * Permission Change - Consolidate image access permissions through `Image Series` resource. All access to images is controlled by granting permissions to image series instead of images.
 * Feature - Show list of potential recipients for notification profiles
 * Feature - (ERICA-168, #6041) Allow prompts for comments on particular actions (e.g. delete record)
+* Feature - (ERICA-165, #6010) Automatically split multi-frame DICOM
+  files in background jobs after the upload of a multi-frame image
+  file completed
 
 ### Patches / Fixes
 

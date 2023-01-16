@@ -23,15 +23,15 @@ module DICOM
       ].freeze
 
       def little_endian?(path)
-        system("dcmdump #{path.inspect} | grep \"(0002,0010)\" | grep -q \"=LittleEndianExplicit\"")
+        system("dcmdump #{path.inspect} | grep -a \"(0002,0010)\" | grep -a -q \"=LittleEndianExplicit\"")
       end
 
       def big_endian?(path)
-        system("dcmdump #{path.inspect} | grep \"(0002,0010)\" | grep -q \"=BigEndianExplicit\"")
+        system("dcmdump #{path.inspect} | grep -a \"(0002,0010)\" | grep -a -q \"=BigEndianExplicit\"")
       end
 
       def transfer_syntax(path)
-        res = `dcmdump -Un #{path.inspect} | grep "(0002,0010)"`
+        res = `dcmdump -Un #{path.inspect} | grep -a "(0002,0010)"`
         match = res.match(/\[([\d.]+)\]/)
         fail StandardError, "cannot read transfer syntax of file #{path.inspect}" unless match
         match[1]
@@ -78,6 +78,19 @@ module DICOM
         system("dcmconv +te #{source.inspect} #{target.inspect}")
       end
 
+      def dcuncat(source, target, options = {})
+        flags = options.map do |key, val|
+          if val.is_a?(TrueClass)
+            "-#{key}"
+          else
+            "-#{key} #{val.inspect}"
+          end
+        end.join(" ")
+        success = system "dcuncat -output-file #{target.inspect} #{flags} #{source.inspect}"
+
+        fail StandardError, "could not uncat multi-frame dicom file #{source.inspect}" unless success
+      end
+
       def run(cmd, *args)
         *flags, source, target, action = args
 
@@ -91,6 +104,12 @@ module DICOM
         mimetype = File.open(path) { |f| Marcel::Magic.by_magic(f).type }
 
         mimetype == "application/dicom"
+      end
+
+      def multi_frame?(path)
+        res = `dcmdump #{path.inspect} | grep -a "(0028,0008)"`
+        match = res.match(/\[(\d+)\]/)
+        (match ? match[1].to_i : 1) > 1
       end
     end
   end

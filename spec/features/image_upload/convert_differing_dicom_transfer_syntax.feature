@@ -25,7 +25,6 @@ Feature: Convert differing DICOM transfer syntax
       | Center      | read                              |
       | Patient     | read                              |
       | ImageSeries | read, read_dicom_metadata, upload |
-      | Image       | read                              |
       | Visit       | read                              |
 
   Scenario: Implicit is converted to Explicit Little Endian
