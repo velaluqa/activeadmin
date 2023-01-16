@@ -28,7 +28,6 @@ Feature: Recognize multi-frame DICOM files as separate image series
       | Image       | read                              |
       | Visit       | read                              |
 
-  @focus
   Scenario: Correct identification of multi-frame image files as separate image series 
     When I sign in as a user with role "Image Manager"
     And I browse to image_upload page
