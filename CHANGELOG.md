@@ -67,6 +67,16 @@
 * Testing - Update `turnip` to 4.4 and add `turnip_documentation_formatter`
 * Testing - Update `rspec` to 3.12 and `rspec-rails` to 5.1
 
+## 7.2.6
+
+### Patches / Fixes
+
+* Fix - Image Upload - (ERICA-175) Fix uploading and anonymizing
+  compressed DICOM files
+* Fix - Image Upload - (ERICA-175) Fix loading images with wrong date
+  formats (e.g. "2022.12.16" instead of "20221216") or wrong time
+  formats (e.g. "15:45:32.153" instead of "154532.153")
+
 ## 7.2.5
 
 ### Patches / Fixes

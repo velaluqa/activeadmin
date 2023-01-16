@@ -232,6 +232,7 @@ step 'I have following abilities:' do |table|
 end
 
 step 'I see :string' do |content|
+  wait_until(10) { page.has_content?(content, normalize_ws: true) }
   expect(page).to have_content(content, normalize_ws: true)
   validation_report_screenshot
 end

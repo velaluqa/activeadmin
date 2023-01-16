@@ -145,15 +145,26 @@ class ImageUploader.Models.Image extends Backbone.Model
       seconds = parseInt(datetime[12..13], 10)
       milliseconds = parseInt(datetime[15..17].paddingRight('000'), 10)
     else if date?
-      year = parseInt(date[0..3], 10)
-      month = parseInt(date[4..5], 10) - 1
-      day = parseInt(date[6..7], 10)
+      if match = date.match(/([0-9]{4})\.([0-9]{2})\.([0-9]{2})/)
+        year = parseInt(match[1], 10)
+        month = parseInt(match[2], 10) - 1
+        day = parseInt(match[3], 10)
+      else if match = date.match(/([0-9]{4})([0-9]{2})([0-9]{2})/)
+        year = parseInt(match[1], 10)
+        month = parseInt(match[2], 10) - 1
+        day = parseInt(match[3], 10)
 
       if time?
-        hours = parseInt(time[0..1], 10)
-        minutes = parseInt(time[2..3], 10)
-        seconds = parseInt(time[4..5], 10)
-        milliseconds = parseInt(time[7..9].paddingRight('000'), 10)
+        if match = time.match(/([0-9]{2}):([0-9]{2}):([0-9]{2})(\.([0-9]{3}))?/)
+          hours = parseInt(match[1], 10)
+          minutes = parseInt(match[2], 10) - 1
+          seconds = parseInt(match[3], 10)
+          milliseconds = parseInt(match[5] || "000", 10)
+        else if match = time.match(/([0-9]{2})([0-9]{2})([0-9]{2})(\.?([0-9]{3}))?/)
+          hours = parseInt(match[1], 10)
+          minutes = parseInt(match[2], 10) - 1
+          seconds = parseInt(match[3], 10)
+          milliseconds = parseInt(match[5] || "000", 10)
       else
         hours = '0'
         minutes = '0'

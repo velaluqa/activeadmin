@@ -104,15 +104,12 @@ JOIN
     mimetype = ::File.open(file.path) { |f| Marcel::Magic.by_magic(f).type }
     if DICOM::FileUtils.test?(file.path)
 
-      # Later down the pipeline we encountered issues with a mixture of
-      # little and big endian transfer syntax. This is a work-around:
-      # Converting uploaded dicom files from explicit big endian to
-      # explicit little endian transfersyntax.
-      if DICOM::FileUtils.big_endian?(file.path)
-        DICOM::FileUtils.copy_little_endian(file.path, tmp.path)
-      else
-        FileUtils.cp(file.path, tmp.path)
-      end
+      # Later down the pipeline we encountered issues with a mixture
+      # of little and big endian transfer syntax aswell as with
+      # compressed images. This is a work-around: Converting uploaded
+      # dicom files from any non-little-endian to explicit little endian
+      # transfer syntax.
+      DICOM::FileUtils.ensure_little_endian(file.path, tmp.path)
 
       tmp_dicom = DICOM::DObject.read(tmp.path)
       raise DicomReadError unless tmp_dicom.read?

@@ -9,9 +9,9 @@ RUN  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
      apt-get update -qq && \
      apt-get install -y \
      build-essential \
-     build-essential \
      cmake \
      dcmtk \
+     libgdcm-tools \
      graphviz \
      imagemagick \
      libmagickwand-dev \
@@ -21,7 +21,8 @@ RUN  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
      locales \
      nodejs \
      pandoc \
-     argyll ghostscript \
+     argyll \
+     ghostscript \
      postgresql-client \
      texlive-base \
      texlive-luatex \
