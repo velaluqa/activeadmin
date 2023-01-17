@@ -19,7 +19,6 @@ Feature: Clean specific DICOM tag for study
     Given a role "Image Manager" with permissions:
       | Study       | clean_dicom_metadata      |
       | ImageSeries | read, read_dicom_metadata |
-      # | Image       | read                      |
       | Version     | read                      |
 
     Given a study "A"

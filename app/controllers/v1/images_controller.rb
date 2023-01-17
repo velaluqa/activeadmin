@@ -12,6 +12,14 @@ class V1::ImagesController < V1::ApiController
         end
         begin
           @image.write_anonymized_file(image_params[:file][:data])
+
+          if DICOM::FileUtils.multi_frame?(@image.absolute_image_storage_path)
+            SplitMultiFrameDicomWorker.perform_async(
+              @image.id,
+              name: "Split multi-frame DICOM upload #{@image.image_series.name}",
+              user_id: current_user.id
+            )
+          end
         rescue StandardError => e
           @image.destroy
           Rails.logger.error "Failed to write uploaded image to image storage: #{e.message}"

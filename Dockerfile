@@ -29,10 +29,24 @@ RUN  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
      texlive-fonts-recommended \
      texlive-xetex \
      zlib1g-dev \
+     xutils-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && npm install -g yarn
 RUN gem install bundler -N -v '< 2'
+
+RUN mkdir -p /dicom3tools_install && \
+    cd /dicom3tools_install && \
+    wget https://www.dclunie.com/dicom3tools/workinprogress/dicom3tools_1.00.snapshot.20220618093127.tar.bz2 && \
+    tar xvjf dicom3tools_1.00.snapshot.20220618093127.tar.bz2 && \
+    cd /dicom3tools_install/dicom3tools_1.00.snapshot.20220618093127 && \
+    ./Configure && \
+    imake -I./config && \
+    make World && \
+    make install && \
+    make clean && \
+    cd / && \
+    rm -rf /dicom3tools_install
 
 # Set the locale
 RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && \
