@@ -38,7 +38,8 @@ class Version < PaperTrail::Version
     :study_id,
     :form_definition_id,
     :form_answer_id,
-    :configuration_id
+    :configuration_id,
+    :background_job_id
   )
 
   belongs_to(:study, optional: true)

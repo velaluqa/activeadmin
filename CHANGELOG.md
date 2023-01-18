@@ -57,6 +57,11 @@
   6000 #1" would match the visit named "Lyon6000#1")
 * Fix - (ERICA-157, #5986) - Block destroy of signed form answers
 * Fix - (ERICA-162, #5982) - Fix audit trail classification for required series
+* Fix - (ERICA-171, #5776) - Update patient name in DICOM metadata when:
+  * patient subject id changes
+  * center code changes
+  * associated patient is assigned to another center
+  * image series is assigned to another patient
 
 ### Dev / DevOps
 

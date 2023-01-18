@@ -36,6 +36,8 @@
 #     * **`user_id`**
 #
 class BackgroundJob < ApplicationRecord
+  has_paper_trail(class_name: 'Version')
+
   belongs_to :user, optional: true
 
   before_destroy :remove_zipfile

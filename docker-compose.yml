@@ -95,6 +95,7 @@ services:
     image: selenium/standalone-chrome:108.0-chromedriver-108.0-grid-4.7.0-20221202
     ports:
       - 5900:5900
+    shm_size: '512mb'
     environment:
       SCREEN_WIDTH: 1920
       SCREEN_HEIGHT: 1080

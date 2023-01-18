@@ -12,7 +12,7 @@ describe SplitMultiFrameDicomWorker do
     let!(:background_job) { create(:background_job) }
 
     it "replaces uploaded multi-frame `Image` with n single-frame `Image` instances" do
-      SplitMultiFrameDicomWorker.new.perform(background_job.id, image.id)
+      SplitMultiFrameDicomWorker.new.perform(background_job.id, {}, image.id)
 
       expect { image.reload }
         .to raise_error(ActiveRecord::RecordNotFound)

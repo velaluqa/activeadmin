@@ -295,4 +295,40 @@ YAML
       end
     end
   end
+
+  describe "callback #eventually_update_dicom_tags" do
+    let!(:study) { create(:study) }
+    let!(:center) { create(:center, study: study, code: "10") }
+    let!(:other_center) { create(:center, study: study, code: "20") }
+    let!(:patient) { create(:patient, center: center, subject_id: "10") }
+    let!(:image_series) { create(:image_series, with_images: 1, patient: patient) }
+    let!(:user) { create(:user) }
+    let(:image) { image_series.images.first }
+
+    describe "updating subject_id" do
+      it 'updates DICOM tag `patient_name` for all associated images through background job' do
+        expect(image.dicom.patients_name.value).to eq("1010")
+
+        patient.subject_id = "20"
+        patient.save
+
+        Sidekiq::Worker.drain_all
+
+        expect(image.dicom.patients_name.value).to eq("1020")
+      end
+    end
+
+    describe "updating center" do
+      it 'updates DICOM tag `patient_name` for all associated images through background job' do
+        expect(image.dicom.patients_name.value).to eq("1010")
+
+        patient.center = other_center
+        patient.save
+
+        Sidekiq::Worker.drain_all
+
+        expect(image.dicom.patients_name.value).to eq("2010")
+      end
+    end
+  end
 end

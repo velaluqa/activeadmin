@@ -95,6 +95,7 @@ describe CleanDicomTagWorker do
       let(:run_worker) do
         CleanDicomTagWorker.new.perform(
           background_job.id.to_s,
+          {},
           "ImageSeries",
           image_series1.id,
           DICOM_TAG
