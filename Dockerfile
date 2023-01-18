@@ -76,7 +76,10 @@ COPY . /app
 RUN pwd
 RUN ls -al /app/public
 
-RUN if [ -z $RAILS_MASTER_KEY ]; then unset RAILS_MASTER_KEY; fi; RAILS_ENV=production bundle exec rails assets:precompile
+ARG RAILS_ENV
+ENV RAILS_ENV $RAILS_ENV
+
+RUN if [ "$RAILS_ENV" != "development" ]; then if [ -z $RAILS_MASTER_KEY ]; then unset RAILS_MASTER_KEY; fi; RAILS_ENV=production bundle exec rails assets:precompile; fi
 RUN ls -al /app/public
 # RUN ls -al /app/public/packs
 # RUN cat /app/public/packs/manifest.json
