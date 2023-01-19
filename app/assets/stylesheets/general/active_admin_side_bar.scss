@@ -54,8 +54,16 @@
     }
 
     input[type=text] {
-      width: 48%;
+      width: 49%;
       float: left;
+    }
+    @media screen and (max-width: 1900px) {
+      input[type=text] {
+        width: 100%;
+      }
+      #q_imaging_date_lteq ,#q_created_at_lteq_datetime {
+        margin-top: 5px;
+      }
     }
   }
 

@@ -232,7 +232,7 @@ span.label {
     margin-bottom: 0;
   }
 }
- 
+
 // These are the corrections for task 5718
 #sidebar .select2 {
   width: 100% !important;
@@ -245,4 +245,9 @@ span.label {
 
 .select2-search__field {
   width: 100% !important;
+}
+
+#q_imaging_date_gteq,
+#q_created_at_gteq_datetime {
+  margin-right: 5px;
 }

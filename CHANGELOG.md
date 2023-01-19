@@ -35,6 +35,7 @@
 
 ### Patches / Fixes
 
+- Fix - (#5718) Adjusted filter input field elements to resize correctly
 - Fix - Only allow users with `assign_patient` permission for `ImageSeries` to re-/assign a patient
 - Fix - Only allow users with `assign_visit` permission for `ImageSeries` to re-/assign a visit
 - Fix - Fix assigning a visit from the edit image series form if the
@@ -398,12 +399,13 @@ _Major Changes:_
 
 - Feature #2000 — MongoDB-to-PostGreSQL migration rake tasks
 - Feature #3075 — Extract Required Series into proper relation
-  - Reimplemented: \* required series assignment
-    - technical QC
-    - medical QC
-    - automatic creation of required series from study config
-      - upon visit type assignment
-      - upon study configuration change of available visit types or required series
+  - Reimplemented:
+    - required series assignment
+      - technical QC
+      - medical QC
+      - automatic creation of required series from study config
+        - upon visit type assignment
+        - upon study configuration change of available visit types or required series
 - Refactor — Study Configuration Upload
 
 _Minor Changes:_
