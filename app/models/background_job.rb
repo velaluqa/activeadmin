@@ -75,9 +75,8 @@ SELECT
     }
   )
 
-  def broadcast_job_update
-    ActionCable.server.broadcast(
-      "background_jobs_channel",
+  def background_job_options
+    {
       job_id: id,
       finished: finished?,
       updated_at: updated_at,
@@ -88,6 +87,13 @@ SELECT
           background_job: self
         }
       )
+    }
+  end
+
+  def broadcast_job_update
+    ActionCable.server.broadcast(
+      "background_jobs_channel",
+      background_job_options
     )
   end
 

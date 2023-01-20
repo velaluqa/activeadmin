@@ -5,7 +5,7 @@ end
 
 source 'https://rubygems.org'
 
-ruby "2.6.10"
+ruby "2.7.7"
 
 gem 'rails', '~> 6.0.0' # >= 6.0, < 6.1
 gem 'bootsnap'

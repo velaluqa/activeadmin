@@ -35,7 +35,6 @@ Feature: Show DICOM metadata for required series
       | RequiredSeries | read                      |
     And a user "authorized.user" with role "Authorized"
 
-  @focus
   Scenario: Unauthorized
     Given a role "Unauthorized" with permissions:
       | ImageSeries    | read |
