@@ -31,6 +31,16 @@ export default ({ currentUser, formDefinition, formLayout, configuration }) => {
     });
   };
 
+  const onClose = () => {
+    if (query.prev === "close") {
+      window.close();
+    } else if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location = `/v1/dashboard`;
+    }
+  };
+
   return (
     <FormContainer name={formDefinition.name}>
       <FormAnswerForm
@@ -39,7 +49,9 @@ export default ({ currentUser, formDefinition, formLayout, configuration }) => {
         layout={formLayout}
         onSign={signAnswers}
         signable
+        onClose={onClose}
       />
     </FormContainer>
   );
 };
+

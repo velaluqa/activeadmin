@@ -67,6 +67,10 @@ export default (props) => {
     });
   };
 
+  const onClose = () => {
+    window.location = `/v1/dashboard`;
+  };
+
   // fetch first form answer and display
   // show step in session in the top nav bar
   // when saving the form answer, step to the next form answer
@@ -99,6 +103,7 @@ export default (props) => {
           value={{ ...formAnswer.answers }}
           layout={formLayout}
           onSign={signAnswers}
+          onClose={onClose}
           signable
         />
       </div>

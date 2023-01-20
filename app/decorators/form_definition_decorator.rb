@@ -36,7 +36,8 @@ class FormDefinitionDecorator < ApplicationDecorator
   end
 
   def open_form_link
-    link_to("Open Form", new_v1_form_form_answer_path(id), target: "_blank")
+    link_to("Open Form", new_v1_form_form_answer_path(id, prev: 'close'), target: "_blank")
+    
   end
 
   def current_configuration

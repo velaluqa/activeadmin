@@ -36,6 +36,8 @@
 ### Patches / Fixes
 
 - Fix - (#5718) Adjusted filter input field elements to resize correctly
+- Fix - Allow users to close the form when opened from session view (Directs back to dashboard)
+- Fix - Allow people to close the from when opened friom for definitions (Directs based on orgin)
 - Fix - Only allow users with `assign_patient` permission for `ImageSeries` to re-/assign a patient
 - Fix - Only allow users with `assign_visit` permission for `ImageSeries` to re-/assign a visit
 - Fix - Fix assigning a visit from the edit image series form if the
