@@ -18,6 +18,7 @@ Feature: Filter users by tags
     And I browse to users list
     Then I see "my_tag" in "Alex" row
     And I see "other_users_tag" in "John" row
+    Then I click link "View Filters"
     When I select "my_tag" for "Tags"
     And I click "Filter"
     Then I see "Alex"

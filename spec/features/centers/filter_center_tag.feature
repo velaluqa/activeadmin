@@ -12,13 +12,14 @@ Feature: Filter centers by tags
       | Center | read, read_tags |
     And a role "Unauthorized Role" with permissions:
       | Center | read |
-
+ 
   Scenario: Authorized to filter centers by tags
     When I sign in as a user with role "Authorized Role" 
     And I browse to centers page
     Then I see "my_tag" in "First Center" row
     And I see "other_centers_tag" in "Second Center" row
-    When I select "my_tag" for "Tags"
+    When I click link "View Filters"
+    And I select "my_tag" for "Tags"
     And I click "Filter"
     Then I see "First Center"
     But I don't see "Second Center"

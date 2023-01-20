@@ -132,6 +132,23 @@ span.label {
   }
 }
 
+// Position the filters & cart and hide on page load
+#sidebar {
+  position: absolute !important;
+  background: white !important;
+  width: 35% !important;
+  right: 0 !important;
+}
+
+#viewer_cart_sidebar_section ,#filters_sidebar_section ,#search-status-_sidebar_section {
+  display: none;
+}
+
+#active_admin_content.with_sidebar #main_content_wrapper {
+  width: 100% !important;
+}
+
+
 /* Tables */
 .index_table {
   @extend .table, .table-striped, .table-hover;
@@ -214,4 +231,18 @@ span.label {
   table:last-child {
     margin-bottom: 0;
   }
+}
+ 
+// These are the corrections for task 5718
+#sidebar .select2 {
+  width: 100% !important;
+}
+
+.filter_form .select_and_search input[type=text], .filter_form .select_and_search select {
+  width: 100% !important;
+  margin-top: 5px;
+}
+
+.select2-search__field {
+  width: 100% !important;
 }

@@ -18,7 +18,8 @@ Feature: Filter image_series by tags
     And I browse to image_series list
     Then I see "my_tag" in "First ImageSeries" row
     And I see "other_image_series_tag" in "Second ImageSeries" row
-    When I select "my_tag" for "Tags"
+    When I click "View Filters"
+    And I select "my_tag" for "Tags"
     And I click "Filter"
     Then I see "First ImageSeries"
     But I don't see "Second ImageSeries"

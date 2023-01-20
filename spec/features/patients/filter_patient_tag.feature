@@ -12,12 +12,13 @@ Feature: Filter patients by tags
       | Patient | read, read_tags |
     And a role "Unauthorized Role" with permissions:
       | Patient | read |
-
+      
   Scenario: Authorized to filter patients by tags
     When I sign in as a user with role "Authorized Role" 
     And I browse to patients page
     Then I see "my_tag" in "First Patient" row
     And I see "other_patients_tag" in "Second Patient" row
+    Then I click link "View Filters"
     When I select "my_tag" for "Tags"
     And I click "Filter"
     Then I see "First Patient"

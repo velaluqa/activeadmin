@@ -27,6 +27,11 @@ module ActiveAdmin
       def build_titlebar_right
         div id: 'titlebar_right' do
           build_action_items
+          #This feels illegal I would like to know how to do this better
+          if  params[:controller] == 'admin/studies' || params[:controller] == 'admin/centers' || params[:controller] == 'admin/patients' || params[:controller] == 'admin/image_series' || params[:controller] == 'admin/visits' || params[:controller] == 'admin/users'
+            add_filter_toggle_button
+            add_cart_toggle_button
+          end
         end
       end
 
@@ -55,6 +60,24 @@ module ActiveAdmin
       def build_action_items
         insert_tag(view_factory.action_items, @action_items)
       end
+
+      def add_filter_toggle_button
+          span class: "action_item filter" do
+            a "View Filters", href: "#", id: 'filter_toggle'
+          end
+        end
+
+      def add_cart_toggle_button
+        span class: "action_item cart" do
+          if session[:viewer_cart].present?
+            a "View Cart (#{session[:viewer_cart].length})", id: 'cart_toggle',href: "#"
+          else
+            a "View Cart", id: 'cart_toggle',href: "#"
+          end
+        end
+      end
     end
   end
 end
+
+

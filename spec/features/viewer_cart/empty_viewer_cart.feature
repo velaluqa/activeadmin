@@ -35,8 +35,10 @@ Feature: Empty a viewer cart
     Then I see "Add To Viewer Cart Selected"
     When I click link "Add To Viewer Cart Selected"
     Then I see "added to viewer cart"
+    When I click link "View Cart"
     And I see "VIEWER CART"
     When I click "Empty"
+    And I click link "View Cart"
     Then I see "Your viewer cart is currently empty"  
   
   Scenario: Authorised to empty the viewer cart for centers
@@ -47,8 +49,10 @@ Feature: Empty a viewer cart
     Then I see "Add To Viewer Cart Selected"
     When I click link "Add To Viewer Cart Selected"
     Then I see "added to viewer cart"
+    When I click link "View Cart"
     And I see "VIEWER CART"
     When I click "Empty"
+    And I click link "View Cart"
     Then I see "Your viewer cart is currently empty"  
 
   Scenario: Authorised to empty the viewer cart for visits
@@ -59,8 +63,10 @@ Feature: Empty a viewer cart
     Then I see "Add To Viewer Cart Selected"
     When I click link "Add To Viewer Cart Selected"
     Then I see "added to viewer cart"
+    When I click link "View Cart"
     And I see "VIEWER CART"
     When I click "Empty"
+    And I click link "View Cart"
     Then I see "Your viewer cart is currently empty"  
   
   Scenario: Authorised to empty the viewer cart for patients
@@ -71,8 +77,10 @@ Feature: Empty a viewer cart
     Then I see "Add To Viewer Cart Selected"
     When I click link "Add To Viewer Cart Selected"
     Then I see "added to viewer cart"
+    When I click link "View Cart"
     And I see "VIEWER CART"
     When I click "Empty"
+    And I click link "View Cart"
     Then I see "Your viewer cart is currently empty"  
 
   Scenario: Authorised to empty the viewer cart for studies
@@ -82,9 +90,11 @@ Feature: Empty a viewer cart
     And I click "Batch Actions"
     Then I see "Add To Viewer Cart Selected"
     When I click link "Add To Viewer Cart Selected"
+    When I click link "View Cart"
     Then I see "added to viewer cart"
     And I see "VIEWER CART"
     When I click "Empty"
+    And I click link "View Cart"
     Then I see "Your viewer cart is currently empty"  
 
   Scenario: Unauthorised to empty the viewer cart

@@ -38,10 +38,12 @@ Feature: Filter Image Series
     And I browse to image_series list
     Then I see "FooImageSeries"
     And I see "BarImageSeries"
+    Then I click link "View Filters"
     When I search "Foo" for "Resource" and select "Study: FooStudy"
     And I click "Filter"
     Then I see "FooImageSeries"
     But I don't see "BarImageSeries"
+    Then I click link "View Filters"
     When I click "Clear Filters"
     Then I see "FooImageSeries"
     And I see "BarImageSeries"

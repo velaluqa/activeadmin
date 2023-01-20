@@ -19,6 +19,7 @@ Feature: Filter visits by tags
     And I browse to visits page
     Then I see "my_tag" in "10000" row
     And I see "other_visits_tag" in "20000" row
+    Then I click link "View Filters"
     When I select "my_tag" for "Tags"
     And I click "Filter"
     Then I see "10000"
