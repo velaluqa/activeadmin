@@ -35,6 +35,7 @@
 
 ### Patches / Fixes
 
+- Fix - (#5717) Fix the uploading of non-DICOM files in safari browser
 - Fix - (#5718) Adjusted filter input field elements to resize correctly
 - Fix - Allow users to close the form when opened from session view (Directs back to dashboard)
 - Fix - Allow people to close the from when opened friom for definitions (Directs based on orgin)

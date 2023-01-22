@@ -60,7 +60,10 @@ class ImageUploader.Models.Image extends Backbone.Model
   parse: (file) ->
     @file = file
 
+
     console.log(file)
+
+
 
     fileExtension = _.last(file.name.split("."))
     isAllowed =
@@ -115,12 +118,12 @@ class ImageUploader.Models.Image extends Backbone.Model
           @set
             state: 'parsed'
             seriesDescription: file.name
-            contentDateTime: file.lastModifiedDate
+            contentDateTime: new Date(file.lastModified)
         else
           @set
             state: 'parsing failed'
             seriesDescription: file.name
-            contentDateTime: file.lastModifiedDate
+            contentDateTime: new Date(file.lastModified)
             warnings: "File type not allowed"
 
     reader.readAsArrayBuffer(file)
