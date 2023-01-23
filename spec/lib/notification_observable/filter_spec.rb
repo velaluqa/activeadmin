@@ -128,9 +128,9 @@ RSpec.describe NotificationObservable::Filter do
       it 'matches relation' do
         expect(@filter).to(receive(:match_relation)
                              .once
-                             .with(@model, :sub_model, bar: { equal: 5 })
+                             .with(@model, :sub_model, { bar: { equal: 5 } })
                              .and_return(true))
-        @filter.match_condition({ sub_model: { bar: { equal: 5 } } }, @model, @changes)
+        @filter.match_condition( { sub_model: { bar: { equal: 5 } } } , @model, @changes)
       end
     end
   end

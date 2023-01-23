@@ -75,25 +75,21 @@ SELECT
     }
   )
 
-  def background_job_options
-    {
-      job_id: id,
-      finished: finished?,
-      updated_at: updated_at,
-      html: ApplicationController.new.render_to_string(
-        template: "admin/background_jobs/_background_job_state",
-        layout: nil,
-        locals: {
-          background_job: self
-        }
-      )
-    }
-  end
-
   def broadcast_job_update
     ActionCable.server.broadcast(
       "background_jobs_channel",
-      background_job_options
+      {
+        job_id: id,
+        finished: finished?,
+        updated_at: updated_at,
+        html: ApplicationController.new.render_to_string(
+          template: "admin/background_jobs/_background_job_state",
+          layout: nil,
+          locals: {
+            background_job: self
+          }
+        )
+      }
     )
   end
 

@@ -1,4 +1,4 @@
-FROM ruby:2.7.7-buster
+FROM ruby:3.0.5-buster
 MAINTAINER aandersen@velalu.qa
 
 ARG RAILS_MASTER_KEY=""
