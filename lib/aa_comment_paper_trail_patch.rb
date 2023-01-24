@@ -1,3 +1,5 @@
+require "paper_trail/frameworks/active_record"
+
 module ActiveAdminCommentPaperTrailPatch
   extend ActiveSupport::Concern
 

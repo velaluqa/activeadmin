@@ -405,14 +405,14 @@ JOIN
     old_patient = Patient.find(patient_id_was)
     return if old_patient.study == patient.study
 
-    errors[:patient] << 'An image series cannot be reassigned to a patient in a different study.'
+    errors.add(:patient, 'An image series cannot be reassigned to a patient in a different study.')
     throw(:abort)
   end
 
   def ensure_visit_is_for_patient
     return unless visit && visit.patient != patient
 
-    errors[:visit] << 'The visits patient is different from this image series\' patient'
+    errors.add(:visit, 'The visits patient is different from this image series\' patient')
     throw(:abort)
   end
 

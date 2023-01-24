@@ -611,7 +611,7 @@ JOIN_QUERY
     old_patient = Patient.find(patient_id_was)
     return unless old_patient.study != patient.study
 
-    errors[:patient] << 'A visit cannot be reassigned to a patient in a different study.'
+    errors.add(:patient, 'A visit cannot be reassigned to a patient in a different study.')
     throw :abort
   end
 

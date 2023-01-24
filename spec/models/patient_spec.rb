@@ -252,7 +252,7 @@ YAML
     patient.center = other_center
 
     expect(patient.save).to be_falsy
-    expect(patient.errors.messages).to include(center: ['A patient cannot be reassigned to a center in a different study.'])
+    expect(patient.errors[:center]).to eq(['A patient cannot be reassigned to a center in a different study.'])
   end
 
   describe 'versioning' do

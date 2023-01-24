@@ -358,7 +358,7 @@ ActiveAdmin.register ImageSeries do
       .gsub(/\A_/, '')
       .downcase
     send_data(
-      render_to_string('admin/shared/viewer_weasis.jnpl', :layout => false),
+      render_to_string('admin/shared/viewer_weasis', formats: [:jnpl], :layout => false),
       type: 'application/x-java-jnlp-file',
       filename: "image_series_#{name}.jnlp",
       disposition: 'attachment'

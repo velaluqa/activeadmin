@@ -7,7 +7,7 @@ source 'https://rubygems.org'
 
 ruby "3.0.5"
 
-gem 'rails', '~> 6.0.0' # >= 6.0, < 6.1
+gem 'rails', '~> 6.1.0' # >= 6.1.0, < 6.2.0
 gem 'bootsnap'
 
 # XML serialization was removed from rails 5 and extracted into its
@@ -72,7 +72,7 @@ gem 'devise'
 gem 'devise-token_authenticatable'
 
 # audit trail
-gem 'paper_trail', '~> 11.0.0'
+gem 'paper_trail'
 
 # ActiveAdmin
 gem 'activeadmin', '~> 2.12.0'

@@ -240,7 +240,7 @@ JOIN
     old_center = Center.find(center_id_was)
     return unless old_center.study != center.study
 
-    errors[:center] << 'A patient cannot be reassigned to a center in a different study.'
+    errors.add(:center, 'A patient cannot be reassigned to a center in a different study.')
     throw :abort
   end
 

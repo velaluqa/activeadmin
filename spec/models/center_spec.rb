@@ -155,7 +155,7 @@ RSpec.describe Center do
     it 'does not allow destruction' do
       is_destroyed = center.destroy
       expect(is_destroyed).to be_falsy
-      expect(center.errors.messages).to include(study: ['You cannot delete a center which has patients associated.'])
+      expect(center.errors[:study]).to eq ['You cannot delete a center which has patients associated.']
     end
   end
 
@@ -165,7 +165,7 @@ RSpec.describe Center do
     center.study = other_study
 
     expect(center.save).to be_falsy
-    expect(center.errors.messages).to include(study: ['A center cannot be reassigned to a different study.'])
+    expect(center.errors[:study]).to eq(['A center cannot be reassigned to a different study.'])
   end
 
   describe 'versioning' do
