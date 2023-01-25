@@ -94,6 +94,8 @@
 - Fix - (#6056) Display proper item name for deleted records in audit
   trail. Before deleted records had a blank item column.
 - Fix - Display parsing errors when uploading invalid study configuration
+- Fix - (#6078) Grow study list dashboard widget vertically the more studies
+  exist
 
 ### Dev / DevOps
 
