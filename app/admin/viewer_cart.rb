@@ -96,7 +96,7 @@ ActiveAdmin.register_page 'Viewer Cart' do
     @wado_query_urls.reject!(&:nil?)
 
     send_data(
-      render_to_string('admin/shared/viewer_weasis', formats: [:jnpl], layout: false),
+      render_to_string('admin/shared/viewer_weasis', formats: [:xml], layout: false),
       type: 'application/x-java-jnlp-file',
       filename: 'viewer.jnlp',
       disposition: 'attachment'

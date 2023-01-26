@@ -19,7 +19,10 @@ ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICACommentMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICAKeywordsMixin::DSL)
 ActiveAdmin::Comment
-ActiveAdmin::Comment.send(:include, ActiveAdminCommentPaperTrailPatch)
+
+Rails.application.config.to_prepare do
+  ActiveAdmin::Comment.send(:include, ActiveAdminCommentPaperTrailPatch)
+end
 
 ActiveAdmin.setup do |config|
   # == Site Title
@@ -356,19 +359,31 @@ ActiveAdmin.setup do |config|
   config.view_factory.register footer: ActiveAdmin::Views::EricaFooter
 end
 
-ActiveAdmin::BaseController.class_eval do
-  helper ApplicationHelper
+ActiveSupport.on_load(:active_admin) do
+  ActiveAdmin::BaseController.class_eval do
+    helper ApplicationHelper
 
-  def authorize_one!(actions, subject)
-    unless actions.any? { |a| can?(a, subject) }
-      raise CanCan::AccessDenied.new(current_user, actions, subject)
+    def authorize_one!(actions, subject)
+      unless actions.any? { |a| can?(a, subject) }
+        raise CanCan::AccessDenied.new(current_user, actions, subject)
+      end
+    end
+
+    def authorize_combination!(*combinations)
+      unless combinations.any? { |a, s| can?(a, s) }
+        raise CanCan::AccessDenied.new(current_user, combinations)
+      end
     end
   end
 
-  def authorize_combination!(*combinations)
-    unless combinations.any? { |a, s| can?(a, s) }
-      raise CanCan::AccessDenied.new(current_user, combinations)
+  # https://github.com/gregbell/active_admin/issues/346
+  module ActiveAdmin
+    class ResourceController < BaseController
+      module DataAccess
+        def max_csv_records
+          1_000_000
+        end
+      end
     end
   end
 end
-

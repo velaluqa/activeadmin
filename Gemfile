@@ -7,7 +7,7 @@ source 'https://rubygems.org'
 
 ruby "3.0.5"
 
-gem 'rails', '~> 6.1.0' # >= 6.1.0, < 6.2.0
+gem 'rails', '~> 7.0.0' # >= 7.0.0, < 7.1.0
 gem 'bootsnap'
 
 # XML serialization was removed from rails 5 and extracted into its
@@ -131,7 +131,7 @@ gem 'marcel', '1.0.2'
 gem 'rubyzip'
 
 # Resource tagging in ERICA Remote
-gem 'acts-as-taggable-on', '~> 7.0.0'
+gem 'acts-as-taggable-on', '~> 9.0.0'
 
 gem 'ruby-progressbar'
 
@@ -141,8 +141,8 @@ gem 'andand'
 gem 'facets', require: false
 
 # For the Sidekiq monitoring interface
-gem 'sinatra', require: nil
-gem 'slim'
+# gem 'sinatra', require: nil
+# gem 'slim'
 
 # FactoryBot is used in production to create seed data.
 gem 'factory_bot_rails'
@@ -184,12 +184,12 @@ group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
   # Chrome extension to get meta info for the current request.
-  gem 'meta_request'
+  gem 'meta_request', github: 'velaluqa/rails_panel', branch: 'master'
   # Generate UML diagrams for the database.
   gem 'railroady'
   gem 'rails-erd'
   # Hints missing indexes.
-  gem 'lol_dba', '~> 2.2.0'
+  gem 'lol_dba', '~> 2.4.0'
 
   # Gems for prettier errors in development
   gem 'better_errors'
