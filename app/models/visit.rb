@@ -562,6 +562,11 @@ JOIN_QUERY
     "#{visit_type}(#{visit_number})"
   end
 
+
+  def versions_item_name
+    "#{patient.name}##{visit_number}"
+  end
+
   def reset_mqc
     self.mqc_user_id = nil
     self.mqc_date = nil

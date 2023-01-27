@@ -18,8 +18,7 @@ Feature: Role Audit Trail
     And I sign in as a user with role "Test Role"
     When I browse to role "Test Role"
     And I click link "Audit Trail" in "#title_bar"
-    Then I see "CREATE" in "Test Role" row
-    And I see "TEST ROLE: READ VERSION GRANTED"
-    And I see "TEST ROLE: READ USER REVOKED"
-
+    Then I see "CREATE" in "Role Test Role" row
+    And I see "Test Role read Version GRANTED"
+    And I see "Test Role read User REVOKED"
 

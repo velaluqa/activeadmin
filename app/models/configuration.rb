@@ -28,6 +28,10 @@ class Configuration < ApplicationRecord
     optional: true
   )
 
+  def versions_item_name
+    "#{configurable_type}: #{configurable.name}"
+  end
+
   def data
     JSON.parse(payload[0] == "{" ? payload : "{}")
   end

@@ -103,6 +103,10 @@ class Notification < ApplicationRecord
     email_throttling_delay > 0
   end
 
+  def to_s 
+    "Notification[#{triggering_action} #{resource_type}]"
+  end
+
   protected
 
   def send_instant_notification_email

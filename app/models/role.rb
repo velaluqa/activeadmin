@@ -46,6 +46,11 @@ SELECT
     all
   end
 
+
+  def to_s
+    title
+  end
+
   # Add permission to the role quickly.
   #
   # @param [Symbol, String] activity The activity to permit

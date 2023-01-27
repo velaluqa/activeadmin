@@ -4,6 +4,7 @@
 # category: Audit Trail
 # components:
 #   - audit trail
+
 Feature: Patient Audit Trail
   To investigate changes to a certain patient,
   As authorized user,
@@ -31,13 +32,14 @@ Feature: Patient Audit Trail
 
   Scenario: Patient-specific Audit Trail
     When I sign in as a user with role "Test Role"
+    
     And I browse to patient "FooPatient"
     And I click link "Audit Trail" in "#title_bar"
     Then I see "RequiredSeries 100FooPatient#10000 SPECT"
-    And I see "Image Foo#1"
+    And I see "Image of Foo"
     And I see "ImageSeries Foo"
     And I see "Visit 100FooPatient#10000"
     And I see "Patient 100FooPatient"
-    And I don't see "Center 100 - FooCenter"
+    And I don't see "Center FooCenter"
     And I don't see "Study FooStudy"
 

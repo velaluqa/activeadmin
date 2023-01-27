@@ -4,6 +4,7 @@
 # category: Audit Trail
 # components:
 #   - audit trail
+
 Feature: ImageSeries Audit Trail
   To investigate changes to a certain image series,
   As authorized user,
@@ -34,10 +35,10 @@ Feature: ImageSeries Audit Trail
     And I browse to image_series "Foo"
     And I click link "Audit Trail" in "#title_bar"
     Then I see "RequiredSeries 100FooPatient#10000 SPECT"
-    And I see "Image Foo#1"
+    And I see "Image of Foo"
     And I see "ImageSeries Foo"
     And I don't see "Visit 100FooPatient#10000"
     And I don't see "Patient 100FooPatient"
-    And I don't see "Center Center 100 - FooCenter"
+    And I don't see "Center FooCenter"
     And I don't see "Study FooStudy"
 

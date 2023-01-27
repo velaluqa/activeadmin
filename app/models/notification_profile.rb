@@ -105,7 +105,7 @@ p #
 # **`triggering_resource`**             | `string`           | `not null`
 # **`updated_at`**                      | `datetime`         | `not null`
 #
-class NotificationProfile < ActiveRecord::Base
+class NotificationProfile < ApplicationRecord
   has_paper_trail(
     class_name: 'Version',
     version: :paper_trail_version,
@@ -127,8 +127,6 @@ class NotificationProfile < ActiveRecord::Base
     FormAnswer
     FormSession
   ].freeze
-
-  has_paper_trail class_name: 'Version'
 
   has_many :notification_profile_users
   has_many :users, through: :notification_profile_users, dependent: :destroy
@@ -274,6 +272,10 @@ JOIN
     filters.to_json
   end
 
+  def versions_item_name
+    title
+  end
+
   def to_s
     props = [id, triggering_actions.join(" or "), triggering_resource, filter.to_s]
     "NotificationProfile[#{props.compact.join(', ')}]"
@@ -324,6 +326,8 @@ JOIN
   def all_users?
     users.empty? && roles.empty?
   end
+
+
 
   protected
 

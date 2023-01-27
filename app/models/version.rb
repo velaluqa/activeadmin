@@ -35,6 +35,7 @@ class Version < PaperTrail::Version
     :object_changes,
     :whodunnit,
     :comment,
+    :item_name,
     :study_id,
     :form_definition_id,
     :form_answer_id,
@@ -45,6 +46,19 @@ class Version < PaperTrail::Version
   belongs_to(:study, optional: true)
 
   after_commit(:trigger_notification_profiles, on: :create)
+
+  before_save :add_item_name_as_string
+
+  def add_item_name_as_string
+    # Normally `item` is non-nil. But for resilience we do a nil-check here. 
+    return if item.nil?
+
+    self.item_name = if item.respond_to?(:versions_item_name)
+      item.versions_item_name
+    else
+      item.to_s
+    end
+  end
 
   scope :for_study, -> (study_id) { where(study_id: study_id) }
   # TODO: #3353 - Use Version#center_id: association_chain.where(center_id: params[:audit_trail_view_id])
@@ -134,6 +148,7 @@ WHERE
       object_changes
     end
   end
+
 
   # TODO: When updated to Ruby 2.4 use `Hash#transform_values`.
   def complete_attributes

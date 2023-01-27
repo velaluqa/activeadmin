@@ -22,9 +22,7 @@ module ActiveAdminCommentPaperTrailPatch
       # for caching columns for the scoping permissions of roles.
       all
     end
-  end
 
-  module InstanceMethods
     def resource_name
       if resource.nil? || !resource.respond_to?(:name)
         "#{resource_type} #{resource_id}"
@@ -35,6 +33,12 @@ module ActiveAdminCommentPaperTrailPatch
 
     def name
       "Comment on #{resource_name}"
+    end
+
+    def versions_item_name
+      return name if respond_to?(:name)
+
+      to_s
     end
   end
 end

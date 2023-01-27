@@ -34,7 +34,7 @@ Feature: Image Audit Trail
     And I browse to last defined image
     And I click link "Audit Trail" in "#title_bar"
     Then I don't see "RequiredSeries 100FooPatient#10000 SPECT"
-    And I see "Image Foo#1"
+    And I see "Image of Foo"
     And I don't see "ImageSeries Foo"
     And I don't see "Patient" within "#main_content"
     And I don't see "Visit" within "#main_content"

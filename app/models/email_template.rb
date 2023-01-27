@@ -15,4 +15,5 @@
 #
 class EmailTemplate < ApplicationRecord
   has_paper_trail class_name: 'Version'
+
 end
