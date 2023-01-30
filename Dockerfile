@@ -1,11 +1,11 @@
-FROM ruby:3.0.5-buster
+FROM ruby:3.1.3-bullseye
 MAINTAINER aandersen@velalu.qa
 
 ARG RAILS_MASTER_KEY=""
 ENV APP_HOME /app
 
 # Install distribution dependencies
-RUN  curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+RUN  curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
      apt-get update -qq && \
      apt-get install -y \
      build-essential \
@@ -33,7 +33,7 @@ RUN  curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && npm install -g yarn
-RUN gem install bundler -N -v '< 2'
+RUN gem install bundler -N -v '2.4.5'
 
 RUN mkdir -p /dicom3tools_install && \
     cd /dicom3tools_install && \

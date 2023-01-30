@@ -117,7 +117,12 @@ class GitConfigRepository
     return nil if file_blob.nil?
 
     # No extra whitelisted classes or symbols; load aliases:
-    YAML.safe_load(file_blob.text, [], [], true)
+    YAML.safe_load(
+      file_blob.text,
+      permitted_classes: [],
+      permitted_symbols: [],
+      aliases: true
+    )
   end
 
   def data_at_version(path, version = nil)

@@ -5,7 +5,7 @@ end
 
 source 'https://rubygems.org'
 
-ruby "3.0.5"
+ruby "3.1.3"
 
 gem 'rails', '~> 7.0.0' # >= 7.0.0, < 7.1.0
 gem 'bootsnap'
@@ -34,7 +34,7 @@ gem 'coffee-rails'
 gem 'sass-rails'
 
 gem 'haml-rails'
-gem 'less-rails'
+# gem 'less-rails'
 
 gem 'bootstrap-datepicker-rails'
 gem 'bootstrap-sass'
@@ -46,8 +46,9 @@ gem 'uglifier'
 # we need these even in production, for server-side judgement functions
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 gem 'execjs'
-gem 'libv8', '~> 3.16.14'
-gem 'therubyracer', '0.12.3', platforms: :ruby
+
+gem 'libv8-node', '~> 16.10.0.0'
+gem 'mini_racer'
 
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
@@ -140,10 +141,6 @@ gem 'andand'
 # Facets provides many helpers that are missing from the ruby standard library.
 gem 'facets', require: false
 
-# For the Sidekiq monitoring interface
-# gem 'sinatra', require: nil
-# gem 'slim'
-
 # FactoryBot is used in production to create seed data.
 gem 'factory_bot_rails'
 gem 'faker'
@@ -154,7 +151,7 @@ gem 'awesome_print'
 # Use HAML and CoffeeScript for Backbone.JS SPAs
 gem 'haml_coffee_assets', '~> 1.21.0'
 gem 'sprockets-rails'
-gem 'sprockets', '~> 3.0'
+gem 'sprockets', '~> 4.2'
 
 # Use webpacker & webpack for all modern assets
 gem 'webpacker', '~> 4.x'
