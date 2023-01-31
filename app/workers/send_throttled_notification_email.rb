@@ -16,7 +16,7 @@ class SendThrottledNotificationEmail
         .joins(:version)
         .order('versions.study_id' => :asc)
         .where(id: notification_ids)
-
+        .to_a
     NotificationMailer
       .throttled_notification_email(user, profile, notifications)
       .deliver_now

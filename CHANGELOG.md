@@ -35,6 +35,7 @@
 
 ### Patches / Fixes
 
+- Fix - (ERICA-105, #5997) Fix throttled notification email render failure
 - Fix - (#5717) Fix the uploading of non-DICOM files in safari browser
 - Fix - (#5718) Adjusted filter input field elements to resize correctly
 - Fix - Allow users to close the form when opened from session view (Directs back to dashboard)
