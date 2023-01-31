@@ -48,7 +48,7 @@ step 'I select following (image )series for upload:' do |selectable|
   selectable.to_a.flatten.each do |series|
     first('tr', text: "#{series} ").check
   end
-
+  Capybara::Screenshot.screenshot_and_save_page
   validation_report_screenshot
 end
 
