@@ -1,4 +1,4 @@
-FROM ruby:3.1.3-bullseye
+FROM ruby:3.2.0-bullseye
 MAINTAINER aandersen@velalu.qa
 
 ARG RAILS_MASTER_KEY=""

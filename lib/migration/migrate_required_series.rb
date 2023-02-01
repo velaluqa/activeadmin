@@ -27,7 +27,7 @@ module Migration
       def migrated_configs(study_id)
         @migrated_configs ||=
           begin
-            if File.exists?('study_config_migration.yml')
+            if File.exist?('study_config_migration.yml')
               JSON.parse(File.read('study_config_migration.yml'))
             else
               {}

@@ -5,7 +5,7 @@ end
 
 source 'https://rubygems.org'
 
-ruby "3.1.3"
+ruby "3.2.0"
 
 gem 'rails', '~> 7.0.0' # >= 7.0.0, < 7.1.0
 gem 'bootsnap'
@@ -34,7 +34,6 @@ gem 'coffee-rails'
 gem 'sass-rails'
 
 gem 'haml-rails'
-# gem 'less-rails'
 
 gem 'bootstrap-datepicker-rails'
 gem 'bootstrap-sass'
@@ -89,7 +88,7 @@ gem 'textpow', github: 'velaluqa/textpow', branch: 'master'
 gem 'ultraviolet'
 
 # Rugged for Git-based config versioning
-gem 'rugged', '0.28.3.1'
+gem 'rugged', '~> 1.5', '>= 1.5.1'
 
 # Airbrake Exception notifier
 gem 'airbrake'
