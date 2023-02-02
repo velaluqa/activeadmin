@@ -264,6 +264,10 @@ class FormAnswer < ApplicationRecord
     "Form Answer: #{form_definition.name}"
   end
 
+  def to_s
+    form_definition.name
+  end
+
   private
 
   def set_sequence_number_for_session
