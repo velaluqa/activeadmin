@@ -19,6 +19,7 @@ RSpec.describe Version do
       @image = create(:image, image_series: @image_series)
       @role = create(:role, title: "test_role")
       @user = create(:user, name: "Max Mustermann")
+      @user_role = create(:user_role, user: @user, role: @role)
       @email_template = create(:email_template, name: "test_template")
       @notification_profile = create(
         :notification_profile,
@@ -45,6 +46,7 @@ RSpec.describe Version do
         @image,
         @role,
         @user,
+        @user_role,
         @email_template,
         @notification_profile,
         @form_definition,
@@ -115,6 +117,13 @@ RSpec.describe Version do
         .to eq("Max Mustermann")
       expect(version_item_name_for("destroy", "User", @user))
         .to eq("Max Mustermann")
+    end
+
+    it 'saves the `item_name` to the `UserRole` version' do
+      expect(version_item_name_for("create", "UserRole", @user_role))
+        .to eq("test_role")
+      expect(version_item_name_for("destroy", "UserRole", @user_role))
+        .to eq("test_role")
     end
 
     it 'saves the `item_name` to the `EmailTemplate` version' do

@@ -19,7 +19,6 @@ describe Migration::AddMissingVersionItemName do
     end
 
     before(:all) do
-
       @study = create(:study, name: "test_study")
       @center = create(:center, code: "100",  name: "test_center" )
       @patient = create(:patient, subject_id: "100", center: @center)
@@ -28,6 +27,7 @@ describe Migration::AddMissingVersionItemName do
       @image = create(:image, image_series: @image_series)
       @role = create(:role, title: "test_role")
       @user = create(:user, name: "Max Mustermann")
+      @user_role = create(:user_role, user: @user, role: @role)
       @email_template = create(:email_template, name: "test_template")
       @notification_profile = create(
         :notification_profile, 
@@ -52,6 +52,7 @@ describe Migration::AddMissingVersionItemName do
         @visit,
         @image_series,
         @image,
+        @user_role,
         @role,
         @user,
         @email_template,
@@ -129,6 +130,13 @@ describe Migration::AddMissingVersionItemName do
         .to eq("Max Mustermann")
       expect(version_item_name_for("destroy", "User", @user))
         .to eq("Max Mustermann")
+    end
+
+    it 'saves the `item_name` to the `UserRole` version' do
+      expect(version_item_name_for("create", "UserRole", @user_role))
+        .to eq("test_role")
+      expect(version_item_name_for("destroy", "UserRole", @user_role))
+        .to eq("test_role")
     end
 
     it 'saves the `item_name` to the `EmailTemplate` version' do
