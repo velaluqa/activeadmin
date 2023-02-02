@@ -9,6 +9,7 @@
 - Fix - (#6106) Form Session View - Fix link to form answers in form session
   form answers table
 - Fix - (#6105) Remove WEASIS `Viewer` link in image series resource views
+- Fix - (#6107) Fix link to image series in image series name column
 
 ## 7.3.0
 

@@ -3,6 +3,10 @@ class ImageSeriesDecorator < ApplicationDecorator
 
   delegate_all
 
+  def name
+    link_to(object.name, admin_image_series_path(object))
+  end
+
   def state
    if model.state_sym == :importing
     status_tag('Importing', class: 'note')
