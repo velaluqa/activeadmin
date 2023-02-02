@@ -31,7 +31,11 @@ class SplitMultiFrameDicomWorker
     ordered_frames = Dir["#{target_dir}/*"].sort_by { |v| File.basename(v)[/\d+/].to_i }
 
     ordered_frames.each do |single_frame_path|
-      single_frame_image = Image.create(image_series_id: image.image_series_id)
+      single_frame_image = Image.create!(
+        image_series_id: image.image_series_id,
+        mimetype: "application/dicom",
+        sha256sum: Image.sha256sum(single_frame_path)
+      )
       ::FileUtils.cp(
         single_frame_path,
         single_frame_image.absolute_image_storage_path

@@ -36,7 +36,12 @@ class Image < ApplicationRecord
     }
   )
 
-  attr_accessible(:image_series_id, :image_series)
+  attr_accessible(
+    :image_series_id,
+    :image_series,
+    :mimetype,
+    :sha256sum
+  )
 
   belongs_to :image_series
 
@@ -311,6 +316,14 @@ JOIN
 
   def to_s
     "#{image_series.name}##{row_number}"
+  end
+
+  class << self
+    def sha256sum(path)
+      File.open(path, 'rb') do |file|
+        Digest::SHA256.hexdigest(file.read)
+      end
+    end
   end
 
   protected

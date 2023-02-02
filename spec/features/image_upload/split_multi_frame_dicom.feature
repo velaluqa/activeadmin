@@ -36,5 +36,5 @@ Feature: Split multi-frame DICOM files
     And I wait for all jobs to finish
     When I browse to image_series list
     Then I see a row for "compressed_multiframe_1" with the following columns:
-      | Files | 10 files | 
-
+      | Files       | 10 files |
+      | Image Types | DICOM    |

@@ -11,6 +11,7 @@
 - Fix - (#6105) Remove WEASIS `Viewer` link in image series resource views
 - Fix - (#6107) Fix link to image series in image series name column
 - Fix - (#6104) Fix migration of versions `item_name` column
+- Fix - (#6108) Fix setting file type for split multi-frame files
 
 ## 7.3.0
 
