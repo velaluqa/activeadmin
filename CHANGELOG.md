@@ -8,6 +8,7 @@
   assigned (only show valid forms on dashboard)
 - Fix - (#6106) Form Session View - Fix link to form answers in form session
   form answers table
+- Fix - (#6105) Remove WEASIS `Viewer` link in image series resource views
 
 ## 7.3.0
 
