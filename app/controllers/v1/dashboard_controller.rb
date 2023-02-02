@@ -13,14 +13,11 @@ class V1::DashboardController < ApplicationController
     render_react(
       "user_dashboard",
       current_user: current_user.attributes.slice("id", "username", "name"),
-      form_answers: form_answers.includes(:form_definition, form_answer_resources: :resource).map do |answer|
+      form_answers: form_answers.includes(:form_definition, form_answer_resources: :resource).filter(&:valid?).map do |answer|
         answer.attributes
           .merge(
             "form_definition" => answer.form_definition.attributes,
-            "form_answer_resources" => answer.form_answer_resources.map do |fa_resource|
-              fa_resource.attributes
-                .merge("resource" => fa_resource.resource.attributes)
-            end
+            "form_answer_resources" => answer.form_answer_resources.map(&:attributes_with_resource)
           )
       end,
       form_sessions: form_sessions.map do |session|
@@ -30,8 +27,10 @@ class V1::DashboardController < ApplicationController
             "answers" => session
                            .form_answers
                            .order(sequence_number: :asc)
+                           .filter(&:valid?)
                            .map(&:attributes))
       end
+        .reject { |s| s["answers"].empty? }
     )
   end
 end

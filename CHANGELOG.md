@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Unreleased
+
+### Patches / Fixes
+
+- Fix - (#6103) Fix opening forms dashboard if the user has invalid forms
+  assigned (only show valid forms on dashboard)
+
 ## 7.3.0
 
 ### Minor Changes

@@ -29,6 +29,7 @@ class V1::FormSessionsController < V1::ApiController
       .form_answers
       .order(sequence_number: :asc)
       .includes(:form_definition, form_answer_resources: :resource)
+      .filter(&:valid?)
       .map(&method(:load_form_answer))
   end
 
