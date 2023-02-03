@@ -27,17 +27,17 @@ module ActiveAdmin
       def build_titlebar_right
         div id: 'titlebar_right' do
           build_action_items
-          if controller.controller_name == 'studies' || controller.controller_name == 'centers' || controller.controller_name == 'patients' || controller.controller_name == 'image_series' || controller.controller_name == 'visits' || controller.controller_name == 'users' || controller.controller_name == 'roles' || controller.controller_name == 'versions' || controller.controller_name == 'images'
-            if controller.action_name == 'index'
-              add_filter_toggle_button
-            end
-          end
-          if controller.action_name == 'index' && controller.controller_name == 'studies' || controller.controller_name == 'centers' || controller.controller_name == 'patients' || controller.controller_name == 'image_series' || controller.controller_name == 'visits'
-            if controller.action_name == 'index'
-              add_cart_toggle_button
-            end
-          end 
-        end 
+
+          add_filter_toggle_button if has_sidebar_section?("filters")
+          add_cart_toggle_button if has_sidebar_section?("viewer_cart")
+        end
+      end
+
+      def has_sidebar_section?(name)
+        active_admin_config
+          .sidebar_sections_for(controller.action_name, self)
+          .map(&:name)
+          .include?(name)
       end
 
       def build_breadcrumb(separator = '/')

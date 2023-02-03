@@ -13,6 +13,7 @@
 - Fix - (#6107) Fix link to image series in image series name column
 - Fix - (#6104) Fix migration of versions `item_name` column
 - Fix - (#6108) Fix setting file type for split multi-frame files
+- Fix - (#6109) Fix display condition of filter/cart buttons
 
 ## 7.3.0
 
