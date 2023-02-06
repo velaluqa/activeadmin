@@ -30,13 +30,13 @@ class Image < ApplicationRecord
   class DicomWriteError < StandardError; end
 
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       study_id: ->(image) { image.study.andand.id }
     }
   )
-
-  attr_accessible(:image_series_id, :image_series)
 
   belongs_to :image_series
 

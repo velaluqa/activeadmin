@@ -236,10 +236,10 @@ CONFIG
     let!(:required_series22) { RequiredSeries.where(visit: visit2, name: 'SPECT_2').first }
 
     before(:each) do
-      required_series11.update_attributes(tqc_state: 0)
-      required_series12.update_attributes(tqc_state: 1)
-      required_series21.update_attributes(tqc_state: 2)
-      required_series22.update_attributes(tqc_state: 2)
+      required_series11.update(tqc_state: 0)
+      required_series12.update(tqc_state: 1)
+      required_series21.update(tqc_state: 2)
+      required_series22.update(tqc_state: 2)
     end
 
     let(:result) do

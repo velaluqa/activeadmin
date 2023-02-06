@@ -11,7 +11,7 @@ describe Middleware do
 
     context "without maintenance file" do
       before(:each) do
-        FileUtils.rm(maintenance) if File.exists?(maintenance)
+        FileUtils.rm(maintenance) if File.exist?(maintenance)
       end
   
       it "calls the app" do

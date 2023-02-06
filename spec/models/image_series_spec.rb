@@ -171,7 +171,7 @@ RSpec.describe ImageSeries do
     image_series.patient = other_patient
 
     expect(image_series.save).to be_falsy
-    expect(image_series.errors.messages).to include(patient: ['An image series cannot be reassigned to a patient in a different study.'])
+    expect(image_series.errors[:patient]).to eq(['An image series cannot be reassigned to a patient in a different study.'])
   end
 
   it 'does not allow setting visit for another patient' do
@@ -186,7 +186,7 @@ RSpec.describe ImageSeries do
     image_series.visit = other_visit
 
     expect(image_series.save).to be_falsy
-    expect(image_series.errors.messages).to include(visit: ['The visits patient is different from this image series\' patient'])
+    expect(image_series.errors[:visit]).to eq(['The visits patient is different from this image series\' patient'])
   end
 
   describe 'versioning' do

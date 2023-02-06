@@ -17,6 +17,16 @@ ActiveAdmin.register User do
     end
   end
 
+  permit_params(
+    :username,
+    :name,
+    :email,
+    :password,
+    :password_confirmation,
+    :email_throttling_delay,
+    user_roles_attributes: [:id, :role_id, :scope_object_identifier, :_destroy]
+  )
+
   controller do
     def max_csv_records
       1_000_000

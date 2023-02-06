@@ -3,7 +3,6 @@
 // Stub batch actions initializer so that the scopes buttons are not
 // automatically restyled to fit the original ActiveAdmin layout.
 // Everything is happening in the CSS.
-//= stub active_admin/initializers/batch_actions
 
 //= require jquery.sortable
 //= require reorder_case_list

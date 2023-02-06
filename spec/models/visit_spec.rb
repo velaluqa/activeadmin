@@ -665,7 +665,7 @@ CONFIG
     visit.patient = other_patient
 
     expect(visit.save).to be_falsy
-    expect(visit.errors.messages).to include(patient: ['A visit cannot be reassigned to a patient in a different study.'])
+    expect(visit.errors[:patient]).to eq(['A visit cannot be reassigned to a patient in a different study.'])
   end
 
   describe 'versioning' do

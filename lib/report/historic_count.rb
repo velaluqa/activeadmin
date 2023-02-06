@@ -123,8 +123,9 @@ QUERY
     end
 
     def transform_entry(entry)
+      date = entry['date']
       {
-        x: entry['date'],
+        x: date.is_a?(Time) ? date.iso8601 : date,
         y: entry['max'].to_i
       }
     end

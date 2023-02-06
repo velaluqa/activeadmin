@@ -5,7 +5,7 @@ Rails.application.configure do
   config.cache_classes = true
 
   # Eager load code on boot. This eager loads most of Rails and
-  # your application in memory, allowing both thread web servers
+  # your application in memory, allowing both threaded web servers
   # and those relying on copy on write to perform better.
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
@@ -26,7 +26,6 @@ Rails.application.configure do
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
 
   # Compress JavaScripts and CSS.
-  # config.assets.js_compressor = :uglifier
   config.assets.css_compressor = :sass
 
   # Fallback to assets pipeline if a precompiled asset is missed.
@@ -42,10 +41,10 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
-  # Store uploaded files on the local file system (see config/storage.yml for options)
+  # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
-  # Mount Action Cable outside main process or domain
+  # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
   # config.action_cable.url = 'wss://example.com/cable'
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
@@ -53,7 +52,6 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 
-  # See everything in the log (default is :info)
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
   config.log_level = :debug
@@ -64,9 +62,9 @@ Rails.application.configure do
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
 
-  # Use a real queuing backend for Active Job (and separate queues per environment)
+  # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque
-  # config.active_job.queue_name_prefix = "study_server_#{Rails.env}"
+  # config.active_job.queue_name_prefix = "study_server_production"
 
   config.action_mailer.perform_caching = false
 
@@ -75,7 +73,7 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
-  # the I18n.default_locale when a translation can not be found).
+  # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
 
   # Send deprecation notices to registered listeners.
@@ -152,4 +150,5 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
 end

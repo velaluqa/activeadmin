@@ -46,7 +46,9 @@ class FormAnswer < ApplicationRecord
   before_create :set_sequence_number_for_session
 
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       form_definition_id: ->(form_answer) { form_answer.form_definition.id },
       form_answer_id: ->(form_answer) { form_answer.id },

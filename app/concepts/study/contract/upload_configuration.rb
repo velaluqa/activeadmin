@@ -65,7 +65,7 @@ module Study::Contract
       return if parsed_config.blank?
       return if deleted_visit_types.empty?
 
-      errors.add(:force, "removed visit types will be deleted from all visits:<br> #{deleted_visit_types.join(', <br>')}")
+      errors.add(:force, "removed visit types will be deleted from all visits: #{deleted_visit_types.join(', <br>')}")
     end
 
     def affected_required_series
@@ -73,7 +73,7 @@ module Study::Contract
       return if parsed_config.blank?
       return if deleted_required_series.empty?
 
-      errors.add(:force, "removed required series will be deleted from all visits:<br> #{deleted_required_series.join(', <br>')}")
+      errors.add(:force, "removed required series will be deleted from all visits: #{deleted_required_series.join(', <br>')}")
     end
 
     def old_visit_types

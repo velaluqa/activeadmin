@@ -60,7 +60,11 @@ class User < ApplicationRecord
     :updated_at
   ]
 
-  has_paper_trail class_name: 'Version'
+  has_paper_trail(
+    versions: {
+      class_name: 'Version'
+    }
+  )
 
   devise(
     :database_authenticatable,
@@ -73,18 +77,6 @@ class User < ApplicationRecord
   )
 
   acts_as_taggable
-
-  attr_accessible(
-    :username,
-    :name,
-    :email,
-    :password,
-    :password_confirmation,
-    :remember_me,
-    :public_key,
-    :private_key,
-    :password_changed_at
-  )
 
   # Fake attributes for form fields and validation
   attr_accessible :signature_password, :signature_password_confirmation

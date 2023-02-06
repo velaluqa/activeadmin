@@ -2,7 +2,7 @@ ActiveAdmin.register_page 'Dashboard' do
   menu(priority: 0, parent: 'immediate')
 
   content title: proc { I18n.t('active_admin.dashboard') } do
-    render file: 'admin/dashboard/index'
+    render template: 'admin/dashboard/index'
   end
 
   controller do

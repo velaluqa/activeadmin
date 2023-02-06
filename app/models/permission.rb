@@ -23,7 +23,11 @@
 #     * **`subject`**
 #
 class Permission < ApplicationRecord
-  has_paper_trail class_name: 'Version'
+  has_paper_trail(
+    versions: {
+      class_name: 'Version'
+    }
+  )
 
   ABILITY_REGEX = /^(.+)_(#{Ability::ACTIVITIES.keys.map { |subject| subject.to_s.underscore }.join('|')})$/
 
@@ -98,10 +102,10 @@ class Permission < ApplicationRecord
   end
 
   def self.classify_audit_trail_event(c)
-    if c.empty?
-      :revoked
-    else
+    if c.transform_values(&:second).values.any?
       :granted
+    else
+      :revoked
     end
   end
 

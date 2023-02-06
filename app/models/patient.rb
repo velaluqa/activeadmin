@@ -26,22 +26,15 @@ class Patient < ApplicationRecord
   include DominoDocument
 
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       study_id: ->(patient) { patient.study.andand.id }
     }
   )
-  acts_as_taggable
 
-  attr_accessible(
-    :center,
-    :subject_id,
-    :domino_unid,
-    :center_id,
-    :data,
-    :export_history,
-    :visit_template
-  )
+  acts_as_taggable
 
   belongs_to :center
   has_many :visits, dependent: :destroy
@@ -247,7 +240,7 @@ JOIN
     old_center = Center.find(center_id_was)
     return unless old_center.study != center.study
 
-    errors[:center] << 'A patient cannot be reassigned to a center in a different study.'
+    errors.add(:center, 'A patient cannot be reassigned to a center in a different study.')
     throw :abort
   end
 

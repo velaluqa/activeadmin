@@ -27,7 +27,7 @@ module Migration
       def migrated_configs(study_id)
         @migrated_configs ||=
           begin
-            if File.exists?('study_config_migration.yml')
+            if File.exist?('study_config_migration.yml')
               JSON.parse(File.read('study_config_migration.yml'))
             else
               {}
@@ -269,7 +269,6 @@ module Migration
             },
             whodunnit: whodunnit,
             created_at: time.to_datetime,
-            updated_at: time.to_datetime,
             study_id: study_id
           )
         end
@@ -336,7 +335,6 @@ module Migration
             },
             whodunnit: version.whodunnit,
             created_at: version.created_at,
-            updated_at: version.created_at,
             study_id: version.study_id
           )
         end
@@ -361,7 +359,6 @@ module Migration
           object: JSON.parse(required_series.to_json),
           object_changes: nil,
           created_at: destroyed_at,
-          updated_at: destroyed_at,
           study_id: study_id,
           whodunnit: whodunnit
         )
@@ -402,7 +399,7 @@ module Migration
         return if required_series.nil?
         attributes = changes.transform_values { |_, new| new }
         puts "--- Updating existing required series"
-        required_series.update_attributes(attributes)
+        required_series.update(attributes)
         required_series.save!
         puts "--- Updating done"
       end

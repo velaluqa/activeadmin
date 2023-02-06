@@ -1,5 +1,6 @@
 require 'report/historic_count'
 
+
 describe Report::HistoricCount do
   describe 'grouped by `state`' do
     let!(:study) { create(:study) }
@@ -244,11 +245,11 @@ describe Report::HistoricCount do
               {
                 label: 'total',
                 data: [
-                  { x: '2016-12-31 12:00:00', y: 1 },
-                  { x: '2017-01-03 14:00:00', y: 2 },
-                  { x: '2017-01-08 11:00:00', y: 3 },
-                  { x: '2017-01-08 14:00:00', y: 4 },
-                  { x: '2017-01-11 13:00:00', y: 5 }
+                  { x: '2016-12-31T12:00:00Z', y: 1 },
+                  { x: '2017-01-03T14:00:00Z', y: 2 },
+                  { x: '2017-01-08T11:00:00Z', y: 3 },
+                  { x: '2017-01-08T14:00:00Z', y: 4 },
+                  { x: '2017-01-11T13:00:00Z', y: 5 }
                 ]
               }
             ]

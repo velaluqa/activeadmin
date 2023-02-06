@@ -5,26 +5,19 @@ end
 
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2.6'
+ruby "3.2.0"
+
+gem 'rails', '~> 7.0.0' # >= 7.0.0, < 7.1.0
 gem 'bootsnap'
 
 # XML serialization was removed from rails 5 and extracted into its
 # own gem.
 gem "activemodel-serializers-xml"
 
-# With Rails 4.0 some gems were extracted into separate gems, which
-# need to be installed separately. Some gems are deprecated and we
-# should make sure to remove the dependency within our app.
-# TODO: Remove protected attributes in favor of strong parameters
-gem 'protected_attributes_continued'
-
 gem 'draper'
 
 gem 'pg'
 gem 'sqlite3'
-
-gem 'mongoid', '~> 6.0'
-gem 'mongoid-history', '~> 0.5.0'
 
 gem 'json'
 
@@ -33,15 +26,14 @@ gem 'json'
 gem 'haml'
 
 # Liquid Templating Engine for User generated Templates
-gem 'liquid'
-gem 'liquid-rails', '~> 0.2.0'
+gem 'liquid', '~> 5.0.0'
+gem 'liquid-rails', github: 'velaluqa/liquid-rails', branch: 'master'
 
 # Gems used for assets
 gem 'coffee-rails'
 gem 'sass-rails'
 
 gem 'haml-rails'
-gem 'less-rails'
 
 gem 'bootstrap-datepicker-rails'
 gem 'bootstrap-sass'
@@ -53,8 +45,9 @@ gem 'uglifier'
 # we need these even in production, for server-side judgement functions
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 gem 'execjs'
-gem 'libv8', '~> 3.16.14'
-gem 'therubyracer', '0.12.3', platforms: :ruby
+
+gem 'libv8-node', '~> 16.10.0.0'
+gem 'mini_racer'
 
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
@@ -79,10 +72,12 @@ gem 'devise'
 gem 'devise-token_authenticatable'
 
 # audit trail
-gem 'paper_trail', '~> 9.0'
+gem 'paper_trail'
 
 # ActiveAdmin
-gem 'activeadmin'
+gem 'activeadmin', '~> 2.12.0'
+
+gem 'kaminari', '~> 1.2.0'
 
 # CodeRay for rendering yaml/json data
 gem 'coderay'
@@ -93,7 +88,7 @@ gem 'textpow', github: 'velaluqa/textpow', branch: 'master'
 gem 'ultraviolet'
 
 # Rugged for Git-based config versioning
-gem 'rugged'
+gem 'rugged', '~> 1.5', '>= 1.5.1'
 
 # Airbrake Exception notifier
 gem 'airbrake'
@@ -136,7 +131,7 @@ gem 'marcel', '1.0.2'
 gem 'rubyzip'
 
 # Resource tagging in ERICA Remote
-gem 'acts-as-taggable-on', '~> 6.0.0'
+gem 'acts-as-taggable-on', '~> 9.0.0'
 
 gem 'ruby-progressbar'
 
@@ -144,10 +139,6 @@ gem 'andand'
 
 # Facets provides many helpers that are missing from the ruby standard library.
 gem 'facets', require: false
-
-# For the Sidekiq monitoring interface
-gem 'sinatra', require: nil
-gem 'slim'
 
 # FactoryBot is used in production to create seed data.
 gem 'factory_bot_rails'
@@ -157,15 +148,16 @@ gem 'faker'
 gem 'awesome_print'
 
 # Use HAML and CoffeeScript for Backbone.JS SPAs
-gem 'haml_coffee_assets'
+gem 'haml_coffee_assets', '~> 1.21.0'
 gem 'sprockets-rails'
-gem 'sprockets', '~> 3.0'
+gem 'sprockets', '~> 4.2'
 
 # Use webpacker & webpack for all modern assets
 gem 'webpacker', '~> 4.x'
 
 # Validate JSONB columns via JSONschema
 gem 'activerecord_json_validator'
+gem 'json-schema', '~> 2.8.0'
 
 # Enum creation macros for migrations
 gem 'activerecord-postgres_enum'
@@ -188,12 +180,12 @@ group :development do
   # Hint opimization opportunities while developing.
   gem 'bullet'
   # Chrome extension to get meta info for the current request.
-  gem 'meta_request'
+  gem 'meta_request', github: 'velaluqa/rails_panel', branch: 'master'
   # Generate UML diagrams for the database.
   gem 'railroady'
   gem 'rails-erd'
   # Hints missing indexes.
-  gem 'lol_dba'
+  gem 'lol_dba', '~> 2.4.0'
 
   # Gems for prettier errors in development
   gem 'better_errors'
@@ -212,7 +204,7 @@ group :development, :test do
   # Ruby console tool and additional extensions
   gem 'hirb'
   gem 'pry'
-  gem 'pry-byebug'
+  gem 'pry-byebug', '~> 3.9'
   gem 'pry-doc'
   gem 'pry-git'
   gem 'pry-rails'
@@ -249,7 +241,7 @@ group :development, :test do
   gem 'yard-activesupport-concern', require: false
 
   gem 'capybara', '~> 3.36.0'
-  gem 'puma' # for capybara
+  gem 'puma', '~> 5.0' # for capybara
 
   # Lock capybara-screenshot because it's being monkey-patched for the
   # validation report
@@ -269,7 +261,7 @@ group :development, :test do
   gem 'rspec-mocks', '~> 3.10'
   gem 'rspec-rails', '~> 5.1'
   gem 'shoulda-matchers'
-  gem 'with_model'
+  gem 'with_model', '~> 2.1.3'
   # Spec delegation via ActiveSupport's #delegate method.
   gem 'delegate_matcher'
   gem 'timecop'

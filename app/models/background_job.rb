@@ -35,7 +35,11 @@
 #     * **`user_id`**
 #
 class BackgroundJob < ApplicationRecord
-  has_paper_trail(class_name: 'Version')
+  has_paper_trail(
+    versions: {
+      class_name: 'Version'
+    }
+  )
 
   belongs_to :user, optional: true
 
@@ -74,16 +78,18 @@ SELECT
   def broadcast_job_update
     ActionCable.server.broadcast(
       "background_jobs_channel",
-      job_id: id,
-      finished: finished?,
-      updated_at: updated_at,
-      html: ApplicationController.new.render_to_string(
-        template: "admin/background_jobs/_background_job_state",
-        layout: nil,
-        locals: {
-          background_job: self
-        }
-      )
+      {
+        job_id: id,
+        finished: finished?,
+        updated_at: updated_at,
+        html: ApplicationController.new.render_to_string(
+          template: "admin/background_jobs/_background_job_state",
+          layout: nil,
+          locals: {
+            background_job: self
+          }
+        )
+      }
     )
   end
 

@@ -25,14 +25,16 @@ class FormDefinition < ApplicationRecord
   SEQUENCE_SCOPE_VALUES = %w[any user resource form_session form_definition].freeze
 
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       form_definition_id: :id,
       configuration_id: ->(form_definition) {
         form_definition.current_configuration_id
       }
     }
-  )
+  ) 
 
   has_many :form_answers
   belongs_to(

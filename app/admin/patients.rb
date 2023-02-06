@@ -10,6 +10,16 @@ ActiveAdmin.register Patient do
   config.per_page = 100
   config.sort_order = 'centers.code_asc'
 
+  permit_params(
+    :center,
+    :subject_id,
+    :domino_unid,
+    :center_id,
+    :data,
+    :export_history,
+    :visit_template
+  )
+
   controller do
     def max_csv_records
       1_000_000

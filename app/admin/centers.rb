@@ -9,6 +9,14 @@ ActiveAdmin.register Center do
 
   config.sort_order = 'code_asc'
 
+  permit_params(
+    :name,
+    :study,
+    :code,
+    :domino_unid,
+    :study_id
+  )
+
   controller do
     def max_csv_records
       1_000_000

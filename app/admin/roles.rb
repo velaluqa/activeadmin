@@ -11,6 +11,8 @@ ActiveAdmin.register Role do
 
   form partial: 'form'
 
+  permit_params(:title, :abilities)
+
   index do
     selectable_column
     column :title, sortable: :name do |role|

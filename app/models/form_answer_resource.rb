@@ -26,7 +26,9 @@
 
 class FormAnswerResource < ApplicationRecord
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       form_definition_id: ->(resource) { resource.form_answer.form_definition.id },
       form_answer_id: ->(resource) { resource.form_answer.id },

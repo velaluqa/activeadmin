@@ -10,6 +10,23 @@ ActiveAdmin.register Visit do
 
   config.per_page = 100
 
+  permit_params(
+    :patient_id,
+    :visit_number,
+    :description,
+    :visit_type,
+    :state,
+    :domino_unid,
+    :patient,
+    :assigned_image_series_index,
+    :required_series,
+    :mqc_date,
+    :mqc_user_id,
+    :mqc_state,
+    :mqc_user,
+    :mqc_results
+  )
+
   controller do
     skip_load_and_authorize_resource(
       only: [
@@ -651,7 +668,7 @@ ActiveAdmin.register Visit do
              .gsub(/\A_/, '')
              .downcase
     send_data(
-      render_to_string('admin/shared/viewer_weasis.jnpl', :layout => false),
+      render_to_string('admin/shared/viewer_weasis', formats: [:xml], :layout => false),
       type: 'application/x-java-jnlp-file',
       filename: "required_series_visit_#{name}.jnlp",
       disposition: 'attachment'

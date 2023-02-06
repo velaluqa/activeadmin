@@ -26,20 +26,14 @@ class Center < ApplicationRecord
   include DominoDocument
 
   has_paper_trail(
-    class_name: 'Version',
+    versions: {
+      class_name: 'Version'
+    },
     meta: {
       study_id: ->(center) { center.study.andand.id }
     }
   )
   acts_as_taggable
-
-  attr_accessible(
-    :name,
-    :study,
-    :code,
-    :domino_unid,
-    :study_id
-  )
 
   belongs_to :study
   has_many :patients

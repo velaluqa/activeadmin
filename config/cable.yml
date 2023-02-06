@@ -1,6 +1,7 @@
 default: &default
   adapter: redis
   url: redis://<%= ENV["REDIS_URL"] || "redis" %>:6379/1
+  channel_prefix: study_server_production
 
 development:
   <<: *default

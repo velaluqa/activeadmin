@@ -17,9 +17,11 @@
 # **`updated_at`**  | `datetime`         |
 #
 class Role < ApplicationRecord
-  has_paper_trail class_name: 'Version'
-
-  attr_accessible(:title, :abilities)
+  has_paper_trail(
+    versions: {
+      class_name: 'Version'
+    }
+  )
 
   has_many :user_roles
   has_many :users, through: :user_roles

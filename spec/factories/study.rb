@@ -35,7 +35,7 @@ FactoryBot.define do
           file.close
         end
 
-        result = Study::UploadConfiguration.(
+        result = Study::Operation::UploadConfiguration.(
           params: {
             id: study.id,
             'study_contract_upload_configuration' => {

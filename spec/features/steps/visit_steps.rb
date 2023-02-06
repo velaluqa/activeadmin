@@ -21,7 +21,7 @@ step 'a visit :string with:' do |visit_number, table|
 
   visit = create(:visit, options)
   visit.tag_list = tag_list if tag_list
-  visit.save
+  visit.save!
 end
 
 step 'a visit with:' do |table|

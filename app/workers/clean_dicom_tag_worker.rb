@@ -10,7 +10,7 @@ class CleanDicomTagWorker
     FileUtils.mkdir_p(ERICA.backup_path.join("images", date).to_s)
 
     backup_file_path = ERICA.backup_path.join("images", date, "#{image.id}.#{count}").to_s
-    while File.exists?(backup_file_path)
+    while File.exist?(backup_file_path)
       count += 1
       backup_file_path = ERICA.backup_path.join("images", date, "#{image.id}.#{count}").to_s
     end
