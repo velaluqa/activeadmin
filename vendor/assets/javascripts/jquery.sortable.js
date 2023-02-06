@@ -128,7 +128,7 @@ $(document).ready(function () {
     });
   });
   $("#filter_toggle").click(function () {
-    $("#filters_sidebar_section,#search-status-_sidebar_section").toggle();
+    $("#filters_sidebar_section,#search_status_sidebar_section").toggle();
     $("#filter_toggle").text(function (i, text) {
       return text.replace(/(Close|View)/, function (match) {
         return match === "Close" ? "View" : "Close";
