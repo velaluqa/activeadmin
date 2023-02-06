@@ -4,7 +4,7 @@ FactoryBot.define do
       with_user_roles { [] }
     end
 
-    email { Faker::Internet.email }
+    sequence(:email) { |n| "user#{n}@test.de" }
     name { Faker::Name.name }
     username do |u|
       Faker::Internet.user_name(
