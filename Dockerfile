@@ -35,18 +35,12 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
     && npm install -g yarn
 RUN gem install bundler -N -v '2.4.5'
 
-RUN mkdir -p /dicom3tools_install && \
-    cd /dicom3tools_install && \
-    wget https://www.dclunie.com/dicom3tools/workinprogress/dicom3tools_1.00.snapshot.20220618093127.tar.bz2 && \
-    tar xvjf dicom3tools_1.00.snapshot.20220618093127.tar.bz2 && \
-    cd /dicom3tools_install/dicom3tools_1.00.snapshot.20220618093127 && \
-    ./Configure && \
-    imake -I./config && \
-    make World && \
-    make install && \
-    make clean && \
+RUN mkdir -p /dicom3tools && \
+    cd /dicom3tools && \
+    wget -O dicom3tools.tar.gz https://github.com/velaluqa/docker-dependencies/raw/master/dicom3tools-1.00.snapshot.20220618093127-buster.tar.gz && \
+    tar xvf dicom3tools.tar.gz -C / && \
     cd / && \
-    rm -rf /dicom3tools_install
+    rm -rf /dicom3tools
 
 # Set the locale
 RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && \
