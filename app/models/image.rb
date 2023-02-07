@@ -313,6 +313,14 @@ JOIN
     "#{image_series.name}##{row_number}"
   end
 
+  class << self
+    def sha256sum(path)
+      File.open(path, 'rb') do |file|
+        Digest::SHA256.hexdigest(file.read)
+      end
+    end
+  end
+
   protected
 
   def dicom_metadata_xml

@@ -41,8 +41,10 @@ FactoryBot.define do
     scope_object { nil }
 
     before(:create) do |user_role, evaluator|
-      user_role.role =
-        create(:role, with_permissions: evaluator.with_permissions)
+      unless user_role.role
+        user_role.role =
+          create(:role, with_permissions: evaluator.with_permissions)
+      end
     end
   end
 end

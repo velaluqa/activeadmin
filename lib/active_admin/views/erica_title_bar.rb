@@ -27,12 +27,17 @@ module ActiveAdmin
       def build_titlebar_right
         div id: 'titlebar_right' do
           build_action_items
-          #This feels illegal I would like to know how to do this better
-          if  params[:controller] == 'admin/studies' || params[:controller] == 'admin/centers' || params[:controller] == 'admin/patients' || params[:controller] == 'admin/image_series' || params[:controller] == 'admin/visits' || params[:controller] == 'admin/users'
-            add_filter_toggle_button
-            add_cart_toggle_button
-          end
+
+          add_filter_toggle_button if has_sidebar_section?("filters")
+          add_cart_toggle_button if has_sidebar_section?("viewer_cart")
         end
+      end
+
+      def has_sidebar_section?(name)
+        active_admin_config
+          .sidebar_sections_for(controller.action_name, self)
+          .map(&:name)
+          .include?(name)
       end
 
       def build_breadcrumb(separator = '/')
@@ -70,9 +75,9 @@ module ActiveAdmin
       def add_cart_toggle_button
         span class: "action_item cart" do
           if session[:viewer_cart].present?
-            a "View Cart (#{session[:viewer_cart].length})", id: 'cart_toggle',href: "#"
+            a "View Cart (#{session[:viewer_cart].length})", href: "#", id: 'cart_toggle'
           else
-            a "View Cart", id: 'cart_toggle',href: "#"
+            a "View Cart", href: "#" , id: 'cart_toggle'
           end
         end
       end

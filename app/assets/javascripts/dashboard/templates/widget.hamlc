@@ -1,5 +1,6 @@
-.buttons
-  %i.fa.fa-edit
-  %i.fa.fa-trash-o
-%h3
+.header
+  .buttons
+    %i.fa.fa-edit
+    %i.fa.fa-trash
+  %h3
 .content

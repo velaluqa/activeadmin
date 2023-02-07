@@ -18,6 +18,14 @@ describe RecordSearch do
     end
   end
 
+  describe '::find_record' do
+    let!(:comment) { create(:active_admin_comment) }
+
+    it 'finds `ActiveAdminComment`' do
+      expect(RecordSearch.find_record("Comment_#{comment.id}")).to eq comment
+    end
+  end
+
   describe '#results' do
     let!(:study1) { create(:study, :locked, name: 'TestStudy1', configuration: <<CONFIG.strip_heredoc ) }
       image_series_properties: []

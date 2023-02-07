@@ -35,7 +35,7 @@ ActiveAdmin.register FormSession do
     panel "Tasks & Form Data" do
       table_for FormAnswerDecorator.decorate_collection(session.form_answers.order(sequence_number: :asc)) do
         column "#", :sequence_number
-        column "Form", :form_definition
+        column "Form", :object
         column :resources
         column :status
         column "User", :user, sortable: "users.name"

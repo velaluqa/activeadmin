@@ -3,6 +3,10 @@ class ImageSeriesDecorator < ApplicationDecorator
 
   delegate_all
 
+  def name
+    link_to(object.name, admin_image_series_path(object))
+  end
+
   def state
    if model.state_sym == :importing
     status_tag('Importing', class: 'note')
@@ -35,7 +39,6 @@ class ImageSeriesDecorator < ApplicationDecorator
   def view_in
     result = ''
 
-    result += link_to('Viewer', viewer_admin_image_series_path(model, :format => 'jnlp'), :class => 'member_link')
     result += link_to('Metadata', dicom_metadata_admin_image_series_path(model), :class => 'member_link', :target => '_blank') if model.has_dicom? && can?(:read_dicom_metadata, model)
     result += link_to('Domino', model.lotus_notes_url, :class => 'member_link') unless(model.domino_unid.nil? or model.lotus_notes_url.nil? or Rails.application.config.is_erica_remote)
     if can?(:assign_visit, model)
@@ -46,10 +49,6 @@ class ImageSeriesDecorator < ApplicationDecorator
     end
 
     result.html_safe
-  end
-
-  def viewer
-    link_to('View in Viewer', weasis_viewer_admin_image_series_path(model, :format => 'jnlp'))
   end
 
   def import_date

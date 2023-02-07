@@ -231,7 +231,6 @@ ActiveAdmin.register ImageSeries do
               end
             end
           end
-          row :viewer
         end
 
         properties_version = image_series.properties_version || image_series.study.andand.locked_version

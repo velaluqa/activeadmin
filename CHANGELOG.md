@@ -1,6 +1,25 @@
 # CHANGELOG
 
-## Unreleased
+## Unrelease
+
+## 7.3.1
+
+### Patches / Fixes
+
+- Fix - (#6101) Fix Dashboard Widget Display Issues
+- Fix - (#6102) Fix Simulating recipients for notification profiles for Active
+  Admin comments
+- Fix - (#6103) Fix opening forms dashboard if the user has invalid forms
+  assigned (only show valid forms on dashboard)
+- Fix - (#6104) Fix migration of versions `item_name` column
+- Fix - (#6105) Remove WEASIS `Viewer` link in image series resource views
+- Fix - (#6106) Form Session View - Fix link to form answers in form session
+  form answers table
+- Fix - (#6107) Fix link to image series in image series name column
+- Fix - (#6108) Fix setting file type for split multi-frame files
+- Fix - (#6109) Fix display condition of filter/cart buttons
+
+## 7.3.0
 
 ### Minor Changes
 

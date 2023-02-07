@@ -64,6 +64,14 @@ module Migration
         foreign_key: :visit_id
       }
     ],
+    "UserRole" => [
+      {
+        type: "Role",
+        getter: :role,
+        setter: :role=,
+        foreign_key: :role_id
+      }
+    ],
     "Permission" => [
       {
         type: "Role",

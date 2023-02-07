@@ -1,7 +1,9 @@
 @-webkit-keyframes sk-scaleout {
-  0% { -webkit-transform: scale(0) translate(-20px, -20px); }
+  0% {
+    -webkit-transform: scale(0) translate(-20px, -20px);
+  }
   100% {
-    -webkit-transform: scale(1.0) translate(-20px, -20px);
+    -webkit-transform: scale(1) translate(-20px, -20px);
     opacity: 0;
   }
 }
@@ -10,20 +12,27 @@
   0% {
     -webkit-transform: scale(0) translate(-20px, -20px);
     transform: scale(0) translate(-20px, -20px);
-  } 100% {
-    -webkit-transform: scale(1.0) translate(-20px, -20px);
-    transform: scale(1.0) translate(-20px, -20px);
+  }
+  100% {
+    -webkit-transform: scale(1) translate(-20px, -20px);
+    transform: scale(1) translate(-20px, -20px);
     opacity: 0;
   }
 }
 
 #dashboard-container .widget {
+  overflow-x: auto;
   padding: 10px;
   background-color: $panel-bg;
   border: 1px solid transparent;
   border-radius: $panel-border-radius;
-  @include box-shadow(0 1px 1px rgba(0,0,0,.05));
-  @include panel-variant($panel-default-border, $panel-default-text, $panel-default-heading-bg, $panel-default-border);
+  @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+  @include panel-variant(
+    $panel-default-border,
+    $panel-default-text,
+    $panel-default-heading-bg,
+    $panel-default-border
+  );
   h3 {
     border-bottom: 1px solid transparent;
     @include border-top-radius(($panel-border-radius - 1));
@@ -46,7 +55,7 @@
     padding: 0;
     margin: 0;
 
-    &> li {
+    & > li {
       list-style-type: none;
       outline: none;
       position: relative;
@@ -55,236 +64,191 @@
       padding-right: 17.5px;
 
       &.sortable-row-placeholder {
-	height: 200px;
+        height: 200px;
       }
 
       div.row {
-	position: relative;
-	margin-left: -25px;
-	margin-right: -25px;
+        position: relative;
+        margin-left: -25px;
+        margin-right: -25px;
+        min-height: 200px;
 
-	ul.row {
-	  margin-bottom: 0;
-	  padding: 0;
-	  margin: 0;
-	}
+        ul.row {
+          margin-bottom: 0;
+          padding: 0;
+          margin: 0;
+          display: flex;
+        }
 
-	button.add-widget {
-	  position: absolute;
-	  right: -8px;
-	  top: 48%;
-	  transform: translateY(-50%);
-	  padding: 0;
-	  text-align: center;
-	  line-height: 30px;
-	  width: 30px;
-	  height: 30px;
-	  display: none;
-	}
+        button.add-widget {
+          position: absolute;
+          right: -8px;
+          top: 48%;
+          transform: translateY(-50%);
+          padding: 0;
+          text-align: center;
+          line-height: 30px;
+          width: 30px;
+          height: 30px;
+          display: none;
+        }
 
-	.row-sortable-handle {
-	  position: absolute;
-	  cursor: pointer;
-	  left: -8px;
-	  top: 48%;
-	  transform: translateY(-50%);
-	  width: 15px;
-	  height: 60px;
-	  opacity: 0.8;
-	  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkYGDwAeItQAwGjDAGTAImMBMokI6uAsSfCQB7SwOeZMuRYgAAAABJRU5ErkJggg==) repeat;
-	  display: none;
-	}
+        .row-sortable-handle {
+          position: absolute;
+          cursor: pointer;
+          left: -8px;
+          top: 48%;
+          transform: translateY(-50%);
+          width: 15px;
+          height: 60px;
+          opacity: 0.8;
+          background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkYGDwAeItQAwGjDAGTAImMBMokI6uAsSfCQB7SwOeZMuRYgAAAABJRU5ErkJggg==)
+            repeat;
+          display: none;
+        }
 
-	&.empty {
-	  position: relative;
-	  padding: 0 7.5px;
-	  margin-bottom: 15px;
-	  display: none;
-	  &:after {
-	    content: 'Move widgets here. Empty rows will be removed when saving dashboard.';
-	    display: block;
-	    position: absolute;
-	    top: 50%;
-	    left: 50%;
-	    transform: translate(-50%,-50%);
-	    color: #b0b0b0;
-	  }
+        &.empty {
+          position: relative;
+          padding: 0 7.5px;
+          margin-bottom: 15px;
+          display: none;
+          &:after {
+            content: "Move widgets here. Empty rows will be removed when saving dashboard.";
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #b0b0b0;
+          }
 
-	  ul.row {
-	    position: relative;
-	    width: 100%;
-	    padding-bottom: 10%;
-	    border: 1px dashed rgba(0,0,0,0.2);
-	  }
-	}
+          ul.row {
+            position: relative;
+            width: 100%;
+            padding-bottom: 10%;
+            border: 1px dashed rgba(0, 0, 0, 0.2);
+          }
+        }
 
-	li {
-	  list-style-type: none;
-	  outline: none;
-	  float: left;
-	  position: relative;
-	  min-height: 1px;
-	  padding-left: 7.5px;
-	  padding-right: 7.5px;
-	  margin-bottom: 15px;
+        li {
+          width: 100%;
+          list-style-type: none;
+          outline: none;
+          float: left;
+          position: relative;
+          min-height: 1px;
+          padding-left: 7.5px;
+          padding-right: 7.5px;
+          margin-bottom: 15px;
 
-	  &.ui-sortable-handle {
-	    cursor: pointer;
-	  }
+          &.ui-sortable-handle {
+            cursor: pointer;
+          }
 
-	  .widget {
-	    position: relative;
-	    width: 100%;
+          .widget {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow-x: auto;
+            .buttons i.fa-trash,
+            .buttons i.fa-edit {
+              display: none;
+            }
+          }
 
-	    .buttons i.fa-trash-o,
-	    .buttons i.fa-edit {
-	      display: none;
-	    }
-	  }
+          &.sortable-placeholder {
+            // Override jquery.sortable placeholder defaults:
+            border: 0 !important;
+            background: transparent !important;
 
-	  .widget,
-	  &.sortable-placeholder:after {
-	    min-height: 240px;
-	  }
+            &:after {
+              content: " ";
+              border: 0;
+              background: rgba(0, 0, 0, 0.05);
+              border-radius: 4px;
+              position: relative;
+              width: 100%;
+              display: block;
+              box-sizing: border-box;
+            }
+          }
+        }
 
-	  &.sortable-placeholder {
-	    // Override jquery.sortable placeholder defaults:
-	    border: 0 !important;
-	    background: transparent !important;
+        &.size-6 {
+          li {
+            width: 16.6666666666%;
 
-	    &:after {
-	      content: ' ';
-	      border: 0;
-	      background: rgba(0,0,0,0.05);
-	      border-radius: 4px;
-	      position: relative;
-	      width: 100%;
-	      display: block;
-	      box-sizing: border-box;
-	    }
-	  }
-	}
+            @media (max-width: 1400px) {
+              width: 33.333333333333%;
+            }
+            @media (max-width: 991px) {
+              width: 50%;
+            }
+            @media (max-width: 767px) {
+              width: 100%;
+            }
+          }
+        }
 
-	&.size-6 {
-	  li {
-	    width: 16.6666666666%;
+        &.size-5 {
+          li {
+            width: 20%;
+            .widget,
+            &.sortable-placeholder:after {
+            }
+            @media (max-width: 1199px) {
+              width: 33.33333333%;
+            }
+            @media (max-width: 991px) {
+              width: 33.3333333333%;
+            }
+            @media (max-width: 767px) {
+              width: 100%;
+            }
+          }
+        }
 
-	    .widget,
-	    &.sortable-placeholder:after {
-	      padding-bottom: 55%;
-	    }
+        &.size-4 {
+          li {
+            width: 25%;
 
-	    @media (max-width: 1400px) {
-	      width: 33.333333333333%;
-	    }
-	    @media (max-width: 991px) {
-	      width: 50%;
-	    }
-	    @media (max-width: 767px) {
-	      width: 100%;
-	    }
-	  }
-	}
+            .widget,
+            &.sortable-placeholder:after {
+            }
+            @media (max-width: 991px) {
+              width: 50%;
+            }
+            @media (max-width: 767px) {
+              width: 100%;
+            }
+          }
+        }
 
-	&.size-5 {
-	  li {
-	    width: 20%;
+        &.size-3 {
+          li {
+            width: 33.333333333333%;
+            @media (max-width: 1199px) {
+              width: 33.33333333%;
+            }
+            @media (max-width: 991px) {
+              width: 50%;
+            }
+            @media (max-width: 767px) {
+              width: 100%;
+            }
+          }
+        }
 
-	    .widget,
-	    &.sortable-placeholder:after {
-	      padding-bottom: 65%;
-	    }
-
-	    @media (max-width: 1199px) {
-	      width: 33.33333333%;
-	    }
-	    @media (max-width: 991px) {
-	      width: 33.3333333333%;
-	    }
-	    @media (max-width: 767px) {
-	      width: 100%;
-	    }
-	  }
-	}
-
-	&.size-4 {
-	  li {
-	    width: 25%;
-
-	    .widget,
-	    &.sortable-placeholder:after {
-	      padding-bottom: 55%;
-	    }
-
-	    // @media (max-width: 1199) {
-	    //   width: 33.33333333%;
-	    // }
-	    @media (max-width: 991px) {
-	      width: 50%;
-	    }
-	    @media (max-width: 767px) {
-	      width: 100%;
-	    }
-	  }
-	}
-
-	&.size-3 {
-	  li {
-	    width: 33.333333333333%;
-
-	    .widget,
-	    &.sortable-placeholder:after {
-	      padding-bottom: 50%;
-	      @media (max-width: 991px) {
-		padding-bottom: 40%;
-	      }
-	      @media (max-width: 767px) {
-		padding-bottom: 45%;
-	      }
-	      @media (max-width: 450px) {
-		padding-bottom: 55%;
-	      }
-	    }
-
-	    @media (max-width: 1199px) {
-	      width: 33.33333333%;
-	    }
-	    @media (max-width: 991px) {
-	      width: 50%;
-	    }
-	    @media (max-width: 767px) {
-	      width: 100%;
-	    }
-	  }
-	}
-
-	&.size-2 {
-	  li {
-	    width: 50%;
-
-	    .widget,
-	    &.sortable-placeholder:after {
-	      padding-bottom: 38%;
-
-	      @media (max-width: 1400px) {
-		padding-bottom: 40%;
-	      }
-	      @media (max-width: 991px) {
-		padding-bottom: 40%;
-	      }
-	      @media (max-width: 767px) {
-		padding-bottom: 50%;
-	      }
-	      @media (max-width: 450px) {
-		padding-bottom: 55%;
-	      }
-	    }
-
-	    @media (max-width: 767px) {
-	      width: 100%;
-	    }
-	  }
-	}
+        &.size-2 {
+          li {
+            width: 50%;
+            @media (max-width: 767px) {
+              width: 100%;
+            }
+          }
+        }
       }
     }
   }
@@ -294,9 +258,9 @@
 
     .empty-widget-notice {
       &:before {
-	content: ' ';
-	display: block;
-	height: 45%;
+        content: " ";
+        display: block;
+        height: 45%;
       }
 
       height: 100%;
@@ -305,114 +269,120 @@
     }
 
     .content {
-      top: 35px;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      flex: 1 1 0%;
       padding: 0;
-
-      transition: opacity ease-in .5s;
+      transition: opacity ease-in 0.5s;
+      min-height: 200px;
 
       &.table {
-	  margin-bottom: 0;
+        margin-bottom: 0;
 
-	&::-webkit-scrollbar {
-	  width: 4px;  /* for vertical scrollbars */
-	  height: 4px; /* for horizontal scrollbars */
-	}
+        &::-webkit-scrollbar {
+          width: 4px; /* for vertical scrollbars */
+          height: 4px; /* for horizontal scrollbars */
+        }
 
-	&::-webkit-scrollbar-track {
-	  background: rgba($wet-asphalt,0.1);
-	}
+        &::-webkit-scrollbar-track {
+          background: rgba($wet-asphalt, 0.1);
+        }
 
-	&::-webkit-scrollbar-thumb {
-	  background: rgba($wet-asphalt,0.5);
-	}
+        &::-webkit-scrollbar-thumb {
+          background: rgba($wet-asphalt, 0.5);
+        }
 
-	.empty.note {
-	  text-align: center;
-	}
+        .empty.note {
+          text-align: center;
+        }
       }
 
       &.graph {
-	overflow: hidden;
+        overflow: hidden;
       }
 
       table {
-	&.values {
-	  width: 50%;
-	  height: 50%;
-	  margin: auto auto;
+        &.values {
+          width: 50%;
+          height: 50%;
+          margin: auto auto;
           font-size: 2em;
 
-	  td {
-	    padding: 0;
-	  }
-	}
-	&.trend {
-	  font-size: 1em;
-	  width: 100%;
-	  height: initial;
+          td {
+            padding: 0;
+          }
+        }
+        &.trend {
+          font-size: 1em;
+          width: 100%;
+          height: initial;
 
-	  td {
-	    &.dec, &.rem, &.inc {
-	      &:before {
-		font: normal normal normal 14px/1 FontAwesome;
-		margin-right: 5px;
-	      }
-	    }
-	    &.dec {
-	      &:before {
-		content: "\f0dd";
-		color: #933;
-	      }
-	    }
-	    &.rem {
-	      &:before {
-		content: "\f0dc";
-		color: #ddd;
-	      }
-	    }
-	    &.inc {
-	      &:before {
-		content: "\f0de";
-		color: #393;
-	      }
-	    }
-	  }
-	}
+          td {
+            &.dec,
+            &.rem,
+            &.inc {
+              &:before {
+                font: normal normal normal 14px/1 FontAwesome;
+                margin-right: 5px;
+              }
+            }
+            &.dec {
+              &:before {
+                content: "\f0dd";
+                color: #933;
+              }
+            }
+            &.rem {
+              &:before {
+                content: "\f0dc";
+                color: #ddd;
+              }
+            }
+            &.inc {
+              &:before {
+                content: "\f0de";
+                color: #393;
+              }
+            }
+          }
+        }
 
-	td {
-	  height: 2.2em;
-	  white-space: nowrap;
-	  vertical-align: bottom;
+        td {
+          height: 2.2em;
+          white-space: nowrap;
+          vertical-align: bottom;
 
-	  &:nth-child(1) {
-	    text-align: left;
-	  }
+          &:nth-child(1) {
+            text-align: left;
+          }
 
-	  &:nth-child(2) {
-	    text-align: right;
-	  }
+          &:nth-child(2) {
+            text-align: right;
+          }
 
-	  span.label {
-	    color: rgba(0,0,0,0.4);
-	    text-transform: uppercase;
-	    font-weight: bold;
-	    vertical-align: bottom;
-	    font-size: 12px;
-	    line-height: 0px;
-	  }
+          span.label {
+            color: rgba(0, 0, 0, 0.4);
+            text-transform: uppercase;
+            font-weight: bold;
+            vertical-align: bottom;
+            font-size: 12px;
+            line-height: 0px;
+          }
 
-	  span.value {
-	    font-size: 1.6em;
-	    font-weight: bold;
-	    vertical-align: bottom;
-	    line-height: 0.35em;
-	    text-align: right;
-	  }
-	}
+          span.value {
+            font-size: 1.6em;
+            font-weight: bold;
+            vertical-align: bottom;
+            line-height: 0.35em;
+            text-align: right;
+          }
+        }
       }
+    }
+
+    .header {
+      flex: 0;
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
     }
 
     h3 {
@@ -427,46 +397,43 @@
     }
 
     .buttons {
-      position: absolute;
-      top: 0;
-      right: 0;
       z-index: 1;
 
       i {
-	margin-left: 5px;
-	opacity: 0.3;
-	transition: opacity ease-in-out .25s;
-	cursor: pointer;
-	height: 30px;
-	width: 30px;
-	line-height: 30px;
-	text-align: center;
+        margin-left: 5px;
+        opacity: 0.3;
+        transition: opacity ease-in-out 0.25s;
+        cursor: pointer;
+        height: 30px;
+        width: 30px;
+        line-height: 30px;
+        text-align: center;
 
-	&:hover {
-	  opacity: 1;
-	}
+        &:hover {
+          opacity: 1;
+        }
       }
     }
 
     &.loading {
       &:after {
-	content: ' ';
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	display: block;
-	width: 40px;
-	height: 40px;
-	background-color: #333;
+        content: " ";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        display: block;
+        width: 40px;
+        height: 40px;
+        background-color: #333;
 
-	border-radius: 100%;
-	transform-origin: left top;
-	-webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
-	animation: sk-scaleout 1.0s infinite ease-in-out;
+        border-radius: 100%;
+        transform-origin: left top;
+        -webkit-animation: sk-scaleout 1s infinite ease-in-out;
+        animation: sk-scaleout 1s infinite ease-in-out;
       }
 
       .content {
-	opacity: 0;
+        opacity: 0;
       }
     }
   }
@@ -486,51 +453,63 @@ body.admin_dashboard {
       margin-bottom: 5px;
 
       label {
-	display: inline-block;
-	width: 130px;
+        display: inline-block;
+        width: 130px;
       }
     }
   }
 
-  .action_items {
-    .action_item.edit_dashboard { display: inline-block; }
-    .action_item.save_dashboard { display: none; }
+  .erica_action_items {
+    .action_item.edit_dashboard {
+      display: inline-block;
+    }
+    .action_item.save_dashboard {
+      display: none;
+    }
   }
-  button.add-row { display: none; }
+  button.add-row {
+    display: none;
+  }
 
   &.editing {
-    .action_items {
-      .action_item.edit_dashboard { display: none; }
-      .action_item.save_dashboard { display: inline-block; }
+    .erica_action_items {
+      .action_item.edit_dashboard {
+        display: none;
+      }
+      .action_item.save_dashboard {
+        display: inline-block;
+      }
     }
 
-    button.add-row { display: block; }
+    button.add-row {
+      display: block;
+    }
 
     #dashboard-container {
       ul.rows > li div.row {
-	ul.row {
-	  margin-bottom: 0;
-	  margin: 0;
+        ul.row {
+          margin-bottom: 0;
+          margin: 0;
 
-	  .widget {
-	    .buttons i.fa-trash-o,
-	    .buttons i.fa-edit {
-	      display: inline-block;
-	    }
-	  }
-	}
+          .widget {
+            .buttons i.fa-trash,
+            .buttons i.fa-edit {
+              display: inline-block;
+            }
+          }
+        }
 
-	button.add-widget {
-	  display: block;
-	}
+        button.add-widget {
+          display: block;
+        }
 
-	.row-sortable-handle {
-	  display: block;
-	}
+        .row-sortable-handle {
+          display: block;
+        }
 
-	&.empty {
-	  display: block;
-	}
+        &.empty {
+          display: block;
+        }
       }
     }
   }

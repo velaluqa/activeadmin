@@ -117,7 +117,6 @@
   };
 })(jQuery);
 
-// added the filter modal jquery here but there could be a better lcation for it
 $(document).ready(function () {
   $("#cart_toggle").click(function () {
     $("#viewer_cart_sidebar_section").toggle();
@@ -135,4 +134,16 @@ $(document).ready(function () {
       });
     });
   });
+
+
+ $("#main_content_wrapper").click(function () {
+    $("#viewer_cart_sidebar_section,#filters_sidebar_section,#search-status-_sidebar_section").hide();
+    if ($("#cart_toggle").text() == "Close Cart") {
+      $("#cart_toggle").text("View Cart");
+    }
+    if ($("#filter_toggle").text() == "Close Filters") {
+      $("#filter_toggle").text("View Filters");
+    }
+  });
 });
+
