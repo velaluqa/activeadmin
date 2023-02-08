@@ -37,17 +37,17 @@ ActiveAdmin.register Image do
     selectable_column
     column :image_series
     column :id
-    column 'Type', sortable: "mimetype" do |image|
+    column 'Type', :type ,sortable: "mimetype" do |image|
       status_tag(image.mime_extension)
     end
-    column 'Status' do |image|
+    column 'Status' , :status do |image|
       if image.file_is_present?
         status_tag('Present', class: 'ok')
       else
         status_tag('Missing', class: 'error')
       end
     end
-    column "View" do |image|
+    column "View" ,:view do |image|
       next "" unless image.dicom? && can?(:read_dicom_metadata, image.image_series)
 
       link_to(
@@ -59,6 +59,16 @@ ActiveAdmin.register Image do
     end
     customizable_default_actions(current_ability)
   end
+
+  hideable_columns(
+    columns: [
+      :image_series,
+      :id,
+      :type,
+      :status,
+      :view
+    ]
+  )
 
   show do |image|
     attributes_table do

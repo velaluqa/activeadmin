@@ -113,3 +113,24 @@
     @extend .btn, .btn-sm, .btn-default;
   }
 }
+
+#hideable_columns_sidebar_section {
+  label {
+    font-weight: 100;
+  }
+  .form-group {
+    margin: 0;
+  }
+  input[type="checkbox"] {
+    margin: 0 0 0 5px;
+    vertical-align: middle;
+  }
+  input[type="submit"] {
+    color: #fff;
+    background-color: #c0392b;
+    border: none;
+  }
+  button {
+    border: none;
+  }
+}

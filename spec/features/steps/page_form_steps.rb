@@ -103,7 +103,11 @@ step "I see select :string with options:" do |locator, select_options|
   select_options.to_a.flatten.each do |option|
     expect(page).to have_css("li.select2-results__option", text: option)
   end
-  select2_close unless was_open
+
+  # We need to click the select2 again (which would be open) in 
+  # order to not trigger a click event on `body` as it is done 
+  # by `select2_close`
+  select2_open from: locator unless was_open
 end
 
 step "I see select :string without options:" do |locator, select_options|
@@ -113,7 +117,11 @@ step "I see select :string without options:" do |locator, select_options|
   select_options.to_a.flatten.each do |option|
     expect(page).not_to have_css("li.select2-results__option", text: option)
   end
-  select2_close unless was_open
+
+  # We need to click the select2 again (which would be open) in 
+  # order to not trigger a click event on `body` as it is done 
+  # by `select2_close`
+  select2_open from: locator unless was_open
 end
 
 step "I select :string for :string" do |select_option, label|
@@ -124,7 +132,11 @@ step "I select :string for :string" do |select_option, label|
     select2_open from: label unless was_open
     select2_select(select_option, from: label)
 
-    select2_close unless was_open
+    # We need to click the select2 again (which would be open) in 
+    # order to not trigger a click event on `body` as it is done 
+    # by `select2_close`
+
+    # select2_open from: label unless was_open
   else
     field.set(value)
   end

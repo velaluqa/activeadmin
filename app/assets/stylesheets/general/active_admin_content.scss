@@ -141,8 +141,13 @@ span.label {
 
 #viewer_cart_sidebar_section,
 #filters_sidebar_section,
-#search_status_sidebar_section {
+#search_status_sidebar_section,
+#hideable_columns_sidebar_section {
   display: none;
+}
+
+#hideable_columns_sidebar_section > div > form {
+  display: grid;
 }
 
 #active_admin_content.with_sidebar #main_content_wrapper {
@@ -251,4 +256,17 @@ span.label {
 #q_imaging_date_gteq,
 #q_created_at_gteq_datetime {
   margin-right: 5px;
+}
+
+#sidebar_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#sidebar {
+  z-index: 2;
 }

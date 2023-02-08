@@ -33,6 +33,8 @@
 //= require erica_menu
 //= require_self
 //= require cable
+//= require aa_sidebar_handler
+//= require hideable_columns/hideable_columns
 
 bootbox.setDefaults({ size: "small" });
 $.fn.select2.defaults.set("theme", "bootstrap");

@@ -105,6 +105,14 @@ ActiveAdmin.register Patient do
     customizable_default_actions(current_ability)
   end
 
+  hideable_columns(
+    columns: [
+      :center,
+      :subject_id,
+      :tags
+    ]
+  )
+
   show do |patient|
     attributes_table do
       row :center

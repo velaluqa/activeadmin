@@ -57,6 +57,16 @@ ActiveAdmin.register Study do
     customizable_default_actions(current_ability)
   end
 
+  hideable_columns(
+    columns: [
+      :name,
+      :configuration,
+      :state,
+      :select_for_session,
+      :tags
+    ]
+  )
+
   show do |study|
     attributes_table do
       row :name

@@ -81,6 +81,7 @@
     }
     &.cart a:before { content: "\f07a";}
     &.filter a:before { content: "\f0b0";}
+    &.hideable_column a:before { content: "\f0db"; }
     &.new a:before { content: "\f067"; }
     &.edit a:before { content: "\f304"; }
     &.destroy a:before { content: "\f2ed"; }

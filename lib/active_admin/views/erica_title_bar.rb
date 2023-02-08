@@ -27,9 +27,9 @@ module ActiveAdmin
       def build_titlebar_right
         div id: 'titlebar_right' do
           build_action_items
-
           add_filter_toggle_button if has_sidebar_section?("filters")
           add_cart_toggle_button if has_sidebar_section?("viewer_cart")
+          add_hideable_column_toggle_button if has_sidebar_section?("hideable_columns")
         end
       end
 
@@ -68,17 +68,21 @@ module ActiveAdmin
 
       def add_filter_toggle_button
           span class: "action_item filter" do
-            a "View Filters", href: "#", id: 'filter_toggle'
+            a "View Filters", href: "#", "data-toggle-sidebar-sections" => "filters,search_status"
           end
         end
 
       def add_cart_toggle_button
+        cart_count = session[:viewer_cart].present? ? session[:viewer_cart].length : 0
+        cart_label = cart_count > 0 ? "View Cart (#{cart_count})" : "View Cart"
         span class: "action_item cart" do
-          if session[:viewer_cart].present?
-            a "View Cart (#{session[:viewer_cart].length})", href: "#", id: 'cart_toggle'
-          else
-            a "View Cart", href: "#" , id: 'cart_toggle'
-          end
+          a cart_label, href: "#", "data-toggle-sidebar-sections" => "viewer_cart"
+        end
+      end
+
+      def add_hideable_column_toggle_button
+        span class: "action_item hideable_column" do
+          a "View Columns", href: "#", "data-toggle-sidebar-sections" => "hideable_columns"
         end
       end
     end

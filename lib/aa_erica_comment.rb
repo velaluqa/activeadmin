@@ -1,10 +1,9 @@
 module ActiveAdmin
   module Views
     class IndexAsTable
-      def comment_column(field, label)
+      def comment_column(label, field)
         label ||= resource_class.human_attribute_name(field)
-
-        column label do |resource|
+        column label, field do |resource|
           if resource[field].blank?
             link_to('Add ' + label, url_for(action: :edit_erica_comment_form, id: resource.id, return_url: request.fullpath))
           else
