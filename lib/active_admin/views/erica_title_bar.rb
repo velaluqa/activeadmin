@@ -65,12 +65,14 @@ module ActiveAdmin
       def build_action_items
         insert_tag(view_factory.action_items, @action_items)
       end
-
+ 
       def add_filter_toggle_button
-          span class: "action_item filter" do
-            a "View Filters", href: "#", "data-toggle-sidebar-sections" => "filters,search_status"
-          end
+        filter_count = (params[:q] || {}).values.reject(&:blank?).length
+        filter_label = filter_count > 0 ? "View Filters (#{filter_count})" : "View Filters"
+        span class: "action_item filter" do
+          a filter_label, href: "#", "data-toggle-sidebar-sections" => "filters,search_status"
         end
+      end
 
       def add_cart_toggle_button
         cart_count = session[:viewer_cart].present? ? session[:viewer_cart].length : 0
