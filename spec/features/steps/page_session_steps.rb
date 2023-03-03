@@ -529,3 +529,36 @@ step 'I click :string in the first :string row' do |locator, row_content|
     click_link(locator)
   end
 end
+
+step 'I see a permission matrix row for :string with the following selectable permissions:' do |subject, permissions|
+  within("li.permission", text: /\b#{subject}\b/) do
+    permissions.raw.flatten.each do |permission|
+      expect(page).to have_field(permission)
+    end
+  end
+end
+
+step 'I see a permission matrix row for :string with the following unselectable permissions:' do |subject, permissions|
+  within("li.permission", text: /\b#{subject}\b/) do
+    permissions.raw.flatten.each do |permission|
+      expect(page).to have_field(permission, disabled: true)
+    end
+  end
+end
+
+step 'I see a permission matrix row for :string I don\'t see the following selectable permissions:' do |subject, permissions|
+  within("li.permission", text: /\b#{subject}\b/) do
+    permissions.raw.flatten.each do |permission|
+      expect(page).not_to have_field(permission)
+    end
+  end
+end
+
+step 'I check permission :string for resource :string' do |permission, subject|
+  within("li.permission", text: /\b#{subject}\b/) do
+    find_field(permission).set(true)
+  end
+end
+
+
+
