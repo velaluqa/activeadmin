@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased 7.3
+
+### Patches / Fixes
+
+- Fix - (#6113) Fix permission matrix in edit roles view
+
 ## 7.3.1
 
 ### Patches / Fixes
