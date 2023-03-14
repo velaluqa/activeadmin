@@ -42,5 +42,22 @@ Feature: Destroy Form Session
     Then I don't see a row with "TestSession"
     When I click "Audit Trail" in the navigation menu
     And I click "View" in the first "FormSession" row
-    Then I see "This is a comment" in "Comment" row    
-    
+    Then I see "This is a comment" in "Comment" row
+
+  Scenario: Delete from show page saves comment for audittrail
+    Given a role "Authorized" with permissions:
+      | FormSession    | read, destroy |
+      | Version        | read          |
+    And a user "authorized.user" with role "Authorized"
+    And form session "TestSession"
+    When I sign in as user "authorized.user"
+    And I browse to form_sessions list
+    Then I see a row with "TestSession"
+    When I click link "View"
+    And I click link "Delete Form Session"
+    And I provide "This is a comment" for browser prompt and confirm
+    And I browse to form_sessions list
+    Then I don't see a row with "TestSession"
+    When I click "Audit Trail" in the navigation menu
+    And I click "View" in the first "FormSession" row
+    Then I see a row with "This is a comment"

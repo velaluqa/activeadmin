@@ -5,6 +5,7 @@
 ### Patches / Fixes
 
 - Fix - (#6113) Fix permission matrix in edit roles view
+- Fix - (ERICA-179, #6124) Delete in show page does not ask for comment
 
 ## 7.3.1
 

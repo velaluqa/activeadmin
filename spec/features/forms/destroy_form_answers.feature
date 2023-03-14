@@ -6,7 +6,7 @@ Feature: Destroy Form Answers
   Notes:
 
   - Signed form answer MUST NOT be deleted
-  
+
   Scenario: Cannot destroy signed form answers
     Given a role "Authorized" with permissions:
       | FormAnswer  | read, destroy |
@@ -46,4 +46,25 @@ Feature: Destroy Form Answers
     Then I don't see a row with "TestForm"
     When I click "Audit Trail" in the navigation menu
     And I click "View" in the first "FormAnswer" row
-    Then I see "This is a comment" in "Comment" row    
+    Then I see "This is a comment" in "Comment" row
+
+  Scenario: Delete from show page saves comment for audittrail
+    Given a role "Authorized" with permissions:
+      | FormAnswer     | read, destroy |
+      | Version        | read          |
+    And form definition "TestForm"
+    And a form answer for "TestForm" with data:
+      | textField | My Text Value   |
+      | textArea  | Some other text |
+      | number    | 15              |
+    And a user "authorized.user" with role "Authorized"
+    When I sign in as user "authorized.user"
+    And I browse to form_answers list
+    And I click "View" in "TestForm" row
+    And I click link "Delete Form Answer"
+    And I provide "This is a comment" for browser prompt and confirm
+    And I browse to form_answers list
+    Then I don't see a row with "TestAnswer"
+    When I click "Audit Trail" in the navigation menu
+    And I click "View" in the first "FormAnswer" row
+    Then I see a row with "This is a comment"

@@ -13,8 +13,8 @@ Feature: Destroy Users
      And a role "Unauthorized" with permissions:
       | User | read |
      And a user "other.user" with:
-      | name | Udo Unauthorized | 
-     And user "other.user" belongs to role "Unauthorized" 
+      | name | Udo Unauthorized |
+     And user "other.user" belongs to role "Unauthorized"
 
    Scenario: Unauthorized to destroy a user
      When I sign in as user "other.user"
@@ -37,4 +37,16 @@ Feature: Destroy Users
      When I click "Audit Trail" in the navigation menu
      And I click "View" in the first "Alex Authorized" row
      Then I see "This is a comment" in "Comment" row
-     
+
+   Scenario: Delete from show page saves comment for audittrail
+     When I sign in as user "authorized.user"
+     And I browse to users list
+     Then I see "View" in "other.user" row
+     When I click "View" in "other.user" row
+     When I click link "Delete User"
+     And I provide "This is a comment" for browser prompt and confirm
+     And I browse to users list
+     Then I don't see a row with "other.user"
+     When I click "Audit Trail" in the navigation menu
+     And I click "View" in the first "Alex Authorized" row
+     Then I see "This is a comment" in "Comment" row
