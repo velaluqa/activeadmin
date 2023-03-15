@@ -101,7 +101,17 @@ JOIN
     File.readable?(Rails.application.config.image_storage_root + '/' + image_storage_path)
   end
 
+  def save_error_file(file)
+    date = "#{Time.now.strftime('%Y%m%d')}"
+    time = "#{Time.now.strftime('%H%M%S')}"
+    file_name = "#{time}_#{file.original_filename}"
+    tmp_file_path = ERICA.backup_path.join('upload_errors', date, file_name).to_s
+    FileUtils.mkdir_p(File.dirname(tmp_file_path))
+    FileUtils.cp(file.path, tmp_file_path)
+  end
+
   def write_anonymized_file(file)
+
     tmp = Tempfile.new('image_to_anonymize')
 
     mimetype = ::File.open(file.path) { |f| Marcel::Magic.by_magic(f).type }

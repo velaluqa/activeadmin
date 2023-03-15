@@ -18,7 +18,6 @@ class V1::ImagesController < V1::ApiController
         end
         begin
           @image.write_anonymized_file(file_params[:file][:data])
-
           if DICOM::FileUtils.multi_frame?(@image.absolute_image_storage_path)
             SplitMultiFrameDicomWorker.perform_async(
               @image.id,
@@ -26,19 +25,29 @@ class V1::ImagesController < V1::ApiController
               user_id: current_user.id
             )
           end
-        rescue StandardError => e
-          @image.destroy
-          Rails.logger.error "Failed to write uploaded image to image storage: #{e.message}"
-          e.backtrace.each { |line| Rails.logger.error(line) }
-          render json: { errors: ["Error writing file to the image storage: #{e.message}"] }, status: :internal_server_error
-          return
+          render json: @image.to_json, status: :created
+        rescue StandardError => image_error
+          begin
+            @image.save_error_file(file_params[:file][:data])
+          rescue StandardError => backup_error 
+            Rails.logger.error "Failed to write backup file: #{backup_error.message}"
+          ensure
+            @image.destroy
+            Rails.logger.error "Failed to write uploaded image to image storage: #{image_error.message}"
+            image_error.backtrace.each { |line| Rails.logger.error(line) }
+            render(
+              json: {
+                errors: ["Error writing file to the image storage: #{image_error.message}"] 
+              }, 
+              status: :internal_server_error
+            )
+          end
         end
-        render json: @image.to_json, status: :created
       end
     end
   end
 
-  protected
+protected
 
   def image_params
     params.require(:image).permit(:image_series_id)

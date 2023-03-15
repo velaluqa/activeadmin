@@ -1,8 +1,10 @@
 # CHANGELOG
 
 ## Unreleased
+### Minor Changes
 
 - Feature - (#6080) - Allow users to select which columns to display in the resource view
+- Feature - (ERICA-169, #6057) - When an error happens during file upload, then the file that is to be uploaded is saved in a backup directory for further investigation.
 
 ## 7.3.1
 
