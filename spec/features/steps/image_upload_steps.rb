@@ -40,6 +40,7 @@ end
 step 'I select (image )series :string for upload' do |series|
   page.all('tr').each do |tr|
     tr.check if tr.text.include?(series)
+    has_checked_field?(tr.text)
   end
   validation_report_screenshot
 end
@@ -71,3 +72,5 @@ step 'I select required series :string for :string' do |visit_number, series|
   end
   validation_report_screenshot
 end
+
+

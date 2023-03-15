@@ -106,7 +106,7 @@ Feature: Convert differing DICOM transfer syntax
     And I click "Metadata" in "explicit_mr_rle_mono2" row
     Then another window is opened
     And I see "1.2.840.10008.1.2.1" in "TransferSyntax" row
- 
+    
   Scenario: JPEG2K is converted to Explicit Little Endian
     Given I sign in as a user with role "Image Manager"
     When I browse to image_upload page
@@ -122,4 +122,3 @@ Feature: Convert differing DICOM transfer syntax
     And I click "Metadata" in "implicit_us_jpeg2k-lossless-mono2-multiframe" row
     Then another window is opened
     And I see "1.2.840.10008.1.2.1" in "TransferSyntax" row
-
