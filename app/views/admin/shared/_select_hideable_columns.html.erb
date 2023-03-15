@@ -1,0 +1,16 @@
+<%= form_with url: url do |form| %>
+<% columns.each do |column| %> 
+<div class="form-group">
+<%= label_tag column.to_s.humanize , column.to_s.humanize %>
+<% if selected_columns.empty? || selected_columns.include?(column.to_s)  %>
+<%= check_box_tag "columns[]", column , true  , id: column %>
+<% else %>
+<%= check_box_tag "columns[]", column , false , id: column %>
+<% end %>
+</div>
+<% end %>
+<div>
+<%= submit_tag 'Submit', class: 'btn btn-primary' %>
+<%= button_tag 'Clear Selected', type: 'button', onclick: "uncheckAll()" %>
+</div>
+<% end %>

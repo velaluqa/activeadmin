@@ -161,6 +161,21 @@ ActiveAdmin.register Visit do
     customizable_default_actions(current_ability)
   end
 
+  hideable_columns(
+    columns: [
+      :patient,
+      :visit_number,
+      :description,
+      :visit_type,
+      :visit_date,
+      :state,
+      :mqc_state,
+      :mqc_date,
+      :mqc_user,
+      :tags
+    ]
+  )
+
   show do |visit|
     attributes_table do
       row :patient

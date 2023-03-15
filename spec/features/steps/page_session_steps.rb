@@ -271,6 +271,10 @@ step 'I click :string' do |locator|
   click_on(locator)
 end
 
+step 'I click button :string' do |locator|
+  find_button(locator).click
+end
+
 step 'I click link :string' do |locator|
   page.click_link(locator)
 end
@@ -335,6 +339,24 @@ step 'I don\'t see a column :string' do |name|
     found_columns += 1 if th.text.include?(name)
   end
   expect(found_columns).to eq(0), "expected not to find a table column with #{name.inspect}"
+end
+
+step 'I see the following columns:' do |table|
+  columns = table.raw.flatten
+  found_columns = 0
+  page.all("table th").map do |th|
+    found_columns += 1 if columns.include?(th.text)
+  end
+  expect(found_columns).to eq(columns.size), "expected to find all table columns (#{columns.join(", ")})"
+end
+
+step 'I don\'t see the following columns:' do |table|
+  columns = table.raw.flatten
+  found_columns = 0
+  page.all("table th").map do |th|
+    found_columns += 1 if columns.include?(th.text)
+  end
+  expect(found_columns).to eq(0), "expected not to find any table columns (#{columns.join(", ")})"
 end
 
 step 'I see a row with the following columns:' do |values|

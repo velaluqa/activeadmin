@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## Unrelease
+## Unreleased
+
+- Feature - (#6080) - Allow users to select which columns to display in the resource view
 
 ## 7.3.1
 

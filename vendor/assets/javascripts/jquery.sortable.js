@@ -116,34 +116,3 @@
     });
   };
 })(jQuery);
-
-$(document).ready(function () {
-  $("#cart_toggle").click(function () {
-    $("#viewer_cart_sidebar_section").toggle();
-    $("#cart_toggle").text(function (i, text) {
-      return text.replace(/(Close|View)/, function (match) {
-        return match === "Close" ? "View" : "Close";
-      });
-    });
-  });
-  $("#filter_toggle").click(function () {
-    $("#filters_sidebar_section,#search_status_sidebar_section").toggle();
-    $("#filter_toggle").text(function (i, text) {
-      return text.replace(/(Close|View)/, function (match) {
-        return match === "Close" ? "View" : "Close";
-      });
-    });
-  });
-
-
- $("#main_content_wrapper").click(function () {
-    $("#viewer_cart_sidebar_section,#filters_sidebar_section,#search-status-_sidebar_section").hide();
-    if ($("#cart_toggle").text() == "Close Cart") {
-      $("#cart_toggle").text("View Cart");
-    }
-    if ($("#filter_toggle").text() == "Close Filters") {
-      $("#filter_toggle").text("View Filters");
-    }
-  });
-});
-

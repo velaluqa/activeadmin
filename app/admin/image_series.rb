@@ -185,13 +185,31 @@ ActiveAdmin.register ImageSeries do
     column :files
     column :image_types
     column :state
-    comment_column(:comment, 'Comment')
-    tags_column(:tags, 'Tags') if can?(:read_tags, ImageSeries)
-
+    comment_column( 'comment', :comment)
+    tags_column(:tags, 'tags') if can?(:read_tags, ImageSeries)
     column :view_in
 
     customizable_default_actions(current_ability)
   end
+
+  hideable_columns(
+    columns: [
+      :id,
+      :study_name,
+      :patient, 
+      :visit,
+      :series_number,
+      :name,
+      :imaging_date,
+      :import_date,
+      :files,
+      :image_types,
+      :state,
+      :comment,
+      :tags,
+      :view_in
+    ]
+  )
 
   show do |image_series|
     div class: image_series.has_dicom? ? "content-columns" : "" do

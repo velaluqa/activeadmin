@@ -49,6 +49,15 @@ ActiveAdmin.register Center do
     end
   end
 
+  hideable_columns(
+    columns: [
+      :study,
+      :code,
+      :name,
+      :tags
+    ]
+  )
+  
   show do |center|
     attributes_table do
       row :study

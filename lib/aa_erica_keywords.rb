@@ -2,9 +2,10 @@ module ActiveAdmin
   module Views
     class IndexAsTable
       def tags_column(context, label)
+
         label ||= context.to_s.humanize
 
-        column label do |resource|
+        column label, context do |resource|
           can_edit = can? :update_tags, resource
 
           if resource.tags_on(context).empty?

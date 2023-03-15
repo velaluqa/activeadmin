@@ -14,14 +14,20 @@ require 'aa_erica_comment'
 require 'aa_erica_keywords'
 require 'aa_comment_paper_trail_patch'
 require 'aa_views_pages_base'
+require 'aa_hideable_column_mixin'
 
+ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::HideableColumnMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICACommentMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICAKeywordsMixin::DSL)
 ActiveAdmin::Comment
 
+
+
 Rails.application.config.to_prepare do
   ActiveAdmin::Comment.send(:include, ActiveAdminCommentPaperTrailPatch)
+  ActiveAdmin::Views::IndexAsTable::IndexTableFor.send(:include, ActiveAdmin::Views::IndexAsTableMixin)
+  ActiveAdmin::Resource.send(:include, ActiveAdmin::HideableColumns::ResourceMixin)
 end
 
 ActiveAdmin.setup do |config|

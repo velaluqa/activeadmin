@@ -171,6 +171,16 @@ ActiveAdmin.register Version do
     actions
   end
 
+  hideable_columns(
+    columns: [
+      :created_at,
+      :item_type,
+      :item,
+      :event,
+      :user
+    ]
+  )
+
   show do |version|
     attributes_table do
       row :created_at
