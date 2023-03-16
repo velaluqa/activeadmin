@@ -6,6 +6,7 @@
 
 - Feature - (#6080) - Allow users to select which columns to display in the resource view
 - Feature - (ERICA-169, #6057) - When an error happens during file upload, then the file that is to be uploaded is saved in a backup directory for further investigation.
+- Feature - (#6111) List Resources Page - Display number of active filters in `View Filters` button
 
 ## Unreleased 7.3
 
