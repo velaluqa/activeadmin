@@ -4,16 +4,23 @@
 
 ### Minor Changes
 
-- Feature - (#6080) - Allow users to select which columns to display in the resource view
-- Feature - (ERICA-169, #6057) - When an error happens during file upload, then the file that is to be uploaded is saved in a backup directory for further investigation.
-- Feature - (#6111) List Resources Page - Display number of active filters in `View Filters` button
+- Feature - (#6080) Resource Index Page - Allow users to select which columns to
+  display in the resource view
+- Feature - (ERICA-169, #6057) Image Upload - When an error happens during file
+  upload, then the file that is to be uploaded is saved in a backup directory
+  for further investigation.
+- Feature - (#6111) Resource Index Page - Display number of applied filters next
+  to the show filters button
 
 ## Unreleased 7.3
 
 ### Patches / Fixes
 
-- Fix - (#6113) Fix permission matrix in edit roles view
-- Fix - (ERICA-179, #6124) Delete in show page does not ask for comment
+- Fix - (#6113) Edit Roles - The permission matrix now shows all available
+  subjects a user can grant permissions for. Not just the ones that already have
+  permissions.
+- Fix - (ERICA-179, #6124) Resource Show Page - Delete action in show page now
+  asks for a comment for the audit trail as it does on the list resources page.
 
 ## 7.3.1
 
