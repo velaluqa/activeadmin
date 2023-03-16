@@ -14,6 +14,7 @@ require 'aa_erica_comment'
 require 'aa_erica_keywords'
 require 'aa_comment_paper_trail_patch'
 require 'aa_views_pages_base'
+require 'patches/active_admin/resource'
 
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ViewerCartMixin::DSL)
 ActiveAdmin::ResourceDSL.send(:include, ActiveAdmin::ERICACommentMixin::DSL)
@@ -287,7 +288,7 @@ ActiveAdmin.setup do |config|
         if: proc { !menu['versions'].children.empty? }
       )
     end
-    
+
     admin.build_menu :utility_navigation do |menu|
       admin.add_current_user_to_menu (menu)
       menu.add  id: "logout", priority: 20,
@@ -295,13 +296,13 @@ ActiveAdmin.setup do |config|
                 html_options: { method: :delete },
                 url: -> { render_or_call_method_or_proc_on self, active_admin_namespace.logout_link_path },
                 if:  -> { current_active_admin_user? && !session["impersonated_user_id"] }
-              
+
       menu.add  id: "stop_impersonating",
                 priority: 20,
                 label: -> { "Stop Impersonating" },
                 url: -> { "/admin/users/stop_impersonating" },
                 if:  -> { current_active_admin_user? && session["impersonated_user_id"] }
-               
+
     end
   end
 
