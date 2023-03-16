@@ -1,6 +1,6 @@
 .permissions_matrix{ class: state }
   - Ability::ACTIVITIES.each_pair do |subject, activities|
-    - if @role.allows_any?(activities, subject)
+    - if state != "show" || @role.allows_any?(activities, subject)
       %li{ class: "permission #{subject}" }
         %label.subject=subject
         %div.activities

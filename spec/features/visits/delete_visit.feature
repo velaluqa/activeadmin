@@ -1,4 +1,4 @@
-# user_requirement: 
+# user_requirement:
 # user_role: Authenticated User
 # goal: Delete an existing visit
 # category: Image Management
@@ -13,10 +13,10 @@ Feature: Delete Visits
     Given a study "FooStudy" with configuration
       """
       visit_types:
-        baseline: 
+        baseline:
           description: A simple visit type
           required_series: []
-        followup: 
+        followup:
           description: A simple visit type
           required_series: []
       """
@@ -46,7 +46,7 @@ Feature: Delete Visits
     When I browse to visit "10000"
     Then I don't see "Delete Visit"
 
-  Scenario: Successful
+  Scenario: Delete from index list page saves comment for audittrail
     Given I sign in as a user with role "Image Manager"
     When I browse to visits list
     Then I see a row with "10000" and the following columns:
@@ -65,3 +65,13 @@ Feature: Delete Visits
     And I click "View" in the first "Visit" row
     Then I see "This is a comment" in "Comment" row
 
+  Scenario: Delete from show page saves comment for audittrail
+    When I sign in as a user with role "Image Manager"
+    And I browse to visit "10000"
+    And I click link "Delete Visit"
+    And I provide "This is a comment" for browser prompt and confirm
+    And I browse to visits list
+    Then I don't see a row with "10000"
+    When I click "Audit Trail" in the navigation menu
+    And I click "View" in the first "Visit" row
+    Then I see a row with "This is a comment"

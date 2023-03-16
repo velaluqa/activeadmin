@@ -1,4 +1,4 @@
-# user_requirement: 
+# user_requirement:
 # user_role: Authenticated User
 # goal: Delete a study
 # category: Study Management
@@ -59,6 +59,18 @@ Feature: Delete Study
     When I click "Audit Trail" in the navigation menu
     And I click "View" in the first "Study" row
     Then I see a row with "This is a comment"
+
+  Scenario: Successfully delete a study in show page
+    When I sign in as a user with role "Image Manager"
+    And I browse to study "FooStudy"
+    And I click link "Delete Study"
+    And I provide "This is a comment" for browser prompt and confirm
+    And I browse to studies list
+    Then I don't see a row with "FooStudy"
+    When I click "Audit Trail" in the navigation menu
+    And I click "View" in the first "Study" row
+    Then I see a row with "This is a comment"
+
 
   # TODO: Discuss Scenario: Scoped permission to study
   # TODO: Discuss Scenario: Scoped permission to center

@@ -1,10 +1,18 @@
 # CHANGELOG
 
 ## Unreleased
+
 ### Minor Changes
 
 - Feature - (#6080) - Allow users to select which columns to display in the resource view
 - Feature - (ERICA-169, #6057) - When an error happens during file upload, then the file that is to be uploaded is saved in a backup directory for further investigation.
+
+## Unreleased 7.3
+
+### Patches / Fixes
+
+- Fix - (#6113) Fix permission matrix in edit roles view
+- Fix - (ERICA-179, #6124) Delete in show page does not ask for comment
 
 ## 7.3.1
 

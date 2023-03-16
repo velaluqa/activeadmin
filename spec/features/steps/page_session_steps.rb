@@ -18,16 +18,16 @@ end
 
 step 'I see the navigation menu with entries:' do |table|
   table.each do |(entry)|
-    expect(page).to have_link(entry), "expected to find #{entry.inspect} in #{page.text.inspect}" 
+    expect(page).to have_link(entry), "expected to find #{entry.inspect} in #{page.text.inspect}"
   end
 end
 
 step 'I see the navigation menu for :string with entries:' do |user_fullname, table|
   within("#header .navigation-wrapper") do
-    expect(page).to have_link(user_fullname), "expected to find #{user_fullname.inspect} in #{page.text.inspect}" 
+    expect(page).to have_link(user_fullname), "expected to find #{user_fullname.inspect} in #{page.text.inspect}"
 
     table.each do |(entry)|
-      expect(page).to have_link(entry), "expected to find #{entry.inspect} in #{page.text.inspect}" 
+      expect(page).to have_link(entry), "expected to find #{entry.inspect} in #{page.text.inspect}"
     end
   end
 end
@@ -252,7 +252,7 @@ step "I don't see :string within :string" do |content, locator|
   validation_report_screenshot
 end
 
-step "I see in given order:" do |elements| 
+step "I see in given order:" do |elements|
   expect(page).to have_text(/#{elements.to_a.flatten.join(".*")}/m)
 end
 
@@ -408,7 +408,7 @@ step 'I see a row with/for :string and/with the following columns:' do |locator,
       end
     end
   end
-end  
+end
 
 step 'I don\'t see a row with/for :string and/with the following columns:' do |locator, values|
   found_rows = 0
@@ -432,7 +432,7 @@ step 'I don\'t see a row with/for :string and/with the following columns:' do |l
 end
 
 step 'I see :string in :string row' do |text, row_content|
-  within('tr', text: row_content) do
+  within('tr', text: row_content, match: :first) do
     expect(page).to have_content(text)
   end
 
@@ -551,3 +551,36 @@ step 'I click :string in the first :string row' do |locator, row_content|
     click_link(locator)
   end
 end
+
+step 'I see a permission matrix row for :string with the following selectable permissions:' do |subject, permissions|
+  within("li.permission", text: /\b#{subject}\b/) do
+    permissions.raw.flatten.each do |permission|
+      expect(page).to have_field(permission)
+    end
+  end
+end
+
+step 'I see a permission matrix row for :string with the following unselectable permissions:' do |subject, permissions|
+  within("li.permission", text: /\b#{subject}\b/) do
+    permissions.raw.flatten.each do |permission|
+      expect(page).to have_field(permission, disabled: true)
+    end
+  end
+end
+
+step 'I see a permission matrix row for :string I don\'t see the following selectable permissions:' do |subject, permissions|
+  within("li.permission", text: /\b#{subject}\b/) do
+    permissions.raw.flatten.each do |permission|
+      expect(page).not_to have_field(permission)
+    end
+  end
+end
+
+step 'I check permission :string for resource :string' do |permission, subject|
+  within("li.permission", text: /\b#{subject}\b/) do
+    find_field(permission).set(true)
+  end
+end
+
+
+
