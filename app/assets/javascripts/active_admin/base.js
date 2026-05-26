@@ -127,7 +127,7 @@
       });
     }
   };
-  $(document).ready(onDOMReady$2).on("page:load turbolinks:load", onDOMReady$2);
+  $(document).ready(onDOMReady$2).on("page:load turbolinks:load turbo:load", onDOMReady$2);
   var CheckboxToggler = function() {
     function CheckboxToggler(options, container) {
       this.options = options;
@@ -293,7 +293,7 @@
   var onDOMReady$1 = function onDOMReady() {
     return $(".dropdown_menu").aaDropdownMenu();
   };
-  $(document).ready(onDOMReady$1).on("page:load turbolinks:load", onDOMReady$1);
+  $(document).ready(onDOMReady$1).on("page:load turbolinks:load turbo:load", onDOMReady$1);
   function hasTurbolinks() {
     return typeof Turbolinks !== "undefined" && Turbolinks.supported;
   }
@@ -428,7 +428,7 @@
       }
     });
   };
-  $(document).ready(init_sortable).on("page:load turbolinks:load", init_sortable);
+  $(document).ready(init_sortable).on("page:load turbolinks:load turbo:load", init_sortable);
   var PerPage = function() {
     function PerPage(element) {
       this.element = element;
@@ -510,7 +510,7 @@
   var onDOMReady = function onDOMReady() {
     return $("#active_admin_content .tabs").tabs();
   };
-  $(document).ready(onDOMReady).on("page:load turbolinks:load", onDOMReady);
+  $(document).ready(onDOMReady).on("page:load turbolinks:load turbo:load", onDOMReady);
   function modal_dialog(message, inputs, callback) {
     console.warn("ActiveAdmin.modal_dialog is deprecated in favor of ActiveAdmin.ModalDialog, please update usage.");
     return ModalDialog(message, inputs, callback);
